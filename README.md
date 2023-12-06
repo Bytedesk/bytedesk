@@ -1,8 +1,8 @@
-# OpenGPTs
+# Bytedesk
 
 This is an open source effort to create a similar experience to OpenAI's GPTs and Assistants API.
 It builds upon [LangChain](https://github.com/langchain-ai/langchain), [LangServe](https://github.com/langchain-ai/langserve) and [LangSmith](https://smith.langchain.com/).
-OpenGPTs gives you more control, allowing you to configure:
+Bytedesk gives you more control, allowing you to configure:
 
 - The LLM you use (choose between the 60+ that LangChain offers)
 - The prompts you use (use LangSmith to debug those)
@@ -12,12 +12,12 @@ OpenGPTs gives you more control, allowing you to configure:
 - The chat history database you use
 
 <p align="center">
-    <img alt="Configure" src="_static/configure.png" width="49%" />
-    <img alt="Chat" src="_static/chat.png" width="49%" />
+    <!-- <img alt="Configure" src="_static/configure.png" width="49%" /> -->
+    <!-- <img alt="Chat" src="_static/chat.png" width="49%" /> -->
 </p>
 
 **Key Links**
-- [GPTs: a simple hosted version](https://opengpts-example-vz4y4ooboq-uc.a.run.app/)
+- [GPTs: a simple hosted version](https://Bytedesk-example-vz4y4ooboq-uc.a.run.app/)
 - [Assistants API: a getting started guide](API.md)
 
 ## Quickstart
@@ -129,7 +129,7 @@ As much as possible, we are striving for feature parity with OpenAI.
 
 ## Customization
 
-The big appeal of OpenGPTs as compared to using OpenAI directly is that it is more customizable.
+The big appeal of Bytedesk as compared to using OpenAI directly is that it is more customizable.
 Specifically, you can choose which language models to use as well as more easily add custom tools.
 You can also use the underlying APIs directly and build a custom UI yourself should you choose.
 
@@ -277,5 +277,5 @@ You can deploy to GCP Cloud Run using the following command:
 First create a `.env.gcp.yaml` file with the contents from `.env.gcp.yaml.example` and fill in the values. Then run:
 
 ```shell
-gcloud run deploy opengpts --source . --port 8001 --env-vars-file .env.gcp.yaml --allow-unauthenticated --region us-central1 --min-instances 1
+gcloud run deploy Bytedesk --source . --port 8001 --env-vars-file .env.gcp.yaml --allow-unauthenticated --region us-central1 --min-instances 1
 ```
