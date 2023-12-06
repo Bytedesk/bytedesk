@@ -1,28 +1,41 @@
-## Getting Started
+# Website
 
-First, run the development server:
+This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
 
-```bash
-yarn dev
+### Installation
+
+```
+$ yarn
 ```
 
-Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
+### Local Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+$ yarn start
+```
 
-To create [API routes](https://nextjs.org/docs/app/building-your-application/routing/router-handlers) add an `api/` directory to the `app/` directory with a `route.ts` file. For individual endpoints, create a subfolder in the `api` directory, like `api/hello/route.ts` would map to [http://localhost:3001/api/hello](http://localhost:3001/api/hello).
+This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
-## Learn More
+### Build
 
-To learn more about Next.js, take a look at the following resources:
+```
+$ yarn build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn/foundations/about-nextjs) - an interactive Next.js tutorial.
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Deployment
 
-## Deploy on Vercel
+Using SSH:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_source=github.com&utm_medium=referral&utm_campaign=turborepo-readme) from the creators of Next.js.
+```
+$ USE_SSH=true yarn deploy
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Not using SSH:
+
+```
+$ GIT_USER=<Your GitHub username> yarn deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.

@@ -152,4 +152,6 @@ export default defineConfig({
     strategy: 'normal',
   },
   requestRecord: {},
+  // fatal - [esbuildHelperChecker] Found conflicts in esbuild helpers..., please set esbuildMinifyIIFE: true in your config file
+  esbuildMinifyIIFE: true,
 });
