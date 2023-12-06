@@ -1,0 +1,68 @@
+[tool.poetry]
+name = "opengpts"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+sse-starlette = "^1.6.5"
+tomli-w = "^1.0.0"
+uvicorn = "^0.23.2"
+fastapi = "^0.103.2"
+langserve = ">=0.0.16"
+# Uncomment if you need to work from a development branch
+# This will only work for local development though!
+# langchain = { git = "git@github.com:langchain-ai/langchain.git/", branch = "nc/subclass-runnable-binding" , subdirectory = "libs/langchain"}
+gizmo-agent = {path = "packages/gizmo-agent", develop = true}
+agent-executor = {path = "packages/agent-executor", develop = true}
+orjson = "^3.9.10"
+redis = "^5.0.1"
+python-multipart = "^0.0.6"
+tiktoken = "^0.5.1"
+langchain = ">=0.0.338"
+permchain = "0.0.6"
+pydantic = "<2.0"
+
+[tool.poetry.group.dev.dependencies]
+uvicorn = "^0.23.2"
+pygithub = "^2.1.1"
+
+[tool.poetry.group.lint.dependencies]
+ruff = "^0.1.4"
+codespell = "^2.2.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.1"
+pytest-cov = "^4.0.0"
+pytest-asyncio = "^0.21.1"
+pytest-mock = "^3.11.1"
+pytest-socket = "^0.6.0"
+pytest-watch = "^4.2.0"
+pytest-timeout = "^2.2.0"
+
+[tool.coverage.run]
+omit = [
+    "tests/*",
+]
+
+[tool.pytest.ini_options]
+# --strict-markers will raise errors on unknown marks.
+# https://docs.pytest.org/en/7.1.x/how-to/mark.html#raising-errors-on-unknown-marks
+#
+# https://docs.pytest.org/en/7.1.x/reference/reference.html
+# --strict-config       any warnings encountered while parsing the `pytest`
+#                       section of the configuration file raise errors.
+addopts = "--strict-markers --strict-config --durations=5 -vv"
+# Use global timeout of 30 seconds for now.
+# Most tests should be closer to ~100 ms, but some of the tests involve
+# parsing files. We can adjust on a per test basis later on.
+timeout = 30
+asyncio_mode = "auto"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

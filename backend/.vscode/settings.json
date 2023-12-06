@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./packages/gizmo-agent",
+        "./packages/agent-executor"
+    ]
+}
