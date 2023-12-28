@@ -1,11 +1,11 @@
 {
-  "name": "docs",
+  "name": "visitor",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 9005",
+    "dev": "next dev --port 9004",
     "build": "next build",
-    "start": "next start --port 9005",
+    "start": "next start --port 9004",
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
