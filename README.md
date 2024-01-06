@@ -1,11 +1,19 @@
 # Bytedesk
 
+ Bytedesk is an open source Zendesk/Intercom Alternative
+
 ## Getting Started
 
-### Server
+### tech stacks
 
-#### Spring Boot
+- java 17
+- mysql/postgre
 
-#### Python
+### start up
 
-### Admin
+```bash
+# Steps to get bytedesk server start up
+
+```
+
+## Others
