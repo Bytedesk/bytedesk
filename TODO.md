@@ -1,1 +1,3 @@
 # TODO:
+
+- support plugins
