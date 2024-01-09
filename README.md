@@ -1,6 +1,6 @@
 # Bytedesk
 
- Bytedesk is an open source Zendesk/Intercom Alternative
+Customer Service With AI
 
 ## Getting Started
 
