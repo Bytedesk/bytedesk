@@ -1,103 +1,108 @@
-# Bytedesk License
+License restrictions
+Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+仅支持企业内部员工自用，严禁用于销售、二次销售或者部署SaaS方式销售
 
-By using the software, you agree to all of the terms and conditions below.
+Business Source License 1.1
 
-## Copyright License
+Parameters
 
-The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software, in each case subject to the limitations and conditions below.
+Licensor:             Bytedesk, Inc.
+Licensed Work:        Bytedesk IM
+                      The Licensed Work is (c) 2020 Bytedesk IM, Inc.
+Additional Use Grant: You may make use of the Licensed Work, provided that
+                      you may not use the Licensed Work for a Document
+                      Service.
 
-## Limitations
+                      A “Document Service” is a commercial offering that
+                      allows third parties (other than your employees and
+                      contractors) to access the functionality of the
+                      Licensed Work by creating teams and documents
+                      controlled by such third parties.
 
-You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software.
+Change Date:          2027-08-18
 
-You may not move, change, disable, or circumvent the license key functionality in the software, and you may not remove or obscure any functionality in the software that is protected by the license key.
+Change License:       Apache License, Version 2.0
 
-You may not alter, remove, or obscure any licensing, copyright, or other notices of the licensor in the software. Any use of the licensor’s trademarks is subject to applicable law.
+For information about alternative licensing arrangements for the Software,
+please visit: https://www.bytedesk.com
 
-## Patents
+Notice
 
-The licensor grants you a license, under any patent claims the licensor can license, or becomes able to license, to make, have made, use, sell, offer for sale, import and have imported the software, in each case subject to the limitations and conditions in this license. This license does not cover any patent claims that you cause to be infringed by modifications or additions to the software. If you or your company make any written claim that the software infringes or contributes to infringement of any patent, your patent license for the software granted under these terms ends immediately. If your company makes such a claim, your patent license ends immediately for work on behalf of your company.
+The Business Source License (this document, or the “License”) is not an Open
+Source license. However, the Licensed Work will eventually be made available
+under an Open Source License, as stated in this License.
 
-## Notices
+License text copyright (c) 2013 Beijing Weiyu Tianxia Keji Youxian Gongsi(Bytedesk), All Rights Reserved.
+“Business Source License” is a trademark of Bytedesk Corporation.
 
-You must ensure that anyone who gets a copy of any part of the software from you also gets a copy of these terms.
+-----------------------------------------------------------------------------
 
-If you modify the software, you must include in any modified copies of the software prominent notices stating that you have modified the software.
+Business Source License 1.1
 
-## No Other Rights
+Terms
 
-These terms do not imply any licenses other than those expressly granted in these terms.
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and make non-production use of the Licensed Work. The
+Licensor may make an Additional Use Grant, above, permitting limited
+production use.
 
-## Termination
+Effective on the Change Date, or the fourth anniversary of the first publicly
+available distribution of a specific version of the Licensed Work under this
+License, whichever comes first, the Licensor hereby grants you rights under
+the terms of the Change License, and the rights granted in the paragraph
+above terminate.
 
-If you use the software in violation of these terms, such use is not licensed, and your licenses will automatically terminate. If the licensor provides you with a notice of your violation, and you cease all violation of this license no later than 30 days after you receive that notice, your licenses will be reinstated retroactively. However, if you violate these terms after such reinstatement, any additional violation of these terms will cause your licenses to terminate automatically and permanently.
+If your use of the Licensed Work does not comply with the requirements
+currently in effect as described in this License, you must purchase a
+commercial license from the Licensor, its affiliated entities, or authorized
+resellers, or you must refrain from using the Licensed Work.
 
-## No Liability
+All copies of the original and modified Licensed Work, and derivative works
+of the Licensed Work, are subject to this License. This License applies
+separately for each version of the Licensed Work and the Change Date may vary
+for each version of the Licensed Work released by Licensor.
 
-As far as the law allows, the software comes as is, without any warranty or condition, and the licensor will not be liable to you for any damages arising out of these terms or the use or nature of the software, under any kind of legal claim.
+You must conspicuously display this License on each original or modified copy
+of the Licensed Work. If you receive the Licensed Work in original or
+modified form from a third party, the terms and conditions set forth in this
+License apply to your use of that work.
 
-## Definitions
+Any use of the Licensed Work in violation of this License will automatically
+terminate your rights under this License for the current and all other
+versions of the Licensed Work.
 
-The licensor is the entity offering these terms, and the software is the software the licensor makes available under these terms, including any portion of it.
+This License does not grant you any right in any trademark or logo of
+Licensor or its affiliates (provided that you may use a trademark or logo of
+Licensor as expressly required by this License).
 
-you refers to the individual or entity agreeing to these terms.
+TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSED WORK IS PROVIDED ON
+AN “AS IS” BASIS. LICENSOR HEREBY DISCLAIMS ALL WARRANTIES AND CONDITIONS,
+EXPRESS OR IMPLIED, INCLUDING (WITHOUT LIMITATION) WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND
+TITLE.
 
-your company is any legal entity, sole proprietorship, or other kind of organization that you work for, plus all organizations that have control over, are under the control of, or are under common control with that organization. control means ownership of substantially all the assets of an entity, or the power to direct its management and policies by vote, contract, or otherwise. Control can be direct or indirect.
+MariaDB hereby grants you permission to use this License’s text to license
+your works, and to refer to it using the trademark “Business Source License”,
+as long as you comply with the Covenants of Licensor below.
 
-your licenses are all the licenses granted to you for the software under these terms.
+Covenants of Licensor
 
-use means anything you do with the software requiring one of your licenses.
+In consideration of the right to use this License’s text and the “Business
+Source License” name and trademark, Licensor covenants to MariaDB, and to all
+other recipients of the licensed work to be provided by Licensor:
 
-trademark means trademarks, service marks, and similar rights.
+1. To specify as the Change License the GPL Version 2.0 or any later version,
+   or a license that is compatible with GPL Version 2.0 or a later version,
+   where “compatible” means that software provided under the Change License can
+   be included in a program with software provided under GPL Version 2.0 or a
+   later version. Licensor may specify additional Change Licenses without
+   limitation.
 
-## Bytedesk许可证
+2. To either: (a) specify an additional grant of rights to use that does not
+   impose any additional restriction on the right granted in this License, as
+   the Additional Use Grant; or (b) insert the text “None”.
 
-通过使用本软件，您同意以下所有条款和条件。
+3. To specify a Change Date.
 
-## 版权许可
-
-许可方向您授予一项非独占、免费、全球范围内的、不可转让的、不可再许可的许可证，以使用、复制、分发、提供、以及制作本软件的衍生作品，但在每种情况下都要遵守以下限制和条件。
-
-## 限制
-
-您不得将本软件作为托管或托管服务提供给第三方，其中该服务向用户提供对软件的任何实质性功能或特性的访问。
-
-您不得移动、更改、禁用或规避软件中的许可证密钥功能，并且您不得移除或掩盖受许可证保护的软件中的任何功能。
-
-您不得更改、移除或掩盖许可方在软件中的任何许可、版权或其他通知。对许可方商标的任何使用均受适用法律的约束。
-
-## 专利
-
-许可方向您授予一项许可证，用于根据许可方能够许可的任何专利权主张，或者在许可方能够许可的情况下，制造、使用、销售、出售、进口和引进该软件，但在每种情况下均受本许可证中的限制和条件约束。本许可证不涵盖您因对软件进行修改或添加而导致侵权的任何专利权主张。如果您或您的公司对软件侵犯或导致侵犯任何专利的行为提出任何书面索赔，根据这些条款，您对该软件的专利许可将立即终止。如果您的公司提出此类索赔，您公司代表工作的工作将立即终止。
-
-## 通知
-
-您必须确保任何从您处获取该软件任何部分副本的人也得到这些条款的副本。
-
-如果您修改了该软件，您必须在任何修改后的软件副本中包含突出显示的通知，说明您已对该软件进行了修改。
-
-## 无其他权利
-
-这些条款不暗示除这些条款明确授予的许可之外的任何许可。
-
-## 终止
-
-如果您违反这些条款使用该软件，则此类使用未获得许可，您的许可将自动终止。如果许可方向您发送有关违规的通知，并且您在接收到该通知后的30天内停止所有违规行为，您的许可将被以追溯性的方式恢复。然而，如果您在此类恢复后违反这些条款，任何进一步违反这些条款的行为将导致您的许可自动和永久终止。
-
-## 免责声明
-
-在法律允许的范围内，本软件按原样提供，没有任何明示或暗示的保证或条件，许可方对于因这些条款或使用或性质而产生的任何损害不承担任何责任，不论根据何种法律主张。
-
-## 定义
-
-许可方是提供这些条款的实体，软件是许可方根据这些条款提供的软件，包括其中的任何部分。
-
-您指的是同意这些条款的个人或实体。
-
-您的公司是指您所工作的任何法人实体、独资企业或其他类型的组织，以及对该组织拥有控制权、受其控制或与其共同受控的所有组织。控制是指对实体的几乎所有资产的所有权，或者通过投票、合同或其他方式对其进行管理和决策的权力。控制可以直接或间接进行。
-
-您的许可是在这些条款下授予您的所有针对该软件的许可证。
-
-使用是指您使用软件所需的任何操作。
-
-商标指商标、服务标志和类似权利。
+4. Not to modify this License in any other way.
