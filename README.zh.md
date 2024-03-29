@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 18:17:42
+ * @LastEditTime: 2024-03-29 18:21:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,8 +32,8 @@ cd bytedesk/starter
 mvn spring-boot:run
 # 本地预览
 # web: http://localhost:9003/
-# admin: http://localhost:9003/admin
-# api docs: http://localhost:9003/swagger-ui/index.html
+# 管理后台: http://localhost:9003/admin, 用户名: admin, 密码: admin
+# api文档: http://localhost:9003/swagger-ui/index.html
 ```
 
 ## 预览

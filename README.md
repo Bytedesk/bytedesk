@@ -32,7 +32,7 @@ cd bytedesk/starter
 mvn spring-boot:run
 # local preview:
 # web: http://localhost:9003/
-# admin: http://localhost:9003/admin
+# admin: http://localhost:9003/admin, default user/password: admin/admin
 # api docs: http://localhost:9003/swagger-ui/index.html
 ```
 
