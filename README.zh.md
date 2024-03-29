@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 17:53:01
+ * @LastEditTime: 2024-03-29 18:17:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,12 +30,22 @@ mvn install -Dmaven.test.skip=true
 # 修改 the value of spring.redis.host and spring.redis.port
 cd bytedesk/starter
 mvn spring-boot:run
+# 本地预览
+# web: http://localhost:9003/
+# admin: http://localhost:9003/admin
+# api docs: http://localhost:9003/swagger-ui/index.html
 ```
+
+## 预览
+
+- [官网](https://www.weiyuai.cn/)
+- [管理后台](https://www.weiyuai.cn/admin)
 
 ## 常用命令
 
 ```bash
 # vscode 点击左侧的debug，运行和调试，会自动热加载
+- cd bytedesk/starter
 - 启动：mvn spring-boot:run
 - 清理：mvn clean
 - 查看依赖：mvn dependency:tree
