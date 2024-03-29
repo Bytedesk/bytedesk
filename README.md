@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 17:52:29
+ * @LastEditTime: 2024-03-29 18:17:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,16 @@ mvn install -Dmaven.test.skip=true
 # change the value of spring.redis.host and spring.redis.port
 cd bytedesk/starter
 mvn spring-boot:run
+# local preview:
+# web: http://localhost:9003/
+# admin: http://localhost:9003/admin
+# api docs: http://localhost:9003/swagger-ui/index.html
 ```
+
+## Preview
+
+- [Web](https://www.weiyuai.cn/)
+- [Web Admin](https://www.weiyuai.cn/admin)
 
 ## Contact
 
