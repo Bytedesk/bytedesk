@@ -81,7 +81,9 @@ api文档: http://localhost:9003/swagger-ui/index.html
 
 ## Download
 
-- [TODO: Desktop](https://www.weiyuai.cn/download.html)
+- [TODO: Windows](https://www.weiyuai.cn/download.html)
+- [TODO: Mac](https://www.weiyuai.cn/download.html)
+- [TODO: Linux](https://www.weiyuai.cn/download.html)
 - [TODO: Android](https://www.weiyuai.cn/download.html)
 - [TODO: IOS](https://www.weiyuai.cn/download.html)
 
