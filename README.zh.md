@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 17:43:16
+ * @LastEditTime: 2024-03-29 17:51:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,8 +17,8 @@
 
 基于AI的企业IM和在线客服系统
 
-- [English](./readme.md)
-- [中文](./readme.zh.md)
+- [English](./README.md)
+- [中文](./README.zh.md)
 
 ## 快速开始
 
