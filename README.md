@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 16:53:35
+ * @LastEditTime: 2024-03-29 17:18:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,4 +33,7 @@ mvn spring-boot:run
 
 ## ⚠️ [Disclaimer](https://www.weiyuai.cn/)
 
-By using bytedesk, you agree to accept **full responsibility** for your actions related to its use. Additionally, you agree **not** to hold any contributors to the bytedesk project responsible for any result of your use of it. The developers of bytedesk do not endorse illegal activity.
+Please be aware of the BSL license restrictions before installing Bytedesk IM
+
+- selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+- 仅支持企业内部员工自用，严禁用于销售、二次销售或者部署SaaS方式销售，请勿用于商业或非法用途。
