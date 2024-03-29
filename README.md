@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 22:26:27
+ * @LastEditTime: 2024-03-29 22:31:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,9 +26,10 @@ Bytedesk is a team collaboration and customer service platform.
 
 ## Technical Stack
 
-- [springboot-3.2.0](https://spring.io/projects/spring-boot)
-- [react-18.2.0](https://reactjs.org/)
-- [electron-29.1.0](https://www.electronjs.org/)
+- [springboot-3.2.0](https://spring.io/projects/spring-boot) for backend
+- [react-18.2.0](https://reactjs.org/) for frontend
+- [react-native-0.73.4](https://reactnative.dev/) for mobile(ios&android)
+- [electron-29.1.0](https://www.electronjs.org/) for desktop(windows&mac&linux)
 
 ## Getting Started
 
