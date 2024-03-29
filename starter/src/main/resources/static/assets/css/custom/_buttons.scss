@@ -1,0 +1,211 @@
+// 
+// buttons.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional styles for theme
+// 
+
+.btn {
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  outline: 0;
+  white-space: nowrap;
+  margin-bottom: 6px;
+}
+.input-group .btn{
+  margin-bottom: 0;
+}
+.btn-xs{
+  padding: 0.4rem 0.6rem;
+  font-size: 0.6rem;
+  line-height: 1.2;
+  border-radius: $btn-border-radius;
+}
+
+.btn-light {
+  background: var(--#{$prefix}light);
+  border-color: var(--#{$prefix}light);
+  color: var(--#{$prefix}gray-900);
+  &.active, &:active, &:focus, &:hover {
+    background: var(--#{$prefix}gray-200);
+    border-color: var(--#{$prefix}gray-200);
+    color: var(--#{$prefix}gray-900);
+  }
+}
+
+
+// button white
+.btn-white {
+  background: $white;
+  color: $gray-800;
+  &.active, &:active, &:focus, &:hover {
+    background: $gray-200;
+    color: $gray-800;
+    border-color:  $gray-200;
+  }
+}
+.btn-outline-white {
+  background: transparent;
+  border-color: $white;
+  color: $white;
+  &.active, &:active, &:focus, &:hover {
+    color: $gray-800;
+    background: $white;
+  }
+}
+
+.btn-outline-light{
+  background: transparent;
+  border-color: var(--#{$prefix}gray-400);
+  color: var(--#{$prefix}body-color);
+	&:active, &:hover, &:focus{
+		background: var(--#{$prefix}gray-400);
+		border-color: var(--#{$prefix}gray-400);
+		color: var(--#{$prefix}gray-800);
+	}
+}
+.btn-check:checked + .btn-outline-light
+{
+  background: var(--#{$prefix}gray-400);
+  border-color: var(--#{$prefix}gray-400);
+  color: var(--#{$prefix}gray-800);
+}
+
+// button round
+.btn-round{
+  height: 40px;
+  width: 40px;
+  line-height: 40px;
+  border-radius: 50%;
+  padding: 0;
+  text-align: center;
+  i{
+    margin:0; 
+  }
+  // Quick fix for play button centered
+  .fa-play{
+    padding-left: 3px;
+  }
+  &.btn-lg{
+    height: 55px;
+    width: 55px;
+    line-height: 55px;
+  }
+  &.btn-sm{
+    height: 32px;
+    width: 32px;
+    line-height: 30px;
+    i{
+      font-size: .6rem;
+    }
+  }
+}
+
+// Quick fix for play button centered in RTL
+/*rtl:raw:
+.btn-round .fa-play{
+  padding-left: 3px;
+  padding-right: 0;
+}
+*/
+
+// button soft
+@mixin button-soft-variant($color, $soft-background: rgba($color, .1)) {
+  color: $color;
+  background-color: $soft-background;
+  &:active, &:hover {
+    color: color-contrast($color) !important;
+    background-color: $color !important;
+    border-color: $color !important; 
+  }
+  &:focus {
+    color: $color;
+    background-color: $soft-background;
+    border-color: transparent; 
+  }
+}
+@each $color, $value in $theme-colors {
+  .btn-#{$color}-soft {
+    @include button-soft-variant($value);
+  }
+}
+
+// Button shadow
+@mixin btn-shadow($color,
+  $background:($color), 
+  $box-shadow: 0 0 0 8px rgba($color, .4),
+  $hover-background: if($color == $color-contrast-light, shade-color($background, $btn-hover-bg-shade-amount), tint-color($background, $btn-hover-bg-tint-amount)),
+  $hover-color: color-contrast($hover-background)
+) {
+  color:$white;
+  box-shadow: $box-shadow;
+  background-color: $background;
+  &:active, &:hover {
+    color: $hover-color;
+    background-color: $background;
+    border-color: $hover-background;
+    box-shadow: 0 0 0 10px rgba($color, .4),
+  }
+  .btn-check:focus + &,
+  &:focus {
+    color: $hover-color;
+    background-color: $background;
+    border-color: $hover-background;
+    box-shadow: 0 0 0 10px rgba($color, .4),
+  }
+}
+@each $color, $value in $theme-colors {
+  .btn-#{$color}-shadow {
+    transition: $transition-base;
+      @include btn-shadow($value);
+  }
+}
+
+// Button primary soft check hover
+.btn-primary-soft-check:hover {
+  background-color: rgba(var(--#{$prefix}primary-rgb), 0.2);
+  border-color: rgba($primary, 0.0);
+}
+.btn-check:active+.btn-primary-soft-check, .btn-check:checked+.btn-primary-soft-check, .btn-primary-soft-check.active, .btn-primary-soft-check:active, .show>.btn-primary-soft-check.dropdown-toggle {
+  background-color: rgba(var(--#{$prefix}primary-rgb), 0.2);
+  color: var(--#{$prefix}primary);
+  border-color: rgba($primary, 0.0);
+}
+.btn-check:focus + .btn, .btn-round-shadow:focus {
+  box-shadow: none;
+}
+
+// Advance filter see more
+.btn-more i{
+  transition: $transition-base;
+}
+.btn-more[aria-expanded="true"] i{
+  transform: rotate(180deg);
+  transition: $transition-base;
+  transform-origin: center;
+
+}
+.btn-more .see-more{
+  display:block;
+}
+.btn-more .see-less{
+  display:none;
+}
+.btn-more[aria-expanded="true"] .see-more{
+  display:none;
+}
+.btn-more[aria-expanded="true"] .see-less{
+  display:block;
+}
+
+//Hover transition
+.btn-transition {
+  transition: all .2s ease-in-out;
+}
+.btn-transition:focus, .btn-transition:hover {
+  -webkit-transform: translateY(-.1875rem);
+  transform: translateY(-.1875rem);
+}

@@ -1,0 +1,3 @@
+rootProject.name = 'team'
+include ':core'
+project(':core').projectDir = new File('../core')

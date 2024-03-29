@@ -1,0 +1,38 @@
+// 
+// tables.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional styles for theme
+// 
+
+.table.table-dark-gray {
+  thead{
+  background-color: var(--#{$prefix}dark) !important;
+  color: var(--#{$prefix}white);
+  }
+  tbody{
+    border-top: none;
+  }
+}
+
+.table td, .table th {
+  white-space: nowrap;
+}
+
+@media (min-width: 767.98px) {
+  .table-responsive .table td, .table-responsive .table th {
+    white-space: inherit;
+  }
+}
+@media (max-width: 767.98px) {
+  .table-responsive .table-responsive-title{
+    width: 200px;
+    white-space: normal;
+  }
+}
+
+.table-border-color{
+  border-color: var(--#{$prefix}gray-300);
+}

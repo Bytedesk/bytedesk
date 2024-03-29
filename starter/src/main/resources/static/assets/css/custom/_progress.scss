@@ -1,0 +1,86 @@
+// 
+// progress.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+//
+.progress{
+    position: relative;
+    overflow-x: visible;
+    overflow-y: visible;
+  .progress-bar{
+    position: relative;
+    overflow: visible;
+    border-radius: $border-radius;
+  }
+  .progress-percent{
+    color: var(--#{$prefix}gray-600);
+    font-weight: $font-weight-normal;
+    line-height: 24px;
+    position: absolute;
+    right: 0;
+    top: -24px;
+    font-size: 12px;
+  }
+  .progress-percent-simple {
+    position: absolute;
+    right: 0;
+    top: -20px;
+    font-size: 14px;
+  } 
+}
+
+// progress percent style
+.progress.progress-percent-bg .progress-percent {
+  background: var(--#{$prefix}dark);
+  padding: 2px 5px;
+  border-radius: 2px;
+  color: var(--#{$prefix}body-bg);
+  line-height: 16px;
+  position: absolute;
+  right: 0;
+  top: -25px;
+  font-size: 10px;
+  &:before {
+    border-top-color: var(--#{$prefix}dark);
+    border-width: 5px;
+    left: 50%;
+    margin-left: -5px;
+  }
+  &:after, &:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  &:after {
+    border-top-color: var(--#{$prefix}dark);
+    border-width: 4px;
+    left: 50%;
+    margin-left: -4px;
+  }
+}
+
+// progress size
+.progress {
+  &.progress-xs {
+    height: 3px;
+  }
+  &.progress-sm {
+    height: 5px;
+  }
+  &.progress-md {
+    height: 10px;
+  }
+  &.progress-lg {
+    height: 16px;
+  }
+  &.progress-xl {
+    height: 20px;
+  }
+}

@@ -1,0 +1,251 @@
+// 
+// tiny-slider.scss
+// Theme Component
+// Vendor css override and new css added
+
+.tns-outer{
+  position: relative;
+}
+.tns-item{
+  touch-action: pan-y;
+  user-select: none;
+}
+.tiny-slider{
+  .item{
+    position: relative;
+  }
+}
+
+//
+// Slider arrow
+//
+.tns-controls{
+  [data-controls] {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: $border-radius;
+    display: block;
+    z-index: 9;
+    text-align: center;
+    transition: $transition-base;
+    background: rgba(var(--bs-white-rgb), 0.3);
+    color: var(--#{$prefix}white);
+    border: none;
+    margin: 0 10px;
+    &:hover{
+      background-color: var(--#{$prefix}primary);
+      color: var(--#{$prefix}white);
+    }
+    i{
+      line-height: inherit;
+    }
+  }
+}
+
+.tns-controls [data-controls='prev'] {
+  left: 0;
+}
+.tns-controls [data-controls='next'] {
+  right: 0;
+}
+
+/* rtl:raw:
+.tiny-slider .tns-controls [data-controls]{
+  transform: scaleX(-1) translateY(-50%);
+}
+.tiny-slider.arrow-creative .tns-controls [data-controls]{
+  transform: scaleX(1) translateY(-50%);
+}
+.tns-visually-hidden {
+  right: -10000em !important;
+  left: 0 !important;
+}
+*/
+
+// arrow dark
+.arrow-dark{
+  [data-controls] {
+    background: var(--#{$prefix}dark);
+    color: var(--#{$prefix}white);
+  }
+}
+
+// arrow white
+.arrow-white{
+  [data-controls] {
+    background-color: var(--#{$prefix}white);
+    color: var(--#{$prefix}body-color);
+  }
+}
+
+// arrow gray
+.arrow-gray{
+  [data-controls] {
+    background: var(--#{$prefix}gray-300);
+    color: var(--#{$prefix}dark);
+  }
+}
+
+// arrow round
+.arrow-round{
+  [data-controls] {
+    border-radius: 50%;
+  }
+}
+
+// arrow blur
+.arrow-blur{
+  [data-controls]{
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.4)!important;
+    &:hover{
+      backdrop-filter: blur(0px);
+      background: rgba(0, 0, 0, 0.4)!important;
+    }
+  }
+  &.arrow-white{
+    [data-controls]{
+      background-color: rgba($body-bg, 0.2)!important;
+      color: var(--#{$prefix}white);
+    }
+  }
+}
+
+// arrow hover
+.arrow-hover{
+  overflow: hidden;
+  [data-controls='prev']{
+    left: -75px;
+  }
+  [data-controls='next']{
+    right: -75px;
+  }
+  &:hover{
+    [data-controls='prev']{
+    left: 0px;
+    }
+    [data-controls='next']{
+      right: 0px;
+    }
+  }
+}
+
+// arrow xs
+.arrow-xs{
+  .tns-controls [data-controls]{
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// arrow md none
+@include media-breakpoint-down(md) {
+  .arrow-md-none [data-controls] {
+    display: none;
+  }
+}
+
+// Arrow creative
+.arrow-creative .fa-chevron-left:before {
+  content: "\f060" !important;
+}
+.arrow-creative .fa-chevron-right:before {
+  content: "\f061" !important;
+}
+
+// 
+// Slider dots
+// 
+.tns-nav{
+  position: absolute;
+  top: 100%;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: auto;
+  text-align: center;
+  white-space: nowrap;
+  [data-nav] {
+    position: relative;
+    display: inline-block;
+    margin: 0 4px;
+    padding: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: inset 0 0 0 2px var(--#{$prefix}gray-500);
+    transition: $transition-base;
+    border: 0;
+    &:after{
+      border-radius: 50%;
+      overflow: hidden;
+      content: '';
+      position: absolute;
+      bottom: 0;
+      height: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--#{$prefix}gray-500);
+      box-shadow: 0 0 1px var(--#{$prefix}gray-500);
+      -webkit-transition: height 0.3s ease-in-out;
+      transition: height 0.3s ease-in-out;
+    }
+  }
+  .tns-nav-active{
+    &:after{
+      height: 100%;
+    }
+  }
+}
+
+// Dots inside
+.dots-inside .tns-nav{
+  top: auto;
+  padding-bottom: 20px;
+}
+
+// Dots primary
+.dots-primary .tns-nav{
+  [data-nav] {
+    box-shadow: inset 0 0 0 2px var(--#{$prefix}primary);
+    transition: $transition-base;
+    &:after{
+      background-color: var(--#{$prefix}primary);
+      box-shadow: 0 0 1px var(--#{$prefix}primary);
+    }
+  }
+}
+
+// Dots white
+.dots-white .tns-nav{
+  [data-nav] {
+    box-shadow: inset 0 0 0 2px var(--#{$prefix}white);
+    transition: $transition-base;
+    &:after{
+      background-color: var(--#{$prefix}white);
+      box-shadow: 0 0 1px var(--#{$prefix}white);
+    }
+  }
+}
+
+// Dots dark
+.dots-dark .tns-nav{
+  [data-nav] {
+    box-shadow: inset 0 0 0 2px var(--#{$prefix}dark-gray);
+    transition: $transition-base;
+    &:after{
+      background-color: var(--#{$prefix}dark-gray);
+      box-shadow: 0 0 1px var(--#{$prefix}dark-gray);
+    }
+  }
+}
