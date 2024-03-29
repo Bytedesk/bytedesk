@@ -38,6 +38,16 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-messaging</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
@@ -100,15 +110,6 @@
 			<systemPath>${project.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 
-		<!-- cluster - 集群 -->
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>cluster</artifactId>
-			<version>${im.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/cluster-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
-
 		<!-- socket - im -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
@@ -141,7 +142,7 @@
 			<version>${im.version}</version>
 		</dependency>
 
-		
+		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>team</artifactId>
