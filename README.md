@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 22:31:03
+ * @LastEditTime: 2024-03-29 22:33:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,9 @@ api docs: http://localhost:9003/swagger-ui/index.html
 
 ## Download
 
-- [TODO: Desktop](https://www.weiyuai.cn/download.html)
+- [TODO: Windows](https://www.weiyuai.cn/download.html)
+- [TODO: Mac](https://www.weiyuai.cn/download.html)
+- [TODO: Linux](https://www.weiyuai.cn/download.html)
 - [TODO: Android](https://www.weiyuai.cn/download.html)
 - [TODO: IOS](https://www.weiyuai.cn/download.html)
 
