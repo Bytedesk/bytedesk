@@ -1,0 +1,158 @@
+// 
+// card.scss
+// Extended from Bootstrap
+//
+
+//
+// Bootstrap Overrides
+//
+
+// Quick fix for border radius issue in safari
+.card, .overflow-hidden{
+  will-change: transform;
+}
+
+.card-header-title{
+  margin-bottom: 0;
+}
+
+// 
+// Additional styles for theme
+// 
+
+// Card image overlay z index
+.card{
+  .card-img-overlay{
+    z-index: 2;
+  }
+}
+
+//Card hover border
+.card-hover-border:hover{
+  border: 1px solid var(--#{$prefix}gray-300);
+}
+
+// Card hover element show
+.card{
+  .card-element-hover{
+    visibility: hidden;
+    margin-top: 30px;
+    opacity: 0;
+    transition: $transition-base;
+    z-index: 9;
+  }
+  &:hover{
+    .card-element-hover{
+      visibility: visible;
+      margin-top: 0px;
+      opacity: 1;
+    }
+  }
+}
+
+
+// Card hover item switch
+.action-trigger-hover .item-show {
+  display: block;
+  visibility: visible;
+  transition: $transition-base;
+}
+.action-trigger-hover:hover .item-show {
+  display: none;
+  visibility: hidden;
+}
+.action-trigger-hover .item-show-hover {
+  display: none;
+  visibility: hidden;
+  transition: $transition-base;
+}
+.action-trigger-hover:hover .item-show-hover {
+  display: block;
+  visibility: visible;
+}
+
+//Card metro
+.card-metro {
+  overflow: hidden;
+
+  .card-img-overlay {
+    z-index: 2;
+  }
+
+  .card-text, img {
+    transition: $transition-base;
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    height: 50%;
+    width: 100%;
+    bottom: 0;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(0, 0, 0, 0.8)));
+    background-image: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.8));
+    z-index: 1;
+  }
+
+  &:hover {
+    .card-text {
+      margin-bottom: 10px;
+    }
+
+    .card-image img {
+      transform: scale(1.08);
+    }
+  }
+}
+
+// Hover overlay
+.card-overlay-hover:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+	transition: $transition-base;
+  background-color: var(--#{$prefix}dark);
+  display: block;
+}
+.card:hover .card-overlay-hover:before {
+  opacity: 0.5;
+}
+
+// Border hover
+.card-border-hover {
+  background-color: var(--#{$prefix}body-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: $transition-base;
+  h2 i {
+    color: var(--#{$prefix}secondary);
+  }
+  &:hover {
+    border-color: var(--#{$prefix}primary);
+    transition: $transition-base;
+    h2 i {
+      color: var(--#{$prefix}primary);
+    }
+  }
+}
+
+// Card image scale
+.card .card-image-scale {
+  overflow: hidden;
+}
+.card .card-image-scale img {
+  -webkit-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+  -webkit-transform: scale(1);
+          transform: scale(1);
+}
+.card:hover .card-image-scale img {
+  -webkit-transform: scale(1.03);
+          transform: scale(1.03);
+}
+

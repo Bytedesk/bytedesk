@@ -1,0 +1,3 @@
+rootProject.name = 'ai'
+include ':core'
+project(':core').projectDir = new File('../core')
