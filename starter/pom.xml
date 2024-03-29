@@ -99,26 +99,7 @@
 			<artifactId>spring-data-rest-hal-explorer</artifactId>
 		</dependency> -->
 
-		<!-- ///////////////////////////////////////////////////////////////////////////// -->
-
-		<!-- customer service - 在线客服 -->
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>service</artifactId>
-			<version>${im.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
-
-		<!-- socket - im -->
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>socket</artifactId>
-			<version>${im.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/socket-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
-
+		
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<!-- ai - 机器人 -->
@@ -147,6 +128,26 @@
 			<groupId>com.bytedesk</groupId>
 			<artifactId>team</artifactId>
 			<version>${im.version}</version>
+		</dependency>
+
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- customer service - 在线客服 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>service</artifactId>
+			<version>${im.version}</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath>
+		</dependency>
+
+		<!-- socket - im -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>socket</artifactId>
+			<version>${im.version}</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/socket-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
@@ -202,6 +203,52 @@
 			<version>2.15.1</version>
 		</dependency>
 
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.106.Final</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/cn.hutool/hutool-crypto -->
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-crypto</artifactId>
+			<version>5.8.25</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.10.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.25.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java-util</artifactId>
+			<version>3.25.2</version>
+		</dependency>
+
+		<!--
+		https://mvnrepository.com/artifact/com.googlecode.protobuf-java-format/protobuf-java-format -->
+		<dependency>
+			<groupId>com.googlecode.protobuf-java-format</groupId>
+			<artifactId>protobuf-java-format</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 		<!--  -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
