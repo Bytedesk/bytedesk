@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 17:22:57
+ * @LastEditTime: 2024-03-29 17:26:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@
 
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
+mvn install -Dmaven.test.skip=true
 # 打开 bytedesk/starter/src/main/resources/application-dev.properties
 # 修改 the value of spring.datasource.url and spring.datasource.username and spring.datasource.password
 # 修改 the value of spring.redis.host and spring.redis.port
@@ -44,6 +45,10 @@ mvn spring-boot:run
 - 查看端口占用：lsof -i:port，其中：port 为端口号, lsof -i:9003
 - 杀掉进程：kill -9 pid，其中：pid 为进程 pid
 ```
+
+## 联系
+
+- [微信](./wechat.png)
 
 ## 声明
 
