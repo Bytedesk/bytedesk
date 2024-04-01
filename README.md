@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 22:33:21
+ * @LastEditTime: 2024-04-01 16:13:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,8 @@
 
 AI powered team cooperation & customer service
 
+## Language
+
 - [English](./README.md)
 - [中文](./README.zh.md)
 
@@ -26,7 +28,7 @@ Bytedesk is a team collaboration and customer service platform.
 
 ## Technical Stack
 
-- [springboot-3.2.0](https://spring.io/projects/spring-boot) for backend
+- [springboot-3.2.0 jdk17](https://spring.io/projects/spring-boot) for backend
 - [react-18.2.0](https://reactjs.org/) for frontend
 - [react-native-0.73.4](https://reactnative.dev/) for mobile(ios&android)
 - [electron-29.1.0](https://www.electronjs.org/) for desktop(windows&mac&linux)
@@ -34,24 +36,13 @@ Bytedesk is a team collaboration and customer service platform.
 ## Getting Started
 
 ```bash
+# Notice: this repo is still under ative development, many features are not completed or not stable，the docs are not completed
 git clone https://github.com/Bytedesk/bytedesk.git
 # open bytedesk/starter/src/main/resources/application-dev.properties
 # change the value of spring.datasource.url and spring.datasource.username and spring.datasource.password
 # change the value of spring.redis.host and spring.redis.port
 cd bytedesk/starter
 mvn spring-boot:run
-# 
-# other commands for reference
-# mvn spring-boot:run
-# mvn clean
-# mvn dependency:tree
-# mvn dependency:analyze
-# mvn dependency:resolve
-# mvn compile -Dmaven.test.skip=true
-# mvn install -Dmaven.test.skip=true
-# mvn package -Dmaven.test.skip=true
-# lsof -i:port，其中：port 为端口号, lsof -i:9003
-# kill -9 pid，其中：pid 为进程 pid
 # 
 # local preview:
 web: http://localhost:9003/
@@ -93,4 +84,4 @@ api docs: http://localhost:9003/swagger-ui/index.html
 
 - support business usage
 - selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
-- 仅支持企业内部员工自用，严禁用于销售、二次销售或者部署SaaS方式销售，请勿用于非法用途。
+- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要活动授权，请勿用于非法用途。
