@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-03-29 22:31:13
+ * @LastEditTime: 2024-04-01 16:13:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,8 @@
 
 基于AI的企业IM和在线客服系统
 
+## 语言
+
 - [English](./README.md)
 - [中文](./README.zh.md)
 
@@ -28,7 +30,7 @@
 
 ## 技术栈
 
-- [springboot-3.2.0](https://spring.io/projects/spring-boot) for 后端
+- [springboot-3.2.0 jdk17](https://spring.io/projects/spring-boot) for 后端
 - [react-18.2.0](https://reactjs.org/) for web前端
 - [react-native-0.73.4](https://reactnative.dev/) for 移动客户端(ios&android)
 - [electron-29.1.0](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
@@ -36,6 +38,7 @@
 ## 快速开始
 
 ```bash
+# 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
 git clone https://github.com/Bytedesk/bytedesk.git
 mvn install -Dmaven.test.skip=true
 # 打开 bytedesk/starter/src/main/resources/application-dev.properties
@@ -43,18 +46,6 @@ mvn install -Dmaven.test.skip=true
 # 修改 the value of spring.redis.host and spring.redis.port
 cd bytedesk/starter
 mvn spring-boot:run
-# 
-# 其他命令
-# - 启动：mvn spring-boot:run
-# - 清理：mvn clean
-# - 查看依赖：mvn dependency:tree
-# - 依赖分析：mvn dependency:analyze
-# - 手动拉取依赖：mvn dependency:resolve
-# - mvn compile -Dmaven.test.skip=true
-# - 本地安装：mvn install -Dmaven.test.skip=true
-# - 本地打包：mvn package -Dmaven.test.skip=true
-# - 查看端口占用：lsof -i:port，其中：port 为端口号, lsof -i:9003
-# - 杀掉进程：kill -9 pid，其中：pid 为进程 pid
 # 
 # 本地预览
 web: http://localhost:9003/
@@ -95,4 +86,4 @@ api文档: http://localhost:9003/swagger-ui/index.html
 ## [声明](https://www.weiyuai.cn/)
 
 - 支持商用
-- 仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售，请勿用于非法用途。
+- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要活动授权，请勿用于非法用途。
