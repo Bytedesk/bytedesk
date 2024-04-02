@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-01 16:13:30
+ * @LastEditTime: 2024-04-02 22:14:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@
 - 企业IM
 - 在线客服
 - 大模型AI助手
+- 局域网文件传输，类似airdrop
 
 ## 技术栈
 
@@ -86,4 +87,4 @@ api文档: http://localhost:9003/swagger-ui/index.html
 ## [声明](https://www.weiyuai.cn/)
 
 - 支持商用
-- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要活动授权，请勿用于非法用途。
+- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权，请勿用于非法用途。
