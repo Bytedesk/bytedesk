@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-01 16:13:38
+ * @LastEditTime: 2024-04-02 22:14:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,10 @@ AI powered team cooperation & customer service
 
 ## Introduction
 
-Bytedesk is a team collaboration and customer service platform.
+- team im
+- customer service
+- ai chatbot
+- local file send, airdrop
 
 ## Technical Stack
 
@@ -36,7 +39,8 @@ Bytedesk is a team collaboration and customer service platform.
 ## Getting Started
 
 ```bash
-# Notice: this repo is still under ative development, many features are not completed or not stable，the docs are not completed
+# Notice: this repo is still under ative development, 
+# many features are not completed or not stable，the docs are not completed
 git clone https://github.com/Bytedesk/bytedesk.git
 # open bytedesk/starter/src/main/resources/application-dev.properties
 # change the value of spring.datasource.url and spring.datasource.username and spring.datasource.password
@@ -84,4 +88,4 @@ api docs: http://localhost:9003/swagger-ui/index.html
 
 - support business usage
 - selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
-- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要活动授权，请勿用于非法用途。
+- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权，请勿用于非法用途。
