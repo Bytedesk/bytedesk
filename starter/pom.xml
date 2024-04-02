@@ -138,7 +138,7 @@
 			<artifactId>service</artifactId>
 			<version>${im.version}</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 
 		<!-- socket - im -->
@@ -147,7 +147,7 @@
 			<artifactId>socket</artifactId>
 			<version>${im.version}</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/socket-0.0.1-SNAPSHOT.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/socket-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
