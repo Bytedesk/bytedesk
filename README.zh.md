@@ -41,7 +41,6 @@
 ```bash
 # 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
 git clone https://github.com/Bytedesk/bytedesk.git
-mvn install -Dmaven.test.skip=true
 # 打开 bytedesk/starter/src/main/resources/application-dev.properties
 # 修改 the value of spring.datasource.url and spring.datasource.username and spring.datasource.password
 # 修改 the value of spring.redis.host and spring.redis.port
