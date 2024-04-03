@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-03 09:48:48
+ * @LastEditTime: 2024-04-03 20:56:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,19 @@ api docs: http://localhost:9003/swagger-ui/index.html
 - [Admin](https://www.weiyuai.cn/admin)
 - [Web Chat](https://www.weiyuai.cn/chat)
 - [Visitor](https://www.weiyuai.cn/v)
+
+## SDK
+
+- [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
+- [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
+- [Android](https://github.com/bytedesk/bytedesk-android)
+- [Flutter](https://github.com/bytedesk/bytedesk-flutter)
+- [React](https://github.com/bytedesk/bytedesk-react)
+- [React-native](https://github.com/bytedesk/bytedesk-react-native)
+- [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
+- [Web](https://github.com/bytedesk/bytedesk-web)
+- [Browser-Extension](https://github.com/bytedesk/bytedesk-browser-extension)
+- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin)
 
 ## Download
 
