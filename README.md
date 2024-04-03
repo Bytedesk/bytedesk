@@ -34,7 +34,7 @@ AI powered team cooperation & customer service
 - [springboot-3.2.0 jdk17](https://spring.io/projects/spring-boot) for backend
 - [react-18.2.0](https://reactjs.org/) for frontend
 - [react-native-0.73.4](https://reactnative.dev/) for mobile(ios&android)
-- [electron-29.1.0](https://www.electronjs.org/) for desktop(windows&mac&linux)
+- [electron-29.1.1](https://www.electronjs.org/) for desktop(windows&mac&linux)
 
 ## Getting Started
 
