@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-03 20:56:58
+ * @LastEditTime: 2024-04-03 21:01:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,7 @@
 - [springboot-3.2.0 jdk17](https://spring.io/projects/spring-boot) for 后端
 - [react-18.2.0](https://reactjs.org/) for web前端
 - [react-native-0.73.4](https://reactnative.dev/) for 移动客户端(ios&android)
-- [electron-29.1.0](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
+- [electron-29.1.1](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
 
 ## 快速开始
 
