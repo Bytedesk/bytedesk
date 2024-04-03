@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-02 23:40:42
+ * @LastEditTime: 2024-04-03 09:48:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ mvn spring-boot:run
 # 本地预览
 web: http://localhost:9003/
 管理后台: http://localhost:9003/admin, 用户名: admin, 密码: admin
-web客服端: http://localhost:9003/chat, 用户名: admin, 密码: admin
+WebIM/客服端: http://localhost:9003/chat, 用户名: admin, 密码: admin
 访客对话窗口: http://localhost:9003/v
 api文档: http://localhost:9003/swagger-ui/index.html
 ```
@@ -71,18 +71,23 @@ api文档: http://localhost:9003/swagger-ui/index.html
 - [WebIM/客服端](https://www.weiyuai.cn/chat)
 - [客服访客端](https://www.weiyuai.cn/v)
 
-## Download
+## 下载
 
 - [TODO: Windows](https://www.weiyuai.cn/download.html)
 - [TODO: Mac](https://www.weiyuai.cn/download.html)
 - [TODO: Linux](https://www.weiyuai.cn/download.html)
+
+| chat | contact | setting |
+| :----------: | :----------: | :----------: |
+| <img src="./images/pc/chat.png" width="250"> | <img src="./images/pc/contact.png" width="250"> | <img src="./images/pc/setting.png" width="250"> |
+
 - [TODO: Android](https://www.weiyuai.cn/download.html)
 - [TODO: IOS](https://www.weiyuai.cn/download.html)
 
 ## 联系
 
 - [Email](mailto:270580156@qq.com)
-- [微信](./wechat.png)
+- [微信](./images/wechat.png)
 
 ## [声明](https://www.weiyuai.cn/)
 
