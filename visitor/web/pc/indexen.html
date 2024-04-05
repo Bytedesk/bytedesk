@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="format-detection" content="email=no">
+    <title>Online Chat</title>
+    <!--  -->
+    <link rel="stylesheet" href="//cdn.kefux.com/assets/css/vendor/iconfontchaty/iconfont.css" />
+    <!-- <link rel="stylesheet" href="./css/index.min.css" /> -->
+    <link rel="stylesheet" href="./css/index.css" />
+
+</head>
+
+<body>
+
+    <section id="pageChat">
+        <header class="header" id="dragHeader">
+            <div id="headLeft" class="pull-left">
+                <div id="bytedesk_title">
+                    <div id="bytedesk_name">
+                        <div style="height: 100%;">
+                            <img id="bytedesk_agent_avatar" src="https://cdn.kefux.com/assets/img/default_avatar.png"
+                                width="40px" height="40px" style="border-radius: 20px;"/>
+                            <div style="margin-left: 60px;">
+                                <div id="bytedesk_agent_nickname">Nickname</div>
+                                <div id="bytedesk_agent_description">Description</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="headRight" class="pull-right">
+                <!-- <a id="btnCallAgent">转人工</a>  -->
+                <div id="bytedesk_close">
+                    <span style="cursor: pointer;"><i class="iconfont icon-l-drop-down"></i></span>
+                </div>
+                <!-- <div id="bytedesk_minus">
+                    <span style="cursor: pointer;"><i class="iconfont icon-minus"></i></span>
+                </div> -->
+                <div id="bytedesk_max">
+                    <span style="cursor: pointer;"><i class="iconfont icon-max"></i></span>
+                </div>
+                <div id="bytedesk_sound">
+                    <span style="cursor: pointer;"><i class="iconfont icon-sound-low"></i></span>
+                </div>
+                <div id="bytedesk_mute">
+                    <span style="cursor: pointer;"><i class="iconfont icon-sound-off"></i></span>
+                </div>
+                <div id="bytedesk_qrcode">
+                    <span style="cursor: pointer;"><i class="iconfont icon-qrcode"></i></span>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </header>
+        <div id="bytedesk_main" class="body">
+            <div id="bytedesk_left" class="body-left">
+                <div id="bytedesk_message_ul">
+                    <div id="bytedesk_toptip"></div>
+                    <div id="bytedesk_loading">Requesting, Please Wait...</div>
+                    <!-- FIXME: 加载更多 消息排序错误 -->
+                    <div id="bytedesk_more" onclick="bd_kfe_httpapi.loadHistoryMessages()">Load More</div>
+                    <div id="bytedesk_message_li"></div>
+                </div>
+                <div class="footer">
+                    <div id="bytedesk_quick_question">
+                        <!-- <span class="bytedesk_quick_question-item">问题1</span>-->
+                    </div>
+                    <div id="bytedesk_faq_preview">
+                        <!-- <span class="bytedesk_faq_preview-item">问题1</span>-->
+                    </div>
+                    <div class="text-holder">
+                        <textarea id="bytedesk_input_textarea" placeholder="Input"
+                            onkeyup="bd_kfe_utils.onKeyUp(arguments[0] || window.event)">
+                        </textarea>
+                    </div>
+                    <div class="feature-holder">
+                        <div id="featureBtns" class="feature-left">
+                            <input type="file" id="imagefile" accept="image/*" style="display: none;" />
+                            <input type="file" id="videofile" accept="video/*" style="display: none;" />
+                            <input type="file" id="filefile" style="display: none;" />
+                            <li id="bytedesk_upload_image" class="iconfont icon-image"><span
+                                    class="bytedesk_tooltiptext">Image</span></li>
+                            <li id="bytedesk_upload_video" class="iconfont icon-video1"><span
+                                    class="bytedesk_tooltiptext">Video</span></li>
+                            <li id="bytedesk_upload_file" class="iconfont icon-file"><span
+                                    class="bytedesk_tooltiptext">File</span></li>
+                            <li id="bytedesk_message_rate" class="iconfont icon-rate"><span
+                                    class="bytedesk_tooltiptext">Rate</span></li>
+                            <li id="bytedesk_message_agent">Agent</li>
+                            <!-- <li id="bytedesk_message_tip">对方正在输入</li> -->
+                            <li id="bytedesk_logo"><a href="https://www.kefux.com" target="_blank"> kefux.com </a></li>
+                        </div>
+                        <div class="feature-right"><input id="bytedesk_input_pc_send" type="button" value="发送"></div>
+                        <div id="emojiHolder"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="bytedesk_resize"></div>
+            <div id="bytedesk_right" class="body-right">
+                <!-- <div id="bytedesk_faq" style="height: 100%; overflow-y: auto;"></div> -->
+                <div class="bytedesk_right_tab" id="bytedesk_right_tab">
+                </div>
+                <div id="bytedesk_right_tabcontent">
+                </div>
+                <div class="support-holder">
+                    <span id="bytedesk_logo_right"><a href="https://www.kefux.com" target="_blank">kefux.com</a></span>
+                </div>
+            </div>
+        </div>
+        <!-- 评价 -->
+        <div id="bytedesk_rate">
+            <p>Thanks for your rate：</p>
+            <div id="ratestar">
+                <img id="ratestar1" style="cursor: pointer;"
+                    src="https://cdn.kefux.com/assets/img/rate/ratestar_selected.png"
+                    onclick="bd_kfe_utils.rateStarChoose(1)">
+                <img id="ratestar2" style="cursor: pointer;"
+                    src="https://cdn.kefux.com/assets/img/rate/ratestar_selected.png"
+                    onclick="bd_kfe_utils.rateStarChoose(2)">
+                <img id="ratestar3" style="cursor: pointer;"
+                    src="https://cdn.kefux.com/assets/img/rate/ratestar_selected.png"
+                    onclick="bd_kfe_utils.rateStarChoose(3)">
+                <img id="ratestar4" style="cursor: pointer;"
+                    src="https://cdn.kefux.com/assets/img/rate/ratestar_selected.png"
+                    onclick="bd_kfe_utils.rateStarChoose(4)">
+                <img id="ratestar5" style="cursor: pointer;"
+                    src="https://cdn.kefux.com/assets/img/rate/ratestar_selected.png"
+                    onclick="bd_kfe_utils.rateStarChoose(5)">
+            </div>
+            <div id="ratescore"></div>
+            <p>postscript:</p>
+            <div id="suggest" class="suggestarea">
+                <textarea id="suggestcontent" style="width: 48%; height: 66px; resize: none; outline: 0;"></textarea>
+            </div>
+            <div class="rate-button" onclick="bd_kfe_httpapi.rate()">
+                <span style="line-height: 2;">Submit</span>
+            </div>
+            <div class="rate-cancel-button" onclick="bd_kfe_utils.hideRate()">
+                <span style="line-height: 2;">Cancel</span>
+            </div>
+        </div>
+        <!-- 留言 -->
+        <div id="bytedesk_leave">
+            <p style="color: gray; text-align: center; padding-top: 60px; font-size: 12px;" id="bytedesk-leavemsg-tip">
+            </p>
+            <div style="text-align: center;">
+                <span style="color: black;">Mobile</span>
+                <input id="bytedesk_leavemsg_mobile" class="leavemsginput" type="text" name="mobile"
+                    style="height: 30px; width: 220px; margin-left: 10px; resize: none; outline: 0;" />
+            </div>
+            <div style="text-align: center;">
+                <span style="color: black;">Content</span>
+                <textarea id="bytedesk_leavemsg_content" class="leavemsgtext"
+                    style="margin-left: 25px; margin-top: 20px; width: 222px; height: 100px; resize: none; outline: 0;"></textarea>
+                </td>
+            </div>
+            <div style="text-align: center;">
+                <div class="bytedesk_leavemsg_button" onclick="bd_kfe_httpapi.leaveMessage()">
+                    <span style="line-height: 2;">Submit</span>
+                </div>
+                <div class="bytedesk_leavemsg_button" onclick="bd_kfe_utils.hideLeaveMessage()">
+                    <span style="line-height: 2;">Cancel</span>
+                </div>
+            </div>
+        </div>
+        <!-- 表单 -->
+        <div id="bytedesk_form">
+            <p style="color: gray; text-align: center; padding-top: 50px; font-size: 15px;" id="bytedesk-leavemsg-tip">
+            </p>
+            <div id="bytedesk_form-name-div" style="margin-top:20px; margin-left:50px;display: none;">
+                <span style="color: black;">Nickname</span>
+                <input id="bytedesk_form-name" class="leavemsginput" type="text" name="name"
+                    style="height: 30px; width: 220px; margin-left: 10px;" />
+            </div>
+            <div id="bytedesk_form-mobile-div" style="margin-top:20px; margin-left:50px;display: none;">
+                <span style="color: black;">Mobile</span>
+                <input id="bytedesk_form-mobile" class="leavemsginput" type="text" name="mobile"
+                    style="height: 30px; width: 220px; margin-left: 10px;" />
+            </div>
+            <div id="bytedesk_form-email-div" style="margin-top:20px; margin-left:50px;display: none;">
+                <span style="color: black;">Email</span>
+                <input id="bytedesk_form-email" class="leavemsginput" type="text" name="email"
+                    style="height: 30px; width: 220px; margin-left: 10px;" />
+            </div>
+            <div id="bytedesk_form-age-div" style="margin-top:20px; margin-left:50px;display: none;">
+                <span style="color: black;">Age</span>
+                <input id="bytedesk_form-age" class="leavemsginput" type="text" name="age"
+                    style="height: 30px; width: 220px; margin-left: 10px;" />
+            </div>
+            <div id="bytedesk_form-job-div" style="margin-top:20px; margin-left:50px;display: none;">
+                <span style="color: black;">Job</span>
+                <input id="bytedesk_form-job" class="leavemsginput" type="text" name="job"
+                    style="height: 30px; width: 220px; margin-left: 10px;" />
+            </div>
+            <div class="form-button" onclick="bd_kfe_stompapi.sendFormMessage()"
+                style="font-size:20px;color:white;background:#007bff;text-align:center;margin-top:20px;margin-left:85px;width:250px;height:30px;">
+                Submit
+            </div>
+        </div>
+    </section>
+
+    <!--手机扫码咨询-->
+    <div class="bytedesk_qrcode_overlay" id="bytedesk_qrcode_overlay"></div>
+    <div class="bytedesk_qrcode_container" id="bytedesk_qrcode_container">
+        <div class="bytedesk_qrcode_h5" id="bytedesk_qrcode_h5"></div>
+        <!-- <span class="bytedesk_qrcode_text">手机扫码咨询</span> -->
+        <img class="bytedesk_qrcode_close" id="bytedesk_qrcode_close"
+            src="https://cdn.bytedesk.com/kb/assets/img/close.png">
+    </div>
+    <audio id="audioPlay" src="https://cdn.kefux.com/assets/sound/sent.wav" hidden="true" />
+
+    <!-- <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/uaparser/0.7.18/ua-parser.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/fingerprintjs2/1.8.0/fingerprint2.min.js"></script> -->
+    <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/lodash/4.17.20/lodash.min.js"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/moment/2.22.1/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/sockjs/1.1.4/sockjs.min.js"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/stomp/1.2/stomp.min.js"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/qrcode/qrcode.min.js"></script>
+
+    <!-- <script type="text/javascript" src="https://cdn.kefux.com/chat/pc/js/bd_kfe_device.min.js?v=230423"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/chat/pc/js/bd_kfe_data.min.js?v=230423"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/chat/pc/js/bd_kfe_utils.min.js?v=230423"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/chat/pc/js/bd_kfe_httpapi.min.js?v=230423"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/chat/pc/js/bd_kfe_stompapi.min.js?v=230423"></script>
+    <script type="text/javascript" src="https://cdn.kefux.com/chat/pc/js/bd_kfe_ready.min.js?v=230423"></script> -->
+
+    <!-- <script type="text/javascript" src="./js/bd_kfe_device.min.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_data.min.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_utils.min.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_httpapi.min.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_stompapi.min.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_ready.min.js?v=230423"></script> -->
+
+    <!-- 判断浏览器是否移动端 https://github.com/matthewhudson/current-device -->
+    <!-- <script type="text/javascript" src="./js/current-device.min.js"></script> -->
+    <!--  -->
+    <script type="text/javascript" src="./js/bd_kfe_device.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_data.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_utils.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_httpapi.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_stompapi.js?v=230423"></script>
+    <script type="text/javascript" src="./js/bd_kfe_ready.js?v=230423"></script>
+    <!-- <script type="text/javascript" src="./js/bd_kfe_enlarge.js?v=230423"></script> -->
+
+</body>
+
+</html>

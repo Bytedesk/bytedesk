@@ -1,0 +1,76 @@
+@tabs-nav-margin: 7px;
+@scrollable-width: 18px;
+
+.Tabs-nav {
+  position: relative;
+  display: flex;
+  margin: @tabs-nav-margin 0;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.Tabs--scrollable {
+  .Tabs-nav {
+    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    // 隐藏滚动条
+    margin-bottom: -(@scrollable-width - @tabs-nav-margin);
+    padding-bottom: @scrollable-width;
+  }
+  .Tabs-navPointer {
+    bottom: @scrollable-width;
+  }
+  .Tabs-navItem {
+    flex: 1 0 auto;
+  }
+}
+
+.Tabs-navItem {
+  flex: 1;
+  text-align: center;
+}
+
+.Tabs-navLink {
+  padding: @tabs-nav-link-padding;
+  border: @tabs-nav-link-border;
+  border-radius: @tabs-nav-link-border-radius;
+  background: @tabs-nav-link-bg;
+  color: @tabs-nav-link-color;
+  font-size: @tabs-nav-link-font-size;
+  transition: @tabs-nav-link-transition;
+
+  &:focus:not(:focus-visible) {
+    outline: 0;
+  }
+  &:hover {
+    cursor: pointer;
+    color: @tabs-nav-link-hover-color;
+  }
+  &.active {
+    position: relative;
+    z-index: 1;
+    color: @tabs-nav-link-active-color;
+    font-weight: bold;
+  }
+}
+
+.Tabs-navPointer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: @tabs-nav-pointer-height;
+  background: @tabs-nav-pointer-bg;
+  border-radius: @tabs-nav-pointer-border-radius;
+  transition: @tabs-nav-pointer-transition;
+}
+
+.Tabs-pane {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}

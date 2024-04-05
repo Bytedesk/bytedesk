@@ -1,0 +1,35 @@
+{
+  // 头部注释 https://github.com/OBKoro1/koro1FileHeader/wiki/%E5%AE%89%E8%A3%85%E5%92%8C%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B
+  "fileheader.customMade": {
+      // Author字段是文件的创建者 可以在specialOptions中更改特殊属性
+      // 公司项目和个人项目可以配置不同的用户名与邮箱 搜索: gitconfig includeIf  比如: https://ayase.moe/2021/03/09/customized-git-config/
+      // 自动提取当前git config中的: 用户名、邮箱
+      "Author": "jackning 270580156@qq.com", // 同时获取用户名与邮箱
+      // "Author": "git config user.name", // 仅获取用户名
+      // "Author": "git config user.email", // 仅获取邮箱
+      // "Author": "OBKoro1", // 写死的固定值 不从git config中获取
+      "Date": "Do not edit", // 文件创建时间(不变)
+      // LastEditors、LastEditTime、FilePath将会自动更新 如果觉得时间更新的太频繁可以使用throttleTime(默认为1分钟)配置更改更新时间。
+      "LastEditors": "jackning 270580156@qq.com", // 文件最后编辑者 与Author字段一致
+      // 由于编辑文件就会变更最后编辑时间，多人协作中合并的时候会导致merge
+      // 可以将时间颗粒度改为周、或者月，这样冲突就减少很多。搜索变更时间格式: dateFormat
+      "LastEditTime": "Do not edit", // 文件最后编辑时间
+      // 输出相对路径，类似: /文件夹名称/src/index.js
+      // "FilePath": "Do not edit", // 文件在项目中的相对路径 自动更新
+      // 插件会自动将光标移动到Description选项中 方便输入 Description字段可以在specialOptions更改
+      "Description": "bytedesk.com https://github.com/Bytedesk/bytedesk", // 介绍文件的作用、文件的入参、出参。
+      // custom_string_obkoro1~custom_string_obkoro100都可以输出自定义信息
+      // 可以设置多条自定义信息 设置个性签名、留下QQ、微信联系方式、输入空行等
+      "custom_string_obkoro1": "  Please be aware of the BSL license restrictions before installing Bytedesk IM – \n selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. \n 仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 \n Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE \n contact: 270580156@qq.com \n联系：270580156@qq.com", 
+      // 版权声明 保留文件所有权利 自动替换年份 获取git配置的用户名和邮箱
+      // 版权声明获取git配置, 与Author字段一致: ${git_name} ${git_email} ${git_name_email}
+      "custom_string_obkoro1_copyright": "Copyright (c) ${now_year} by bytedesk.com, All Rights Reserved. "
+      // "custom_string_obkoro1_copyright": "Copyright (c) ${now_year} by 写死的公司名/用户名, All Rights Reserved. "
+  },
+  // 函数注释
+  "fileheader.cursorMode": {
+      "description": "", // 函数注释生成之后，光标移动到这里
+      "param": "", // param 开启函数参数自动提取 需要将光标放在函数行或者函数上方的空白行
+      "return": "",
+  },
+}

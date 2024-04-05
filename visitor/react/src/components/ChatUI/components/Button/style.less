@@ -1,0 +1,107 @@
+.Btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  min-width: 80px;
+  margin: 0;
+  padding: @btn-padding;
+  border: @btn-border-width solid @btn-border-color;
+  border-radius: @btn-border-radius;
+  background: @btn-bg;
+  color: @body-color;
+  font-weight: @btn-font-weight;
+  font-size: @btn-font-size;
+  line-height: @btn-line-height;
+  font-family: @btn-font-family;
+  text-transform: none;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  transition: @btn-transition;
+  user-select: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+  &:focus:not(:focus-visible) {
+    outline: 0;
+  }
+  &:active {
+    background: @btn-active-bg;
+  }
+  &:disabled {
+    pointer-events: none;
+    color: var(--gray-4);
+    opacity: 0.5;
+  }
+  &--primary:not(.Btn--outline) {
+    border-color: var(--btn-primary-border-color);
+    background: var(--btn-primary-bg);
+    background-origin: border-box;
+    color: var(--btn-primary-color);
+
+    &:active {
+      // background: @btn-primary-active-bg;
+      opacity: 0.8;
+    }
+  }
+  &--outline&--primary {
+    border-color: var(--brand-1);
+    color: var(--brand-1);
+  }
+  &--sm {
+    padding: @btn-padding-sm;
+    // border-radius: @btn-border-radius-sm;
+    font-size: @btn-font-size-sm;
+  }
+  &--lg {
+    padding: @btn-padding-lg;
+    // border-radius: @btn-border-radius-lg;
+    font-size: @btn-font-size-lg;
+  }
+  &--block {
+    display: block;
+    width: 100%;
+  }
+  &-icon {
+    display: inline-flex;
+    align-self: center;
+    flex-shrink: 0;
+    margin-inline-end: 0.5rem;
+  }
+}
+
+[data-old-ios] .Btn:not(.Btn--block) {
+  display: inline-block;
+}
+
+@media (hover: hover) {
+  .Btn {
+    &:hover {
+      background: @btn-hover-bg;
+    }
+    &--primary:not(.Btn--outline) {
+      &:hover {
+        background: var(--btn-primary-bg);
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+.Btn--text {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--link-color);
+  font-size: inherit;
+  vertical-align: initial;
+
+  &:hover,
+  &:active {
+    background: transparent;
+  }
+}

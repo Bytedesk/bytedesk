@@ -1,0 +1,82 @@
+.Goods {
+  padding: @goods-padding;
+  font-size: 14px;
+
+  &[data-elder-mode="true"] {
+    .Goods-img {
+      width: 56px;
+      height: 56px;
+    }
+    .Price {
+      color: var(--brand-1);
+    }
+    .Btn {
+      min-width: 0;
+    }
+  }
+  & + & {
+    border-top: @goods-border-width solid @goods-border-color;
+  }
+  &-img {
+    width: @goods-img-width;
+    height: @goods-img-height;
+    margin-right: @goods-gap;
+    object-fit: cover;
+    border-radius: @goods-img-border-radius;
+  }
+  &-name {
+    margin: 0 0 3px;
+    font-size: @font-size-sm;
+    font-weight: 400;
+  }
+  &-main {
+    .Price {
+      margin-right: @goods-gap;
+    }
+  }
+  &-desc {
+    margin-bottom: 3px;
+    color: @goods-desc-color;
+    word-break: break-all;
+  }
+  &-meta {
+    color: @goods-meta-color;
+    font-size: @goods-meta-font-size;
+  }
+  &-countUnit {
+    margin: 3px 0;
+    color: @goods-count-color;
+    font-size: @goods-count-font-size;
+  }
+  &-unit {
+    margin-left: 3px;
+    font-size: @goods-unit-font-size;
+  }
+  &-buyBtn {
+    float: right;
+    background: @goods-buy-btn-bg;
+    color: @goods-buy-btn-color;
+    padding: @goods-buy-btn-padding;
+
+    &:hover {
+      background: @goods-buy-btn-bg;
+    }
+  }
+  &-detailBtn {
+    min-width: @goods-detail-btn-min-width;
+    padding: @goods-detail-btn-padding;
+    border-radius: @goods-detail-btn-border-radius;
+    font-size: @goods-detail-btn-font-size;
+    line-height: @goods-detail-btn-line-height;
+  }
+  &-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: 9px;
+  }
+  &-status {
+    color: @goods-status-color;
+    font-size: 12px;
+  }
+}

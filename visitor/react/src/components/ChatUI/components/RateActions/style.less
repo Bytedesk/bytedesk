@@ -1,0 +1,34 @@
+.ChatApp[data-elder-mode="true"] {
+  --rate-width: 38px;
+}
+
+.RateActions {
+  position: relative;
+  z-index: @zindex-rate-actions;
+  align-self: flex-end;
+  width: var(--rate-width);
+  margin: 0 8px;
+}
+
+.RateBtn {
+  padding: 6px;
+  border-radius: 50%;
+  background: @rate-btn-bg;
+  font-size: calc(var(--rate-width) - 12px);
+
+  & + .RateBtn {
+    margin-top: 8px;
+  }
+  &[data-type="up"] {
+    &:hover,
+    &.active {
+      color: var(--brand-1);
+    }
+  }
+  &[data-type="down"] {
+    &:hover,
+    &.active {
+      color: var(--blue);
+    }
+  }
+}

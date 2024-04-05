@@ -1,0 +1,57 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
+
+    <string name="app_name">萝卜丝Demo</string>
+
+    <!-- 接口说明界面 -->
+    <string name="bytedesk_login">登录</string>
+    <string name="bytedesk_logining">登录中...</string>
+    <string name="bytedesk_logouting">登出中...</string>
+
+    <string name="bytedesk_home">萝卜丝</string>
+    <string name="bytedesk_queue">队列</string>
+    <string name="bytedesk_contact">联系人</string>
+    <string name="bytedesk_group">群组</string>
+    <string name="bytedesk_profile">个人资料</string>
+    <string name="bytedesk_status">在线状态</string>
+    <string name="bytedesk_thread">会话列表</string>
+    <string name="bytedesk_select">建群</string>
+    <string name="bytedesk_discovery">发现</string>
+    <string name="bytedesk_notice">通知</string>
+    <string name="bytedesk_setting">设置</string>
+    <string name="bytedesk_ok">确定</string>
+
+    <string name="bytedesk_login_success">登录成功</string>
+    <string name="bytedesk_login_failed">登录失败</string>
+    <string name="bytedesk_logout_first">请先退出登录</string>
+    <string name="bytedesk_logout_success">退出登录成功</string>
+    <string name="bytedesk_logout_failed">退出登录失败</string>
+
+    <string name="bytedesk_scan">扫描二维码</string>
+    <string name="bytedesk_qrcode">二维码</string>
+
+    <string name="bytedesk_self_server">自定义服务器</string>
+
+    <!-- 登录接口界面 -->
+
+
+    <!-- 开始新会话界面 -->
+
+
+    <!-- 设置用户信息界面 -->
+
+
+    <!-- 查询/设置用户信息界面 -->
+
+
+    <!-- 会话历史接口界面 -->
+
+
+    <!-- 关于界面 -->
+    <string name="about_title">关于</string>
+    <string name="about_url">https://www.bytedesk.com</string>
+    <string name="about_item_homepage">访问官网: www.bytedesk.com</string>
+    <string name="about_item_github">GitHub</string>
+    <string name="about_copyright">© %1$s bytedesk.com All rights reserved.</string>
+
+
+</resources>

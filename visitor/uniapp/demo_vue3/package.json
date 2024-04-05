@@ -1,0 +1,11 @@
+{
+  "name": "bytedesk_demo_v3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "google-protobuf": "^3.21.2",
+    "moment": "^2.29.3",
+    "mqtt": "4.0.1"
+  }
+}

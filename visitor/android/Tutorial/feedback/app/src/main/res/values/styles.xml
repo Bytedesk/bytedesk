@@ -1,0 +1,39 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!--添加萝卜丝样式 开始-->
+    <style name="AppTheme.ByteDesk" parent="QMUI.Compat.NoActionBar">
+        <!--导航栏样式-->
+        <item name="QMUITopBarStyle">@style/ByteDeskTopBar</item>
+    </style>
+
+    <style name="ByteDeskTopBar" parent="QMUI.TopBar">
+        <!--导航栏背景颜色-->
+        <item name="android:background">@color/app_color_blue</item>
+        <!--导航栏字体颜色-->
+        <item name="qmui_topbar_title_color">@color/qmui_config_color_white</item>
+        <item name="qmui_topbar_subtitle_color">@color/qmui_config_color_white</item>
+        <item name="qmui_topbar_text_btn_color_state_list">@color/qmui_config_color_white</item>
+        <!--导航栏高度-->
+        <item name="qmui_topbar_height">48dp</item>
+        <item name="qmui_topbar_image_btn_height">48dp</item>
+    </style>
+    <!--添加萝卜丝样式 结束-->
+
+
+</resources>

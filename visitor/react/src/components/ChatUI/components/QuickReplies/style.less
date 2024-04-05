@@ -1,0 +1,83 @@
+.QuickReplies {
+  padding: @quick-replies-padding;
+  transition: opacity 0.3s;
+
+  &[data-visible="false"] {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  &:not(.ScrollView--hasControls) {
+    padding-left: 0;
+    padding-right: 0;
+
+    .ScrollView-inner {
+      padding: 0 var(--gutter);
+    }
+    .ScrollView-item:last-child {
+      padding-right: var(--gutter);
+    }
+  }
+}
+
+.QuickReply {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 4px 12px;
+  border: 1px solid transparent;
+  border-radius: 99px;
+  line-height: 20px;
+  background: var(--white);
+  cursor: pointer;
+  color: var(--gray-1);
+  font-size: @quick-reply-font-size;
+  transition: 0.15s ease-in-out;
+
+  &.new::after {
+    content: "";
+    position: absolute;
+    top: @quick-reply-dot-top;
+    right: @quick-reply-dot-right;
+    width: @quick-reply-dot-size;
+    height: @quick-reply-dot-size;
+    background: @quick-reply-dot-bg;
+    overflow: hidden;
+    border: 1px solid #fff;
+    border-radius: 50%;
+  }
+  &.highlight {
+    background: #fff;
+    border-color: #ffd0bf;
+    font-weight: 500;
+  }
+  &-inner {
+    display: flex;
+    align-items: center;
+  }
+  &-img {
+    max-height: 13px;
+  }
+  &-inner > .Icon,
+  &-img {
+    margin-right: 3px;
+  }
+  .Icon {
+    color: var(--brand-1);
+    font-size: 15px;
+  }
+}
+
+.ChatApp[data-elder-mode="true"] {
+  .QuickReply {
+    font-size: 17px;
+    line-height: 26px;
+
+    .Icon {
+      font-size: 17px;
+    }
+  }
+  .QuickReply-img {
+    max-height: 17px;
+  }
+}

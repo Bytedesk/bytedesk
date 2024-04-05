@@ -1,0 +1,70 @@
+{
+  "name": "visitor",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "dev": "react-scripts start",
+    "serve": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.3.6",
+    "@stomp/stompjs": "^7.0.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.61",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.15",
+    "@use-gesture/react": "^10.3.0",
+    "antd": "^5.16.0",
+    "axios": "^1.6.2",
+    "clsx": "^2.0.0",
+    "dompurify": "^3.0.6",
+    "event-source-polyfill": "^1.0.31",
+    "i18next": "^23.10.1",
+    "i18next-browser-languagedetector": "^7.2.1",
+    "intersection-observer": "^0.12.2",
+    "mitt": "^3.0.1",
+    "react": "^18.2.0",
+    "react-cookie": "^7.1.4",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-helmet": "^6.1.0",
+    "react-i18next": "^14.1.0",
+    "react-router-dom": "^6.18.0",
+    "react-scripts": "5.0.1",
+    "sockjs-client": "^1.6.1",
+    "typescript": "^4.9.5",
+    "ua-parser-js": "^1.0.37",
+    "web-vitals": "^2.1.4",
+    "zustand": "^4.4.4"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/ua-parser-js": "^0.7.39",
+    "prettier": "3.2.5"
+  }
+}

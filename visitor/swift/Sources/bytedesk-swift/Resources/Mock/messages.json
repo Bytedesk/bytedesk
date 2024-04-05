@@ -1,0 +1,24 @@
+{
+    "data": [
+        {
+            "timestamp": "2023-05-17 10:31:35",
+            "user": {
+                "avatar": "mock_avatar1",
+                "nickname": "SwiftUI",
+                "uid": "123"
+            },
+            "content": "编写更少的代码，打造更出色的 app",
+            "type": "text"
+        },
+        {
+            "timestamp": "2023-05-17 10:31:35",
+            "user": {
+                "avatar": "mock_avatar10",
+                "nickname": "森仔",
+                "uid": "sen_baby"
+            },
+            "content": "🤩 啥也别说了，我这就去学！",
+            "type": "text"
+        }
+    ]
+}

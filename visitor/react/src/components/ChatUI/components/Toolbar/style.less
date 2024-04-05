@@ -1,0 +1,94 @@
+.Toolbar {
+  padding: var(--gutter);
+  padding-top: 0;
+}
+
+.Toolbar-item {
+  display: inline-block;
+  width: 25%;
+  margin-top: var(--gutter);
+  text-align: center;
+}
+
+.Toolbar-btn {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  // width: 76Px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--gray-2);
+  vertical-align: top;
+
+  &:hover {
+    background: transparent;
+  }
+  &:active {
+    .Toolbar-btnIcon {
+      background: @btn-hover-bg;
+    }
+  }
+}
+
+@media (hover: hover) {
+  .Toolbar-btn {
+    &:hover {
+      .Toolbar-btnIcon {
+        background: @btn-hover-bg;
+      }
+    }
+  }
+}
+
+@toolbar-icon-size: 30px;
+
+.Toolbar-btnIcon {
+  display: inline-block;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--white);
+  transition: 0.3s;
+
+  .Icon {
+    font-size: @toolbar-icon-size;
+    vertical-align: top;
+  }
+}
+
+.Toolbar-img {
+  width: @toolbar-icon-size;
+  height: @toolbar-icon-size;
+  vertical-align: top;
+}
+
+.Toolbar-btnText {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.1;
+  white-space: initial;
+  word-wrap: break-word;
+}
+
+.ChatApp[data-elder-mode="true"] {
+  .Toolbar-btnIcon {
+    padding: 16px;
+  }
+}
+@media (min-width: 350px) {
+  .ChatApp[data-elder-mode="true"] {
+    // .Toolbar-btn {
+    //   width: 86Px;
+    // }
+    .Toolbar-btnIcon {
+      padding: 19px;
+    }
+    .Toolbar-btnIcon .Icon {
+      font-size: 36px;
+    }
+  }
+}

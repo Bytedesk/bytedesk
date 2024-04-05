@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--[if lte IE 7]> <html class="ie7"> <![endif]-->
+<!--[if IE 8]> <html class="ie8"> <![endif]-->
+<!--[if IE 9]> <html class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html>
+<!--<![endif]-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="email=no">
+    <title>在线咨询</title>
+    <link rel="stylesheet" href="./css/iframe.css">
+    <!-- <style type="text/css"></style> -->
+</head>
+
+<body>
+    <!--  -->
+    <div id="panelHolder">
+        <iframe id="iframePanel" class="fusion" src=""></iframe>
+        <!-- 二维码 -->
+        <!-- <div id="url_qrcode">
+            <img src="./img/luobosi_mp.png" width="100px" height="100px" />
+        </div> -->
+    </div>
+    <!--  -->
+    <script type="text/javascript" src="https://cdn.kefux.com/assets/js/vendor/qrcode/qrcode.min.js"></script>
+    
+    <script>
+        //
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg); //匹配目标参数
+            if (r != null) return decodeURIComponent(r[2]);
+            return null; //返回参数值
+        }
+        //
+        var sub = getUrlParam('sub')
+        var uid = getUrlParam('uid')
+        var wid = getUrlParam('wid')
+        var type = getUrlParam('type')
+        var aid = getUrlParam('aid')
+        var showhistory = getUrlParam('history')
+        var lang = getUrlParam('lang')
+        var color = getUrlParam('color')
+        var background = getUrlParam('background')
+        var column = getUrlParam('column')
+        var v2robot = getUrlParam('v2robot') === null ? "0" : getUrlParam("v2robot")
+        var selfuser = getUrlParam("selfuser")
+        var username = getUrlParam("username")
+        var nickname = getUrlParam("nickname")
+        var avatar = getUrlParam("avatar")
+        var goods = getUrlParam('goods')
+        var goods_id = getUrlParam('goods_id')
+        var goods_title = getUrlParam('goods_title')
+        var goods_content = getUrlParam('goods_content')
+        var goods_price = getUrlParam('goods_price')
+        var goods_url = getUrlParam('goods_url')
+        var goods_imageUrl = getUrlParam('goods_imageUrl')
+        var goods_categoryCode = getUrlParam('goods_categoryCode')
+        var postscript = getUrlParam('postscript')
+        //
+        var websiteUrl = window.location.href
+        var websiteTitle = document.title
+        var refererUrl = document.referrer
+        // console.log('sub:', sub, ' uid:', uid, ' wid:', wid, ' type:', type, ' aid:', aid, ' history:', showhistory, ' lang:', lang, 'background:', background, ' column:', column);
+        // 从URL获取参数，动态设置iframe src属性
+        var index = 'index'
+        if (lang === 'en') {
+            index = 'indexen'
+            document.title = 'Live Chat'
+        }
+        var src = './' + index + '.html?sub=' + sub + 
+                '&uid=' + uid + 
+                '&wid=' + wid + 
+                '&type=' + type + 
+                '&aid=' + aid + 
+                '&history=' + showhistory + 
+                '&lang=' + lang + 
+                '&color=' + encodeURIComponent(color) + 
+                '&background=' + encodeURIComponent(background) + '&column=' + column + 
+                '&websiteurl=' + encodeURIComponent(websiteUrl) +
+                '&websitetitle=' + encodeURIComponent(websiteTitle) +
+                '&refererurl=' + encodeURIComponent(refererUrl) +
+                '&v2robot=' + v2robot +
+                '&selfuser=' + selfuser +
+                '&username=' + encodeURIComponent(username) +
+                '&nickname=' + encodeURIComponent(nickname) +
+                '&avatar=' + encodeURIComponent(avatar) +
+                (goods === '1' ? ('&goods=1' +
+                '&goods_id=' + goods_id +
+                '&goods_title=' + encodeURIComponent(goods_title) +
+                '&goods_content=' + encodeURIComponent(goods_content) +
+                '&goods_price=' + encodeURIComponent(goods_price) +
+                '&goods_url=' + encodeURIComponent(goods_url) +
+                '&goods_imageUrl=' + encodeURIComponent(goods_imageUrl) +
+                '&goods_categoryCode=' + encodeURIComponent(goods_categoryCode) ) : '') +
+                (postscript ? ('&postscript=' + encodeURIComponent(postscript)) : '' )  +
+                '&closable=0&preload=0&p'
+        // console.log('urll:', src)
+        document.getElementById('iframePanel').setAttribute('src', src)
+        // document.getElementById('byteDesk-iframe').setAttribute('src', '../meilele')
+        // console.log('iframe websiteUrl:', window.location.href, 'iframe refererUrl:', document.referrer)
+    </script>
+</body>
+
+</html>
