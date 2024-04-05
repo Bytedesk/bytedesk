@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F3F3">
+
+    <com.bytedesk.ui.widget.InputAwareLayout
+        android:id="@+id/bytedesk_activity_chat_im"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/album_dp_20">
+
+        <!-- 聊天记录 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="?attr/qmui_topbar_height"
+            android:fillViewport="true"
+            android:fitsSystemWindows="true">
+
+            <com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout
+                android:id="@+id/bytedesk_chat_pulltorefresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/bytedesk_chat_fragment_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bytedesk_activity_chat_background_default"
+                    android:paddingLeft="@dimen/bytedesk_activity_horizontal_margin"
+                    android:paddingRight="@dimen/bytedesk_activity_horizontal_margin"
+                    android:scrollbars="vertical"
+                    android:scrollbarStyle="outsideOverlay"/>
+
+            </com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout>
+
+            <!--输入框-->
+            <include layout="@layout/bytedesk_activity_chat_im_input" />
+
+            <!--快捷用语-->
+            <include layout="@layout/bytedesk_activity_chat_im_faq" />
+
+            <!--表情-->
+            <include layout="@layout/bytedesk_activity_chat_im_emotion" />
+
+            <!--扩展-->
+            <include layout="@layout/bytedesk_activity_chat_im_extension" />
+
+        </LinearLayout>
+
+        <!-- 录音提示框 -->
+        <LinearLayout
+            android:id="@+id/bytedesk_chat_wx_voice_record"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <include layout="@layout/bytedesk_activity_chat_im_record" />
+
+        </LinearLayout>
+
+    </com.bytedesk.ui.widget.InputAwareLayout>
+
+
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/bytedesk_chat_topbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"/>
+
+</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>

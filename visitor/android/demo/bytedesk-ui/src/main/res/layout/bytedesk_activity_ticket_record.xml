@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qmui_config_color_white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="?attr/qmui_topbar_height"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true">
+
+        <com.qmuiteam.qmui.widget.QMUIEmptyView
+            android:id="@+id/bytedesk_ticket_record_emptyView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/qmui_config_color_white"
+            app:qmui_title_text="我的工单"
+            app:qmui_detail_text="暂无工单"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/bytedesk_ticket_record_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/bytedesk_activity_horizontal_margin"
+            android:paddingRight="@dimen/bytedesk_activity_horizontal_margin"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay"/>
+
+    </LinearLayout>
+
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/bytedesk_ticket_record_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"/>
+
+</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>

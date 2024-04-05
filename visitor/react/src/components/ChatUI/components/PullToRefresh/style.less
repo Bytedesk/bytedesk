@@ -1,0 +1,35 @@
+.PullToRefresh {
+  height: 100%;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+
+  &-fallback {
+    padding-top: var(--gutter);
+    text-align: center;
+  }
+  &-loadMore {
+    font-size: 14px;
+  }
+}
+
+.PullToRefresh-inner {
+  overflow: hidden;
+  min-height: 100%;
+}
+
+.PullToRefresh-indicator {
+  height: 30px;
+  margin-top: -30px;
+  color: grey;
+  text-align: center;
+  line-height: 30px;
+}
+
+.PullToRefresh-spinner {
+  color: var(--gray-3);
+  font-size: 27px;
+}
+
+.PullToRefresh-transition {
+  transition: transform 0.3s;
+}

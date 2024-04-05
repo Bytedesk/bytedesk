@@ -1,0 +1,331 @@
+<resources>
+
+
+    <string name="bytedesk_app_upgrade_tip_title">Release Notes (%1$s)</string>
+
+    <!-- ChatFragment -->
+    <string name="kfds_demo_chat_chat_description">一：会话接口参数说明</string>
+    <string name="kfds_demo_chat_normal_start_txt">1.人工会话说明</string>
+    <string name="kfds_demo_chat_normal_start">人工会话</string>
+    <string name="kfds_demo_chat_ec_start_txt">2.电商会话说明</string>
+    <string name="kfds_demo_chat_ec_start">电商会话</string>
+    <string name="kfds_demo_chat_robot_start_txt">3.机器人会话</string>
+    <string name="kfds_demo_chat_robot_start">机器人会话</string>
+
+    <!-- -->
+    <string name="kfds_demo_chat_type_description">二：打开会话方式说明</string>
+    <string name="kfds_demo_chat_activity_start_txt">1. Activity方式会话说明</string>
+    <string name="kfds_demo_chat_activity_start">Activity方式会话</string>
+    <string name="kfds_demo_chat_fragment_start_txt">2. Fragment方式打开会话说明</string>
+    <string name="kfds_demo_chat_fragment_start">Fragment方式打开会话</string>
+
+    <!-- -->
+    <string name="action_image">Image</string>
+    <string name="action_leave">Leave</string>
+    <string name="action_send">Send</string>
+    <string name="prompt_message">请输入...</string>
+
+    <string name="connect">Connected</string>
+    <string name="disconnect">Disconnected, Please check your internet connection</string>
+    <string name="error_connect">Failed to connect</string>
+
+    <!-- messages -->
+    <string name="message_welcome">Welcome to Socket.IO Chat –</string>
+    <plurals name="message_participants">
+        <item quantity="one">there\'s %d participant</item>
+        <item quantity="other">there are %d participants</item>
+    </plurals>
+    <string name="message_user_joined">%s joined</string>
+    <string name="message_user_left">%s left</string>
+    <string name="user_action_typing">is typing</string>
+
+    <string name="kfds_titlebar_backbtn_title">返回</string>
+    <string name="kfds_titlebar_leavebtn_title">暂时离开</string>
+    <string name="kfds_titlebar_closebtn_title">结束会话</string>
+    <string name="kfds_titlebar_title_text">咨询客服</string>
+    <string name="kfds_titlebar_rate_title">满意度评价</string>
+    <string name="kfds_titlebar_center_title">客服中心</string>
+
+    <string name="kfds_pull_to_refresh_pull_label">下拉可以刷新</string>
+    <string name="kfds_pull_to_refresh_refreshing_label">加载中...</string>
+    <string name="kfds_pull_to_refresh_release_label">松开可以刷新</string>
+
+    <string name="kfds_pull_to_refresh_tap_label">下拉可以刷新</string>
+    <string name="kfds_pull_to_refresh_update">最近更新：</string>
+
+    <string name="kfds_rate_backkey_down">请对客服做出评价,谢谢</string>
+    <string name="kfds_rate_reason">请填写评分低的原因</string>
+    <string name="kfds_rate_tip">请对我们的服务做出评价</string>
+    <string name="kfds_resend_tip">确定要重新发送?</string>
+
+
+    <string name="kfds_pull_to_refresh_from_bottom_pull_label">上滑可以刷新</string>
+    <string name="kfds_pull_to_refresh_from_bottom_release_label">@string/kfds_pull_to_refresh_release_label</string>
+    <string name="kfds_pull_to_refresh_from_bottom_refreshing_label">@string/kfds_pull_to_refresh_refreshing_label</string>
+
+    <string name="kfds_imageview_content_description">图片</string>
+    <string name="kfds_picture">图片</string>
+    <string name="kfds_choose_picture_error">选择图片文件出错</string>
+    <string name="kfds_voice">语音</string>
+    <string name="kfds_location">位置</string>
+
+    <string name="kfds_pick_picture_label">照片</string>
+    <string name="kfds_take_picture_label">拍照</string>
+    <string name="kfds_show_red_packet_label">红包</string>
+    <string name="kfds_file_label">文件</string>
+    <string name="kfds_inputbar_send">发送</string>
+    <string name="kfds_press_to_speak">按住 说话</string>
+    <string name="kfds_lose_to_cancel">松开 取消</string>
+    <string name="kfds_record_voice_hint_record">手指上滑,取消发送</string>
+    <string name="kfds_record_voice_hint_cancel">松开手指,取消发送</string>
+    <string name="kfds_record_voice_too_short">录音时间太短</string>
+    <string name="kfds_record_voice_too_long">录音时间太长</string>
+    <string name="kfds_record_permission_tip">您需要授权才能够发送语音</string>
+    <string name="kfds_camera_permission_tip">您需要授权才能够拍照</string>
+    <string name="bytedesk_read_destroy_label">阅后即焚</string>
+    <string name="bytedesk_shop_label">商品</string>
+
+
+    <string name="kfds_notification_recording">正在录音</string>
+    <string name="kfds_notification_record_stopped">录音停止</string>
+    <string name="kfds_notification_record_warning">录音警告</string>
+    <string name="kfds_record_voice_insert_sdcard">请插入SDCard</string>
+    <string name="kfds_record_voice_no_sdcard_exist">内存卡不存在</string>
+    <string name="kfds_record_voice_sdcard_full">SDCard已满,无法完成录音,请清理SDCard</string>
+
+    <string name="kfds_notification_send_picture">发送图片</string>
+    <string name="kfds_notification_sending_picture">正在发送图片</string>
+    <string name="kfds_notification_send_picture_succeed">发送图片成功</string>
+    <string name="kfds_notification_send_picture_failed">发送图片失败</string>
+
+    <string name="kfds_notification_send_voice">发送语音</string>
+    <string name="kfds_notification_sending_voice">正在发送语音</string>
+    <string name="kfds_notification_send_voice_succeed">发送语音成功</string>
+    <string name="kfds_notification_send_voice_failed">发送语音失败</string>
+
+    <string name="kfds_notification_ticker">您收到一条新消息</string>
+    <string name="kfds_notification_contentview_content">您收到一条新消息</string>
+
+    <string name="kfds_minuites_ago">分钟前</string>
+    <string name="kfds_hours_ago">小时前</string>
+    <string name="kfds_yestoday">昨天</string>
+    <string name="kfds_the_day_before_yestoday">前天</string>
+    <string name="kfds_days_ago">天前</string>
+
+    <string name="kfds_please_choose_action">请选择操作</string>
+    <string name="kfds_copy">复制内容</string>
+    <string name="kfds_delete">删除内容</string>
+    <string name="kfds_cancel">取消</string>
+    <string name="kfds_offline_send_again_later">当前离线,请稍后重试</string>
+
+    <string name="kfds_comment_title">调查</string>
+    <string name="kfds_comment_description">请为此客服打分</string>
+    <string name="kfds_comment_good">满意</string>
+    <string name="kfds_comment_ok">一般</string>
+    <string name="kfds_comment_bad">很差</string>
+    <string name="kfds_comment_thanks">多谢您的评价</string>
+    <string name="kfds_comment_request">客服发起满意度评价</string>
+
+    <string name="kfds_queue_position">你前面还有%1$s人,大约还需要等待%2$s秒</string>
+    <string name="kfds_queue_position_2">你前面还有%1$s人,请耐心等待</string>
+    <string name="kfds_no_agent_online">目前没有客服在线,请留言.客服上线后会在第一时间回复您!</string>
+
+    <string name="kfds_settings_title">设置</string>
+    <string name="kfds_settings_clearmessage">清空聊天记录</string>
+    <string name="kfds_settings_support">微客服(kfds.com)技术支持</string>
+    <string name="kfds_settings_clearmessge_asure">确定要清空聊天记录?</string>
+    <string name="kfds_profile_title">个人资料</string>
+
+    <string name="kfds_webbrowser_title">网页</string>
+
+    <string name="kfds_faq_title">常见问题</string>
+
+    <string name="kfds_ok">确定</string>
+    <string name="kfds_offline">离线</string>
+    <string name="kfds_backkeypressed_toast">再按一次退出</string>
+
+    <string name="kfds_promotion_title">提示</string>
+    <string name="kfds_close_session">客服已关闭会话</string>
+    <string name="kfds_quit_session">客服已退出会话</string>
+    <string name="kfds_agent_offline">客服暂时离开,请稍后</string>
+    <string name="kfds_create_menu">未在管理后台创建自定义菜单</string>
+    <string name="kfds_close_chat_session_asure">确定要关闭会话?</string>
+    <string name="kfds_request_agent">正在联系客服,请稍后</string>
+    <string name="kfds_goto_faq">查看常见问题</string>
+
+    <string name="kfds_network_disconnected">网络连接异常,请稍后重试</string>
+    <string name="kfds_timeout">请求超时</string>
+    <string name="kfds_request_again">重新请求客服</string>
+    <string name="kfds_request_success">已接通客服</string>
+
+    <string name="kfds_webview_loadingprogress">页面加载中，请稍后..</string>
+
+    <string name="kfds_dialog_rate_comment">附言:</string>
+    <string name="kfds_dialog_rate_title">满意度评价</string>
+    <string name="kfds_dialog_rate_body">为了给您提供更加优质的服务,请您为客服的服务进行评价,谢谢您的合作</string>
+    <string name="kfds_dialog_rate_good">非常满意</string>
+    <string name="kfds_dialog_rate_ok">满意</string>
+    <string name="kfds_dialog_rate_normal">一般</string>
+    <string name="kfds_dialog_rate_bad">不满意</string>
+    <string name="kfds_dialog_rate_verybad">非常不满意</string>
+
+    <string name="kfds_robot_rate_is_helpfull">该回答对您有帮助吗?</string>
+    <string name="kfds_robot_rate_thanks">感谢您的支持!</string>
+    <string name="kfds_robot_rate_usefull">有用</string>
+    <string name="kfds_robot_rate_useless">没用</string>
+    <string name="kfds_robot_no_answer_found">很抱歉,客服小秘书没能理解您的问题,您可以选择以下操作:</string>
+    <string name="kfds_robot_founded_answers">为您找到以下相关问题:</string>
+    <string name="kfds_robot_get_default">查看智能应答</string>
+    <string name="kfds_robot_route_human_service">呼叫人工客服</string>
+    <string name="kfds_robot_not_set">暂未设置智能机器人应答</string>
+    <string name="kfds_robot_leave_message">留言</string>
+    <string name="kfds_robot_is_routing_human_service">正在呼叫人工客服</string>
+    <string name="kfds_robot_no_agent_available">抱歉,当前无客服在线</string>
+    <string name="kfds_robot_cannot_send_picture">机器人应答模式下下不能发送图片</string>
+    <string name="kfds_robot_cannot_send_voice">机器人应答模式下下不能发送语音</string>
+
+    <string name="kfds_no_email_client_found">抱歉,此手机未安装邮箱客户端,无法发送邮件</string>
+
+    <string name="kfds_product_info_price">￥</string>
+    <string name="kfds_product_info_sendlinkbtn">发送宝贝链接</string>
+    <string name="kfds_imageview_contentdescription"></string>
+    <string name="appkefu_imageview_content_description"></string>
+
+    <string name="kfds_already_rated">已经评价过此次会话</string>
+    <string name="kfds_mobileformat_wrong">手机号码格式错误</string>
+    <string name="kfds_content_null">留言内容不能为空</string>
+    <string name="kfds_leavemsg_title">留言</string>
+    <string name="kfds_leavemsg_success">留言成功</string>
+    <string name="kfds_leavemsg_failed">留言失败</string>
+    <string name="kfds_leavemsg_submited">留言已提交</string>
+
+    <string name="kfds_default_agentnickname">小薇</string>
+
+    <string name="appkefu_f001">[微笑]</string>
+    <string name="appkefu_f002">[撇嘴]</string>
+    <string name="appkefu_f003">[色]</string>
+    <string name="appkefu_f004">[发呆]</string>
+    <string name="appkefu_f005">[得意]</string>
+    <string name="appkefu_f006">[流泪]</string>
+    <string name="appkefu_f007">[害羞]</string>
+    <string name="appkefu_f008">[闭嘴]</string>
+    <string name="appkefu_f009">[睡]</string>
+    <string name="appkefu_f010">[大哭]</string>
+
+    <string name="appkefu_f011">[尴尬]</string>
+    <string name="appkefu_f012">[发怒]</string>
+    <string name="appkefu_f013">[调皮]</string>
+    <string name="appkefu_f014">[呲牙]</string>
+    <string name="appkefu_f015">[惊讶]</string>
+    <string name="appkefu_f016">[难过]</string>
+    <string name="appkefu_f017">[酷]</string>
+    <string name="appkefu_f018">[冷汗]</string>
+    <string name="appkefu_f019">[抓狂]</string>
+    <string name="appkefu_f020">[吐]</string>
+
+    <string name="appkefu_f021">[偷笑]</string>
+    <string name="appkefu_f022">[可爱]</string>
+    <string name="appkefu_f023">[白眼]</string>
+    <string name="appkefu_f024">[傲慢]</string>
+    <string name="appkefu_f025">[饥饿]</string>
+    <string name="appkefu_f026">[困]</string>
+    <string name="appkefu_f027">[惊恐]</string>
+    <string name="appkefu_f028">[流汗]</string>
+    <string name="appkefu_f029">[憨笑]</string>
+    <string name="appkefu_f030">[大兵]</string>
+
+    <string name="appkefu_f031">[奋斗]</string>
+    <string name="appkefu_f032">[咒骂]</string>
+    <string name="appkefu_f033">[疑问]</string>
+    <string name="appkefu_f034">[嘘]</string>
+    <string name="appkefu_f035">[晕]</string>
+    <string name="appkefu_f036">[折磨]</string>
+    <string name="appkefu_f037">[衰]</string>
+    <string name="appkefu_f038">[骷髅]</string>
+    <string name="appkefu_f039">[敲打]</string>
+    <string name="appkefu_f040">[再见]</string>
+
+    <string name="appkefu_f041">[擦汗]</string>
+    <string name="appkefu_f042">[抠鼻]</string>
+    <string name="appkefu_f043">[鼓掌]</string>
+    <string name="appkefu_f044">[糗大了]</string>
+    <string name="appkefu_f045">[坏笑]</string>
+    <string name="appkefu_f046">[左哼哼]</string>
+    <string name="appkefu_f047">[右哼哼]</string>
+    <string name="appkefu_f048">[哈欠]</string>
+    <string name="appkefu_f049">[鄙视]</string>
+    <string name="appkefu_f050">[委屈]</string>
+
+    <string name="appkefu_f051">[快哭了]</string>
+    <string name="appkefu_f052">[阴险]</string>
+    <string name="appkefu_f053">[亲亲]</string>
+    <string name="appkefu_f054">[吓]</string>
+    <string name="appkefu_f055">[可怜]</string>
+    <string name="appkefu_f056">[菜刀]</string>
+    <string name="appkefu_f057">[西瓜]</string>
+    <string name="appkefu_f058">[啤酒]</string>
+    <string name="appkefu_f059">[篮球]</string>
+    <string name="appkefu_f060">[乒乓球]</string>
+
+    <string name="appkefu_f061">[喝茶]</string>
+    <string name="appkefu_f062">[米饭]</string>
+    <string name="appkefu_f063">[猪头]</string>
+    <string name="appkefu_f064">[玫瑰]</string>
+    <string name="appkefu_f065">[垂玫瑰]</string>
+    <string name="appkefu_f066">[爱心]</string>
+    <string name="appkefu_f067">[红爱心]</string>
+    <string name="appkefu_f068">[伤心]</string>
+    <string name="appkefu_f069">[蛋糕]</string>
+    <string name="appkefu_f070">[闪电]</string>
+
+    <string name="appkefu_f071">[地雷]</string>
+    <string name="appkefu_f072">[匕首]</string>
+    <string name="appkefu_f073">[足球]</string>
+    <string name="appkefu_f074">[瓢虫]</string>
+    <string name="appkefu_f075">[便便]</string>
+    <string name="appkefu_f076">[月亮]</string>
+    <string name="appkefu_f077">[太阳]</string>
+    <string name="appkefu_f078">[礼物]</string>
+    <string name="appkefu_f079">[抱抱]</string>
+    <string name="appkefu_f080">[强]</string>
+
+    <string name="appkefu_f081">[差]</string>
+    <string name="appkefu_f082">[握手]</string>
+    <string name="appkefu_f083">[胜利]</string>
+    <string name="appkefu_f084">[抱拳]</string>
+    <string name="appkefu_f085">[勾引]</string>
+    <string name="appkefu_f086">[拳头]</string>
+    <string name="appkefu_f087">[差劲]</string>
+    <string name="appkefu_f088">[爱你]</string>
+    <string name="appkefu_f089">[不]</string>
+    <string name="appkefu_f090">[好]</string>
+
+    <string name="appkefu_f091">[吻]</string>
+    <string name="appkefu_f092">[飞心]</string>
+    <string name="appkefu_f093">[歪歪]</string>
+    <string name="appkefu_f094">[发抖]</string>
+    <string name="appkefu_f095">[怒吼]</string>
+    <string name="appkefu_f096">[单脚立]</string>
+    <string name="appkefu_f097">[立正]</string>
+    <string name="appkefu_f098">[背偷笑]</string>
+    <string name="appkefu_f099">[跳]</string>
+    <string name="appkefu_f100">[挥手]</string>
+
+    <string name="appkefu_f101">[激动]</string>
+    <string name="appkefu_f102">[双脚跳]</string>
+    <string name="appkefu_f103">[飞吻]</string>
+    <string name="appkefu_f104">[母企鹅]</string>
+    <string name="appkefu_f105">[公企鹅]</string>
+
+    <string name="title_activity_big_image">BigImageActivity</string>
+    <string name="title_activity_contact">ContactActivity</string>
+    <string name="title_activity_feedback">FeedbackActivity</string>
+    <string name="title_activity_chat_wx">ChatWxActivity</string>
+    <string name="title_activity_contact_profile">ContactProfileActivity</string>
+    <string name="title_activity_leave_message">LeaveMessageActivity</string>
+    <string name="title_activity_feedback_record">FeedbackRecordActivity</string>
+    <string name="title_activity_ticket_record">TicketRecordActivity</string>
+    <string name="title_activity_chat_video">ChatVideoActivity</string>
+
+
+</resources>

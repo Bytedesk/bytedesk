@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="65.0dip"
+    android:background="@drawable/home_item_selector"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="5dp">
+
+    <RelativeLayout
+        android:id="@+id/relativelayout_avatar"
+        android:layout_width="59dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="2dp">
+        
+        <ImageView
+            android:id="@+id/imageview_avatar"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/appkefu_kefu128" />
+
+        <TextView
+            android:id="@+id/textview_unreadnum"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/home_icon_unreadnum_red"
+            android:gravity="center"
+            android:textColor="@color/qmui_config_color_white"
+            android:textSize="12sp"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.0"
+        android:orientation="vertical"
+        android:paddingLeft="5dip">
+
+        <TextView
+            android:id="@+id/textview_firstitem_nickname"
+            style="@style/MMFontTitleInList"
+            android:text="nickname"
+            android:textColor="@color/qmui_config_color_black"
+            android:maxLines="1"/>
+
+        <TextView
+            android:id="@+id/textview_firstitem_status"
+            style="@style/MMFontTitleInList"
+            android:layout_below="@+id/textview_firstitem_nickname"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/btn_bg_blue"
+            android:text="已读"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/textview_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textview_firstitem_nickname"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@+id/textview_firstitem_status"
+            android:text="content"
+            android:textColor="@color/qmui_config_color_black"
+            android:textSize="14sp"
+            android:maxLines="1"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textview_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:gravity="top"
+        android:text="2016-10-30 14:40:00"
+        android:textSize="12sp"
+        android:maxLines="1"/>
+
+</LinearLayout>

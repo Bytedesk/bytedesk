@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="65.0dip"
+    android:background="@drawable/bytedesk_contact_item_selector"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="5dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.0"
+        android:orientation="vertical"
+        android:paddingLeft="5dip">
+
+        <TextView
+            android:id="@+id/bytedesk_feedback_item_content"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="nickname"
+            android:textColor="@color/qmui_config_color_black"
+            android:maxLines="1"/>
+
+        <TextView
+            android:id="@+id/bytedesk_feedback_item_reply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bytedesk_feedback_item_content"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/qmui_config_color_black"
+            android:textSize="14sp"
+            android:maxLines="1"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qmui_config_color_white">
+
+    <com.bytedesk.ui.widget.InputAwareLayout
+        android:id="@+id/bytedesk_activity_chat_kf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/album_dp_20">
+
+        <!-- 聊天记录 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="?attr/qmui_topbar_height"
+            android:fillViewport="true"
+            android:fitsSystemWindows="true">
+
+            <com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout
+                android:id="@+id/bytedesk_chat_pulltorefresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_above="@+id/bytedesk_chat_kf_input">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/bytedesk_chat_fragment_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bytedesk_activity_chat_background_default"
+                    android:paddingLeft="@dimen/bytedesk_activity_horizontal_margin"
+                    android:paddingRight="@dimen/bytedesk_activity_horizontal_margin"
+                    android:scrollbars="vertical"
+                    android:scrollbarStyle="outsideOverlay"/>
+
+            </com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout>
+
+            <include android:id="@+id/bytedesk_chat_kf_input" layout="@layout/bytedesk_activity_chat_kf_input" />
+
+        </LinearLayout>
+
+    </com.bytedesk.ui.widget.InputAwareLayout>
+
+    <!--<com.liyi.viewer.widget.ScaleImageView-->
+        <!--android:id="@+id/bytedesk_image_preivew"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="#000000"-->
+        <!--android:visibility="gone" />-->
+
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/bytedesk_chat_topbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"/>
+
+</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>

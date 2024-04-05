@@ -1,0 +1,41 @@
+.S--wide {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.S--wide #root {
+  width: 100%;
+}
+:root {
+  --marked-color: var(--gray-1);
+  --marked-bg-color: var(--brand-3);
+}
+.showcase-title {
+  color: #9ba6b3;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 18px;
+  margin: 16px 0 8px;
+}
+.showcase-title:after {
+  content: ":";
+}
+.RichText mark {
+  background: var(--marked-bg-color);
+  border-radius: 10px;
+  color: var(--marked-color);
+  font-weight: 700;
+  padding: 2px 6px;
+}
+@media (min-width: 660px) {
+  .showcase {
+    grid-gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1000px) {
+  .showcase {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,82 @@
+.Navbar {
+  position: relative;
+  z-index: @zindex-navbar;
+  display: flex;
+  align-items: center;
+  padding: @navbar-padding;
+  padding-top: var(--safe-top);
+  border-bottom: 1px solid @navbar-border-color;
+  background: @navbar-bg;
+
+  &-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: @navbar-height;
+    padding: 3px 0;
+    box-sizing: border-box;
+  }
+  &-left,
+  &-right {
+    display: flex;
+    width: 58px;
+  }
+  &-right {
+    justify-content: flex-end;
+  }
+  &-title {
+    margin: 0;
+    color: @navbar-color;
+    font-size: @navbar-font-size;
+    font-weight: 500;
+  }
+  &-logo {
+    width: auto;
+    height: @navbar-logo-height;
+  }
+  .IconBtn {
+    color: var(--gray-1);
+    font-size: 24px;
+  }
+  .IconBtn + .IconBtn {
+    margin-left: 9px;
+  }
+}
+
+.Navbar--left {
+  .Navbar-left {
+    width: 24px;
+  }
+  .Navbar-main {
+    min-height: 62px;
+    justify-content: flex-start;
+  }
+  .Navbar-logo {
+    margin-left: 9px;
+  }
+}
+
+.Navbar-logo + .Navbar-inner {
+  margin-left: 9px;
+}
+
+.Navbar-desc {
+  color: var(--gray-2);
+  font-size: 12px;
+}
+
+.ChatApp[data-elder-mode="true"] {
+  .Navbar .IconBtn {
+    font-size: 26px;
+  }
+  .Navbar-logo {
+    height: 43px;
+  }
+  .Navbar-title {
+    font-size: 18px;
+  }
+  .Navbar-desc {
+    font-size: 13px;
+  }
+}

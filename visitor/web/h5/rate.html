@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>萝卜丝-满意度评价-公众号</title>
+    <!-- <link rel="stylesheet" href="./css/vendor/weui/weui.min.css" /> -->
+    <!-- 说明：https://github.com/Tencent/weui/wiki -->
+    <link rel="stylesheet" href="https://res.wx.qq.com/t/wx_fed/weui-source/res/2.5.15/weui.min.css" />
+    <style>
+        /* body,html{height:100%;-webkit-tap-highlight-color:transparent} */
+    </style>
+</head>
+<body>
+    
+    <div class="page">
+        <div class="weui-form">
+            <div class="weui-form__text-area">
+                <h2 class="weui-form__title">文本域</h2>
+                <div class="weui-form__desc">输入更多内容的输入区域样式展示</div>
+            </div>
+            <div class="weui-form__control-area">
+                <div class="weui-cells__group weui-cells__group_form">
+                    <div class="weui-cells__title">问题描述</div>
+                    <div class="weui-cells weui-cells_form">
+                        <div class="weui-cell weui-cell_active">
+                            <div class="weui-cell__bd">
+                                <textarea class="weui-textarea" placeholder="请描述你所发生的问题" rows="3"></textarea>
+                                <div role="option" aria-live="polite" class="weui-textarea-counter"><span>0</span>/200</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-form__opr-area">
+                <a role="button" class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/t/wx_fed/cdn_libs/res/weui/1.2.8/weui.min.js"></script>
+    <script type="text/javascript">
+        function wxReady(callback) {
+            if (
+                typeof WeixinJSBridge === 'object' &&
+                typeof window.WeixinJSBridge.invoke === 'function'
+            ) {
+                callback()
+            } else {
+                document.addEventListener('WeixinJSBridgeReady', callback, false)
+            }
+        }
+        wxReady(function () {
+            WeixinJSBridge.invoke('getUserConfig', {}, function (res) {
+                if (res.isCareMode) {
+                    document.body.setAttribute('data-weui-mode', 'care');
+                }
+            });
+        });
+    </script> -->
+
+</body>
+</html>

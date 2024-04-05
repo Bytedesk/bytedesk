@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bytedesk_chat_emotion"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:visibility="gone">
+
+    <!--TODO: 表情-->
+    <View
+        android:id="@+id/appkefu_inputbar_bottomline"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="#E0E0E0" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/appkefu_emotion_viewpager"
+        android:layout_width="wrap_content"
+        android:layout_height="180dp"
+        android:layout_below="@+id/appkefu_inputbar_bottomline"
+        android:background="#F3F3F3" />
+
+    <LinearLayout
+        android:id="@+id/appkefu_emotionview_pageindicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appkefu_emotion_viewpager"
+        android:background="#F3F3F3"
+        android:gravity="center_horizontal" >
+
+        <ImageView
+            android:id="@+id/appkefu_emotionview_pageindicator_imageview_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/kfds_imageview_content_description"
+            android:padding="5dp"
+            android:src="@drawable/appkefu_page_active" />
+
+        <ImageView
+            android:id="@+id/appkefu_emotionview_pageindicator_imageview_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/kfds_imageview_content_description"
+            android:padding="5dp"
+            android:src="@drawable/appkefu_page_normal" />
+
+        <ImageView
+            android:id="@+id/appkefu_emotionview_pageindicator_imageview_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/kfds_imageview_content_description"
+            android:padding="5dp"
+            android:src="@drawable/appkefu_page_normal" />
+
+        <ImageView
+            android:id="@+id/appkefu_emotionview_pageindicator_imageview_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/kfds_imageview_content_description"
+            android:padding="5dp"
+            android:src="@drawable/appkefu_page_normal" />
+
+        <ImageView
+            android:id="@+id/appkefu_emotionview_pageindicator_imageview_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/kfds_imageview_content_description"
+            android:padding="5dp"
+            android:src="@drawable/appkefu_page_normal" />
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -1,0 +1,22 @@
+.MessageContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  & > .PullToRefresh {
+    flex: 1;
+  }
+  &:focus {
+    outline: 0;
+  }
+}
+
+.MessageList {
+  padding: @message-list-padding;
+  font-size: 15px;
+  // 自定义 jackning
+  height: 500px;
+  overflow-y: auto;
+}

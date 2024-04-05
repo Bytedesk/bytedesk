@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+
+    defaultConfig {
+        applicationId "com.bytedesk.feedback"
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
+    }
+
+    // 萝卜丝第二步
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // 萝卜丝第三步
+    // 加载萝卜丝核心库
+    implementation 'com.bytedesk:libcore:2.8.0'
+    // 加载萝卜丝默认UI库
+    implementation 'com.bytedesk:libui:2.8.0'
+
+    // 腾讯QMUI界面库
+    // http://qmuiteam.com/android/page/start.html
+    // https://bintray.com/chanthuang/qmuirepo
+    implementation 'com.qmuiteam:qmui:2.0.0-alpha10'
+
+
+    implementation 'androidx.appcompat:appcompat:.1.2.0-alpha02'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.material:material:1.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+}

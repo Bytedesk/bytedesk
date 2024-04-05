@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="kefudemo" type="id"/>
+    <item name="main_container" type="id"/>
+
+    <item name="empty_button" type="id"/>
+
+    <item name="topbar_right_about_button" type="id"/>
+    <item name="topbar_right_change_button" type="id"/>
+
+    <item name="layout_for_test" type="id"/>
+</resources>

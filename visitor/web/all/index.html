@@ -1,0 +1,74 @@
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-03-22 14:41:04
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-03-22 14:42:20
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta name="renderer" content="webkit" />
+    <meta name="force-rendering" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+    <title>智能助理</title>
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/chatui/sdk-v2/0.3.5/sdk.css"> -->
+    <link rel="stylesheet" href="./assets/css/0.3.5/sdk.css">
+    <!-- <style>
+        // 修改输入框高度
+        .ChatFooter .Composer-input {
+            min-height: 88px;
+        }
+    </style> -->
+</head>
+<!--[if IE]>
+  <div class="browseupgrade">
+    当前网页
+    <strong>不支持</strong> 您正在使用的浏览器。为了体验更好的访问效果， 请
+    <a href="http://browsehappy.com/" target="_blank">升级你的浏览器</a>.
+  </div>
+<![endif]-->
+
+<body>
+    <div id="root"></div>
+    <!-- 兼容低版本浏览器 https://chatui.io/sdk/compatibility -->
+    <script>
+        if (typeof Set === 'undefined' || typeof Set.prototype.keys !== 'function') {
+            document.write('<script src="//g.alicdn.com/alime/polyfill/0.1.1/??ie10.js,css-vars.js"><\/script>');
+        } else if (!(window.CSS && CSS.supports('color', 'var(--a)'))) {
+            document.write('<script src="//g.alicdn.com/alime/polyfill/0.1.1/css-vars.js"><\/script>');
+        }
+    </script>
+    <!-- <script src="//g.alicdn.com/chatui/sdk-v2/0.3.5/sdk.js"></script> -->
+    <script src="./assets/js/0.3.5/sdk.js"></script>
+    <!-- <script src="//g.alicdn.com/chatui/extensions/5.15.3/isv-parser.js"></script> -->
+    <script src="./assets/js/5.15.3/isv-parser.js"></script>
+    <script src="./setup.js"></script>
+    <!-- <script src="//g.alicdn.com/chatui/icons/2.0.2/index.js" async></script> -->
+    <script src="./assets/js/2.0.2/index.js" async></script>
+    <!--  -->
+    <script>
+        var $buoop = { required: { e: -4, f: -3, o: -3, s: -1, c: -3 }, insecure: true, api: 2023.11 };
+        function $buo_f() {
+            var e = document.createElement("script");
+            e.src = "//browser-update.org/update.min.js";
+            document.body.appendChild(e);
+        };
+        try { document.addEventListener("DOMContentLoaded", $buo_f, false) }
+        catch (e) { window.attachEvent("onload", $buo_f) }
+    </script>
+
+</body>
+
+</html>

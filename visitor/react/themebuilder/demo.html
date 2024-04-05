@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ChatUI Theme Preview</title>
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/chatui/core/2.4.2/index.css"> -->
+    <link rel="stylesheet" href="./core/index.css" />
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/chatui/theme-builder/0.3.0/demo.css"> -->
+    <link rel="stylesheet" href="./css/demo.css" />
+  </head>
+
+  <body>
+    <script>
+      <!-- with (document) with (body) with (insertBefore(createElement("script"), firstChild)) setAttribute("exparams", "category=&userid=&aplus&yunid=&b5ee331eeee3&asid=AQAAAAAfJa9lG3w7OQAAAABgaIDUnLr0sg==", id = "tb-beacon-aplus", src = (location > "https" ? "//g" : "//g") + ".alicdn.com/alilog/mlog/aplus_v2.js") -->
+      with (document)
+        with (body)
+          with (insertBefore(createElement("script"), firstChild))
+            setAttribute(
+              "exparams",
+              "category=&userid=&aplus&yunid=&b5ee331eeee3&asid=AQAAAAAfJa9lG3w7OQAAAABgaIDUnLr0sg==",
+              (id = "tb-beacon-aplus"),
+              (src = "./aplus_v2.js"),
+            );
+    </script>
+    <div id="root"></div>
+    <script>
+      window.ontouchstart = null;
+    </script>
+    <script
+      src="//g.alicdn.com/code/lib/??react/17.0.2/umd/react.production.min.js,react-dom/17.0.2/umd/react-dom.production.min.js"
+      crossorigin
+    ></script>
+    <!-- <script src="//g.alicdn.com/chatui/core/2.4.2/index.js" crossorigin></script> -->
+    <script src="./core/index.js" crossorigin></script>
+    <!-- <script src="//g.alicdn.com/chatui/theme-builder/0.3.0/demo.js" crossorigin></script> -->
+    <script src="./core/demo.js" crossorigin></script>
+    <!-- <script src="//g.alicdn.com/chatui/icons/2.0.1/index.js" crossorigin></script> -->
+    <script src="./icons/index.js" crossorigin></script>
+  </body>
+</html>
