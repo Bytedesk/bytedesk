@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-27 18:45:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 10:56:48
+ * @LastEditTime: 2024-04-05 00:04:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,7 +83,7 @@ public class CacheConfig {
      * @return
      */
     // @Bean
-    @SuppressWarnings("null")
+    // @SuppressWarnings("null")
     public RedisCacheManager redisCacheManager() {
         return RedisCacheManager.builder(redisConnectionFactory)
         .cacheDefaults(cacheConfiguration())
@@ -101,7 +101,7 @@ public class CacheConfig {
      * @param redisCacheManager
      * @return
      */
-    @SuppressWarnings("null")
+    // @SuppressWarnings("null")
     public CompositeCacheManager compositeCacheManager(CaffeineCacheManager caffeineCacheManager,
             RedisCacheManager redisCacheManager) {
         CompositeCacheManager compositeCacheManager = new CompositeCacheManager();

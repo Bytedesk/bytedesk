@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 12:42:58
+ * @LastEditTime: 2024-04-02 16:50:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,10 +18,13 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.TypeConsts;
 // import com.bytedesk.core.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.utils.BdConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.team.department.Department;
@@ -43,13 +46,12 @@ public class MemberService {
 
     public JsonResult<?> create(MemberRequest memberRequest) {
         // 
-        if (userService.existsByMobile(memberRequest.getMobile())) {
-            return JsonResult.error("mobile already exist");
-        }
-        if (userService.existsByEmail(memberRequest.getEmail())) {
-            return JsonResult.error("email already exist");
-        }
-
+        // if (userService.existsByMobile(memberRequest.getMobile())) {
+        //     return JsonResult.error("mobile already exist");
+        // }
+        // if (userService.existsByEmail(memberRequest.getEmail())) {
+        //     return JsonResult.error("email already exist");
+        // }
         //
         Optional<Member> memberOptional = memberRepository.findByUser_Mobile(memberRequest.getMobile());
         if (!memberOptional.isPresent()) {
@@ -67,8 +69,9 @@ public class MemberService {
             User user;
             Optional<User> userOptional = userService.findByMobile(memberRequest.getMobile());
             if (!userOptional.isPresent()) {
-                user = userService.createUserFromMember(
-                        memberRequest.getRealname(),
+                user = userService.createUser(
+                        memberRequest.getNickname(),
+                        AvatarConsts.DEFAULT_AVATAR_URL,
                         memberRequest.getPassword(),
                         memberRequest.getMobile(),
                         memberRequest.getEmail(),
@@ -76,16 +79,17 @@ public class MemberService {
                         member.getOrganization().getOid()
                     );
             } else {
-                user = userService.updateUserFromMember(
-                        userOptional.get(),
-                        memberRequest.getPassword(),
-                        memberRequest.getMobile(),
-                        memberRequest.getEmail()
-                    );
+                    user = userOptional.get();
+                // user = userService.updateUser(
+                //         userOptional.get(),
+                //         memberRequest.getPassword(),
+                //         memberRequest.getMobile(),
+                //         memberRequest.getEmail()
+                //     );
             }
             member.setUser(user);
             // 
-            Member result = memberRepository.save(member);
+            MemberResponse result = save(member);
 
             return JsonResult.success(result);
         }
@@ -96,7 +100,7 @@ public class MemberService {
     public JsonResult<?> update(Member member, MemberRequest memberRequest) {
 
         member.setJobNo(memberRequest.getJobNo());
-        member.setRealname(memberRequest.getRealname());
+        member.setNickname(memberRequest.getNickname());
         member.setSeatNo(memberRequest.getSeatNo());
         member.setTelephone(memberRequest.getTelephone());
         member.setEmail(memberRequest.getEmail());
@@ -109,7 +113,7 @@ public class MemberService {
             return null;
         }
 
-        Member result = memberRepository.save(member);
+        MemberResponse result = save(member);
 
         return JsonResult.success(result);
     }
@@ -122,7 +126,16 @@ public class MemberService {
     // }
     // }
 
-    
+    @SuppressWarnings("null")
+    private MemberResponse save(Member member) {
+        return convertToMemberResponse(memberRepository.save(member));
+    }
+
+    private MemberResponse convertToMemberResponse(Member member) {
+        MemberResponse memberResponse = modelMapper.map(member, MemberResponse.class);
+        memberResponse.setUser(BdConvertUtils.convertTUserResponseSimple(member.getUser()));
+        return memberResponse;
+    }
 
     public void initData() {
 
@@ -136,7 +149,7 @@ public class MemberService {
             MemberRequest memberRequest = MemberRequest.builder()
                 .jobNo("001")
                 .password("123456")
-                .realname("User001")
+                .nickname("User001")
                 .seatNo("001")
                 .telephone("881")
                 .mobile("18888888881")
@@ -148,7 +161,7 @@ public class MemberService {
             MemberRequest memberRequest2 = MemberRequest.builder()
                 .jobNo("002")
                 .password("123456")
-                .realname("User002")
+                .nickname("User002")
                 .seatNo("002")
                 .telephone("882")
                 .mobile("18888888882")
@@ -165,7 +178,7 @@ public class MemberService {
             MemberRequest memberRequest = MemberRequest.builder()
                 .jobNo("003")
                 .password("123456")
-                .realname("User003")
+                .nickname("User003")
                 .seatNo("003")
                 .telephone("883")
                 .mobile("18888888883")
@@ -176,7 +189,7 @@ public class MemberService {
             MemberRequest memberRequest2 = MemberRequest.builder()
                 .jobNo("004")
                 .password("123456")
-                .realname("User004")
+                .nickname("User004")
                 .seatNo("004")
                 .telephone("884")
                 .mobile("18888888884")
@@ -192,7 +205,7 @@ public class MemberService {
             MemberRequest memberRequest = MemberRequest.builder()
                     .jobNo("005")
                     .password("123456")
-                    .realname("User005")
+                    .nickname("User005")
                     .seatNo("005")
                     .telephone("885")
                     .mobile("18888888885")
@@ -203,7 +216,7 @@ public class MemberService {
             MemberRequest memberRequest2 = MemberRequest.builder()
                     .jobNo("006")
                     .password("123456")
-                    .realname("User006")
+                    .nickname("User006")
                     .seatNo("006")
                     .telephone("886")
                     .mobile("18888888886")
@@ -219,7 +232,7 @@ public class MemberService {
             MemberRequest memberRequest = MemberRequest.builder()
                     .jobNo("007")
                     .password("123456")
-                    .realname("User007")
+                    .nickname("User007")
                     .seatNo("007")
                     .telephone("887")
                     .mobile("18888888887")
@@ -230,7 +243,7 @@ public class MemberService {
             MemberRequest memberRequest2 = MemberRequest.builder()
                     .jobNo("008")
                     .password("123456")
-                    .realname("User008")
+                    .nickname("User008")
                     .seatNo("008")
                     .telephone("888")
                     .mobile("18888888888")
@@ -246,7 +259,7 @@ public class MemberService {
             MemberRequest memberRequest = MemberRequest.builder()
                     .jobNo("009")
                     .password("123456")
-                    .realname("User009")
+                    .nickname("User009")
                     .seatNo("009")
                     .telephone("889")
                     .mobile("18888888889")
@@ -257,7 +270,7 @@ public class MemberService {
             MemberRequest memberRequest2 = MemberRequest.builder()
                     .jobNo("010")
                     .password("123456")
-                    .realname("User010")
+                    .nickname("User010")
                     .seatNo("010")
                     .telephone("810")
                     .mobile("18888888810")
@@ -273,7 +286,7 @@ public class MemberService {
             MemberRequest memberRequest = MemberRequest.builder()
                 .jobNo("011")
                 .password("123456")
-                .realname("User011")
+                .nickname("User011")
                 .seatNo("011")
                 .telephone("811")
                 .mobile("18888888811")
@@ -284,7 +297,7 @@ public class MemberService {
             MemberRequest memberRequest2 = MemberRequest.builder()
                 .jobNo("012")
                 .password("123456")
-                .realname("User012")
+                .nickname("User012")
                 .seatNo("012")
                 .telephone("812")
                 .mobile("18888888812")
@@ -300,7 +313,7 @@ public class MemberService {
             MemberRequest memberRequest = MemberRequest.builder()
                     .jobNo("013")
                     .password("123456")
-                    .realname("User013")
+                    .nickname("User013")
                     .seatNo("013")
                     .telephone("813")
                     .mobile("18888888813")
@@ -311,7 +324,7 @@ public class MemberService {
             MemberRequest memberRequest2 = MemberRequest.builder()
                     .jobNo("014")
                     .password("123456")
-                    .realname("User014")
+                    .nickname("User014")
                     .seatNo("014")
                     .telephone("814")
                     .mobile("18888888814")

@@ -8,7 +8,10 @@
 </head>
 <body>
     <!--  -->
+    <a href="/" target="_blank">home</a><br/>
     <a href="/admin" target="_blank">admin</a><br/>
+    <a href="/chat" target="_blank">chat</a><br/>
+    <a href="/v" target="_blank">visitor</a><br/>
     <a href="/swagger-ui/index.html" target="_blank">api docs</a><br/>
     <a href="/im/actuator" target="_blank">actuator</a>
 </body> 

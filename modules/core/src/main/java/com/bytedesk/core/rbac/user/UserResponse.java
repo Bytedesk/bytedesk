@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 13:57:21
+ * @LastEditTime: 2024-04-02 14:46:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,11 @@
 package com.bytedesk.core.rbac.user;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.experimental.Accessors;
 
 // import java.util.Collection;
 import java.util.List;
@@ -25,12 +27,15 @@ import java.util.List;
 // import org.springframework.security.core.GrantedAuthority;
 
 import com.bytedesk.core.rbac.role.RoleResponse;
+import com.bytedesk.core.utils.BaseResponse;
 
 @Data
+@Builder
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class UserResponse {
+@EqualsAndHashCode(callSuper = true)
+public class UserResponse extends BaseResponse {
 
     private String uid;
     private String username;

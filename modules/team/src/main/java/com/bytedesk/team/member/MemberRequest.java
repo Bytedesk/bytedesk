@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 12:42:34
+ * @LastEditTime: 2024-04-02 15:56:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,11 +40,11 @@ public class MemberRequest extends BaseRequest {
     private String jobNo;
 
     /**
-     * realname
+     * nickname
      * 姓名
      */
     @NotEmpty
-    private String realname;
+    private String nickname;
 
     private String password;
 

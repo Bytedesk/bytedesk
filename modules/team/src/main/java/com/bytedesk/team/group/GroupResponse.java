@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 09:55:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-06 09:55:53
+ * @LastEditTime: 2024-04-02 15:10:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,8 @@
  */
 package com.bytedesk.team.group;
 
-public class GroupResponse {
+import com.bytedesk.core.utils.BaseResponse;
+
+public class GroupResponse extends BaseResponse {
 
 }

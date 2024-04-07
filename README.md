@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-05 15:56:57
+ * @LastEditTime: 2024-04-07 09:14:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,9 +38,9 @@ AI powered team cooperation & customer service
 
 ## Getting Started
 
+- Notice: this repo is still under ative development, many features are not completed or not stable，the docs are not completed
+
 ```bash
-# Notice: this repo is still under ative development, 
-# many features are not completed or not stable，the docs are not completed
 git clone https://github.com/Bytedesk/bytedesk.git
 # open bytedesk/starter/src/main/resources/application-dev.properties
 # change the value of spring.datasource.url and spring.datasource.username and spring.datasource.password

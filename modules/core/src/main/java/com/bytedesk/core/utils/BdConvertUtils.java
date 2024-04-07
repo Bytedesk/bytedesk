@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-01 17:25:05
+ * @LastEditTime: 2024-04-02 11:06:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,8 @@ import org.modelmapper.ModelMapper;
 
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.rbac.role.Role;
+import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 
@@ -27,6 +29,10 @@ public class BdConvertUtils {
 
     public static UserResponseSimple convertTUserResponseSimple(User user) {
         return new ModelMapper().map(user, UserResponseSimple.class);
+    }
+
+    public static RoleResponse convertToRoleResponse(Role role) {
+        return new ModelMapper().map(role, RoleResponse.class);
     }
     
     public static MessageResponse convertToMessageResponse(Message message) {

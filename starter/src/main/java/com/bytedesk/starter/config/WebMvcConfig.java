@@ -43,7 +43,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
             "classpath:/META-INF/resources/",
             "classpath:/resources/",
             "classpath:/static/",
-            "classpath:/public/",
+            "classpath:/templates/",
             // String.format("file:%s", uploadDir),
             // "file:/Users/ningjinpeng/Desktop/git/private/weiyu/server/upload/"
     };

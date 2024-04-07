@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 13:59:30
+ * @LastEditTime: 2024-04-02 11:07:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,16 +17,20 @@ package com.bytedesk.core.rbac.role;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserRepository;
+import com.bytedesk.core.utils.BdConvertUtils;
 import com.bytedesk.core.utils.Utils;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -40,8 +44,14 @@ public class RoleService {
 
         private final BytedeskProperties properties;
 
-        public List<Role> findAll() {
-                return roleRepository.findAll();
+        public Page<RoleResponse> query(User user, RoleRequest roleRequest) {
+                
+                Pageable pageable = PageRequest.of(roleRequest.getPageNumber(), roleRequest.getPageSize(), Sort.Direction.DESC,
+                                "id");
+                
+                Page<Role> rolePage = roleRepository.findByUser(user, pageable);
+
+                return rolePage.map(BdConvertUtils::convertToRoleResponse);
         }
 
         public Optional<Role> findByValue(String value) {
@@ -105,14 +115,16 @@ public class RoleService {
                 }
                 //
                 Arrays.stream(roles).forEach((role) -> {
-                        Optional<Role> roleOptional = roleRepository.findByValue(role.getValue());
-                        if (!roleOptional.isPresent()) {
+                        if (!roleRepository.existsByValue(role.getValue())) {
                                 roleRepository.save(role);
                         }
                 });
         }
 
+        @SuppressWarnings("null")
         public void updateInitData() {
+
+
                 //
                 Optional<User> adminOptional = userRepository.findByEmail(properties.getEmail());
                 if (adminOptional.isPresent()) {
@@ -120,8 +132,8 @@ public class RoleService {
                         Arrays.stream(roles).forEach((role) -> {
                                 Optional<Role> roleOptional = roleRepository.findByValue(role.getValue());
                                 if (roleOptional.isPresent()) {
-                                        role.setUser(adminOptional.get());
-                                        roleRepository.save(role);
+                                        roleOptional.get().setUser(adminOptional.get());
+                                        roleRepository.save(roleOptional.get());
                                 }
                         });
                 }

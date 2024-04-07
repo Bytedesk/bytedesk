@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-25 15:26:53
+ * @LastEditTime: 2024-04-02 15:02:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.team.member;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,9 +49,9 @@ public class MemberController {
      * @return json
      */
     @PostMapping("/create")
-    public JsonResult<?> create(@RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<?> create(@RequestBody MemberRequest memberRequest) {
 
-        return memberService.create(memberRequest);
+        return ResponseEntity.ok(memberService.create(memberRequest));
     }
 
     /**
@@ -60,10 +61,10 @@ public class MemberController {
      * @return json
      */
     @PostMapping("/update")
-    public JsonResult<?> update(@RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<?> update(@RequestBody MemberRequest memberRequest) {
 
         //
-        return new JsonResult<>("update success", 200, false);
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**
@@ -73,11 +74,11 @@ public class MemberController {
      * @return json
      */
     @PostMapping("/delete")
-    public JsonResult<?> delete(@RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<?> delete(@RequestBody MemberRequest memberRequest) {
 
 
 
-        return new JsonResult<>("delete success", 200, memberRequest.getId());
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**
@@ -86,10 +87,10 @@ public class MemberController {
      * @return json
      */
     @GetMapping("/filter")
-    public JsonResult<?> filter(BaseRequest filterParam) {
+    public ResponseEntity<?> filter(BaseRequest filterParam) {
 
         //
-        return new JsonResult<>("filter success", 200, false);
+        return ResponseEntity.ok(JsonResult.success());
     }
 
 }

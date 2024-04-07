@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-15 11:20:55
+ * @LastEditTime: 2024-04-05 14:14:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -107,7 +107,6 @@ public class HelloController {
 	// https://spring.io/guides/gs/rest-service-cors
 	private static final String template = "Hello, %s!";
 	private final AtomicLong counter = new AtomicLong();
-
 
 	// http://localhost:9003/greeting
 	@CrossOrigin(origins = "http://localhost:9000")

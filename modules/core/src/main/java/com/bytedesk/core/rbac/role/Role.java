@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 14:02:15
+ * @LastEditTime: 2024-03-29 18:12:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,13 +57,11 @@ public class Role implements Serializable {
 	 * name
 	 */
 	private String name;
-	// @Enumerated(EnumType.STRING)
-	// @Column(length = 20)
-	// private ERole name;
 
 	/**
 	 * value
 	 */
+	@Column(unique = true, nullable = false)
 	private String value;
 
 	/**

@@ -79,6 +79,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-data-redis</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
@@ -99,8 +104,14 @@
 			<artifactId>spring-data-rest-hal-explorer</artifactId>
 		</dependency> -->
 
-		
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- cluster - 集群 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>cluster</artifactId>
+			<version>${im.version}</version>
+		</dependency>
 
 		<!-- ai - 机器人 -->
 		<dependency>
@@ -123,7 +134,6 @@
 			<version>${im.version}</version>
 		</dependency>
 
-		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>team</artifactId>
@@ -137,11 +147,11 @@
 			<groupId>com.bytedesk</groupId>
 			<artifactId>service</artifactId>
 			<version>${im.version}</version>
+			<!-- <classifier>small</classifier> -->
 			<scope>system</scope>
 			<systemPath>${pom.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 
-		<!-- socket - im -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>socket</artifactId>
@@ -315,11 +325,15 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<!-- 引入系统范围内的依赖 -->
-				<configuration>
-					<includeSystemScope>true</includeSystemScope>
-				</configuration>
 			</plugin>
+			<!-- ip2region.xdb -->
+			<!-- <plugin>
+				<configuration>
+					<nonFilteredFileExtensions>
+						<nonFilteredFileExtension>xdb</nonFilteredFileExtension>
+					</nonFilteredFileExtensions>
+				</configuration>
+			</plugin> -->
 		</plugins>
 	</build>
 
