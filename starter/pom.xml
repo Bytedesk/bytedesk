@@ -116,27 +116,27 @@
 		<!-- ai - 机器人 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>ai</artifactId>
+			<artifactId>weiyu-ai</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
 		<!-- singleton - 单机 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>local</artifactId>
+			<artifactId>weiyu-local</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
 		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>core</artifactId>
+			<artifactId>weiyu-core</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>team</artifactId>
+			<artifactId>weiyu-team</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
@@ -145,19 +145,14 @@
 		<!-- customer service - 在线客服 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>service</artifactId>
+			<artifactId>weiyu-service</artifactId>
 			<version>${im.version}</version>
-			<!-- <classifier>small</classifier> -->
-			<scope>system</scope>
-			<systemPath>${pom.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>socket</artifactId>
+			<artifactId>weiyu-socket</artifactId>
 			<version>${im.version}</version>
-			<scope>system</scope>
-			<systemPath>${pom.basedir}/src/main/resources/lib/socket-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
