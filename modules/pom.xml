@@ -18,14 +18,10 @@
 
     <modules>
         <module>ai</module>
-        <!-- <module>cloud</module> -->
-        <!-- <module>cluster</module> -->
         <module>core</module>
         <module>local</module>
         <module>oa</module>
-        <!-- <module>service</module> -->
         <module>social</module>
-        <!-- <module>socket</module> -->
         <module>team</module>
     </modules>
 

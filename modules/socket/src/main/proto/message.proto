@@ -1,0 +1,223 @@
+syntax = "proto3";
+// prevent naming conflicts between different projects.
+// package protobuf.proto;
+
+// [START java_declaration]
+option java_package = "com.bytedesk.socket.protobuf.model";
+option java_outer_classname = "MessageProto";
+// [END java_declaration]
+
+// 类名前缀
+// [START objc_declaration]
+//option objc_class_prefix = "Proto";
+// [END objc_declaration]
+
+//DoubleValue
+//FloatValue
+//Int64Value
+//UInt64Value
+//Int32Value
+//UInt32Value
+//BoolValue
+//StringValue
+//BytesValue
+//import "google/protobuf/wrappers.proto";
+import "user.proto";
+import "thread.proto";
+// import "queue.proto";
+// import "group.proto";
+
+// 注意 1: 每个字段后面的序号一旦投入生产不能随便修改
+// 注意 2: 前1~15序号仅需一个字节编码，尽量用在常用字段
+// 注意 3: 被删除的field要作为reserved变量，不能重新赋值
+// types: bool, int32/int64/uint32/uint64/sint32/sint64/fixed32/fixed64/sfixed32/sfixed64, bytes, float, double, and string
+
+// [START messages]
+
+// 会话类型, 将会话类型作为topic前缀来区分，如：agent/...., user/..., group/...
+
+// 消息体内容
+message Text {
+    // 文本消息内容
+    string content = 1;
+}
+
+message Image {
+    //
+    string mediaId = 1;
+    // 图片消息, 微信pic_url，web版容易引起跨域访问问题，所以要使用image_url
+    string picUrl = 2;
+    // 存储在自己服务器之后的url
+    string imageUrl = 3;
+}
+
+message File {
+    // 文件消息类型，文件url, 文件类型通过format标示
+    string fileUrl = 1;
+    // 文件名
+    string fileName = 2;
+    // 文件大小
+    string fileSize = 3;
+}
+
+message Voice {
+    // 语音消息，图片+语音+视频+短视频 公用字段
+    string mediaId = 1;
+    // 语音格式amr等
+    string format = 2;
+    // 语音url
+    string voiceUrl = 3;
+    // 语音长度
+//    google.protobuf.Int32Value length = 4;
+    int32 length = 4;
+    // 是否已经播放过
+    bool played = 5;
+}
+
+message Video {
+    //
+    string mediaId = 1;
+    // 视频和短视频
+    string thumbMediaId = 2;
+    //
+    string videoOrShortUrl = 3;
+    //
+    string videoOrShortThumbUrl = 4;
+    // 
+    string title = 5;
+    //
+    string description = 6;
+}
+
+message Location {
+    // 地理位置消息
+    string locationX = 1;
+    //
+    string locationY = 2;
+    //
+    string scale = 3;
+    //
+    string label = 4;
+}
+
+message Link {
+    // 链接消息
+    string title = 1;
+    //
+    string description = 2;
+    //
+    string url = 3;
+}
+
+message Receipt {
+    // 消息回执
+    string mid = 1;
+    // 状态
+    string status = 2;
+}
+
+message Reply {
+    // 消息回复
+    string mid = 1;
+    // 内容
+    string content = 2;
+}
+
+message Preview {
+    // 消息预览
+    string content = 1;
+}
+
+message Recall {
+    // 消息撤回
+    string mid = 1;
+}
+
+message Transfer {
+    // 接收者的topic
+    string topic = 1;
+    // 类型：转接会话给 技能组 or 个人
+    string type = 2;
+    // 附言
+    string content = 3;
+    // 转接结果：接受 or 拒绝
+    bool accept = 4;
+}
+
+message Invite {
+    // 接收者的topic
+    string topic = 1;
+    // 类型：邀请会话给 技能组 or 个人
+    string type = 2;
+    // 附言
+    string content = 3;
+    // 转接结果：接受 or 拒绝
+    bool accept = 4;
+}
+
+message Notice {
+    // topic
+    string topic = 1;
+    // 会议提醒等
+    string type = 2;
+    // 内容
+    string content = 3;
+}
+
+message Extra {
+    // 开发者自定义字段内容
+    string content = 1;
+}
+
+// 消息三要素：1. 谁发送的消息？ 2. 发送给谁的消息？ 3. 发送的消息内容是什么？
+message Message {
+    // 唯一ID/localId=mid
+    string mid = 1;
+    // 主题：消息接收者为订阅此topic的人
+    // string topic = 2;
+    // 消息发送状态
+    string status = 3;
+    // 时间戳
+    // string createdAt = 4;
+    string timestamp = 4;
+    // mqtt clientId
+    // string clientId = 5;
+    // 消息来源客户端ew
+    string client = 6;
+    // 消息版本
+    string version = 7;
+    // 消息类型
+    string type = 8;
+    // 1. 谁发送的消息？ 消息发送者
+    User user = 9;
+    // 3. 发送的消息内容是什么？消息体内容，至少设置其中一种
+    oneof body {
+        Text text = 10;
+        Image image = 11;
+        File file = 12;
+        Voice voice = 13;
+        Video video = 14;
+        Location location = 15;
+        Link link = 16;
+        Receipt receipt = 17;
+        Reply reply = 18;
+        Preview preview = 19;
+        Recall recall = 20;
+        Transfer transfer = 21;
+        Invite invite = 22;
+        Notice notice = 23;
+        //
+        Extra extra = 30;
+    }
+    // 2. 发送给谁的消息？客服会话/一对一会话/群组会话
+    Thread thread = 31;
+    // 是否加密，true为加密，false为明文
+    bool encrypted = 32;
+}
+
+// 列表
+message MessageList {
+    //
+    repeated Message list = 1;
+}
+// [END messages]
