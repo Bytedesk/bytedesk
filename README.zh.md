@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-05 15:57:25
+ * @LastEditTime: 2024-04-07 09:14:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,8 +38,9 @@
 
 ## 快速开始
 
+- 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
+
 ```bash
-# 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
 git clone https://github.com/Bytedesk/bytedesk.git
 # 打开 bytedesk/starter/src/main/resources/application-dev.properties
 # 修改 the value of spring.datasource.url and spring.datasource.username and spring.datasource.password

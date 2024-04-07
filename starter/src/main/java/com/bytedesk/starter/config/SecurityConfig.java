@@ -35,9 +35,6 @@ import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // @Autowired
-    // JwtAuthFilter jwtAuthFilter;
-
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -61,7 +58,6 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider())
             // .oauth2ResourceServer((oauth2) -> oauth2.jwt(withDefaults()))
             .addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         // .httpBasic(withDefaults())
         // .formLogin(withDefaults());
         //

@@ -18,11 +18,12 @@ package com.bytedesk.core.rbac.role;
 
 import lombok.AllArgsConstructor;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.bytedesk.core.auth.AuthService;
+import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.utils.JsonResult;
 
 /**
@@ -35,18 +36,22 @@ import com.bytedesk.core.utils.JsonResult;
 public class RoleController {
 
     private final RoleService roleService;
+
+    private final AuthService authService;
     
     /**
-     * all
+     * query my roles by page
      *
      * @return json
      */
-    @GetMapping("/all")
-    public ResponseEntity<JsonResult<?>> all(RoleRequest roleRequest) {
+    @GetMapping("/query")
+    public ResponseEntity<JsonResult<?>> query(RoleRequest roleRequest) {
 
-        List<Role> roleList = roleService.findAll();
+        User user = authService.getCurrentUser();
+
+        Page<RoleResponse> rolePage = roleService.query(user, roleRequest);
         //
-        return ResponseEntity.ok().body(new JsonResult<>("get all roles success", 200, roleList));
+        return ResponseEntity.ok(JsonResult.success(rolePage));
     }
 
     /**
@@ -55,16 +60,13 @@ public class RoleController {
      * @param roleParam role
      * @return json
      */
-    // @PostMapping("/create")
-    // public Callable<JsonResult<?>> create(@RequestBody RoleParam roleParam) {
+    @PostMapping("/create")
+    public ResponseEntity<JsonResult<?>> create(@RequestBody RoleRequest roleParam) {
 
-    //     return () -> {
+        // RoleDTO roleDTO = roleService.create(roleParam);
 
-    //         RoleDTO roleDTO = roleService.create(roleParam);
-
-    //         return new JsonResult<>("创建角色成功", 200, roleDTO);
-    //     };
-    // }
+        return ResponseEntity.ok(JsonResult.success(false));
+    }
 
     /**
      * 更新

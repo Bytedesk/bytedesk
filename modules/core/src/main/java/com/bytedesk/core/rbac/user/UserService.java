@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 13:07:17
+ * @LastEditTime: 2024-04-02 16:32:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,6 +47,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserService {
 
+    // cycle dependency - 循环引用，不能使用
     // private final AuthService authService;
 
     private final UserRepository userRepository;
@@ -65,35 +66,40 @@ public class UserService {
         } else if (userRequest.getPassword() == null) {
             throw new RuntimeException("Parameter password is not found in request..!!");
         }
-        // BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String rawPassword = userRequest.getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
         //
         User user = modelMapper.map(userRequest, User.class);
         user.setPassword(encodedPassword);
-        // user.setCreatedBy(currentUser);
         //
         User savedUser = userRepository.save(user);
-        // userRepository.refresh(savedUser);
-        UserResponse userResponse = modelMapper.map(savedUser, UserResponse.class);
-        //
-        return userResponse;
+        // 
+        return modelMapper.map(savedUser, UserResponse.class);
     }
 
-    public User createUserFromMember(String nickname, String password, String mobile, String email, boolean isVerified,
+    public UserResponse update(UserRequest userRequest, User user) {
+
+        
+
+        return null;
+    }
+
+    // 
+    public User createUser(String nickname, String avatar, String password, String mobile, String email, boolean isVerified,
                 String organization_oid) {
 
         User user = User.builder()
-                .uid(Utils.getUid())
-                .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
-                .username(mobile)
-                .nickname(nickname)
-                .mobile(mobile)
-                .num(mobile)
-                .email(email)
-                .superUser(false)
-                .verified(isVerified)
-                .build();
+            .uid(Utils.getUid())
+            .avatar(avatar)
+            .username(mobile)
+            .nickname(nickname)
+            .mobile(mobile)
+            .num(mobile)
+            .email(email)
+            .superUser(false)
+            .emailVerified(isVerified)
+            .mobileVerified(isVerified)
+            .build();
 
         if (StringUtils.hasLength(password)) {
             user.setPassword(passwordEncoder.encode(password));
@@ -103,10 +109,11 @@ public class UserService {
 
         user.getOrganizations().add(organization_oid);
 
+        // return save(user);
         return user;
     }
 
-    public User updateUserFromMember(User user, String password, String mobile, String email) {
+    public User updateUser(User user, String password, String mobile, String email) {
 
         if (StringUtils.hasLength(password)) {
             user.setPassword(passwordEncoder.encode(password));
@@ -115,16 +122,11 @@ public class UserService {
         user.setMobile(mobile);
         user.setNum(mobile);
         user.setEmail(email);
-        save(user);
 
-        return user;
+        return save(user);
     }
 
-    // public UserResponse getUser() {
-    //     User user = authService.getCurrentUser();
-    //     return modelMapper.map(user, UserResponse.class);
-    // }
-
+    // 
     @Cacheable(cacheNames = "users", unless="#result == null")
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -201,7 +203,8 @@ public class UserService {
                 .mobile(properties.getMobile())
                 .num(properties.getMobile())
                 .superUser(true)
-                .verified(true)
+                .emailVerified(true)
+                .mobileVerified(true)
                 .build();
         //
         Optional<Role> roleOptional = roleService.findByValue(TypeConsts.ROLE_ADMIN);

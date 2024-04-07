@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 12:52:19
+ * @LastEditTime: 2024-04-02 16:36:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,7 +59,7 @@ public class Member extends AuditModel {
      * realname
      * 姓名
      */
-    private String realname;
+    private String nickname;
 
     /**
      * seat no
@@ -83,20 +83,15 @@ public class Member extends AuditModel {
     /**
      * department
      */
-    // @Column(name = "department_did")
-    // private String departmentDid;
-    // , cascade = CascadeType.ALL
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "department_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     private Department department;
 
     /**
      * login user info
      */
     // @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private User user;
 
     /**
@@ -104,7 +99,6 @@ public class Member extends AuditModel {
      */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     private Organization organization;
 
 }

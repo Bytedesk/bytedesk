@@ -2,6 +2,9 @@ package com.bytedesk.core.rbac.user;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.role.Role;
 import com.bytedesk.core.utils.AuditModel;
 import com.bytedesk.core.utils.StringListConverter;
@@ -75,10 +78,11 @@ public class User extends AuditModel {
 	@Digits(message = "phone length error", fraction = 0, integer = 11)
 	private String mobile;
 
-	private String avatar;
+	@Builder.Default
+	private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
 
 	@Builder.Default
-	private String description = "default user description";
+	private String description = BdConstants.DEFAULT_USER_DESCRIPTION;
 
 	/**
 	 * 
@@ -97,8 +101,12 @@ public class User extends AuditModel {
 	 * 
 	 */
 	@Builder.Default
-	@Column(name = "is_verified")
-	private boolean verified = false;
+	@Column(name = "is_email_verified")
+	private boolean emailVerified = false;
+
+	@Builder.Default
+	@Column(name = "is_mobile_verified")
+	private boolean mobileVerified = false;
 
 	/**
 	 * 
@@ -107,11 +115,7 @@ public class User extends AuditModel {
 	@OneToMany(fetch = FetchType.EAGER)
 	@JsonManagedReference // 避免无限递归
 	private List<Role> roles = new ArrayList<>();
-	// @Builder.Default
-	// @ManyToMany(fetch = FetchType.EAGER)
-	// @JoinTable(name = "core_user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	// private List<Role> roles = new ArrayList<>();
-
+	
 	/**
 	 * 
 	 */

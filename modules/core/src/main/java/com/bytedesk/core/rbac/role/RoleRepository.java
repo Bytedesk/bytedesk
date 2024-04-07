@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 14:00:54
+ * @LastEditTime: 2024-03-29 15:46:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,11 +42,9 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
 
     List<Role> findByType(String type);
 
-    // List<Role> findAllByUser(User user);
-
     Page<Role> findByUser(User user, Pageable pageable);
 
-    // Page<Role> findByNameContainingOrValueContainingAndUser(String name, String value, User user, Pageable pageable);
+    Boolean existsByValue(String value);
 
     @Transactional
     void deleteById(@NonNull Long id);

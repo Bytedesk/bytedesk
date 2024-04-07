@@ -26,6 +26,8 @@ public class BdConstants {
      */
     public static final String FILE_SEPARATOR = File.separator;
 
+    public static final String DEFAULT_USER_DESCRIPTION = "user default description";
+
     /**
      * 是否私有部署
      */
@@ -78,7 +80,7 @@ public class BdConstants {
      * TODO: 支持管理后台自定义
      */
     public static final String DEFAULT_WORK_GROUP_OFFLINE_TIP = "当前无客服在线，请自助查询或留言";
-    public static final String DEFAULT_WORK_GROUP_DESCRIPTION = "这是一个默认工作组，系统自动生成";
+    public static final String DEFAULT_WORK_GROUP_DESCRIPTION = "DEFAULT_WORKGROUP_DESCRIPTION";
     public static final String DEFAULT_WORK_GROUP_ABOUT = "关于我们";
     public static final String DEFAULT_WORK_GROUP_AGENT_CLOSE_TIP = "客服关闭会话";
     public static final String DEFAULT_WORK_GROUP_VISITOR_CLOSE_TIP = "访客关闭会话";
@@ -92,7 +94,7 @@ public class BdConstants {
     public static final String DEFAULT_WORK_GROUP_ROBOT_MAX_QUEUE_COUNT_EXCEED_TIP = "人工繁忙，请稍后再试";
     public static final String DEFAULT_WORK_GROUP_ROBOT_MAX_QUEUE_SECOND_EXCEED_TIP = "很抱歉，目前人工服务全忙，请稍后";
     public static final String DEFAULT_WORK_GROUP_ROBOT_TO_AGENT_TIP = "转人工客服，关闭机器人会话";
-    public static final String DEFAULT_WORK_GROUP_DEFAULT_TOP_TIP = "默认置顶欢迎语";
+    public static final String DEFAULT_WORK_GROUP_DEFAULT_TOP_TIP = "DEFAULT_WORKGROUP_TOP_TIP";
 
     /**
      * 工作组
@@ -127,7 +129,7 @@ public class BdConstants {
     public static final String DEFAULT_VISITOR_REQUEST_THREAD = " 请求会话";
     public static final String DEFAULT_AGENT_OFFLINE_TIP = "当前客服不在线，请留言";
     public static final String DEFAULT_AGENT_WELCOME_TIP = "您好，有什么可以帮您的?";
-    public static final String DEFAULT_AGENT_DESCRIPTION = "让客户服务更智能";
+    public static final String DEFAULT_AGENT_DESCRIPTION = "DEFAULT_AGENT_DESCRIPTION";
     public static final String DEFAULT_AGENT_AUTO_REPLY_CONTENT = "无自动回复";
 
     /**
