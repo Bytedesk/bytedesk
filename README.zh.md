@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-07 09:14:46
+ * @LastEditTime: 2024-04-10 09:32:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,7 @@
 
 # 微语 - 企业即时通讯 & 在线客服系统 & 大模型AI助手
 
-基于AI的企业IM和在线客服系统
+面向对数据安全比较敏感的中大型企业和组织，提供开箱即用的企业内部IM和客服系统，同时提供基于大模型的AI助手。
 
 ## 语言
 
