@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-10 09:34:26
+ * @LastEditTime: 2024-04-10 09:35:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -114,4 +114,4 @@ api文档: http://localhost:9003/swagger-ui/index.html
 
 - 支持商用
 - 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权
-- 请勿用于非法用途。
+- 请勿用于非法用途
