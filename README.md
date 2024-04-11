@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-07 09:14:10
+ * @LastEditTime: 2024-04-11 09:51:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved.
 -->
 
-# bytedesk - team im && customer service && ai
+# bytedesk
 
-AI powered team cooperation & customer service
+AI powered customer service & team collaboration
 
 ## Language
 
