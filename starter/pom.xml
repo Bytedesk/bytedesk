@@ -107,11 +107,11 @@
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<!-- cluster - 集群 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>cluster</artifactId>
 			<version>${im.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- ai - 机器人 -->
 		<dependency>
