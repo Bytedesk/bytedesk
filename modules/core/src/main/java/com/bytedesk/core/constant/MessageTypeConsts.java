@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 15:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-22 15:59:49
+ * @LastEditTime: 2024-04-11 17:20:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -580,5 +580,16 @@ public class MessageTypeConsts {
      */
     public static final String NOTIFICATION_GROUP_DISMISS = "notification_group_dismiss";
     
+
+
+    /**
+     * 回执
+     */
+    // 服务器回复客户端，已经收到。消息发送成功
+    public static final String NOTIFICATION_ACK_SUCCESS = "notification_ack_success";
+    // 消息送达
+    public static final String NOTIFICATION_ACK_RECEIVED = "notification_ack_received";
+    // 消息已读
+    public static final String NOTIFICATION_ACK_READ = "notification_ack_read";
 
 }

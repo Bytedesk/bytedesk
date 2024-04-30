@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:52:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-22 23:12:17
+ * @LastEditTime: 2024-04-26 22:53:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,8 @@ package com.bytedesk.service.customer;
 
 import com.bytedesk.core.utils.AuditModel;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -44,7 +45,20 @@ public class Customer extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     private Long id;
 
+    private String name;
+
+
+    /**
+     * https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html
+     */
+    @Embedded
+    Address address;
+
+    @Embeddable
+    public static class Address {
+        String zipCode, city, street;
+    }
+    
 }

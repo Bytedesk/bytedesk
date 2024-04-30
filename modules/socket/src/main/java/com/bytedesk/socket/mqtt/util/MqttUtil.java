@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-24 11:26:25
+ * @LastEditTime: 2024-04-13 15:47:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.socket.mqtt.util;
 
-import cn.hutool.core.util.StrUtil;
 import io.netty.handler.codec.mqtt.MqttTopicSubscription;
 
 import java.io.FileInputStream;
@@ -29,23 +28,26 @@ import org.springframework.util.StringUtils;
 
 public class MqttUtil {
 
+    private MqttUtil() {
+    }
+
     public static boolean validTopicFilter(List<MqttTopicSubscription> topicSubscriptions) {
         for (MqttTopicSubscription topicSubscription : topicSubscriptions) {
             String topicFilter = topicSubscription.topicName();
             if (StringUtils.hasText(topicFilter)) {
                 // 以#或+符号开头的、以/符号结尾的订阅按非法订阅处理, 这里没有参考标准协议
-                if (StrUtil.startWith(topicFilter, '+') || StrUtil.endWith(topicFilter, '/')) {
+                if (topicFilter.endsWith("+") || topicFilter.endsWith("/")) {
                     return false;
                 }
-                if (StrUtil.contains(topicFilter, '#')) {
+                if (topicFilter.contains("#")) {
                     // 如果出现多个#符号的订阅按非法订阅处理
-                    if (StrUtil.count(topicFilter, '#') > 1) {
+                    if (StringUtils.countOccurrencesOf(topicFilter, "#") > 1) {
                         return false;
                     }
                 }
-                if (StrUtil.contains(topicFilter, '+')) {
+                if (topicFilter.contains("+")) {
                     // 如果+符号和/+字符串出现的次数不等的情况按非法订阅处理
-                    if (StrUtil.count(topicFilter, '+') != StrUtil.count(topicFilter, "/+")) {
+                    if (StringUtils.countOccurrencesOf(topicFilter, "+") != StringUtils.countOccurrencesOf(topicFilter, "/+")) {
                         return false;
                     }
                 }
@@ -81,4 +83,5 @@ public class MqttUtil {
         return sslContext;
     }
 
+    
 }

@@ -5,6 +5,9 @@ package com.bytedesk.socket.mqtt.protocol;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessage;
+
+// import com.bytedesk.core.topic.Topic;
+import com.bytedesk.core.topic.TopicService;
 // import com.bytedesk.core.constant.StatusConsts;
 // import com.bytedesk.core.model.entity.User;
 // import com.bytedesk.core.service.MessageService;
@@ -18,11 +21,11 @@ import io.netty.handler.codec.mqtt.MqttMessage;
 // import com.bytedesk.core.redis.RedisStatisticService;
 // import com.bytedesk.core.redis.RedisUserService;
 // import com.bytedesk.socket.mqtt.model.MqttSession;
-import com.bytedesk.socket.mqtt.service.MqttClientIdStoreService;
-import com.bytedesk.socket.mqtt.service.MqttDupPubRelMessageStoreService;
-import com.bytedesk.socket.mqtt.service.MqttDupPublishMessageStoreService;
-import com.bytedesk.socket.mqtt.service.MqttSessionStoreService;
-import com.bytedesk.socket.mqtt.service.MqttSubscribeStoreService;
+// import com.bytedesk.socket.mqtt.service.MqttClientIdService;
+// import com.bytedesk.socket.mqtt.service.MqttDupPubRelMessageStoreService;
+// import com.bytedesk.socket.mqtt.service.MqttDupPublishMessageStoreService;
+import com.bytedesk.socket.mqtt.service.MqttSessionService;
+// import com.bytedesk.socket.mqtt.service.MqttSubscribeService;
 import com.bytedesk.socket.mqtt.util.ChannelUtils;
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -34,15 +37,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class DisConnect {
 
-    private final MqttSessionStoreService mqttSessionStoreService;
+    private final MqttSessionService mqttSessionStoreService;
 
-    private final MqttSubscribeStoreService mqttSubscribeStoreService;
+    private final TopicService topicService;
 
-    private final MqttDupPublishMessageStoreService mqttDupPublishMessageStoreService;
+    // private final MqttSubscribeService mqttSubscribeStoreService;
 
-    private final MqttDupPubRelMessageStoreService mqttDupPubRelMessageStoreService;
+    // private final MqttDupPublishMessageStoreService mqttDupPublishMessageStoreService;
 
-    private final MqttClientIdStoreService mqttClientIdStoreService;
+    // private final MqttDupPubRelMessageStoreService mqttDupPubRelMessageStoreService;
+
+    // private final MqttClientIdService mqttClientIdStoreService;
 
     // private final UserService userService;
 
@@ -72,9 +77,9 @@ public class DisConnect {
         String clientId = ChannelUtils.getClientId(channel);
         // final MqttSession sessionStore = mqttSessionStoreService.get(clientId);
         // if (sessionStore != null && sessionStore.isCleanSession()){
-        mqttSubscribeStoreService.removeForClient(clientId);
-        mqttDupPublishMessageStoreService.removeByClient(clientId);
-        mqttDupPubRelMessageStoreService.removeByClient(clientId);
+        // mqttSubscribeStoreService.removeForClient(clientId);
+        // mqttDupPublishMessageStoreService.removeByClient(clientId);
+        // mqttDupPubRelMessageStoreService.removeByClient(clientId);
         // }
         // 更新离线状态
         updateDisconnectedStatus(clientId);
@@ -84,7 +89,8 @@ public class DisConnect {
         // }
 
         mqttSessionStoreService.remove(clientId);
-        mqttClientIdStoreService.remove(clientId);
+        // mqttClientIdStoreService.remove(clientId);
+        topicService.removeClientId(clientId);
         
         channel.close();
 
@@ -101,7 +107,7 @@ public class DisConnect {
     }
 
     // 延迟执行，如果客服在此时间段之内重新连接，则不执行
-    public void updateDisconnectedStatus(String clientId) {
+    private void updateDisconnectedStatus(String clientId) {
         // 用户离线
         // final String uid = clientId.split("/")[0];
         // log.debug("DisConnect disconnected {}", uid);

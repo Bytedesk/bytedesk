@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 15:56:10
+ * @LastEditTime: 2024-04-24 15:15:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,7 @@ package com.bytedesk.team.member;
 
 import com.bytedesk.core.utils.BaseRequest;
 
-import jakarta.validation.constraints.NotEmpty;
+// import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +31,7 @@ public class MemberRequest extends BaseRequest {
     /**
      * uuid
      */
-    private String mid;
+    private String uid;
 
     /**
      * job number
@@ -43,7 +43,7 @@ public class MemberRequest extends BaseRequest {
      * nickname
      * 姓名
      */
-    @NotEmpty
+    // @NotEmpty
     private String nickname;
 
     private String password;
@@ -52,7 +52,7 @@ public class MemberRequest extends BaseRequest {
      * mobile
      * 手机号
      */
-    @NotEmpty
+    // @NotEmpty
     private String mobile;
 
     private String email;
@@ -74,14 +74,14 @@ public class MemberRequest extends BaseRequest {
      * 是否已验证
      */
     @Builder.Default
-    private boolean verified = false;
+    private Boolean verified = false;
 
     /**
      * department did
      */
-    @NotEmpty
     private String depDid;
 
-    
+    // 
+    private String orgOid;
 
 }

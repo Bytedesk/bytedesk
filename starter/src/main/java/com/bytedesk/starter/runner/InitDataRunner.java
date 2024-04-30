@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 13:40:05
+ * @LastEditTime: 2024-04-28 11:16:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,9 +21,15 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.llm.LlmService;
 import com.bytedesk.ai.robot.RobotService;
+import com.bytedesk.core.asistant.AsistantService;
+import com.bytedesk.core.channel.ChannelService;
+import com.bytedesk.core.rbac.authority.AuthorityService;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.upload.UploadService;
+import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.service.workgroup.WorkgroupService;
 import com.bytedesk.team.department.DepartmentService;
 import com.bytedesk.team.member.MemberService;
 import com.bytedesk.team.organization.OrganizationService;
@@ -38,6 +44,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class InitDataRunner implements ApplicationRunner {
+
+    @Autowired
+    AuthorityService authorityService;
 
     @Autowired
     RoleService roleService;
@@ -61,19 +70,36 @@ public class InitDataRunner implements ApplicationRunner {
     RobotService robotService;
 
     @Autowired
+    AgentService agentService;
+
+    @Autowired
+    WorkgroupService workgroupService;
+
+    @Autowired
     UploadService uploadService;
+
+    @Autowired
+    AsistantService asistantService;
+
+    @Autowired
+    ChannelService channelService;
+
+    @Autowired
+    ThreadService threadService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.debug("application started, init Default data, dont change the init order");
 
+        authorityService.initData();
+        
         roleService.initData();
 
         userService.initData();
 
-        roleService.updateInitData();
-
         organizationService.initData();
+
+        roleService.updateInitData();
 
         departmentService.initData();
 
@@ -83,7 +109,17 @@ public class InitDataRunner implements ApplicationRunner {
 
         robotService.initData();
 
+        agentService.initData();
+
+        workgroupService.initData();
+
         uploadService.initUploadDir();
+
+        asistantService.initData();
+
+        channelService.initData();
+
+        threadService.initData();
     }
 
 }

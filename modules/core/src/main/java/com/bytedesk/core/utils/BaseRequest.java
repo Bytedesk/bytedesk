@@ -23,16 +23,16 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class BaseRequest implements Serializable {
 
-    Long id;
+    public Long id;
 
-    int pageNumber;
+    public int pageNumber;
 
-    int pageSize;
+    public int pageSize;
 
-    String type;
+    public String type;
 
-    String content;
+    public String content;
 
-    String client;
+    public String client;
 
 }

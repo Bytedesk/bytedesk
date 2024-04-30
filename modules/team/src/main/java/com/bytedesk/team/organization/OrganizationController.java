@@ -1,3 +1,17 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-01-29 16:20:17
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-04-26 15:21:52
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.team.organization;
 
 import java.util.Optional;
@@ -12,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +39,7 @@ import lombok.AllArgsConstructor;
 // @RepositoryRestController("/v1/org")
 @RestController
 @RequestMapping("/api/v1/org")
+@Tag(name = "organization - 组织", description = "organization apis")
 public class OrganizationController {
 
     private final OrganizationService organizationService;
@@ -34,11 +50,11 @@ public class OrganizationController {
      * @return json
      */
     @GetMapping("/query")
-    public ResponseEntity<JsonResult<?>> query(OrganizationRequest pageParam) {
+    public ResponseEntity<?> query(OrganizationRequest pageParam) {
         //
-        Page<Organization> orgPage = organizationService.queryMyOrgs(pageParam);
+        Page<OrganizationResponse> orgPage = organizationService.query(pageParam);
         // //
-        return ResponseEntity.ok().body(new JsonResult<>("get my orgs success", 200, orgPage));
+        return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
     /**
@@ -46,80 +62,23 @@ public class OrganizationController {
      * @param request
      * @return
      */
-    @GetMapping("/query/oid")
-    public ResponseEntity<JsonResult<?>> queryByOid(OrganizationRequest request) {
+    @GetMapping("/oid")
+    public ResponseEntity<?> queryByOid(OrganizationRequest request) {
         //
-        Optional<Organization> organizations = organizationService.findByOid(request.getOid());
+        Optional<Organization> org = organizationService.findByOid(request.getOid());
+        if (!org.isPresent()) {
+            return ResponseEntity.ok(JsonResult.error("组织不存在"));
+        }
         //
-        return ResponseEntity.ok().body(new JsonResult<>("get or by oid success", 200, organizations));
+        return ResponseEntity.ok(JsonResult.success(organizationService.convertToOrganizationResponse(org.get())));
     }
 
-    // /**
-    // * 创建
-    // *
-    // * @param roleParam role
-    // * @return json
-    // */
-    // @PostMapping("/create")
-    // public Callable<JsonResult<?>> create(@RequestBody RoleParam roleParam) {
-
-    // return () -> {
-
-    // // RoleDTO roleDTO = roleService.create(roleParam);
-
-    // return new JsonResult<>("创建成功", 200, false);
-    // };
-    // }
-
-    // /**
-    // * 更新
-    // *
-    // * @param roleParam role
-    // * @return json
-    // */
-    // @PostMapping("/update")
-    // public Callable<JsonResult<?>> update(@RequestBody RoleParam roleParam) {
-
-    // return () -> {
-
-    // // RoleDTO roleDTO = roleService.update(roleParam);
-    // //
-    // return new JsonResult<>("更新成功", 200, false);
-    // };
-    // }
-
-    // /**
-    // * 删除
-    // *
-    // * @param roleParam role
-    // * @return json
-    // */
-    // @PostMapping("/delete")
-    // public Callable<JsonResult<?>> delete(@RequestBody RoleParam roleParam) {
-
-    // return () -> {
-    // //
-    // // roleService.deleteById(roleParam.getId());
-
-    // return new JsonResult<>("删除成功", 200, roleParam.getId());
-    // };
-    // }
-
-    // /**
-    // * 搜索
-    // *
-    // * @return json
-    // */
-    // @GetMapping("/filter")
-    // public Callable<JsonResult<?>> filter(FilterParam filterParam) {
-
-    // return () -> {
-    // //
-    // // Page<RoleDTO> roleDTOPage =
-    // // roleService.findByNameContainingOrValueContainingAndUser(filterParam);
-    // //
-    // return new JsonResult<>("搜索成功", 200, false);
-    // };
-    // }
+    /** user join organization by oid */
+    @GetMapping("/join")
+    public ResponseEntity<?> join(OrganizationRequest request) {
+        // TODO: check if user is already in the organization
+        //
+        return ResponseEntity.ok(JsonResult.success());
+    }
 
 }

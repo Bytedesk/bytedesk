@@ -11,7 +11,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>weiyu-socket</artifactId>
+	<artifactId>im-socket</artifactId>
 
 	<name>socket</name>
 	<description>Demo project for Spring Boot</description>
@@ -47,7 +47,7 @@
 		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>weiyu-core</artifactId>
+			<artifactId>im-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -59,14 +59,6 @@
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
 			<version>4.1.106.Final</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/cn.hutool/hutool-crypto -->
-		<dependency>
-			<groupId>cn.hutool</groupId>
-			<artifactId>hutool-crypto</artifactId>
-			<version>5.8.25</version>
 			<scope>provided</scope>
 		</dependency>
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-05 22:51:38
+ * @LastEditTime: 2024-04-23 16:04:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,12 +16,18 @@ package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.RouteConsts;
 import com.bytedesk.core.utils.AuditModel;
 import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.worktime.Worktime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -45,13 +51,12 @@ import lombok.experimental.Accessors;
 @Table(name = "service_workgroup")
 public class Workgroup extends AuditModel {
 
+    private static final long serialVersionUID = 680083751L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /**
-     * 
-     */
     @Column(unique = true, nullable = false)
     private String wid;
 
@@ -64,48 +69,87 @@ public class Workgroup extends AuditModel {
     private String description = BdConstants.DEFAULT_WORK_GROUP_DESCRIPTION;
 
     /**
-     * 
-     */
-
-
-    /**
-     * 
+     * route type
      */
     @Builder.Default
     private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
 
     /**
-     * 
+     * 熟客优先
      */
     @Builder.Default
     @Column(name = "is_recent")
-    private Boolean recent = false;
+    private boolean recent = false;
 
-    /**
-     * 
-     */
     @Builder.Default
     @Column(name = "is_auto_pop")
-    private Boolean autoPop = false;
+    private boolean autoPop = false;
 
     /**
-     * 
+     * tips
+     * TODO: set different tips for different lang
      */
     @Builder.Default
-    private Boolean showTopTip = false;
+    private boolean showTopTip = false;
 
     @Builder.Default
     @Column(length = 512)
     private String topTip = BdConstants.DEFAULT_WORK_GROUP_DEFAULT_TOP_TIP;
 
+    @Builder.Default
+    private String welcomeTip = BdConstants.DEFAULT_WORK_GROUP_WELCOME_TIP;
+
     /**
-	 * 
+     * robot
+     * 是否默认机器人接待
+     */
+    @Builder.Default
+    private boolean defaultRobot = false;
+
+    /** 无客服在线时，是否启用机器人接待 */
+    @Builder.Default
+    private boolean offlineRobot = false;
+     
+    /** 非工作时间段，是否启用机器人接待 */
+    @Builder.Default
+    private boolean nonWorktimeRobot = false;
+
+    /** auto close time in min - 默认自动关闭时间，单位分钟 */
+    @Builder.Default
+    private Double autoCloseMin = Double.valueOf(25);
+
+    /** work time */
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Worktime> workTimes = new ArrayList<>();
+
+    /**
+	 * one wg can have many agents, one agent can belong to many wgs
 	 */
 	@JsonIgnore
 	@Builder.Default
-	@OneToMany
-	private List<Agent> agents = new ArrayList<>();
+	@ManyToMany(fetch = FetchType.LAZY)
+	private Set<Agent> agents = new HashSet<>();
 
-
+    /** 存储下一个待分配的客服等信息 */
+    @Builder.Default
+    @Column(columnDefinition = "json")
+    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String extra = BdConstants.EMPTY_JSON_STRING;
     
+    /**
+     * belong to org
+     */
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private Organization organization;
+    private String orgOid;
+
+    /**
+     * belongs to user
+     */
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private User owner;
 }

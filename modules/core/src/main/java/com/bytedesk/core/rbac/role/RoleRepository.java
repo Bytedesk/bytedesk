@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 15:46:34
+ * @LastEditTime: 2024-04-24 10:14:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,8 +22,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.rbac.user.User;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
@@ -38,13 +36,14 @@ import java.util.Optional;
 @Tag(name = "roles - 角色")
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
 
-    Optional<Role> findByValue(String value);
+    Optional<Role> findByName(String name);
 
     List<Role> findByType(String type);
 
-    Page<Role> findByUser(User user, Pageable pageable);
+    // Page<Role> findByUser(User user, Pageable pageable);
+    Page<Role> findByOrgOid(String orgOid, Pageable pageable);
 
-    Boolean existsByValue(String value);
+    Boolean existsByName(String name);
 
     @Transactional
     void deleteById(@NonNull Long id);

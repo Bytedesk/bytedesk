@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-26 15:28:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 13:16:31
+ * @LastEditTime: 2024-04-23 21:02:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,18 +14,17 @@
  */
 package com.bytedesk.starter.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+// import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.bytedesk.core.config.BytedeskProperties;
+// import com.bytedesk.core.config.BytedeskProperties;
 
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+// @Slf4j
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
@@ -35,9 +34,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     // @Value("${bytedesk.upload-dir}")
     // private static String uploadDir;
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
-    
+    // @Autowired
+    // private BytedeskProperties bytedeskProperties;
     
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
             "classpath:/META-INF/resources/",
@@ -50,23 +48,27 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 跨域配置: 允许跨域访问
+     * 在 CorsConfig.java中配置，此处没有必要？
      */
     // https://spring.io/guides/gs/rest-service-cors
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedMethods("*")
-                .allowedOrigins(bytedeskProperties.getCorsAllowedOrigins());
-    }
+    // @Override
+    // public void addCorsMappings(CorsRegistry registry) {
+    //     // 
+    //     registry.addMapping("/**")
+    //             .allowedMethods("*")
+    //             .allowedOriginPatterns("*")
+    //             // allow cookies
+    //             .allowCredentials(true);
+    // }
 
 	/**
      * 静态资源的配置 - 使得可以从磁盘中读取 Html、图片、视频、音频等
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        for (String path : CLASSPATH_RESOURCE_LOCATIONS) {
-            log.info("CLASSPATH_RESOURCE_LOCATIONS: {}", path);
-        }
+        // for (String path : CLASSPATH_RESOURCE_LOCATIONS) {
+        //     log.info("CLASSPATH_RESOURCE_LOCATIONS: {}", path);
+        // }
         /*
             配置server虚拟路径，handler为前台访问的URL目录，locations为files相对应的本地路径
             也就是说如果有一个 upload/avatar/aaa.png 请求，那程序会到后面的目录里面找aaa.png文件

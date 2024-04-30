@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-25 14:18:25
+ * @LastEditTime: 2024-04-25 09:35:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,17 +16,19 @@ package com.bytedesk.team.department;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.auth.AuthService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.user.UserService;
-import com.bytedesk.core.utils.Utils;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.organization.Organization;
 import com.bytedesk.team.organization.OrganizationService;
 
@@ -38,10 +40,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class DepartmentService {
 
-    private final AuthService authService;
-
-    private final UserService userService;
-
     private final ModelMapper modelMapper;
 
     private final BytedeskProperties properties;
@@ -50,33 +48,55 @@ public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
 
+    private final UidUtils uidUtils;
+
+    public Page<DepartmentResponse> query(DepartmentRequest departmentRequest) {
+
+        Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(), Sort.Direction.ASC,
+                "id");
+
+        Page<Department> page = departmentRepository.findByOrgOidAndParent(departmentRequest.getOrgOid(), null, pageable);
+
+        return page.map(this::convertToDepartmentResponse);
+    }
+
     public Department create(DepartmentRequest departmentRequest) {
 
         Department department = modelMapper.map(departmentRequest, Department.class);
-        department.setDid(Utils.getUid());
+        department.setDid(uidUtils.getCacheSerialUid());
 
-        if (StringUtils.hasLength(departmentRequest.getParent_did())) {
-            log.debug("TODO: parent_did {}", departmentRequest.getParent_did());
+        if (StringUtils.hasLength(departmentRequest.getParentDid())) {
+            log.debug("parent_did {}", departmentRequest.getParentDid());
+            Optional<Department> parentOptional = departmentRepository.findByDid(departmentRequest.getParentDid());
+            if (parentOptional.isPresent()) {
+                parentOptional.get().addChild(department);
+            }
         } else {
             log.debug("parent_did is null");
             department.setParent(null);
         }
 
-        Optional<Organization> orgOptional = organizationService.findByOid(departmentRequest.getOrg_oid());
-        if (orgOptional.isPresent()) {
-            log.debug("org_oid {} exist", departmentRequest.getOrg_oid());
-            department.setOrganization(orgOptional.get());
-        } else {
-            log.debug("org_oid {} not exist", departmentRequest.getOrg_oid());
-            return null;
-        }
+        department.setOrgOid(departmentRequest.getOrgOid());
 
-        department.setUser(authService.getCurrentUser());
+        return save(department);
+    }
 
-        // FIXME: throw error ?
-        // log.debug("department {}", department.toString());
+    @Cacheable(value = "department", key = "#name", unless = "#result == null")
+    public Optional<Department> findByName(String name) {
+        return departmentRepository.findByName(name);
+    }
 
+    @Cacheable(value = "department", key = "#did", unless = "#result == null")
+    public Optional<Department> findByDid(String did) {
+        return departmentRepository.findByDid(did);
+    }
+
+    public Department save(Department department) {
         return departmentRepository.save(department);
+    }
+
+    public DepartmentResponse convertToDepartmentResponse(Department department) {
+        return modelMapper.map(department, DepartmentResponse.class);
     }
 
     public void initData() {
@@ -88,32 +108,33 @@ public class DepartmentService {
 
         Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
         if (orgOptional.isPresent()) {
+            String orgOid = orgOptional.get().getOid();
             //
             Department[] departments = new Department[] {
                     Department.builder().name(TypeConsts.DEPT_HR).description(TypeConsts.DEPT_HR)
-                            .organization(orgOptional.get()).type(TypeConsts.TYPE_SYSTEM).build(),
+                            .orgOid(orgOid).type(TypeConsts.TYPE_SYSTEM).build(),
                     Department.builder().name(TypeConsts.DEPT_ORG).description(TypeConsts.DEPT_ORG)
-                            .organization(orgOptional.get()).type(TypeConsts.TYPE_SYSTEM).build(),
+                            .orgOid(orgOid).type(TypeConsts.TYPE_SYSTEM).build(),
                     Department.builder().name(TypeConsts.DEPT_IT).description(TypeConsts.DEPT_IT)
-                            .organization(orgOptional.get()).type(TypeConsts.TYPE_SYSTEM).build(),
+                            .orgOid(orgOid).type(TypeConsts.TYPE_SYSTEM).build(),
                     Department.builder().name(TypeConsts.DEPT_MONEY).description(TypeConsts.DEPT_MONEY)
-                            .organization(orgOptional.get()).type(TypeConsts.TYPE_SYSTEM).build(),
+                            .orgOid(orgOid).type(TypeConsts.TYPE_SYSTEM).build(),
                     Department.builder().name(TypeConsts.DEPT_MARKETING).description(TypeConsts.DEPT_MARKETING)
-                            .organization(orgOptional.get()).type(TypeConsts.TYPE_SYSTEM).build(),
+                            .orgOid(orgOid).type(TypeConsts.TYPE_SYSTEM).build(),
                     Department.builder().name(TypeConsts.DEPT_SALES).description(TypeConsts.DEPT_SALES)
-                            .organization(orgOptional.get()).type(TypeConsts.TYPE_SYSTEM).build(),
+                            .orgOid(orgOid).type(TypeConsts.TYPE_SYSTEM).build(),
                     Department.builder().name(TypeConsts.DEPT_CUSTOMER_SERVICE)
                             .description(TypeConsts.DEPT_CUSTOMER_SERVICE)
-                            .organization(orgOptional.get()).type(TypeConsts.TYPE_SYSTEM).build()
+                            .orgOid(orgOid).type(TypeConsts.TYPE_SYSTEM).build()
             };
 
             Arrays.stream(departments).forEach((department) -> {
                 Optional<Department> depOptional = departmentRepository.findByName(department.getName());
                 if (!depOptional.isPresent()) {
-                    String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-                    department.setDid(uuid);
+                    department.setDid(uidUtils.getCacheSerialUid());
+                    department.setOrgOid(orgOid);
                     // department.setOrganization(orgOptional.get());
-                    department.setUser(userService.getAdmin().get());
+                    // department.setUser(userService.getAdmin().get());
                     departmentRepository.save(department);
                 }
             });

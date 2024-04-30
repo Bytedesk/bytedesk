@@ -7,11 +7,10 @@
 	<parent>
 		<groupId>com.bytedesk</groupId>
 		<artifactId>modules</artifactId>
-		<!-- <version>${im.version}</version> -->
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>weiyu-ai</artifactId>
+	<artifactId>im-ai</artifactId>
 
 	<name>ai</name>
 	<description>Demo project for Spring Boot</description>
@@ -59,7 +58,7 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>weiyu-core</artifactId>
+			<artifactId>im-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>

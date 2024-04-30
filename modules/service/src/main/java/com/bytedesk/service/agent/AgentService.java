@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 16:50:31
+ * @LastEditTime: 2024-04-25 15:21:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,21 +17,25 @@ package com.bytedesk.service.agent;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserService;
-import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.Utils;
-import com.bytedesk.team.department.Department;
-import com.bytedesk.team.department.DepartmentRepository;
+import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.team.organization.Organization;
+import com.bytedesk.team.organization.OrganizationService;
 
 import lombok.AllArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
 
 // @Slf4j
 @Service
@@ -40,24 +44,33 @@ public class AgentService {
 
     private final AgentRepository agentRepository;
 
-    private final DepartmentRepository departmentRepository;
-
     private final ModelMapper modelMapper;
 
     private final UserService userService;
 
-    public Page<AgentResponse> query(AgentRequest pageParam) {
+    private final UidUtils uidUtils;
 
-        Pageable pageable = PageRequest.of(pageParam.getPageNumber(),
-                pageParam.getPageSize(), Sort.Direction.DESC,
+    // private final TopicService topicService;
+
+    // private final AuthService authService;
+
+    private final BytedeskProperties properties;
+
+    private final OrganizationService organizationService;
+
+    public Page<AgentResponse> query(AgentRequest agentRequest) {
+
+        Pageable pageable = PageRequest.of(agentRequest.getPageNumber(),
+                agentRequest.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Page<Agent> agentPage = agentRepository.findAll(pageable);
+        Page<Agent> agentPage = agentRepository.findByOrgOid(agentRequest.getOrgOid(), pageable);
 
         return agentPage.map(this::convertToAgentResponse);
     }
-    
-    public JsonResult<?> create(AgentRequest agentRequest) {
+
+    @Transactional
+    public Agent create(AgentRequest agentRequest) {
         // 
         // if (userService.existsByMobile(agentRequest.getMobile())) {
         //     return JsonResult.error("mobile already exist");
@@ -67,15 +80,10 @@ public class AgentService {
         // }
         // 
         Agent agent = modelMapper.map(agentRequest, Agent.class);
-        agent.setAid(Utils.getUid());
-        // 
-        Optional<Department> depOptional = departmentRepository.findByName(TypeConsts.DEPT_CUSTOMER_SERVICE);
-        if (!depOptional.isPresent()) {
-            return JsonResult.error("department not exist");
-        }
+        agent.setUid(uidUtils.getCacheSerialUid());
         // 
         User user;
-        Optional<User> userOptional = userService.findByMobile(agentRequest.getMobile());
+        Optional<User> userOptional = userService.findByEmail(agentRequest.getEmail());
         if (!userOptional.isPresent()) {
             user = userService.createUser(
                     agentRequest.getNickname(),
@@ -83,40 +91,107 @@ public class AgentService {
                     agentRequest.getPassword(),
                     agentRequest.getMobile(),
                     agentRequest.getEmail(),
-                    true,
-                    depOptional.get().getOrganization().getOid()
+                    true, 
+                    agentRequest.getOrgOid()
             );
         } else {
+            // just return user
             user = userOptional.get();
-            // user = userService.updateUser(
-            //         userOptional.get(),
-            //         agentRequest.getPassword(),
-            //         agentRequest.getMobile(),
-            //         agentRequest.getEmail()
-            // );
         }
         agent.setUser(user);
+
+        agent = save(agent);
         // 
-        return JsonResult.success(save(agent));
+        return agent;
     }
     
     public AgentResponse update(AgentRequest agentRequest) {
 
         Agent agent = modelMapper.map(agentRequest, Agent.class);
 
-        return save(agent);
+        agent = save(agent);
+
+        return convertToAgentResponse(agent);
     }
 
-    @SuppressWarnings("null")
-    public AgentResponse save(Agent agent) {
-        return convertToAgentResponse(agentRepository.save(agent));
+    public void updateConnect(String uid, boolean isConnect) {
+        Optional<Agent> agentOptional = findByUser_Uid(uid);
+        agentOptional.ifPresent(agent -> {
+            agent.setConnected(isConnect);
+            save(agent);
+        });
+    }
+
+
+    @Cacheable(value = "agent", key = "#uid", unless="#result == null")
+    public Optional<Agent> findByUid(String uid) {
+        return agentRepository.findByUid(uid);
+    }
+
+    @Cacheable(value = "agent", key = "#mobile", unless="#result == null")
+    public Optional<Agent> findByMobile(String mobile) {
+        return agentRepository.findByMobile(mobile);
+    }
+
+    @Cacheable(value = "agent", key = "#email", unless="#result == null")
+    public Optional<Agent> findByEmail(String email) {
+        return agentRepository.findByEmail(email);
+    }
+
+    @Cacheable(value = "agent", key = "#userUid", unless="#result == null")
+    public Optional<Agent> findByUser_Uid(String userUid) {
+        return agentRepository.findByUser_Uid(userUid);
     }
     
-    private AgentResponse convertToAgentResponse(Agent agent) {
-        return new ModelMapper().map(agent, AgentResponse.class);
+    @Caching(put = {
+        @CachePut(value = "agent", key = "#agent.uid"),
+        @CachePut(value = "agent", key = "#agent.mobile"),
+        @CachePut(value = "agent", key = "#agent.email"),
+    })
+    public Agent save(Agent agent) {
+        return agentRepository.save(agent);
+    }
+    
+    public AgentResponse convertToAgentResponse(Agent agent) {
+        return modelMapper.map(agent, AgentResponse.class);
+    }
+
+    public AgentResponseSimple convertToAgentResponseSimple(Agent agent) {
+        return modelMapper.map(agent, AgentResponseSimple.class);
     }
 
 
+    public void initData() {
+
+        if (agentRepository.count() > 0) {
+            return;
+        }
+        
+        Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
+        if (orgOptional.isPresent()) {
+            // add agent
+            AgentRequest agent1Request = AgentRequest.builder()
+                    .nickname("Agent1")
+                    .email("agent1@email.com")
+                    .mobile("18888888008")
+                    .password("123456")
+                    .orgOid(orgOptional.get().getOid())
+                    .build();
+            create(agent1Request);
+            // 
+            AgentRequest agent2Request = AgentRequest.builder()
+                    .nickname("Agent2")
+                    .email("agent2@email.com")
+                    .mobile("18888888009")
+                    .password("123456")
+                    .orgOid(orgOptional.get().getOid())
+                    .build();
+            create(agent2Request);
+  
+        }
+        
+
+    }
 
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-06 13:55:45
+ * @LastEditTime: 2024-04-18 16:28:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,12 +21,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+// import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.lang.NonNull;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.CrossOrigin;
+// import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.bytedesk.core.rbac.user.User;
 
@@ -36,14 +36,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * // @RepositoryRestResource(exported = false) // 隐藏接口
  */
 // https://docs.spring.io/spring-data/rest/reference/customizing/configuring-cors.html
-@CrossOrigin
+// @CrossOrigin
 @Repository
 @Tag(name = "organization - 公司/组织")
 // https://docs.spring.io/spring-data/rest/reference/security.html
 // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER')")
 // https://docs.spring.io/spring-data/rest/reference/customizing/configuring-the-rest-url-path.html
 // use excerptProjection to self define response format:
-@RepositoryRestResource(path = "org", excerptProjection = OrganizationResponse.class)
+// @RepositoryRestResource(path = "org", excerptProjection = OrganizationResponse.class)
 public interface OrganizationRepository
                 extends JpaRepository<Organization, Long>, JpaSpecificationExecutor<Organization> {
 
@@ -59,7 +59,6 @@ public interface OrganizationRepository
         // List<Organization> findAll();
 
         //
-        // @Cacheable(cacheNames = "userOrgs", key = "#user.username")
         Page<Organization> findByUser(User user, Pageable pageable);
 
         @RestResource(exported = false)

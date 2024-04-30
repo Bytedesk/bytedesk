@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-06 09:25:50
+ * @LastEditTime: 2024-04-24 10:54:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,20 +15,77 @@
 package com.bytedesk.core.rbac.authority;
 
 import lombok.AllArgsConstructor;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.uid.UidUtils;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class AuthorityService {
 
-    // private final ActionRepository actionRepository;
-
     private final AuthorityRepository authorityRepository;
 
-    public List<Authority> findAll() {
-        return authorityRepository.findAll();
+    private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
+
+    public Authority create(AuthorityRequest authorityRequest) {
+        // 
+        Authority authority = modelMapper.map(authorityRequest, Authority.class);
+        authority.setAid(uidUtils.getCacheSerialUid());
+
+        return save(authority);
+    }
+
+    @Cacheable(value = "authority", key = "#aid", unless = "#result == null")
+    public Optional<Authority> findByAid(String aid) {
+        return authorityRepository.findByAid(aid);
+    }
+
+    @Cacheable(value = "authority", key = "#value", unless = "#result == null")
+    public Optional<Authority> findByValue(String value) {
+        return authorityRepository.findByValue(value);
+    }
+
+    public Authority save(Authority authority) {
+        return authorityRepository.save(authority);
+    }
+
+    public void initData() {
+
+        if (authorityRepository.count() > 0) {
+            return;
+        }
+        // 
+        String[] authorities = {
+            TypeConsts.AUTHORITY_SUPER,
+            TypeConsts.AUTHORITY_ADMIN,
+            TypeConsts.AUTHORITY_HR,
+            TypeConsts.AUTHORITY_ORG,
+            TypeConsts.AUTHORITY_IT,
+            TypeConsts.AUTHORITY_MONEY,
+            TypeConsts.AUTHORITY_MARKETING,
+            TypeConsts.AUTHORITY_SALES,
+            TypeConsts.AUTHORITY_CUSTOMER_SERVICE,
+        };
+
+        for (String authority : authorities) {
+            AuthorityRequest authRequest = AuthorityRequest.builder()
+                .name(authority)
+                .value(authority)
+                .description(authority)
+                .build();
+            authRequest.setType(TypeConsts.TYPE_SYSTEM);
+            // 
+            create(authRequest);
+        }
+
     }
 
 }

@@ -56,7 +56,7 @@ public class Kb extends AuditModel {
     private String embeddings;
     
     // is_published or not
-    // private Boolean published;
+    // private boolean published;
 
     /**
      * 所属用户

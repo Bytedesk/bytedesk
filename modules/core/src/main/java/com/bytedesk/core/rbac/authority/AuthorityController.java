@@ -1,27 +1,8 @@
-/*
- *  bytedesk.com https://github.com/Bytedesk/bytedesk
- *
- *  Copyright (C)  2013-2024 bytedesk.com
- *
- *  License restrictions
- * 
- *      Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
- *  仅支持企业内部员工自用，严禁用于销售、二次销售或者部署SaaS方式销售
- * 
- *  https://github.com/Bytedesk/bytedesk/blob/main/LICENSE
- *  
- */
 package com.bytedesk.core.rbac.authority;
 
 import lombok.AllArgsConstructor;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.bytedesk.core.utils.JsonResult;
 
 /**
  * 权限管理
@@ -32,38 +13,20 @@ import com.bytedesk.core.utils.JsonResult;
 @RequestMapping("/api/v1/authority")
 public class AuthorityController {
 
-    private final AuthorityService authorityService;
-
-    /**
-     * 全部
-     *
-     * @return json
-     */
-    // @GetMapping("/list")
-    // public Callable<JsonResult<?>> list() {
-
-    // return () -> {
-
-    // // 全部查询
-    // List<AuthorityDTO> authorityDTOPage = authorityService.findByUser();
-
-    // return new JsonResult<>("获取全部权限成功", 200, authorityDTOPage);
-    // };
-    // }
+    // private final AuthorityService authorityService;
 
     /**
      * 查询
      *
      * @return json
      */
-    @GetMapping("/query")
-    public ResponseEntity<JsonResult<?>> query(AuthorityRequest authorityRequest) {
+    // @GetMapping("/query")
+    // public ResponseEntity<JsonResult<?>> query(AuthorityRequest authorityRequest) {
 
+    //     List<Authority> authorityList = authorityService.findAll();
 
-        List<Authority> authorityList = authorityService.findAll();
-
-        return ResponseEntity.ok().body(new JsonResult<>("get authority success", 200, authorityList)); 
-    }
+    //     return ResponseEntity.ok().body(new JsonResult<>("get authority success", 200, authorityList)); 
+    // }
 
     /**
      * 创建

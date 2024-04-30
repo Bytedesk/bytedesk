@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 12:54:09
+ * @LastEditTime: 2024-04-23 17:19:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,9 @@
  */
 package com.bytedesk.team.organization;
 
-import java.util.List;
-
+import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.utils.AuditModel;
-import com.bytedesk.team.department.Department;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -41,34 +39,30 @@ public class Organization extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     private Long id;
 
-    /**
-     * 
-     */
-    @Column(name = "oid", unique = true, nullable = false)
+    // 随机字符串，可读性差
+    @Column(unique = true, nullable = false)
     private String oid;
 
-    /**
-     * 
-     */
+    /** name should be unique */
+    @Column(unique = true, nullable = false)
     private String name;
 
-    /**
-     * 
-     */
+    // logo
+    @Builder.Default
+    private String logo = AvatarConsts.DEFAULT_AVATAR_URL;
+
+    // organiztion code, 可读性强，供用户搜索
+    @Column(unique = true)
+    private String code;
+
     private String description;
 
-    /**
-     * 
-     */
-    @OneToMany(mappedBy = "organization", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Department> departments;
+    // @Builder.Default
+    // @OneToMany(fetch = FetchType.LAZY)
+    // private Set<Department> departments = new HashSet<>();
 
-    /**
-     * 
-     */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;

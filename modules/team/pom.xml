@@ -11,11 +11,10 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>weiyu-team</artifactId>
+	<artifactId>im-team</artifactId>
 
 	<name>team</name>
 	<description>Demo project for Spring Boot</description>
-
 
 	<dependencies>
 
@@ -29,7 +28,7 @@
 		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>weiyu-core</artifactId>
+			<artifactId>im-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>

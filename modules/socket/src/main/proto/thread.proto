@@ -24,29 +24,9 @@ option java_outer_classname = "ThreadProto";
 message Thread {
     // ID
     string tid = 1;
+    // 订阅主题
+    string topic = 2;
     // 会话类型
-    string type = 2;
-    // 来源客户端
-    string client = 5;
-    //
-    string nickname = 6;
-    //
-    string avatar = 7;
-    //
-    string content = 8;
-    //
-    string timestamp = 9;
-    //
-    int32 unreadCount = 10;
-    // 主题：消息接收者为订阅此topic的人
-    string topic = 11;
-    // 扩展字段
-    string extra = 20;
-}
-
-// 列表
-message ThreadList {
-
-    repeated Thread list = 1;
+    string type = 3;
 }
 //

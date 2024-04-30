@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-06 10:38:09
+ * @LastEditTime: 2024-04-22 12:17:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,9 +14,13 @@
  */
 package com.bytedesk.service.agent;
 
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.security.access.prepost.PreAuthorize;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,8 +30,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Repository
 @Tag(name = "agent account info - 客服账号信息")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+// @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecificationExecutor<Agent> {
 
-    // Page<Agent> findAll(Pageable pageable);
+    Optional<Agent> findByUid(String uid);
+
+    Optional<Agent> findByEmail(String email);
+
+    Optional<Agent> findByMobile(String mobile);
+
+    Optional<Agent> findByUser_Uid(String uid);
+
+    // Page<Agent> findByOrganization_Oid(String oid, Pageable pageable);
+    Page<Agent> findByOrgOid(String oid, Pageable pageable);
 }

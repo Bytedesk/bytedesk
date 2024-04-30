@@ -11,13 +11,13 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>weiyu-core</artifactId>
-	<packaging>jar</packaging>
+	<artifactId>im-core</artifactId>
 
 	<name>core</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
+		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>
 	</properties>
 
 	<dependencies>
@@ -53,14 +53,14 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
-			<version>0.12.3</version>
+			<version>${jsonwebtoken.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.12.3</version>
+			<version>${jsonwebtoken.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -68,15 +68,8 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
-			<version>0.12.3</version>
+			<version>${jsonwebtoken.version}</version>
 			<scope>runtime</scope>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/cn.hutool/hutool-all -->
-		<dependency>
-			<groupId>cn.hutool</groupId>
-			<artifactId>hutool-all</artifactId>
-			<version>5.8.25</version>
 		</dependency>
 
 		<!-- 导入、导出Excel -->

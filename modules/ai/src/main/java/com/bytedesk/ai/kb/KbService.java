@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:46:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-26 16:52:17
+ * @LastEditTime: 2024-04-11 12:08:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 
@@ -32,6 +32,8 @@ public class KbService {
     private final KbRepository kbRepository;
 
     private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
 
     public Page<KbResponse> query(KbRequest kbRequest) {
 
@@ -44,7 +46,7 @@ public class KbService {
     public JsonResult<?> create(KbRequest kbRequest) {
 
         Kb kb = modelMapper.map(kbRequest, Kb.class);
-        kb.setKid(Utils.getUid());
+        kb.setKid(uidUtils.getCacheSerialUid());
 
         // kb.setUser(authService.getCurrentUser());
 
@@ -54,11 +56,10 @@ public class KbService {
     }
 
 
-    @SuppressWarnings("null")
     public Kb getKb(String name) {
 
         Kb kb = Kb.builder()
-                .kid(Utils.getUid())
+                .kid(uidUtils.getCacheSerialUid())
                 .name(name)
                 .vectorStore("redis")
                 .embeddings("m3e-base")

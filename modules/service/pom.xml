@@ -11,10 +11,15 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>weiyu-service</artifactId>
+	<artifactId>im-service</artifactId>
 
 	<name>service</name>
 	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<proguard.version>7.4.2</proguard.version>
+		<proguard.maven.plugin.version>2.6.1</proguard.maven.plugin.version>
+	</properties>
 
 	<dependencies>
 
@@ -22,14 +27,14 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>weiyu-core</artifactId>
+			<artifactId>im-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>weiyu-team</artifactId>
+			<artifactId>im-team</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -38,6 +43,28 @@
 
 	<build>
 		<plugins>
+			<!-- <plugin>
+				<groupId>com.github.wvengen</groupId>
+				<artifactId>proguard-maven-plugin</artifactId>
+				<version>${proguard.maven.plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>proguard</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<injar>${project.build.finalName}.jar</injar>
+					<outjar>${project.build.finalName}.jar</outjar>
+					<obfuscate>true</obfuscate>
+					<attach>true</attach>
+					<proguardInclude>${project.basedir}/proguard.cfg</proguardInclude>
+					<inLibsFilter>!META-INF/**</inLibsFilter>
+					<outputDirectory>${project.basedir}/target</outputDirectory>
+				</configuration>
+			</plugin> -->
 			<!-- <plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

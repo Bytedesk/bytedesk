@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:18:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-03 15:16:02
+ * @LastEditTime: 2024-04-17 13:54:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,8 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class WorkgroupResponse extends BaseResponse {
 
+    private static final long serialVersionUID = -5451766294L;    
+
     private String wid;
 
     private String nickname;
@@ -42,33 +44,21 @@ public class WorkgroupResponse extends BaseResponse {
 
     private String description;
 
-    /**
-     * 
-     */
-
-
-
-    /**
-     * 
-     */
     private String routeType;
 
-    /**
-     * 
-     */
     private boolean recent;
 
-    /**
-     * 
-     */
     private boolean autoPop;
 
-    /**
-     * 
-     */
     private boolean showTopTip;
 
     private String topTip;
+
+    private String welcomeTip;
+
+    private boolean defaultRobot;
+
+    private Double autoCloseMin;
 
     // 
     private List<AgentResponse> agents;

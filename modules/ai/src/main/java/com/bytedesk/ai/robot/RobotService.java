@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 17:14:46
+ * @LastEditTime: 2024-04-17 23:57:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,12 +24,12 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ai.kb.KbService;
 import com.bytedesk.ai.llm.LlmService;
-import com.bytedesk.core.auth.AuthService;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 
@@ -48,6 +48,8 @@ public class RobotService {
     private final UserService userService;
 
     private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
 
     public Page<RobotResponse> query(RobotRequest robotRequest) {
 
@@ -71,7 +73,7 @@ public class RobotService {
         // 
         Robot robot = modelMapper.map(robotRequest, Robot.class);
         // 
-        String rid = Utils.getUid();
+        String rid = uidUtils.getCacheSerialUid();
         robot.setRid(rid);
 
         robot.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
@@ -90,7 +92,7 @@ public class RobotService {
     }
 
 
-    @SuppressWarnings("null")
+    // @SuppressWarnings("null")
     public void initData() {
         
         if (robotRepository.count() > 0) {
@@ -101,7 +103,7 @@ public class RobotService {
         Optional<User> adminOptional = userService.getAdmin();
         if (adminOptional.isPresent()) {
             // 
-            String rid = Utils.getUid();
+            String rid = uidUtils.getCacheSerialUid();
             Robot robot = Robot.builder()
                     .rid(rid)
                     .name("客服机器人")

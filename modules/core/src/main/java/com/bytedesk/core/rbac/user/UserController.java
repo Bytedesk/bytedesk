@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 11:01:20
+ * @LastEditTime: 2024-04-25 22:46:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,11 @@
  */
 package com.bytedesk.core.rbac.user;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.bytedesk.core.auth.AuthService;
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -35,8 +35,6 @@ public class UserController {
 
     private final AuthService authService;
 
-    private final ModelMapper modelMapper;
-
     /**
      * get user info
      * 
@@ -44,16 +42,12 @@ public class UserController {
      */
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
-        try {
-            // 
-            User user = authService.getCurrentUser();
+        // 
+        User user = authService.getCurrentUser();
 
-            UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        UserResponse userResponse = userService.convertToUserResponse(user);
 
-            return ResponseEntity.ok(JsonResult.success(userResponse));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
     /**
@@ -64,56 +58,35 @@ public class UserController {
      */
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
-        try {
 
-            User user = authService.getCurrentUser();
+        UserResponse userResponse = userService.update(userRequest);
 
-            UserResponse userResponse = userService.update(userRequest, user);
-
-            return ResponseEntity.ok().body(new JsonResult<>("update user success", 200, userResponse));
-            
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    /**
-     * 
-     * @return
-     */
+    /**  */
     @PostMapping("/logout")
     public ResponseEntity<String> logout() {
-        try {
-            return ResponseEntity.ok().body("logout");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // TODO: 清理token，使其过期
+        return ResponseEntity.ok().body("logout");
+    }
+    
+    /** for testing，client will return 403, if dont have authority/role */
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER', 'ROLE_ADMIN')")
+    // @PreAuthorize("hasAuthority('ROLE_SUPER') or hasAuthority('ROLE_ADMIN')")
+    // @PreAuthorize("hasAuthority('ROLE_SUPER')")
+    @GetMapping("/test/super")
+    public ResponseEntity<?> testSuperAuthority() {
+       return ResponseEntity.ok("you have super authority");
     }
 
-    // @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    // @GetMapping("/test")
-    // public String test() {
-    //     try {
-    //         return "Welcome";
-    //     } catch (Exception e) {
-    //         throw new RuntimeException(e);
-    //     }
-    // }
-
-    // @GetMapping("/me")
-    // @PreAuthorize("isAuthenticated()")
-    // public ResponseEntity<User> authenticatedUser() {
-    //     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    //     User currentUser = (User) authentication.getPrincipal();
-    //     return ResponseEntity.ok(currentUser);
-    // }
-
-    // @GetMapping
-    // @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    // public ResponseEntity<List<User>> allUsers() {
-    //     // List <User> users = userService.allUsers();
-    //     return ResponseEntity.ok(null);
-    // }
+    /** no need to add ROLE_ prefix, system will auto add */
+    @GetMapping(value = "/test/cs")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER', 'CS')")
+    // @PreAuthorize("hasRole('CS')")
+    public ResponseEntity<?> testCsRole() {
+        return ResponseEntity.ok("you have admin or cs role");
+    }
 
     
 }

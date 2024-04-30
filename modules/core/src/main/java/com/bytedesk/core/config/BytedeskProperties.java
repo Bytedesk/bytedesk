@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-28 10:55:27
+ * @LastEditTime: 2024-04-24 10:18:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,13 +30,15 @@ public class BytedeskProperties {
 
     private String password;
 
+    private String nickname;
+
     private String email;
 
     private String mobile;
 
     private String company;
 
-    private String timezone;
+    // private String timezone;
 
     // cors
     private String corsAllowedOrigins;

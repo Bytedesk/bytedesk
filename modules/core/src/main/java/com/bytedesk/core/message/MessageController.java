@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-01 17:26:34
+ * @LastEditTime: 2024-04-27 16:42:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,25 +14,22 @@
  */
 package com.bytedesk.core.message;
 
-import java.util.Map;
-
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
  * http://localhost:9003/swagger-ui/index.html
  */
-@Slf4j
+// @Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/message")
@@ -47,28 +44,12 @@ public class MessageController {
      * @return json
      */
     @GetMapping("/query")
-    public JsonResult<?> query(MessageRequest messageRequest) {
+    public ResponseEntity<?> query(MessageRequest messageRequest) {
 
         Page<MessageResponse> messagePage = messageService.query(messageRequest);
         //
-        return new JsonResult<>("query message success", 200, messagePage);
+        return ResponseEntity.ok(JsonResult.success(messagePage));
     }
 
-
-    /**
-     * send offline message
-     * 
-     * @param map map
-     * @return json
-     */
-    @PostMapping("/send")
-    public JsonResult<?> sendOfflineMessage(@RequestBody Map<String, String> map) {
-
-        String json = (String) map.get("json");
-        log.debug("json {}", json);
-        // stompMqService.sendMessageToMq(json);
-        //
-        return new JsonResult<>("send offline message success", 200, json);
-    }
 
 }

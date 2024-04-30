@@ -48,8 +48,6 @@ dependencies {
 	implementation 'io.netty:netty-codec-http:4.1.105.Final'
 
 
-	// https://mvnrepository.com/artifact/cn.hutool/hutool-crypto
-	implementation 'cn.hutool:hutool-crypto:5.8.25'
 	// https://mvnrepository.com/artifact/com.google.guava/guava
 	// implementation 'com.google.guava:guava:33.0.0-jre'
 	// https://mvnrepository.com/artifact/com.google.code.gson/gson

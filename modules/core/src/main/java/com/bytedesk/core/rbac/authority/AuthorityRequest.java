@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 14:02:47
+ * @LastEditTime: 2024-04-24 10:41:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,16 @@
  */
 package com.bytedesk.core.rbac.authority;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
+import lombok.experimental.Accessors;
 
 import com.bytedesk.core.utils.BaseRequest;
 
 @Data
+@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 public class AuthorityRequest extends BaseRequest {
 
@@ -31,12 +33,10 @@ public class AuthorityRequest extends BaseRequest {
 
     private String value;
 
-    private int status;
+    // private int status;
 
     private String description;
 
-    private String type;
-
-    private List<Long> actions;
+    // private List<Long> actions;
 
 }

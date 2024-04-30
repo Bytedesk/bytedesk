@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-05 14:34:16
+ * @LastEditTime: 2024-04-08 10:24:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.core.ip;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +31,22 @@ public class IpService {
 
     private final Searcher searcher;
 
+
+    /**
+     * 获取客户端ip
+     * @param request
+     * @return
+     */
+    public String getIp(HttpServletRequest request) {
+        return IpUtils.clientIp(request);
+    }
+
+    /**
+     * location: "国家|区域|省份|城市|ISP"
+     * location: "中国|0|湖北省|武汉市|联通"
+     * @param ip
+     * @return
+     */
     public String getIpLocation(String ip) {
         try {
             return searcher.search(ip);
@@ -37,6 +54,11 @@ public class IpService {
             log.error("failed to search(%s): %s\n", ip, e);
         }
         return null;
+    }
+
+    public String getIpLocation(HttpServletRequest request) {
+        String ip = getIp(request);
+        return getIpLocation(ip);
     }
 
 }

@@ -15,7 +15,6 @@ import org.springframework.util.StringUtils;
 public class BdDateUtils {
 
     private BdDateUtils() {
-
     }
 
     private static final String datetimeFormat = "yyyy-MM-dd HH:mm:ss";

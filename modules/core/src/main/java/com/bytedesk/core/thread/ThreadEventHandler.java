@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 10:40:06
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-22 11:11:52
+ * @LastEditTime: 2024-04-15 09:32:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,13 +25,11 @@ import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.auth.AuthService;
-import com.bytedesk.core.utils.Utils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * used for spring-data-rest api
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
  * https://docs.spring.io/spring-data/rest/reference/events.html
  */
@@ -41,14 +39,14 @@ import lombok.extern.slf4j.Slf4j;
 @RepositoryEventHandler(Thread.class)
 public class ThreadEventHandler {
 
-    private AuthService authService;
+    // private AuthService authService;
 
     @HandleBeforeCreate
     public void beforeCreate(Thread thread) {
         log.debug("beforeCreate");
         //
-        thread.setTid(Utils.getUid());
-        thread.setUser(authService.getCurrentUser());
+        // thread.setTid(Utils.getUid());
+        // thread.setOwner(authService.getCurrentUser());
 
         return;
     }

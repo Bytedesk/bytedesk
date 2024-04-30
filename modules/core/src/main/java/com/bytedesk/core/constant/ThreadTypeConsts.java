@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:01:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-22 16:01:17
+ * @LastEditTime: 2024-04-27 12:37:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,17 +15,20 @@
 package com.bytedesk.core.constant;
 
 public class ThreadTypeConsts {
+    
     private ThreadTypeConsts() {
     }
 
     /**
      * thread type
      */
-    public static final String WORKGROUP = "workgroup";
     public static final String APPOINTED = "appointed";
+    public static final String WORKGROUP = "workgroup";
     public static final String MEMBER = "member";
     public static final String GROUP = "group";
     public static final String ROBOT = "robot";
     public static final String LEAVEMSG = "leavemsg";
     public static final String FEEDBACK = "feedback";
+    public static final String ASISTANT = "assistant";
+    public static final String CHANNEL = "channel";
 }

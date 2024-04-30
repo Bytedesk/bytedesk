@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-25 12:08:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-26 16:03:31
+ * @LastEditTime: 2024-04-11 12:09:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,8 +15,8 @@
 package com.bytedesk.ai.llm;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 
@@ -26,7 +26,7 @@ public class LlmService {
 
     private LlmRepository llmRepository;
 
-    
+    private final UidUtils uidUtils;
 
     public JsonResult<?> create(LlmRequest llmRequest) {
 
@@ -36,7 +36,7 @@ public class LlmService {
 
     public Llm getLlm(String type) {
         Llm llm = new Llm();
-        llm.setLid(Utils.getUid());
+        llm.setLid(uidUtils.getCacheSerialUid());
         llm.setName("智谱AI");
         llm.setDescription("对接智谱API");
         llm.setType(type);

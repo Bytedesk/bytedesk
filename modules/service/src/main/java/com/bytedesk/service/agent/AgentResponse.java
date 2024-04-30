@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 14:49:30
+ * @LastEditTime: 2024-04-16 17:07:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class AgentResponse extends BaseResponse {
 
-    private String aid;
+    private static final long serialVersionUID = 94072119L;    
+
+    private String uid;
 
     private String nickname;
 
@@ -43,5 +45,11 @@ public class AgentResponse extends BaseResponse {
 
     private String description;
 
+    private String acceptStatus;
+
+    private boolean connected;
     
+    private Integer maxThreadCount;
+
+    private String welcomeTip;
 }
