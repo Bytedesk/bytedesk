@@ -150,9 +150,9 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
         // final MqttSession sessionStore =
         // protocolProcess.getMqttSessionStoreService().get(clientId);
         // if (sessionStore != null && sessionStore.isCleanSession()) {
-        protocolProcess.getMqttSubscribeStoreService().removeForClient(clientId);
-        protocolProcess.getMqttDupPublishMessageStoreService().removeByClient(clientId);
-        protocolProcess.getMqttDupPubRelMessageStoreService().removeByClient(clientId);
+        // protocolProcess.getMqttSubscribeStoreService().removeForClient(clientId);
+        // protocolProcess.getMqttDupPublishMessageStoreService().removeByClient(clientId);
+        // protocolProcess.getMqttDupPubRelMessageStoreService().removeByClient(clientId);
         // }
         // 更新离线状态
         updateDisconnectedStatus(clientId);
@@ -164,7 +164,8 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
         // }
         //
         protocolProcess.getMqttSessionStoreService().remove(clientId);
-        protocolProcess.getMqttClientIdStoreService().remove(clientId);
+        // protocolProcess.getMqttClientIdStoreService().remove(clientId);
+        protocolProcess.getTopicService().removeClientId(clientId);
         //
         // 非客户端调用接口断开
         // log.debug("DISCONNECT - channelInactive - clientId: {}", clientId);

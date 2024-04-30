@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-04 14:18:57
+ * @LastEditTime: 2024-04-22 20:51:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,51 +16,48 @@ package com.bytedesk.core.message;
 
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import com.bytedesk.core.rbac.user.UserResponseSimple;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import com.bytedesk.core.thread.ThreadResponseSimple;
+import com.bytedesk.core.utils.BaseResponse;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+/**
+ * response for visitor init/request thread
+ * distinguish visitor message from agent view
+ * 区分 访客端拉取的消息格式 和 客服端拉取到的消息格式
+ */
 @Data
-public class MessageResponse {
+@Builder
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class MessageResponse extends BaseResponse {
 
-    @Value("${bytedesk.timezone}")
-    private static final String timezone = "GMT+8";
+	private static final long serialVersionUID = 9911390153L;	
 
-    private String mid;
+	/** message */
+	private String mid;
 
-    /**
-     *
-     */
-    private String type;
+	private String type;
 
-    /**
-     * 
-     */
-    private String content;
+	private String content;
 
-    /**
-     * 
-     */
-    private String extra;
+	private String status;
 
-    /**
-     * 
-     */
-    private String status;
+	private String client;
 
-    /**
-     * 
-     */
-    private String client;
+	private Date createdAt;
 
+    /** */
+	private ThreadResponseSimple thread;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = timezone)
-    private Date createdAt;
-
-
-    private UserResponseSimple user;
+    /** */
+	private UserResponseSimple user;
 
 }

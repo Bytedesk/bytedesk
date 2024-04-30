@@ -237,13 +237,16 @@ public class StatusConsts {
     public static final String ANSWER_STATUS_PUBLISHED = "published";
     public static final String ANSWER_STATUS_UNPUBLISHED = "unpublished";
 
-    /**
-     * 学校认领：待审核、审核通过、审核拒绝
-     */
-    public static final String CLAIM_STATUS_WAITING = "waiting";
-    public static final String CLAIM_STATUS_ACCEPT = "accept";
-    public static final String CLAIM_STATUS_REJECT = "reject";
-    
+    // 同事和群组会话初始值为init
+    public static final String THREAD_STATUS_INIT = "init";
+    // 只有客服会话会有open
+    public static final String THREAD_STATUS_OPEN = "open";
+    public static final String THREAD_STATUS_CLOSED_AUTO = "closed_auto";
+    public static final String THREAD_STATUS_CLOSED_AGENT = "closed_agent";
+    // 发送验证码状态
+    public static final String CODE_STATUS_PENDING = "pending";
+    public static final String CODE_STATUS_CONFIRM = "confirmed";
+    public static final String CODE_STATUS_EXPIRED = "expired";
 
 }
 

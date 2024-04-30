@@ -19,7 +19,8 @@ public class BdConstants {
     public static final boolean IS_DEBUG = false;
 
     // 空字符串
-    public static final String EMPTY = "";
+    public static final String EMPTY_STRING = "";
+    public static final String EMPTY_JSON_STRING = "{}";
 
     /**
      * Path separator.

@@ -51,10 +51,6 @@ dependencies {
 	implementation 'com.alibaba.fastjson2:fastjson2:2.0.45'
 	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
 	implementation 'org.modelmapper:modelmapper:3.2.0'
-	// docs: https://doc.hutool.cn/pages/index/#%F0%9F%93%9A%E7%AE%80%E4%BB%8B
-	// https://mvnrepository.com/artifact/cn.hutool/hutool-all
-	implementation 'cn.hutool:hutool-all:5.8.25'
-
 
 	// for api docs
 	// https://springdoc.org/

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-03 14:50:35
+ * @LastEditTime: 2024-04-25 15:21:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,19 +14,28 @@
  */
 package com.bytedesk.service.workgroup;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.Utils;
+import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.team.organization.Organization;
+import com.bytedesk.team.organization.OrganizationService;
 
 import lombok.AllArgsConstructor;
+import static java.util.Arrays.asList;
 
 // @Slf4j
 @Service
@@ -35,40 +44,140 @@ public class WorkgroupService {
 
     private final WorkgroupRepository workgroupRepository;
 
+    private final AgentService agentService;
+
     private final ModelMapper modelMapper;
 
-    public List<Workgroup> findAll() {
-        return workgroupRepository.findAll();
-    }
+    private final UidUtils uidUtils;
 
-    public Page<WorkgroupResponse> query(WorkgroupRequest pageParam) {
+    private final BytedeskProperties properties;
 
-        Pageable pageable = PageRequest.of(pageParam.getPageNumber(),
-                pageParam.getPageSize(), Sort.Direction.DESC,
+    private final OrganizationService organizationService;
+
+    public Page<WorkgroupResponse> query(WorkgroupRequest workgroupRequest) {
+
+        Pageable pageable = PageRequest.of(workgroupRequest.getPageNumber(),
+                workgroupRequest.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Page<Workgroup> workgroupPage = workgroupRepository.findAll(pageable);
+        Page<Workgroup> workgroupPage = workgroupRepository.findByOrgOid(workgroupRequest.getOrgOid(),
+                pageable);
 
         return workgroupPage.map(this::convertToWorkgroupResponse);
     }
 
-
-    public JsonResult<?> create(WorkgroupRequest workgroupRequest) {
-
+    public Workgroup create(WorkgroupRequest workgroupRequest) {
+        // 
         Workgroup workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
-        workgroup.setWid(Utils.getUid());
-
-        return JsonResult.success(save(workgroup));
+        workgroup.setWid(uidUtils.getCacheSerialUid());
+        // 
+        Iterator<String> iterator = workgroupRequest.getAgentAids().iterator();
+        while (iterator.hasNext()) {
+            String agentAid = iterator.next();
+            Optional<Agent> agentOptional = agentService.findByUid(agentAid);
+            if (agentOptional.isPresent()) {
+                Agent agentEntity = agentOptional.get();
+                workgroup.getAgents().add(agentEntity);
+            } else {
+                return null;
+            }
+        }
+        // 
+        return save(workgroup);
     }
     
+    Workgroup update(WorkgroupRequest workgroupRequest) {
 
-    @SuppressWarnings("null")
-    private WorkgroupResponse save(Workgroup workgroup) {
-        return convertToWorkgroupResponse(workgroupRepository.save(workgroup));
+        Optional<Workgroup> workgroupOptional = findByWid(workgroupRequest.getWid());
+        if (!workgroupOptional.isPresent()) {
+            return null;
+        }
+        // 
+        Workgroup workgroup = workgroupOptional.get();
+        workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
+        // workgroupOptional.get().setNickname(workgroupRequest.getNickname());
+        // workgroupOptional.get().setAvatar(workgroupRequest.getAvatar());
+        // workgroupOptional.get().setDescription(workgroupRequest.getDescription());
+        // workgroupOptional.get().setRouteType(workgroupRequest.getRouteType());
+        // workgroupOptional.get().setRecent(workgroupRequest.getRecent());
+        // workgroupOptional.get().setAutoPop(workgroupRequest.getAutoPop());
+        // 
+        // 
+        Iterator<String> iterator = workgroupRequest.getAgentAids().iterator();
+        while (iterator.hasNext()) {
+            String agentAid = iterator.next();
+            Optional<Agent> agentOptional = agentService.findByUid(agentAid);
+            if (agentOptional.isPresent()) {
+                Agent agentEntity = agentOptional.get();
+                workgroup.getAgents().add(agentEntity);
+            } else {
+                return null;
+            }
+        }
+        // 
+        return save(workgroup);
+    }
+    
+    
+
+    @Cacheable(value = "workgroup", key = "#wid", unless="#result == null")
+    public Optional<Workgroup> findByWid(String wid) {
+        return workgroupRepository.findByWid(wid);
     }
 
-    private WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
+    @Cacheable(value = "workgroup", key = "#nickname", unless="#result == null")
+    public Optional<Workgroup> findByNickname(String nickname) {
+        return workgroupRepository.findByNickname(nickname);
+    }
+
+    // @SuppressWarnings("null")
+    private Workgroup save(Workgroup workgroup) {
+        return workgroupRepository.save(workgroup);
+    }
+
+    public WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
         return modelMapper.map(workgroup, WorkgroupResponse.class);
+    }
+
+    public void initData() {
+
+        if (workgroupRepository.count() > 0) {
+            return;
+        }
+
+        Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
+        if (orgOptional.isPresent()) {
+
+            List<String> agents = new ArrayList<>();
+            Optional<Agent> agent1Optional = agentService.findByMobile("18888888008");
+            agent1Optional.ifPresent(agent -> {
+                agents.add(agent.getUid());
+            });
+            Optional<Agent> agent2Optional = agentService.findByMobile("18888888009");
+            agent2Optional.ifPresent(agent -> {
+                agents.add(agent.getUid());
+            });
+        
+            // add workgroups
+            WorkgroupRequest workgroup1Request = WorkgroupRequest.builder()
+                    .nickname("客服组1")
+                    .agentAids(agents)
+                    .orgOid(orgOptional.get().getOid())
+                    .build();
+            create(workgroup1Request);
+
+            // 
+            WorkgroupRequest workgroup2Request = WorkgroupRequest.builder()
+                    .nickname("客服组2")
+                    .agentAids(asList(agent1Optional.get().getUid()))
+                    .orgOid(orgOptional.get().getOid())
+                    .build();
+            create(workgroup2Request);
+                
+        }
+
+        
+        
     }
 
 

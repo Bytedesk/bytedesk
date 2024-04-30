@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-04-26 14:11:29
+ * @LastEditTime: 2024-04-30 09:34:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,9 +42,6 @@ AI powered customer service & team collaboration
 
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
-# open bytedesk/starter/src/main/resources/application-dev.properties
-# change the value of spring.datasource.url and spring.datasource.username and spring.datasource.password
-# change the value of spring.redis.host and spring.redis.port
 cd bytedesk/starter
 mvn spring-boot:run
 # 

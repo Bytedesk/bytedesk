@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-23 13:39:01
+ * @LastEditTime: 2024-04-17 11:33:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -94,7 +94,7 @@ public class UploadService {
 		return rootLocation.resolve(filename);
 	}
 
-	@SuppressWarnings("null")
+	// @SuppressWarnings("null")
 	public Resource loadAsResource(String filename) {
 		try {
 			Path file = load(filename);

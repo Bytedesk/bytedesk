@@ -1,0 +1,3 @@
+rootProject.name = 'blog'
+include ':core'
+project(':core').projectDir = new File('../core')

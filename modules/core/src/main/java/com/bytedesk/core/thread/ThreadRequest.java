@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-01 15:21:22
+ * @LastEditTime: 2024-04-13 16:25:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,22 +14,27 @@
  */
 package com.bytedesk.core.thread;
 
+import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.utils.BaseRequest;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@Builder
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
+@AllArgsConstructor
 public class ThreadRequest extends BaseRequest {
     
     private String tid;
 
     private String topic;
 
-    private String nickname;
-
-    private String avatar;
-
-    private String extra;
+    private UserResponseSimple user;
 }

@@ -11,7 +11,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>weiyu-local</artifactId>
+	<artifactId>im-local</artifactId>
 
 	<name>local</name>
 	<description>Demo project for Spring Boot</description>
@@ -20,14 +20,21 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>weiyu-core</artifactId>
+			<artifactId>im-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>weiyu-socket</artifactId>
+			<artifactId>im-service</artifactId>
+			<version>${im.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>im-socket</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -51,6 +58,7 @@
 
 	<build>
 		<plugins>
+
 			<!-- <plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

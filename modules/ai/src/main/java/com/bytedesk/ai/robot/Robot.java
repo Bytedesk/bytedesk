@@ -74,7 +74,7 @@ public class Robot extends AuditModel {
     private String type;
 
     // is_published or not
-    private Boolean published;
+    private boolean published;
     
     /**
      * llm

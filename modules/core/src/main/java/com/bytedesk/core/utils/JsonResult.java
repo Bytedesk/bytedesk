@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-05 09:45:50
+ * @LastEditTime: 2024-04-22 21:08:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,8 +52,12 @@ public class JsonResult<T> implements Serializable {
         return new JsonResult<T>().setCode(200).setMessage("success").setData(data);
     }
 
-    public static <T> JsonResult<T> success(String message, int statusCode, T data) {
-        return new JsonResult<T>().setCode(statusCode).setMessage(message).setData(data);
+    public static <T> JsonResult<T> success(String message, T data) {
+        return new JsonResult<T>().setCode(200).setMessage(message).setData(data);
+    }
+
+    public static <T> JsonResult<T> success(String message, int code, T data) {
+        return new JsonResult<T>().setCode(code).setMessage(message).setData(data);
     }
 
     public static JsonResult<Boolean> error() {
@@ -64,7 +68,11 @@ public class JsonResult<T> implements Serializable {
         return new JsonResult<Boolean>().setCode(500).setMessage(message).setData(false);
     }
 
-    public static <T> JsonResult<T> error(String message, int statusCode, T data) {
-        return new JsonResult<T>().setCode(statusCode).setMessage(message).setData(data);
+    public static JsonResult<Boolean> error(String message, int code) {
+        return new JsonResult<Boolean>().setCode(code).setMessage(message).setData(false);
+    }
+
+    public static <T> JsonResult<T> error(String message, int code, T data) {
+        return new JsonResult<T>().setCode(code).setMessage(message).setData(data);
     }
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-04 17:07:01
+ * @LastEditTime: 2024-04-16 17:07:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+
+/**
+ * used for agent client
+ */
 @Data
 @Builder
 @Accessors(chain = true)
@@ -31,8 +35,10 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class VisitorResponse extends BaseResponse {
+
+	private static final long serialVersionUID = 50026477L;	
     
-    private String vid;
+    private String uid;
 
 	/**
 	 * developers can set basic visitor info
@@ -41,20 +47,29 @@ public class VisitorResponse extends BaseResponse {
 
 	private String avatar;
 
-	private String mobile;
-
-	private String email;
-
+	// location info
 	private String ip;
 
 	private String ipLocation;
 
+	// device info
 	private String browser;
 
 	private String os;
 
 	private String device;
 
+	private String referrer;
+
+	// used for agent notation
+	private String mobile;
+
+	private String email;
+
 	private String note;
+	
+	// from source
+	private String client;
+
     
 }

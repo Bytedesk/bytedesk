@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 16:50:05
+ * @LastEditTime: 2024-04-26 18:21:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,20 +15,27 @@
 package com.bytedesk.team.member;
 
 import java.util.Optional;
-
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.TypeConsts;
 // import com.bytedesk.core.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserService;
-import com.bytedesk.core.utils.BdConvertUtils;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.Utils;
 import com.bytedesk.team.department.Department;
-import com.bytedesk.team.department.DepartmentRepository;
+import com.bytedesk.team.department.DepartmentService;
+
 import lombok.AllArgsConstructor;
 
 // @Slf4j
@@ -38,12 +45,36 @@ public class MemberService {
 
     private UserService userService;
 
-    private DepartmentRepository departmentRepository;
+    private DepartmentService departmentService;
 
     private MemberRepository memberRepository;
 
     private ModelMapper modelMapper;
 
+    private UidUtils uidUtils;
+
+    public Page<MemberResponse> queryAll(MemberRequest memberRequest) {
+
+        Pageable pageable = PageRequest.of(memberRequest.getPageNumber(), memberRequest.getPageSize(), Sort.Direction.ASC,
+                "id");
+        
+        Page<Member> memberPage = memberRepository.findByOrgOid(memberRequest.getOrgOid(), pageable);
+
+        return memberPage.map(this::convertToMemberResponse);
+    }
+
+    public Page<MemberResponse> query(MemberRequest memberRequest) {
+
+        Pageable pageable = PageRequest.of(memberRequest.getPageNumber(), memberRequest.getPageSize(), Sort.Direction.ASC,
+                "id");
+        
+        Page<Member> memberPage = memberRepository.findByDepartmentsDidIn(new String[]{memberRequest.getDepDid()}, pageable);
+
+        return memberPage.map(this::convertToMemberResponse);
+    }
+
+
+    @Transactional
     public JsonResult<?> create(MemberRequest memberRequest) {
         // 
         // if (userService.existsByMobile(memberRequest.getMobile())) {
@@ -53,21 +84,24 @@ public class MemberService {
         //     return JsonResult.error("email already exist");
         // }
         //
-        Optional<Member> memberOptional = memberRepository.findByUser_Mobile(memberRequest.getMobile());
+        Optional<Member> memberOptional = findByEmail(memberRequest.getEmail());
         if (!memberOptional.isPresent()) {
             Member member = modelMapper.map(memberRequest, Member.class);
-            member.setMid(Utils.getUid());
+            member.setUid(uidUtils.getCacheSerialUid());
             //
-            Optional<Department> depOptional = departmentRepository.findByDid(memberRequest.getDepDid());
+            Optional<Department> depOptional = departmentService.findByDid(memberRequest.getDepDid());
             if (depOptional.isPresent()) {
-                member.setDepartment(depOptional.get());
-                member.setOrganization(depOptional.get().getOrganization());
+                member.addDepartment(depOptional.get());
+                // member.setDepartment(depOptional.get());
+                // member.setOrganization(depOptional.get().getOrganization());
+                // member.setOrgOid(depOptional.get().getOrganization().getOid());
+                member.setOrgOid(depOptional.get().getOrgOid());
             } else {
-                return null;
+                return JsonResult.error("department not exist");
             }
             // 
             User user;
-            Optional<User> userOptional = userService.findByMobile(memberRequest.getMobile());
+            Optional<User> userOptional = userService.findByEmail(memberRequest.getEmail());
             if (!userOptional.isPresent()) {
                 user = userService.createUser(
                         memberRequest.getNickname(),
@@ -75,23 +109,18 @@ public class MemberService {
                         memberRequest.getPassword(),
                         memberRequest.getMobile(),
                         memberRequest.getEmail(),
-                        memberRequest.isVerified(),
-                        member.getOrganization().getOid()
-                    );
+                        memberRequest.getVerified(),
+                        depOptional.get().getOrgOid()
+                        );
             } else {
-                    user = userOptional.get();
-                // user = userService.updateUser(
-                //         userOptional.get(),
-                //         memberRequest.getPassword(),
-                //         memberRequest.getMobile(),
-                //         memberRequest.getEmail()
-                //     );
+                // just return user
+                user = userOptional.get();
             }
             member.setUser(user);
             // 
-            MemberResponse result = save(member);
+            Member result = save(member);
 
-            return JsonResult.success(result);
+            return JsonResult.success(convertToMemberResponse(result));
         }
         //
         return update(memberOptional.get(), memberRequest);
@@ -105,234 +134,98 @@ public class MemberService {
         member.setTelephone(memberRequest.getTelephone());
         member.setEmail(memberRequest.getEmail());
         //
-        Optional<Department> depOptional = departmentRepository.findByDid(memberRequest.getDepDid());
+        Optional<Department> depOptional = departmentService.findByDid(memberRequest.getDepDid());
         if (depOptional.isPresent()) {
-            member.setDepartment(depOptional.get());
-            member.setOrganization(depOptional.get().getOrganization());
+            member.addDepartment(depOptional.get());
+            // member.setDepartment(depOptional.get());
+            // member.setOrganization(depOptional.get().getOrganization());
+            // member.setOrgOid(depOptional.get().getOrganization().getOid());
+            member.setOrgOid(depOptional.get().getOrgOid());
         } else {
             return null;
         }
 
-        MemberResponse result = save(member);
+        Member result = save(member);
 
-        return JsonResult.success(result);
+        return JsonResult.success(convertToMemberResponse(result));
     }
 
     // public void delete(MemberRequest memberRequest) {
-        // Optional<Member> memberOptional =
-        // memberRepository.findById(memberRequest.getId());
-        // if (memberOptional.isPresent()) {
-        // memberRepository.delete(memberOptional.get());
+    // Optional<Member> memberOptional =
+    // memberRepository.findById(memberRequest.getId());
+    // if (memberOptional.isPresent()) {
+    // memberRepository.delete(memberOptional.get());
     // }
     // }
 
-    @SuppressWarnings("null")
-    private MemberResponse save(Member member) {
-        return convertToMemberResponse(memberRepository.save(member));
+    @Cacheable(value = "member", key = "#uid", unless="#result == null")
+    public Optional<Member> findByUid(String uid) {
+        return memberRepository.findByUid(uid);
+    }
+
+    @Cacheable(value = "member", key = "#mobile", unless="#result == null")
+    public Optional<Member> findByMobile(String mobile) {
+        return memberRepository.findByUser_Mobile(mobile);
+    }
+
+    @Cacheable(value = "member", key = "#email", unless="#result == null")
+    public Optional<Member> findByEmail(String email) {
+        return memberRepository.findByUser_Email(email);
+    }
+
+    @Caching(put = {
+        @CachePut(value = "member", key = "#member.uid"),
+        @CachePut(value = "member", key = "#member.user.mobile"),
+        @CachePut(value = "member", key = "#member.user.email")
+    })
+    private Member save(Member member) {
+        return memberRepository.save(member);
     }
 
     private MemberResponse convertToMemberResponse(Member member) {
         MemberResponse memberResponse = modelMapper.map(member, MemberResponse.class);
-        memberResponse.setUser(BdConvertUtils.convertTUserResponseSimple(member.getUser()));
+        // memberResponse.setUser(BdConvertUtils.convertTUserResponseSimple(member.getUser()));
         return memberResponse;
     }
 
-    public void initData() {
+    // 
+    private static final String[] departments = {
+        TypeConsts.DEPT_HR,
+        TypeConsts.DEPT_ORG,
+        TypeConsts.DEPT_IT,
+        TypeConsts.DEPT_MONEY,
+        TypeConsts.DEPT_MARKETING,
+        TypeConsts.DEPT_SALES,
+        TypeConsts.DEPT_CUSTOMER_SERVICE
+    };
 
+    public void initData() {
         if (memberRepository.count() > 0) {
             return;
         }
-
-        // 初始化-人力部门
-        Optional<Department> departHROptional = departmentRepository.findByName(TypeConsts.DEPT_HR);
-        if (departHROptional.isPresent()) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                .jobNo("001")
-                .password("123456")
-                .nickname("User001")
-                .seatNo("001")
-                .telephone("881")
-                .mobile("18888888881")
-                    .email("001@email.com")
-                .verified(true)
-                .depDid(departHROptional.get().getDid())
-                .build();
-            create(memberRequest);
-            MemberRequest memberRequest2 = MemberRequest.builder()
-                .jobNo("002")
-                .password("123456")
-                .nickname("User002")
-                .seatNo("002")
-                .telephone("882")
-                .mobile("18888888882")
-                    .email("002@email.com")
-                .verified(true)
-                .depDid(departHROptional.get().getDid())
-                .build();
-            create(memberRequest2);
+        // 
+        for (int i = 1; i <= departments.length; i++) {
+            String department = departments[i-1];
+            Optional<Department> depOptional = departmentService.findByName(department);
+            if (depOptional.isPresent()) {
+                String userNo = String.format("%03d", i);
+                MemberRequest memberRequest = MemberRequest.builder()
+                        .jobNo(userNo)
+                        .password("123456")
+                        .nickname("User" + userNo)
+                        .seatNo(userNo)
+                        .telephone(userNo)
+                        .mobile("18888888" + userNo)
+                        .email(userNo + "@email.com")
+                        .verified(true)
+                        .depDid(depOptional.get().getDid())
+                        .build();
+                create(memberRequest);
+            }
         }
         
-        // 行政
-        Optional<Department> departORGOptional = departmentRepository.findByName(TypeConsts.DEPT_ORG);
-        if (departORGOptional.isPresent()) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                .jobNo("003")
-                .password("123456")
-                .nickname("User003")
-                .seatNo("003")
-                .telephone("883")
-                .mobile("18888888883")
-                .email("003@email.com").verified(true)
-                .depDid(departORGOptional.get().getDid())
-                .build();
-            create(memberRequest);
-            MemberRequest memberRequest2 = MemberRequest.builder()
-                .jobNo("004")
-                .password("123456")
-                .nickname("User004")
-                .seatNo("004")
-                .telephone("884")
-                .mobile("18888888884")
-                .email("004@email.com").verified(true)
-                .depDid(departORGOptional.get().getDid())
-                .build();
-            create(memberRequest2);
-        }
-        
-        // IT
-        Optional<Department> departITOptional = departmentRepository.findByName(TypeConsts.DEPT_IT);
-        if (departITOptional.isPresent()) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                    .jobNo("005")
-                    .password("123456")
-                    .nickname("User005")
-                    .seatNo("005")
-                    .telephone("885")
-                    .mobile("18888888885")
-                    .email("005@email.com").verified(true)
-                    .depDid(departITOptional.get().getDid())
-                    .build();
-            create(memberRequest);
-            MemberRequest memberRequest2 = MemberRequest.builder()
-                    .jobNo("006")
-                    .password("123456")
-                    .nickname("User006")
-                    .seatNo("006")
-                    .telephone("886")
-                    .mobile("18888888886")
-                    .email("006@email.com").verified(true)
-                    .depDid(departITOptional.get().getDid())
-                    .build();
-            create(memberRequest2);
-        }
-        
-        // 财务
-        Optional<Department> departMoneyOptional = departmentRepository.findByName(TypeConsts.DEPT_MONEY);
-        if (departMoneyOptional.isPresent()) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                    .jobNo("007")
-                    .password("123456")
-                    .nickname("User007")
-                    .seatNo("007")
-                    .telephone("887")
-                    .mobile("18888888887")
-                    .email("007@email.com").verified(true)
-                    .depDid(departMoneyOptional.get().getDid())
-                    .build();
-            create(memberRequest);
-            MemberRequest memberRequest2 = MemberRequest.builder()
-                    .jobNo("008")
-                    .password("123456")
-                    .nickname("User008")
-                    .seatNo("008")
-                    .telephone("888")
-                    .mobile("18888888888")
-                    .email("008@email.com").verified(true)
-                    .depDid(departMoneyOptional.get().getDid())
-                    .build();
-            create(memberRequest2);
-        }
-        
-        // 营销
-        Optional<Department> departMarketingOptional = departmentRepository.findByName(TypeConsts.DEPT_MARKETING);
-        if (departMarketingOptional.isPresent()) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                    .jobNo("009")
-                    .password("123456")
-                    .nickname("User009")
-                    .seatNo("009")
-                    .telephone("889")
-                    .mobile("18888888889")
-                    .email("009@email.com").verified(true)
-                    .depDid(departMarketingOptional.get().getDid())
-                    .build();
-            create(memberRequest);
-            MemberRequest memberRequest2 = MemberRequest.builder()
-                    .jobNo("010")
-                    .password("123456")
-                    .nickname("User010")
-                    .seatNo("010")
-                    .telephone("810")
-                    .mobile("18888888810")
-                    .email("010@email.com").verified(true)
-                    .depDid(departMarketingOptional.get().getDid())
-                    .build();
-            create(memberRequest2);
-        }
-        
-        // 销售
-        Optional<Department> departSalesOptional = departmentRepository.findByName(TypeConsts.DEPT_SALES);
-        if (departSalesOptional.isPresent()) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                .jobNo("011")
-                .password("123456")
-                .nickname("User011")
-                .seatNo("011")
-                .telephone("811")
-                .mobile("18888888811")
-                .email("011@email.com").verified(true)
-                .depDid(departSalesOptional.get().getDid())
-                .build();
-            create(memberRequest);
-            MemberRequest memberRequest2 = MemberRequest.builder()
-                .jobNo("012")
-                .password("123456")
-                .nickname("User012")
-                .seatNo("012")
-                .telephone("812")
-                .mobile("18888888812")
-                .email("012@email.com").verified(true)
-                .depDid(departSalesOptional.get().getDid())
-                .build();
-            create(memberRequest2);
-        }
-    
-        // 客服
-        Optional<Department> departCSOptional = departmentRepository.findByName(TypeConsts.DEPT_CUSTOMER_SERVICE);
-        if (departCSOptional.isPresent()) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                    .jobNo("013")
-                    .password("123456")
-                    .nickname("User013")
-                    .seatNo("013")
-                    .telephone("813")
-                    .mobile("18888888813")
-                    .email("013@email.com").verified(true)
-                    .depDid(departCSOptional.get().getDid())
-                    .build();
-            create(memberRequest);
-            MemberRequest memberRequest2 = MemberRequest.builder()
-                    .jobNo("014")
-                    .password("123456")
-                    .nickname("User014")
-                    .seatNo("014")
-                    .telephone("814")
-                    .mobile("18888888814")
-                    .email("014@email.com").verified(true)
-                    .depDid(departCSOptional.get().getDid())
-                    .build();
-            create(memberRequest2);
-        }
-    
     }
+    
+
+
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-03 14:51:01
+ * @LastEditTime: 2024-04-22 10:37:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ActionLog;
 import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -43,9 +44,10 @@ public class WorkgroupController {
      * @param workgroupRequest
      * @return
      */
+    @ActionLog(title = "workgroup", action = "query")
     @GetMapping("/query")
     public ResponseEntity<?> query(WorkgroupRequest workgroupRequest) {
-
+        
         return ResponseEntity.ok(JsonResult.success(workgroupService.query(workgroupRequest)));
     }
 
@@ -58,7 +60,12 @@ public class WorkgroupController {
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest workgroupRequest) {
 
-        return ResponseEntity.ok(workgroupService.create(workgroupRequest));
+        Workgroup workgroup = workgroupService.create(workgroupRequest);
+        if (workgroup == null) {
+            return ResponseEntity.ok(JsonResult.error("create failed"));
+        }
+
+        return ResponseEntity.ok(JsonResult.success(workgroupService.convertToWorkgroupResponse(workgroup)));
     }
 
     /**
@@ -70,8 +77,12 @@ public class WorkgroupController {
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest workgroupRequest) {
 
+        Workgroup workgroup = workgroupService.update(workgroupRequest);
+        if (workgroup == null) {
+            return ResponseEntity.ok(JsonResult.error("update failed"));
+        }
         //
-        return ResponseEntity.ok(JsonResult.success("update success"));
+        return ResponseEntity.ok(JsonResult.success(workgroupService.convertToWorkgroupResponse(workgroup)));
     }
 
     /**

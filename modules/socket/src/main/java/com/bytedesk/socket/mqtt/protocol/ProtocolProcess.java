@@ -1,24 +1,8 @@
 package com.bytedesk.socket.mqtt.protocol;
 
 import com.bytedesk.core.event.BytedeskEventPublisher;
-import com.bytedesk.core.redis.RedisUserService;
-
-// import com.bytedesk.core.publisher.EventPublisher;
-// import com.bytedesk.core.redis.RedisAutoReplyService;
-// import com.bytedesk.core.redis.RedisBlockService;
-// import com.bytedesk.core.redis.RedisConnectService;
-// import com.bytedesk.core.redis.RedisHostService;
-// import com.bytedesk.core.redis.RedisRoutingRoundRobin;
-// import com.bytedesk.core.redis.RedisSettingService;
-// import com.bytedesk.core.redis.RedisStatisticService;
-// import com.bytedesk.core.redis.RedisUserService;
-// import com.bytedesk.core.service.GroupService;
-// import com.bytedesk.core.service.MessageService;
-// import com.bytedesk.core.service.ThreadService;
-// import com.bytedesk.core.service.UserService;
-
+import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.socket.mqtt.service.*;
-import com.bytedesk.socket.redis.RedisMessageCacheOfflineService;
 
 import lombok.Data;
 
@@ -35,10 +19,10 @@ import org.springframework.stereotype.Component;
 public class ProtocolProcess {
 
     @Autowired
-    private MqttSessionStoreService mqttSessionStoreService;
+    private MqttSessionService mqttSessionStoreService;
 
-    @Autowired
-    private MqttSubscribeStoreService mqttSubscribeStoreService;
+    // @Autowired
+    // private MqttSubscribeService mqttSubscribeStoreService;
 
     @Autowired
     private MqttAuthService mqttAuthService;
@@ -52,53 +36,23 @@ public class ProtocolProcess {
     @Autowired
     private MqttMessageIdService mqttMessageIdService;
 
-    @Autowired
-    private MqttRetainMessageStoreService mqttRetainMessageStoreService;
+    // @Autowired
+    // private MqttRetainMessageStoreService mqttRetainMessageStoreService;
+
+    // @Autowired
+    // private MqttDupPublishMessageStoreService mqttDupPublishMessageStoreService;
+
+    // @Autowired
+    // private MqttDupPubRelMessageStoreService mqttDupPubRelMessageStoreService;
+
+    // @Autowired
+    // private MqttClientIdService mqttClientIdStoreService;
 
     @Autowired
-    private MqttDupPublishMessageStoreService mqttDupPublishMessageStoreService;
-
-    @Autowired
-    private MqttDupPubRelMessageStoreService mqttDupPubRelMessageStoreService;
-
-    @Autowired
-    private MqttClientIdStoreService mqttClientIdStoreService;
+    private TopicService topicService;
 
     @Autowired
     private BytedeskEventPublisher bytedeskEventPublisher;
-
-    // @Autowired
-    // private UserService userService;
-
-    // @Autowired
-    // private GroupService groupService;
-
-    // @Autowired
-    // private ThreadService threadService;
-
-    // @Autowired
-    // private MessageService messageService;
-
-    @Autowired
-    private RedisUserService redisUserService;
-
-    // @Autowired
-    // private RedisRoutingRoundRobin redisRoutingRoundRobin;
-
-    // @Autowired
-    // private RedisStatisticService redisStatisticService;
-
-    // @Autowired
-    // private RedisHostService redisHostService;
-
-    // @Autowired
-    // private RedisConnectService redisConnectService;
-
-    // @Autowired
-    // private RedisSettingService redisSettingService;
-
-    @Autowired
-    private RedisMessageCacheOfflineService redisMessageCacheOfflineService;
 
     private Connect connect;
 
@@ -125,17 +79,12 @@ public class ProtocolProcess {
             connect = new Connect(
                     mqttAuthService,
                     mqttSessionStoreService,
-                    mqttDupPublishMessageStoreService,
-                    mqttDupPubRelMessageStoreService,
-                    mqttSubscribeStoreService,
-                    mqttClientIdStoreService,
-                    // userService, groupService, threadService,
-                    // redisUserService, redisRoutingRoundRobin, redisStatisticService,
-                    // redisHostService,
-                    // redisConnectService,
-                    // messageService,
-                    redisUserService,
-                    redisMessageCacheOfflineService);
+                    // mqttDupPublishMessageStoreService,
+                    // mqttDupPubRelMessageStoreService,
+                    // mqttSubscribeStoreService,
+                    // mqttClientIdStoreService,
+                    bytedeskEventPublisher, topicService
+                    );
         }
         return connect;
     }
@@ -143,10 +92,11 @@ public class ProtocolProcess {
     public Subscribe subscribe() {
         if (subscribe == null) {
             subscribe = new Subscribe(
-                mqttMessageIdService,
-                mqttSubscribeStoreService,
-                mqttRetainMessageStoreService
-            // redisUserService
+                // mqttMessageIdService,
+                // mqttSubscribeStoreService
+                // mqttRetainMessageStoreService
+                // redisUserService
+                topicService
             );
         }
         return subscribe;
@@ -154,7 +104,10 @@ public class ProtocolProcess {
 
     public UnSubscribe unSubscribe() {
         if (unSubscribe == null) {
-            unSubscribe = new UnSubscribe(mqttSubscribeStoreService);
+            unSubscribe = new UnSubscribe(
+            // mqttSubscribeStoreService
+                    topicService
+                );
         }
         return unSubscribe;
     }
@@ -162,7 +115,7 @@ public class ProtocolProcess {
     public Publish publish() {
         if (publish == null) {
             publish = new Publish(
-                mqttRetainMessageStoreService,
+                // mqttRetainMessageStoreService,
                 bytedeskEventPublisher
                 // mqttMessageIdService,
                 // mqttClientIdStoreService,
@@ -175,16 +128,11 @@ public class ProtocolProcess {
     public DisConnect disConnect() {
         if (disConnect == null) {
             disConnect = new DisConnect(
-                mqttSessionStoreService,
-                mqttSubscribeStoreService,
-                mqttDupPublishMessageStoreService,
-                mqttDupPubRelMessageStoreService,
-                mqttClientIdStoreService
-            // userService,
-            // redisUserService, redisRoutingRoundRobin, redisStatisticService,
-            // redisHostService,
-            // redisConnectService
-            // messageService
+                mqttSessionStoreService, topicService
+                // mqttSubscribeStoreService,
+                // mqttDupPublishMessageStoreService,
+                // mqttDupPubRelMessageStoreService,
+                // mqttClientIdStoreService
             );
         }
         return disConnect;
@@ -206,47 +154,33 @@ public class ProtocolProcess {
 
     public PubAck pubAck() {
         if (pubAck == null) {
-            pubAck = new PubAck(mqttDupPublishMessageStoreService);
+            pubAck = new PubAck(
+                    // mqttDupPublishMessageStoreService
+                );
         }
         return pubAck;
     }
 
     public PubRec pubRec() {
         if (pubRec == null) {
-            pubRec = new PubRec(mqttDupPublishMessageStoreService, mqttDupPubRelMessageStoreService);
+            pubRec = new PubRec(
+                    // mqttDupPublishMessageStoreService, mqttDupPubRelMessageStoreService
+                );
         }
         return pubRec;
     }
 
     public PubComp pubComp() {
         if (pubComp == null) {
-            pubComp = new PubComp(mqttDupPubRelMessageStoreService);
+            pubComp = new PubComp(
+                    // mqttDupPubRelMessageStoreService
+                );
         }
         return pubComp;
     }
 
-    public MqttSessionStoreService getMqttSessionStoreService() {
+    public MqttSessionService getMqttSessionStoreService() {
         return mqttSessionStoreService;
     }
-
-    // public RedisUserService getRedisUserService() {
-    // return redisUserService;
-    // }
-
-    // public RedisService getRedisService() {
-    // return redisService;
-    // }
-
-    // public RedisStatisticService getRedisStatisticService() {
-    // return redisStatisticService;
-    // }
-
-    // public RedisHostService getRedisHostService() {
-    // return redisHostService;
-    // }
-
-    // public RedisConnectService getRedisConnectService() {
-    // return redisConnectService;
-    // }
 
 }

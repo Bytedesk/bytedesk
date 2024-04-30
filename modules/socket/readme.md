@@ -21,6 +21,7 @@ gradle generateProto
 ## links
 
 - [mqtt](https://mqtt.org/mqtt-specification/)
+- [mqtt-v3.1.1](https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html)
 - [netty](https://netty.io/wiki/user-guide-for-4.x.html)
 - [netty mqtt](https://netty.io/4.1/api/io/netty/handler/codec/mqtt/package-summary.html)
 - [netty mqtt github](https://github.com/netty/netty/tree/4.1/codec-mqtt/src/main/java/io/netty/handler/codec/mqtt)

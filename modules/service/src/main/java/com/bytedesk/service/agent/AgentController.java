@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 15:06:30
+ * @LastEditTime: 2024-04-15 13:16:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,7 +59,12 @@ public class AgentController {
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody AgentRequest agentRequest) {
 
-        return ResponseEntity.ok(agentService.create(agentRequest));
+        Agent agent = agentService.create(agentRequest);
+        if (agent == null) {
+            return ResponseEntity.ok(JsonResult.error("department not exist"));
+        }
+
+        return ResponseEntity.ok(JsonResult.success(agentService.convertToAgentResponse(agent)));
     }
 
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-05 15:25:09
+ * @LastEditTime: 2024-04-11 16:50:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,17 +21,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ApiRateLimiter;
+import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
 /**
  * anonymous api, no need to login
  * http://localhost:9003/swagger-ui/index.html
  */
-@Slf4j
+// @Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/visitor/api/v1/")
@@ -41,41 +43,43 @@ public class VisitorController {
 
     /**
      * init visitor cookies in browser & generate visitor in db
+     * 
+     * considering multi request from different clients, including ios/android/web, 
+     * apis should not use cookies which is specific to web browsers
      * http://localhost:9003/visitor/api/v1/init
      * 
      * @param visitorRequest
      * @return
      */
+    @ApiRateLimiter(value = 10.0, timeout = 1)
     @GetMapping("/init")
-    public ResponseEntity<?> init(VisitorRequest visitorRequest) {
+    public ResponseEntity<?> init(VisitorRequest visitorRequest, HttpServletRequest request) {
+        // 
+        Visitor visitor = visitorService.create(visitorRequest, request);
+        if (visitor == null) {
+            return ResponseEntity.ok(JsonResult.error("init visitor failed", -401));
+        }
 
-        log.info("visitor init");
-
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(visitorService.convertToVisitorResponseSimple(visitor)));
     }
 
      /**
-     * query
+     * request thread
      * 
      * @param visitorRequest
      * @return
      */
-    @GetMapping("/query")
-    public ResponseEntity<?> query(VisitorRequest visitorRequest) {
-
-        return ResponseEntity.ok(JsonResult.success());
-    }
-
-    /**
-     * create
-     *
-     * @param visitorRequest visitor
-     * @return json
-     */
-    @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody VisitorRequest visitorRequest) {
-
-        return ResponseEntity.ok(JsonResult.success());
+    @GetMapping("/thread")
+    public ResponseEntity<?> requestThread(VisitorRequest visitorRequest, HttpServletRequest request) {
+        // TODO: check if visitor is banned
+        // TODO: check if visitor ip is banned
+        // 
+        MessageResponse messageResponse = visitorService.createCustomerServiceThread(visitorRequest);
+        if (messageResponse == null) {
+            return ResponseEntity.ok(JsonResult.error("sid not exist", -402));
+        }        
+        // 
+        return ResponseEntity.ok(JsonResult.success(messageResponse));
     }
 
     /**

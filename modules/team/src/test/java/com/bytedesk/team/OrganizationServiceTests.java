@@ -20,7 +20,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.bytedesk.core.auth.AuthService;
+
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.team.organization.OrganizationRepository;
 import com.bytedesk.team.organization.OrganizationService;
 

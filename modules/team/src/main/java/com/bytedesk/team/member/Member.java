@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 16:36:48
+ * @LastEditTime: 2024-04-24 20:41:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,12 @@
  */
 package com.bytedesk.team.member;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.utils.AuditModel;
 import com.bytedesk.team.department.Department;
-import com.bytedesk.team.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -33,9 +35,10 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "departments" })
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ MemberListener.class })
 @Table(name = "team_member")
 public class Member extends AuditModel {
 
@@ -43,11 +46,8 @@ public class Member extends AuditModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /**
-     * uuid
-     */
-    @Column(name = "mid", unique = true, nullable = false)
-    private String mid;
+    @Column(name = "uuid", unique = true, nullable = false)
+	private String uid;
 
     /**
      * job number
@@ -77,28 +77,42 @@ public class Member extends AuditModel {
      * work email
      */
     @Email(message = "email format error")
-    @Column(name = "email", unique = true)
+    @Column(unique = true)
     private String email;
 
     /**
      * department
      */
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Department department;
+    // 关联多个Department
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<Department> departments = new HashSet<>();
 
     /**
      * login user info
      */
     // @JsonIgnore
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER)
     private User user;
 
     /**
      * belong to org
      */
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Organization organization;
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private Organization organization;
+    private String orgOid;
+
+     // 添加、移除部门的方法
+    public void addDepartment(Department department) {
+        departments.add(department);
+        // department.getMembers().add(this); // 假设Department类中有getMembers()方法返回成员列表
+    }
+
+    public void removeDepartment(Department department) {
+        departments.remove(department);
+        // department.getMembers().remove(this); // 假设Department类中有getMembers()方法返回成员列表
+    }
 
 }

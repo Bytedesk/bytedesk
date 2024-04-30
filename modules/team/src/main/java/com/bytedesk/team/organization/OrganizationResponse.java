@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 21:20:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-01 22:17:17
+ * @LastEditTime: 2024-04-23 17:27:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,29 +14,28 @@
  */
 package com.bytedesk.team.organization;
 
-import java.util.Set;
+import com.bytedesk.core.utils.BaseResponse;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.rest.core.config.Projection;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-import com.bytedesk.team.department.Department;
+@Data
+@Builder
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class OrganizationResponse extends BaseResponse {
 
-@Projection(name = "organizationResponse", types = Organization.class)
-public interface OrganizationResponse {
+    private static final long serialVersionUID = 6917647433L;
+    
+    private String oid;
 
-    @Value("#{target.id}")
-    long getId();
+    private String name;
 
-    String getOid();
-
-    String getNickname();
-
-    Set<Department> getDepartments();
-
-    @Value("#{target.getDepartments().size()}")
-    int getDepCount();
-
-    // @Value("#{target.address.toString()}")
-    // String getAddress();
-
+    private String description;
 }

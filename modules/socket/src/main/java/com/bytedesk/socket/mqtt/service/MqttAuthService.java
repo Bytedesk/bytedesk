@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-29 11:06:17
+ * @LastEditTime: 2024-04-15 14:49:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,7 @@ package com.bytedesk.socket.mqtt.service;
 
 import com.bytedesk.socket.mqtt.service.MqttAuthService;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  *
  * @author jackning
  */
-@Slf4j
+// @Slf4j
 @Service
 @AllArgsConstructor
 public class MqttAuthService {
@@ -37,7 +37,7 @@ public class MqttAuthService {
 
     // TODO: 待实现
     public boolean checkValid(String username, String password) {
-        log.debug("auth username {}, password {}", username, password);
+        // log.debug("auth username {}, password {}", username, password);
 
         // 客户端使用accessToken作为password传递，避免客户端存储密码
 

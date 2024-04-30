@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-02 11:06:19
+ * @LastEditTime: 2024-04-11 11:53:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.core.utils;
 
 import org.modelmapper.ModelMapper;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.role.Role;
@@ -39,7 +40,9 @@ public class BdConvertUtils {
 
         MessageResponse messageResponse = new ModelMapper().map(message, MessageResponse.class);
 
-        messageResponse.setUser(convertTUserResponseSimple(message.getUser()));
+        UserResponseSimple user = JSON.parseObject(message.getUser(), UserResponseSimple.class);
+        messageResponse.setUser(user);
+        // messageResponse.setUser(convertTUserResponseSimple(message.getUser()));
 
         return messageResponse;
     }

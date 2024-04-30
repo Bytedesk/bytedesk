@@ -22,8 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.bytedesk.core.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.utils.JsonResult;
 
 /**
@@ -37,7 +35,7 @@ public class RoleController {
 
     private final RoleService roleService;
 
-    private final AuthService authService;
+    // private final AuthService authService;
     
     /**
      * query my roles by page
@@ -47,9 +45,7 @@ public class RoleController {
     @GetMapping("/query")
     public ResponseEntity<JsonResult<?>> query(RoleRequest roleRequest) {
 
-        User user = authService.getCurrentUser();
-
-        Page<RoleResponse> rolePage = roleService.query(user, roleRequest);
+        Page<RoleResponse> rolePage = roleService.query(roleRequest);
         //
         return ResponseEntity.ok(JsonResult.success(rolePage));
     }
@@ -76,9 +72,7 @@ public class RoleController {
      */
     // @PostMapping("/update")
     // public Callable<JsonResult<?>> update(@RequestBody RoleParam roleParam) {
-
     //     return () -> {
-
     //         RoleDTO roleDTO = roleService.update(roleParam);
     //         //
     //         return new JsonResult<>("更新角色成功", 200, roleDTO);
@@ -93,9 +87,7 @@ public class RoleController {
      */
     // @PostMapping("/delete")
     // public Callable<JsonResult<?>> delete(@RequestBody RoleParam roleParam) {
-
     //     return () -> {
-    //         //
     //         roleService.deleteById(roleParam.getId());
 
     //         return new JsonResult<>("删除角色成功", 200, roleParam.getId());
@@ -109,9 +101,7 @@ public class RoleController {
      */
     // @GetMapping("/filter")
     // public Callable<JsonResult<?>> filter(FilterParam filterParam) {
-
     //     return () -> {
-    //         //
     //         Page<RoleDTO> roleDTOPage = roleService.findByNameContainingOrValueContainingAndUser(filterParam);
     //         //
     //         return new JsonResult<>("搜索角色成功", 200, roleDTOPage);

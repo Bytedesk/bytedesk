@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-06 14:34:53
+ * @LastEditTime: 2024-04-24 10:13:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,13 +18,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -40,14 +41,16 @@ public class UserDetailsImpl implements UserDetails {
     private String description;
     @JsonIgnore
     private String password;
-    private List<Role> roles;
-    private List<String> organizations;
+    private Set<Role> roles;
+    private Set<String> organizations;
+    // 
+    private boolean enabled;
     Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String uid, String username, String nickname, String avatar, String mobile,
+    private UserDetailsImpl(Long id, String uid, String username, String nickname, String avatar, String mobile,
             String email, String password,
-            Collection<? extends GrantedAuthority> authorities, List<Role> roles, List<String> organizations,
-            String description) {
+            Collection<? extends GrantedAuthority> authorities, Set<Role> roles, Set<String> organizations,
+            String description, boolean enabled) {
         this.id = id;
         this.uid = uid;
         this.username = username;
@@ -60,13 +63,19 @@ public class UserDetailsImpl implements UserDetails {
         this.roles = roles;
         this.organizations = organizations;
         this.description = description;
+        this.enabled = enabled;
     }
 
     //
     public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getValue()))
-                .collect(Collectors.toList());
+        // 
+        // Set<GrantedAuthority> authorities = user.getRoles().stream()
+        //         .map(role -> new SimpleGrantedAuthority(role.getValue()))
+        //         .collect(Collectors.toSet());
+        Set<GrantedAuthority> authorities = user.getRoles().stream()
+                .flatMap(role -> role.getAuthorities().stream()
+                        .map(authority -> new SimpleGrantedAuthority(TypeConsts.ROLE_ + authority.getValue())))
+                .collect(Collectors.toSet());
 
         return new UserDetailsImpl(user.getId(),
                 user.getUid(),
@@ -79,7 +88,8 @@ public class UserDetailsImpl implements UserDetails {
                 authorities,
                 user.getRoles(),
                 user.getOrganizations(),
-                user.getDescription());
+                user.getDescription(),
+                user.isEnabled());
     }
 
     @Override
@@ -99,21 +109,25 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        // return true;
+        return enabled;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        // return true;
+        return enabled;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        // return true;
+        return enabled;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        // return true;
+        return enabled;
     }
 }

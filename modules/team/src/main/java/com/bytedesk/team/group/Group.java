@@ -2,7 +2,7 @@
  * @Author: jack ning github@bytedesk.com
  * @Date: 2024-01-23 14:53:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-29 12:52:42
+ * @LastEditTime: 2024-04-26 20:41:38
  * @FilePath: /server/plugins/im/src/main/java/com/bytedesk/im/group/Group.java
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -33,34 +33,22 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+// @EntityListeners({ GroupListener.class })
 // 注：group为mysql保留关键字, groups在mysql8启动报错，所有表名修改为groupes
 @Table(name = "team_groupes")
 public class Group extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     private Long id;
 
-    /**
-     * 
-     */
-    @Column(name = "gid", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String gid;
 
-    /**
-     * 
-     */
     private String name;
 
-    /**
-     * 
-     */
     private String avatar;
 
-    /**
-     * 
-     */
     private String description;
 
     /**

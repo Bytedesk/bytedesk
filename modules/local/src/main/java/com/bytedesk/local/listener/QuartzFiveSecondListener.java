@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 14:40:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-28 17:05:59
+ * @LastEditTime: 2024-04-18 12:43:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.event.QuartzFiveSecondEvent;
-import com.bytedesk.socket.redis.RedisMessageCacheProtobufService;
-import com.bytedesk.socket.service.MessageSocketService;
+import com.bytedesk.core.push.PushService;
+// import com.bytedesk.socket.service.MessageSocketService;
+import com.bytedesk.local.caffeine.CaffeineCacheService;
+import com.bytedesk.service.thread_log.ThreadLogService;
+import com.bytedesk.socket.service.MessageJsonService;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -29,20 +32,27 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class QuartzFiveSecondListener implements ApplicationListener<QuartzFiveSecondEvent> {
 
-    private final MessageSocketService messageSocketService;
+    private final CaffeineCacheService cacheService;
 
-    private final RedisMessageCacheProtobufService redisMessageCacheProtobufService;
+    private final MessageJsonService messageJsonService;
+
+    private final ThreadLogService threadLogService;
+
+    private final PushService pushService;
 
     @Override
     public void onApplicationEvent(QuartzFiveSecondEvent event) {
         // log.info("FiveSecondJob listener");
-        //
-        byte[] messageBytes = redisMessageCacheProtobufService.pop();
-        if (messageBytes == null) {
+        // auto close thread
+        threadLogService.autoCloseThread();
+        // auto outdate code
+        pushService.autoOutdateCode();
+        // 
+        String json = cacheService.getFirst();
+        if (json == null) {
             return;
         }
-        // 
-        messageSocketService.saveToDb(messageBytes);
+        messageJsonService.saveToDb(json);
     }
 
 }

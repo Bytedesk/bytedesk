@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-25 16:39:55
+ * @LastEditTime: 2024-04-28 11:10:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,8 @@
 package com.bytedesk.core.constant;
 
 /**
- * 头像常量
+ * 头像常量, 可以去这里获取 https://www.iconfont.cn/
+ * TODO: 头像不能引用外部链接，使用本地或本服务器地址
  *
  * @author bytedesk.com
  */
@@ -134,6 +135,12 @@ public class AvatarConsts {
      */
     public static final String DEFAULT_GROUP_AVATAR_URL = "https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/group_default_avatar.png";
     
+    // 文件助手头像
+    public static final String DEFAULT_FILE_ASISTANT_AVATAR_URL = "https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/file_asistant_avatar.png";
+    
+    // 系统通知-公众号头像
+    public static final String DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL = "https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/notification.png";
+
     /**
      * 测试头像：
      * https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/girl.png

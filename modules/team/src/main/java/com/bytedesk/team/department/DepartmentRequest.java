@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 17:03:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 16:12:30
+ * @LastEditTime: 2024-04-24 17:11:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,41 +17,31 @@ package com.bytedesk.team.department;
 import com.bytedesk.core.utils.BaseRequest;
 
 import jakarta.validation.constraints.NotEmpty;
-// import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
-// @Builder
+@Builder
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class DepartmentRequest extends BaseRequest  {
 
     private String did;
 
-    /**
-     * 
-     */
     @NotEmpty
-    private String nickname;
+    private String name;
 
-    /**
-     * 
-     */
-    private String avatar;
-
-    /**
-     * 
-     */
     private String description;
-
-    /**
-     * 
-     */
-    private String parent_did;
+    // 
+    private String parentDid;
 
     @NotEmpty
-    private String org_oid;
+    private String orgOid;
 
 }

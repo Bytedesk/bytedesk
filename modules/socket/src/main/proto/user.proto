@@ -22,21 +22,8 @@ option java_outer_classname = "UserProto";
 message User {
     //uuID
     string uid = 1;
-    // 用户名
-    string username = 2;
     // 昵称
-    string nickname = 3;
+    string nickname = 2;
     // 头像
-    string avatar = 4;
-    // 来源客户端
-    string client = 5;
-    // 企业号
-    string subDomain = 6;
-    // 扩展字段
-    string extra = 7;
-}
-// 列表
-message UserList {
-
-    repeated User list = 1;
+    string avatar = 3;
 }

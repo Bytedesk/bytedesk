@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 22:11:38
+ * @LastEditTime: 2024-04-26 21:10:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,19 +32,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // @Cacheable(cacheNames = "users")
     Optional<User> findByEmail(String email);
 
-    // @Cacheable(cacheNames = "users")
     Optional<User> findByMobile(String mobile);
 
-    // @Cacheable(cacheNames = "users")
     Optional<User> findByUsername(String username);
 
-    // @Cacheable(cacheNames = "users")
     Optional<User> findByUid(String uid);
 
-    // 
     Boolean existsByUsernameAndDeleted(String username, Boolean deleted);
 
     Boolean existsByMobileAndDeleted(String mobile, Boolean deleted);

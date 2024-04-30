@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 22:14:36
+ * @LastEditTime: 2024-04-26 11:34:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,9 +22,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.utils.exception.EmailNotFoundException;
-import com.bytedesk.core.utils.exception.ForbiddenException;
-import com.bytedesk.core.utils.exception.MobileNotFoundException;
+import com.bytedesk.core.exception.EmailNotFoundException;
+import com.bytedesk.core.exception.MobileNotFoundException;
+import com.bytedesk.core.exception.UserDisabledException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
 		if (!userOptional.get().isEnabled()) {
-			throw new ForbiddenException("username " + username + " is not enabled");
+			throw new UserDisabledException("username " + username + " is not enabled");
 		}
 		return UserDetailsImpl.build(userOptional.get());
 	}
@@ -60,7 +60,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			throw new EmailNotFoundException("email " + email + " is not found");
 		}
 		if (!userOptional.get().isEnabled()) {
-			throw new ForbiddenException("email " + email + " is not enabled");
+			throw new UserDisabledException("email " + email + " is not enabled");
 		}
 		return UserDetailsImpl.build(userOptional.get());
 	}
@@ -73,7 +73,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			throw new MobileNotFoundException("mobile " + mobile + " is not found");
 		}
 		if (!userOptional.get().isEnabled()) {
-			throw new ForbiddenException("mobile " + mobile + " is not enabled");
+			throw new UserDisabledException("mobile " + mobile + " is not enabled");
 		}
 		return UserDetailsImpl.build(userOptional.get());
 	}

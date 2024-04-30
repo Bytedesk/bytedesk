@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-07 22:59:20
+ * @LastEditTime: 2024-04-13 11:45:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * current version based on 3.1.1
+ * 当前版本基于 mqtt3.1.1
+ * @see https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+ * @see https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html
+ * 
  * encrypt/security through nginx proxy
  * 
  * @author jackning

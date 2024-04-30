@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-01 16:07:01
+ * @LastEditTime: 2024-04-17 09:43:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Repository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * 
+ * QuerydslPredicateExecutor<Message>
  */
 @Repository
 @Tag(name = "message - 消息")
@@ -35,6 +35,10 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
 
     Long deleteByMid(String mid);
 
-    Page<Message> findByThreadsTidIn(String[] threadIds, Pageable pageable);
+    Page<Message> findByThreadsTidIn(String[] threadTids, Pageable pageable);
+
+    Optional<Message> findFirstByThreadsTidInOrderByCreatedAtDesc(String[] threadTids);
+
+    boolean existsByMid(String mid);
 
 }

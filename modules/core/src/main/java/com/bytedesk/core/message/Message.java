@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 16:12:05
+ * @LastEditTime: 2024-04-22 22:21:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,10 @@ package com.bytedesk.core.message;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.core.rbac.user.User;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.utils.AuditModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,67 +43,54 @@ import lombok.experimental.Accessors;
 @Table(name = "core_message")
 public class Message extends AuditModel {
 
+    private static final long serialVersionUID = 6816837318L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /**
-     * 
-     */
     @Column(unique = true, nullable = false)
     private String mid;
 
-    /**
-     * 
-     * 消息类型
-     */
     @Column(name = "by_type")
     private String type;
 
-    /**
-     * 
-     */
     @Column(length = 512)
     private String content;
 
-    /**
-     * 
-     */
-    @Lob
-    private String extra;
+    // @Lob
+    // @Builder.Default
+    // @Column(columnDefinition = "json")
+    // @JdbcTypeCode(SqlTypes.JSON)
+    // private String extra = BdConstants.EMPTY_JSON_STRING;
 
-    /**
-     * 
-     */
+    /** send/stored/read */
     private String status;
 
-    /**
-     * 
-     */
     private String client;
 
-    /**
-     * message belongs to
-     */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "thread_id", foreignKey = @ForeignKey(name = "none", value
-    // = ConstraintMode.NO_CONSTRAINT))
-    // private Thread thread;
-
+    /**  message belongs to */
     @JsonIgnore
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "core_message_threads", 
-        joinColumns = @JoinColumn(name = "message_id"), 
-        inverseJoinColumns = @JoinColumn(name = "thread_id"))
     private List<Thread> threads = new ArrayList<>();
 
     /**
      * sender
+     * 考虑到访客信息不存储在user表中，在visitor表中，此处使用json存储，加快查询速度，
+     * 以空间换时间
      */
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-    private User user;
+    // @ManyToOne(fetch = FetchType.EAGER)
+    // private User user;
+    // 
+    // h2 db 不能使用 user, 所以重定义为 by_user
+    @Builder.Default
+    @Column(name = "by_user", columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String user = BdConstants.EMPTY_JSON_STRING;
+
+    // TODO:
+    /** belong to org */
+    private String orgOid;
 
 }

@@ -37,7 +37,7 @@ public class GroupService {
 
     public Page<Group> query(GroupRequest pageParam) {
 
-        Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
+        Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.ASC,
                 "id");
 
         return groupRepository.findAll(pageable);

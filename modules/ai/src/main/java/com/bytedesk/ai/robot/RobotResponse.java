@@ -35,5 +35,5 @@ public class RobotResponse {
 
     private String welcome;
 
-    private Boolean published;
+    private boolean published;
 }

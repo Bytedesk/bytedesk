@@ -32,6 +32,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 仅能够监听spring-data-rest接口
+ * 
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
  * https://docs.spring.io/spring-data/rest/reference/events.html
  */

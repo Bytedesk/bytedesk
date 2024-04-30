@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 16:02:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-06 16:02:38
+ * @LastEditTime: 2024-04-23 14:13:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,14 +25,11 @@ public class OrganizationRequest extends BaseRequest {
 
     private String oid;
 
-    /**
-     * 
-     */
     private String name;
 
-    /**
-     * 
-     */
-    private String description;
+    private String logo;
 
+    private String code;
+    
+    private String description;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-22 11:30:17
+ * @LastEditTime: 2024-04-23 10:07:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,9 @@
 package com.bytedesk.core.thread;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,22 +43,43 @@ public class ThreadController {
      * @return json
      */
     @GetMapping("/query")
-    public JsonResult<?> query(BaseRequest pageParam) {
+    public ResponseEntity<?> query(BaseRequest pageParam) {
 
-        Page<Thread> threadPage = threadService.query(pageParam);
+        Page<ThreadResponse> threadPage = threadService.query(pageParam);
         //
-        return new JsonResult<>("query thread success", 200, threadPage);
+        return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
-    @RequestMapping("/create")
-    public JsonResult<?> create(@RequestBody ThreadRequest threadRequest) {
-         
-        Thread thread = threadService.create(threadRequest);
+    /**
+     * user create member thread
+     * @param threadRequest
+     * @return
+     */
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody ThreadRequest threadRequest) {
+        // 
+        ThreadResponse thread = threadService.createMemberThread(threadRequest);
         if (thread == null) {
-            return new JsonResult<>("create thread failed", -1, null);
+            return ResponseEntity.ok(JsonResult.error());
         }
-        return new JsonResult<>("create thread success", 200, thread);
+        return ResponseEntity.ok(JsonResult.success(thread));
     }
+
+
+
+
+    
+    // @PostMapping("/delete")
+    // public ResponseEntity<?> delete(@RequestBody ThreadRequest threadRequest) {
+    //     Thread thread = threadService.findByTid(threadRequest.getTid()).orElse(null);
+    //     if (thread == null) {
+    //         return ResponseEntity.ok(JsonResult.error());
+    //     }
+    //     threadService.delete(thread);
+    //     return ResponseEntity.ok(JsonResult.success());
+    // }
+
+    
 
 
 }

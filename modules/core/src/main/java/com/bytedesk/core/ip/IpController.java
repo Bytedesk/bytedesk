@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:15:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-05 14:37:36
+ * @LastEditTime: 2024-04-08 00:08:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,6 +51,8 @@ public class IpController {
 
     /**
      * http://localhost:9003/ip/api/v1/location
+     * location: "国家|区域|省份|城市|ISP"
+     * location: "中国|0|湖北省|武汉市|联通"
      * 
      * @param request
      * @return
@@ -59,6 +61,7 @@ public class IpController {
     public JsonResult<?> location(HttpServletRequest request) {
 
         String ip = IpUtils.clientIp(request);
+        // location: "中国|0|湖北省|武汉市|联通"
         String location = ipService.getIpLocation(ip);
         // 
         JSONObject jsonObject = new JSONObject();
@@ -77,6 +80,8 @@ public class IpController {
     @GetMapping("/ip/location")
     public JsonResult<?> ipLocation(@RequestParam String ip) {
 
+        // location: "国家|区域|省份|城市|ISP"
+        // location: "中国|0|湖北省|武汉市|联通"
         String location = ipService.getIpLocation(ip);
         // 
         JSONObject jsonObject = new JSONObject();

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-28 22:32:02
+ * @LastEditTime: 2024-04-22 12:16:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *  Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,13 @@
  */
 package com.bytedesk.service.workgroup;
 
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.lang.NonNull;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
@@ -30,5 +35,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface WorkgroupRepository extends JpaRepository<Workgroup, Long>, JpaSpecificationExecutor<Workgroup> {
 
     // Page<Workgroup> findAll(@NonNull Pageable pageable);
+
+    Optional<Workgroup> findByWid(@NonNull String wid);
+
+    Optional<Workgroup> findByNickname(@NonNull String nickname);
+
+    // Page<Workgroup> findByOrganization_Oid(String oid, Pageable pageable);
+    Page<Workgroup> findByOrgOid(String oid, Pageable pageable);
 
 }
