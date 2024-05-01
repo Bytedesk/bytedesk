@@ -47,11 +47,11 @@ mvn spring-boot:run
 # 
 # local preview:
 web: http://localhost:9003/
-admin: http://localhost:9003/admin, default user/password: admin@email.com/admin
-chat: http://localhost:9003/chat, default user/password: admin@email.com/admin
+admin: http://localhost:9003/admin, user/password: admin@email.com/admin
+chat: http://localhost:9003/chat, user/password: admin@email.com/admin
 visitor: http://localhost:9003/v
 api docs: http://localhost:9003/swagger-ui/index.html
-h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, default user/password: sa/sa
+h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
 ```
 
 ## Docs
