@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-01 12:56:18
+ * @LastEditTime: 2024-05-04 17:44:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,9 @@ AI powered customer service & team im
 
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
-cd bytedesk/starter
+cd bytedesk
+mvn install -Dmaven.test.skip=true
+cd starter
 mvn spring-boot:run
 # 
 # local preview:

@@ -164,15 +164,6 @@
 			<version>${im.version}</version>
 		</dependency>
 
-		<!-- //////////////////////////////////付费模块/////////////////////////////////////////// -->
-
-		<!-- cluster - 集群 -->
-		<!-- <dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>vip-cluster</artifactId>
-			<version>${im.version}</version>
-		</dependency> -->
-
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 
 		<!--  -->
