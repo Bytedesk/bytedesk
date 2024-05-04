@@ -1,0 +1,92 @@
+{
+    "name": "PairDrop",
+    "short_name": "PairDrop",
+    "icons": [
+        {
+            "src": "images/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "images/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "images/android-chrome-192x192-maskable.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "images/android-chrome-512x512-maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "background_color": "#efefef",
+    "start_url": "/",
+    "scope": "/",
+    "display": "minimal-ui",
+    "theme_color": "#3367d6",
+    "screenshots" : [
+        {
+            "src": "images/pairdrop_screenshot_mobile_1.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pairdrop_screenshot_mobile_2.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pairdrop_screenshot_mobile_3.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pairdrop_screenshot_mobile_4.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pairdrop_screenshot_mobile_5.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pairdrop_screenshot_mobile_6.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pairdrop_screenshot_mobile_7.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pairdrop_screenshot_mobile_8.png",
+            "sizes": "1170x2532",
+            "type": "image/png"
+        }
+    ],
+    "share_target": {
+        "action": "/",
+        "method":"POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url",
+            "files": [{
+                "name": "allfiles",
+                "accept": ["*/*"]
+            }]
+        }
+    },
+    "launch_handler": {
+        "client_mode": "focus-existing"
+    }
+}
