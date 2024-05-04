@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 09:13:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 17:23:25
+ * @LastEditTime: 2024-05-04 11:40:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,8 +49,8 @@ public class DepartmentControllerTests {
         // Arrange
         DepartmentRequest departmentRequest = new DepartmentRequest();
         departmentRequest.setName("Test Department");
-        departmentRequest.setParentDid(null);
-        departmentRequest.setOrgOid("f01f5444ecbc437cb5b8de7ca7dd023c");
+        departmentRequest.setParentUid(null);
+        departmentRequest.setOrgUid("f01f5444ecbc437cb5b8de7ca7dd023c");
 
         // Act
         ResponseEntity<JsonResult<?>> response = departmentController.create(departmentRequest);
@@ -62,14 +62,14 @@ public class DepartmentControllerTests {
         assertEquals(200, result.getCode());
     }
 
-    @SuppressWarnings("null")
+    // @SuppressWarnings("null")
     @Test
     public void testCreateFailure() {
         // Arrange
         DepartmentRequest departmentRequest = new DepartmentRequest();
-        departmentRequest.setDid("testDid");
-        departmentRequest.setParentDid(null);
-        departmentRequest.setOrgOid("testOrgOid");
+        departmentRequest.setUid("testDid");
+        departmentRequest.setParentUid(null);
+        departmentRequest.setOrgUid("testOrgUid");
 
         // Act
         ResponseEntity<JsonResult<?>> response = departmentController.create(departmentRequest);

@@ -26,12 +26,12 @@ public class I18Consts {
     // public static final String ZH_CN = "zh-cn";
     
     // "文件助手"
-    public static final String I18_FILE_ASISTANT_NAME = "file_asistant";
+    public static final String I18_FILE_ASISTANT_NAME = "i18_file_asistant";
     // "手机、电脑文件互传"
-    public static final String I18_FILE_ASISTANT_DESCRIPTION = "file_asistant_description";
+    public static final String I18_FILE_ASISTANT_DESCRIPTION = "i18_file_asistant_description";
     // 系统通知
-    public static final String I18_SYSTEM_NOTIFICATION_NAME = "system_notification";
-    public static final String I18_SYSTEM_NOTIFICATION_DESCRIPTION = "system_notification_description";
+    public static final String I18_SYSTEM_NOTIFICATION_NAME = "i18_system_notification";
+    public static final String I18_SYSTEM_NOTIFICATION_DESCRIPTION = "i18_system_notification_description";
 
 
 }

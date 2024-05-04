@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:02:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 23:06:16
+ * @LastEditTime: 2024-05-04 10:44:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,7 @@ public class MessageProtoService {
             // 消息所属的会话
             Thread thread = getThread(messageProto);
             if (thread == null) {
-                log.info("thread not exists, tid: {}", messageProto.getThread().getTid());
+                log.info("thread not exists, uid: {}", messageProto.getThread().getUid());
                 return;
             }
 
@@ -75,7 +75,7 @@ public class MessageProtoService {
             //
             messageService.save(message);
 
-            log.info("save proto msg mid {}, tid {}", message.getMid(), thread.getTid());
+            log.info("save proto msg mid {}, uid {}", message.getUid(), thread.getUid());
 
             // 以json格式存储到message archive里面，方便搜索
             // String messageJson = ProtobufJsonUtil.toJson(messageProto);
@@ -91,11 +91,11 @@ public class MessageProtoService {
     private Thread getThread(MessageProto.Message messageProto) {
 
         ThreadProto.Thread threadProto = messageProto.getThread();
-        String tid = threadProto.getTid();
-        // log.info("tid: {}, threadType {}", tid, threadType);
-        Thread thread = threadService.findByTid(tid).orElse(null);
+        String uid = threadProto.getUid();
+        // log.info("uid: {}, threadType {}", uid, threadType);
+        Thread thread = threadService.findByTid(uid).orElse(null);
         if (thread == null) {
-            log.info("thread not exists, tid: {}", tid);
+            log.info("thread not exists, uid: {}", uid);
             return null;
         }
         // thread.setContent(threadProto.getContent());
@@ -112,15 +112,16 @@ public class MessageProtoService {
         String nickname = userProto.getNickname();
         log.debug("uid: {}, avatar {}, nickname {}", uid, nickname, avatar);
         //
-        String mid = messageProto.getMid();
+        String mid = messageProto.getUid();
         // 持久化消息
         Message message = new Message();
-        message.setMid(mid);
+        message.setUid(mid);
         message.setType(type);
         message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
         message.setClient(messageProto.getClient());
         // 
-        UserResponseSimple user = UserResponseSimple.builder().uid(uid).nickname(nickname).avatar(avatar).build();
+        UserResponseSimple user = UserResponseSimple.builder().nickname(nickname).avatar(avatar).build();
+        user.setUid(uid);
         message.setUser(JSON.toJSONString(user));
         // message.setThread(thread);
         message.getThreads().add(thread);
@@ -135,7 +136,7 @@ public class MessageProtoService {
         // 暂定：所有消息类型均放到text里面处理，复杂类型存储json
         String content = messageProto.getContent();
         message.setContent(content);
-        message.setOrgOid(thread.getOrgOid());
+        message.setOrgUid(thread.getOrgUid());
         // 
         return message;
     }

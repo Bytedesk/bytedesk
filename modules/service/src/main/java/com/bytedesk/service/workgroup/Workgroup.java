@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 16:04:38
+ * @LastEditTime: 2024-05-04 10:31:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import org.hibernate.type.SqlTypes;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.RouteConsts;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.worktime.Worktime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -49,16 +49,13 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_workgroup")
-public class Workgroup extends AuditModel {
+public class Workgroup extends AbstractEntity {
 
-    private static final long serialVersionUID = 680083751L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-    @Column(unique = true, nullable = false)
-    private String wid;
+    // @NotBlank(message = "wid is required")
+    // @Column(unique = true, nullable = false)
+    // private String wid;
 
     private String nickname;
 
@@ -144,7 +141,7 @@ public class Workgroup extends AuditModel {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgOid;
+    private String orgUid;
 
     /**
      * belongs to user

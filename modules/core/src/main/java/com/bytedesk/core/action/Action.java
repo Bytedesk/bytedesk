@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:31:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 15:36:07
+ * @LastEditTime: 2024-05-04 11:37:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,9 @@
  */
 package com.bytedesk.core.action;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,19 +36,23 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_action")
-public class Action extends AuditModel {
+public class Action extends AbstractEntity {
 
-    @Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-
-	@Column(unique = true, nullable = false)
-	private String aid;
+    private static final long serialVersionUID = 1L;
+    
+    // @NotBlank
+	// @Column(unique = true, nullable = false)
+	// private String aid;
     
     private String title;
 
     private String action;
 
     private String description;
+
+    // 
+    private String userUid;
+
+    private String orgUid;
 
 }

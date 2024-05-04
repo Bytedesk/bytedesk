@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 18:18:09
+ * @LastEditTime: 2024-05-04 11:33:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,9 +65,9 @@ public class OrganizationService {
         return orgPage.map(organization -> convertToOrganizationResponse(organization));
     }
 
-    @Cacheable(value = "organization", key = "#oid", unless = "#result == null")
-    public Optional<Organization> findByOid(String oid) {
-        return organizationRepository.findByOid(oid);
+    @Cacheable(value = "organization", key = "#uid", unless = "#result == null")
+    public Optional<Organization> findByUid(String uid) {
+        return organizationRepository.findByUid(uid);
     }
 
     @Cacheable(value = "organization", key = "#name", unless = "#result == null")
@@ -76,7 +76,7 @@ public class OrganizationService {
     }
 
     @Caching(put = {
-        @CachePut(value = "organization", key = "#organization.oid"),
+        @CachePut(value = "organization", key = "#organization.uid"),
         @CachePut(value = "organization", key = "#organization.name")
     })
     public Organization save(Organization organization) {
@@ -98,14 +98,15 @@ public class OrganizationService {
         if (adminOptional.isPresent()) {
             //
             Organization organization = Organization.builder()
-                    .oid(uidUtils.getCacheSerialUid())
+                    // .uid(uidUtils.getCacheSerialUid())
                     .name(properties.getCompany())
                     .description(properties.getCompany() + " Description")
                     .user(adminOptional.get())
-                .build();
+                    .build();
+            organization.setUid(uidUtils.getCacheSerialUid());
             save(organization);
             //
-            adminOptional.get().getOrganizations().add(organization.getOid());
+            adminOptional.get().getOrganizations().add(organization.getUid());
             userService.save(adminOptional.get());
         }
         

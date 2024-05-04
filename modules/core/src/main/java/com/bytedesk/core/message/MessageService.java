@@ -45,14 +45,14 @@ public class MessageService {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Page<Message> messagePage = messageRepository.findByThreadsTidIn(request.getThreads(), pageable);
+        Page<Message> messagePage = messageRepository.findByThreadsUidIn(request.getThreads(), pageable);
 
         return messagePage.map(BdConvertUtils::convertToMessageResponse);
     }
 
     @Cacheable(value = "message", key = "#mid", unless="#result == null")
     public Optional<Message> findByMid(String mid) {
-        return messageRepository.findByMid(mid);
+        return messageRepository.findByUid(mid);
     }
 
     /** 
@@ -60,8 +60,8 @@ public class MessageService {
      *  找到当前会话中最新一条聊天记录 
      */
     @Cacheable(value = "message", key = "#threadTid", unless="#result == null")
-    public Optional<Message> findByThreadsTidInOrderByCreatedAtDesc(String threadTid) {
-        return messageRepository.findFirstByThreadsTidInOrderByCreatedAtDesc(new String[]{threadTid});
+    public Optional<Message> findByThreadsUidInOrderByCreatedAtDesc(String threadTid) {
+        return messageRepository.findFirstByThreadsUidInOrderByCreatedAtDesc(new String[]{threadTid});
     }
 
     @Caching(put = {
@@ -82,11 +82,11 @@ public class MessageService {
         @CacheEvict(value = "message", key = "#mid"),
     })
     public void deleteByMid(String mid) {
-        messageRepository.deleteByMid(mid);
+        messageRepository.deleteByUid(mid);
     }
 
     public boolean existsByMid(String mid) {
-        return messageRepository.existsByMid(mid);
+        return messageRepository.existsByUid(mid);
     }
 
     // public MessageResponse convertToMessageResponse(Message message) {

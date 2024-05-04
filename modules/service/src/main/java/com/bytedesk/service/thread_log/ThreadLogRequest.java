@@ -30,5 +30,5 @@ public class ThreadLogRequest extends BaseRequest {
     
 
     // organization oid
-    private String orgOid;
+    private String orgUid;
 }

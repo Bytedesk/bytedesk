@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 18:21:20
+ * @LastEditTime: 2024-05-04 10:33:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,7 +58,7 @@ public class MemberService {
         Pageable pageable = PageRequest.of(memberRequest.getPageNumber(), memberRequest.getPageSize(), Sort.Direction.ASC,
                 "id");
         
-        Page<Member> memberPage = memberRepository.findByOrgOid(memberRequest.getOrgOid(), pageable);
+        Page<Member> memberPage = memberRepository.findByOrgUid(memberRequest.getOrgUid(), pageable);
 
         return memberPage.map(this::convertToMemberResponse);
     }
@@ -68,7 +68,7 @@ public class MemberService {
         Pageable pageable = PageRequest.of(memberRequest.getPageNumber(), memberRequest.getPageSize(), Sort.Direction.ASC,
                 "id");
         
-        Page<Member> memberPage = memberRepository.findByDepartmentsDidIn(new String[]{memberRequest.getDepDid()}, pageable);
+        Page<Member> memberPage = memberRepository.findByDepartmentsUidIn(new String[]{memberRequest.getDepUid()}, pageable);
 
         return memberPage.map(this::convertToMemberResponse);
     }
@@ -89,13 +89,13 @@ public class MemberService {
             Member member = modelMapper.map(memberRequest, Member.class);
             member.setUid(uidUtils.getCacheSerialUid());
             //
-            Optional<Department> depOptional = departmentService.findByDid(memberRequest.getDepDid());
+            Optional<Department> depOptional = departmentService.findByDid(memberRequest.getDepUid());
             if (depOptional.isPresent()) {
                 member.addDepartment(depOptional.get());
                 // member.setDepartment(depOptional.get());
                 // member.setOrganization(depOptional.get().getOrganization());
                 // member.setOrgOid(depOptional.get().getOrganization().getOid());
-                member.setOrgOid(depOptional.get().getOrgOid());
+                member.setOrgUid(depOptional.get().getOrgUid());
             } else {
                 return JsonResult.error("department not exist");
             }
@@ -110,7 +110,7 @@ public class MemberService {
                         memberRequest.getMobile(),
                         memberRequest.getEmail(),
                         memberRequest.getVerified(),
-                        depOptional.get().getOrgOid()
+                        depOptional.get().getOrgUid()
                         );
             } else {
                 // just return user
@@ -134,13 +134,13 @@ public class MemberService {
         member.setTelephone(memberRequest.getTelephone());
         member.setEmail(memberRequest.getEmail());
         //
-        Optional<Department> depOptional = departmentService.findByDid(memberRequest.getDepDid());
+        Optional<Department> depOptional = departmentService.findByDid(memberRequest.getDepUid());
         if (depOptional.isPresent()) {
             member.addDepartment(depOptional.get());
             // member.setDepartment(depOptional.get());
             // member.setOrganization(depOptional.get().getOrganization());
             // member.setOrgOid(depOptional.get().getOrganization().getOid());
-            member.setOrgOid(depOptional.get().getOrgOid());
+            member.setOrgUid(depOptional.get().getOrgUid());
         } else {
             return null;
         }
@@ -218,7 +218,7 @@ public class MemberService {
                         .mobile("18888888" + userNo)
                         .email(userNo + "@email.com")
                         .verified(true)
-                        .depDid(depOptional.get().getDid())
+                        .depUid(depOptional.get().getUid())
                         .build();
                 create(memberRequest);
             }

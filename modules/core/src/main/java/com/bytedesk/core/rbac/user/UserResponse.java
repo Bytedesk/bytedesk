@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 22:52:53
+ * @LastEditTime: 2024-05-04 10:43:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,9 +35,9 @@ import com.bytedesk.core.utils.BaseResponse;
 @EqualsAndHashCode(callSuper = true)
 public class UserResponse extends BaseResponse {
 
-    private static final long serialVersionUID = -2015147462L;    
+    private static final long serialVersionUID = 1L;    
 
-    private String uid;
+    // private String uid;
     private String username;
     private String nickname;
     private String email;

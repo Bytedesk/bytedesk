@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-25 15:36:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 15:15:36
+ * @LastEditTime: 2024-05-04 10:51:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class MemberResponse extends BaseResponse {
 
-    private String uid;
+    // private String uid;
 
     private String jobNo;
 

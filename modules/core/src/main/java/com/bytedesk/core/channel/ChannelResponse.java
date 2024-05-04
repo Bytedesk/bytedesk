@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class ChannelResponse extends BaseResponse {
     
-    private String cid;
+    // private String cid;
 
     private String topic;
 
@@ -40,5 +40,5 @@ public class ChannelResponse extends BaseResponse {
     private String description;
 
     /** belong to org */
-    private String orgOid;
+    private String orgUid;
 }

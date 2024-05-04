@@ -39,7 +39,7 @@ import "thread.proto";
 // 消息三要素：1. 谁发送的消息？ 2. 发送给谁的消息？ 3. 发送的消息内容是什么？
 message Message {
     // 唯一mid
-    string mid = 1;
+    string uid = 1;
     // 消息类型
     string type = 2;
     // 消息内容，可能是文本，图片，语音，视频，文件等，json

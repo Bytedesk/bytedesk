@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 11:13:15
+ * @LastEditTime: 2024-05-04 10:39:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import jakarta.persistence.*;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 
 /**
  * @author im.bytedesk.com
@@ -35,16 +35,13 @@ import com.bytedesk.core.utils.AuditModel;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_authority")
-public class Authority extends AuditModel {
+public class Authority extends AbstractEntity {
 
-    private static final long serialVersionUID = -3232924689L;
+    private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-	@Column(unique = true, nullable = false, length = 127)
-	private String aid;
+    // @NotBlank
+	// @Column(unique = true, nullable = false, length = 127)
+	// private String aid;
 
     private String name;
 

@@ -17,7 +17,6 @@
 
     <modules>
         <module>ai</module>
-        <module>blog</module>
         <module>core</module>
         <module>local</module>
         <module>service</module>
@@ -82,7 +81,6 @@
             <artifactId>spring-boot-starter-cache</artifactId>
             <scope>provided</scope>
         </dependency>
-
         
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -100,6 +98,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -197,11 +201,11 @@
 
         <!-- 生成随机用户：用户名、邮箱、地址等，方便测试 https://github.com/DiUS/java-faker?tab=readme-ov-file -->
         <!-- https://mvnrepository.com/artifact/com.github.javafaker/javafaker -->
-        <dependency>
+        <!-- <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>1.0.2</version>
-        </dependency>
+        </dependency> -->
 
         <!--  -->
         <dependency>

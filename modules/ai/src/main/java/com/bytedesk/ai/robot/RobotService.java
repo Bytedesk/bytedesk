@@ -74,7 +74,7 @@ public class RobotService {
         Robot robot = modelMapper.map(robotRequest, Robot.class);
         // 
         String rid = uidUtils.getCacheSerialUid();
-        robot.setRid(rid);
+        robot.setUid(rid);
 
         robot.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         robot.setDescription("default robot description");
@@ -105,7 +105,7 @@ public class RobotService {
             // 
             String rid = uidUtils.getCacheSerialUid();
             Robot robot = Robot.builder()
-                    .rid(rid)
+                    // .rid(rid)
                     .name("客服机器人")
                     .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
                     .description("客服机器人")
@@ -116,6 +116,7 @@ public class RobotService {
                     .kb(kbService.getKb(rid))
                     .user(adminOptional.get())
                     .build();
+            robot.setUid(rid);
             robotRepository.save(robot);
         }
         

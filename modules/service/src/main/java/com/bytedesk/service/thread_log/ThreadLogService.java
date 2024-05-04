@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:47:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 20:43:01
+ * @LastEditTime: 2024-05-04 10:49:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,7 +54,7 @@ public class ThreadLogService {
                 threadLogRequest.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Page<ThreadLog> threadLogPage = threadLogRepository.findByOrgOid(threadLogRequest.getOrgOid(), pageable);
+        Page<ThreadLog> threadLogPage = threadLogRepository.findByOrgUid(threadLogRequest.getOrgUid(), pageable);
 
         return threadLogPage.map(this::convertThreadLogResponse);
     }
@@ -62,7 +62,7 @@ public class ThreadLogService {
     @Async
     public ThreadLog create(Thread thread) {
 
-        if (threadLogRepository.existsByTid(thread.getTid())) {
+        if (threadLogRepository.existsByUid(thread.getUid())) {
             return null;
         }
 
@@ -112,14 +112,14 @@ public class ThreadLogService {
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         Thread thread = event.getThread();
-        log.info("onThreadCreateEvent: {}", thread.getTid());
+        log.info("onThreadCreateEvent: {}", thread.getUid());
         // create(thread);
     }
 
     @EventListener
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
         Thread thread = event.getThread();
-        log.info("onThreadUpdateEvent: {}", thread.getTid());
+        log.info("onThreadUpdateEvent: {}", thread.getUid());
     }
 
 }

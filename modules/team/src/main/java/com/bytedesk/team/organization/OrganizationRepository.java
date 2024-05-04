@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-18 16:28:44
+ * @LastEditTime: 2024-05-04 11:25:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface OrganizationRepository
                 extends JpaRepository<Organization, Long>, JpaSpecificationExecutor<Organization> {
 
-        Optional<Organization> findByOid(String oid);
+        Optional<Organization> findByUid(String uid);
 
         //
         @RestResource(path = "name", rel = "name")

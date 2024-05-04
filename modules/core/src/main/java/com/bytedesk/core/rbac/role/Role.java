@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 11:06:52
+ * @LastEditTime: 2024-05-04 10:39:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.core.rbac.role;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +27,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.rbac.authority.Authority;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -42,17 +43,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_role")
-public class Role extends AuditModel {
+public class Role extends AbstractEntity {
 
-	private static final long serialVersionUID = -1470818087L;
+	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	// @NotBlank
+	// @Column(unique = true, nullable = false, length = 127)
+	// private String rid;
 
-	@Column(unique = true, nullable = false, length = 127)
-	private String rid;
-
+	@NotBlank
+	@Column(unique = true, nullable = false)
 	private String name;
 
 	/**
@@ -80,7 +80,7 @@ public class Role extends AuditModel {
 	// @JsonBackReference("user-roles") // 避免无限递归
 	// private User user;
 
-	private String orgOid;
+	private String orgUid;
 
 
 	public void addAuthority(Authority authority) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 22:21:00
+ * @LastEditTime: 2024-05-04 10:36:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.thread.Thread;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -41,16 +41,13 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_message")
-public class Message extends AuditModel {
+public class Message extends AbstractEntity {
 
-    private static final long serialVersionUID = 6816837318L;
+    private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
-    private String mid;
+    // @NotBlank
+    // @Column(unique = true, nullable = false)
+    // private String mid;
 
     @Column(name = "by_type")
     private String type;
@@ -91,6 +88,6 @@ public class Message extends AuditModel {
 
     // TODO:
     /** belong to org */
-    private String orgOid;
+    private String orgUid;
 
 }

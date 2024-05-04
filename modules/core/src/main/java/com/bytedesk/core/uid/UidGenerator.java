@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2021-02-24 15:52:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-13 11:37:17
+ * @LastEditTime: 2024-05-04 11:20:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,12 +17,10 @@ package com.bytedesk.core.uid;
 import java.util.Date;
 
 import com.bytedesk.core.uid.worker.WorkerNodeType;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,15 +42,10 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_uid_generator")
-public class UidGenerator extends AuditModel {
+public class UidGenerator extends AbstractEntity {
 
-    /**
-     * Entity unique id (table unique)
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Type of CONTAINER: HostName, ACTUAL : IP.
      */
@@ -66,6 +59,7 @@ public class UidGenerator extends AuditModel {
     /**
      * type of {@link WorkerNodeType}
      */
+    @Column(name = "by_type")
     private int type;
 
     /**

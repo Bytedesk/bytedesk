@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-17 09:43:34
+ * @LastEditTime: 2024-05-04 11:29:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,14 +31,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "message - 消息")
 public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpecificationExecutor<Message> {
 
-    Optional<Message> findByMid(String mid);
+    Optional<Message> findByUid(String mid);
 
-    Long deleteByMid(String mid);
+    Long deleteByUid(String mid);
 
-    Page<Message> findByThreadsTidIn(String[] threadTids, Pageable pageable);
+    Page<Message> findByThreadsUidIn(String[] threadTids, Pageable pageable);
 
-    Optional<Message> findFirstByThreadsTidInOrderByCreatedAtDesc(String[] threadTids);
+    Optional<Message> findFirstByThreadsUidInOrderByCreatedAtDesc(String[] threadTids);
 
-    boolean existsByMid(String mid);
+    boolean existsByUid(String mid);
 
 }

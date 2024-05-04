@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 23:04:54
+ * @LastEditTime: 2024-05-04 10:51:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class MessageJsonService {
 
         dealWithMessageRecall(type, messageResponse);
         // 
-        String mid = messageResponse.getMid();
+        String mid = messageResponse.getUid();
         if (messageService.existsByMid(mid)) {
             log.info("message already exists, mid: {}", mid);
             return;
@@ -69,7 +69,7 @@ public class MessageJsonService {
 
         messageService.save(message);
 
-        log.info("save json msg mid {}, tid {}", message.getMid(), thread.getTid());
+        log.info("save json msg mid {}, tid {}", message.getUid(), thread.getUid());
     }
 
     private Thread getThread(MessageResponse messageResponse) {
@@ -91,7 +91,7 @@ public class MessageJsonService {
         message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
         message.getThreads().add(thread);
         message.setUser(JSON.toJSONString(messageResponse.getUser()));
-        message.setOrgOid(thread.getOrgOid());
+        message.setOrgUid(thread.getOrgUid());
         
         return message;
     }

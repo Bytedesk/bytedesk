@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.annotation.ActionLog;
+import com.bytedesk.core.action.ActionLogAnnotation;
 import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -44,7 +44,7 @@ public class WorkgroupController {
      * @param workgroupRequest
      * @return
      */
-    @ActionLog(title = "workgroup", action = "query")
+    @ActionLogAnnotation(title = "workgroup", action = "query")
     @GetMapping("/query")
     public ResponseEntity<?> query(WorkgroupRequest workgroupRequest) {
         

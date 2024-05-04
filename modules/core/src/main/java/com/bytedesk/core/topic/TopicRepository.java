@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 16:16:14
+ * @LastEditTime: 2024-05-04 10:20:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,9 +25,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Long> {
 
-    Optional<Topic> findByTid(String tid);
+    Optional<Topic> findByUid(String uid);
     
-    Optional<Topic> findFirstByUid(String uid);
+    Optional<Topic> findFirstByUserUid(String userUid);
 
     // boolean existsByTopicAndUid(String topic, String uid);
 

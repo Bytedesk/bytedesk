@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-17 16:53:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 23:41:33
+ * @LastEditTime: 2024-05-04 12:33:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import com.bytedesk.core.annotation.ActionLog;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +43,7 @@ public class ActionLogAspect {
      * 处理请求前执行
      */
     @Before(value = "@annotation(controllerLog)")
-    public void doBefore(JoinPoint joinPoint, ActionLog controllerLog) {
+    public void doBefore(JoinPoint joinPoint, ActionLogAnnotation controllerLog) {
         log.debug("actionLog before: model {}, action {}", controllerLog.title(), controllerLog.action());
     }
 
@@ -54,11 +53,11 @@ public class ActionLogAspect {
      * @param joinPoint 切点
      */
     @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
-    public void doAfterReturning(JoinPoint joinPoint, ActionLog controllerLog, Object jsonResult) {
+    public void doAfterReturning(JoinPoint joinPoint, ActionLogAnnotation controllerLog, Object jsonResult) {
         log.debug("actionLog after returning: model {}, action {}, jsonResult {}", controllerLog.title(),
                 controllerLog.action(), jsonResult);
         // handleLog(joinPoint, controllerLog, null, jsonResult);
-        // 
+        // TODO: 记录具体用户
         ActionRequest actionRequest = ActionRequest.builder()
                 .title(controllerLog.title())
                 .action(controllerLog.action())
@@ -74,7 +73,7 @@ public class ActionLogAspect {
      * @param e 异常
      */
     @AfterThrowing(value = "@annotation(controllerLog)", throwing = "e")
-    public void doAfterThrowing(JoinPoint joinPoint, ActionLog controllerLog, Exception e) {
+    public void doAfterThrowing(JoinPoint joinPoint, ActionLogAnnotation controllerLog, Exception e) {
         log.info("actionLog after throwing: model {}, action {}", controllerLog.title(), controllerLog.action());
         // handleLog(joinPoint, controllerLog, e, null);
     }

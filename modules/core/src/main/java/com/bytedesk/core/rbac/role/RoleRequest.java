@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 11:10:01
+ * @LastEditTime: 2024-05-04 10:40:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ import com.bytedesk.core.utils.BaseRequest;
 @EqualsAndHashCode(callSuper = false)
 public class RoleRequest extends BaseRequest {
 
-    private String rid;
+    // private String rid;
 
     private String name;
 
@@ -42,7 +42,7 @@ public class RoleRequest extends BaseRequest {
     private Set<String> authorityAids = new HashSet<>();
 
     // organization oid
-    private String orgOid;
+    private String orgUid;
 
 
     

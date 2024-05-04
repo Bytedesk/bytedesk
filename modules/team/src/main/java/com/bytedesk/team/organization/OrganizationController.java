@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 15:21:52
+ * @LastEditTime: 2024-05-04 11:33:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,10 +62,10 @@ public class OrganizationController {
      * @param request
      * @return
      */
-    @GetMapping("/oid")
-    public ResponseEntity<?> queryByOid(OrganizationRequest request) {
+    @GetMapping("/uid")
+    public ResponseEntity<?> queryByUid(OrganizationRequest request) {
         //
-        Optional<Organization> org = organizationService.findByOid(request.getOid());
+        Optional<Organization> org = organizationService.findByUid(request.getUid());
         if (!org.isPresent()) {
             return ResponseEntity.ok(JsonResult.error("组织不存在"));
         }

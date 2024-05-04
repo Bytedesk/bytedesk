@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 12:55:37
+ * @LastEditTime: 2024-05-04 10:39:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,7 +64,7 @@ public class RoleService {
                 }
 
                 Role role = modelMapper.map(rolerRequest, Role.class);
-                role.setRid(uidUtils.getCacheSerialUid());
+                role.setUid(uidUtils.getCacheSerialUid());
                 // 
                 Iterator<String> iterator = rolerRequest.getAuthorityAids().iterator();
                 while (iterator.hasNext()) {
@@ -84,7 +84,7 @@ public class RoleService {
                                 Sort.Direction.DESC,
                                 "id");
 
-                Page<Role> rolePage = roleRepository.findByOrgOid(roleRequest.getOrgOid(), pageable);
+                Page<Role> rolePage = roleRepository.findByOrgUid(roleRequest.getOrgUid(), pageable);
 
                 return rolePage.map(BdConvertUtils::convertToRoleResponse);
         }
@@ -145,7 +145,7 @@ public class RoleService {
                         // 
                         Optional<Authority> authorityOptional = authorityService.findByValue(authority);
                         if (authorityOptional.isPresent()) {
-                                roleRequest.getAuthorityAids().add(authorityOptional.get().getAid());
+                                roleRequest.getAuthorityAids().add(authorityOptional.get().getUid());
                         }
                         // 
                         create(roleRequest);
@@ -161,7 +161,7 @@ public class RoleService {
                                 String roleName = TypeConsts.ROLE_ + authority;
                                 Optional<Role> roleOptional = findByName(roleName);
                                 roleOptional.ifPresent(role -> {
-                                        role.setOrgOid(adminOptional.get().getOrgOid());
+                                        role.setOrgUid(adminOptional.get().getOrgUid());
                                         roleRepository.save(role);
                                 });
                         });

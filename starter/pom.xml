@@ -82,6 +82,11 @@
 			<artifactId>spring-boot-starter-quartz</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
 		<!-- cloud -->
 		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -90,11 +95,11 @@
 
 		<!-- application-dev-mysql.properties -->
 		<!-- mysql driver -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
-		</dependency> -->
+		</dependency>
 
 		<!-- application-dev-pg.properties -->
 		<!-- PostgreSQL JDBC driver -->
@@ -106,11 +111,11 @@
 
 		<!-- application-dev-h2.properties -->
 		<!-- h2 driver -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency> -->
 
 		<!-- /////////////////////////////////////开源模块//////////////////////////////////////// -->
 
@@ -167,6 +172,36 @@
 			<artifactId>vip-cluster</artifactId>
 			<version>${im.version}</version>
 		</dependency> -->
+
+		<!-- //////////////////////////////////项目模块/////////////////////////////////////////// -->
+
+		<!-- 良师宝 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>liangshibao</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 今日美语 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>meiyu</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 微语题库 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>tiku</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 微语招标 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>zhaobiao</artifactId>
+			<version>${im.version}</version>
+		</dependency>
 
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 

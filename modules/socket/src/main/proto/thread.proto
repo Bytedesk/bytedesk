@@ -23,7 +23,7 @@ option java_outer_classname = "ThreadProto";
 
 message Thread {
     // ID
-    string tid = 1;
+    string uid = 1;
     // 订阅主题
     string topic = 2;
     // 会话类型

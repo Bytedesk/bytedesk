@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:59:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 17:48:53
+ * @LastEditTime: 2024-05-04 10:57:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,10 +32,17 @@ public class KbFileService {
 
     public Page<KbFileResponse> query(KbFileRequest kbFileRequest) {
 
-        Pageable pageable = PageRequest.of(kbFileRequest.getPageNumber(), kbFileRequest.getPageSize(), Sort.Direction.DESC,
+        Pageable pageable = PageRequest.of(kbFileRequest.getPageNumber(), kbFileRequest.getPageSize(),
+                Sort.Direction.DESC,
                 "id");
 
-        return null;
+        Page<KbFile> kbFiles = kbFileRepository.findAll(pageable);
+
+        return kbFiles.map(this::convertToKbFileResponse);
+    }
+    
+    public KbFileResponse convertToKbFileResponse(KbFile kbFile) {
+        return modelMapper.map(kbFile, KbFileResponse.class);
     }
 
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 17:19:26
+ * @LastEditTime: 2024-05-03 23:48:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,10 +16,11 @@ package com.bytedesk.team.organization;
 
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,16 +36,15 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "team_organization")
-public class Organization extends AuditModel {
+public class Organization extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
     // 随机字符串，可读性差
-    @Column(unique = true, nullable = false)
-    private String oid;
+    // @Column(unique = true, nullable = false)
+    // private String oid;
 
+    @NotBlank
     /** name should be unique */
     @Column(unique = true, nullable = false)
     private String name;
