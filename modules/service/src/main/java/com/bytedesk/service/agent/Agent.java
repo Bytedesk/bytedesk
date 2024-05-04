@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 15:14:35
+ * @LastEditTime: 2024-05-04 10:29:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,10 +19,15 @@ import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,14 +49,12 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ AgentListener.class })
 @Table(name = "service_agent")
-public class Agent extends AuditModel {
+public class Agent extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-    @Column(name = "uuid", unique = true, nullable = false)
-	private String uid;
+    // @Column(name = "uuid", unique = true, nullable = false)
+	// private String uid;
 
     /**
      * visible to visitors
@@ -110,7 +113,7 @@ public class Agent extends AuditModel {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgOid;
+    private String orgUid;
     
     /**
      * belongs to user

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2021-02-24 15:52:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-09 16:59:02
+ * @LastEditTime: 2024-05-04 11:24:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,7 @@ import com.bytedesk.core.uid.UidGenerator;
 import com.bytedesk.core.uid.UidGereratorRepository;
 // import com.bytedesk.core.uid.utils.DockerUtils;
 import com.bytedesk.core.uid.utils.NetUtils;
+import com.bytedesk.core.utils.Utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,6 +98,7 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
      */
     private UidGenerator buildWorkerNode() {
         UidGenerator workerNodeEntity = new UidGenerator();
+        workerNodeEntity.setUid(Utils.getUid());
     
         workerNodeEntity.setType(WorkerNodeType.ACTUAL.value());
         workerNodeEntity.setHost(NetUtils.getLocalAddress());
@@ -109,6 +111,8 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
 
     private UidGenerator buildFakeWorkerNode() {
         UidGenerator workerNodeEntity = new UidGenerator();
+        workerNodeEntity.setUid(Utils.getUid());
+
         workerNodeEntity.setType(WorkerNodeType.FAKE.value());
         workerNodeEntity.setHost(NetUtils.getLocalAddress());
         // workerNodeEntity.setPort(System.currentTimeMillis() + "-" + new Random().nextInt(100000));

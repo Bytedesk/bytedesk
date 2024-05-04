@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 16:12:07
+ * @LastEditTime: 2024-05-04 10:38:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -87,12 +87,12 @@ public class MessageSocketService {
         if (threadType.equals(ThreadTypeConsts.MEMBER)) {
             doSendToSenderClients(messageProto);
             // 广播给消息发送者的多个客户端，如：pc客户端发送消息，手机客户端可以同步收到自己发送的消息
-            String tid = messageProto.getThread().getTid();
+            String tid = messageProto.getThread().getUid();
             String reverseTid = new StringBuffer(tid).reverse().toString();
             //
             String userTopic = messageProto.getUser().getUid();
             ThreadProto.Thread thread = messageProto.getThread().toBuilder()
-                    .setTid(reverseTid)
+                    .setUid(reverseTid)
                     .setTopic(userTopic)
                     .build();
             MessageProto.Message message = messageProto.toBuilder()

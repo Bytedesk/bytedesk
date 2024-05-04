@@ -2,7 +2,7 @@
  * @Author: jack ning github@bytedesk.com
  * @Date: 2024-01-23 14:53:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 20:41:38
+ * @LastEditTime: 2024-05-04 10:27:41
  * @FilePath: /server/plugins/im/src/main/java/com/bytedesk/im/group/Group.java
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -36,14 +36,12 @@ import lombok.experimental.Accessors;
 // @EntityListeners({ GroupListener.class })
 // 注：group为mysql保留关键字, groups在mysql8启动报错，所有表名修改为groupes
 @Table(name = "team_groupes")
-public class Group extends AuditModel {
+public class Group extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-    @Column(unique = true, nullable = false)
-    private String gid;
+    // @Column(unique = true, nullable = false)
+    // private String gid;
 
     private String name;
 

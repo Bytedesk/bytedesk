@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 20:41:49
+ * @LastEditTime: 2024-05-04 10:27:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.bytedesk.team.department.Department;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -40,14 +40,12 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ MemberListener.class })
 @Table(name = "team_member")
-public class Member extends AuditModel {
+public class Member extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-    @Column(name = "uuid", unique = true, nullable = false)
-	private String uid;
+    // @Column(name = "uuid", unique = true, nullable = false)
+	// private String uid;
 
     /**
      * job number
@@ -102,7 +100,7 @@ public class Member extends AuditModel {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgOid;
+    private String orgUid;
 
      // 添加、移除部门的方法
     public void addDepartment(Department department) {

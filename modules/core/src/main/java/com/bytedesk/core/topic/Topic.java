@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:03:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 16:09:01
+ * @LastEditTime: 2024-05-04 10:18:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,16 +17,14 @@ package com.bytedesk.core.topic;
 import java.util.Set;
 import java.util.HashSet;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,14 +42,13 @@ import lombok.experimental.Accessors;
 @Table(name = "core_topic", uniqueConstraints = {
     // @UniqueConstraint(columnNames = {"topic", "uuid"}),
 })
-public class Topic extends AuditModel {
+public class Topic extends AbstractEntity {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
-    private String tid;
+    private static final long serialVersionUID = 1L;
+    
+    // @NotBlank
+    // @Column(unique = true, nullable = false)
+    // private String tid;
 
     // @Column(nullable = false)
     // private String topic;
@@ -63,8 +60,9 @@ public class Topic extends AuditModel {
     // private String topic;
 
     // user, no need map, just uid
-    @Column(name = "uuid", nullable = false)
-    private String uid;
+    @NotBlank
+    @Column(nullable = false)
+    private String userUid;
 
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
     // @Builder.Default

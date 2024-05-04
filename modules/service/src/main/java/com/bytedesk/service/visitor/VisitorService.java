@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 16:06:38
+ * @LastEditTime: 2024-05-04 10:48:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -152,7 +152,7 @@ public class VisitorService {
             String type = visitorRequest.formatType();
             // 
             Thread newThread = new Thread();
-            newThread.setTid(uidUtils.getCacheSerialUid());
+            newThread.setUid(uidUtils.getCacheSerialUid());
             newThread.setTopic(topic);
             newThread.setType(type);
             newThread.setClient(visitorRequest.getClient());
@@ -176,7 +176,7 @@ public class VisitorService {
                     // 
                     newThread.setOwner(agent.getUser());
                     newThread.setContent(agent.getWelcomeTip());
-                    newThread.setOrgOid(agent.getOrgOid());
+                    newThread.setOrgUid(agent.getOrgUid());
                 } else {
                     log.error("agent aid {} not exist", aid);
                     return null;
@@ -198,7 +198,7 @@ public class VisitorService {
                         // 
                         newThread.setOwner(agent.getUser());
                         newThread.setContent(workgroup.getWelcomeTip());
-                        newThread.setOrgOid(agent.getOrgOid());
+                        newThread.setOrgUid(agent.getOrgUid());
                     } else {
                         log.error("No agents found in workgroup with wid {}", aid);
                         return null;
@@ -232,7 +232,7 @@ public class VisitorService {
         }
 
         // find the last message
-        Optional<Message> messageOptional = messageService.findByThreadsTidInOrderByCreatedAtDesc(thread.getTid());
+        Optional<Message> messageOptional = messageService.findByThreadsUidInOrderByCreatedAtDesc(thread.getUid());
         if (messageOptional.isPresent()) {
             return messageOptional.get();
         }
@@ -247,14 +247,15 @@ public class VisitorService {
         UserResponseSimple user = convertToUserResponseSimple(extra.getAgent());
 
         Message message = Message.builder()
-                .mid(uidUtils.getCacheSerialUid())
+                // .mid(uidUtils.getCacheSerialUid())
                 .type(MessageTypeConsts.NOTIFICATION_THREAD)
                 .content(extra.getWelcomeTip())
                 .status(StatusConsts.MESSAGE_STATUS_READ)
                 .client(ClientConsts.CLIENT_SYSTEM)
                 .user(JSON.toJSONString(user))
-                .orgOid(thread.getOrgOid())
+                .orgUid(thread.getOrgUid())
                 .build();
+        message.setUid(uidUtils.getCacheSerialUid());
 
         message.getThreads().add(thread);
         return message;

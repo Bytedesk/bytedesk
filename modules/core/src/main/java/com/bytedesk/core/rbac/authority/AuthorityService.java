@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 10:54:51
+ * @LastEditTime: 2024-05-04 10:39:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,14 +38,14 @@ public class AuthorityService {
     public Authority create(AuthorityRequest authorityRequest) {
         // 
         Authority authority = modelMapper.map(authorityRequest, Authority.class);
-        authority.setAid(uidUtils.getCacheSerialUid());
+        authority.setUid(uidUtils.getCacheSerialUid());
 
         return save(authority);
     }
 
     @Cacheable(value = "authority", key = "#aid", unless = "#result == null")
     public Optional<Authority> findByAid(String aid) {
-        return authorityRepository.findByAid(aid);
+        return authorityRepository.findByUid(aid);
     }
 
     @Cacheable(value = "authority", key = "#value", unless = "#result == null")

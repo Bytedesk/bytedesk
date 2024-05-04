@@ -29,7 +29,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class AgentRequest extends BaseRequest {
 
-    private String uid;
+    // private String uid;
 
     private String nickname;
 
@@ -46,6 +46,6 @@ public class AgentRequest extends BaseRequest {
     private String description = BdConstants.DEFAULT_AGENT_DESCRIPTION;
 
     // organization oid
-    private String orgOid;
+    private String orgUid;
 
 }

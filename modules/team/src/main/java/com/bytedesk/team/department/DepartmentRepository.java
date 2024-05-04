@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 17:19:33
+ * @LastEditTime: 2024-05-04 11:26:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,8 +45,8 @@ public interface DepartmentRepository extends JpaRepository<Department, Long>, J
 
     Optional<Department> findByName(String name);
 
-    Optional<Department> findByDid(String did);
+    Optional<Department> findByUid(String uid);
 
-    Page<Department> findByOrgOidAndParent(String orgOid, Department parent, Pageable pageable);
+    Page<Department> findByOrgUidAndParent(String orgUid, Department parent, Pageable pageable);
 
 }

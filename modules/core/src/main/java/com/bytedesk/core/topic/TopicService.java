@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 12:06:52
+ * @LastEditTime: 2024-05-04 10:26:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ public class TopicService {
     public void create(String topic, String uid) {
         TopicRequest topicRequest = TopicRequest.builder()
                 .topic(topic)
-                .uid(uid)
+                .userUid(uid)
                 // .qos(1)
                 .build();
         create(topicRequest);
@@ -59,7 +59,7 @@ public class TopicService {
         //     return;
         // }
 
-        Optional<Topic> topicOptional = findByUid(topicRequest.getUid());
+        Optional<Topic> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
             Topic topicElement = topicOptional.get();
             if (topicElement.getTopics().contains(topicRequest.getTopic())) {
@@ -73,7 +73,7 @@ public class TopicService {
             return;
         }
         // 
-        topicRequest.setTid(uidUtils.getCacheSerialUid());
+        topicRequest.setUid(uidUtils.getCacheSerialUid());
         // 
         Topic topic = modelMapper.map(topicRequest, Topic.class);
         topic.getTopics().add(topicRequest.getTopic());
@@ -103,7 +103,7 @@ public class TopicService {
             final String uid = clientId.split("/")[0];
             TopicRequest topicRequest = TopicRequest.builder()
                     .topic(topic)
-                    .uid(uid)
+                    .userUid(uid)
                     // .qos(qos)
                     .build();
             topicRequest.getClientIds().add(clientId);
@@ -155,21 +155,21 @@ public class TopicService {
         }
     }
 
-    @Cacheable(value = "topic", key = "#tid")
-    public Optional<Topic> findByTid(String tid) {
-        return topicRepository.findByTid(tid);
+    @Cacheable(value = "topic", key = "#uid")
+    public Optional<Topic> findByUid(String uid) {
+        return topicRepository.findByUid(uid);
     }
 
     @Cacheable(value = "topic", key = "#clientId", unless = "#result == null")
     public Optional<Topic> findByClientId(String clientId) {
         // 用户clientId格式: uid/client
         final String uid = clientId.split("/")[0];
-        return findByUid(uid);
+        return findByUserUid(uid);
     }
 
     @Cacheable(value = "topic", key = "#uid", unless = "#result == null")
-    public Optional<Topic> findByUid(String uid) {
-        return topicRepository.findFirstByUid(uid);
+    public Optional<Topic> findByUserUid(String uid) {
+        return topicRepository.findFirstByUserUid(uid);
     }
 
     @Cacheable(value = "topic", key = "#topic", unless="#result == null")
@@ -181,7 +181,7 @@ public class TopicService {
     }
 
     @Caching(put = {
-        @CachePut(value = "topic", key = "#topic.uid")
+        @CachePut(value = "topic", key = "#topic.userUid")
     })
     public Topic save(Topic topic) {
         return topicRepository.save(topic);
@@ -189,15 +189,15 @@ public class TopicService {
 
     // TODO: 需要从原先uid的缓存列表中删除，然后添加到新的uid的换成列表中
     // @CachePut(value = "topic", key = "#uid")
-    public void update(String tid, String uid) {
-        Optional<Topic> optionalTopic = findByTid(tid);
+    public void update(String uid, String userUid) {
+        Optional<Topic> optionalTopic = findByUid(uid);
         optionalTopic.ifPresent(topic -> {
-            topic.setUid(uid);
+            topic.setUserUid(userUid);
             topicRepository.save(topic);
         });
     }
 
-    @CacheEvict(value = "topic", key = "#topic.uid")
+    @CacheEvict(value = "topic", key = "#topic.userUid")
     public void delete(Topic topic) {
         topicRepository.delete(topic);
     }

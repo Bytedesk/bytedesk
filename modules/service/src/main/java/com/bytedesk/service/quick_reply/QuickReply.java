@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-22 23:13:26
+ * @LastEditTime: 2024-05-03 22:45:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,10 @@
  */
 package com.bytedesk.service.quick_reply;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,11 +37,11 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_quick_reply")
-public class QuickReply extends AuditModel {
+public class QuickReply extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private Long id;
+    private static final long serialVersionUID = 1L;
+
+    @Column(name = "qid", unique = true, nullable = false)
+    private String qid;
 
 }

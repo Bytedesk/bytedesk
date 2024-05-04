@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 12:55:58
+ * @LastEditTime: 2024-05-03 20:30:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,11 @@ import com.bytedesk.core.message.Message;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * https://springdoc.cn/spring-boot-email/
+ * https://springdoc.cn/spring/integration.html#mail
+ * https://mailtrap.io/blog/spring-send-email/
+ */
 @Slf4j
 @Service
 public class PushServiceImplEmail extends Notifier {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 12:24:01
+ * @LastEditTime: 2024-05-04 10:22:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -170,10 +170,10 @@ public class UserService {
 
     @Transactional
     public User createUser(String nickname, String avatar, String password, String mobile, String email, boolean isVerified,
-                String orgOid) {
+                String orgUid) {
 
         User user = User.builder()
-            .uid(uidUtils.getCacheSerialUid())
+            // .uid(uidUtils.getCacheSerialUid())
             .avatar(avatar)
             // use email as default username
             .username(email)
@@ -184,7 +184,8 @@ public class UserService {
             .superUser(false)
             .emailVerified(isVerified)
             .mobileVerified(isVerified)
-            .build();
+                .build();
+        user.setUid(uidUtils.getCacheSerialUid());
 
         if (StringUtils.hasLength(password)) {
             user.setPassword(passwordEncoder.encode(password));
@@ -192,7 +193,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode("123456"));
         }
 
-        user.getOrganizations().add(orgOid);
+        user.getOrganizations().add(orgUid);
 
         return save(user);
         // return user;
@@ -300,7 +301,7 @@ public class UserService {
         }
         
         User admin = User.builder()
-                .uid(uidUtils.getCacheSerialUid())
+                // .uid(uidUtils.getCacheSerialUid())
                 .email(properties.getEmail())
                 .username(properties.getUsername())
                 .password(new BCryptPasswordEncoder().encode(properties.getPassword()))
@@ -312,6 +313,7 @@ public class UserService {
                 .emailVerified(true)
                 .mobileVerified(true)
                 .build();
+        admin.setUid(uidUtils.getCacheSerialUid());
         //
         Optional<Role> roleOptional = roleService.findByName(TypeConsts.ROLE_SUPER);
         Set<Role> roles = new HashSet<>();

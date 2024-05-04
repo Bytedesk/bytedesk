@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:34:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-28 11:20:53
+ * @LastEditTime: 2024-05-04 10:47:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,11 @@
  */
 package com.bytedesk.core.channel;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,14 +39,12 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ChannelListener.class})
 @Table(name = "core_channel")
-public class Channel extends AuditModel {
+public class Channel extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-	@Column(unique = true, nullable = false, length = 127)
-    private String cid;
+	// @Column(unique = true, nullable = false, length = 127)
+    // private String cid;
 
     private String topic;
 
@@ -63,7 +58,7 @@ public class Channel extends AuditModel {
     private String description;
 
     /** belong to org */
-    private String orgOid;
+    private String orgUid;
 
     
 }

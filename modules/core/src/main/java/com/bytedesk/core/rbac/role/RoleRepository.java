@@ -41,7 +41,7 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
     List<Role> findByType(String type);
 
     // Page<Role> findByUser(User user, Pageable pageable);
-    Page<Role> findByOrgOid(String orgOid, Pageable pageable);
+    Page<Role> findByOrgUid(String orgUid, Pageable pageable);
 
     Boolean existsByName(String name);
 

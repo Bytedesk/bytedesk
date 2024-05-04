@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-26 16:02:39
+ * @LastEditTime: 2024-05-04 10:59:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ package com.bytedesk.ai.robot;
 import com.bytedesk.ai.kb.Kb;
 import com.bytedesk.ai.llm.Llm;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -25,9 +25,6 @@ import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -51,14 +48,12 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ai_robot")
-public class Robot extends AuditModel {
+public class Robot extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-    @Column(name = "rid", unique = true, nullable = false)
-    private String rid;
+    // @Column(name = "rid", unique = true, nullable = false)
+    // private String rid;
 
     private String name;
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-28 11:14:48
+ * @LastEditTime: 2024-05-04 10:41:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,7 +67,7 @@ public class AsistantService {
     public Asistant create(AsistantRequest asistantRequest) {
 
         Asistant asistant = modelMapper.map(asistantRequest, Asistant.class);
-        asistant.setAid(uidUtils.getCacheSerialUid());
+        asistant.setUid(uidUtils.getCacheSerialUid());
         
         return save(asistant);
     }
@@ -95,7 +95,7 @@ public class AsistantService {
                 .name(I18Consts.I18_FILE_ASISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .description(I18Consts.I18_FILE_ASISTANT_DESCRIPTION)
-                .orgOid(adminOptional.get().getOrgOid())
+                .orgUid(adminOptional.get().getOrgUid())
                 .build();
         asistantRequest.setType(TypeConsts.TYPE_SYSTEM);
         create(asistantRequest);
@@ -109,21 +109,23 @@ public class AsistantService {
         userPage.forEach(user -> {
             // 
             UserResponseSimple userSimple = UserResponseSimple.builder()
-                    .uid(asistantRequest.getAid())
+                    // .uid(asistantRequest.getAid())
                     .nickname(asistantRequest.getName())
                     .avatar(asistantRequest.getAvatar())
                     .build();
+            userSimple.setUid(asistantRequest.getUid());
             // 
             Thread thread = Thread.builder()
-                    .tid(uidUtils.getCacheSerialUid())
+                    // .tid(uidUtils.getCacheSerialUid())
                     .type(ThreadTypeConsts.ASISTANT)
                     .topic(TopicConsts.TOPIC_FILE_ASISTANT + "/" + user.getUid())
                     .status(StatusConsts.THREAD_STATUS_INIT)
                     .client(TypeConsts.TYPE_SYSTEM)
                     .user(JSON.toJSONString(userSimple))
                     .owner(user)
-                    .orgOid(asistantRequest.getOrgOid())
+                    .orgUid(asistantRequest.getOrgUid())
                     .build();
+            thread.setUid(uidUtils.getCacheSerialUid());
             
             threadService.save(thread);
         });

@@ -81,7 +81,7 @@ public class DepartmentController {
         //
         // departmentService.deleteById(departmentRequest.getId());
 
-        return ResponseEntity.ok().body(new JsonResult<>("delete dep success", 200, departmentRequest.getId()));
+        return ResponseEntity.ok().body(new JsonResult<>("delete dep success", 200, departmentRequest.getUid()));
     }
 
     /**

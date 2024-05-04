@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 09:55:39
+ * @LastEditTime: 2024-05-04 10:40:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,10 +21,11 @@ import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.StatusConsts;
 import com.bytedesk.core.constant.ThreadTypeConsts;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,14 +46,13 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ ThreadListener.class })
 @Table(name = "core_thread")
-public class Thread extends AuditModel {
+public class Thread extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-    @Column(unique = true, nullable = false)
-    private String tid;
+    // @NotBlank
+    // @Column(unique = true, nullable = false)
+    // private String tid;
 
     /**
      * used to push message
@@ -61,6 +61,7 @@ public class Thread extends AuditModel {
      * agent_aid + '/' + visitor_vid
      * such as: wid/vid or aid/vid
      */
+    @NotBlank
     private String topic;
 
     @Builder.Default
@@ -105,6 +106,6 @@ public class Thread extends AuditModel {
 
     // TODO: 
     /** belong to org */
-    private String orgOid;
+    private String orgUid;
 
 }

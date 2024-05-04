@@ -25,7 +25,7 @@ import lombok.ToString;
 @ToString
 public class KbFileResponse {
 
-    private String fid;
+    // private String fid;
 
     private String loader;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 12:12:59
+ * @LastEditTime: 2024-05-04 10:40:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ public class ThreadListener {
 
     @PostPersist
     public void postPersist(Thread thread) {
-        log.info("thread postPersist {}", thread.getTid());
+        log.info("thread postPersist {}", thread.getUid());
         // 这里可以记录日志
         // create thread topic
         TopicService topicService = ApplicationContextHolder.getBean(TopicService.class);
@@ -52,7 +52,7 @@ public class ThreadListener {
 
     @PostUpdate
     public void postUpdate(Thread thread) {
-        log.info("postUpdate {}", thread.getTid());
+        log.info("postUpdate {}", thread.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadUpdateEvent(thread);

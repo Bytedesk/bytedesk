@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-28 10:55:02
+ * @LastEditTime: 2024-05-04 10:46:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,11 @@
  */
 package com.bytedesk.core.asistant;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,14 +39,13 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ AsistantListener.class })
 @Table(name = "core_asistant")
-public class Asistant extends AuditModel {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class Asistant extends AbstractEntity {
 
-	@Column(unique = true, nullable = false, length = 127)
-    private String aid;
+    private static final long serialVersionUID = 1L;
+    
+    // @NotBlank
+	// @Column(unique = true, nullable = false, length = 127)
+    // private String aid;
 
     private String topic;
 
@@ -63,5 +59,5 @@ public class Asistant extends AuditModel {
     private String description;
 
     /** belong to org */
-    private String orgOid;
+    private String orgUid;
 }

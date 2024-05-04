@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-09 16:34:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 21:38:50
+ * @LastEditTime: 2024-05-04 10:49:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,15 +21,12 @@ import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.StatusConsts;
 import com.bytedesk.core.constant.ThreadTypeConsts;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -52,14 +49,12 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_thread_log")
-public class ThreadLog extends AuditModel {
+public class ThreadLog extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
 
-    @Column(unique = true, nullable = false)
-    private String tid;
+    // @Column(unique = true, nullable = false)
+    // private String tid;
     
     /**
      * used to push message
@@ -110,6 +105,6 @@ public class ThreadLog extends AuditModel {
 
 
     /** belong to org */
-    private String orgOid;
+    private String orgUid;
 
 }

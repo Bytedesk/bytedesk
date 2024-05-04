@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 12:16:54
+ * @LastEditTime: 2024-05-04 11:28:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *  Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,11 +36,11 @@ public interface WorkgroupRepository extends JpaRepository<Workgroup, Long>, Jpa
 
     // Page<Workgroup> findAll(@NonNull Pageable pageable);
 
-    Optional<Workgroup> findByWid(@NonNull String wid);
+    Optional<Workgroup> findByUid(@NonNull String uid);
 
     Optional<Workgroup> findByNickname(@NonNull String nickname);
 
     // Page<Workgroup> findByOrganization_Oid(String oid, Pageable pageable);
-    Page<Workgroup> findByOrgOid(String oid, Pageable pageable);
+    Page<Workgroup> findByOrgUid(String oid, Pageable pageable);
 
 }

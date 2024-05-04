@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 15:52:51
+ * @LastEditTime: 2024-05-04 11:37:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ public class ActionService {
     public Action create(ActionRequest actionRequest) {
 
         Action action = modelMapper.map(actionRequest, Action.class);
-        action.setAid(uidUtils.getCacheSerialUid());
+        action.setUid(uidUtils.getCacheSerialUid());
 
         return save(action);
     }

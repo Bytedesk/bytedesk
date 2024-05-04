@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 12:17:20
+ * @LastEditTime: 2024-05-04 10:33:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,5 +42,5 @@ public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecific
     Optional<Agent> findByUser_Uid(String uid);
 
     // Page<Agent> findByOrganization_Oid(String oid, Pageable pageable);
-    Page<Agent> findByOrgOid(String oid, Pageable pageable);
+    Page<Agent> findByOrgUid(String oid, Pageable pageable);
 }

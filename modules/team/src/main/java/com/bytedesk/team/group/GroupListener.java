@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:44:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-15 09:45:01
+ * @LastEditTime: 2024-05-04 10:27:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,32 +30,32 @@ public class GroupListener {
 
     @PrePersist
     public void prePersist(Group group) {
-        log.info("prePersist {}", group.getGid());
+        log.info("prePersist {}", group.getUid());
     }
 
     @PostPersist
     public void postPersist(Group group) {
-        log.info("postPersist {}", group.getGid());
+        log.info("postPersist {}", group.getUid());
     }
 
     @PreUpdate
     public void preUpdate(Group group) {
-        log.info("preUpdate {}", group.getGid());
+        log.info("preUpdate {}", group.getUid());
     }
 
     @PostUpdate
     public void postUpdate(Group group) {
-        log.info("postUpdate {}", group.getGid());
+        log.info("postUpdate {}", group.getUid());
     }
 
     @PreRemove
     public void preRemove(Group group) {
-        log.info("preRemove {}", group.getGid());
+        log.info("preRemove {}", group.getUid());
     }
 
     @PostRemove
     public void postRemove(Group group) {
-        log.info("postRemove {}", group.getGid());
+        log.info("postRemove {}", group.getUid());
     }
 
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:21:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-25 12:49:42
+ * @LastEditTime: 2024-05-04 10:56:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,14 +15,10 @@
 package com.bytedesk.ai.doc;
 
 import com.bytedesk.ai.file.KbFile;
-import com.bytedesk.core.utils.AuditModel;
-import jakarta.persistence.Column;
+import com.bytedesk.core.utils.AbstractEntity;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
@@ -45,14 +41,12 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ai_kb_doc")
-public class KbDoc extends AuditModel {
+public class KbDoc extends AbstractEntity {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private static final long serialVersionUID = 1L;
     
-    @Column(name = "did", unique = true, nullable = false)
-    private String did;
+    // @Column(name = "did", unique = true, nullable = false)
+    // private String did;
 
     @Lob
     private String content;

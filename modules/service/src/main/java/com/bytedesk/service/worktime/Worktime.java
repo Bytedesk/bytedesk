@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:43:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-18 14:50:05
+ * @LastEditTime: 2024-05-03 22:59:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,14 +19,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -48,23 +45,15 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_worktime")
-public class Worktime extends AuditModel {
+public class Worktime extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    
-    /**
-     * 
-     */
+    private static final long serialVersionUID = 1L;
+
     @Column(name = "start_time")
     @JsonFormat(pattern = "HH:mm:ss")
     @Temporal(TemporalType.TIME)
     private Date startTime;
 
-    /**
-     * 
-     */
     @Column(name = "end_time")
     @JsonFormat(pattern = "HH:mm:ss")
     @Temporal(TemporalType.TIME)

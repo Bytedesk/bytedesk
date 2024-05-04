@@ -36,9 +36,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class VisitorResponseSimple extends BaseResponse {
 
-	private static final long serialVersionUID = 6459370944L;	
+	private static final long serialVersionUID = 1L;	
     
-    private String uid;
+    // private String uid;
 
 	private String nickname;
 

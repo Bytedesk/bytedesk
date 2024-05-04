@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 12:51:21
+ * @LastEditTime: 2024-05-04 10:45:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class AsistantRequest extends BaseRequest {
     
-    private String aid;
+    // private String aid;
 
     private String topic;
     
@@ -38,5 +38,5 @@ public class AsistantRequest extends BaseRequest {
     private String description;
 
     /** belong to org */
-    private String orgOid;
+    private String orgUid;
 }

@@ -25,7 +25,7 @@ import lombok.ToString;
 @ToString
 public class KbDocResponse {
     
-    private String did;
+    // private String did;
 
     private String content;
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 15:21:30
+ * @LastEditTime: 2024-05-04 12:26:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,7 +60,7 @@ public class WorkgroupService {
                 workgroupRequest.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Page<Workgroup> workgroupPage = workgroupRepository.findByOrgOid(workgroupRequest.getOrgOid(),
+        Page<Workgroup> workgroupPage = workgroupRepository.findByOrgUid(workgroupRequest.getOrgUid(),
                 pageable);
 
         return workgroupPage.map(this::convertToWorkgroupResponse);
@@ -69,7 +69,7 @@ public class WorkgroupService {
     public Workgroup create(WorkgroupRequest workgroupRequest) {
         // 
         Workgroup workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
-        workgroup.setWid(uidUtils.getCacheSerialUid());
+        workgroup.setUid(uidUtils.getCacheSerialUid());
         // 
         Iterator<String> iterator = workgroupRequest.getAgentAids().iterator();
         while (iterator.hasNext()) {
@@ -88,7 +88,7 @@ public class WorkgroupService {
     
     Workgroup update(WorkgroupRequest workgroupRequest) {
 
-        Optional<Workgroup> workgroupOptional = findByWid(workgroupRequest.getWid());
+        Optional<Workgroup> workgroupOptional = findByWid(workgroupRequest.getUid());
         if (!workgroupOptional.isPresent()) {
             return null;
         }
@@ -122,7 +122,7 @@ public class WorkgroupService {
 
     @Cacheable(value = "workgroup", key = "#wid", unless="#result == null")
     public Optional<Workgroup> findByWid(String wid) {
-        return workgroupRepository.findByWid(wid);
+        return workgroupRepository.findByUid(wid);
     }
 
     @Cacheable(value = "workgroup", key = "#nickname", unless="#result == null")
@@ -162,7 +162,7 @@ public class WorkgroupService {
             WorkgroupRequest workgroup1Request = WorkgroupRequest.builder()
                     .nickname("客服组1")
                     .agentAids(agents)
-                    .orgOid(orgOptional.get().getOid())
+                    .orgUid(orgOptional.get().getUid())
                     .build();
             create(workgroup1Request);
 
@@ -170,7 +170,7 @@ public class WorkgroupService {
             WorkgroupRequest workgroup2Request = WorkgroupRequest.builder()
                     .nickname("客服组2")
                     .agentAids(asList(agent1Optional.get().getUid()))
-                    .orgOid(orgOptional.get().getOid())
+                    .orgUid(orgOptional.get().getUid())
                     .build();
             create(workgroup2Request);
                 

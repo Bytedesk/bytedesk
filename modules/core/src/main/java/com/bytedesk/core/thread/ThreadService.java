@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 12:29:48
+ * @LastEditTime: 2024-05-04 10:41:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,7 +86,7 @@ public class ThreadService {
         }
         // 
         Thread thread = modelMapper.map(threadRequest, Thread.class);
-        thread.setTid(uidUtils.getCacheSerialUid());
+        thread.setUid(uidUtils.getCacheSerialUid());
         thread.setStatus(StatusConsts.THREAD_STATUS_INIT);
         // 
         String user = JSON.toJSONString(threadRequest.getUser());
@@ -102,7 +102,7 @@ public class ThreadService {
     /** */
     public Thread getReverse(Thread thread) {
 
-        String reverseTid = new StringBuffer(thread.getTid()).reverse().toString();
+        String reverseTid = new StringBuffer(thread.getUid()).reverse().toString();
         Optional<Thread> reverseThreadOptional = findByTid(reverseTid);
         if (reverseThreadOptional.isPresent()) {
             reverseThreadOptional.get().setContent(thread.getContent());
@@ -113,7 +113,7 @@ public class ThreadService {
                 return null;
             }
             Thread reverseThread = new Thread();
-            reverseThread.setTid(reverseTid);
+            reverseThread.setUid(reverseTid);
             reverseThread.setTopic(thread.getOwner().getUid());
             // 
             UserResponseSimple user = userService.convertToUserResponseSimple(thread.getOwner());
@@ -139,9 +139,9 @@ public class ThreadService {
     }
 
 
-    @Cacheable(value = "thread", key = "#tid", unless = "#result == null")
-    public Optional<Thread> findByTid(String tid) {
-        return threadRepository.findByTid(tid);
+    @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
+    public Optional<Thread> findByTid(String uid) {
+        return threadRepository.findByUid(uid);
     }
 
     // TODO: how to cacheput or cacheevict?
@@ -187,7 +187,7 @@ public class ThreadService {
     }
 
     @Caching(put = {
-            @CachePut(value = "thread", key = "#thread.tid"),
+            @CachePut(value = "thread", key = "#thread.uid"),
             @CachePut(value = "thread", key = "#thread.topic")
     })
     public Thread save(@NonNull Thread thread) {
@@ -195,7 +195,7 @@ public class ThreadService {
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "thread", key = "#thread.tid"),
+            @CacheEvict(value = "thread", key = "#thread.uid"),
             @CacheEvict(value = "thread", key = "#thread.topic")
     })
     public void delete(@NonNull Thread thread) {

@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class OrganizationRequest extends BaseRequest {
 
-    private String oid;
+    // private String oid;
 
     private String name;
 

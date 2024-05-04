@@ -36,7 +36,7 @@ public class DepartmentResponse extends BaseResponse {
 
     private static final long serialVersionUID = 5377636189L;    
     
-    private String did;
+    // private String did;
 
     private String name;
 

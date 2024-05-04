@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 09:22:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-06 13:56:13
+ * @LastEditTime: 2024-05-04 10:28:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,10 +50,10 @@ public class OrganizationEventHandler {
     public void beforeCreate(Organization organization) {
         log.debug("beforeCreate");
         User user = authService.getCurrentUser();
-        organization.setOid(Utils.getUid());
+        organization.setUid(Utils.getUid());
         organization.setUser(user);
         //
-        user.getOrganizations().add(organization.getOid());
+        user.getOrganizations().add(organization.getUid());
         userService.save(user);
     }
 

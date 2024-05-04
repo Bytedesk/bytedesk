@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 15:21:19
+ * @LastEditTime: 2024-05-04 10:33:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,7 +64,7 @@ public class AgentService {
                 agentRequest.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Page<Agent> agentPage = agentRepository.findByOrgOid(agentRequest.getOrgOid(), pageable);
+        Page<Agent> agentPage = agentRepository.findByOrgUid(agentRequest.getOrgUid(), pageable);
 
         return agentPage.map(this::convertToAgentResponse);
     }
@@ -92,7 +92,7 @@ public class AgentService {
                     agentRequest.getMobile(),
                     agentRequest.getEmail(),
                     true, 
-                    agentRequest.getOrgOid()
+                    agentRequest.getOrgUid()
             );
         } else {
             // just return user
@@ -175,7 +175,7 @@ public class AgentService {
                     .email("agent1@email.com")
                     .mobile("18888888008")
                     .password("123456")
-                    .orgOid(orgOptional.get().getOid())
+                    .orgUid(orgOptional.get().getUid())
                     .build();
             create(agent1Request);
             // 
@@ -184,7 +184,7 @@ public class AgentService {
                     .email("agent2@email.com")
                     .mobile("18888888009")
                     .password("123456")
-                    .orgOid(orgOptional.get().getOid())
+                    .orgUid(orgOptional.get().getUid())
                     .build();
             create(agent2Request);
   

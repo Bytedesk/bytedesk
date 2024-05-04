@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.annotation.ActionLog;
+import com.bytedesk.core.action.ActionLogAnnotation;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
@@ -72,7 +72,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success("register success", userResponse));
     }
 
-    @ActionLog(title = "Auth", action = "loginWithUsernamePassword", description = "Login With Username & Password")
+    @ActionLogAnnotation(title = "Auth", action = "loginWithUsernamePassword", description = "Login With Username & Password")
     @PostMapping("/login")
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());

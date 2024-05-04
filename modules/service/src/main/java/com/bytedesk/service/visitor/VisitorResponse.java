@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-16 17:07:29
+ * @LastEditTime: 2024-05-04 12:02:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,9 +36,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class VisitorResponse extends BaseResponse {
 
-	private static final long serialVersionUID = 50026477L;	
+	private static final long serialVersionUID = 1L;	
     
-    private String uid;
+    // private String uid;
 
 	/**
 	 * developers can set basic visitor info

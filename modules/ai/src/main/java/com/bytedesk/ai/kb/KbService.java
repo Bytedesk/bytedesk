@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:46:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-11 12:08:49
+ * @LastEditTime: 2024-05-04 10:58:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,14 +39,16 @@ public class KbService {
 
         Pageable pageable = PageRequest.of(kbRequest.getPageNumber(), kbRequest.getPageSize(), Sort.Direction.DESC,
                 "id");
+
+        Page<Kb> kbList = kbRepository.findAll(pageable);
         // 
-        return null;
+        return kbList.map(this::convertToKbResponse);
     }
 
     public JsonResult<?> create(KbRequest kbRequest) {
 
         Kb kb = modelMapper.map(kbRequest, Kb.class);
-        kb.setKid(uidUtils.getCacheSerialUid());
+        kb.setUid(uidUtils.getCacheSerialUid());
 
         // kb.setUser(authService.getCurrentUser());
 
@@ -55,15 +57,19 @@ public class KbService {
         return JsonResult.success();
     }
 
+    public KbResponse convertToKbResponse(Kb kb) {
+        return modelMapper.map(kb, KbResponse.class);
+    }
 
     public Kb getKb(String name) {
 
         Kb kb = Kb.builder()
-                .kid(uidUtils.getCacheSerialUid())
+                // .kid(uidUtils.getCacheSerialUid())
                 .name(name)
                 .vectorStore("redis")
                 .embeddings("m3e-base")
                 .build();
+        kb.setUid(uidUtils.getCacheSerialUid());
 
         return kbRepository.save(kb);
     }

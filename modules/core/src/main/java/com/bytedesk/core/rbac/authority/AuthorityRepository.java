@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 11:04:52
+ * @LastEditTime: 2024-05-04 11:25:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk@
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import java.util.Optional;
 @Tag(name = "authoritys - 权限")
 public interface AuthorityRepository extends JpaRepository<Authority, Long>, JpaSpecificationExecutor<Authority> {
 
-    Optional<Authority> findByAid(String aid);
+    Optional<Authority> findByUid(String uid);
 
     Optional<Authority> findByValue(String value);
 

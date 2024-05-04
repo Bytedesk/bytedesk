@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 17:03:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 17:11:41
+ * @LastEditTime: 2024-05-04 12:24:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,16 +32,16 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class DepartmentRequest extends BaseRequest  {
 
-    private String did;
+    // private String did;
 
     @NotEmpty
     private String name;
 
     private String description;
     // 
-    private String parentDid;
+    private String parentUid;
 
     @NotEmpty
-    private String orgOid;
+    private String orgUid;
 
 }

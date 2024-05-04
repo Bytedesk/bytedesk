@@ -6,7 +6,7 @@ import java.util.Set;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.role.Role;
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.bytedesk.core.utils.StringSetConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -14,14 +14,12 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 // import jakarta.persistence.UniqueConstraint;
 // import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,21 +39,15 @@ import lombok.experimental.Accessors;
 		// @UniqueConstraint(columnNames = "username"),
 		// @UniqueConstraint(columnNames = "email")
 })
-public class User extends AuditModel {
+public class User extends AbstractEntity {
 
-	private static final long serialVersionUID = 3817197261L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-
-	@Column(name = "uuid", unique = true, nullable = false)
-	private String uid;
+	private static final long serialVersionUID = 1L;
 
 	@Column(unique = true)
 	private String num;
 
 	// used in authjwtToken, should not be null
+	@NotBlank(message = "username is required")
 	@Column(unique = true, nullable = false)
 	private String username;
 
@@ -104,7 +96,7 @@ public class User extends AuditModel {
 	private Set<String> organizations = new HashSet<>();
 
 	// return the first organization oid
-	public String getOrgOid() {
+	public String getOrgUid() {
 		return this.organizations.isEmpty() ? null : this.organizations.iterator().next();
 	}
 

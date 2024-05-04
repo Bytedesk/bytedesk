@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-22 23:06:17
+ * @LastEditTime: 2024-05-03 21:26:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,25 @@
  */
 package com.bytedesk.service.customer;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+
+/**
+ * 
+ */
+@Service
+@RequiredArgsConstructor
 public class CustomerService {
 
+    private final CustomerRepository customerRepository;
+
+    public Page<Customer> getCustomersForDatatable(String queryString, Pageable pageable) {
+
+        CustomerDatatableFilter customerDatatableFilter = new CustomerDatatableFilter(queryString);
+
+        return customerRepository.findAll(customerDatatableFilter, pageable);
+    }
 }

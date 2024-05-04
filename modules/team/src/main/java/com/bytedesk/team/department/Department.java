@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 18:05:45
+ * @LastEditTime: 2024-05-04 10:27:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ package com.bytedesk.team.department;
 import java.util.Set;
 import java.util.HashSet;
 
-import com.bytedesk.core.utils.AuditModel;
+import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,14 +38,13 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "team_department")
-public class Department extends AuditModel {
+public class Department extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
-    private String did;
+    private static final long serialVersionUID = 1L;
+    
+    // @NotBlank
+    // @Column(unique = true, nullable = false)
+    // private String did;
 
     private String name;
 
@@ -71,13 +70,13 @@ public class Department extends AuditModel {
     // @ManyToMany(mappedBy = "departments", fetch = FetchType.LAZY)
     // private Set<Member> members = new HashSet<>();
 
-    // private String orgOid;
+    // private String orgUid;
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // // @JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     // @JsonBackReference("organization-departments")
     // private Organization organization;
-    private String orgOid;
+    private String orgUid;
 
     /** created by */
     // @JsonIgnore

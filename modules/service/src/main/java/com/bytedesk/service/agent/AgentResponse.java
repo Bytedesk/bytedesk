@@ -33,7 +33,7 @@ public class AgentResponse extends BaseResponse {
 
     private static final long serialVersionUID = 94072119L;    
 
-    private String uid;
+    // private String uid;
 
     private String nickname;
 
