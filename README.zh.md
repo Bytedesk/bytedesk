@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-06 17:20:26
+ * @LastEditTime: 2024-05-06 17:50:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,10 +24,10 @@
 
 ## 介绍
 
-- 企业即时通讯/IM
-- 在线客服
+- 企业即时通讯/IM：多层组织架构、角色、权限管理
+- 在线客服：支持多渠道、多种路由策略、详细考核指标
 - 大模型AI助手：更适合团队使用，一人配置，全公司使用
-- 局域网文件传输，类似airdrop
+- 局域网文件传输：无需连接登录，无需连接外网，利用WiFi/热点跨平台传文件
 
 ## 技术栈
 
