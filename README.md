@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-04 17:44:53
+ * @LastEditTime: 2024-05-06 12:23:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,11 +48,13 @@ cd starter
 mvn spring-boot:run
 # 
 # local preview:
+developer: http://localhost:9003/dev
 web: http://localhost:9003/
 admin: http://localhost:9003/admin, user/password: admin@email.com/admin
 chat: http://localhost:9003/chat, user/password: admin@email.com/admin
 visitor: http://localhost:9003/v
 api docs: http://localhost:9003/swagger-ui/index.html
+actuator: http://localhost:9003/im/actuator
 h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
 ```
 
