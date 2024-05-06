@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-06 12:23:34
+ * @LastEditTime: 2024-05-06 17:21:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ AI powered customer service & team im
 
 - team im
 - customer service
-- ai chatbot
+- ai chatbot: for team, config once, used by everyone
 - local file send, airdrop
 
 ## Technical Stack
