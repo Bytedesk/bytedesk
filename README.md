@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 12:04:05
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2024-05-15 12:10:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ AI powered customer service & team im
 ### Enterprise Instant Messaging/IM
 
 - Multi-level organizational structure
-- role
+- role management
 - Permission management
 - Chat record management
 
