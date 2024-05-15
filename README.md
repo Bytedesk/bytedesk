@@ -93,14 +93,14 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 
 - [Docs](https://www.weiyuai.cn/docs/)
 
-## Customer Service Visitor SDK
+## Preview
 
 - [Web](https://www.weiyuai.cn/)
 - [Admin](https://www.weiyuai.cn/admin)
 - [Web Chat](https://www.weiyuai.cn/chat)
 - [Visitor](https://www.weiyuai.cn/v)
 
-## SDK
+## Customer Service Visitor SDK
 
 - [iOS-oc](./visitor/oc)
 - [iOS-swift](./visitor/swift)
