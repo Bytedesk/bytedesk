@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:33:52
+ * @LastEditTime: 2024-05-13 11:18:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 // import com.bytedesk.core.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
@@ -101,7 +103,7 @@ public class MemberService {
             }
             // 
             User user;
-            Optional<User> userOptional = userService.findByEmail(memberRequest.getEmail());
+            Optional<User> userOptional = userService.findByEmailAndPlatform(memberRequest.getEmail(), BdConstants.PLATFORM_BYTEDESK);
             if (!userOptional.isPresent()) {
                 user = userService.createUser(
                         memberRequest.getNickname(),
@@ -110,6 +112,7 @@ public class MemberService {
                         memberRequest.getMobile(),
                         memberRequest.getEmail(),
                         memberRequest.getVerified(),
+                        BdConstants.PLATFORM_BYTEDESK,
                         depOptional.get().getOrgUid()
                         );
             } else {
@@ -190,20 +193,25 @@ public class MemberService {
 
     // 
     private static final String[] departments = {
-        TypeConsts.DEPT_HR,
-        TypeConsts.DEPT_ORG,
-        TypeConsts.DEPT_IT,
-        TypeConsts.DEPT_MONEY,
-        TypeConsts.DEPT_MARKETING,
-        TypeConsts.DEPT_SALES,
-        TypeConsts.DEPT_CUSTOMER_SERVICE
+        I18Consts.I18N_PREFIX + TypeConsts.DEPT_HR,
+        I18Consts.I18N_PREFIX + TypeConsts.DEPT_ORG,
+            I18Consts.I18N_PREFIX
+                    + TypeConsts.DEPT_IT,
+            I18Consts.I18N_PREFIX
+                    + TypeConsts.DEPT_MONEY,
+            I18Consts.I18N_PREFIX
+                    + TypeConsts.DEPT_MARKETING,
+            I18Consts.I18N_PREFIX
+                    + TypeConsts.DEPT_SALES,
+            I18Consts.I18N_PREFIX
+                    + TypeConsts.DEPT_CUSTOMER_SERVICE
     };
 
     public void initData() {
         if (memberRepository.count() > 0) {
             return;
         }
-        // 
+        // 手机号18888888000已经被使用给admin，所有需要从1开始
         for (int i = 1; i <= departments.length; i++) {
             String department = departments[i-1];
             Optional<Department> depOptional = departmentService.findByName(department);

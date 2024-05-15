@@ -17,7 +17,7 @@ package com.bytedesk.core.topic;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.core.utils.BaseResponse;
+import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

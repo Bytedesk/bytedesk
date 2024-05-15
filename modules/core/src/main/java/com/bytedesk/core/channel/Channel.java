@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.channel;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,7 +39,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ChannelListener.class})
 @Table(name = "core_channel")
-public class Channel extends AbstractEntity {
+public class Channel extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

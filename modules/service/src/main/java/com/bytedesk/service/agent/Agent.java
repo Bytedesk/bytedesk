@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:29:33
+ * @LastEditTime: 2024-05-13 22:30:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,9 +17,9 @@ package com.bytedesk.service.agent;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -48,13 +48,13 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ AgentListener.class })
-@Table(name = "service_agent")
-public class Agent extends AbstractEntity {
+@Table(name = "service_agent", uniqueConstraints = {
+    // @UniqueConstraint(columnNames = { "email", "orgUid" }),
+    // @UniqueConstraint(columnNames = { "mobile", "orgUid" })
+})
+public class Agent extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    // @Column(name = "uuid", unique = true, nullable = false)
-	// private String uid;
 
     /**
      * visible to visitors

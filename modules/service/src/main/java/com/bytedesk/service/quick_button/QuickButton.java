@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.quick_button;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_quick_button")
-public class QuickButton extends AbstractEntity {
+public class QuickButton extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

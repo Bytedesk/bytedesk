@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:32:08
+ * @LastEditTime: 2024-05-10 23:22:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,12 +26,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.organization.Organization;
-import com.bytedesk.team.organization.OrganizationService;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,9 +40,9 @@ public class DepartmentService {
 
     private final ModelMapper modelMapper;
 
-    private final BytedeskProperties properties;
+    // private final BytedeskProperties properties;
 
-    private final OrganizationService organizationService;
+    // private final OrganizationService organizationService;
 
     private final DepartmentRepository departmentRepository;
 
@@ -106,39 +104,52 @@ public class DepartmentService {
             return;
         }
 
-        Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
-        if (orgOptional.isPresent()) {
-            String orgUid = orgOptional.get().getUid();
-            //
-            Department[] departments = new Department[] {
-                    Department.builder().name(TypeConsts.DEPT_HR).description(TypeConsts.DEPT_HR)
-                            .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM).build(),
-                    Department.builder().name(TypeConsts.DEPT_ORG).description(TypeConsts.DEPT_ORG)
-                            .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM).build(),
-                    Department.builder().name(TypeConsts.DEPT_IT).description(TypeConsts.DEPT_IT)
-                            .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM).build(),
-                    Department.builder().name(TypeConsts.DEPT_MONEY).description(TypeConsts.DEPT_MONEY)
-                            .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM).build(),
-                    Department.builder().name(TypeConsts.DEPT_MARKETING).description(TypeConsts.DEPT_MARKETING)
-                            .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM).build(),
-                    Department.builder().name(TypeConsts.DEPT_SALES).description(TypeConsts.DEPT_SALES)
-                            .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM).build(),
-                    Department.builder().name(TypeConsts.DEPT_CUSTOMER_SERVICE)
-                            .description(TypeConsts.DEPT_CUSTOMER_SERVICE)
-                            .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM).build()
-            };
+        // Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
+        // if (orgOptional.isPresent()) {
+        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID; //orgOptional.get().getUid();
+        //
+        Department[] departments = new Department[] {
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_HR)
+                        .description(TypeConsts.DEPT_HR)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build(),
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ORG)
+                        .description(TypeConsts.DEPT_ORG)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build(),
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_IT)
+                        .description(TypeConsts.DEPT_IT)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build(),
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_MONEY)
+                        .description(TypeConsts.DEPT_MONEY)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build(),
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_MARKETING)
+                        .description(TypeConsts.DEPT_MARKETING)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build(),
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_SALES)
+                        .description(TypeConsts.DEPT_SALES)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build(),
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_CUSTOMER_SERVICE)
+                        .description(TypeConsts.DEPT_CUSTOMER_SERVICE)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build()
+        };
 
-            Arrays.stream(departments).forEach((department) -> {
-                Optional<Department> depOptional = departmentRepository.findByName(department.getName());
-                if (!depOptional.isPresent()) {
-                    department.setUid(uidUtils.getCacheSerialUid());
-                    department.setOrgUid(orgUid);
-                    // department.setOrganization(orgOptional.get());
-                    // department.setUser(userService.getAdmin().get());
-                    departmentRepository.save(department);
-                }
-            });
-        }
+        Arrays.stream(departments).forEach((department) -> {
+            Optional<Department> depOptional = departmentRepository.findByName(department.getName());
+            if (!depOptional.isPresent()) {
+                department.setUid(uidUtils.getCacheSerialUid());
+                department.setOrgUid(orgUid);
+                // department.setOrganization(orgOptional.get());
+                // department.setUser(userService.getAdmin().get());
+                departmentRepository.save(department);
+            }
+        });
+        // }
 
     }
 

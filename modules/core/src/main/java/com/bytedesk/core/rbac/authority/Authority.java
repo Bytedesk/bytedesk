@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:39:34
+ * @LastEditTime: 2024-05-10 23:25:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,9 +20,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import jakarta.persistence.*;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
+
+import jakarta.persistence.*;
 
 /**
  * @author im.bytedesk.com
@@ -35,13 +36,9 @@ import com.bytedesk.core.utils.AbstractEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_authority")
-public class Authority extends AbstractEntity {
+public class Authority extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    // @NotBlank
-	// @Column(unique = true, nullable = false, length = 127)
-	// private String aid;
 
     private String name;
 
@@ -55,9 +52,5 @@ public class Authority extends AbstractEntity {
 
     @Column(name = "by_type")
     private String type;
-
-    // @JsonIgnore
-    // @OneToMany
-    // private List<Action> actions = new ArrayList<>();
 
 }

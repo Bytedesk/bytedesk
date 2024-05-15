@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.action;
 
-import com.bytedesk.core.utils.BaseRequest;
+import com.bytedesk.core.base.BaseRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

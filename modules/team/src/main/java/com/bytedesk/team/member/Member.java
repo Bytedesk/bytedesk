@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:27:01
+ * @LastEditTime: 2024-05-13 22:27:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,8 +17,8 @@ package com.bytedesk.team.member;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.bytedesk.team.department.Department;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -39,13 +39,12 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ MemberListener.class })
-@Table(name = "team_member")
-public class Member extends AbstractEntity {
+@Table(name = "team_member", uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "email", "orgUid" })
+})
+public class Member extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    // @Column(name = "uuid", unique = true, nullable = false)
-	// private String uid;
 
     /**
      * job number
@@ -75,7 +74,7 @@ public class Member extends AbstractEntity {
      * work email
      */
     @Email(message = "email format error")
-    @Column(unique = true)
+    // @Column(unique = true)
     private String email;
 
     /**

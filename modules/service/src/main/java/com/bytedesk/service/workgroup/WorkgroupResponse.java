@@ -16,7 +16,7 @@ package com.bytedesk.service.workgroup;
 
 import java.util.List;
 
-import com.bytedesk.core.utils.BaseResponse;
+import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.service.agent.AgentResponse;
 
 import lombok.AllArgsConstructor;

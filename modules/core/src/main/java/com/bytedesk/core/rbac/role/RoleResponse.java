@@ -24,8 +24,8 @@ import lombok.experimental.Accessors;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
-import com.bytedesk.core.utils.BaseResponse;
 
 /**
  * @author bytedesk.com on 2019-06-24

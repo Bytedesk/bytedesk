@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-26 15:32:48
+ * @LastEditTime: 2024-05-08 09:15:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -94,7 +93,7 @@ public class RobotController {
      * @return json
      */
     @GetMapping("/filter")
-    public JsonResult<?> filter(BaseRequest filterParam) {
+    public JsonResult<?> filter(RobotRequest filterParam) {
 
         //
         

@@ -17,10 +17,10 @@ package com.bytedesk.service.workgroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.RouteConsts;
-import com.bytedesk.core.utils.BaseRequest;
 
 import lombok.Builder;
 import lombok.Data;

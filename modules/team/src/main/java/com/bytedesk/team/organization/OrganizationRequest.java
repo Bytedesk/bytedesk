@@ -14,7 +14,7 @@
  */
 package com.bytedesk.team.organization;
 
-import com.bytedesk.core.utils.BaseRequest;
+import com.bytedesk.core.base.BaseRequest;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:39:53
+ * @LastEditTime: 2024-05-13 11:04:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.authority.Authority;
 import com.bytedesk.core.rbac.authority.AuthorityService;
@@ -65,7 +66,7 @@ public class RoleService {
 
                 Role role = modelMapper.map(rolerRequest, Role.class);
                 role.setUid(uidUtils.getCacheSerialUid());
-                // 
+                //
                 Iterator<String> iterator = rolerRequest.getAuthorityAids().iterator();
                 while (iterator.hasNext()) {
                         String authorityAid = iterator.next();
@@ -74,7 +75,7 @@ public class RoleService {
                                 role.addAuthority(authorityOptional.get());
                         }
                 }
-                // 
+                //
                 return save(role);
         }
 
@@ -88,48 +89,37 @@ public class RoleService {
 
                 return rolePage.map(BdConvertUtils::convertToRoleResponse);
         }
-        
-        @Cacheable(value = "roleExists", key = "#name", unless="#result == null")
+
+        @Cacheable(value = "roleExists", key = "#name", unless = "#result == null")
         public Boolean existsByName(String namString) {
                 return roleRepository.existsByName(namString);
         }
 
-        @Cacheable(value = "role", key = "#name", unless="#result == null")
+        @Cacheable(value = "role", key = "#name", unless = "#result == null")
         public Optional<Role> findByName(String name) {
                 return roleRepository.findByName(name);
         }
 
         @Caching(put = {
-                @CachePut(value = "role", key = "#role.name"),
-                // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
-                // @CachePut(value = "roleExists", key = "#role.name")
+                        @CachePut(value = "role", key = "#role.name"),
+                        // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
+                        // @CachePut(value = "roleExists", key = "#role.name")
         })
         public Role save(Role role) {
                 return roleRepository.save(role);
         }
 
-        // 
-        // private static final String [] roles = {
-        //         TypeConsts.ROLE_ADMIN,
-        //         TypeConsts.ROLE_ORG,
-        //         TypeConsts.ROLE_IT,
-        //         TypeConsts.ROLE_MONEY,
-        //         TypeConsts.ROLE_HR,
-        //         TypeConsts.ROLE_MARKETING,
-        //         TypeConsts.ROLE_SALES,
-        //         TypeConsts.ROLE_CUSTOMER_SERVICE,
-        // };
-        // 
+        //
         private static final String[] authorities = {
-            TypeConsts.AUTHORITY_SUPER,
-            TypeConsts.AUTHORITY_ADMIN,
-            TypeConsts.AUTHORITY_HR,
-            TypeConsts.AUTHORITY_ORG,
-            TypeConsts.AUTHORITY_IT,
-            TypeConsts.AUTHORITY_MONEY,
-            TypeConsts.AUTHORITY_MARKETING,
-            TypeConsts.AUTHORITY_SALES,
-            TypeConsts.AUTHORITY_CUSTOMER_SERVICE,
+                        TypeConsts.AUTHORITY_SUPER,
+                        TypeConsts.AUTHORITY_ADMIN,
+                        TypeConsts.AUTHORITY_HR,
+                        TypeConsts.AUTHORITY_ORG,
+                        TypeConsts.AUTHORITY_IT,
+                        TypeConsts.AUTHORITY_MONEY,
+                        TypeConsts.AUTHORITY_MARKETING,
+                        TypeConsts.AUTHORITY_SALES,
+                        TypeConsts.AUTHORITY_CUSTOMER_SERVICE,
         };
 
         public void initData() {
@@ -139,26 +129,26 @@ public class RoleService {
                 }
                 //
                 for (String authority : authorities) {
-                        String role = TypeConsts.ROLE_ + authority;
+                        String role = TypeConsts.ROLE_PREFIX + authority;
                         RoleRequest roleRequest = RoleRequest.builder().name(role).description(role).build();
                         roleRequest.setType(TypeConsts.TYPE_SYSTEM);
-                        // 
+                        //
                         Optional<Authority> authorityOptional = authorityService.findByValue(authority);
                         if (authorityOptional.isPresent()) {
                                 roleRequest.getAuthorityAids().add(authorityOptional.get().getUid());
                         }
-                        // 
+                        //
                         create(roleRequest);
                 }
         }
 
         public void updateInitData() {
                 //
-                Optional<User> adminOptional = userRepository.findByEmail(properties.getEmail());
+                Optional<User> adminOptional = userRepository.findByEmailAndPlatform(properties.getEmail(), BdConstants.PLATFORM_BYTEDESK);
                 if (adminOptional.isPresent()) {
                         //
                         Arrays.stream(authorities).forEach((authority) -> {
-                                String roleName = TypeConsts.ROLE_ + authority;
+                                String roleName = TypeConsts.ROLE_PREFIX + authority;
                                 Optional<Role> roleOptional = findByName(roleName);
                                 roleOptional.ifPresent(role -> {
                                         role.setOrgUid(adminOptional.get().getOrgUid());
@@ -166,7 +156,7 @@ public class RoleService {
                                 });
                         });
                 }
-                
+
         }
 
 }

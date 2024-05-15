@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:33:09
+ * @LastEditTime: 2024-05-13 12:49:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,20 +24,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.organization.Organization;
-import com.bytedesk.team.organization.OrganizationService;
-
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AgentService {
@@ -53,10 +53,6 @@ public class AgentService {
     // private final TopicService topicService;
 
     // private final AuthService authService;
-
-    private final BytedeskProperties properties;
-
-    private final OrganizationService organizationService;
 
     public Page<AgentResponse> query(AgentRequest agentRequest) {
 
@@ -83,7 +79,7 @@ public class AgentService {
         agent.setUid(uidUtils.getCacheSerialUid());
         // 
         User user;
-        Optional<User> userOptional = userService.findByEmail(agentRequest.getEmail());
+        Optional<User> userOptional = userService.findByEmailAndPlatform(agentRequest.getEmail(), BdConstants.PLATFORM_BYTEDESK);
         if (!userOptional.isPresent()) {
             user = userService.createUser(
                     agentRequest.getNickname(),
@@ -91,7 +87,8 @@ public class AgentService {
                     agentRequest.getPassword(),
                     agentRequest.getMobile(),
                     agentRequest.getEmail(),
-                    true, 
+                    true,
+                    BdConstants.PLATFORM_BYTEDESK,
                     agentRequest.getOrgUid()
             );
         } else {
@@ -114,6 +111,10 @@ public class AgentService {
         return convertToAgentResponse(agent);
     }
 
+    // FIXME: org.springframework.orm.ObjectOptimisticLockingFailureException: Row
+    // was updated or deleted by another transaction (or unsaved-value mapping was
+    // incorrect) : [com.bytedesk.service.agent.Agent#1]
+    @Async
     public void updateConnect(String uid, boolean isConnect) {
         Optional<Agent> agentOptional = findByUser_Uid(uid);
         agentOptional.ifPresent(agent -> {
@@ -149,7 +150,24 @@ public class AgentService {
         @CachePut(value = "agent", key = "#agent.email"),
     })
     public Agent save(Agent agent) {
-        return agentRepository.save(agent);
+
+        try {
+            return agentRepository.save(agent);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // 乐观锁冲突处理逻辑
+            handleOptimisticLockingFailureException(e, agent);
+        }
+
+        return null;
+    }
+    
+    // TODO: 待处理
+    private void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Agent agent) {
+        // 可以在这里实现重试逻辑，例如使用递归调用或定时任务
+        // 也可以记录日志、发送通知或执行其他业务逻辑
+        log.error("Optimistic locking failure for agent: {}", agent.getUid());
+        // e.printStackTrace();
+        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
     }
     
     public AgentResponse convertToAgentResponse(Agent agent) {
@@ -166,29 +184,27 @@ public class AgentService {
         if (agentRepository.count() > 0) {
             return;
         }
-        
-        Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
-        if (orgOptional.isPresent()) {
-            // add agent
-            AgentRequest agent1Request = AgentRequest.builder()
-                    .nickname("Agent1")
-                    .email("agent1@email.com")
-                    .mobile("18888888008")
-                    .password("123456")
-                    .orgUid(orgOptional.get().getUid())
-                    .build();
-            create(agent1Request);
-            // 
-            AgentRequest agent2Request = AgentRequest.builder()
-                    .nickname("Agent2")
-                    .email("agent2@email.com")
-                    .mobile("18888888009")
-                    .password("123456")
-                    .orgUid(orgOptional.get().getUid())
-                    .build();
-            create(agent2Request);
+
+        // add agent
+        AgentRequest agent1Request = AgentRequest.builder()
+                .nickname("Agent1")
+                .email("agent1@email.com")
+                .mobile("18888888008")
+                .password("123456")
+                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
+                .build();
+        create(agent1Request);
+        // 
+        AgentRequest agent2Request = AgentRequest.builder()
+                .nickname("Agent2")
+                .email("agent2@email.com")
+                .mobile("18888888009")
+                .password("123456")
+                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
+                .build();
+        create(agent2Request);
   
-        }
+    
         
 
     }

@@ -87,21 +87,28 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<!-- support docker -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-docker-compose -->
+		<!-- https://hub.docker.com/r/jackning/bytedesk -->
+		<!-- https://springdoc.cn/docker-compose-support-spring-boot/ -->
+		<!-- <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-docker-compose</artifactId>
+		</dependency> -->
+
 		<!-- cloud -->
 		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency> -->
 
-		<!-- application-dev-mysql.properties -->
 		<!-- mysql driver -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
-		</dependency> -->
+		</dependency>
 
-		<!-- application-dev-pg.properties -->
 		<!-- PostgreSQL JDBC driver -->
 		<!-- <dependency>
 			<groupId>org.postgresql</groupId>
@@ -109,64 +116,145 @@
 			<scope>runtime</scope>
 		</dependency> -->
 
-		<!-- application-dev-h2.properties -->
 		<!-- h2 driver -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency> -->
 
 		<!-- /////////////////////////////////////开源模块//////////////////////////////////////// -->
 
 		<!-- ai - 机器人 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-ai</artifactId>
+			<artifactId>module-ai</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
 		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-core</artifactId>
+			<artifactId>module-core</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-team</artifactId>
+			<artifactId>module-team</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
 		<!-- customer service - 在线客服 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-service</artifactId>
+			<artifactId>module-service</artifactId>
 			<version>${im.version}</version>
 			<!-- <classifier>small</classifier> -->
 			<!-- <scope>system</scope> -->
-			<!-- <systemPath>${pom.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath> -->
+			<!--
+			<systemPath>${pom.basedir}/src/main/resources/lib/service-0.0.1-SNAPSHOT.jar</systemPath> -->
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-socket</artifactId>
+			<artifactId>module-socket</artifactId>
 			<version>${im.version}</version>
 			<!-- <scope>system</scope> -->
-			<!-- <systemPath>${pom.basedir}/src/main/resources/lib/socket-0.0.1-SNAPSHOT.jar</systemPath> -->
+			<!--
+			<systemPath>${pom.basedir}/src/main/resources/lib/socket-0.0.1-SNAPSHOT.jar</systemPath> -->
 		</dependency>
 
 		<!-- singleton - 单机 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-local</artifactId>
+			<artifactId>module-local</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- //////////////////////////////////付费模块/////////////////////////////////////////// -->
+
+		<!-- blog - 博客 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>vip-blog</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- cluster - 集群 -->
+		<!-- <dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>vip-cluster</artifactId>
+			<version>${im.version}</version>
+		</dependency> -->
+
+		<!-- cms - 内容管理 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>vip-cms</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- helpdoc - 帮助文档 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>vip-helpdoc</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- oa - 办公 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>vip-oa</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- statistic - 统计 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>vip-statistic</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- ticket - 工单 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>vip-ticket</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- //////////////////////////////////项目模块/////////////////////////////////////////// -->
+
+		<!-- 良师宝 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>project-liangshibao</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 今日美语 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>project-meiyu</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 微语题库 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>project-tiku</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 微语招标 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>project-zhaobiao</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 
-		<!--  -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
 		<dependency>
 			<groupId>com.alibaba.fastjson2</groupId>
@@ -271,6 +359,31 @@
 			<version>3.14.0</version>
 		</dependency> -->
 
+		<!-- 定时任务 -->
+		<!-- https://mvnrepository.com/artifact/com.xuxueli/xxl-job-core -->
+		<!-- <dependency>
+			<groupId>com.xuxueli</groupId>
+			<artifactId>xxl-job-core</artifactId>
+			<version>2.4.1</version>
+		</dependency> -->
+
+		<!--阿里云短信平台-->
+		<!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<!-- <version>4.6.4</version> -->
+			<version>4.5.13</version>
+		</dependency>
+		<!-- 邮件 -->
+		<!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-dm -->
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-dm</artifactId>
+			<!-- <version>3.3.2</version> -->
+			<version>3.3.1</version>
+		</dependency>
+
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 		<!-- devtools-热加载容易导致fastjson2类型转换失败，暂时禁用吧 -->
 		<!-- <dependency>
@@ -308,45 +421,21 @@
 
 	<build>
 		<plugins>
-			<!-- tag::asciidoc[] -->
-			<plugin>
-				<groupId>org.asciidoctor</groupId>
-				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.8</version>
-				<executions>
-					<execution>
-						<id>generate-docs</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>process-asciidoc</goal>
-						</goals>
-						<configuration>
-							<backend>html</backend>
-							<doctype>book</doctype>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework.restdocs</groupId>
-						<artifactId>spring-restdocs-asciidoctor</artifactId>
-						<version>${spring-restdocs.version}</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<!-- end::asciidoc[] -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<!-- ip2region.xdb -->
-			<!-- <plugin>
+			<!-- 不需要编译的资源文件 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
 				<configuration>
 					<nonFilteredFileExtensions>
 						<nonFilteredFileExtension>xdb</nonFilteredFileExtension>
 					</nonFilteredFileExtensions>
 				</configuration>
-			</plugin> -->
+			</plugin>
 		</plugins>
 	</build>
 

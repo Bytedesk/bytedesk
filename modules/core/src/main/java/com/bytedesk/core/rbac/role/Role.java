@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:39:48
+ * @LastEditTime: 2024-05-10 23:25:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,8 +26,8 @@ import lombok.experimental.Accessors;
 import java.util.Set;
 import java.util.HashSet;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.authority.Authority;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -43,14 +43,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_role")
-public class Role extends AbstractEntity {
+public class Role extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
-
-	// @NotBlank
-	// @Column(unique = true, nullable = false, length = 127)
-	// private String rid;
-
+	
 	@NotBlank
 	@Column(unique = true, nullable = false)
 	private String name;

@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-06 18:05:07
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-05-15 12:01:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,7 @@
 
 # 微语
 
-基于AI的开源企业IM和在线客服系统
+基于AI的开源企业IM和在线客服系统。
 
 ## 语言
 
@@ -24,28 +24,58 @@
 
 ## 介绍
 
-- 企业即时通讯/IM：多层组织架构、角色、权限管理
-- 在线客服：支持多渠道、多种路由策略、详细考核指标
-- 大模型AI助手：更适合团队使用，一人配置，全公司使用
-- 局域网文件传输：无需登录，无需连接外网，利用WiFi/热点跨平台传文件
+### 企业即时通讯/IM
 
-## 技术栈
+- 多层组织架构、
+- 角色、
+- 权限管理
+- 聊天记录管理
+
+### 在线客服
+
+- 支持多渠道、多种路由策略、详细考核指标
+- 坐席工作台、
+- 工单系统、
+- 坐席管理、
+- 数据看板、
+- 人工知识库、
+- 技能组管理、
+- 实时监控、
+- 公告、
+- 敏感词、
+- CRM、
+- 报表功能，
+- 为客户提供一体化客服工作台服务
+
+### 大模型AI助手
+
+- 更适合团队使用，一人配置，全公司使用
+
+### 局域网文件传输
+
+- 无需登录，无需连接外网，利用WiFi/热点跨平台传文件
+
+<!-- ## 技术栈
 
 - [springboot-3.2.0 jdk17/maven/mysql8.0 or postgresql](https://spring.io/projects/spring-boot) for 后端
 - [react-18.2.0](https://reactjs.org/) for web前端
 - [react-native-0.73.4](https://reactnative.dev/) for 移动客户端(ios&android)
-- [electron-29.1.1](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
+- [electron-29.1.1](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux) -->
 
 ## 快速开始
 
-- 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
-
 ```bash
+# 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
 git clone https://github.com/Bytedesk/bytedesk.git
-cd bytedesk
-mvn install -Dmaven.test.skip=true
-cd starter
+# 配置文件: bytedesk/starter/src/main/resources/application-dev.properties
+cd bytedesk/starter
 mvn spring-boot:run
+# 打包jar并运行:
+cd bytedesk/starter
+mvn package -Dmaven.test.skip=true
+java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+# 后台运行
+nohup java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
 # 
 # 本地预览
 开发者入口: http://localhost:9003/dev

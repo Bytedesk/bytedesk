@@ -11,7 +11,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>im-service</artifactId>
+	<artifactId>module-service</artifactId>
 
 	<name>service</name>
 	<description>Demo project for Spring Boot</description>
@@ -27,14 +27,14 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-core</artifactId>
+			<artifactId>module-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>im-team</artifactId>
+			<artifactId>module-team</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>

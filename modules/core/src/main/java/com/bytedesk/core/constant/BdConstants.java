@@ -225,24 +225,23 @@ public class BdConstants {
     // public static final String TOPIC_PROTOBUF_PREFIX = "protobuf/";
     // public static final String TOPIC_JSON_PREFIX = "json/";
 
-    // 萝卜丝
+    // 微语
     public static final String PLATFORM_BYTEDESK = "bytedesk";
-    /**
-     * 良师宝
-     */
+    // 良师宝
     public static final String PLATFORM_LIANGSHIBAO = "liangshibao";
-    /**
-     * 剪贴助手-微同步
-     */
+    // 招投标
+    public static final String PLATFORM_ZHAOBIAO = "zhaobiao";
+    // 今日美语
+    public static final String PLATFORM_MEIYU = "meiyu";
+    // 微语题库
+    public static final String PLATFORM_TIKU = "tiku";
+    // 
     public static final String PLATFORM_WEITONGBU = "weitongbu";
-    /**
-     * 微语AI
-     */
+    // 
     public static final String PLATFORM_WEIYU_AI = "weiyu_ai";
     // 微语TTS-文字转语音
     public static final String PLATFORM_WEIYU_TTS = "weiyu_tts";
-    // 招投标
-    public static final String PLATFORM_ZHAOBIAO = "zhaobiao";
+    
 
     /**
      * 华为推送
@@ -258,5 +257,9 @@ public class BdConstants {
      */
     public static final String LEAVE_MESSAGE_TYPE_FORM = "form";
     public static final String LEAVE_MESSAGE_TYPE_CHAT = "chat";
+
+
+    // 
+    
 
 }

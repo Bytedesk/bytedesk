@@ -14,8 +14,8 @@
  */
 package com.bytedesk.team.member;
 
+import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
-import com.bytedesk.core.utils.BaseResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

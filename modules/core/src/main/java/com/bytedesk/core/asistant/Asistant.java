@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.asistant;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,7 +39,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ AsistantListener.class })
 @Table(name = "core_asistant")
-public class Asistant extends AbstractEntity {
+public class Asistant extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     

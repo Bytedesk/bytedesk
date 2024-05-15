@@ -180,7 +180,7 @@ public class Connect {
         // 
         bytedeskEventPublisher.publishMqttConnectedEvent(clientId);
 
-        // 用户clientId格式: uid/client
+        // 用户clientId格式: uid/client/deviceUid
         // final String uid = clientId.split("/")[0];
         // 判断是否已经缓存
         // subscribe(clientId, uid);

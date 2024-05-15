@@ -16,8 +16,8 @@ package com.bytedesk.service.thread_log;
 
 import java.util.Date;
 
+import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
-import com.bytedesk.core.utils.BaseResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

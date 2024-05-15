@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 09:41:28
+ * @LastEditTime: 2024-05-10 23:29:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,12 +24,12 @@ public class TypeConsts {
     public static final String TYPE_EMAIL = "email";
 
     // ROLES - 角色
-    public static final String ROLE_ = "ROLE_";
+    public static final String ROLE_PREFIX = "ROLE_";
 
     // super - 超级管理员
     public static final String ROLE_SUPER = "ROLE_SUPER";
     public static final String AUTHORITY_SUPER = "SUPER";
-     
+
     // admin - 管理员
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String AUTHORITY_ADMIN = "ADMIN";
@@ -84,13 +84,10 @@ public class TypeConsts {
     // customer service - 客服
     public static final String DEPT_CUSTOMER_SERVICE = "DEPT_CS";
 
-
-    // 
-    public static final String  SEND_MOBILE_CODE_TYPE_LOGIN = "login";
-    public static final String  SEND_MOBILE_CODE_TYPE_REGISTER = "register";
-    public static final String  SEND_MOBILE_CODE_TYPE_FORGET = "forget";
-    public static final String  SEND_MOBILE_CODE_TYPE_VERIFY = "verify";
-    
-
+    //
+    public static final String SEND_MOBILE_CODE_TYPE_LOGIN = "login";
+    public static final String SEND_MOBILE_CODE_TYPE_REGISTER = "register";
+    public static final String SEND_MOBILE_CODE_TYPE_FORGET = "forget";
+    public static final String SEND_MOBILE_CODE_TYPE_VERIFY = "verify";
 
 }

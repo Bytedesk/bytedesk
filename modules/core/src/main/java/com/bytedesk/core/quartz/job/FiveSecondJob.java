@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 13:07:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-28 14:30:51
+ * @LastEditTime: 2024-05-11 23:34:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 @DisallowConcurrentExecution
 public class FiveSecondJob extends QuartzJobBean implements Serializable {
 
-    private static final long serialVersionUID = -2059576861L;
+    private static final long serialVersionUID = 1L;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 

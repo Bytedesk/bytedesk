@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 10:37:22
+ * @LastEditTime: 2024-05-08 09:16:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionLogAnnotation;
-import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -104,7 +103,7 @@ public class WorkgroupController {
      * @return json
      */
     @GetMapping("/filter")
-    public ResponseEntity<?> filter(BaseRequest filterParam) {
+    public ResponseEntity<?> filter(WorkgroupRequest filterParam) {
         
         //
         return ResponseEntity.ok(JsonResult.success());

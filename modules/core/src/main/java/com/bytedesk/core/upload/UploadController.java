@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-21 15:17:13
+ * @LastEditTime: 2024-05-10 16:35:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.upload;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -37,8 +39,10 @@ public class UploadController {
 
 	private final UploadService uploadService;
 
-	@PostMapping("/")
-	public JsonResult<?> upload(
+	private final BytedeskProperties bytedeskProperties;
+
+	@PostMapping("/file")
+	public ResponseEntity<?> upload(
 			@RequestParam("file") MultipartFile file,
 			@RequestParam("file_name") String fileName,
 			@RequestParam("file_type") String type) {
@@ -47,9 +51,10 @@ public class UploadController {
 
 		// http://localhost:9003/file/20240319162820_img-service2.png
 		String uploadPath = uploadService.store(file, fileName);
+		// http://localhost:9003
+		String url = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
 
-		// TODO: format
-		return JsonResult.success(String.format("http://localhost:9003/file/%s", uploadPath));
+		return ResponseEntity.ok(JsonResult.success("upload success", url));
 	}
 	
 	

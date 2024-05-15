@@ -14,9 +14,9 @@
  */
 package com.bytedesk.service.visitor;
 
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.ThreadTypeConsts;
-import com.bytedesk.core.utils.BaseRequest;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

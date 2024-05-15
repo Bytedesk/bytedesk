@@ -16,9 +16,10 @@ package com.bytedesk.core.message;
 
 import java.util.Date;
 
+import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.thread.ThreadResponseSimple;
-import com.bytedesk.core.utils.BaseResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

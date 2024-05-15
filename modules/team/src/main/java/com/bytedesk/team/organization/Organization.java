@@ -14,9 +14,9 @@
  */
 package com.bytedesk.team.organization;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -36,7 +36,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "team_organization")
-public class Organization extends AbstractEntity {
+public class Organization extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

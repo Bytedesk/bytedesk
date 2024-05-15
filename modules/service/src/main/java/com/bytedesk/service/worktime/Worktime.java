@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -45,7 +45,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_worktime")
-public class Worktime extends AbstractEntity {
+public class Worktime extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

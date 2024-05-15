@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-05 14:14:14
+ * @LastEditTime: 2024-05-05 18:11:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -112,14 +112,14 @@ public class HelloController {
 	@CrossOrigin(origins = "http://localhost:9000")
 	@GetMapping("/greeting")
 	public Greeting greeting(@RequestParam(required = false, defaultValue = "World") String name) {
-		System.out.println("==== get greeting ====");
+		log.info("==== get greeting ====");
 		return new Greeting(counter.incrementAndGet(), String.format(template, name));
 	}
 
 	// http://localhost:9003/greeting-javaconfig
 	@GetMapping("/greeting-javaconfig")
 	public Greeting greetingWithJavaconfig(@RequestParam(required = false, defaultValue = "World") String name) {
-		System.out.println("==== in greeting ====");
+		log.info("==== in greeting ====");
 		return new Greeting(counter.incrementAndGet(), String.format(template, name));
 	}
 

@@ -14,8 +14,8 @@
  */
 package com.bytedesk.core.upload;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -42,7 +42,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_upload")
-public class Upload extends AbstractEntity {
+public class Upload extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
 

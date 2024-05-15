@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-11 11:53:16
+ * @LastEditTime: 2024-05-10 10:11:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,12 +23,18 @@ import com.bytedesk.core.rbac.role.Role;
 import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.thread.ThreadResponseSimple;
 
 public class BdConvertUtils {
+    
     private BdConvertUtils() {
     }
 
-    public static UserResponseSimple convertTUserResponseSimple(User user) {
+    public static ThreadResponseSimple convertToThreadResponseSimple(com.bytedesk.core.thread.Thread thread) {
+        return new ModelMapper().map(thread, ThreadResponseSimple.class);
+    }
+
+    public static UserResponseSimple convertToUserResponseSimple(User user) {
         return new ModelMapper().map(user, UserResponseSimple.class);
     }
 
@@ -40,9 +46,12 @@ public class BdConvertUtils {
 
         MessageResponse messageResponse = new ModelMapper().map(message, MessageResponse.class);
 
+        if (message.getThreads() != null && message.getThreads().size() > 0) {
+            messageResponse.setThread(convertToThreadResponseSimple(message.getThreads().get(0)));
+        }
+        
         UserResponseSimple user = JSON.parseObject(message.getUser(), UserResponseSimple.class);
         messageResponse.setUser(user);
-        // messageResponse.setUser(convertTUserResponseSimple(message.getUser()));
 
         return messageResponse;
     }

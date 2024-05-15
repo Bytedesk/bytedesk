@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.channel;
 
-import com.bytedesk.core.utils.BaseResponse;
+import com.bytedesk.core.base.BaseResponse;
 
 import lombok.Builder;
 import lombok.Data;

@@ -11,8 +11,8 @@ package com.bytedesk.team.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -36,7 +36,7 @@ import lombok.experimental.Accessors;
 // @EntityListeners({ GroupListener.class })
 // 注：group为mysql保留关键字, groups在mysql8启动报错，所有表名修改为groupes
 @Table(name = "team_groupes")
-public class Group extends AbstractEntity {
+public class Group extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.summary;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_summary")
-public class Summary extends AbstractEntity {
+public class Summary extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

@@ -3,10 +3,10 @@ package com.bytedesk.core.rbac.user;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.role.Role;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.bytedesk.core.utils.StringSetConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -16,6 +16,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 // import jakarta.persistence.UniqueConstraint;
 // import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
@@ -36,19 +37,23 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ UserListener.class })
 @Table(name = "core_user", uniqueConstraints = {
-		// @UniqueConstraint(columnNames = "username"),
-		// @UniqueConstraint(columnNames = "email")
+	// num, username, email, mobile 在各个平台唯一
+	@UniqueConstraint(columnNames = { "num", "platform" }),
+	@UniqueConstraint(columnNames = { "username", "platform" }),
+	@UniqueConstraint(columnNames = { "email", "platform" }),
+	@UniqueConstraint(columnNames = { "mobile", "platform" }),
 })
-public class User extends AbstractEntity {
+public class User extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
 
-	@Column(unique = true)
+	// @Column(unique = true)
 	private String num;
 
 	// used in authjwtToken, should not be null
 	@NotBlank(message = "username is required")
-	@Column(unique = true, nullable = false)
+	// unique = true,
+	@Column(nullable = false)
 	private String username;
 
 	private String nickname;
@@ -57,12 +62,12 @@ public class User extends AbstractEntity {
 	private String password;
 
 	@Email(message = "email format error")
-	@Column(unique = true)
+	// @Column(unique = true)
 	private String email;
 
 	// TODO: including country
 	// @Digits(message = "phone length error", fraction = 0, integer = 11)
-	@Column(unique = true)
+	// @Column(unique = true)
 	private String mobile;
 
 	@Builder.Default
@@ -86,6 +91,9 @@ public class User extends AbstractEntity {
 	@Builder.Default
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
+
+	@Builder.Default
+	private String platform = BdConstants.PLATFORM_BYTEDESK;
 
 	@Builder.Default
 	@ManyToMany(fetch = FetchType.EAGER)

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:40:42
+ * @LastEditTime: 2024-05-10 21:47:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,11 +17,11 @@ package com.bytedesk.core.thread;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.StatusConsts;
 import com.bytedesk.core.constant.ThreadTypeConsts;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -46,7 +46,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ ThreadListener.class })
 @Table(name = "core_thread")
-public class Thread extends AbstractEntity {
+public class Thread extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -83,14 +83,12 @@ public class Thread extends AbstractEntity {
 
     private String client;
 
-    // @Lob
     @Builder.Default
     @Column(columnDefinition = "json")
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
 
-    // 
     // h2 db 不能使用 user, 所以重定义为 by_user
     @Builder.Default
     @Column(name = "by_user", columnDefinition = "json")
@@ -104,7 +102,6 @@ public class Thread extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
-    // TODO: 
     /** belong to org */
     private String orgUid;
 

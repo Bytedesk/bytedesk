@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:51:18
+ * @LastEditTime: 2024-05-10 15:57:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,10 +20,12 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.StatusConsts;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageService;
+import com.bytedesk.core.message.MessageTypeConsts;
 import com.bytedesk.core.thread.ThreadService;
 
 import lombok.AllArgsConstructor;
@@ -42,24 +44,24 @@ public class MessageJsonService {
 
     @Async
     public void saveToDb(String messageJSON) {
-        log.info("saveToDb: {}", messageJSON);
+        // log.info("saveToDb: {}", messageJSON);
         MessageResponse messageResponse = JSON.parseObject(messageJSON, MessageResponse.class);
-        // 
+        //
         String type = messageResponse.getType();
-        // 
-        dealWithMessageReceipt(type, messageResponse);
-
-        dealWithMessageRecall(type, messageResponse);
-        // 
-        String mid = messageResponse.getUid();
-        if (messageService.existsByMid(mid)) {
-            log.info("message already exists, mid: {}", mid);
+        //
+        if (dealWithMessageNotification(type, messageResponse)) {
             return;
         }
-        // 
+        //
+        String uid = messageResponse.getUid();
+        if (messageService.existsByUid(uid)) {
+            log.info("message already exists, uid: {}", uid);
+            return;
+        }
+        //
         Thread thread = getThread(messageResponse);
         if (thread == null) {
-            log.info("thread not exists, tid: {}", messageResponse.getThread().getTid());
+            log.info("thread not exists, tid: {}", messageResponse.getThread().getUid());
             return;
         }
 
@@ -69,18 +71,23 @@ public class MessageJsonService {
 
         messageService.save(message);
 
-        log.info("save json msg mid {}, tid {}", message.getUid(), thread.getUid());
+        // log.info("save json msg {}", messageJSON);
     }
 
     private Thread getThread(MessageResponse messageResponse) {
 
-        String tid = messageResponse.getThread().getTid();
-        Thread thread = threadService.findByTid(tid).orElse(null);
+        String uid = messageResponse.getThread().getUid();
+        Thread thread = threadService.findByUid(uid).orElse(null);
         if (thread == null) {
-            log.info("thread not exists, tid: {}", tid);
+            log.info("thread not exists, uid: {}", uid);
             return null;
         }
         thread.setContent(messageResponse.getContent());
+        if (messageResponse.getType().equals(MessageTypeConsts.IMAGE)) {
+            thread.setContent(I18Consts.I18N_THREAD_CONTENT_IMAGE);
+        } else if (messageResponse.getType().equals(MessageTypeConsts.FILE)) {
+            thread.setContent(I18Consts.I18N_THREAD_CONTENT_FILE);
+        }
 
         return thread;
     }
@@ -92,18 +99,46 @@ public class MessageJsonService {
         message.getThreads().add(thread);
         message.setUser(JSON.toJSONString(messageResponse.getUser()));
         message.setOrgUid(thread.getOrgUid());
-        
+
         return message;
     }
 
+
+    // 处理消息通知
+    private boolean dealWithMessageNotification(String type, MessageResponse messageResponse) {
+        log.info("dealWithMessageNotification: {}", type);
+
+        // 正在输入- 不保存
+        if (type.equals(MessageTypeConsts.NOTIFICATION_TYPING)) {
+            return true;
+        }
+
+        // 消息撤回- 从数据库中删除
+        if (type.equals(MessageTypeConsts.NOTIFICATION_RECALL) && dealWithMessageRecall(type, messageResponse)) {
+            return true;
+        }
+
+        // 消息回执- 处理
+        if (type.equals(MessageTypeConsts.NOTIFICATION_RECEIPT) && dealWithMessageReceipt(type, messageResponse)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     // 处理消息回执
-    private void dealWithMessageReceipt(String type, MessageResponse message) {
+    private boolean dealWithMessageReceipt(String type, MessageResponse message) {
         log.info("dealWithMessageReceipt: {}", type);
+
+        return true;
     }
 
     // 消息撤回，从数据库中删除消息
-    private void dealWithMessageRecall(String type, MessageResponse message) {
+    private boolean dealWithMessageRecall(String type, MessageResponse message) {
         log.info("dealWithMessageRecall: {}", type);
+
+        return true;
     }
-    
+
 }

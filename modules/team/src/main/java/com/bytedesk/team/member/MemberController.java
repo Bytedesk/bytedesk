@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 15:21:47
+ * @LastEditTime: 2024-05-11 15:35:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +41,7 @@ public class MemberController {
     private final MemberService memberService;
 
     /**
+     * 管理后台 分页查找 企业所有成员
      * 
      * @param memberRequest
      * @return
@@ -111,7 +111,7 @@ public class MemberController {
      * @return json
      */
     @GetMapping("/filter")
-    public ResponseEntity<?> filter(BaseRequest filterParam) {
+    public ResponseEntity<?> filter(MemberRequest filterParam) {
 
         //
         return ResponseEntity.ok(JsonResult.success());

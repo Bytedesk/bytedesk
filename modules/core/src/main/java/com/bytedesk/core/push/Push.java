@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:30:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-03 23:36:01
+ * @LastEditTime: 2024-05-13 12:26:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,12 @@
  */
 package com.bytedesk.core.push;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.StatusConsts;
-import com.bytedesk.core.utils.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,13 +38,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_push")
-public class Push extends AbstractEntity {
+public class Push extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
-
-    @NotBlank
-	@Column(unique = true, nullable = false)
-    private String pid;
 
     private String sender;
     

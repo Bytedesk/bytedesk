@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.rate;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_rate")
-public class Rate extends AbstractEntity {
+public class Rate extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

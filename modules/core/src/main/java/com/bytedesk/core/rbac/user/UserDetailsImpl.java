@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 10:13:18
+ * @LastEditTime: 2024-05-13 11:47:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,18 +39,29 @@ public class UserDetailsImpl implements UserDetails {
     private String mobile;
     private String email;
     private String description;
+    // 
+    private boolean superUser;
+    private boolean emailVerified;
+    private boolean mobileVerified;
+    private String platform;
+    // 
     @JsonIgnore
     private String password;
     private Set<Role> roles;
     private Set<String> organizations;
-    // 
+    //
     private boolean enabled;
     Collection<? extends GrantedAuthority> authorities;
 
     private UserDetailsImpl(Long id, String uid, String username, String nickname, String avatar, String mobile,
             String email, String password,
             Collection<? extends GrantedAuthority> authorities, Set<Role> roles, Set<String> organizations,
-            String description, boolean enabled) {
+            String description,
+            boolean superUser,
+            boolean emailVerified,
+            boolean mobileVerified,
+            String platform,
+            boolean enabled) {
         this.id = id;
         this.uid = uid;
         this.username = username;
@@ -63,18 +74,24 @@ public class UserDetailsImpl implements UserDetails {
         this.roles = roles;
         this.organizations = organizations;
         this.description = description;
+        // 
+        this.superUser = superUser;
+        this.emailVerified = emailVerified;
+        this.mobileVerified = mobileVerified;
+        this.platform = platform;
+        // 
         this.enabled = enabled;
     }
 
     //
     public static UserDetailsImpl build(User user) {
-        // 
+        //
         // Set<GrantedAuthority> authorities = user.getRoles().stream()
-        //         .map(role -> new SimpleGrantedAuthority(role.getValue()))
-        //         .collect(Collectors.toSet());
+        // .map(role -> new SimpleGrantedAuthority(role.getValue()))
+        // .collect(Collectors.toSet());
         Set<GrantedAuthority> authorities = user.getRoles().stream()
                 .flatMap(role -> role.getAuthorities().stream()
-                        .map(authority -> new SimpleGrantedAuthority(TypeConsts.ROLE_ + authority.getValue())))
+                        .map(authority -> new SimpleGrantedAuthority(TypeConsts.ROLE_PREFIX + authority.getValue())))
                 .collect(Collectors.toSet());
 
         return new UserDetailsImpl(user.getId(),
@@ -89,6 +106,10 @@ public class UserDetailsImpl implements UserDetails {
                 user.getRoles(),
                 user.getOrganizations(),
                 user.getDescription(),
+                user.isSuperUser(),
+                user.isEmailVerified(),
+                user.isMobileVerified(),
+                user.getPlatform(),
                 user.isEnabled());
     }
 

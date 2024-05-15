@@ -43,7 +43,7 @@ public class MessageProtoService {
     private final MessageService messageService;
 
     private final ThreadService threadService;
-     
+
     @Async
     public void saveToDb(@NonNull byte[] messageBytes) {
         //
@@ -87,13 +87,12 @@ public class MessageProtoService {
         }
     }
 
-
     private Thread getThread(MessageProto.Message messageProto) {
 
         ThreadProto.Thread threadProto = messageProto.getThread();
         String uid = threadProto.getUid();
         // log.info("uid: {}, threadType {}", uid, threadType);
-        Thread thread = threadService.findByTid(uid).orElse(null);
+        Thread thread = threadService.findByUid(uid).orElse(null);
         if (thread == null) {
             log.info("thread not exists, uid: {}", uid);
             return null;
@@ -119,7 +118,7 @@ public class MessageProtoService {
         message.setType(type);
         message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
         message.setClient(messageProto.getClient());
-        // 
+        //
         UserResponseSimple user = UserResponseSimple.builder().nickname(nickname).avatar(avatar).build();
         user.setUid(uid);
         message.setUser(JSON.toJSONString(user));
@@ -137,10 +136,9 @@ public class MessageProtoService {
         String content = messageProto.getContent();
         message.setContent(content);
         message.setOrgUid(thread.getOrgUid());
-        // 
+        //
         return message;
     }
-
 
     /**
      * 处理消息回执
@@ -169,15 +167,15 @@ public class MessageProtoService {
      * @param messageProto
      */
     // private void dealWithMessageStream(MessageProto.Message messageProto) {
-    //     String mid = messageProto.getMid();
-    //     Optional<Message> messageOptional = messageService.findByMid(mid);
-    //     if (messageOptional.isPresent()) {
-    //         //
-    //         String content = messageProto.getContent();
-    //         messageOptional.get().setContent(content);
-    //         messageService.save(messageOptional.get());
-    //         return;
-    //     }
+    // String mid = messageProto.getMid();
+    // Optional<Message> messageOptional = messageService.findByMid(mid);
+    // if (messageOptional.isPresent()) {
+    // //
+    // String content = messageProto.getContent();
+    // messageOptional.get().setContent(content);
+    // messageService.save(messageOptional.get());
+    // return;
     // }
-    
+    // }
+
 }

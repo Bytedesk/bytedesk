@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.customer;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -40,7 +40,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_customer")
-public class Customer extends AbstractEntity {
+public class Customer extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

@@ -14,8 +14,8 @@
  */
 package com.bytedesk.service.visitor;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.utils.AbstractEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_visitor")
-public class Visitor extends AbstractEntity {
+public class Visitor extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
 

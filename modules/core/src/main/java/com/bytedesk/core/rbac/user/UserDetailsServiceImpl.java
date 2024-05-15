@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 11:34:30
+ * @LastEditTime: 2024-05-13 14:22:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,9 +22,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.exception.EmailNotFoundException;
 import com.bytedesk.core.exception.MobileNotFoundException;
 import com.bytedesk.core.exception.UserDisabledException;
+import com.bytedesk.core.utils.JwtSubject;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,9 +43,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		// String username = JSON.parseObject(subject, JwtSubject.class).getUsername();
+		// String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();
 		log.debug("loadUserByUsername {}", username);
 		//
-		Optional<User> userOptional = userService.findByUsername(username);
+		Optional<User> userOptional = userService.findByUsernameAndPlatform(username, BdConstants.PLATFORM_BYTEDESK);
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -52,10 +57,25 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(userOptional.get());
 	}
 
-	public UserDetailsImpl loadUserByEmail(String email) throws EmailNotFoundException {
+	public UserDetails loadUserByUsernameAndPlatform(String subject) throws UsernameNotFoundException {
+		String username = JSON.parseObject(subject, JwtSubject.class).getUsername();
+		String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();
+		log.debug("loadUserByUsername {}, username {}, platform {}", subject, username, platform);
+		//
+		Optional<User> userOptional = userService.findByUsernameAndPlatform(username, platform);
+		if (!userOptional.isPresent()) {
+			throw new UsernameNotFoundException("username " + username + " is not found");
+		}
+		if (!userOptional.get().isEnabled()) {
+			throw new UserDisabledException("username " + username + " is not enabled");
+		}
+		return UserDetailsImpl.build(userOptional.get());
+	}
+
+	public UserDetailsImpl loadUserByEmailAndPlatform(String email, String platform) throws EmailNotFoundException {
 		log.debug("loadUserByEmail {}", email);
 		//
-		Optional<User> userOptional = userService.findByEmail(email);
+		Optional<User> userOptional = userService.findByEmailAndPlatform(email, platform);
 		if (!userOptional.isPresent()) {
 			throw new EmailNotFoundException("email " + email + " is not found");
 		}
@@ -65,10 +85,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(userOptional.get());
 	}
 
-	public UserDetailsImpl loadUserByMobile(String mobile) throws MobileNotFoundException {
+	public UserDetailsImpl loadUserByMobileAndPlatform(String mobile, String platform) throws MobileNotFoundException {
 		log.debug("loadUserByMobile {}", mobile);
 		//
-		Optional<User> userOptional = userService.findByMobile(mobile);
+		Optional<User> userOptional = userService.findByMobileAndPlatform(mobile, platform);
 		if (!userOptional.isPresent()) {
 			throw new MobileNotFoundException("mobile " + mobile + " is not found");
 		}

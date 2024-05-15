@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:06:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:47:33
+ * @LastEditTime: 2024-05-08 10:16:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,8 +13,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.channel;
-
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -27,8 +25,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TopicConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -39,7 +36,7 @@ public class ChannelService {
 
     private final ChannelRepository channelRepository;
 
-    private final UserService userService;
+    // private final UserService userService;
 
     private final ModelMapper modelMapper;
 
@@ -77,14 +74,15 @@ public class ChannelService {
             return;
         }
         
-        Optional<User> adminOptional = userService.getAdmin();
+        // Optional<User> adminOptional = userService.getAdmin();
         
         ChannelRequest channelRequest = ChannelRequest.builder()
                 .topic(TopicConsts.TOPIC_SYSTEM_NOTIFICATION)
-                .name(I18Consts.I18_SYSTEM_NOTIFICATION_NAME)
+                .name(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
                 .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
-                .description(I18Consts.I18_SYSTEM_NOTIFICATION_DESCRIPTION)
-                .orgUid(adminOptional.get().getOrgUid())
+                .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
+                // .orgUid(adminOptional.get().getOrgUid())
+                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
         channelRequest.setType(TypeConsts.TYPE_SYSTEM);
         create(channelRequest);

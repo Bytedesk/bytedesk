@@ -14,12 +14,12 @@
  */
 package com.bytedesk.core.rbac.authority;
 
+import com.bytedesk.core.base.BaseRequest;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import com.bytedesk.core.utils.BaseRequest;
 
 @Data
 @Builder

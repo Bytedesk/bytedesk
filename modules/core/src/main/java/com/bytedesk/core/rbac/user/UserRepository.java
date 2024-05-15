@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 21:10:25
+ * @LastEditTime: 2024-05-13 10:55:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,18 +32,18 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndPlatform(String email, String platform);
 
-    Optional<User> findByMobile(String mobile);
+    Optional<User> findByMobileAndPlatform(String mobile, String platform);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsernameAndPlatform(String username, String platform);
 
     Optional<User> findByUid(String uid);
 
-    Boolean existsByUsernameAndDeleted(String username, Boolean deleted);
+    Boolean existsByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
 
-    Boolean existsByMobileAndDeleted(String mobile, Boolean deleted);
+    Boolean existsByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
 
-    Boolean existsByEmailAndDeleted(String email, Boolean deleted);
+    Boolean existsByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
 
 }

@@ -15,8 +15,8 @@
 package com.bytedesk.ai.file;
 
 import com.bytedesk.ai.kb.Kb;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.upload.Upload;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.ConstraintMode;
@@ -45,7 +45,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ai_kb_file")
-public class KbFile extends AbstractEntity {
+public class KbFile extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
 

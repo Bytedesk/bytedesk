@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 20:28:15
+ * @LastEditTime: 2024-05-13 11:02:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.rbac.auth;
 
-import com.bytedesk.core.utils.BaseRequest;
+import com.bytedesk.core.base.BaseRequest;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +27,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class AuthRequest extends BaseRequest {
     
-    private static final long serialVersionUID = -9618212342L;
+    private static final long serialVersionUID = 1L;
 
     private String username;
     private String password;
@@ -36,5 +36,8 @@ public class AuthRequest extends BaseRequest {
     private String mobile;
     private String email;
     private String code;
+
+    // 
+    private String platform;
 
 }

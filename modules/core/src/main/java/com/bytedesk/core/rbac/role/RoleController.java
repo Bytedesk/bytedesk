@@ -34,8 +34,6 @@ import com.bytedesk.core.utils.JsonResult;
 public class RoleController {
 
     private final RoleService roleService;
-
-    // private final AuthService authService;
     
     /**
      * query my roles by page

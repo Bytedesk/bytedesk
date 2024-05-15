@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:03:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:18:59
+ * @LastEditTime: 2024-05-13 16:03:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ package com.bytedesk.core.topic;
 import java.util.Set;
 import java.util.HashSet;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.Column;
@@ -39,10 +39,8 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "core_topic", uniqueConstraints = {
-    // @UniqueConstraint(columnNames = {"topic", "uuid"}),
-})
-public class Topic extends AbstractEntity {
+@Table(name = "core_topic")
+public class Topic extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
     
@@ -54,14 +52,15 @@ public class Topic extends AbstractEntity {
     // private String topic;
     /** 为防止后添加的记录，clientIds缺失，所以用数组代替，这样每个用户在topic中只有一条记录，cliendIds可共用 */
     @Builder.Default
-    @Column(length = 512)
+    @Column(columnDefinition = "LONGTEXT")
     @Convert(converter = StringSetConverter.class)
     private Set<String> topics = new HashSet<>();
     // private String topic;
 
+    // 每个用户仅存在一条记录
     // user, no need map, just uid
     @NotBlank
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String userUid;
 
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
@@ -83,6 +82,7 @@ public class Topic extends AbstractEntity {
 
     /**
      * current online clientIds
+     * 用户clientId格式: uid/client/deviceUid
      */
     @Builder.Default
     @Convert(converter = StringSetConverter.class)

@@ -16,8 +16,8 @@ package com.bytedesk.ai.robot;
 
 import com.bytedesk.ai.kb.Kb;
 import com.bytedesk.ai.llm.Llm;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -48,7 +48,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ai_robot")
-public class Robot extends AbstractEntity {
+public class Robot extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
