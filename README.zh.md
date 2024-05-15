@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-15 12:10:32
+ * @LastEditTime: 2024-05-15 21:31:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,10 +92,6 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 
 - [文档](https://www.weiyuai.cn/docs/)
 
-## 功能
-
-- TODO:
-
 ## 预览
 
 - [官网](https://www.weiyuai.cn/)
@@ -103,7 +99,7 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 - [WebIM/客服端](https://www.weiyuai.cn/chat)
 - [客服访客端](https://www.weiyuai.cn/v)
 
-## SDK
+## 在线客服-访客端SDK
 
 - [iOS-oc](./visitor/oc)
 - [iOS-swift](./visitor/swift)
