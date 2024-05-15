@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 12:01:17
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2024-05-15 12:10:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@
 ### 企业即时通讯/IM
 
 - 多层组织架构、
-- 角色、
+- 角色管理
 - 权限管理
 - 聊天记录管理
 
