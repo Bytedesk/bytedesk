@@ -2,7 +2,7 @@
  * @Visitoror: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-18 12:21:15
+ * @LastEditTime: 2024-05-05 18:39:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,7 @@ public class UserAspect {
         String[] parameters =  methodSignature.getParameterNames();
         //参数值： FIXME: user/role toString 循环引用栈溢出
         // Object[] args = joinPoint.getArgs();
-        log.info("beforeUserSave {}, {}, {}, {}", clazzName, methodName, parameters);
+        log.info("beforeUserSave {}, {}, {}", clazzName, methodName, parameters);
         
     }   
     

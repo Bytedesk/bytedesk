@@ -14,9 +14,9 @@
  */
 package com.bytedesk.service.agent;
 
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.utils.BaseRequest;
 
 import lombok.Builder;
 import lombok.Data;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 11:28:48
+ * @LastEditTime: 2024-05-10 22:11:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,15 +41,12 @@ public interface ThreadRepository extends JpaRepository<Thread, Long>, JpaSpecif
         Optional<Thread> findFirstByTopic(String topic);
         
         Page<Thread> findByOwner(User owner, Pageable pageable);
-
-        // @Query(value="select * from core_thread where extra like %?1% ", nativeQuery = true)
-        // public Boolean existByExtra(String vid);
-
+        
         // FIXME: h2不兼容 JSON_EXTRACT
         // FIXME: PostgreSQL ERROR: function json_extract(json, unknown) does not exist
         // @Query(value = "SELECT * FROM core_thread WHERE JSON_EXTRACT(extra, '$.closed') = false", nativeQuery = true)
         // List<Thread> findByExtraClosed();
         List<Thread> findByStatus(String status);
 
-        // List<Thread> findByUpdatedAtAfter(Date updatedAt);
+        Page<Thread> findByOrgUid(String orgUid, Pageable pageable);
 }

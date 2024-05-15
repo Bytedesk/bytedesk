@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 13:04:16
+ * @LastEditTime: 2024-05-08 09:16:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.apilimit.ApiRateLimiter;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -115,7 +114,7 @@ public class VisitorController {
      * @return json
      */
     @GetMapping("/filter")
-    public ResponseEntity<?> filter(BaseRequest filterParam) {
+    public ResponseEntity<?> filter(VisitorRequest filterParam) {
         
         //
         return ResponseEntity.ok(JsonResult.success());

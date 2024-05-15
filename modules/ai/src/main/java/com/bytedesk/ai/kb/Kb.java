@@ -14,7 +14,8 @@
  */
 package com.bytedesk.ai.kb;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ai_kb")
-public class Kb extends AbstractEntity {
+public class Kb extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
 

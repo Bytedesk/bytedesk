@@ -24,3 +24,4 @@ logs/*
 hs_err_pid*
 /starter/logs
 h2db/
+application-prod.properties

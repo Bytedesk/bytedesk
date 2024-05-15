@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.action;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -36,7 +36,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_action")
-public class Action extends AbstractEntity {
+public class Action extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     

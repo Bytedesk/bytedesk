@@ -16,8 +16,8 @@ package com.bytedesk.core.uid;
 
 import java.util.Date;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.uid.worker.WorkerNodeType;
-import com.bytedesk.core.utils.AbstractEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,7 +42,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_uid_generator")
-public class UidGenerator extends AbstractEntity {
+public class UidGenerator extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     

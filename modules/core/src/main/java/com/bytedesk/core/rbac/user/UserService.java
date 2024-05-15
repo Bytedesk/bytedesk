@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:22:24
+ * @LastEditTime: 2024-05-13 11:17:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,9 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.NotFoundException;
@@ -78,29 +80,29 @@ public class UserService {
 
     @Transactional
     public UserResponse register(UserRequest userRequest) {
-        
-        if (existsByEmail(userRequest.getEmail())) {
+
+        if (existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
             throw new EmailExistsException("Email already exists..!!");
         }
-        if (existsByMobile(userRequest.getMobile())) {
+        if (existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
             throw new MobileExistsException("Mobile already exists..!!");
         }
         //
         User user = modelMapper.map(userRequest, User.class);
         user.setUid(uidUtils.getCacheSerialUid());
-        // 
+        //
         if (StringUtils.hasLength(userRequest.getNickname())) {
             user.setNickname(userRequest.getNickname());
         } else {
             user.setNickname(createNickname());
         }
-        // 
+        //
         if (StringUtils.hasLength(userRequest.getAvatar())) {
             user.setAvatar(userRequest.getAvatar());
         } else {
             user.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         }
-        // 
+        //
         if (StringUtils.hasLength(userRequest.getPassword())) {
             String rawPassword = userRequest.getPassword();
             String encodedPassword = passwordEncoder.encode(rawPassword);
@@ -121,8 +123,8 @@ public class UserService {
         }
         // TODO: 设置角色role
         //
-        
-        // 
+
+        //
         return convertToUserResponse(save(user));
     }
 
@@ -155,7 +157,7 @@ public class UserService {
                 user.setMobile(userRequest.getMobile());
             }
 
-            if(StringUtils.hasLength(userRequest.getDescription())) {
+            if (StringUtils.hasLength(userRequest.getDescription())) {
                 user.setDescription(userRequest.getDescription());
             }
 
@@ -169,21 +171,22 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(String nickname, String avatar, String password, String mobile, String email, boolean isVerified,
-                String orgUid) {
+    public User createUser(String nickname, String avatar, String password, String mobile, String email,
+            boolean isVerified, String platform, String orgUid) {
 
         User user = User.builder()
-            // .uid(uidUtils.getCacheSerialUid())
-            .avatar(avatar)
-            // use email as default username
-            .username(email)
-            .nickname(nickname)
-            .mobile(mobile)
-            .num(mobile)
-            .email(email)
-            .superUser(false)
-            .emailVerified(isVerified)
-            .mobileVerified(isVerified)
+                // .uid(uidUtils.getCacheSerialUid())
+                .avatar(avatar)
+                // use email as default username
+                .username(email)
+                .nickname(nickname)
+                .mobile(mobile)
+                .num(mobile)
+                .email(email)
+                .superUser(false)
+                .emailVerified(isVerified)
+                .mobileVerified(isVerified)
+                .password(platform)
                 .build();
         user.setUid(uidUtils.getCacheSerialUid());
 
@@ -212,69 +215,69 @@ public class UserService {
         return save(user);
     }
 
-    @Cacheable(value = "user", key = "#email", unless="#result == null")
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @Cacheable(value = "user", key = "#email", unless = "#result == null")
+    public Optional<User> findByEmailAndPlatform(String email, String platform) {
+        return userRepository.findByEmailAndPlatform(email, platform);
     }
 
-    @Cacheable(value = "user", key = "#mobile", unless="#result == null")
-    public Optional<User> findByMobile(String mobile) {
-        return userRepository.findByMobile(mobile);
+    @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
+    public Optional<User> findByMobileAndPlatform(String mobile, String platform) {
+        return userRepository.findByMobileAndPlatform(mobile, platform);
     }
 
-    @Cacheable(value = "user", key = "#username", unless="#result == null")
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    @Cacheable(value = "user", key = "#username", unless = "#result == null")
+    public Optional<User> findByUsernameAndPlatform(String username, String platform) {
+        return userRepository.findByUsernameAndPlatform(username, platform);
     }
 
-    @Cacheable(value = "user", key = "#uid", unless="#result == null")
+    @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     public Optional<User> findByUid(String uid) {
         return userRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "admin", unless="#result == null")
+    @Cacheable(value = "admin", unless = "#result == null")
     public Optional<User> getAdmin() {
-        return userRepository.findByUsername(properties.getUsername());
+        return userRepository.findByUsernameAndPlatform(properties.getUsername(), BdConstants.PLATFORM_BYTEDESK);
     }
 
-    // 
-    @Cacheable(value = "userExists", key = "#username", unless="#result == null")
-    public Boolean existsByUsername(String username) {
-        return userRepository.existsByUsernameAndDeleted(username, false);
+    //
+    @Cacheable(value = "userExists", key = "#username", unless = "#result == null")
+    public Boolean existsByUsernameAndPlatform(String username, String platform) {
+        return userRepository.existsByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
-    @Cacheable(value = "userExists", key = "#mobile", unless="#result == null")
-    public Boolean existsByMobile(String mobile) {
-        return userRepository.existsByMobileAndDeleted(mobile, false);
+    @Cacheable(value = "userExists", key = "#mobile", unless = "#result == null")
+    public Boolean existsByMobileAndPlatform(String mobile, String platform) {
+        return userRepository.existsByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
-    @Cacheable(value = "userExists", key = "#email", unless="#result == null")
-    public Boolean existsByEmail(String email) {
-        return userRepository.existsByEmailAndDeleted(email, false);
+    @Cacheable(value = "userExists", key = "#email", unless = "#result == null")
+    public Boolean existsByEmailAndPlatform(String email, String platform) {
+        return userRepository.existsByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
     @Caching(put = {
-        @CachePut(value = "user", key = "#user.username"),
-        @CachePut(value = "user", key = "#user.mobile"),
-        @CachePut(value = "user", key = "#user.email"),
+            @CachePut(value = "user", key = "#user.username"),
+            @CachePut(value = "user", key = "#user.mobile"),
+            @CachePut(value = "user", key = "#user.email"),
             @CachePut(value = "user", key = "#user.uid"),
-        // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
-        // @CachePut(value = "userExists", key = "#user.username"),
-        // @CachePut(value = "userExists", key = "#user.mobile"),
-        // @CachePut(value = "userExists", key = "#user.email"),
+            // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
+            // @CachePut(value = "userExists", key = "#user.username"),
+            // @CachePut(value = "userExists", key = "#user.mobile"),
+            // @CachePut(value = "userExists", key = "#user.email"),
     })
     public User save(@NonNull User user) {
         return userRepository.save(user);
     }
 
     @Caching(evict = {
-        @CacheEvict(value = "user", key = "#user.username"),
-        @CacheEvict(value = "user", key = "#user.mobile"),
-        @CacheEvict(value = "user", key = "#user.email"),
-        @CacheEvict(value = "user", key = "#user.uid"),
-        @CacheEvict(value = "userExists", key = "#user.username"),
-        @CacheEvict(value = "userExists", key = "#user.mobile"),
-        @CacheEvict(value = "userExists", key = "#user.email"),
+            @CacheEvict(value = "user", key = "#user.username"),
+            @CacheEvict(value = "user", key = "#user.mobile"),
+            @CacheEvict(value = "user", key = "#user.email"),
+            @CacheEvict(value = "user", key = "#user.uid"),
+            @CacheEvict(value = "userExists", key = "#user.username"),
+            @CacheEvict(value = "userExists", key = "#user.mobile"),
+            @CacheEvict(value = "userExists", key = "#user.email"),
     })
     public void delete(@NonNull User user) {
         userRepository.delete(user);
@@ -295,11 +298,11 @@ public class UserService {
     }
 
     public void initData() {
-        
+
         if (userRepository.count() > 0) {
             return;
         }
-        
+
         User admin = User.builder()
                 // .uid(uidUtils.getCacheSerialUid())
                 .email(properties.getEmail())
@@ -314,7 +317,8 @@ public class UserService {
                 .mobileVerified(true)
                 .build();
         admin.setUid(uidUtils.getCacheSerialUid());
-        //
+        admin.getOrganizations().add(UserConsts.DEFAULT_ORGANIZATION_UID);
+        
         Optional<Role> roleOptional = roleService.findByName(TypeConsts.ROLE_SUPER);
         Set<Role> roles = new HashSet<>();
         roleOptional.ifPresent(role -> {

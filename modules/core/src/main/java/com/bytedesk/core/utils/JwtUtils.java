@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 11:55:28
+ * @LastEditTime: 2024-05-13 14:00:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,8 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson2.JSON;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -43,12 +45,14 @@ public class JwtUtils {
   // @SuppressWarnings("deprecation")
   /**
    * https://github.com/jwtk/jjwt?tab=readme-ov-file#creating-a-jwt
+   * 
    * @param username
    * @return
    */
-  public String generateJwtToken(String username) {
+  public String generateJwtToken(String username, String platform) {
+    JwtSubject jwtSubject = new JwtSubject(username, platform);
     return Jwts.builder()
-        .subject((username))
+        .subject(JSON.toJSONString(jwtSubject))
         .issuedAt(new Date())
         .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
         // .signWith(key(), SignatureAlgorithm.HS256)
@@ -56,7 +60,6 @@ public class JwtUtils {
         .compact();
   }
 
-  // @SuppressWarnings("deprecation")
   public boolean validateJwtToken(String authToken) {
     try {
       Jwts.parser()
@@ -78,19 +81,42 @@ public class JwtUtils {
     return false;
   }
 
-  // @SuppressWarnings("deprecation")
-  public String getUserNameFromJwtToken(String token) {
+  public String getSubjectFromJwtToken(String token) {
     return Jwts.parser()
         // .setSigningKey(key())
-         .verifyWith(secretKey())
+        .verifyWith(secretKey())
         .build()
         .parseSignedClaims(token)
         .getPayload()
         .getSubject();
   }
-  
+
+  // public String getUsernameFromJwtToken(String token) {
+  //   String subject = Jwts.parser()
+  //       // .setSigningKey(key())
+  //       .verifyWith(secretKey())
+  //       .build()
+  //       .parseSignedClaims(token)
+  //       .getPayload()
+  //       .getSubject();
+  //   JwtSubject jwtSubject = JSON.parseObject(subject, JwtSubject.class);
+  //   return jwtSubject.getUsername();
+  // }
+
+  // public String getPlatformFromJwtToken(String token) {
+  //   String subject = Jwts.parser()
+  //       // .setSigningKey(key())
+  //       .verifyWith(secretKey())
+  //       .build()
+  //       .parseSignedClaims(token)
+  //       .getPayload()
+  //       .getSubject();
+  //   JwtSubject jwtSubject = JSON.parseObject(subject, JwtSubject.class);
+  //   return jwtSubject.getPlatform();
+  // }
+
   // private Key key() {
-  //   return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+  // return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
   // }
 
   private SecretKey secretKey() {

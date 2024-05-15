@@ -17,7 +17,7 @@ package com.bytedesk.team.department;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.bytedesk.core.utils.BaseResponse;
+import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

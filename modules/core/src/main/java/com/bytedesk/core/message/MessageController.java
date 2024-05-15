@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 16:42:05
+ * @LastEditTime: 2024-05-14 12:02:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,20 @@ import lombok.AllArgsConstructor;
 public class MessageController {
 
     private final MessageService messageService;
+
+    /**
+     * 管理后台 根据 orgUids 查询
+     * 
+     * @param messageRequest
+     * @return
+     */
+    @GetMapping("/org")
+    public ResponseEntity<?> queryAll(MessageRequest messageRequest) {
+
+        Page<MessageResponse> messagePage = messageService.queryAll(messageRequest);
+        //
+        return ResponseEntity.ok(JsonResult.success(messagePage));
+    }
 
     /**
      * TODO: 

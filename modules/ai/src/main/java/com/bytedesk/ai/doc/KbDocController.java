@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:59:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-27 17:23:22
+ * @LastEditTime: 2024-05-08 09:15:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.utils.BaseRequest;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -93,7 +92,7 @@ public class KbDocController {
      * @return json
      */
     @GetMapping("/filter")
-    public JsonResult<?> filter(BaseRequest filterParam) {
+    public JsonResult<?> filter(KbDocRequest filterParam) {
 
         //
         

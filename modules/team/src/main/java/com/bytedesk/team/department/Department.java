@@ -17,7 +17,7 @@ package com.bytedesk.team.department;
 import java.util.Set;
 import java.util.HashSet;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "team_department")
-public class Department extends AbstractEntity {
+public class Department extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     

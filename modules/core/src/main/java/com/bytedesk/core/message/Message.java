@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:36:46
+ * @LastEditTime: 2024-05-15 09:18:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,9 +20,9 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.thread.Thread;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -41,7 +41,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_message")
-public class Message extends AbstractEntity {
+public class Message extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,10 +52,9 @@ public class Message extends AbstractEntity {
     @Column(name = "by_type")
     private String type;
 
-    @Column(length = 512)
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
-    // @Lob
     // @Builder.Default
     // @Column(columnDefinition = "json")
     // @JdbcTypeCode(SqlTypes.JSON)
@@ -66,7 +65,7 @@ public class Message extends AbstractEntity {
 
     private String client;
 
-    /**  message belongs to */
+    /** message belongs to */
     @JsonIgnore
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
@@ -79,14 +78,13 @@ public class Message extends AbstractEntity {
      */
     // @ManyToOne(fetch = FetchType.EAGER)
     // private User user;
-    // 
+    //
     // h2 db 不能使用 user, 所以重定义为 by_user
     @Builder.Default
     @Column(name = "by_user", columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private String user = BdConstants.EMPTY_JSON_STRING;
 
-    // TODO:
     /** belong to org */
     private String orgUid;
 

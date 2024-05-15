@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 12:26:26
+ * @LastEditTime: 2024-05-13 12:49:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,13 +27,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentService;
-import com.bytedesk.team.organization.Organization;
-import com.bytedesk.team.organization.OrganizationService;
-
 import lombok.AllArgsConstructor;
 import static java.util.Arrays.asList;
 
@@ -50,10 +47,6 @@ public class WorkgroupService {
 
     private final UidUtils uidUtils;
 
-    private final BytedeskProperties properties;
-
-    private final OrganizationService organizationService;
-
     public Page<WorkgroupResponse> query(WorkgroupRequest workgroupRequest) {
 
         Pageable pageable = PageRequest.of(workgroupRequest.getPageNumber(),
@@ -67,10 +60,10 @@ public class WorkgroupService {
     }
 
     public Workgroup create(WorkgroupRequest workgroupRequest) {
-        // 
+        //
         Workgroup workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
         workgroup.setUid(uidUtils.getCacheSerialUid());
-        // 
+        //
         Iterator<String> iterator = workgroupRequest.getAgentAids().iterator();
         while (iterator.hasNext()) {
             String agentAid = iterator.next();
@@ -82,17 +75,17 @@ public class WorkgroupService {
                 return null;
             }
         }
-        // 
+        //
         return save(workgroup);
     }
-    
+
     Workgroup update(WorkgroupRequest workgroupRequest) {
 
         Optional<Workgroup> workgroupOptional = findByWid(workgroupRequest.getUid());
         if (!workgroupOptional.isPresent()) {
             return null;
         }
-        // 
+        //
         Workgroup workgroup = workgroupOptional.get();
         workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
         // workgroupOptional.get().setNickname(workgroupRequest.getNickname());
@@ -101,8 +94,8 @@ public class WorkgroupService {
         // workgroupOptional.get().setRouteType(workgroupRequest.getRouteType());
         // workgroupOptional.get().setRecent(workgroupRequest.getRecent());
         // workgroupOptional.get().setAutoPop(workgroupRequest.getAutoPop());
-        // 
-        // 
+        //
+        //
         Iterator<String> iterator = workgroupRequest.getAgentAids().iterator();
         while (iterator.hasNext()) {
             String agentAid = iterator.next();
@@ -114,18 +107,16 @@ public class WorkgroupService {
                 return null;
             }
         }
-        // 
+        //
         return save(workgroup);
     }
-    
-    
 
-    @Cacheable(value = "workgroup", key = "#wid", unless="#result == null")
+    @Cacheable(value = "workgroup", key = "#wid", unless = "#result == null")
     public Optional<Workgroup> findByWid(String wid) {
         return workgroupRepository.findByUid(wid);
     }
 
-    @Cacheable(value = "workgroup", key = "#nickname", unless="#result == null")
+    @Cacheable(value = "workgroup", key = "#nickname", unless = "#result == null")
     public Optional<Workgroup> findByNickname(String nickname) {
         return workgroupRepository.findByNickname(nickname);
     }
@@ -145,40 +136,32 @@ public class WorkgroupService {
             return;
         }
 
-        Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
-        if (orgOptional.isPresent()) {
+        List<String> agents = new ArrayList<>();
+        Optional<Agent> agent1Optional = agentService.findByMobile("18888888008");
+        agent1Optional.ifPresent(agent -> {
+            agents.add(agent.getUid());
+        });
+        Optional<Agent> agent2Optional = agentService.findByMobile("18888888009");
+        agent2Optional.ifPresent(agent -> {
+            agents.add(agent.getUid());
+        });
 
-            List<String> agents = new ArrayList<>();
-            Optional<Agent> agent1Optional = agentService.findByMobile("18888888008");
-            agent1Optional.ifPresent(agent -> {
-                agents.add(agent.getUid());
-            });
-            Optional<Agent> agent2Optional = agentService.findByMobile("18888888009");
-            agent2Optional.ifPresent(agent -> {
-                agents.add(agent.getUid());
-            });
-        
-            // add workgroups
-            WorkgroupRequest workgroup1Request = WorkgroupRequest.builder()
-                    .nickname("客服组1")
-                    .agentAids(agents)
-                    .orgUid(orgOptional.get().getUid())
-                    .build();
-            create(workgroup1Request);
+        // add workgroups
+        WorkgroupRequest workgroup1Request = WorkgroupRequest.builder()
+                .nickname("客服组1")
+                .agentAids(agents)
+                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
+                .build();
+        create(workgroup1Request);
 
-            // 
-            WorkgroupRequest workgroup2Request = WorkgroupRequest.builder()
-                    .nickname("客服组2")
-                    .agentAids(asList(agent1Optional.get().getUid()))
-                    .orgUid(orgOptional.get().getUid())
-                    .build();
-            create(workgroup2Request);
-                
-        }
+        //
+        WorkgroupRequest workgroup2Request = WorkgroupRequest.builder()
+                .nickname("客服组2")
+                .agentAids(asList(agent1Optional.get().getUid()))
+                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
+                .build();
+        create(workgroup2Request);
 
-        
-        
     }
-
 
 }

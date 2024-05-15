@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.bytedesk.core.utils.BaseRequest;
+import com.bytedesk.core.base.BaseRequest;
 
 @Data
 @Builder

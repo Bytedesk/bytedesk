@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 17:36:36
+ * @LastEditTime: 2024-05-13 12:57:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ public interface PushRepository extends JpaRepository<Push, Long> {
 
     List<Push> findByStatus(String status);
     
-    Optional<Push> findByStatusAndTypeAndReceiver(String status, String type, String receiver);
+    Optional<Push> findByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver, String content);
 
     Boolean existsByStatusAndTypeAndReceiver(String status, String type, String receiver);
 

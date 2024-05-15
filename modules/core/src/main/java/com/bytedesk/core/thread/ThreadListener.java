@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.thread;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.event.BytedeskEventPublisher;
@@ -24,6 +25,7 @@ import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
 
+@Async
 @Slf4j
 @Component
 public class ThreadListener {

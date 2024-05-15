@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 12:24:40
+ * @LastEditTime: 2024-05-13 12:57:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,26 +54,26 @@ public class PushService {
 
     private final UserService userService;
 
-    public Boolean sendEmailCode(String email, String client, String authType) {
+    public Boolean sendEmailCode(String email, String client, String authType, String platform) {
 
-        return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType);
+        return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform);
     }
 
-    public Boolean sendSmsCode(String mobile, String client, String authType) {
+    public Boolean sendSmsCode(String mobile, String client, String authType, String platform) {
 
-        return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType);
+        return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform);
     }
 
-    public Boolean sendCode(String receiver, String type, String client, String authType) {
+    public Boolean sendCode(String receiver, String type, String client, String authType, String platform) {
 
         // 注册验证码，如果账号已经存在，则直接抛出异常
         if (authType.equals(TypeConsts.SEND_MOBILE_CODE_TYPE_REGISTER)) {
 
-            if (type.equals(TypeConsts.TYPE_MOBILE) && userService.existsByMobile(receiver)) {
+            if (type.equals(TypeConsts.TYPE_MOBILE) && userService.existsByMobileAndPlatform(receiver, platform)) {
                 throw new MobileExistsException("mobile already exists");
             }
 
-            if (type.equals(TypeConsts.TYPE_EMAIL) && userService.existsByEmail(receiver)) {
+            if (type.equals(TypeConsts.TYPE_EMAIL) && userService.existsByEmailAndPlatform(receiver, platform)) {
                 throw new EmailExistsException("email already exists");
             }
         }
@@ -109,7 +109,7 @@ public class PushService {
         log.info("pushRequest {}", pushRequest.toString());
 
         Push push = modelMapper.map(pushRequest, Push.class);
-        push.setPid(uidUtils.getCacheSerialUid());
+        push.setUid(uidUtils.getCacheSerialUid());
         push.setClient(pushRequest.getClient());
 
         return save(push);
@@ -124,12 +124,27 @@ public class PushService {
     }
 
     public Boolean validateCode(String receiver, String type, String code) {
-        return pushRepository.existsByStatusAndTypeAndReceiverAndContent(StatusConsts.CODE_STATUS_PENDING, type, receiver, code);
+        // check if has already send validate code within 15min
+        
+        // Boolean result = pushRepository.existsByStatusAndTypeAndReceiverAndContent(StatusConsts.CODE_STATUS_PENDING,
+        //         type, receiver, code);
+        // if (result) {
+        //     // TODO: 更新状态
+        // }
+        // return result;
+        // 
+        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(StatusConsts.CODE_STATUS_PENDING, type, receiver, code);
+        if (pushOptional.isPresent()) {
+            pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
+            save(pushOptional.get());
+            return true;
+        }
+        return false;
     }
 
-    @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result == null")
-    public Optional<Push> findByStatusAndTypeAndReceiver(String status, String type, String receiver) {
-        return pushRepository.findByStatusAndTypeAndReceiver(status, type, receiver);
+    // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result == null")
+    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver, String content) {
+        return pushRepository.findByStatusAndTypeAndReceiverAndContent(status, type, receiver, content);
     }
 
     public Boolean existsByStatusAndTypeAndReceiver(String status, String type, String receiver) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-09 16:34:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:49:04
+ * @LastEditTime: 2024-05-15 09:18:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,11 +17,11 @@ package com.bytedesk.service.thread_log;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.StatusConsts;
 import com.bytedesk.core.constant.ThreadTypeConsts;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -49,7 +49,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_thread_log")
-public class ThreadLog extends AbstractEntity {
+public class ThreadLog extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -84,7 +84,6 @@ public class ThreadLog extends AbstractEntity {
 
     private String client;
 
-    // @Lob
     @Builder.Default
     @Column(columnDefinition = "json")
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying

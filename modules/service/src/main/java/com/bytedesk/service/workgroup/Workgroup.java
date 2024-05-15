@@ -22,10 +22,10 @@ import java.util.HashSet;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.RouteConsts;
-import com.bytedesk.core.utils.AbstractEntity;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.worktime.Worktime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -49,7 +49,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "service_workgroup")
-public class Workgroup extends AbstractEntity {
+public class Workgroup extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

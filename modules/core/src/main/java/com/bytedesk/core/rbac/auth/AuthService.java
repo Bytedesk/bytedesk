@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 10:40:14
+ * @LastEditTime: 2024-05-13 14:23:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,9 +54,10 @@ public class AuthService {
         return modelMapper.map(userDetails, User.class);
     }
 
-    public UsernamePasswordAuthenticationToken getAuthentication(@NonNull HttpServletRequest request, String username) {
+    public UsernamePasswordAuthenticationToken getAuthentication(@NonNull HttpServletRequest request, String subject) {
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = userDetailsService.loadUserByUsernameAndPlatform(subject);
+
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,
@@ -66,13 +67,13 @@ public class AuthService {
         return authentication;
     }
 
-    public AuthToken authenticationWithMobile(String mobile) {
-        UserDetailsImpl userDetails = userDetailsService.loadUserByMobile(mobile);
+    public AuthToken authenticationWithMobileAndPlatform(String mobile, String platform) {
+        UserDetailsImpl userDetails = userDetailsService.loadUserByMobileAndPlatform(mobile, platform);
         return new AuthToken(userDetails);
     }
 
-    public AuthToken authenticationWithEmail(String email) {
-        UserDetailsImpl userDetails = userDetailsService.loadUserByEmail(email);
+    public AuthToken authenticationWithEmailAndPlatform(String email, String platform) {
+        UserDetailsImpl userDetails = userDetailsService.loadUserByEmailAndPlatform(email, platform);
         return new AuthToken(userDetails);
     }
 
@@ -84,10 +85,10 @@ public class AuthService {
 
         UserResponse userResponse = convertToUserResponse(userDetails);
 
-        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
+        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
 
         return AuthResponse.builder()
-                .access_token(jwt)
+                .accessToken(jwt)
                 .user(userResponse)
                 .build();
     }

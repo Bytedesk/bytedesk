@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:26:15
+ * @LastEditTime: 2024-05-10 12:23:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import java.util.Set;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -42,7 +43,6 @@ public class TopicService {
 
     private final UidUtils uidUtils;
 
-    @Async
     public void create(String topic, String uid) {
         TopicRequest topicRequest = TopicRequest.builder()
                 .topic(topic)
@@ -85,9 +85,8 @@ public class TopicService {
     }
     
 
-    @Async
     public void subscribe(String topic, String clientId) {
-        // 用户clientId格式: uid/client
+        // 用户clientId格式: uid/client/deviceUid
         Optional<Topic> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
             Topic topicElement = topicOptional.get();
@@ -111,9 +110,8 @@ public class TopicService {
         }
     }
 
-    @Async
     public void unsubscribe(String topic, String clientId) {
-        // 用户clientId格式: uid/client
+        // 用户clientId格式: uid/client/deviceUid
         Optional<Topic> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
             Topic topicElement = topicOptional.get();
@@ -127,14 +125,18 @@ public class TopicService {
         // deleteByTopicAndUid(topic, uid);
     }
 
+
     @Async
     public void addClientId(String clientId) {
-        // 用户clientId格式: uid/client
+        // 用户clientId格式: uid/client/deviceUid
         Optional<Topic> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
             Topic topic = topicOptional.get();
             if (!topic.getClientIds().contains(clientId)) {
                 log.info("addClientId: {}", clientId);
+                // FIXME: org.springframework.orm.ObjectOptimisticLockingFailureException: Row
+                // was updated or deleted by another transaction (or unsaved-value mapping was
+                // incorrect) : [com.bytedesk.core.topic.Topic#16]
                 topic.getClientIds().add(clientId);
                 save(topic);
             }
@@ -143,12 +145,15 @@ public class TopicService {
 
     @Async
     public void removeClientId(String clientId) {
-        // 用户clientId格式: uid/client
+        // 用户clientId格式: uid/client/deviceUid
         Optional<Topic> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
             Topic topic = topicOptional.get();
             if (topic.getClientIds().contains(clientId)) {
                 log.info("removeClientId: {}", clientId);
+                // FIXME: org.springframework.orm.ObjectOptimisticLockingFailureException: Row
+                // was updated or deleted by another transaction (or unsaved-value mapping was
+                // incorrect) : [com.bytedesk.core.topic.Topic#16]
                 topic.getClientIds().remove(clientId);
                 save(topic);
             }
@@ -162,7 +167,7 @@ public class TopicService {
 
     @Cacheable(value = "topic", key = "#clientId", unless = "#result == null")
     public Optional<Topic> findByClientId(String clientId) {
-        // 用户clientId格式: uid/client
+        // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
         return findByUserUid(uid);
     }
@@ -184,7 +189,22 @@ public class TopicService {
         @CachePut(value = "topic", key = "#topic.userUid")
     })
     public Topic save(Topic topic) {
-        return topicRepository.save(topic);
+        try {
+            return topicRepository.save(topic);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // 乐观锁冲突处理逻辑
+            handleOptimisticLockingFailureException(e, topic);
+        }
+        return null;
+    }
+
+    // TODO: 待处理
+    private void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Topic topic) {
+        // 可以在这里实现重试逻辑，例如使用递归调用或定时任务
+        // 也可以记录日志、发送通知或执行其他业务逻辑
+        log.error("Optimistic locking failure for topic: {}", topic.getUserUid());
+        // e.printStackTrace();
+        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
     }
 
     // TODO: 需要从原先uid的缓存列表中删除，然后添加到新的uid的换成列表中

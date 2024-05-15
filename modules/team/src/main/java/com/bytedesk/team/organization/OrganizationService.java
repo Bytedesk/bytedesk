@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 11:33:58
+ * @LastEditTime: 2024-05-08 10:10:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,11 +27,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.BaseRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +53,7 @@ public class OrganizationService {
 
     private final ModelMapper modelMapper;
 
-    public Page<OrganizationResponse> query(BaseRequest pageParam) {
+    public Page<OrganizationResponse> query(OrganizationRequest pageParam) {
 
         User user = authService.getCurrentUser();
 
@@ -64,6 +64,30 @@ public class OrganizationService {
 
         return orgPage.map(organization -> convertToOrganizationResponse(organization));
     }
+
+    public Organization create(OrganizationRequest organizationRequest) {
+
+        Organization organization = modelMapper.map(organizationRequest, Organization.class);
+        organization.setUid(uidUtils.getCacheSerialUid());
+        organization.setUser(authService.getCurrentUser());
+
+        return save(organization);
+    }
+    
+    public Organization update(OrganizationRequest organizationRequest) {
+        
+        Optional<Organization> organizationOptional = findByUid(organizationRequest.getUid());
+        if (!organizationOptional.isPresent()) {
+            return null;
+        }
+        organizationOptional.get().setName(organizationRequest.getName());
+        organizationOptional.get().setLogo(organizationRequest.getLogo());
+        organizationOptional.get().setCode(organizationRequest.getCode());
+        organizationOptional.get().setDescription(organizationRequest.getDescription());
+
+        return save(organizationOptional.get());
+    }
+    
 
     @Cacheable(value = "organization", key = "#uid", unless = "#result == null")
     public Optional<Organization> findByUid(String uid) {
@@ -103,11 +127,12 @@ public class OrganizationService {
                     .description(properties.getCompany() + " Description")
                     .user(adminOptional.get())
                     .build();
-            organization.setUid(uidUtils.getCacheSerialUid());
+            // organization.setUid(uidUtils.getCacheSerialUid());
+            organization.setUid(UserConsts.DEFAULT_ORGANIZATION_UID);
             save(organization);
             //
-            adminOptional.get().getOrganizations().add(organization.getUid());
-            userService.save(adminOptional.get());
+            // adminOptional.get().getOrganizations().add(organization.getUid());
+            // userService.save(adminOptional.get());
         }
         
     }

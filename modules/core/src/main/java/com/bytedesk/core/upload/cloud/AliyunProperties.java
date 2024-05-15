@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 20:24:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-15 20:33:44
+ * @LastEditTime: 2024-05-15 10:40:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.upload.cloud;
 
+import org.springframework.beans.factory.annotation.Value;
 // import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -27,23 +28,23 @@ public class AliyunProperties {
 
     private String regionId;
 
-    // @Value("${aliyun.access.key.id}")
+    @Value("${aliyun.access.key.id}")
     private String accessKeyId;
 
-    // @Value("${aliyun.access.key.secret}")
+    @Value("${aliyun.access.key.secret}")
     private String accessKeySecret;
 
-    // @Value("${aliyun.oss.endpoint}")
+    @Value("${aliyun.oss.endpoint}")
     private String ossEndpoint;
 
-    // @Value("${aliyun.oss.bucket.name}")
+    @Value("${aliyun.oss.bucket.name}")
     private String ossBucketName;
 
-    // @Value("${aliyun.oss.base.url}")
+    @Value("${aliyun.oss.base.url}")
     private String ossBaseUrl;
 
-    // @Value("${upload.dir.prefix}")
-    // private String uploadDirPrefix;
+    @Value("${upload.dir.prefix}")
+    private String uploadDirPrefix;
 
     
 

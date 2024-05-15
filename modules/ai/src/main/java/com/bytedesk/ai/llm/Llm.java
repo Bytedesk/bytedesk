@@ -14,7 +14,8 @@
  */
 package com.bytedesk.ai.llm;
 
-import com.bytedesk.core.utils.AbstractEntity;
+import com.bytedesk.core.base.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -38,7 +39,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ai_llm")
-public class Llm extends AbstractEntity {
+public class Llm extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-23 09:00:16
+ * @LastEditTime: 2024-05-08 10:53:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,16 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-
 import jakarta.persistence.PostPersist;
 import lombok.extern.slf4j.Slf4j;
 
+@Async
 @Slf4j
 @Component
 public class UserListener {
@@ -35,8 +37,10 @@ public class UserListener {
         // 这里可以记录日志、发送通知等
         // create user topic
         TopicService topicService = ApplicationContextHolder.getBean(TopicService.class);
-        // 
         topicService.create(user.getUid(), user.getUid());
+        // 每创建一个用户，自动给此用户生成一条文件助理的会话
+        ThreadService threadService = ApplicationContextHolder.getBean(ThreadService.class);
+        threadService.createAsistantThread(user);
     }
 
     // @PreUpdate

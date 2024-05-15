@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.thread_log;
 
-import com.bytedesk.core.utils.BaseRequest;
+import com.bytedesk.core.base.BaseRequest;
 
 import lombok.Builder;
 import lombok.Data;

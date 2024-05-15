@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,6 +56,23 @@ public class OrganizationController {
         Page<OrganizationResponse> orgPage = organizationService.query(pageParam);
         // //
         return ResponseEntity.ok(JsonResult.success(orgPage));
+    }
+
+    /**
+     * create user organization
+     * 
+     * @param request
+     * @return
+     */
+    @PostMapping("/create")
+    public ResponseEntity<?> create(OrganizationRequest request) {
+        //
+        Organization org = organizationService.create(request);
+        if (org == null) {
+            return ResponseEntity.ok(JsonResult.error("创建组织失败"));
+        }
+        //
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**

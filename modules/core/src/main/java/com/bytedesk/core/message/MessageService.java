@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 21:11:23
+ * @LastEditTime: 2024-05-10 22:13:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,58 +39,70 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
 
+
+    public Page<MessageResponse> queryAll(MessageRequest request) {
+
+        // 优先加载最新聊天记录，也即：id越大越新
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "createdAt");
+        
+        Page<Message> messagePage = messageRepository.findByOrgUid(request.getOrgUid(), pageable);
+
+        return messagePage.map(BdConvertUtils::convertToMessageResponse);
+    }
+
     public Page<MessageResponse> query(MessageRequest request) {
 
         // 优先加载最新聊天记录，也即：id越大越新
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "id");
+                "createdAt");
 
         Page<Message> messagePage = messageRepository.findByThreadsUidIn(request.getThreads(), pageable);
 
         return messagePage.map(BdConvertUtils::convertToMessageResponse);
     }
 
-    @Cacheable(value = "message", key = "#mid", unless="#result == null")
-    public Optional<Message> findByMid(String mid) {
-        return messageRepository.findByUid(mid);
+    @Cacheable(value = "message", key = "#uid", unless = "#result == null")
+    public Optional<Message> findByUid(String uid) {
+        return messageRepository.findByUid(uid);
     }
 
-    /** 
-     *  find the last message in the thread
-     *  找到当前会话中最新一条聊天记录 
+    /**
+     * find the last message in the thread
+     * 找到当前会话中最新一条聊天记录
      */
-    @Cacheable(value = "message", key = "#threadTid", unless="#result == null")
+    @Cacheable(value = "message", key = "#threadTid", unless = "#result == null")
     public Optional<Message> findByThreadsUidInOrderByCreatedAtDesc(String threadTid) {
-        return messageRepository.findFirstByThreadsUidInOrderByCreatedAtDesc(new String[]{threadTid});
+        return messageRepository.findFirstByThreadsUidInOrderByCreatedAtDesc(new String[] { threadTid });
     }
 
     @Caching(put = {
-        @CachePut(value = "message", key = "#message.mid"),
+            @CachePut(value = "message", key = "#message.uid"),
     })
     public Message save(@NonNull Message message) {
         return messageRepository.save(message);
     }
 
     @Caching(evict = {
-        @CacheEvict(value = "message", key = "#message.mid"),
+            @CacheEvict(value = "message", key = "#message.uid"),
     })
     public void delete(@NonNull Message message) {
         messageRepository.delete(message);
     }
 
     @Caching(evict = {
-        @CacheEvict(value = "message", key = "#mid"),
+            @CacheEvict(value = "message", key = "#uid"),
     })
-    public void deleteByMid(String mid) {
-        messageRepository.deleteByUid(mid);
+    public void deleteByUid(String uid) {
+        messageRepository.deleteByUid(uid);
     }
 
-    public boolean existsByMid(String mid) {
-        return messageRepository.existsByUid(mid);
+    public boolean existsByUid(String uid) {
+        return messageRepository.existsByUid(uid);
     }
 
     // public MessageResponse convertToMessageResponse(Message message) {
-    //     return modelMapper.map(message, MessageResponse.class);
+    // return modelMapper.map(message, MessageResponse.class);
     // }
 
 }

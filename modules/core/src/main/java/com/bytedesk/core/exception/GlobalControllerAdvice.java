@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 15:06:12
+ * @LastEditTime: 2024-05-13 21:29:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.exception;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -88,11 +89,18 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler(value = NullPointerException.class)
-    public ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
+    public ResponseEntity<?> handleNullPointerException(NullPointerException ex) {
         return ResponseEntity.badRequest().body(JsonResult.error("Null Pointer Exception"));
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    // @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error("Bad request Exception"));
+    }
+
     @ExceptionHandler(Exception.class)
+    // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> handleException(Exception e) {
         log.error("not handled exception:", e);
         return ResponseEntity.badRequest().body(JsonResult.error("Internal Server Error"));

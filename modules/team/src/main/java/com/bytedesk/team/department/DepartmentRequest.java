@@ -14,7 +14,7 @@
  */
 package com.bytedesk.team.department;
 
-import com.bytedesk.core.utils.BaseRequest;
+import com.bytedesk.core.base.BaseRequest;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;

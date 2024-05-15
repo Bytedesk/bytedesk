@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-28 11:16:55
+ * @LastEditTime: 2024-05-08 11:04:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import com.bytedesk.ai.llm.LlmService;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.asistant.AsistantService;
 import com.bytedesk.core.channel.ChannelService;
+import com.bytedesk.core.quartz.QuartzService;
 import com.bytedesk.core.rbac.authority.AuthorityService;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserService;
@@ -37,6 +38,7 @@ import com.bytedesk.team.organization.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * init data - 初始化基础数据
  * https://docs.spring.io/spring-boot/docs/3.2.0/reference/htmlsingle/#features.spring-application.command-line-runner
  * 
  * @author bytedesk.com on 2019/4/21
@@ -44,6 +46,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class InitDataRunner implements ApplicationRunner {
+
+    @Autowired
+    AsistantService asistantService;
+
+    @Autowired
+    ChannelService channelService;
 
     @Autowired
     AuthorityService authorityService;
@@ -77,19 +85,20 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Autowired
     UploadService uploadService;
-
-    @Autowired
-    AsistantService asistantService;
-
-    @Autowired
-    ChannelService channelService;
-
+    
     @Autowired
     ThreadService threadService;
+    
+    @Autowired
+    QuartzService quartzService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.debug("application started, init Default data, dont change the init order");
+
+        asistantService.initData();
+
+        channelService.initData();
 
         authorityService.initData();
         
@@ -115,11 +124,9 @@ public class InitDataRunner implements ApplicationRunner {
 
         uploadService.initUploadDir();
 
-        asistantService.initData();
-
-        channelService.initData();
-
         threadService.initData();
+
+        quartzService.initData();
     }
 
 }

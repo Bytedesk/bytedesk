@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 20:28:33
+ * @LastEditTime: 2024-05-13 12:26:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,8 @@
  */
 package com.bytedesk.core.push;
 
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.StatusConsts;
-import com.bytedesk.core.utils.BaseRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,10 +35,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class PushRequest extends BaseRequest {
     
-    private static final long serialVersionUID = 6684752544L;
-    
-    private String pid;
-        
+    private static final long serialVersionUID = 1L;
+            
     private String sender;
     
     private String receiver;

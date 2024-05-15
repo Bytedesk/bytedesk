@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-06 17:21:33
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-05-15 12:04:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,28 +24,59 @@ AI powered customer service & team im
 
 ## Introduction
 
-- team im
-- customer service
-- ai chatbot: for team, config once, used by everyone
-- local file send, airdrop
+### Enterprise Instant Messaging/IM
 
-## Technical Stack
+- Multi-level organizational structure
+- role
+- Permission management
+- Chat record management
+
+### Online customer service
+
+- Support multiple channels, multiple routing strategies, and detailed assessment indicators
+- Seating workbench
+- Work order system
+- Seat management
+- Data dashboard
+- manual knowledge base
+- Skill group management
+- Real-time monitoring
+- Announcements
+- sensitive words
+- CRM
+- Report function,
+- Provide customers with integrated customer service workbench services
+
+### Large model AI assistant
+
+- More suitable for team use, one person configuration, for use throughout the company
+
+### Local Area Network File Transfer
+
+- No need to log in or connect to the internet, use WiFi/hotspots to transfer files across platforms
+
+<!-- ## Technical Stack
 
 - [springboot-3.2.0 jdk17/maven/mysql8.0 or postgresql](https://spring.io/projects/spring-boot) for backend
 - [react-18.2.0](https://reactjs.org/) for frontend
 - [react-native-0.73.4](https://reactnative.dev/) for mobile(ios&android)
-- [electron-29.1.1](https://www.electronjs.org/) for desktop(windows&mac&linux)
+- [electron-29.1.1](https://www.electronjs.org/) for desktop(windows&mac&linux) -->
 
 ## Getting Started
 
-- Notice: this repo is still under ative development, many features are not completed or not stable，the docs are not completed
-
 ```bash
+# Notice: this repo is still under ative development, 
+# many features are not completed or not stable，the docs are not completed
 git clone https://github.com/Bytedesk/bytedesk.git
-cd bytedesk
-mvn install -Dmaven.test.skip=true
-cd starter
+# config file: bytedesk/starter/src/main/resources/application-dev.properties
+cd bytedesk/starter
 mvn spring-boot:run
+# release jar:
+cd bytedesk/starter
+mvn package -Dmaven.test.skip=true
+java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+# background run:
+# nohup java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
 # 
 # local preview:
 developer: http://localhost:9003/dev
@@ -83,8 +114,16 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 - [React-native](./visitor/react-native)
 - [UniApp](./visitor/uniapp)
 - [Web](./visitor/web)
-<!-- - [Browser-Extension](https://github.com/bytedesk/bytedesk-browser-extension) -->
-<!-- - [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
+<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
+- [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
+- [Android](https://github.com/bytedesk/bytedesk-android)
+- [Flutter](https://github.com/bytedesk/bytedesk-flutter)
+- [React](https://github.com/bytedesk/bytedesk-react)
+- [React-native](https://github.com/bytedesk/bytedesk-react-native)
+- [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
+- [Web](https://github.com/bytedesk/bytedesk-web)
+- [Browser-Extension](https://github.com/bytedesk/bytedesk-browser-extension)
+- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
 
 ## Download
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 10:19:53
+ * @LastEditTime: 2024-05-13 13:43:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,10 +51,12 @@ public class AuthJwtTokenFilter extends OncePerRequestFilter {
       String jwt = parseJwt(request);
       log.debug("access_token {}", jwt);
       if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-        String username = jwtUtils.getUserNameFromJwtToken(jwt);
-        log.debug("username {}", username);
+        String subject = jwtUtils.getSubjectFromJwtToken(jwt);
+        // String username = jwtUtils.getUsernameFromJwtToken(jwt);
+        // String platform = jwtUtils.getPlatformFromJwtToken(jwt);
+        log.debug("subject {}", subject);
         //
-        UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, username);
+        UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     } catch (Exception e) {

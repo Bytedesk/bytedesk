@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 12:11:26
+ * @LastEditTime: 2024-05-13 12:52:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,7 +90,7 @@ public class AuthController {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getClient(), authRequest.getType());
 
         // send mobile code
-        Boolean result = pushService.sendSmsCode(authRequest.getMobile(), authRequest.getClient(), authRequest.getType());
+        Boolean result = pushService.sendSmsCode(authRequest.getMobile(), authRequest.getClient(), authRequest.getType(), authRequest.getPlatform());
         if (!result) {
             return ResponseEntity.ok().body(JsonResult.error("already send, dont repeat", -1, false));
         }
@@ -98,6 +98,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success("send mobile code success"));
     }
 
+    @ActionLogAnnotation(title = "Auth", action = "loginWithMobileCode", description = "Login With mobile & code")
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest) {
         log.debug("login mobile {}", authRequest.toString());
@@ -110,14 +111,15 @@ public class AuthController {
 
         // if mobile already exists, if none, then registe
         // 手机号是否已经注册，如果没有，则自动注册
-        if (!userService.existsByMobile(authRequest.getMobile())) {
+        if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())) {
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getMobile());
             userRequest.setMobile(authRequest.getMobile());
+            userRequest.setPlatform(authRequest.getPlatform());
             userService.register(userRequest);
         }
         
-        Authentication authentication = authService.authenticationWithMobile(authRequest.getMobile());
+        Authentication authentication = authService.authenticationWithMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform());
         //
         AuthResponse authResponse = authService.formatResponse(authentication);
 
@@ -129,7 +131,7 @@ public class AuthController {
         log.debug("send email code {}", authRequest.toString());
 
         // send email code
-        Boolean result = pushService.sendEmailCode(authRequest.getEmail(), authRequest.getClient(), authRequest.getType());
+        Boolean result = pushService.sendEmailCode(authRequest.getEmail(), authRequest.getClient(), authRequest.getType(), authRequest.getPlatform());
         if (!result) {
             return ResponseEntity.ok(JsonResult.error("already send, dont repeat", -1, false));
         }
@@ -137,6 +139,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success("send email code success"));
     }
 
+    @ActionLogAnnotation(title = "Auth", action = "loginWithEmailCode", description = "Login With email & code")
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest) {
         log.debug("login email {}", authRequest.toString());
@@ -147,14 +150,15 @@ public class AuthController {
         }
 
         // 邮箱是否已经注册，如果没有，则自动注册
-        if (!userService.existsByEmail(authRequest.getEmail())) {
+        if (!userService.existsByEmailAndPlatform(authRequest.getEmail(), authRequest.getPlatform())) {
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getEmail());
             userRequest.setEmail(authRequest.getEmail());
+            userRequest.setPlatform(authRequest.getPlatform());
             userService.register(userRequest);
         }
 
-        Authentication authentication = authService.authenticationWithEmail(authRequest.getEmail());
+        Authentication authentication = authService.authenticationWithEmailAndPlatform(authRequest.getEmail(), authRequest.getPlatform());
         //
         AuthResponse authResponse = authService.formatResponse(authentication);
 
