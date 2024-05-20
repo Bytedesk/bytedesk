@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-15 21:38:36
+ * @LastEditTime: 2024-05-20 10:56:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,6 +132,15 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 
 - [TODO: Android](https://www.weiyuai.cn/download.html)
 - [TODO: IOS](https://www.weiyuai.cn/download.html)
+
+## 技术栈
+
+- [springboot-3.2.0 jdk17/maven/mysql8.0 or postgresql](https://spring.io/projects/spring-boot) for 后端
+- [react-18.2.0](https://reactjs.org/) for web前端
+- [react-native-0.73.4](https://reactnative.dev/) for 移动客户端(ios&android)
+- [electron-29.1.1](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
+
+有兴趣的同学，特别是独立开发者，欢迎加入，共同开发，利润共享。
 
 ## 联系
 
