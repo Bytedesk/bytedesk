@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>微语 · 隐私策略 - 开源团队协作平台 - 企业即时通讯、在线客服系统、大模型AI助手三位一体</title>
+    <title>微语 · 隐私策略 - 基于AI的企业IM和在线客服系统 - 企业即时通讯、在线客服系统、大模型AI助手三位一体</title>
     
     <#include "./common/header_meta.ftl" />
 

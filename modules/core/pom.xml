@@ -11,7 +11,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>module-core</artifactId>
+	<artifactId>bytedesk-module-core</artifactId>
 
 	<name>core</name>
 	<description>Demo project for Spring Boot</description>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>微语 - 开源团队协作平台 - 企业即时通讯、在线客服系统、大模型AI助手三位一体</title>
+	<title>微语 - 开源在线客服和企业IM - 企业即时通讯、在线客服系统、大模型AI助手三位一体</title>
 
 	<#--  Header  -->
 	<#include "./common/header_meta.ftl" />
@@ -33,7 +33,7 @@ Main Banner START -->
 		<div class="row align-items-center">
 			<div class="col-md-5">
 				<!-- Title -->
-				<h1 class="mb-3">一切以服务客户为中心</h1>
+				<h1 class="mb-3">基于AI全新打造</h1>
 				<h4 class="mb-3">企业即时通讯、在线客服系统、AI助手</h4>
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->

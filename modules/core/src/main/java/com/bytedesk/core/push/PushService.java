@@ -100,6 +100,7 @@ public class PushService {
         pushRequest.setContent(code);
         pushRequest.setReceiver(receiver);
         pushRequest.setClient(client);
+        pushRequest.setPlatform(platform);
         create(pushRequest);
 
         return true;

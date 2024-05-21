@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-14 15:33:46
+ * @LastEditTime: 2024-05-15 14:19:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,7 +70,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
 
         Page<QuartzEntity> page = quartzRepository.findByOrgUid(request.getOrgUid(), pageable);
 
-        return page.map(this::convertToQuartzResponse);
+        return page.map(this::convertToResponse);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
 
         quartzEntity = save(quartzEntity);
 
-        return convertToQuartzResponse(quartzEntity);
+        return convertToResponse(quartzEntity);
     }
 
     public QuartzResponse update(QuartzRequest quartzRequest) {
@@ -139,11 +139,12 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
         quartzOptional.get().setTriggerType(quartzRequest.getTriggerType());
         quartzOptional.get().setTriggerState(quartzRequest.getTriggerState());
         //
-        return convertToQuartzResponse(save(quartzOptional.get()));
+        return convertToResponse(save(quartzOptional.get()));
     }
 
-    public QuartzResponse convertToQuartzResponse(QuartzEntity quartzEntity) {
-        return modelMapper.map(quartzEntity, QuartzResponse.class);
+    @Override
+    public QuartzResponse convertToResponse(QuartzEntity entity) {
+        return modelMapper.map(entity, QuartzResponse.class);
     }
 
     @Override
@@ -285,4 +286,5 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
         startJob(quartzRequest);
     }
 
+    
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-03 21:27:59
+ * @LastEditTime: 2024-05-19 18:46:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,8 @@ public interface CustomerRepository extends //JpaRepository<Customer, Long>
 {
 
     Collection<CustomerNameOnly> findByName(String name);
+    
+    // swagger can't decide, Tweak configuration to get to unambiguous paths
     // using a dynamic projection parameter
-    <T> Collection<T> findByName(String name, Class<T> type);
+    // <T> Collection<T> findByName(String name, Class<T> type);
 }

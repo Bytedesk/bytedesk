@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 12:26:44
+ * @LastEditTime: 2024-05-17 17:37:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,4 +34,6 @@ public class PushResponse extends BaseResponse {
     private String type;
     
     private String status;
+
+    private String platform;
 }
