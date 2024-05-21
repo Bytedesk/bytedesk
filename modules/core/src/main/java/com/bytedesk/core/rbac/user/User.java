@@ -3,6 +3,9 @@ package com.bytedesk.core.rbac.user;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
@@ -102,6 +105,12 @@ public class User extends BaseEntity {
 	@Builder.Default
 	@Convert(converter = StringSetConverter.class)
 	private Set<String> organizations = new HashSet<>();
+
+	@Builder.Default
+    @Column(columnDefinition = "json")
+    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String extra = BdConstants.EMPTY_JSON_STRING;
 
 	// return the first organization oid
 	public String getOrgUid() {

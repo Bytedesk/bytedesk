@@ -11,7 +11,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>module-local</artifactId>
+	<artifactId>bytedesk-module-local</artifactId>
 
 	<name>local</name>
 	<description>Demo project for Spring Boot</description>
@@ -20,21 +20,21 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>module-core</artifactId>
+			<artifactId>bytedesk-module-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>module-service</artifactId>
+			<artifactId>bytedesk-module-service</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>module-socket</artifactId>
+			<artifactId>bytedesk-module-socket</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>

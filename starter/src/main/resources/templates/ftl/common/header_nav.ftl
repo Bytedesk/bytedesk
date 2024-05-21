@@ -7,7 +7,7 @@
 			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/">
 				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="logo">  -->
 				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="logo">  -->
-				<h5>微语-开源团队协作平台</h5>
+				<h5>微语-基于AI的企业IM和在线客服系统</h5>
 			</a>
 			<!-- Logo END -->
 

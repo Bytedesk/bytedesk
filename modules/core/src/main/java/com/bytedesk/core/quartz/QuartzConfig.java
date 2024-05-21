@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 13:05:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-28 13:23:03
+ * @LastEditTime: 2024-05-17 11:39:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.bytedesk.core.quartz.job.FiveSecondJob;
+
+/**
+ * Cron使用方法：
+ * https://stackoverflow.com/questions/26147044/spring-cron-expression-for-every-day-101am
+ * https://docs.spring.io/spring/docs/3.0.x/javadoc-api/org/springframework/scheduling/support/CronSequenceGenerator.html
+ */
+
+// second, minute, hour, day of month, month, day(s) of week
+// "0 0 * * * *" = the top of every hour of every day. // 测试报：invalid
+// "*/10 * * * * *" = every ten seconds.
+// "0 0 8-10 * * *" = 8, 9 and 10 o'clock of every day.
+// "0 0/30 8-10 * * *" = 8:00, 8:30, 9:00, 9:30 and 10 o'clock every day.
+// "0 0 9-17 * * MON-FRI" = on the hour nine-to-five weekdays
+// "0 0 0 25 12 ?" = every Christmas Day at midnight
+// (*) means match any
+// */X means "every X"
+// ? ("no specific value")
 
 /**
  * <a href=

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 12:23:34
+ * @LastEditTime: 2024-05-16 10:44:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,12 +16,14 @@ package com.bytedesk.core.topic;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,8 @@ public class TopicService {
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
 
     public void create(String topic, String uid) {
         TopicRequest topicRequest = TopicRequest.builder()
@@ -128,6 +132,8 @@ public class TopicService {
 
     @Async
     public void addClientId(String clientId) {
+        concurrentMap.remove(clientId);
+
         // 用户clientId格式: uid/client/deviceUid
         Optional<Topic> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
@@ -145,6 +151,11 @@ public class TopicService {
 
     @Async
     public void removeClientId(String clientId) {
+        // TODO: 防止客户端频繁闪断重连的情况，延迟执行，防止频繁删除
+        concurrentMap.put(clientId, clientId);
+    }
+
+    private void doRemoveClientId(String clientId) {
         // 用户clientId格式: uid/client/deviceUid
         Optional<Topic> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
@@ -158,6 +169,16 @@ public class TopicService {
                 save(topic);
             }
         }
+    }
+
+    // 5分钟没有重连成功的话，就删除掉
+    @Scheduled(fixedDelay = 5 * 60 * 1000)
+    public void scheduleTask() {
+        // log.info("scheduleTask");
+
+        concurrentMap.forEach((key, value) -> {
+            doRemoveClientId(key);
+        });
     }
 
     @Cacheable(value = "topic", key = "#uid")

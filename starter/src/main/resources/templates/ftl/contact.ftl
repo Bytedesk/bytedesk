@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>联系微语 - 开源团队协作平台 - 企业即时通讯、在线客服系统、大模型AI助手三位一体</title>
+	<title>联系微语 - 基于AI的企业IM和在线客服系统 - 企业即时通讯、在线客服系统、大模型AI助手三位一体</title>
 
 	<#--  Header  -->
 	<#include "./common/header_meta.ftl" />

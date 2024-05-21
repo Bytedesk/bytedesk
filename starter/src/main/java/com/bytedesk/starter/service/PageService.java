@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-13 13:08:06
+ * @LastEditTime: 2024-05-16 16:55:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,7 +39,6 @@ public class PageService {
     private static final String htmlSavePath = "/templates/";
     private static final String templatePath = "/templates/ftl/";
     
-
     @Autowired
     Configuration configuration;
 

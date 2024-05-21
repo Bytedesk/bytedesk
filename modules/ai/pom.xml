@@ -10,7 +10,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>module-ai</artifactId>
+	<artifactId>bytedesk-module-ai</artifactId>
 
 	<name>ai</name>
 	<description>Demo project for Spring Boot</description>
@@ -58,7 +58,7 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>module-core</artifactId>
+			<artifactId>bytedesk-module-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>

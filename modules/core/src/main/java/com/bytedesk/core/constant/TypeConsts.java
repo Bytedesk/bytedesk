@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 23:29:18
+ * @LastEditTime: 2024-05-16 11:56:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,4 +90,14 @@ public class TypeConsts {
     public static final String SEND_MOBILE_CODE_TYPE_FORGET = "forget";
     public static final String SEND_MOBILE_CODE_TYPE_VERIFY = "verify";
 
+
+    /**
+     * region类型, 代码长度分别为：省 2、市 4、区/县 6、镇 9
+     */
+    public static final String REGION_TYPE_PROVINCE = "province";
+    public static final String REGION_TYPE_CITY = "city";
+    public static final String REGION_TYPE_COUNTY = "county";
+    public static final String REGION_TYPE_TOWN = "town";
+
+    
 }

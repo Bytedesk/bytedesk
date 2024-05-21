@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 11:17:50
+ * @LastEditTime: 2024-05-20 09:41:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,10 +21,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -70,13 +66,13 @@ public class UserService {
 
     private final UidUtils uidUtils;
 
-    public Page<User> query(UserRequest userRequest) {
+    // public Page<User> query(UserRequest userRequest) {
 
-        Pageable pageable = PageRequest.of(userRequest.getPageNumber(), userRequest.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+    //     Pageable pageable = PageRequest.of(userRequest.getPageNumber(), userRequest.getPageSize(), Sort.Direction.ASC,
+    //             "updatedAt");
 
-        return userRepository.findAll(pageable);
-    }
+    //     return userRepository.findAll(pageable);
+    // }
 
     @Transactional
     public UserResponse register(UserRequest userRequest) {

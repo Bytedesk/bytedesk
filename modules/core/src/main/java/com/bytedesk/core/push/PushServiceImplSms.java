@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 11:56:11
+ * @LastEditTime: 2024-05-15 12:37:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.message.Message;
+import com.bytedesk.core.utils.Utils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,10 +43,12 @@ public class PushServiceImplSms extends Notifier {
 
     @Async
     @Override
-    void send(String to, String content) {
-        log.info("send sms to {}, content: {}", to, content);
-        // 
-        sendValidateCode(to, content);
+    void send(String mobile, String content) {
+        log.info("send sms to {}, content: {}", mobile, content);
+        // not test mobile, send sms
+        if (!Utils.isTestMobile(mobile)) {
+            sendValidateCode(mobile, content);
+        }
     }
     
     @Value("${aliyun.access.key.id}")

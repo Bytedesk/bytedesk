@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 12:52:05
+ * @LastEditTime: 2024-05-17 17:24:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -106,7 +106,7 @@ public class AuthController {
         // validate mobile & code
         // 验证手机验证码
         if (!pushService.validateSmsCode(authRequest.getMobile(), authRequest.getCode())) {
-            return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, new AuthResponse()));
         }
 
         // if mobile already exists, if none, then registe
@@ -146,7 +146,7 @@ public class AuthController {
 
         // validate email & code
         if (!pushService.validateEmailCode(authRequest.getEmail(), authRequest.getCode())) {
-            return ResponseEntity.ok(JsonResult.error("validate code failed", -1, false));
+            return ResponseEntity.ok(JsonResult.error("validate code failed", -1, new AuthResponse()));
         }
 
         // 邮箱是否已经注册，如果没有，则自动注册
@@ -165,8 +165,6 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-
-    
 
     // @PostMapping("/refreshToken")
     // public JwtResponse refreshToken(@RequestBody RefreshTokenRequest

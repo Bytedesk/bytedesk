@@ -25,6 +25,8 @@ hs_err_pid*
 /starter/logs
 h2db/
 application-prod.properties
+application-dev-mysql.properties
+application-dev-pg.properties
 projects/*
 liangshibao/*
 tiku/*

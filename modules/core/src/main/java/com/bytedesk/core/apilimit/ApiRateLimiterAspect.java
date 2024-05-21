@@ -24,6 +24,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.utils.JsonResult;
@@ -73,8 +74,8 @@ public class ApiRateLimiterAspect {
         if (proceed) {
             return point.proceed();
         }
-        //
-        return JsonResult.error("api out of limit, please try later");
+        // TODO: 将相关ip记录到黑名单中，后续请求直接返回错误信息
+        return ResponseEntity.ok(JsonResult.error("api out of limit, please try later"));
     }
     
 }

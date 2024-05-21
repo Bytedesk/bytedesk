@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 23:22:04
+ * @LastEditTime: 2024-05-18 16:55:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,10 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 public class DepartmentService {
 
     private final ModelMapper modelMapper;
-
-    // private final BytedeskProperties properties;
-
-    // private final OrganizationService organizationService;
 
     private final DepartmentRepository departmentRepository;
 

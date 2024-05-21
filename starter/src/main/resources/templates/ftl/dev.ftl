@@ -13,6 +13,6 @@
     <a href="/chat" target="_blank">chat</a><br/>
     <a href="/v" target="_blank">visitor</a><br/>
     <a href="/swagger-ui/index.html" target="_blank">api docs</a><br/>
-    <a href="/im/actuator" target="_blank">actuator</a>
+    <a href="/actuator" target="_blank">actuator</a>
 </body> 
 </html>

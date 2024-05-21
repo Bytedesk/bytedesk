@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 11:57:51
+ * @LastEditTime: 2024-05-15 12:38:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,10 +48,10 @@ public class PushServiceImplEmail extends Notifier {
 
     @Async
     @Override
-    void send(String to, String content) {
-        log.info("send email to {}, content {}", to, content);
+    void send(String email, String content) {
+        log.info("send email to {}, content {}", email, content);
         // 
-        sendValidateCode(to, content);
+        sendValidateCode(email, content);
     }
     
     @Value("${aliyun.access.key.id}")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 12:54:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-28 13:29:57
+ * @LastEditTime: 2024-05-20 10:08:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,14 @@
  */
 package com.bytedesk.local;
 
-import org.springframework.boot.SpringApplication;
+// import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class LocalApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LocalApplication.class, args);
-	}
+	// public static void main(String[] args) {
+	// 	SpringApplication.run(LocalApplication.class, args);
+	// }
 
 }
