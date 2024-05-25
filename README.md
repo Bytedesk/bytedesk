@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-15 21:38:47
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-05-25 11:08:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,7 +85,7 @@ admin: http://localhost:9003/admin, user/password: admin@email.com/admin
 chat: http://localhost:9003/chat, user/password: admin@email.com/admin
 visitor: http://localhost:9003/v
 api docs: http://localhost:9003/swagger-ui/index.html
-actuator: http://localhost:9003/im/actuator
+actuator: http://localhost:9003/actuator
 h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
 ```
 
@@ -95,10 +95,11 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 
 ## Preview
 
-- [Web](https://www.weiyuai.cn/)
-- [Admin](https://www.weiyuai.cn/admin)
-- [Web Chat](https://www.weiyuai.cn/chat)
-- [Visitor](https://www.weiyuai.cn/v)
+### Admin
+
+| team | service | ai |
+| :----------: | :----------: | :----------: |
+| <img src="./images/admin/team.png" width="250"> | <img src="./images/admin/service.png" width="250"> | <img src="./images/admin/ai.png" width="250"> |
 
 ## Customer Service Visitor SDK
 
