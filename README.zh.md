@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-05-20 10:56:15
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-05-25 11:08:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,13 +55,6 @@
 
 - 无需登录，无需连接外网，利用WiFi/热点跨平台传文件
 
-<!-- ## 技术栈
-
-- [springboot-3.2.0 jdk17/maven/mysql8.0 or postgresql](https://spring.io/projects/spring-boot) for 后端
-- [react-18.2.0](https://reactjs.org/) for web前端
-- [react-native-0.73.4](https://reactnative.dev/) for 移动客户端(ios&android)
-- [electron-29.1.1](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux) -->
-
 ## 快速开始
 
 ```bash
@@ -84,7 +77,7 @@ web: http://localhost:9003/
 WebIM/客服端: http://localhost:9003/chat, 用户名: admin@email.com, 密码: admin
 访客对话窗口: http://localhost:9003/v
 api文档: http://localhost:9003/swagger-ui/index.html
-actuator: http://localhost:9003/im/actuator
+actuator: http://localhost:9003/actuator
 h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
 ```
 
@@ -94,10 +87,11 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 
 ## 预览
 
-- [官网](https://www.weiyuai.cn/)
-- [管理后台](https://www.weiyuai.cn/admin)
-- [WebIM/客服端](https://www.weiyuai.cn/chat)
-- [客服访客端](https://www.weiyuai.cn/v)
+### 管理后台
+
+| team | service | ai |
+| :----------: | :----------: | :----------: |
+| <img src="./images/admin/team.png" width="250"> | <img src="./images/admin/service.png" width="250"> | <img src="./images/admin/ai.png" width="250"> |
 
 ## 在线客服-访客端SDK
 
