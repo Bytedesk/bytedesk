@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-25 14:51:03
+ * @LastEditTime: 2024-05-29 10:22:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,8 @@
 
 # 微语
 
-基于AI的开源企业IM和在线客服系统。
+<!-- 基于AI的开源企业IM和在线客服系统。 -->
+一款开源聊天软件
 
 ## 语言
 
@@ -24,14 +25,19 @@
 
 ## 介绍
 
-### 企业即时通讯/IM
+### 社交IM：跟好友聊
+
+- 好友、
+- 群组、
+
+### 企业IM：跟同事聊
 
 - 多层组织架构、
 - 角色管理
 - 权限管理
 - 聊天记录管理
 
-### 在线客服
+### 在线客服：跟客户聊
 
 - 支持多渠道、多种路由策略、详细考核指标
 - 坐席工作台、
@@ -47,7 +53,9 @@
 - 报表功能，
 - 为客户提供一体化客服工作台服务
 
-### 大模型AI助手
+### 智能客服：跟AI聊
+
+### 大模型AI助手：跟AI聊
 
 - 更适合团队使用，一人配置，全公司使用
 
