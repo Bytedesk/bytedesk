@@ -132,11 +132,11 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 
 ## 客户端&客服端
 
-- [TODO: Windows](https://www.weiyuai.cn/download.html)
-- [TODO: Mac](https://www.weiyuai.cn/download.html)
-- [TODO: Linux](https://www.weiyuai.cn/download.html)
-- [TODO: Android](https://www.weiyuai.cn/download.html)
-- [TODO: IOS](https://www.weiyuai.cn/download.html)
+- [Windows](https://www.weiyuai.cn/download.html)
+- [Mac](https://www.weiyuai.cn/download.html)
+- [Linux](https://www.weiyuai.cn/download.html)
+- [Android](https://www.weiyuai.cn/download.html)
+- [IOS](https://www.weiyuai.cn/download.html)
 
 ## 技术栈 - 基于金融级云原生架构
 
