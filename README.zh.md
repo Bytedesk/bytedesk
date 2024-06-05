@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-05 09:49:32
+ * @LastEditTime: 2024-06-05 09:47:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,4 +16,97 @@
 
 基于 LLM 和 RAG 的智能客服
 
-## 开始使用
+## 快速开始
+
+```bash
+# 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
+git clone https://github.com/Bytedesk/bytedesk.git
+# 配置文件: bytedesk/starter/src/main/resources/application-dev.properties
+cd bytedesk/starter
+mvn spring-boot:run
+# 打包jar并运行:
+cd bytedesk/starter
+mvn package -Dmaven.test.skip=true
+java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+# 后台运行
+nohup java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+# 
+# 本地预览
+开发者入口: http://localhost:9003/dev
+web: http://localhost:9003/
+管理后台: http://localhost:9003/admin, 用户名: admin@email.com, 密码: admin
+WebIM/客服端: http://localhost:9003/chat, 用户名: admin@email.com, 密码: admin
+访客对话窗口: http://localhost:9003/v
+api文档: http://localhost:9003/swagger-ui/index.html
+actuator: http://localhost:9003/actuator
+h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
+```
+
+## 文档
+
+- [文档](https://www.weiyuai.cn/docs/)
+
+## 预览
+
+### 管理后台
+
+| 组织 | 客服 | ai |
+| :----------: | :----------: | :----------: |
+| <img src="./images/admin/team.png" width="250"> | <img src="./images/admin/service.png" width="250"> | <img src="./images/admin/ai.png" width="250"> |
+
+## 桌面客户端
+
+| 登录 | 对话 | 通讯录 | 设置 |
+| :----------: | :----------: | :----------: | :----------: |
+| <img src="./images/pc/login2.png" width="100"><img src="./images/pc/switch.png" width="100"> | <img src="./images/pc/chat.png" width="250"> | <img src="./images/pc/contact.png" width="250"> | <img src="./images/pc/setting.png" width="250"> |
+
+## 在线客服-访客端SDK
+
+- [iOS-oc](./visitor/oc)
+- [iOS-swift](./visitor/swift)
+- [Android](./visitor/android)
+- [Flutter](./visitor/flutter)
+- [React](./visitor/react)
+- [React-native](./visitor/react-native)
+- [UniApp](./visitor/uniapp)
+- [Web](./visitor/web)
+<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
+- [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
+- [Android](https://github.com/bytedesk/bytedesk-android)
+- [Flutter](https://github.com/bytedesk/bytedesk-flutter)
+- [React](https://github.com/bytedesk/bytedesk-react)
+- [React-native](https://github.com/bytedesk/bytedesk-react-native)
+- [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
+- [Web](https://github.com/bytedesk/bytedesk-web)
+- [Browser-Extension](https://github.com/bytedesk/bytedesk-browser-extension)
+- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
+
+## 客户端&客服端
+
+- [Windows](https://www.weiyuai.cn/download.html)
+- [Mac](https://www.weiyuai.cn/download.html)
+- [Linux](https://www.weiyuai.cn/download.html)
+- [Android](https://www.weiyuai.cn/download.html)
+- [IOS](https://www.weiyuai.cn/download.html)
+
+## 技术栈 - 基于金融级云原生架构
+
+<!-- - [springboot-3.2.0 jdk17/maven/h2/mysql8.0/postgresql/oracle(jpa支持的所有数据库)](https://spring.io/projects/spring-boot) for 后端 -->
+- [sofaboot-4.2.0 jdk17/maven/h2/mysql8.0/postgresql/oracle(jpa支持的所有数据库)](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for 后端
+- [python-3.10](https://docs.python.org/zh-cn/3/) for AI助手
+- [react-18.2.0](https://reactjs.org/) for web前端
+- [react-native-0.73.4](https://reactnative.dev/) for 移动客户端(ios&android)
+- [electron-29.1.1](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
+
+<!-- 有兴趣的同学，特别是独立开发者，欢迎加入，共同开发，利润共享。 -->
+
+## 联系
+
+- [Email](mailto:270580156@qq.com)
+- [微信](./images/wechat.png)
+
+## [声明](https://www.weiyuai.cn/)
+
+- 支持商用
+- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权
+- 请勿用于非法用途
