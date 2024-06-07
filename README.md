@@ -37,7 +37,7 @@ developer: http://localhost:9003/dev
 web: http://localhost:9003/
 admin: http://localhost:9003/admin, user/password: admin@email.com/admin
 agent: http://localhost:9003/agent, user/password: admin@email.com/admin
-chat: http://localhost:9003/chat
+chat: http://localhost:9003/chat?t=0&sid=default_agent_uid&
 api docs: http://localhost:9003/swagger-ui/index.html
 actuator: http://localhost:9003/actuator
 h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa

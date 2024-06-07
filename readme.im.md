@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:43:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 16:32:00
+ * @LastEditTime: 2024-06-07 16:58:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,7 +83,7 @@ developer: http://localhost:9003/dev
 web: http://localhost:9003/
 admin: http://localhost:9003/admin, user/password: admin@email.com/admin
 agent: http://localhost:9003/agent, user/password: admin@email.com/admin
-chat: http://localhost:9003/chat
+chat: http://localhost:9003/chat?t=0&sid=default_agent_uid&
 api docs: http://localhost:9003/swagger-ui/index.html
 actuator: http://localhost:9003/actuator
 h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
