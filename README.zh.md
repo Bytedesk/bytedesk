@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-05 09:47:59
+ * @LastEditTime: 2024-06-07 16:32:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,8 +35,8 @@ nohup java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
 开发者入口: http://localhost:9003/dev
 web: http://localhost:9003/
 管理后台: http://localhost:9003/admin, 用户名: admin@email.com, 密码: admin
-WebIM/客服端: http://localhost:9003/chat, 用户名: admin@email.com, 密码: admin
-访客对话窗口: http://localhost:9003/v
+客服端: http://localhost:9003/agent, 用户名: admin@email.com, 密码: admin
+访客: http://localhost:9003/chat
 api文档: http://localhost:9003/swagger-ui/index.html
 actuator: http://localhost:9003/actuator
 h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
