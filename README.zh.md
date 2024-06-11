@@ -22,6 +22,10 @@
 # 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
 git clone https://github.com/Bytedesk/bytedesk.git
 # 配置文件: bytedesk/starter/src/main/resources/application-dev.properties
+# 
+cd bytedesk
+mvn install -Dmaven.test.skip=true
+#
 cd bytedesk/starter
 mvn spring-boot:run
 # 打包jar并运行:
