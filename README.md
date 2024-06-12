@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 12:08:52
+ * @LastEditTime: 2024-06-12 16:36:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -66,7 +66,7 @@ Chat as a Service
 # many features are not completed or not stable，the docs are not completed
 git clone https://github.com/Bytedesk/bytedesk.git
 # config file: bytedesk/starter/src/main/resources/application-dev.properties
-# 
+# use maven && vscode
 cd bytedesk
 mvn install -Dmaven.test.skip=true
 # 
