@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 21:41:27
+ * @LastEditTime: 2024-06-06 14:44:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,23 +26,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.asistant.Asistant;
+import com.bytedesk.core.channel.Channel;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.StatusConsts;
-import com.bytedesk.core.constant.ThreadTypeConsts;
 import com.bytedesk.core.constant.TopicConsts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,17 +64,20 @@ public class ThreadService {
 
     private UidUtils uidUtils;
 
-    public Page<ThreadResponse> queryAll(ThreadRequest pageParam) {
+    public Page<ThreadResponse> queryByOrg(ThreadRequest request) {
 
         // 优先加载最近更新的会话记录，updatedAt越大越新
-        Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Page<Thread> threadPage = threadRepository.findByOrgUid(pageParam.getOrgUid(), pageable);
+        Specification<Thread> specs = ThreadSpecification.search(request);
+        Page<Thread> threadPage = threadRepository.findAll(specs, pageable);
+        // Page<Thread> threadPage =
+        // threadRepository.findByOrgUidAndDeleted(pageParam.getOrgUid(), false,
+        // pageable);
 
-        return threadPage.map(this::convertToThreadResponse);
+        return threadPage.map(this::convertToResponse);
     }
-    
 
     /**  */
     public Page<ThreadResponse> query(ThreadRequest pageParam) {
@@ -85,39 +90,7 @@ public class ThreadService {
 
         Page<Thread> threadPage = findByOwner(user, pageable);
 
-        return threadPage.map(this::convertToThreadResponse);
-    }
-
-    /**
-     * create member thread
-     * 
-     * @param threadRequest
-     * @return
-     */
-    public ThreadResponse createMemberThread(ThreadRequest threadRequest) {
-
-        User owner = authService.getCurrentUser();
-        //
-        Optional<Thread> threadOptional = findByTopicAndOwner(threadRequest.getTopic(), owner);
-        if (threadOptional.isPresent()) {
-            return convertToThreadResponse(threadOptional.get());
-        }
-        //
-        Thread thread = modelMapper.map(threadRequest, Thread.class);
-        thread.setUid(uidUtils.getCacheSerialUid());
-        thread.setStatus(StatusConsts.THREAD_STATUS_INIT);
-
-        //
-        String user = JSON.toJSONString(threadRequest.getUser());
-        log.info("request {}, user {}", threadRequest.toString(), user);
-        thread.setUser(user);
-        //
-        thread.setOwner(owner);
-        thread.setOrgUid(owner.getOrgUid());
-        //
-        Thread result = save(thread);
-        //
-        return convertToThreadResponse(result);
+        return threadPage.map(this::convertToResponse);
     }
 
     /** */
@@ -137,10 +110,9 @@ public class ThreadService {
             reverseThread.setUid(reverseTid);
             reverseThread.setTopic(thread.getOwner().getUid());
             //
-            UserResponseSimple user = userService.convertToUserResponseSimple(thread.getOwner());
+            UserResponseSimple user = ConvertUtils.convertToUserResponseSimple(thread.getOwner());
             reverseThread.setUser(JSON.toJSONString(user));
-            // reverseThread.setAvatar(thread.getOwner().getAvatar());
-            // reverseThread.setNickname(thread.getOwner().getNickname());
+            // reverseThread.setUser(thread.getOwner());
             //
             reverseThread.setContent(thread.getContent());
             // reverseThread.setExtra(thread.getExtra());
@@ -149,31 +121,149 @@ public class ThreadService {
             //
             return save(reverseThread);
         }
+
+    }
+
+    /**
+     * create member thread
+     * 
+     * @param threadRequest
+     * @return
+     */
+    public ThreadResponse createMemberThread(ThreadRequest threadRequest) {
+
+        User owner = authService.getCurrentUser();
+        //
+        Optional<Thread> threadOptional = findByTopicAndOwner(threadRequest.getTopic(), owner);
+        if (threadOptional.isPresent()) {
+            return convertToResponse(threadOptional.get());
+        }
+        //
+        Thread thread = modelMapper.map(threadRequest, Thread.class);
+        thread.setUid(uidUtils.getCacheSerialUid());
+        // thread.setStatus(StatusConsts.THREAD_STATUS_INIT);
+        thread.setStatus(ThreadStatusEnum.OPEN);
+
+        //
+        String user = JSON.toJSONString(threadRequest.getUser());
+        log.info("request {}, user {}", threadRequest.toString(), user);
+        thread.setUser(user);
+        //
+        thread.setOwner(owner);
+        thread.setOrgUid(owner.getOrgUid());
+        //
+        Thread result = save(thread);
+        //
+        return convertToResponse(result);
     }
 
     /** */
-    public Thread createAsistantThread(User user) {
+    public Thread createFileAsistantThread(User user, Asistant asistant) {
 
         UserResponseSimple userSimple = UserResponseSimple.builder()
                 // .uid(UserConsts.DEFAULT_FILE_ASISTANT_UID)
                 .nickname(I18Consts.I18N_FILE_ASISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .build();
-        userSimple.setUid(UserConsts.DEFAULT_FILE_ASISTANT_UID);
         //
         Thread thread = Thread.builder()
                 // .tid(uidUtils.getCacheSerialUid())
-                .type(ThreadTypeConsts.ASISTANT)
+                // .type(ThreadTypeConsts.ASISTANT)
+                .type(ThreadTypeEnum.ASISTANT)
                 .topic(TopicConsts.TOPIC_FILE_ASISTANT + "/" + user.getUid())
-                .status(StatusConsts.THREAD_STATUS_INIT)
-                .client(TypeConsts.TYPE_SYSTEM)
+                // .status(StatusConsts.THREAD_STATUS_INIT)
+                .status(ThreadStatusEnum.OPEN)
+                // .client(TypeConsts.TYPE_SYSTEM)
+                .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(userSimple))
+                // .user(userSimple)
+                // .user(asistant)
                 .owner(user)
                 .orgUid(user.getOrgUid())
                 .build();
-        thread.setUid(Utils.getUid());
+        thread.setUid(uidUtils.getCacheSerialUid());
 
         return save(thread);
+    }
+
+    public Thread createSystemNotificationChannelThread(User user, Channel channel) {
+
+        UserResponseSimple userSimple = UserResponseSimple.builder()
+                .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
+                .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
+                .build();
+        userSimple.setUid(UserConsts.DEFAULT_SYSTEM_NOTIFICATION_UID);
+        // //
+        Thread thread = Thread.builder()
+                // .tid(uidUtils.getCacheSerialUid())
+                // .type(ThreadTypeConsts.CHANNEL)
+                .type(ThreadTypeEnum.CHANNEL)
+                .topic(TopicConsts.TOPIC_SYSTEM_NOTIFICATION + "/" + user.getUid())
+                // .status(StatusConsts.THREAD_STATUS_INIT)
+                .status(ThreadStatusEnum.OPEN)
+                // .client(TypeConsts.TYPE_SYSTEM)
+                .client(ClientEnum.SYSTEM)
+                .user(JSON.toJSONString(userSimple))
+                // .user(channel)
+                .owner(user)
+                .orgUid(user.getOrgUid())
+                .build();
+        thread.setUid(uidUtils.getCacheSerialUid());
+
+        return save(thread);
+    }
+
+    public ThreadResponse update(ThreadRequest threadRequest) {
+        String uid = threadRequest.getUid();
+        Optional<Thread> threadOptional = findByUid(uid);
+        //
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("thread not found");
+        }
+        //
+        Thread thread = threadOptional.get();
+        //
+        // if (ThreadStatusEnum.AGENT_CLOSED.equals(thread.getStatus())) {
+        //     log.info("thread {} is already closed", uid);
+        //     throw new RuntimeException("thread is already closed");
+        // }
+        // //
+        // modelMapper.map(threadRequest, Thread.class);
+
+        thread.setStatus(threadRequest.getStatus());
+
+        //
+        Thread updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        return convertToResponse(updateThread);
+    }
+
+    public ThreadResponse close(ThreadRequest threadRequest) {
+        String uid = threadRequest.getUid();
+        Optional<Thread> threadOptional = findByUid(uid);
+        //
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("thread not found");
+        }
+        //
+        Thread thread = threadOptional.get();
+        //
+        if (ThreadStatusEnum.AGENT_CLOSED.equals(thread.getStatus())
+                || ThreadStatusEnum.AUTO_CLOSED.equals(thread.getStatus())) {
+            log.info("thread {} is already closed", uid);
+            throw new RuntimeException("thread is already closed");
+        }
+        //
+        thread.setStatus(ThreadStatusEnum.AGENT_CLOSED);
+        //
+        Thread updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+
+        return convertToResponse(updateThread);
     }
 
     @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
@@ -184,72 +274,84 @@ public class ThreadService {
     // TODO: how to cacheput or cacheevict?
     @Cacheable(value = "thread", key = "#topic-#user.uid", unless = "#result == null")
     public Optional<Thread> findByTopicAndOwner(String topic, User user) {
-        return threadRepository.findFirstByTopicAndOwner(topic, user);
+        return threadRepository.findFirstByTopicAndOwnerAndDeleted(topic, user, false);
     }
 
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<Thread> findByTopic(String topic) {
-        return threadRepository.findFirstByTopic(topic);
+        return threadRepository.findFirstByTopicAndDeleted(topic, false);
     }
 
     // TODO: how to cacheput or cacheevict?
     @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
     public Page<Thread> findByOwner(User user, Pageable pageable) {
-        return threadRepository.findByOwner(user, pageable);
+        return threadRepository.findByOwnerAndDeleted(user, false, pageable);
     }
 
     // TODO: 更新缓存
     @Cacheable(value = "threadOpen")
     public List<Thread> findStatusOpen() {
-        return threadRepository.findByStatus(StatusConsts.THREAD_STATUS_OPEN);
+        // return threadRepository.findByStatus(StatusConsts.THREAD_STATUS_OPEN);
+        return threadRepository.findByStatusAndDeleted(ThreadStatusEnum.OPEN, false);
     }
 
     public Boolean isClosed(Thread thread) {
-        return !StatusConsts.THREAD_STATUS_OPEN.equals(thread.getStatus());
+        // return !StatusConsts.THREAD_STATUS_OPEN.equals(thread.getStatus());
+        return !ThreadStatusEnum.OPEN.equals(thread.getStatus());
     }
 
     public Thread reopen(Thread thread) {
-        thread.setStatus(StatusConsts.THREAD_STATUS_OPEN);
+        // thread.setStatus(StatusConsts.THREAD_STATUS_OPEN);
+        thread.setStatus(ThreadStatusEnum.OPEN);
         return save(thread);
     }
 
     public Thread autoClose(Thread thread) {
-        thread.setStatus(StatusConsts.THREAD_STATUS_CLOSED_AUTO);
+        // thread.setStatus(StatusConsts.THREAD_STATUS_CLOSED_AUTO);
+        thread.setStatus(ThreadStatusEnum.AUTO_CLOSED);
         return save(thread);
     }
 
-    public Thread agentClose(Thread thread) {
-        thread.setStatus(StatusConsts.THREAD_STATUS_CLOSED_AGENT);
-        return save(thread);
-    }
+    // public Thread agentClose(Thread thread) {
+    // // thread.setStatus(StatusConsts.THREAD_STATUS_CLOSED_AGENT);
+    // thread.setStatus(ThreadStatusEnum.AGENT_CLOSED);
+    // return save(thread);
+    // }
 
     @Caching(put = {
             @CachePut(value = "thread", key = "#thread.uid"),
             @CachePut(value = "thread", key = "#thread.topic")
     })
     public Thread save(@NonNull Thread thread) {
-        return threadRepository.save(thread);
+        try {
+            return threadRepository.save(thread);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Caching(evict = {
             @CacheEvict(value = "thread", key = "#thread.uid"),
             @CacheEvict(value = "thread", key = "#thread.topic")
     })
-    public void delete(@NonNull Thread thread) {
-        threadRepository.delete(thread);
+    public void delete(@NonNull Thread entity) {
+        // threadRepository.delete(thread);
+        Optional<Thread> threadOptional = findByUid(entity.getUid());
+        threadOptional.ifPresent(thread -> {
+            thread.setDeleted(true);
+            save(thread);
+        });
     }
 
-    public ThreadResponse convertToThreadResponse(Thread thread) {
+    public ThreadResponse convertToResponse(Thread thread) {
         ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
         //
         UserResponseSimple user = JSON.parseObject(thread.getUser(), UserResponseSimple.class);
         threadResponse.setUser(user);
 
         return threadResponse;
-    }
-
-    public ThreadResponseSimple convertToThreadResponseSimple(Thread thread) {
-        return modelMapper.map(thread, ThreadResponseSimple.class);
     }
 
     //

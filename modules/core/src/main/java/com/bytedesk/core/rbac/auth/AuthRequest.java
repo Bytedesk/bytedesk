@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 11:02:22
+ * @LastEditTime: 2024-06-03 16:21:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.auth;
 
 import com.bytedesk.core.base.BaseRequest;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -38,6 +39,7 @@ public class AuthRequest extends BaseRequest {
     private String code;
 
     // 
+    @NotBlank
     private String platform;
 
 }

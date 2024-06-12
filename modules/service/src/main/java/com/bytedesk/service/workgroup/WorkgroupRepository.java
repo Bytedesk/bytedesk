@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 11:28:06
+ * @LastEditTime: 2024-06-07 11:49:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *  Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,8 +16,6 @@ package com.bytedesk.service.workgroup;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.lang.NonNull;
@@ -34,13 +32,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface WorkgroupRepository extends JpaRepository<Workgroup, Long>, JpaSpecificationExecutor<Workgroup> {
 
-    // Page<Workgroup> findAll(@NonNull Pageable pageable);
-
     Optional<Workgroup> findByUid(@NonNull String uid);
 
-    Optional<Workgroup> findByNickname(@NonNull String nickname);
+    // Optional<Workgroup> findByNicknameAndOrgUidAndDeleted(String nickname, String orgUid, Boolean deleted);
 
-    // Page<Workgroup> findByOrganization_Oid(String oid, Pageable pageable);
-    Page<Workgroup> findByOrgUid(String oid, Pageable pageable);
+    // Page<Workgroup> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable pageable);
 
 }

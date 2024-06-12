@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 12:49:10
+ * @LastEditTime: 2024-06-12 15:32:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,14 +25,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotService;
+import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.quick_button.QuickButton;
+import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.service.common.ServiceSettings;
+import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.worktime.Worktime;
+import com.bytedesk.service.worktime.WorktimeService;
+
 import lombok.AllArgsConstructor;
-import static java.util.Arrays.asList;
+// import lombok.extern.slf4j.Slf4j;
 
 // @Slf4j
 @Service
@@ -43,91 +56,176 @@ public class WorkgroupService {
 
     private final AgentService agentService;
 
+    private final RobotService robotService;
+
+    private final WorktimeService worktimeService;
+
+    private final QuickButtonService quickButtonService;
+
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
-    public Page<WorkgroupResponse> query(WorkgroupRequest workgroupRequest) {
+    private final BytedeskProperties bytedeskProperties;
+
+    public Page<WorkgroupResponse> queryByOrg(WorkgroupRequest workgroupRequest) {
 
         Pageable pageable = PageRequest.of(workgroupRequest.getPageNumber(),
                 workgroupRequest.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Page<Workgroup> workgroupPage = workgroupRepository.findByOrgUid(workgroupRequest.getOrgUid(),
-                pageable);
+        Specification<Workgroup> specs = WorkgroupSpecification.search(workgroupRequest);
+        Page<Workgroup> workgroupPage = workgroupRepository.findAll(specs, pageable);
+        // Page<Workgroup> workgroupPage =
+        // workgroupRepository.findByOrgUidAndDeleted(workgroupRequest.getOrgUid(),
+        // false, pageable);
 
-        return workgroupPage.map(this::convertToWorkgroupResponse);
+        return workgroupPage.map(ConvertServiceUtils::convertToWorkgroupResponse);
     }
 
-    public Workgroup create(WorkgroupRequest workgroupRequest) {
+    public WorkgroupResponse create(WorkgroupRequest workgroupRequest) {
         //
-        Workgroup workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
-        workgroup.setUid(uidUtils.getCacheSerialUid());
+        // // 使用映射会把默认值给清空为null
+        // Workgroup workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
+        Workgroup workgroup = Workgroup.builder()
+                .nickname(workgroupRequest.getNickname())
+                .orgUid(workgroupRequest.getOrgUid())
+                .build();
+        if (!StringUtils.hasText(workgroupRequest.getUid())) {
+            workgroup.setUid(uidUtils.getCacheSerialUid());
+        } else {
+            workgroup.setUid(workgroupRequest.getUid());
+        }
         //
-        Iterator<String> iterator = workgroupRequest.getAgentAids().iterator();
-        while (iterator.hasNext()) {
-            String agentAid = iterator.next();
+        Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
+        while (worktimeTterator.hasNext()) {
+            String worktimeUid = worktimeTterator.next();
+            Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
+            if (worktimeOptional.isPresent()) {
+                Worktime worktimeEntity = worktimeOptional.get();
+                workgroup.getServiceSettings().getWorktimes().add(worktimeEntity);
+            } else {
+                throw new RuntimeException(worktimeUid + " is not found.");
+            }
+        }
+        //
+        Iterator<String> agentIterator = workgroupRequest.getAgentUids().iterator();
+        while (agentIterator.hasNext()) {
+            String agentAid = agentIterator.next();
             Optional<Agent> agentOptional = agentService.findByUid(agentAid);
             if (agentOptional.isPresent()) {
                 Agent agentEntity = agentOptional.get();
                 workgroup.getAgents().add(agentEntity);
             } else {
-                return null;
+                throw new RuntimeException(agentAid + " is not found.");
             }
         }
         //
-        return save(workgroup);
+        workgroup = save(workgroup);
+
+        return ConvertServiceUtils.convertToWorkgroupResponse(workgroup);
     }
 
-    Workgroup update(WorkgroupRequest workgroupRequest) {
+    public WorkgroupResponse update(WorkgroupRequest workgroupRequest) {
 
-        Optional<Workgroup> workgroupOptional = findByWid(workgroupRequest.getUid());
+        Optional<Workgroup> workgroupOptional = findByUid(workgroupRequest.getUid());
         if (!workgroupOptional.isPresent()) {
-            return null;
+            throw new RuntimeException(workgroupRequest.getUid() + " is not found.");
         }
         //
         Workgroup workgroup = workgroupOptional.get();
-        workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
-        // workgroupOptional.get().setNickname(workgroupRequest.getNickname());
-        // workgroupOptional.get().setAvatar(workgroupRequest.getAvatar());
-        // workgroupOptional.get().setDescription(workgroupRequest.getDescription());
-        // workgroupOptional.get().setRouteType(workgroupRequest.getRouteType());
-        // workgroupOptional.get().setRecent(workgroupRequest.getRecent());
-        // workgroupOptional.get().setAutoPop(workgroupRequest.getAutoPop());
+        // 
+        // modelMapper.map(workgroupRequest, workgroup); // 会把orgUid给清空为null
+        workgroup.setNickname(workgroupRequest.getNickname());
+        workgroup.setAvatar(workgroupRequest.getAvatar());
+        workgroup.setDescription(workgroupRequest.getDescription());
+        workgroup.setRouteType(workgroupRequest.getRouteType());
+        workgroup.setRecent(workgroupRequest.getRecent());
         //
+        ServiceSettings serviceSettings = modelMapper.map(workgroupRequest.getServiceSettings(), ServiceSettings.class);
+        if (StringUtils.hasText(workgroupRequest.getServiceSettings().getRobotUid())) {
+            Optional<Robot> robotOptional = robotService.findByUid(workgroupRequest.getServiceSettings().getRobotUid());
+            if (robotOptional.isPresent()) {
+                Robot robot = robotOptional.get();
+                serviceSettings.setRobot(robot);
+            } else {
+                throw new RuntimeException(workgroupRequest.getServiceSettings().getRobotUid() + " is not found.");
+            }
+        }
+        if (workgroupRequest.getServiceSettings().getQuickButtonUids() != null
+                && workgroupRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
+            Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickButtonUids().iterator();
+            while (iterator.hasNext()) {
+                String quickButtonUid = iterator.next();
+                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
+                if (quickButtonOptional.isPresent()) {
+                    QuickButton quickButtonEntity = quickButtonOptional.get();
+
+                    serviceSettings.getQuickButtons().add(quickButtonEntity);
+                }
+            }
+        }
         //
-        Iterator<String> iterator = workgroupRequest.getAgentAids().iterator();
+        workgroup.getServiceSettings().getWorktimes().clear();
+        Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
+        while (worktimeTterator.hasNext()) {
+            String worktimeUid = worktimeTterator.next();
+            Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
+            if (worktimeOptional.isPresent()) {
+                Worktime worktimeEntity = worktimeOptional.get();
+                serviceSettings.getWorktimes().add(worktimeEntity);
+            } else {
+                throw new RuntimeException(worktimeUid + " is not found.");
+            }
+        }
+        workgroup.setServiceSettings(serviceSettings);
+        //
+        workgroup.getAgents().clear();
+        Iterator<String> iterator = workgroupRequest.getAgentUids().iterator();
         while (iterator.hasNext()) {
-            String agentAid = iterator.next();
-            Optional<Agent> agentOptional = agentService.findByUid(agentAid);
+            String agentUid = iterator.next();
+            Optional<Agent> agentOptional = agentService.findByUid(agentUid);
             if (agentOptional.isPresent()) {
                 Agent agentEntity = agentOptional.get();
                 workgroup.getAgents().add(agentEntity);
             } else {
-                return null;
+                throw new RuntimeException(agentUid + " is not found.");
             }
         }
         //
-        return save(workgroup);
+        workgroup = save(workgroup);
+
+        return ConvertServiceUtils.convertToWorkgroupResponse(workgroup);
     }
 
-    @Cacheable(value = "workgroup", key = "#wid", unless = "#result == null")
-    public Optional<Workgroup> findByWid(String wid) {
-        return workgroupRepository.findByUid(wid);
+    @Cacheable(value = "workgroup", key = "#uid", unless = "#result == null")
+    public Optional<Workgroup> findByUid(String uid) {
+        return workgroupRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "workgroup", key = "#nickname", unless = "#result == null")
-    public Optional<Workgroup> findByNickname(String nickname) {
-        return workgroupRepository.findByNickname(nickname);
-    }
+    // @Cacheable(value = "workgroup", key = "#nickname-#orgUid", unless = "#result
+    // == null")
+    // public Optional<Workgroup> findByNicknameAndOrgUidAndDeleted(String nickname,
+    // String orgUid) {
+    // return workgroupRepository.findByNicknameAndOrgUidAndDeleted(nickname,
+    // orgUid, false);
+    // }
 
-    // @SuppressWarnings("null")
     private Workgroup save(Workgroup workgroup) {
-        return workgroupRepository.save(workgroup);
+        try {
+            return workgroupRepository.save(workgroup);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
     }
 
-    public WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
-        return modelMapper.map(workgroup, WorkgroupResponse.class);
+    public void deleteByUid(String uid) {
+        Optional<Workgroup> workgroupOptional = findByUid(uid);
+        workgroupOptional.ifPresent(workgroup -> {
+            workgroup.setDeleted(true);
+            save(workgroup);
+        });
     }
 
     public void initData() {
@@ -136,31 +234,29 @@ public class WorkgroupService {
             return;
         }
 
-        List<String> agents = new ArrayList<>();
-        Optional<Agent> agent1Optional = agentService.findByMobile("18888888008");
-        agent1Optional.ifPresent(agent -> {
-            agents.add(agent.getUid());
-        });
-        Optional<Agent> agent2Optional = agentService.findByMobile("18888888009");
-        agent2Optional.ifPresent(agent -> {
-            agents.add(agent.getUid());
+        List<String> agentUids = new ArrayList<>();
+        Optional<Agent> agentOptional = agentService.findByMobileAndOrgUid(bytedeskProperties.getMobile(),
+                UserConsts.DEFAULT_ORGANIZATION_UID);
+        agentOptional.ifPresent(agent -> {
+            agentUids.add(agent.getUid());
         });
 
-        // add workgroups
-        WorkgroupRequest workgroup1Request = WorkgroupRequest.builder()
-                .nickname("客服组1")
-                .agentAids(agents)
+        // // add workgroups
+        WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
+                .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
+                .description(I18Consts.I18N_WORKGROUP_DESCRIPTION)
+                .agentUids(agentUids)
                 .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
-        create(workgroup1Request);
+        workgroupRequest.setUid(UserConsts.DEFAULT_WORKGROUP_UID);
 
-        //
-        WorkgroupRequest workgroup2Request = WorkgroupRequest.builder()
-                .nickname("客服组2")
-                .agentAids(asList(agent1Optional.get().getUid()))
-                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
-                .build();
-        create(workgroup2Request);
+        List<String> worktimeUids = new ArrayList<>();
+        String worktimeUid = worktimeService.createDefault();
+        worktimeUids.add(worktimeUid);
+        workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
+
+        // 
+        create(workgroupRequest);
 
     }
 

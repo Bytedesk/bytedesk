@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:13:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:58:05
+ * @LastEditTime: 2024-06-11 11:41:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.ai.kb;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -41,9 +42,6 @@ public class Kb extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
 
-    // @Column(name = "kid", unique = true, nullable = false)
-    // private String kid;    
-
     private String name;
 
     private String vectorStore;
@@ -51,8 +49,20 @@ public class Kb extends BaseEntity {
     private String embeddings;
     
     // is_published or not
-    // private boolean published;
+    @Builder.Default
+    private boolean published = true;
 
+    @Builder.Default
+    private String language = I18Consts.ZH_CN;
+
+    /**
+     * belong to org
+     */
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private Organization organization;
+    private String orgUid;
+    
     /**
      * 所属用户
      */

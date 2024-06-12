@@ -1,7 +1,6 @@
 package com.bytedesk.socket.mqtt.protocol;
 
 import com.bytedesk.core.event.BytedeskEventPublisher;
-import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.socket.mqtt.service.*;
 
 import lombok.Data;
@@ -48,8 +47,8 @@ public class ProtocolProcess {
     // @Autowired
     // private MqttClientIdService mqttClientIdStoreService;
 
-    @Autowired
-    private TopicService topicService;
+    // @Autowired
+    // private TopicService topicService;
 
     @Autowired
     private BytedeskEventPublisher bytedeskEventPublisher;
@@ -83,7 +82,8 @@ public class ProtocolProcess {
                     // mqttDupPubRelMessageStoreService,
                     // mqttSubscribeStoreService,
                     // mqttClientIdStoreService,
-                    bytedeskEventPublisher, topicService
+                    bytedeskEventPublisher
+                    // topicService
                     );
         }
         return connect;
@@ -96,7 +96,8 @@ public class ProtocolProcess {
                 // mqttSubscribeStoreService
                 // mqttRetainMessageStoreService
                 // redisUserService
-                topicService
+                // topicService
+                bytedeskEventPublisher
             );
         }
         return subscribe;
@@ -106,7 +107,8 @@ public class ProtocolProcess {
         if (unSubscribe == null) {
             unSubscribe = new UnSubscribe(
             // mqttSubscribeStoreService
-                    topicService
+            // topicService
+                    bytedeskEventPublisher
                 );
         }
         return unSubscribe;
@@ -128,7 +130,9 @@ public class ProtocolProcess {
     public DisConnect disConnect() {
         if (disConnect == null) {
             disConnect = new DisConnect(
-                mqttSessionStoreService, topicService
+                    mqttSessionStoreService,
+                    // topicService,
+                    bytedeskEventPublisher
                 // mqttSubscribeStoreService,
                 // mqttDupPublishMessageStoreService,
                 // mqttDupPubRelMessageStoreService,

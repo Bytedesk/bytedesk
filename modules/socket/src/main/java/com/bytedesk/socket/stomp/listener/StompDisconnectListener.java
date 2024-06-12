@@ -18,7 +18,7 @@ package com.bytedesk.socket.stomp.listener;
 // import com.bytedesk.core.publisher.EventPublisher;
 // import com.bytedesk.core.service.*;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -32,14 +32,14 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
  * 
  * @author bytedesk.com
  */
-@Slf4j
+// @Slf4j
 @Component
 @AllArgsConstructor
 public class StompDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
 
     @Override
     public void onApplicationEvent(@NonNull SessionDisconnectEvent evet) {
-        log.debug(evet.toString());
+        // log.debug(evet.toString());
     }
 
 }

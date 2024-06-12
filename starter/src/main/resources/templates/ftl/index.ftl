@@ -34,7 +34,7 @@ Main Banner START -->
 			<div class="col-md-5">
 				<!-- Title -->
 				<h1 class="mb-3">基于AI全新打造</h1>
-				<h4 class="mb-3">企业即时通讯、在线客服系统、AI助手</h4>
+				<h4 class="mb-3">社交IM、企业IM、在线客服、AI助手</h4>
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->
 				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>
@@ -71,7 +71,7 @@ Listed course START -->
 						<img src="assets/images/element/coding.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">企业即时通讯</a></h5>
+					<h5 class="mb-1"><a href="#" class="stretched-link">即时通讯</a></h5>
 					<span class="mb-0">按照中大型团队架构使用规模设计，支持数万人同时在线</span>
 				</div>
 			</div>
@@ -84,7 +84,7 @@ Listed course START -->
 						<img src="assets/images/element/data-science.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weikefu.net" class="stretched-link" target="_blank">在线客服系统</a></h5>
+					<h5 class="mb-1"><a href="https://www.weikefu.net" class="stretched-link" target="_blank">在线客服</a></h5>
 					<span class="mb-0">支持数十项在线客服通用功能，支持私有部署在线客服系统，
 						来自<a href="https://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
 					</span>

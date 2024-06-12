@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-26 15:12:12
+ * @LastEditTime: 2024-06-12 09:10:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,26 +14,25 @@
  */
 package com.bytedesk.ai.robot;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import com.bytedesk.core.rbac.user.User;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * 机器人
  *
  */
 @Repository
-@Tag(name = "robot info - 机器人")
+@Tag(name = "robot info")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface RobotRepository extends JpaRepository<Robot, Long>, JpaSpecificationExecutor<Robot> {
-    
-    Page<Robot> findByUser(User user, Pageable pageable);
 
-    Boolean existsByUserAndName(User user, String name);
+    Optional<Robot> findByUid(String uid);
+
+    // Page<Robot> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable pageable);
+
+    Boolean existsByNicknameAndOrgUidAndDeleted(String nickname, String orgUid, Boolean deleted);
 }

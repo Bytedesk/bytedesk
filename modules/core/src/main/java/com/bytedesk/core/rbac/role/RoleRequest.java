@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:40:03
+ * @LastEditTime: 2024-06-11 17:47:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,20 +30,18 @@ import com.bytedesk.core.base.BaseRequest;
 @EqualsAndHashCode(callSuper = false)
 public class RoleRequest extends BaseRequest {
 
-    // private String rid;
-
     private String name;
+
+    private String displayName;
 
     // private String value;
 
     private String description;
 
     @Builder.Default
-    private Set<String> authorityAids = new HashSet<>();
+    private Set<String> authorityUids = new HashSet<>();
 
     // organization oid
     private String orgUid;
 
-
-    
 }

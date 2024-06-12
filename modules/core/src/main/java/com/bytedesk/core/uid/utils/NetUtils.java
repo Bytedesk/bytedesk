@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2021-02-24 15:52:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-15 16:48:18
+ * @LastEditTime: 2024-05-29 17:17:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -105,10 +105,6 @@ public abstract class NetUtils {
      * @return the string local address
      */
     public static String getLocalAddress() {
-        return localAddress.getHostAddress();
-    }
-
-    public static String getHostname() {
         return localAddress.getHostAddress();
     }
 

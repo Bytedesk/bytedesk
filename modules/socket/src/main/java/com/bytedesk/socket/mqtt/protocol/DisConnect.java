@@ -6,8 +6,9 @@ package com.bytedesk.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessage;
 
+import com.bytedesk.core.event.BytedeskEventPublisher;
 // import com.bytedesk.core.topic.Topic;
-import com.bytedesk.core.topic.TopicService;
+// import com.bytedesk.core.topic.TopicService;
 // import com.bytedesk.core.constant.StatusConsts;
 // import com.bytedesk.core.model.entity.User;
 // import com.bytedesk.core.service.MessageService;
@@ -28,18 +29,20 @@ import com.bytedesk.socket.mqtt.service.MqttSessionService;
 // import com.bytedesk.socket.mqtt.service.MqttSubscribeService;
 import com.bytedesk.socket.mqtt.util.ChannelUtils;
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 断开连接
  */
-// @Slf4j
+@Slf4j
 @AllArgsConstructor
 public class DisConnect {
 
     private final MqttSessionService mqttSessionStoreService;
 
-    private final TopicService topicService;
+    // private final TopicService topicService;
+
+     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     // private final MqttSubscribeService mqttSubscribeStoreService;
 
@@ -75,6 +78,7 @@ public class DisConnect {
         // log.debug("processDisConnect {}", mqttMessage.toString());
         //
         String clientId = ChannelUtils.getClientId(channel);
+        log.info("processDisConnect {}", clientId);
         // final MqttSession sessionStore = mqttSessionStoreService.get(clientId);
         // if (sessionStore != null && sessionStore.isCleanSession()){
         // mqttSubscribeStoreService.removeForClient(clientId);
@@ -82,15 +86,15 @@ public class DisConnect {
         // mqttDupPubRelMessageStoreService.removeByClient(clientId);
         // }
         // 更新离线状态
-        updateDisconnectedStatus(clientId);
+        // updateDisconnectedStatus(clientId);
         // final Optional<User> userOptional = userService.findByUidCache(uid);
         // if (userOptional.isPresent()) {
         // eventPublisher.publishUserDisconnected(userOptional.get());
         // }
-
         mqttSessionStoreService.remove(clientId);
         // mqttClientIdStoreService.remove(clientId);
-        topicService.removeClientId(clientId);
+        // topicService.removeClientId(clientId);
+        bytedeskEventPublisher.publishMqttDisconnectedEvent(clientId);
         
         channel.close();
 
@@ -107,47 +111,47 @@ public class DisConnect {
     }
 
     // 延迟执行，如果客服在此时间段之内重新连接，则不执行
-    private void updateDisconnectedStatus(String clientId) {
-        // 用户离线
-        // final String uid = clientId.split("/")[0];
-        // log.debug("DisConnect disconnected {}", uid);
-        // redisConnectService.setDelayDisconnect(uid);
-        //
-        // if (redisUserService.isAgent(uid)) {
-        // //
-        // Set<String> workGroupSet = redisUserService.getWorkGroups(uid);
-        // Iterator<String> iterator = workGroupSet.iterator();
-        // while (iterator.hasNext()) {
-        // String wid = iterator.next();
-        // // 将客服从缓存redis中删除
-        // redisRoutingRoundRobin.removeRoundRobinAgent(wid, uid);
-        // }
-        // // 清除客服在线缓存
-        // // TODO: 考虑同一个用户，登录多个客户端的情况
-        // redisConnectService.deleteConnectedAgent(uid);
-        // //
-        // User user = redisUserService.getAgentInfo(uid);
-        // if (user != null) {
-        // // 统计数据：减少在线客服数量
-        // redisStatisticService.removeOnlineAgent(user.getSubDomain(), uid);
-        // }
-        // // 清空空闲数量
-        // // redisService.removeAgentIdleCount(uid);
-        // } else {
-        // //
-        // // deleteConnectedVisitor(user);
-        // // TODO: 减少在线访客数量
-        // // redisStatisticService.removeOnlineVisitor();
-        // // 通知客服端访客离线
-        // messageService.notifyDisconnectedUid(uid);
-        // }
-        // //
-        // redisConnectService.disconnected(uid);
-        // // 设置连接状态为离线
-        // userService.updateConnectionStatusByUid(StatusConsts.USER_STATUS_DISCONNECTED,
-        // uid);
-        // // 将当前用户长连接从所在服务器删除
-        // redisHostService.removeUserHost(uid);
-    }
+    // private void updateDisconnectedStatus(String clientId) {
+    //     // 用户离线
+    //     // final String uid = clientId.split("/")[0];
+    //     // log.debug("DisConnect disconnected {}", uid);
+    //     // redisConnectService.setDelayDisconnect(uid);
+    //     //
+    //     // if (redisUserService.isAgent(uid)) {
+    //     // //
+    //     // Set<String> workGroupSet = redisUserService.getWorkGroups(uid);
+    //     // Iterator<String> iterator = workGroupSet.iterator();
+    //     // while (iterator.hasNext()) {
+    //     // String wid = iterator.next();
+    //     // // 将客服从缓存redis中删除
+    //     // redisRoutingRoundRobin.removeRoundRobinAgent(wid, uid);
+    //     // }
+    //     // // 清除客服在线缓存
+    //     // // TODO: 考虑同一个用户，登录多个客户端的情况
+    //     // redisConnectService.deleteConnectedAgent(uid);
+    //     // //
+    //     // User user = redisUserService.getAgentInfo(uid);
+    //     // if (user != null) {
+    //     // // 统计数据：减少在线客服数量
+    //     // redisStatisticService.removeOnlineAgent(user.getSubDomain(), uid);
+    //     // }
+    //     // // 清空空闲数量
+    //     // // redisService.removeAgentIdleCount(uid);
+    //     // } else {
+    //     // //
+    //     // // deleteConnectedVisitor(user);
+    //     // // TODO: 减少在线访客数量
+    //     // // redisStatisticService.removeOnlineVisitor();
+    //     // // 通知客服端访客离线
+    //     // messageService.notifyDisconnectedUid(uid);
+    //     // }
+    //     // //
+    //     // redisConnectService.disconnected(uid);
+    //     // // 设置连接状态为离线
+    //     // userService.updateConnectionStatusByUid(StatusConsts.USER_STATUS_DISCONNECTED,
+    //     // uid);
+    //     // // 将当前用户长连接从所在服务器删除
+    //     // redisHostService.removeUserHost(uid);
+    // }
 
 }

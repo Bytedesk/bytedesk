@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-03 22:45:40
+ * @LastEditTime: 2024-06-07 14:42:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,14 @@
 package com.bytedesk.service.quick_reply;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.category.Category;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +46,19 @@ public class QuickReply extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "qid", unique = true, nullable = false)
-    private String qid;
+    private String title;
 
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String content;
+
+    @Builder.Default
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    // private String type;
+    private MessageTypeEnum type = MessageTypeEnum.TEXT;
+
+    @JsonIgnore
+    @ManyToOne
+    private Category category;
+
+    private String orgUid;
 }

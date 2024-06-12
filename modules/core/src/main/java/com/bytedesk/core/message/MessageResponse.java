@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:48:05
+ * @LastEditTime: 2024-06-06 10:37:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.core.message;
 import java.util.Date;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.thread.ThreadResponseSimple;
 
@@ -40,25 +41,23 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class MessageResponse extends BaseResponse {
 
-	private static final long serialVersionUID = 9911390153L;	
+	private static final long serialVersionUID = 1L;	
 
-	/** message */
-	// private String mid;
-
-	private String type;
+	// private String type;
+	private MessageTypeEnum type;
 
 	private String content;
 
-	private String status;
+	// private String status;
+	private MessageStatusEnum status;
 
-	private String client;
+	// private String client;
+	private ClientEnum client;
 
 	private Date createdAt;
 
-    /** */
 	private ThreadResponseSimple thread;
 
-    /** */
 	private UserResponseSimple user;
 
 }

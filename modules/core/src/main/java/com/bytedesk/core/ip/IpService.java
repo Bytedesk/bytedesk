@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-05 17:00:38
+ * @LastEditTime: 2024-06-05 16:02:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,8 @@ package com.bytedesk.core.ip;
 
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.springframework.stereotype.Service;
+
+import com.bytedesk.core.uid.UidUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -31,8 +33,11 @@ public class IpService {
 
     private final Searcher searcher;
 
+    private final UidUtils uidUtils;
+
     /**
      * 获取客户端ip
+     * 
      * @param request
      * @return
      */
@@ -43,6 +48,7 @@ public class IpService {
     /**
      * location: "国家|区域|省份|城市|ISP"
      * location: "中国|0|湖北省|武汉市|联通"
+     * 
      * @param ip
      * @return
      */
@@ -58,6 +64,27 @@ public class IpService {
     public String getIpLocation(HttpServletRequest request) {
         String ip = getIp(request);
         return getIpLocation(ip);
+    }
+
+    public String createVisitorNickname(HttpServletRequest request) {
+
+        String location = getIpLocation(request);
+        // TODO: 修改昵称后缀数字为从1~递增
+        String randomId = uidUtils.getCacheSerialUid();//.substring(11, 15);
+
+        // location: "国家|区域|省份|城市|ISP"
+        // location: "中国|0|湖北省|武汉市|联通"
+        // 0|0|0|内网IP|内网IP
+        String[] locals = location.split("|");
+        // log.info("locals {}", location);
+        if (locals.length > 2) {
+            if (locals[2].equals("0")) {
+                return "Local" + randomId;
+            }
+            return locals[2] + randomId;
+        }
+
+        return "Visitor";
     }
 
 }

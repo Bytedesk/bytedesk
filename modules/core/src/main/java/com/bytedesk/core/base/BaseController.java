@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:16:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-14 11:06:53
+ * @LastEditTime: 2024-05-31 07:39:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ public abstract class BaseController<T> {
      * @param request
      * @return
      */
-    @GetMapping("/org")
+    @GetMapping("/query/org")
     abstract public ResponseEntity<?> queryByOrg(T request);
 
     /**
@@ -67,11 +67,4 @@ public abstract class BaseController<T> {
     @PostMapping("/delete")
     abstract public ResponseEntity<?> delete(@RequestBody T request);
 
-    /**
-     * filter
-     *
-     * @return json
-     */
-    @GetMapping("/filter")
-    abstract public ResponseEntity<?> filter(T filterParam);
 }

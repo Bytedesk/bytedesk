@@ -208,7 +208,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--阿里云短信平台-->
+        <!--aliyun sms-->
         <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
         <dependency>
             <groupId>com.aliyun</groupId>
@@ -217,13 +217,23 @@
             <version>4.5.13</version>
             <scope>provided</scope>
         </dependency>
-        <!-- 邮件 -->
+
+        <!-- aliyun ecs send email -->
         <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-dm -->
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-dm</artifactId>
             <!-- <version>3.3.2</version> -->
             <version>3.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- export excel -->
+        <!-- https://mvnrepository.com/artifact/com.alibaba/easyexcel -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>3.3.4</version>
             <scope>provided</scope>
         </dependency>
 
@@ -260,13 +270,17 @@
             <artifactId>pinyin</artifactId>
             <version>0.3.1</version>
             <!-- <version>0.4.0</version> -->
+            <scope>provided</scope>
         </dependency>
 
-        <!-- monitoring -->
-        <!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus -->
+        <!-- apijson auto generate crud api -->
+        <!-- http://apijson.cn/doc/zh/ -->
+        <!-- https://jitpack.io/#Tencent/APIJSON/7.0.0 -->
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
+            <groupId>com.github.Tencent</groupId>
+            <artifactId>APIJSON</artifactId>
+            <version>7.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--  -->
@@ -324,5 +338,13 @@
             </plugin> -->
         </plugins>
     </build>
+
+    <repositories>
+        <!-- APIJSON 必须用到的托管平台 -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
 </project>

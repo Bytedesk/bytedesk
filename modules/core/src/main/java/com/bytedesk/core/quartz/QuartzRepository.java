@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:40:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-14 15:33:07
+ * @LastEditTime: 2024-05-24 15:46:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import jakarta.transaction.Transactional;
+// import jakarta.transaction.Transactional;
 
 public interface QuartzRepository extends JpaRepository<QuartzEntity, Long> {
     
@@ -28,10 +28,10 @@ public interface QuartzRepository extends JpaRepository<QuartzEntity, Long> {
 
     Optional<QuartzEntity> findByUid(String uid);
 
-    Page<QuartzEntity> findByOrgUid(String orgUid, Pageable pageable);
+    Page<QuartzEntity> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable pageable);
 
     Boolean existsByJobName(String jobName);
 
-    @Transactional
-    void deleteByUid(String uid);
+    // @Transactional
+    // void deleteByUid(String uid);
 }

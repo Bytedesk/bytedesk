@@ -39,12 +39,12 @@
         if (window.location.href.indexOf('/admin') != -1) {
             // react打包发布之后，刷新页面会报404，nginx配置"try_files $uri /index.html"无效，暂时重定向到/admin
             window.location.href = '/admin';
-        } else if (window.location.href.indexOf('/chat') != -1 ) {
+        } else if (window.location.href.indexOf('/agent') != -1 ) {
             // web客服端
-            window.location.href = '/chat';
-        } else if (window.location.href.indexOf('/v') != -1 ) {
+            window.location.href = '/agent';
+        } else if (window.location.href.indexOf('/chat') != -1 ) {
             // 访客对话窗口
-            window.location.href = '/v';
+            window.location.href = '/chat';
         } else {
             window.location.href = '/dev';
         }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 21:46:28
+ * @LastEditTime: 2024-06-05 23:28:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,13 @@ public class ThreadRequest extends BaseRequest {
     
     private String topic;
 
+    private ThreadStatusEnum status;
+
     private UserResponseSimple user;
+    
+    private String userNickname;
+
+    // private String memberUid;
 
     private String orgUid;
 }

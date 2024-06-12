@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-11 11:38:34
+ * @LastEditTime: 2024-06-04 15:48:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,5 +26,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VisitorRepository extends JpaRepository<Visitor, Long>, JpaSpecificationExecutor<Visitor> {
 
-    Optional<Visitor> findByUid(String uid);
+    Optional<Visitor> findByUidAndDeleted(String uid, Boolean deleted);
 }

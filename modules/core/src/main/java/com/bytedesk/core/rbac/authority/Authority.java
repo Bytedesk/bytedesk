@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.*;
 
@@ -31,7 +32,7 @@ import jakarta.persistence.*;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,7 +51,7 @@ public class Authority extends BaseEntity {
 
     private String description;
 
-    @Column(name = "by_type")
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
 
 }

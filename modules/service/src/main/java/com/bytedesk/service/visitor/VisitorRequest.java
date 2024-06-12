@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 12:01:34
+ * @LastEditTime: 2024-06-06 11:38:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,7 @@ package com.bytedesk.service.visitor;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.ThreadTypeConsts;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,8 +26,6 @@ import lombok.EqualsAndHashCode;
 public class VisitorRequest extends BaseRequest {
 
 	private static final long serialVersionUID = 1L;
-    
-    // private String uid;
 
 	/**
 	 * developers can set basic visitor info
@@ -55,8 +53,8 @@ public class VisitorRequest extends BaseRequest {
 
 	private String email;
 
-    private String note;
-    
+	private String note;
+
 	// from source
 	private String client;
 
@@ -64,19 +62,33 @@ public class VisitorRequest extends BaseRequest {
 	// private String type; // use super.type
 	private String sid;
 
-
-	public String formatTopic(String uid) {
-		return this.sid + "/" + uid;
+	public String formatTopic() {
+		// 格式化topic，sid/uid, 其中：sid为agentUid或者workgroupUid, uid为访客visitorUid
+		return this.sid + "/" + super.uid;
 		// return formatType() + "/" + this.sid + "/" + uid;
 	}
 
-	public String formatType() {
-		if (type.equals("1")) {
-            return ThreadTypeConsts.APPOINTED;
-        } else if (type.equals("2")) {
-            return ThreadTypeConsts.WORKGROUP;
-        } else {
-			return type;
-        }
+	public ThreadTypeEnum formatType() {
+		int typeInt;
+		try {
+			typeInt = Integer.parseInt(super.type);
+		} catch (NumberFormatException e) {
+			// 处理异常，比如记录日志、返回默认值等
+			e.printStackTrace();
+			// 假设有一个默认值
+			typeInt = 0;
+		}
+		return ThreadTypeEnum.fromValue(typeInt);
+		// 
+		// if (type.equals("1")) {
+		// 	// return ThreadTypeConsts.APPOINTED;
+		// 	return ThreadTypeEnum.APPOINTED;
+		// } else if (type.equals("2")) {
+		// 	// return ThreadTypeConsts.WORKGROUP;
+		// 	return ThreadTypeEnum.WORKGROUP;
+		// } else {
+		// 	// return type;
+		// 	return ThreadTypeEnum.valueOf(type);
+		// }
 	}
 }

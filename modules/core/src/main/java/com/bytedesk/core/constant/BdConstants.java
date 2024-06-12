@@ -26,8 +26,7 @@ public class BdConstants {
      * Path separator.
      */
     public static final String FILE_SEPARATOR = File.separator;
-
-    public static final String DEFAULT_USER_DESCRIPTION = "user default description";
+    // public static final String DEFAULT_USER_DESCRIPTION = "user default description";
 
     /**
      * 是否私有部署

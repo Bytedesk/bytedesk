@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-27 12:09:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-27 13:00:43
+ * @LastEditTime: 2024-06-04 15:45:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class AsistantListener {
 
-
     @PostPersist
     public void onPostPersist(Asistant asistant) {
-        log.debug("AsistantListener: onPostPersist {}", asistant.getName());
+        log.debug("AsistantListener: onPostPersist {}", asistant.getNickname());
 
+        
 
     }
     

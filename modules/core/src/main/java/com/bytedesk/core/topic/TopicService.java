@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-16 10:44:49
+ * @LastEditTime: 2024-06-01 11:35:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,9 @@
  */
 package com.bytedesk.core.topic;
 
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +31,10 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.action.ActionRequest;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -44,6 +50,8 @@ public class TopicService {
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
 
@@ -88,7 +96,6 @@ public class TopicService {
         save(topic);
     }
     
-
     public void subscribe(String topic, String clientId) {
         // 用户clientId格式: uid/client/deviceUid
         Optional<Topic> topicOptional = findByClientId(clientId);
@@ -124,11 +131,12 @@ public class TopicService {
                 return;
             }
             topicElement.getTopics().add(topic);
+            // 
+            save(topicElement);
         }
         // final String uid = clientId.split("/")[0];
         // deleteByTopicAndUid(topic, uid);
     }
-
 
     @Async
     public void addClientId(String clientId) {
@@ -140,9 +148,6 @@ public class TopicService {
             Topic topic = topicOptional.get();
             if (!topic.getClientIds().contains(clientId)) {
                 log.info("addClientId: {}", clientId);
-                // FIXME: org.springframework.orm.ObjectOptimisticLockingFailureException: Row
-                // was updated or deleted by another transaction (or unsaved-value mapping was
-                // incorrect) : [com.bytedesk.core.topic.Topic#16]
                 topic.getClientIds().add(clientId);
                 save(topic);
             }
@@ -152,7 +157,8 @@ public class TopicService {
     @Async
     public void removeClientId(String clientId) {
         // TODO: 防止客户端频繁闪断重连的情况，延迟执行，防止频繁删除
-        concurrentMap.put(clientId, clientId);
+        // concurrentMap.put(clientId, clientId);
+        doRemoveClientId(clientId);
     }
 
     private void doRemoveClientId(String clientId) {
@@ -162,9 +168,6 @@ public class TopicService {
             Topic topic = topicOptional.get();
             if (topic.getClientIds().contains(clientId)) {
                 log.info("removeClientId: {}", clientId);
-                // FIXME: org.springframework.orm.ObjectOptimisticLockingFailureException: Row
-                // was updated or deleted by another transaction (or unsaved-value mapping was
-                // incorrect) : [com.bytedesk.core.topic.Topic#16]
                 topic.getClientIds().remove(clientId);
                 save(topic);
             }
@@ -175,7 +178,6 @@ public class TopicService {
     @Scheduled(fixedDelay = 5 * 60 * 1000)
     public void scheduleTask() {
         // log.info("scheduleTask");
-
         concurrentMap.forEach((key, value) -> {
             doRemoveClientId(key);
         });
@@ -219,15 +221,72 @@ public class TopicService {
         return null;
     }
 
-    // TODO: 待处理
-    private void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Topic topic) {
-        // 可以在这里实现重试逻辑，例如使用递归调用或定时任务
-        // 也可以记录日志、发送通知或执行其他业务逻辑
-        log.error("Optimistic locking failure for topic: {}", topic.getUserUid());
-        // e.printStackTrace();
-        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
+    private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
+    private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
+    private final Queue<Topic> retryQueue = new LinkedList<>();
+
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Topic topic) {
+        retryQueue.add(topic);
+        processRetryQueue();
     }
 
+    private void processRetryQueue() {
+        while (!retryQueue.isEmpty()) {
+            Topic topic = retryQueue.poll(); // 从队列中取出一个元素
+            if (topic == null) {
+                break; // 队列为空，跳出循环
+            }
+
+            int retryCount = 0;
+            while (retryCount < MAX_RETRY_ATTEMPTS) {
+                try {
+                    // 尝试更新Topic对象
+                    topicRepository.save(topic);
+                    // 更新成功，无需进一步处理
+                    log.info("Optimistic locking succeeded for topic: {}", topic.getUserUid());
+                    break; // 跳出内部循环
+                } catch (ObjectOptimisticLockingFailureException ex) {
+                    // 捕获乐观锁异常
+                    log.error("Optimistic locking failure for topic: {}, retry count: {}", topic.getUserUid(),
+                            retryCount + 1);
+                    // 等待一段时间后重试
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("Interrupted while waiting for retry", ie);
+                        return;
+                    }
+                    retryCount++; // 增加重试次数
+
+                    // 如果还有重试机会，则将topic放回队列末尾
+                    if (retryCount < MAX_RETRY_ATTEMPTS) {
+                        // FIXME: 发现会一直失败，暂时不重复处理
+                        // retryQueue.add(topic);
+                    } else {
+                        // 所有重试都失败了
+                        handleFailedRetries(topic);
+                    }
+                }
+            }
+        }
+    }
+
+    private void handleFailedRetries(Topic topic) {
+        String topicJSON = JSONObject.toJSONString(topic);
+        ActionRequest actionRequest = ActionRequest.builder()
+                .title("topic")
+                .action("save")
+                .description("All retry attempts failed for optimistic locking")
+                .extra(topicJSON)
+                .build();
+        actionRequest.setType(TypeConsts.ACTION_TYPE_FAILED);
+        bytedeskEventPublisher.publishActionEvent(actionRequest);
+        log.error("All retry attempts failed for optimistic locking of topic: {}", topic.getUserUid());
+        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
+        // notifyUserOfFailure(topic);
+    }
+    
     // TODO: 需要从原先uid的缓存列表中删除，然后添加到新的uid的换成列表中
     // @CachePut(value = "topic", key = "#uid")
     public void update(String uid, String userUid) {

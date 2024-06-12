@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 23:25:43
+ * @LastEditTime: 2024-06-11 18:06:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.authority.Authority;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -38,28 +39,32 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Data
 @Entity
 @Builder
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "core_role")
+@Table(name = "core_role", uniqueConstraints = {
+	@UniqueConstraint(columnNames = { "name", "orgUid" }),
+})
 public class Role extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@NotBlank
-	@Column(unique = true, nullable = false)
+	@Column(nullable = false)
 	private String name;
+
+	private String displayName;
 
 	/**
 	 * value is a keyword in h2 db
 	 */
-	// @Column(name = "by_value", unique = true, nullable = false)
+	// @Column(name = "by_value", nullable = false)
 	// private String value;
 
 	private String description;
 
-	@Column(name = "by_type")
+	@Column(name = TypeConsts.COLUMN_NAME_TYPE)
 	private String type;
 
 	@JsonIgnore
@@ -75,13 +80,12 @@ public class Role extends BaseEntity {
 	// @ManyToOne(fetch = FetchType.LAZY)
 	// @JsonBackReference("user-roles") // 避免无限递归
 	// private User user;
-
 	private String orgUid;
-
 
 	public void addAuthority(Authority authority) {
 		this.authorities.add(authority);
 	}
+
 	public void removeAuthority(Authority authority) {
 		this.authorities.remove(authority);
 	}

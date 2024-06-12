@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:30:14
+ * @LastEditTime: 2024-06-05 09:19:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.service.visitor;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.enums.ClientEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -36,14 +37,12 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
+// @DiscriminatorValue("Visitor")
 @Table(name = "service_visitor")
 public class Visitor extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
-
-    // @Column(name = "uuid", unique = true, nullable = false)
-	// private String uid;
-
+	
 	/**
 	 * developers can set basic visitor info
 	 */
@@ -51,6 +50,8 @@ public class Visitor extends BaseEntity {
 
 	@Builder.Default
 	private String avatar = AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
+
+    // private String description;
 
 	// location info
 	private String ip;
@@ -73,4 +74,9 @@ public class Visitor extends BaseEntity {
 
 	private String note;
 
+	// private String client;
+	private ClientEnum client;
+
+	// belongs to org
+	private String orgUid;
 }

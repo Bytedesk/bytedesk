@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:47:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:49:34
+ * @LastEditTime: 2024-06-04 17:27:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,23 +21,22 @@ import java.util.concurrent.TimeUnit;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.event.ThreadCreateEvent;
-import com.bytedesk.core.event.ThreadUpdateEvent;
+import com.bytedesk.ai.robot.RobotServiceSettings;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.service.visitor.VisitorExtra;
+import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.service.common.ServiceSettings;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+// @Slf4j
 @Service
 @AllArgsConstructor
 public class ThreadLogService {
@@ -59,7 +58,6 @@ public class ThreadLogService {
         return threadLogPage.map(this::convertThreadLogResponse);
     }
 
-    @Async
     public ThreadLog create(Thread thread) {
 
         if (threadLogRepository.existsByUid(thread.getUid())) {
@@ -85,17 +83,23 @@ public class ThreadLogService {
         List<Thread> threads = threadService.findStatusOpen();
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
-            // 
-            VisitorExtra extra = JSON.parseObject(thread.getExtra(), VisitorExtra.class);
             // 计算两个日期之间的毫秒差
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            if (diffInMinutes > extra.getAutoCloseMin()) {
-                // 关闭线程
-                threadService.autoClose(thread);                
-            } else {
-                // log.debug("autoCloseThread: {}, min: {}", thread.getTid(), diffInMinutes);
+            // VisitorExtra extra = JSON.parseObject(thread.getExtra(), VisitorExtra.class);
+            if (thread.getType() == ThreadTypeEnum.WORKGROUP || thread.getType() == ThreadTypeEnum.APPOINTED) {
+                ServiceSettings settings = JSON.parseObject(thread.getExtra(), ServiceSettings.class);
+                Double autoCloseMinites = settings.getAutoCloseMin();
+                if (diffInMinutes > autoCloseMinites) {
+                    threadService.autoClose(thread);
+                }
+            } else if (thread.getType() == ThreadTypeEnum.ROBOT) {
+                RobotServiceSettings settings = JSON.parseObject(thread.getExtra(), RobotServiceSettings.class);
+                Double autoCloseMinites = settings.getAutoCloseMin();
+                if (diffInMinutes > autoCloseMinites) {
+                    threadService.autoClose(thread);
+                }
             }
         });
     }
@@ -107,19 +111,6 @@ public class ThreadLogService {
     public ThreadLogResponse convertThreadLogResponse(ThreadLog threadLog) {
         return modelMapper.map(threadLog, ThreadLogResponse.class);
     }
-
-
-    @EventListener
-    public void onThreadCreateEvent(ThreadCreateEvent event) {
-        Thread thread = event.getThread();
-        log.info("onThreadCreateEvent: {}", thread.getUid());
-        // create(thread);
-    }
-
-    @EventListener
-    public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-        Thread thread = event.getThread();
-        log.info("onThreadUpdateEvent: {}", thread.getUid());
-    }
+    
 
 }

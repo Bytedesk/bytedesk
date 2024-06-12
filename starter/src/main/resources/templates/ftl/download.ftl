@@ -33,8 +33,8 @@ Main Banner START -->
 		<div class="row align-items-center">
 			<div class="col-md-5">
 				<!-- Title -->
-				<h1 class="mb-3">一切以服务客户为中心</h1>
-				<h4 class="mb-3">企业即时通讯、在线客服、AI助手</h4>
+				<h1 class="mb-3">基于AI全新打造</h1>
+				<h4 class="mb-3">社交IM、企业IM、在线客服、AI助手</h4>
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->
 				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>
@@ -73,8 +73,8 @@ Listed course START -->
 						<img src="assets/images/element/coding.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">服务器端</a></h5>
-					<span class="mb-0">即将开放下载</span>
+					<h5 class="mb-1"><a href="https://github.com/Bytedesk/bytedesk" class="stretched-link" target="_blank">服务器端</a></h5>
+					<#--  <span class="mb-0">即将开放下载</span>  -->
 				</div>
 			</div>
 
@@ -86,8 +86,8 @@ Listed course START -->
 						<img src="assets/images/element/data-science.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">Windows客户端</a></h5>
-					<span class="mb-0">即将开放下载.</span>
+					<h5 class="mb-1"><a href="https://pan.baidu.com/s/1lEoBGKh-iQJvfndnhn8r-A?pwd=jnk2" class="stretched-link" target="_blank">Windows客户端</a></h5>
+					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
 
@@ -99,8 +99,21 @@ Listed course START -->
 						<img src="assets/images/element/online.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">Mac客户端</a></h5>
-					<span class="mb-0">即将开放下载.</span>
+					<h5 class="mb-1"><a href="https://pan.baidu.com/s/1lEoBGKh-iQJvfndnhn8r-A?pwd=jnk2" class="stretched-link" target="_blank">Mac客户端</a></h5>
+					<#--  <span class="mb-0">即将开放下载.</span>  -->
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="assets/images/element/profit.svg" alt="">
+					</div>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="https://pan.baidu.com/s/1lEoBGKh-iQJvfndnhn8r-A?pwd=jnk2" class="stretched-link" target="_blank">Linux客户端</a></h5>
+					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
 

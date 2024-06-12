@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:13:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 14:19:12
+ * @LastEditTime: 2024-05-24 15:48:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,7 @@ public abstract class BaseService<T, TRequest, TResponse> {
 
     abstract public T save(T entity);
 
-    abstract public void deleteByUid(TRequest request);
+    abstract public void deleteByUid(String uid);
 
     abstract public void delete(T entity);
 

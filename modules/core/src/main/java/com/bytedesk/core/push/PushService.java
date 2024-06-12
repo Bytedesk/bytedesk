@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 12:57:27
+ * @LastEditTime: 2024-06-01 16:15:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,14 +26,16 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.constant.StatusConsts;
+import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,17 +56,23 @@ public class PushService {
 
     private final UserService userService;
 
-    public Boolean sendEmailCode(String email, String client, String authType, String platform) {
+    private final BytedeskProperties bytedeskProperties;
 
-        return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform);
+    private final IpService ipService;
+
+    public Boolean sendEmailCode(String email, String client, String authType, String platform,
+            HttpServletRequest request) {
+
+        return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform, request);
     }
 
-    public Boolean sendSmsCode(String mobile, String client, String authType, String platform) {
+    public Boolean sendSmsCode(String mobile, String client, String authType, String platform, HttpServletRequest request) {
 
-        return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform);
+        return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, request);
     }
 
-    public Boolean sendCode(String receiver, String type, String client, String authType, String platform) {
+    public Boolean sendCode(String receiver, String type, String client, String authType, String platform,
+            HttpServletRequest request) {
 
         // 注册验证码，如果账号已经存在，则直接抛出异常
         if (authType.equals(TypeConsts.SEND_MOBILE_CODE_TYPE_REGISTER)) {
@@ -79,20 +87,28 @@ public class PushService {
         }
 
         // check if has already send validate code within 15min
-        if (existsByStatusAndTypeAndReceiver(StatusConsts.CODE_STATUS_PENDING, type, receiver)) {
+        if (existsByStatusAndTypeAndReceiver(PushStatus.PENDING, type, receiver)) {
             return false;
         }
 
-        String code = Utils.getRandomCode(receiver);
+        String code = "";
+        if (Utils.isTestMobile(receiver) || Utils.isTestEmail(receiver) || bytedeskProperties.isInWhitelist(receiver)) {
+            code = bytedeskProperties.getMobileCode();
+            log.info("test code: {}", code);
+        } else {
+            code = Utils.getRandomCode(receiver);
+        }
 
         if (type.equals(TypeConsts.TYPE_EMAIL)) {
-            pushServiceImplEmail.send(receiver, code);
+            pushServiceImplEmail.send(receiver, code, request);
         } else if (type.equals(TypeConsts.TYPE_MOBILE)) {
-            pushServiceImplSms.send(receiver, code);
+            pushServiceImplSms.send(receiver, code, request);
         } else {
             return false;
         }
 
+        String ip = ipService.getIp(request);
+        String ipLocation = ipService.getIpLocation(ip);
         // 
         PushRequest pushRequest = new PushRequest();
         pushRequest.setType(type);
@@ -101,6 +117,8 @@ public class PushService {
         pushRequest.setReceiver(receiver);
         pushRequest.setClient(client);
         pushRequest.setPlatform(platform);
+        pushRequest.setIp(ip);
+        pushRequest.setIpLocation(ipLocation);
         create(pushRequest);
 
         return true;
@@ -134,9 +152,10 @@ public class PushService {
         // }
         // return result;
         // 
-        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(StatusConsts.CODE_STATUS_PENDING, type, receiver, code);
+        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatus.PENDING, type, receiver, code);
         if (pushOptional.isPresent()) {
-            pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
+            // pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
+            pushOptional.get().setStatus(PushStatus.CONFIRMED);
             save(pushOptional.get());
             return true;
         }
@@ -144,11 +163,11 @@ public class PushService {
     }
 
     // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result == null")
-    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver, String content) {
+    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(PushStatus status, String type, String receiver, String content) {
         return pushRepository.findByStatusAndTypeAndReceiverAndContent(status, type, receiver, content);
     }
 
-    public Boolean existsByStatusAndTypeAndReceiver(String status, String type, String receiver) {
+    public Boolean existsByStatusAndTypeAndReceiver(PushStatus status, String type, String receiver) {
         return pushRepository.existsByStatusAndTypeAndReceiver(status, type, receiver);
     }
     
@@ -163,7 +182,8 @@ public class PushService {
     // TODO: 更新缓存
     @Cacheable(value = "pushPending")
     public List<Push> findStatusPending() {
-        return pushRepository.findByStatus(StatusConsts.CODE_STATUS_PENDING);
+        // return pushRepository.findByStatus(StatusConsts.CODE_STATUS_PENDING);
+        return pushRepository.findByStatus(PushStatus.PENDING);
     }
 
     // 自动过期
@@ -179,7 +199,8 @@ public class PushService {
             // 验证码有效时间15分钟
             if (diffInMinutes > 15) {
                 // TODO: 过期，清空缓存
-                push.setStatus(StatusConsts.CODE_STATUS_EXPIRED);
+                // push.setStatus(StatusConsts.CODE_STATUS_EXPIRED);
+                push.setStatus(PushStatus.EXPIRED);
                 save(push);
             }
         });

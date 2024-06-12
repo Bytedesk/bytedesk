@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 09:15:46
+ * @LastEditTime: 2024-06-05 10:19:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,18 @@
  */
 package com.bytedesk.ai.robot;
 
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.action.ActionAnnotation;
+import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
@@ -32,74 +36,54 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/robot")
 @AllArgsConstructor
 @Tag(name = "robot - 机器人", description = "robot description")
-public class RobotController {
+public class RobotController extends BaseController<RobotRequest> {
 
     private final RobotService robotService;
 
-    /**
-     * query
-     * 
-     * @param robotRequest
-     * @return
-     */
-    @GetMapping("/query")
-    public JsonResult<?> query(RobotRequest robotRequest) {
-
-        return JsonResult.success(robotService.query(robotRequest));
-    }
-
-    /**
-     * create
-     *
-     * @param robotRequest robot
-     * @return json
-     */
-    @PostMapping("/create")
-    public JsonResult<?> create(@RequestBody RobotRequest robotRequest) {
-
-        return robotService.create(robotRequest);
-    }
-
-    /**
-     * update
-     *
-     * @param robotRequest robot
-     * @return json
-     */
-    @PostMapping("/update")
-    public JsonResult<?> update(@RequestBody RobotRequest robotRequest) {
-
-        //
-        return new JsonResult<>("update success", 200, false);
-    }
-
-    /**
-     * delete
-     *
-     * @param robotRequest robot
-     * @return json
-     */
-    @PostMapping("/delete")
-    public JsonResult<?> delete(@RequestBody RobotRequest robotRequest) {
-
-        //
-
-        return new JsonResult<>("delete success", 200, true);
-    }
-
-    /**
-     * filter
-     *
-     * @return json
-     */
-    @GetMapping("/filter")
-    public JsonResult<?> filter(RobotRequest filterParam) {
-
-        //
+    @GetMapping("/query/org")
+    @Override
+    public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
-        //
-        return new JsonResult<>("filter success", 200, false);
+        Page<RobotResponse> page = robotService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @GetMapping("/query/user")
+    @Override
+    public ResponseEntity<?> query(RobotRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    }
+
+    @ActionAnnotation(title = "robot", action = "create", description = "create robot")
+    @PostMapping("/create")
+    @Override
+    public ResponseEntity<?> create(@RequestBody RobotRequest request) {
+        
+        RobotResponse robot = robotService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(robot));
+    }
+
+    @ActionAnnotation(title = "robot", action = "update", description = "update robot")
+    @PostMapping("/update")
+    @Override
+    public ResponseEntity<?> update(@RequestBody RobotRequest request) {
+
+        RobotResponse robotResponse = robotService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(robotResponse));
+    }
+
+    @ActionAnnotation(title = "robot", action = "delete", description = "delete robot")
+    @PostMapping("/delete")
+    @Override
+    public ResponseEntity<?> delete(@RequestBody RobotRequest request) {
+        
+        robotService.deleteByUid(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(request));
+    }
     
 }

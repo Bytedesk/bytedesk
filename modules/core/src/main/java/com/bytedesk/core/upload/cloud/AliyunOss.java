@@ -2,7 +2,6 @@ package com.bytedesk.core.upload.cloud;
 
 import com.aliyun.oss.OSS;
 // import com.aliyun.oss.model.PutObjectResult;
-import com.bytedesk.core.constant.StatusConsts;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -158,7 +157,7 @@ public class AliyunOss {
      */
     public String uploadP12(String fileName, String build, File file) {
 
-        String folder = build.equals(StatusConsts.IOS_BUILD_DEBUG) ? "apns/development/" : "apns/production/";
+        String folder = build.equals("debug") ? "apns/development/" : "apns/production/";
         return uploadCommon(folder, fileName, file);
     }
 

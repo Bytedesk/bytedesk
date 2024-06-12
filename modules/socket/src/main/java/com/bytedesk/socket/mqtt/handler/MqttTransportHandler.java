@@ -155,7 +155,7 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
         // protocolProcess.getMqttDupPubRelMessageStoreService().removeByClient(clientId);
         // }
         // 更新离线状态
-        updateDisconnectedStatus(clientId);
+        // updateDisconnectedStatus(clientId);
         //
         // final Optional<User> userOptional =
         // protocolProcess.getUserService().findByUidCache(uid);
@@ -163,9 +163,12 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
         // protocolProcess.getEventPublisher().publishUserDisconnected(userOptional.get());
         // }
         //
-        protocolProcess.getMqttSessionStoreService().remove(clientId);
+        log.info("channelInactive {}", clientId);
+        // FIXME: 客户端异常断开的情况，需要清理数据。目前会造成数据不一致，待完善
+        // protocolProcess.getMqttSessionStoreService().remove(clientId);
         // protocolProcess.getMqttClientIdStoreService().remove(clientId);
-        protocolProcess.getTopicService().removeClientId(clientId);
+        // protocolProcess.getTopicService().removeClientId(clientId);
+        // protocolProcess.getBytedeskEventPublisher().publishMqttDisconnectedEvent(clientId);
         //
         // 非客户端调用接口断开
         // log.debug("DISCONNECT - channelInactive - clientId: {}", clientId);

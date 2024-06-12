@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 15:57:02
+ * @LastEditTime: 2024-06-05 22:19:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,11 +21,11 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.StatusConsts;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageService;
-import com.bytedesk.core.message.MessageTypeConsts;
+import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadService;
 
 import lombok.AllArgsConstructor;
@@ -46,8 +46,7 @@ public class MessageJsonService {
     public void saveToDb(String messageJSON) {
         // log.info("saveToDb: {}", messageJSON);
         MessageResponse messageResponse = JSON.parseObject(messageJSON, MessageResponse.class);
-        //
-        String type = messageResponse.getType();
+        MessageTypeEnum type = messageResponse.getType();
         //
         if (dealWithMessageNotification(type, messageResponse)) {
             return;
@@ -83,11 +82,16 @@ public class MessageJsonService {
             return null;
         }
         thread.setContent(messageResponse.getContent());
-        if (messageResponse.getType().equals(MessageTypeConsts.IMAGE)) {
+        if (messageResponse.getType().equals(MessageTypeEnum.IMAGE)) {
             thread.setContent(I18Consts.I18N_THREAD_CONTENT_IMAGE);
-        } else if (messageResponse.getType().equals(MessageTypeConsts.FILE)) {
+        } else if (messageResponse.getType().equals(MessageTypeEnum.FILE)) {
             thread.setContent(I18Consts.I18N_THREAD_CONTENT_FILE);
         }
+        // if (messageResponse.getType().equals(MessageTypeConsts.IMAGE)) {
+        //     thread.setContent(I18Consts.I18N_THREAD_CONTENT_IMAGE);
+        // } else if (messageResponse.getType().equals(MessageTypeConsts.FILE)) {
+        //     thread.setContent(I18Consts.I18N_THREAD_CONTENT_FILE);
+        // }
 
         return thread;
     }
@@ -95,7 +99,8 @@ public class MessageJsonService {
     private Message getMessage(Thread thread, MessageResponse messageResponse) {
 
         Message message = modelMapper.map(messageResponse, Message.class);
-        message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
+        // message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
+        message.setStatus(MessageStatusEnum.SENT);
         message.getThreads().add(thread);
         message.setUser(JSON.toJSONString(messageResponse.getUser()));
         message.setOrgUid(thread.getOrgUid());
@@ -103,39 +108,37 @@ public class MessageJsonService {
         return message;
     }
 
-
     // 处理消息通知
-    private boolean dealWithMessageNotification(String type, MessageResponse messageResponse) {
+    private boolean dealWithMessageNotification(MessageTypeEnum type, MessageResponse messageResponse) {
         log.info("dealWithMessageNotification: {}", type);
 
         // 正在输入- 不保存
-        if (type.equals(MessageTypeConsts.NOTIFICATION_TYPING)) {
+        if (type.equals(MessageTypeEnum.TYPING)) {
             return true;
         }
 
         // 消息撤回- 从数据库中删除
-        if (type.equals(MessageTypeConsts.NOTIFICATION_RECALL) && dealWithMessageRecall(type, messageResponse)) {
+        if (type.equals(MessageTypeEnum.RECALL) && dealWithMessageRecall(type, messageResponse)) {
             return true;
         }
 
         // 消息回执- 处理
-        if (type.equals(MessageTypeConsts.NOTIFICATION_RECEIPT) && dealWithMessageReceipt(type, messageResponse)) {
+        if (type.equals(MessageTypeEnum.RECEIPT) && dealWithMessageReceipt(type, messageResponse)) {
             return true;
         }
 
         return false;
     }
 
-
     // 处理消息回执
-    private boolean dealWithMessageReceipt(String type, MessageResponse message) {
+    private boolean dealWithMessageReceipt(MessageTypeEnum type, MessageResponse message) {
         log.info("dealWithMessageReceipt: {}", type);
 
         return true;
     }
 
     // 消息撤回，从数据库中删除消息
-    private boolean dealWithMessageRecall(String type, MessageResponse message) {
+    private boolean dealWithMessageRecall(MessageTypeEnum type, MessageResponse message) {
         log.info("dealWithMessageRecall: {}", type);
 
         return true;

@@ -33,7 +33,7 @@ public class MqttUtil {
 
     public static boolean validTopicFilter(List<MqttTopicSubscription> topicSubscriptions) {
         for (MqttTopicSubscription topicSubscription : topicSubscriptions) {
-            String topicFilter = topicSubscription.topicName();
+            String topicFilter = topicSubscription.topicFilter();//.topicName();
             if (StringUtils.hasText(topicFilter)) {
                 // 以#或+符号开头的、以/符号结尾的订阅按非法订阅处理, 这里没有参考标准协议
                 if (topicFilter.endsWith("+") || topicFilter.endsWith("/")) {

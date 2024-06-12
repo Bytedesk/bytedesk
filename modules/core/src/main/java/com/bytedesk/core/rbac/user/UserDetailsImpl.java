@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 11:47:22
+ * @LastEditTime: 2024-06-03 11:04:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.role.Role;
+import com.bytedesk.core.rbac.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -47,15 +46,21 @@ public class UserDetailsImpl implements UserDetails {
     // 
     @JsonIgnore
     private String password;
-    private Set<Role> roles;
-    private Set<String> organizations;
+    private Organization currentOrganization;
+    private Set<UserOrganizationRole> userOrganizationRoles;
+    // private Set<Role> roles;
+    // private Set<String> organizations;
     //
     private boolean enabled;
     Collection<? extends GrantedAuthority> authorities;
 
     private UserDetailsImpl(Long id, String uid, String username, String nickname, String avatar, String mobile,
             String email, String password,
-            Collection<? extends GrantedAuthority> authorities, Set<Role> roles, Set<String> organizations,
+            Collection<? extends GrantedAuthority> authorities,
+            Organization currentOrganization,
+            Set<UserOrganizationRole> userOrganizationRoles,
+            // Set<Role> roles,
+            // Set<String> organizations,
             String description,
             boolean superUser,
             boolean emailVerified,
@@ -71,8 +76,10 @@ public class UserDetailsImpl implements UserDetails {
         this.email = email;
         this.password = password;
         this.authorities = authorities;
-        this.roles = roles;
-        this.organizations = organizations;
+        this.currentOrganization = currentOrganization;
+        this.userOrganizationRoles = userOrganizationRoles;
+        // this.roles = roles;
+        // this.organizations = organizations;
         this.description = description;
         // 
         this.superUser = superUser;
@@ -89,9 +96,15 @@ public class UserDetailsImpl implements UserDetails {
         // Set<GrantedAuthority> authorities = user.getRoles().stream()
         // .map(role -> new SimpleGrantedAuthority(role.getValue()))
         // .collect(Collectors.toSet());
-        Set<GrantedAuthority> authorities = user.getRoles().stream()
-                .flatMap(role -> role.getAuthorities().stream()
-                        .map(authority -> new SimpleGrantedAuthority(TypeConsts.ROLE_PREFIX + authority.getValue())))
+        // 
+        // Set<GrantedAuthority> authorities = user.getRoles().stream()
+        //         .flatMap(role -> role.getAuthorities().stream()
+        //                 .map(authority -> new SimpleGrantedAuthority(TypeConsts.ROLE_PREFIX + authority.getValue())))
+        //         .collect(Collectors.toSet());
+        // 
+        Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
+                .flatMap(uor -> uor.getRole().getAuthorities().stream()
+                        .map(authority -> new SimpleGrantedAuthority(authority.getValue())))
                 .collect(Collectors.toSet());
 
         return new UserDetailsImpl(user.getId(),
@@ -103,8 +116,10 @@ public class UserDetailsImpl implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 authorities,
-                user.getRoles(),
-                user.getOrganizations(),
+                user.getCurrentOrganization(),
+                user.getUserOrganizationRoles(),
+                // user.getRoles(),
+                // user.getOrganizations(),
                 user.getDescription(),
                 user.isSuperUser(),
                 user.isEmailVerified(),

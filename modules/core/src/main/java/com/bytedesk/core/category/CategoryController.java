@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-20 12:51:23
+ * @LastEditTime: 2024-06-08 16:47:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,16 @@
  */
 package com.bytedesk.core.category;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
 
@@ -27,12 +32,15 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/category")
 public class CategoryController extends BaseController<CategoryRequest> {
     
-    // private final CategoryService categoryService;
+    private final CategoryService categoryService;
     
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        
+        Page<CategoryResponse> page = categoryService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
@@ -41,31 +49,32 @@ public class CategoryController extends BaseController<CategoryRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    public ResponseEntity<?> create(@RequestBody CategoryRequest request) {
+        
+        CategoryResponse response = categoryService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public ResponseEntity<?> update(@RequestBody CategoryRequest request) {
+        
+        CategoryResponse response = categoryService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    public ResponseEntity<?> delete(@RequestBody CategoryRequest request) {
+        
+        categoryService.deleteByUid(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
-    @Override
-    public ResponseEntity<?> filter(CategoryRequest filterParam) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filter'");
-    }
-
-    
-    
 
 }

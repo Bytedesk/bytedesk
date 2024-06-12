@@ -34,16 +34,16 @@ import com.bytedesk.core.utils.JsonResult;
 public class RoleController {
 
     private final RoleService roleService;
-    
+
     /**
      * query my roles by page
      *
      * @return json
      */
-    @GetMapping("/query")
-    public ResponseEntity<JsonResult<?>> query(RoleRequest roleRequest) {
+    @GetMapping("/query/org")
+    public ResponseEntity<JsonResult<?>> queryByOrg(RoleRequest roleRequest) {
 
-        Page<RoleResponse> rolePage = roleService.query(roleRequest);
+        Page<RoleResponse> rolePage = roleService.queryByOrg(roleRequest);
         //
         return ResponseEntity.ok(JsonResult.success(rolePage));
     }
@@ -70,11 +70,11 @@ public class RoleController {
      */
     // @PostMapping("/update")
     // public Callable<JsonResult<?>> update(@RequestBody RoleParam roleParam) {
-    //     return () -> {
-    //         RoleDTO roleDTO = roleService.update(roleParam);
-    //         //
-    //         return new JsonResult<>("更新角色成功", 200, roleDTO);
-    //     };
+    // return () -> {
+    // RoleDTO roleDTO = roleService.update(roleParam);
+    // //
+    // return new JsonResult<>("更新角色成功", 200, roleDTO);
+    // };
     // }
 
     /**
@@ -85,11 +85,11 @@ public class RoleController {
      */
     // @PostMapping("/delete")
     // public Callable<JsonResult<?>> delete(@RequestBody RoleParam roleParam) {
-    //     return () -> {
-    //         roleService.deleteById(roleParam.getId());
+    // return () -> {
+    // roleService.deleteById(roleParam.getId());
 
-    //         return new JsonResult<>("删除角色成功", 200, roleParam.getId());
-    //     };
+    // return new JsonResult<>("删除角色成功", 200, roleParam.getId());
+    // };
     // }
 
     /**
@@ -99,11 +99,12 @@ public class RoleController {
      */
     // @GetMapping("/filter")
     // public Callable<JsonResult<?>> filter(FilterParam filterParam) {
-    //     return () -> {
-    //         Page<RoleDTO> roleDTOPage = roleService.findByNameContainingOrValueContainingAndUser(filterParam);
-    //         //
-    //         return new JsonResult<>("搜索角色成功", 200, roleDTOPage);
-    //     };
+    // return () -> {
+    // Page<RoleDTO> roleDTOPage =
+    // roleService.findByNameContainingOrValueContainingAndUser(filterParam);
+    // //
+    // return new JsonResult<>("搜索角色成功", 200, roleDTOPage);
+    // };
     // }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-16 18:19:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-19 21:51:00
+ * @LastEditTime: 2024-05-23 20:51:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.bytedesk.core.rbac.auth.AuthEntryPoint;
-import com.bytedesk.core.rbac.auth.AuthJwtTokenFilter;
+import com.bytedesk.core.rbac.auth.AuthTokenFilter;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 
 /**
@@ -66,7 +66,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin().disable()))
                 .authenticationProvider(authenticationProvider())
                 // .oauth2ResourceServer((oauth2) -> oauth2.jwt(withDefaults()))
-                .addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         //
         return http.build();
     }
@@ -77,8 +77,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthJwtTokenFilter authJwtTokenFilter() {
-        return new AuthJwtTokenFilter();
+    public AuthTokenFilter authTokenFilter() {
+        return new AuthTokenFilter();
     }
 
     /**

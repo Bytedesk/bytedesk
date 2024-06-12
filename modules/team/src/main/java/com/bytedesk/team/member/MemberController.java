@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-11 15:35:24
+ * @LastEditTime: 2024-06-12 10:11:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,8 @@
  */
 package com.bytedesk.team.member;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,15 +44,15 @@ public class MemberController {
     private final MemberService memberService;
 
     /**
-     * 管理后台 分页查找 企业所有成员
+     * query by orgUid
      * 
      * @param memberRequest
      * @return
      */
-    @GetMapping("/all")
-    public ResponseEntity<?> queryAll(MemberRequest memberRequest) {
+    @GetMapping("/query/org")
+    public ResponseEntity<?> queryByOrg(MemberRequest memberRequest) {
         //
-        Page<MemberResponse> memberResponse = memberService.queryAll(memberRequest);
+        Page<MemberResponse> memberResponse = memberService.queryByOrg(memberRequest);
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
@@ -59,10 +62,21 @@ public class MemberController {
      *
      * @return json
      */
+    // @GetMapping("/query/dept")
+    // public ResponseEntity<?> queryByDepartments(MemberRequest memberRequest) {
+    //     //
+    //     Page<MemberResponse> memberResponse = memberService.queryByDepartments(memberRequest);
+    //     //
+    //     return ResponseEntity.ok(JsonResult.success(memberResponse));
+    // }
+
     @GetMapping("/query")
     public ResponseEntity<?> query(MemberRequest memberRequest) {
         //
-        Page<MemberResponse> memberResponse = memberService.query(memberRequest);
+        Optional<MemberResponse> memberResponse = memberService.query(memberRequest);
+        if (memberResponse.isEmpty()) {
+            return ResponseEntity.ok(JsonResult.error("member not found", -1));
+        }
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
@@ -73,10 +87,13 @@ public class MemberController {
      * @param memberRequest role
      * @return json
      */
+    @ActionAnnotation(title = "member", action = "create", description = "create member")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody MemberRequest memberRequest) {
 
-        return ResponseEntity.ok(memberService.create(memberRequest));
+        MemberResponse member = memberService.create(memberRequest);
+
+        return ResponseEntity.ok(JsonResult.success(member));
     }
 
     /**
@@ -85,11 +102,13 @@ public class MemberController {
      * @param memberRequest role
      * @return json
      */
+    @ActionAnnotation(title = "member", action = "update", description = "update member")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody MemberRequest memberRequest) {
 
+        MemberResponse member = memberService.update(memberRequest);
         //
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(member));
     }
 
     /**
@@ -98,9 +117,11 @@ public class MemberController {
      * @param memberRequest role
      * @return json
      */
+    @ActionAnnotation(title = "member", action = "delete", description = "delete member")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody MemberRequest memberRequest) {
 
+        memberService.deleteByUid(memberRequest.getUid());
 
         return ResponseEntity.ok(JsonResult.success());
     }

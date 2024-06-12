@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 14:19:28
+ * @LastEditTime: 2024-05-24 15:47:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,14 +61,12 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
 
     private QuartzRepository quartzRepository;
 
-    // private AuthService authService;
-
     @Override
     public Page<QuartzResponse> queryByOrg(QuartzRequest request) {
         
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC, "updatedAt");
 
-        Page<QuartzEntity> page = quartzRepository.findByOrgUid(request.getOrgUid(), pageable);
+        Page<QuartzEntity> page = quartzRepository.findByOrgUidAndDeleted(request.getOrgUid(), false, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -94,16 +92,16 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
         return quartzRepository.save(quartzEntity);
     }
 
-
     @Override
-    public void deleteByUid(QuartzRequest quartzRequest) {
-        log.info("deleteByUid {}", quartzRequest.getUid());
-        quartzRepository.deleteByUid(quartzRequest.getUid());
+    public void deleteByUid(String uid) {
+        log.info("deleteByUid {}", uid);
+        // quartzRepository.deleteByUid(quartzRequest.getUid());
     }
     
     @Override
     public void delete(QuartzEntity object) {
-        quartzRepository.delete(object);
+        // quartzRepository.delete(object);
+        deleteByUid(object.getUid());
     }
 
     public QuartzResponse create(QuartzRequest quartzRequest) {
@@ -239,7 +237,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
             Trigger trigger = scheduler.getTrigger(triggerKey);
             if (trigger == null) {
                 log.info("trigger is null");
-                deleteByUid(quartzRequest);
+                deleteByUid(quartzRequest.getUid());
                 return;
             }
             // 停止触发器
@@ -252,9 +250,8 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
             // TODO: handle exception
             e.printStackTrace();
         }
-
         // 
-        deleteByUid(quartzRequest);
+        deleteByUid(quartzRequest.getUid());
     }
 
 
@@ -280,10 +277,9 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
                 .triggerState("started")
                 .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
-        //
         create(quartzRequest);
         //
-        startJob(quartzRequest);
+        // startJob(quartzRequest);
     }
 
     

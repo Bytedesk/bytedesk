@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-24 10:14:30
+ * @LastEditTime: 2024-06-11 17:36:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,14 +36,14 @@ import java.util.Optional;
 @Tag(name = "roles - 角色")
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
 
-    Optional<Role> findByName(String name);
+    Optional<Role> findByNameAndOrgUidAndDeleted(String name, String orgUid, Boolean deleted);
 
-    List<Role> findByType(String type);
+    List<Role> findByTypeAndOrgUidAndDeleted(String type, String orgUid, Boolean deleted);
 
     // Page<Role> findByUser(User user, Pageable pageable);
-    Page<Role> findByOrgUid(String orgUid, Pageable pageable);
+    Page<Role> findByOrgUidAndDeleted(String orgUid, boolean deleted, Pageable pageable);
 
-    Boolean existsByName(String name);
+    Boolean existsByNameAndOrgUidAndDeleted(String name, String orgUid, boolean deleted);
 
     @Transactional
     void deleteById(@NonNull Long id);

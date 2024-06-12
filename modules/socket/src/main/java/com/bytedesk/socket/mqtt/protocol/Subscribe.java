@@ -3,7 +3,8 @@ package com.bytedesk.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
-import com.bytedesk.core.topic.TopicService;
+import com.bytedesk.core.event.BytedeskEventPublisher;
+// import com.bytedesk.core.topic.TopicService;
 // import com.bytedesk.core.redis.RedisUserService;
 // import com.bytedesk.socket.mqtt.model.MqttRetainMessage;
 // import com.bytedesk.socket.mqtt.model.MqttSubscribe;
@@ -31,7 +32,9 @@ public class Subscribe {
 
     // private final RedisUserService redisUserService;
 
-    private final TopicService topicService;
+    // private final TopicService topicService;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     public void processSubscribe(Channel channel, MqttSubscribeMessage mqttSubscribeMessage) {
         // log.debug("processSubscribe {}", mqttSubscribeMessage.toString());
@@ -51,12 +54,13 @@ public class Subscribe {
             List<Integer> mqttQoSList = new ArrayList<>();
             topicSubscriptions.forEach(topicSubscription -> {
 
-                String topicFilter = topicSubscription.topicName();
+                String topicFilter = topicSubscription.topicFilter(); //topicSubscription.topicName();
                 MqttQoS mqttQoS = topicSubscription.qualityOfService();
                 // MqttSubscribe subscribeStore = new MqttSubscribe(clientId, topicFilter, mqttQoS.value());
                 //
                 // mqttSubscribeStoreService.put(topicFilter, subscribeStore);
-                topicService.subscribe(topicFilter, clientId);
+                // topicService.subscribe(topicFilter, clientId);
+                bytedeskEventPublisher.publishMqttSubscribeEvent(topicFilter, clientId);
                 // 
                 mqttQoSList.add(mqttQoS.value());
                 // 添加缓存

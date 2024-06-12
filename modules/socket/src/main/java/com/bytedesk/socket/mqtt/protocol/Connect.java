@@ -9,7 +9,7 @@ import io.netty.util.CharsetUtil;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.event.BytedeskEventPublisher;
-import com.bytedesk.core.topic.TopicService;
+// import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.socket.mqtt.handler.MqttIdleStateHandler;
 import com.bytedesk.socket.mqtt.model.MqttSession;
 import com.bytedesk.socket.mqtt.service.*;
@@ -30,9 +30,11 @@ public class Connect {
 
     private final MqttSessionService mqttSessionStoreService;
 
-    // private final MqttDupPublishMessageStoreService mqttDupPublishMessageStoreService;
+    // private final MqttDupPublishMessageStoreService
+    // mqttDupPublishMessageStoreService;
 
-    // private final MqttDupPubRelMessageStoreService mqttDupPubRelMessageStoreService;
+    // private final MqttDupPubRelMessageStoreService
+    // mqttDupPubRelMessageStoreService;
 
     // private final MqttSubscribeService mqttSubscribeStoreService;
 
@@ -40,7 +42,7 @@ public class Connect {
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final TopicService topicService;
+    // private final TopicService topicService;
 
     /**
      * TODO: 重构，每个功能独立成一个函数，精简此函数体
@@ -87,7 +89,7 @@ public class Connect {
         final boolean isCleanSession = mqttConnectMessage.variableHeader().isCleanSession();
 
         // clientId为空或null的情况, 这里要求客户端必须提供clientId, 不管cleanSession是否为1, 此处没有参考标准协议实现
-        if (!StringUtils.hasLength(clientId)) {
+        if (!StringUtils.hasText(clientId)) {
             final MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
                     new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
                     new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED, false),
@@ -125,14 +127,19 @@ public class Connect {
                 if (cleanSession.booleanValue()) {
                     mqttSessionStoreService.remove(clientId);
                     // mqttSubscribeStoreService.removeForClient(clientId);
-                    topicService.removeClientId(clientId);
+                    // topicService.removeClientId(clientId);
                     // mqttDupPublishMessageStoreService.removeByClient(clientId);
                     // mqttDupPubRelMessageStoreService.removeByClient(clientId);
+                    // bytedeskEventPublisher.publishMqttDisconnectedEvent(clientId);
                 }
                 // TODO: 修改消息类型 CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD
-                // final MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
-                // new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-                // new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD, false), null);
+                // final MqttConnAckMessage connAckMessage = (MqttConnAckMessage)
+                // MqttMessageFactory.newMessage(
+                // new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE,
+                // false, 0),
+                // new
+                // MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD,
+                // false), null);
                 // previous.writeAndFlush(connAckMessage);
                 previous.close();
             }
@@ -167,7 +174,7 @@ public class Connect {
                 new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_ACCEPTED, sessionPresent), null);
         channel.writeAndFlush(okResp);
 
-         // 将clientId存储到channel的map中
+        // 将clientId存储到channel的map中
         channel.attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).set(clientId);
         channel.attr(AttributeKey.valueOf(MqttConsts.MQTT_USERNAME)).set(username);
         channel.attr(AttributeKey.valueOf(MqttConsts.MQTT_PASSWORD)).set(password);
@@ -176,8 +183,7 @@ public class Connect {
         mqttSessionStoreService.put(clientId, mqttSession);
         // 存储clientId
         // mqttClientIdStoreService.put(clientId);
-        topicService.addClientId(clientId);
-        // 
+        // topicService.addClientId(clientId);
         bytedeskEventPublisher.publishMqttConnectedEvent(clientId);
 
         // 用户clientId格式: uid/client/deviceUid
@@ -193,31 +199,31 @@ public class Connect {
     }
 
     // private void subscribe(String clientId, String topic) {
-    //     // final String uid = clientId.split("/")[0];
-    //     // redisUserService.addTopic(uid, topic);
-    //     log.debug("clientid {}, topic {}", clientId, topic);
-    //     //
-    //     final MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
-    //     final MqttSubscribe subscribeStore = new MqttSubscribe(clientId, topic, mqttQoS.value());
-    //     mqttSubscribeStoreService.put(topic, subscribeStore);
+    // // final String uid = clientId.split("/")[0];
+    // // redisUserService.addTopic(uid, topic);
+    // log.debug("clientid {}, topic {}", clientId, topic);
+    // //
+    // final MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
+    // final MqttSubscribe subscribeStore = new MqttSubscribe(clientId, topic,
+    // mqttQoS.value());
+    // mqttSubscribeStoreService.put(topic, subscribeStore);
     // }
 
     // // 更新在线状态
     // private void updateConnectedStatus(String uid) {
-    //     log.debug("connected {}", uid);
+    // log.debug("connected {}", uid);
     // }
 
     // 发送离线消息
     // private void sendOfflineMessage(String uid) {
-    //     // while (redisMessageCacheOfflineService.length(uid) > 0) {
-    //     //     byte[] messageBytes = redisMessageCacheOfflineService.pop(uid);
-    //     //     if (messageBytes != null) {
-    //     //         // log.debug("send offline message to {}", uid);
-    //     //         // 发送给mq
-    //     //         // messageService.sendProtobufBytesToMqOffline(messageBytes);
-    //     //     }
-    //     // }
+    // // while (redisMessageCacheOfflineService.length(uid) > 0) {
+    // // byte[] messageBytes = redisMessageCacheOfflineService.pop(uid);
+    // // if (messageBytes != null) {
+    // // // log.debug("send offline message to {}", uid);
+    // // // 发送给mq
+    // // // messageService.sendProtobufBytesToMqOffline(messageBytes);
+    // // }
+    // // }
     // }
-
 
 }

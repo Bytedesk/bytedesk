@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 10:25:53
+ * @LastEditTime: 2024-06-04 15:31:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,49 +81,16 @@ public class AsistantService {
             return;
         }
 
-        // Optional<User> adminOptional = userService.getAdmin();
-
         AsistantRequest asistantRequest = AsistantRequest.builder()
                 .topic(TopicConsts.TOPIC_FILE_ASISTANT)
-                .name(I18Consts.I18N_FILE_ASISTANT_NAME)
+                .nickname(I18Consts.I18N_FILE_ASISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .description(I18Consts.I18N_FILE_ASISTANT_DESCRIPTION)
-                // .orgUid(adminOptional.get().getOrgUid())
                 .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
         asistantRequest.setUid(UserConsts.DEFAULT_FILE_ASISTANT_UID);
         asistantRequest.setType(TypeConsts.TYPE_SYSTEM);
         create(asistantRequest);
-
-        // 方便测试，默认给每个初始用户生成一个跟 文件助手 的对话
-        // UserRequest userRequest = new UserRequest();
-        // userRequest.setPageNumber(0);
-        // userRequest.setPageSize(10);
-        // // 
-        // Page<User> userPage = userService.query(userRequest);
-        // userPage.forEach(user -> {
-        //     // 
-        //     UserResponseSimple userSimple = UserResponseSimple.builder()
-        //             // .uid(asistantRequest.getAid())
-        //             .nickname(asistantRequest.getName())
-        //             .avatar(asistantRequest.getAvatar())
-        //             .build();
-        //     userSimple.setUid(asistantRequest.getUid());
-        //     // 
-        //     Thread thread = Thread.builder()
-        //             // .tid(uidUtils.getCacheSerialUid())
-        //             .type(ThreadTypeConsts.ASISTANT)
-        //             .topic(TopicConsts.TOPIC_FILE_ASISTANT + "/" + user.getUid())
-        //             .status(StatusConsts.THREAD_STATUS_INIT)
-        //             .client(TypeConsts.TYPE_SYSTEM)
-        //             .user(JSON.toJSONString(userSimple))
-        //             .owner(user)
-        //             .orgUid(asistantRequest.getOrgUid())
-        //             .build();
-        //     thread.setUid(uidUtils.getCacheSerialUid());
-            
-        //     threadService.save(thread);
-        // });
 
     }
 

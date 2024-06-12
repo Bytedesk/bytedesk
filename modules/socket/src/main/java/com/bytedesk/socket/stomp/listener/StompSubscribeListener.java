@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-04 12:07:11
+ * @LastEditTime: 2024-05-29 17:58:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
 /**
  * published when a new STOMP SUBSCRIBE is received.
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author bytedesk.com
  */
-@Slf4j
+// @Slf4j
 @Component
 public class StompSubscribeListener implements ApplicationListener<SessionSubscribeEvent> {
 
@@ -39,7 +39,7 @@ public class StompSubscribeListener implements ApplicationListener<SessionSubscr
      */
     @Override
     public void onApplicationEvent(@NonNull SessionSubscribeEvent sessionSubscribeEvent) {
-        log.debug(sessionSubscribeEvent.toString());
+        // log.debug(sessionSubscribeEvent.toString());
 
         //
         // MessageHeaders headers = sessionSubscribeEvent.getMessage().getHeaders();

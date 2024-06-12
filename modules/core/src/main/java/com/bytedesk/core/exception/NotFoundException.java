@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 12:35:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 12:35:10
+ * @LastEditTime: 2024-06-03 19:18:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,7 @@ package com.bytedesk.core.exception;
  */
 public class NotFoundException extends BaseException {
 
-    private static final long serialVersionUID = -984846602L;
+    private static final long serialVersionUID = 1L;
 
     public NotFoundException(String message) {
         super(message);

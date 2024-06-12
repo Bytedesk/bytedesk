@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-16 12:01:55
+ * @LastEditTime: 2024-06-11 12:27:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.robot;
 
 import com.bytedesk.core.base.BaseRequest;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,18 +28,24 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class RobotRequest extends BaseRequest {
 
-    private String name;
+    private String nickname;
     
     private String avatar;
 
     private String description;
 
-    private String welcome;
-
-    // private boolean published;
+    // @Builder.Default
+    // private RobotTypeEnum type = RobotTypeEnum.SERVICE;
     
-    // 
+    @Builder.Default
+    private Boolean published = false;
+
+    @Builder.Default
+    private RobotServiceSettingsRequest serviceSettings = new RobotServiceSettingsRequest();
+
+    @Builder.Default
+    private RobotLlm llm = new RobotLlm();
     
-
-
+    @NotBlank
+    private String orgUid;
 }

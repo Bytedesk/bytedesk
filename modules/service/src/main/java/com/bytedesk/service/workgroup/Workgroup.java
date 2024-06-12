@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:31:17
+ * @LastEditTime: 2024-06-10 11:25:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,11 @@
  */
 package com.bytedesk.service.workgroup;
 
+// import java.util.Set;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.Queue;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -25,9 +26,10 @@ import org.hibernate.type.SqlTypes;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.constant.RouteConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.service.agent.Agent;
-import com.bytedesk.service.worktime.Worktime;
+import com.bytedesk.service.common.ServiceSettings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -39,7 +41,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 技能组
+ * 
  */
 @Entity
 @Data
@@ -48,14 +50,11 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(value = { WorkgroupEntityListener.class })
 @Table(name = "service_workgroup")
 public class Workgroup extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    // @NotBlank(message = "wid is required")
-    // @Column(unique = true, nullable = false)
-    // private String wid;
 
     private String nickname;
 
@@ -63,78 +62,55 @@ public class Workgroup extends BaseEntity {
     private String avatar = AvatarConsts.DEFAULT_WORK_GROUP_AVATAR_URL;
 
     @Builder.Default
-    private String description = BdConstants.DEFAULT_WORK_GROUP_DESCRIPTION;
+    private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
     /**
      * route type
      */
     @Builder.Default
-    private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
+    // private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
+    private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
 
     /**
      * 熟客优先
      */
     @Builder.Default
     @Column(name = "is_recent")
-    private boolean recent = false;
+    private Boolean recent = false;
 
+    @Embedded
     @Builder.Default
-    @Column(name = "is_auto_pop")
-    private boolean autoPop = false;
+    private ServiceSettings serviceSettings = new ServiceSettings();
 
     /**
-     * tips
-     * TODO: set different tips for different lang
+     * one wg can have many agents, one agent can belong to many wgs
      */
+    @JsonIgnore
     @Builder.Default
-    private boolean showTopTip = false;
-
-    @Builder.Default
-    @Column(length = 512)
-    private String topTip = BdConstants.DEFAULT_WORK_GROUP_DEFAULT_TOP_TIP;
-
-    @Builder.Default
-    private String welcomeTip = BdConstants.DEFAULT_WORK_GROUP_WELCOME_TIP;
+    @ManyToMany(fetch = FetchType.LAZY)
+    // private Set<Agent> agents = new HashSet<>();
+    // 为方便路由分配客服，特修改成list
+    private List<Agent> agents = new ArrayList<>();
 
     /**
-     * robot
-     * 是否默认机器人接待
+     * 路由队列，用于分配客服
      */
+    @Transient
     @Builder.Default
-    private boolean defaultRobot = false;
+    private Queue<Agent> agentQueue = new LinkedList<>();
 
-    /** 无客服在线时，是否启用机器人接待 */
-    @Builder.Default
-    private boolean offlineRobot = false;
-     
-    /** 非工作时间段，是否启用机器人接待 */
-    @Builder.Default
-    private boolean nonWorktimeRobot = false;
+    // TODO: 处理留言agent
 
-    /** auto close time in min - 默认自动关闭时间，单位分钟 */
-    @Builder.Default
-    private Double autoCloseMin = Double.valueOf(25);
-
-    /** work time */
-    @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Worktime> workTimes = new ArrayList<>();
-
-    /**
-	 * one wg can have many agents, one agent can belong to many wgs
-	 */
-	@JsonIgnore
-	@Builder.Default
-	@ManyToMany(fetch = FetchType.LAZY)
-	private Set<Agent> agents = new HashSet<>();
+    // TODO: 监控管理员agent
 
     /** 存储下一个待分配的客服等信息 */
     @Builder.Default
-    @Column(columnDefinition = "json")
-    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
+    // of type character varying
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
-    
+
     /**
      * belong to org
      */
@@ -149,4 +125,23 @@ public class Workgroup extends BaseEntity {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private User owner;
+
+    // TODO: 根据算法选择一个agent
+    // TODO: 增加agent-currentThreadCount数量
+    // TODO: 模拟测试1000个访客分配给10个客服，每个客服平均分配50个访客
+    public Agent nextAgent() {
+
+        if (routeType.equals(WorkgroupRouteEnum.ROBIN)) {
+
+        } else if (routeType.equals(WorkgroupRouteEnum.AVERAGE)) {
+
+        } else if (routeType.equals(WorkgroupRouteEnum.IDLE)) {
+
+        } else if (routeType.equals(WorkgroupRouteEnum.LESS)) {
+
+        }
+
+        return getAgents().iterator().next();
+    }
+
 }

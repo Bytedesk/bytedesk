@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 22:30:05
+ * @LastEditTime: 2024-06-11 12:00:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,11 +18,18 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.service.common.ServiceSettings;
+// import com.bytedesk.core.constant.StatusConsts;
+// import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.team.member.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -37,6 +44,7 @@ import lombok.experimental.Accessors;
 // import lombok.extern.slf4j.Slf4j;
 
 /**
+ * human agent, not ai agent
  * 客服账号-关联信息
  */
 // @Slf4j
@@ -47,10 +55,11 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ AgentListener.class })
+@EntityListeners({ AgentEntityListener.class })
+// @DiscriminatorValue("Agent")
 @Table(name = "service_agent", uniqueConstraints = {
-    // @UniqueConstraint(columnNames = { "email", "orgUid" }),
-    // @UniqueConstraint(columnNames = { "mobile", "orgUid" })
+// @UniqueConstraint(columnNames = { "email", "orgUid" }),
+// @UniqueConstraint(columnNames = { "mobile", "orgUid" })
 })
 public class Agent extends BaseEntity {
 
@@ -61,44 +70,58 @@ public class Agent extends BaseEntity {
      */
     private String nickname;
 
-    private String avatar;
+    @Builder.Default
+    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
 
+    @Builder.Default
+    private String description = I18Consts.I18N_USER_DESCRIPTION;
+
+    // show on agent card
     private String mobile;
 
     private String email;
 
-    /** agent description */
-    private String description;
+    /**
+     * @{AgentConsts}
+     */
+    // @Builder.Default
+    // private String acceptStatus = AgentConsts.ACCEPT_STATUS_ACCEPTING;
+    @Builder.Default
+    private AgentStatus status = AgentStatus.AVAILABLE;
 
     /**
      * @{AgentConsts}
      */
-    @Builder.Default
-    private String acceptStatus = AgentConsts.ACCEPT_STATUS_ACCEPTING;
+    // @Builder.Default
+    // private String status = StatusConsts.AGENT_STATUS_PENDING;
+    // @Builder.Default
+    // private String status = StatusConsts.AGENT_STATUS_PENDING;
+    // @Builder.Default
+    // @Column(name = "is_enabled")
+    // private boolean enabled = true;
 
+    // TODO:是否需要跟内存中mqttsession同步
     @Builder.Default
     @Column(name = "is_connected")
     private boolean connected = false;
 
+    @Embedded
+    @Builder.Default
+    private ServiceSettings serviceSettings = new ServiceSettings();
+
     // max concurrent chatting thread count
     @Builder.Default
-    private Integer maxThreadCount = 10;
+    private int maxThreadCount = 10;
 
-    /**
-     * tips
-     * TODO: set different tips for different lang
-     */
+    // TODO: 是否需要跟进行中thread同步
     @Builder.Default
-    private String welcomeTip = BdConstants.DEFAULT_WORK_GROUP_ACCEPT_TIP;
-
-    /** auto close time in min - 默认自动关闭时间，单位分钟 */
-    @Builder.Default
-    private Double autoCloseMin = Double.valueOf(25);
+    private int currentThreadCount = 0;
 
     /** 存储当前接待数量等 */
     @Builder.Default
-    @Column(columnDefinition = "json")
-    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
+    // of type character varying
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
 
@@ -107,31 +130,31 @@ public class Agent extends BaseEntity {
      */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    // private User user;
+    private Member member;
+
+    // for quick query, space exchange for speed
+    private String userUid;
 
     /** belong to org */
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
     private String orgUid;
-    
-    /**
-     * belongs to user
-     */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private User owner;
 
+    public void incrementThreadCount() {
+        this.currentThreadCount++;
+    }
 
-    // @PostPersist
-    // public void onPostPersist() {
-    //     // log.debug("onPostPersist: {}", this);
-    //     // 这里可以记录日志、发送通知等
-    //     // create agent topic
-    //     TopicService topicService = ApplicationContextHolder.getBean(TopicService.class);
-    //     // 
-    //     topicService.create(this.getUid(), this.getUser().getUid());
-    // }
-    
+    public void decrementThreadCount() {
+        this.currentThreadCount--;
+    }
+
+    public Boolean isAvailable() {
+        return this.status == AgentStatus.AVAILABLE;
+    }
+
+    public Boolean canAcceptMore() {
+        return this.currentThreadCount < this.maxThreadCount;
+    }
 }
-

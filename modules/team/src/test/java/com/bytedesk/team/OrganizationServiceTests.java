@@ -22,8 +22,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.team.organization.OrganizationRepository;
-import com.bytedesk.team.organization.OrganizationService;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
+import com.bytedesk.core.rbac.organization.OrganizationService;
 
 @ExtendWith(MockitoExtension.class)
 public class OrganizationServiceTests {

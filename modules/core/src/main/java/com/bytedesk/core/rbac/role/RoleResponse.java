@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:40:07
+ * @LastEditTime: 2024-05-23 09:15:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,11 +38,11 @@ import com.bytedesk.core.rbac.authority.AuthorityResponse;
 @EqualsAndHashCode(callSuper = true)
 public class RoleResponse extends BaseResponse {
 
-    private static final long serialVersionUID = 4082434575L;    
-
-    // private String rid;
+    private static final long serialVersionUID = 1L;    
     
     private String name;
+
+    private String displayName;
 
     // private String value;
 

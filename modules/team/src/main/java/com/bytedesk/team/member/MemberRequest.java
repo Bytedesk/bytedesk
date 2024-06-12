@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 12:25:11
+ * @LastEditTime: 2024-06-10 08:33:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,70 +15,65 @@
 package com.bytedesk.team.member;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 // import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
 @Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberRequest extends BaseRequest {
 
-    // private String uid;
-
-    /**
-     * job number
-     * 工号
-     */
-    private String jobNo;
-
-    /**
-     * nickname
-     * 姓名
-     */
-    // @NotEmpty
+    @NotBlank
     private String nickname;
+
+    @Builder.Default
+    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_USER_DESCRIPTION;
 
     private String password;
 
-    /**
-     * mobile
-     * 手机号
-     */
-    // @NotEmpty
+    @NotBlank
     private String mobile;
 
+    // @NotBlank
+    @Email(message = "email format error")
     private String email;
 
-    /**
-     * seat no
-     * 工位
-     */
+    private String jobNo;
+
+    private String jobTitle; // 职位
+
     private String seatNo;
 
-    /**
-     * telephone
-     * 电话-分机号
-     */
     private String telephone;
 
-    /**
-     * is verified
-     * 是否已验证
-     */
+    private Boolean inviteAccepted;
+
     @Builder.Default
-    private Boolean verified = false;
+    private MemberStatusEnum status = MemberStatusEnum.PENDING;
+    // private String status = StatusConsts.AGENT_STATUS_PENDING;
 
-    /**
-     * department did
-     */
+    // @Builder.Default
+    // private Boolean enabled = true;
+
+    @NotBlank
     private String depUid;
-
     // 
+    @NotBlank
     private String orgUid;
-
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 11:04:11
+ * @LastEditTime: 2024-06-04 14:25:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,12 +19,12 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.llm.LlmService;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.asistant.AsistantService;
 import com.bytedesk.core.channel.ChannelService;
 import com.bytedesk.core.quartz.QuartzService;
 import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.rbac.organization.OrganizationService;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.thread.ThreadService;
@@ -33,7 +33,6 @@ import com.bytedesk.service.agent.AgentService;
 import com.bytedesk.service.workgroup.WorkgroupService;
 import com.bytedesk.team.department.DepartmentService;
 import com.bytedesk.team.member.MemberService;
-import com.bytedesk.team.organization.OrganizationService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,9 +71,6 @@ public class InitDataRunner implements ApplicationRunner {
     MemberService memberService;
 
     @Autowired
-    LlmService llmService;
-
-    @Autowired
     RobotService robotService;
 
     @Autowired
@@ -108,13 +104,11 @@ public class InitDataRunner implements ApplicationRunner {
 
         organizationService.initData();
 
-        roleService.updateInitData();
+        userService.updateInitData();
 
         departmentService.initData();
 
         memberService.initData();
-
-        llmService.initData();
 
         robotService.initData();
 

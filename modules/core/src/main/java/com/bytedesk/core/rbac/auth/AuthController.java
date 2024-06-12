@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-17 17:24:47
+ * @LastEditTime: 2024-06-03 14:56:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,13 +23,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.action.ActionLogAnnotation;
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,8 +73,8 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success("register success", userResponse));
     }
 
-    @ActionLogAnnotation(title = "Auth", action = "loginWithUsernamePassword", description = "Login With Username & Password")
     @PostMapping("/login")
+    @ActionAnnotation(title = "auth", action = "loginWithUsernamePassword", description = "Login With Username & Password")
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());
 
@@ -86,11 +87,11 @@ public class AuthController {
     }
 
     @PostMapping("/send/mobile")
-    public ResponseEntity<?> sendMobileCode(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> sendMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getClient(), authRequest.getType());
 
         // send mobile code
-        Boolean result = pushService.sendSmsCode(authRequest.getMobile(), authRequest.getClient(), authRequest.getType(), authRequest.getPlatform());
+        Boolean result = pushService.sendSmsCode(authRequest.getMobile(), authRequest.getClient(), authRequest.getType(), authRequest.getPlatform(), request);
         if (!result) {
             return ResponseEntity.ok().body(JsonResult.error("already send, dont repeat", -1, false));
         }
@@ -98,7 +99,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success("send mobile code success"));
     }
 
-    @ActionLogAnnotation(title = "Auth", action = "loginWithMobileCode", description = "Login With mobile & code")
+    @ActionAnnotation(title = "auth", action = "loginWithMobileCode", description = "Login With mobile & code")
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest) {
         log.debug("login mobile {}", authRequest.toString());
@@ -106,7 +107,7 @@ public class AuthController {
         // validate mobile & code
         // 验证手机验证码
         if (!pushService.validateSmsCode(authRequest.getMobile(), authRequest.getCode())) {
-            return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, new AuthResponse()));
+            return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
         // if mobile already exists, if none, then registe
@@ -127,11 +128,11 @@ public class AuthController {
     }
 
     @PostMapping("/send/email")
-    public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
 
         // send email code
-        Boolean result = pushService.sendEmailCode(authRequest.getEmail(), authRequest.getClient(), authRequest.getType(), authRequest.getPlatform());
+        Boolean result = pushService.sendEmailCode(authRequest.getEmail(), authRequest.getClient(), authRequest.getType(), authRequest.getPlatform(), request);
         if (!result) {
             return ResponseEntity.ok(JsonResult.error("already send, dont repeat", -1, false));
         }
@@ -139,14 +140,14 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success("send email code success"));
     }
 
-    @ActionLogAnnotation(title = "Auth", action = "loginWithEmailCode", description = "Login With email & code")
+    @ActionAnnotation(title = "auth", action = "loginWithEmailCode", description = "Login With email & code")
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest) {
         log.debug("login email {}", authRequest.toString());
 
         // validate email & code
         if (!pushService.validateEmailCode(authRequest.getEmail(), authRequest.getCode())) {
-            return ResponseEntity.ok(JsonResult.error("validate code failed", -1, new AuthResponse()));
+            return ResponseEntity.ok(JsonResult.error("validate code failed", -1, false));
         }
 
         // 邮箱是否已经注册，如果没有，则自动注册

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 22:11:49
+ * @LastEditTime: 2024-06-06 14:43:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,20 +33,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Repository
 @Tag(name = "thread - 会话")
-public interface ThreadRepository extends JpaRepository<Thread, Long>, JpaSpecificationExecutor<Thread> { 
+public interface ThreadRepository extends JpaRepository<Thread, Long>, JpaSpecificationExecutor<Thread> {
         Optional<Thread> findByUid(String uid);
-        /** used for member thread type */
-        Optional<Thread> findFirstByTopicAndOwner(String topic, User owner);
 
-        Optional<Thread> findFirstByTopic(String topic);
-        
-        Page<Thread> findByOwner(User owner, Pageable pageable);
-        
+        /** used for member thread type */
+        Optional<Thread> findFirstByTopicAndOwnerAndDeleted(String topic, User owner, Boolean deleted);
+
+        Optional<Thread> findFirstByTopicAndDeleted(String topic, Boolean deleted);
+
+        Page<Thread> findByOwnerAndDeleted(User owner, Boolean deleted, Pageable pageable);
+
         // FIXME: h2不兼容 JSON_EXTRACT
         // FIXME: PostgreSQL ERROR: function json_extract(json, unknown) does not exist
-        // @Query(value = "SELECT * FROM core_thread WHERE JSON_EXTRACT(extra, '$.closed') = false", nativeQuery = true)
-        // List<Thread> findByExtraClosed();
-        List<Thread> findByStatus(String status);
+        // @Query(value = "SELECT * FROM core_thread WHERE JSON_EXTRACT(extra,'$.closed') = false", nativeQuery = true)
+        List<Thread> findByStatusAndDeleted(ThreadStatusEnum status, Boolean deleted);
 
-        Page<Thread> findByOrgUid(String orgUid, Pageable pageable);
+        // Page<Thread> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable pageable);
 }

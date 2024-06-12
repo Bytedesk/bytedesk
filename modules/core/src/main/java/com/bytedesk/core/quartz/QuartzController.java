@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:40:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-14 15:35:37
+ * @LastEditTime: 2024-05-31 07:40:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,7 +45,7 @@ public class QuartzController extends BaseController<QuartzRequest> {
     @Override
     public ResponseEntity<?> queryByOrg(QuartzRequest request) {
 
-        Page<QuartzResponse> pageResult = this.quartzService.queryByOrg(request);
+        Page<QuartzResponse> pageResult = quartzService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
@@ -56,8 +56,8 @@ public class QuartzController extends BaseController<QuartzRequest> {
     @GetMapping("/query")
     @Override
     public ResponseEntity<?> query(QuartzRequest request) {
-        
-        Page<QuartzResponse> pageResult = this.quartzService.queryByUser(request);
+
+        Page<QuartzResponse> pageResult = quartzService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
@@ -65,20 +65,20 @@ public class QuartzController extends BaseController<QuartzRequest> {
     @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody QuartzRequest request) {
-        
-        QuartzResponse response = this.quartzService.create(request);
+
+        QuartzResponse response = quartzService.create(request);
         if (response == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("jobName already exists"));
         }
-        
+
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody QuartzRequest request) {
-        
-        QuartzResponse response = this.quartzService.update(request);
+
+        QuartzResponse response = quartzService.update(request);
         if (response == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("uid not exists"));
         }
@@ -89,43 +89,35 @@ public class QuartzController extends BaseController<QuartzRequest> {
     @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuartzRequest request) {
-        
-        this.quartzService.deleteByUid(request);
+
+        quartzService.deleteByUid(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @GetMapping("/filter")
-    @Override
-    public ResponseEntity<?> filter(QuartzRequest filterParam) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filter'");
-    }
-
-    // 
+    //
     @PostMapping("/startJob")
     public ResponseEntity<?> startJob(@RequestBody QuartzRequest request) {
-        this.quartzService.startJob(request);
+        quartzService.startJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
     @PostMapping("/pauseJob")
     public ResponseEntity<?> pauseJob(@RequestBody QuartzRequest request) {
-        this.quartzService.pauseJob(request);
+        quartzService.pauseJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
     @PostMapping("/resumeJob")
     public ResponseEntity<?> resumeJob(@RequestBody QuartzRequest request) {
-        this.quartzService.resumeJob(request);
+        quartzService.resumeJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
     @PostMapping("/deleteJob")
     public ResponseEntity<?> deleteJob(@RequestBody QuartzRequest request) {
-        this.quartzService.deleteJob(request);
+        quartzService.deleteJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
-    
 
 }

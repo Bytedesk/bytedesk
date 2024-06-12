@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 11:33:18
+ * @LastEditTime: 2024-06-07 14:51:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.Column;
@@ -37,6 +38,7 @@ import lombok.experimental.Accessors;
  * access_token or refresh_token
  * 授权验证token时，不只是使用jwt解码验证，还需要跟数据库中进行对比，如果token被禁用或者过期，则拒绝访问
  * 存储第三方access_token，refresh_token，过期时间等，微信，qq等第三方授权登录
+ * 
  * @author jackning
  */
 @Entity
@@ -47,7 +49,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_token")
-public class Token  extends BaseEntity {
+public class Token extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,7 +57,7 @@ public class Token  extends BaseEntity {
 
     private String refreshToken;
 
-    @Column(name = "by_type")
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
 
     private Long expireTime;
@@ -64,7 +66,7 @@ public class Token  extends BaseEntity {
     @Column(name = "is_valid")
     private boolean valid = true;
 
-   // user, no need map, just uid
+    // user, no need map, just uid
     @NotBlank
     @Column(nullable = false)
     private String userUid;
@@ -73,5 +75,5 @@ public class Token  extends BaseEntity {
     @Builder.Default
     @Convert(converter = StringSetConverter.class)
     private Set<String> clientIds = new HashSet<>();
-   
+
 }
