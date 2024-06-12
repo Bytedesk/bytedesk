@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 11:59:42
+ * @LastEditTime: 2024-06-12 12:07:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,50 @@
 -->
 # 微语
 
-基于 LLM 和 RAG 的智能客服
+对话即服务，Chat as a Service
+
+## 语言
+
+- [English](./README.md)
+- [中文](./README.zh.md)
+
+## 介绍
+
+### 社交IM：跟好友聊
+
+- 好友、
+- 群组、
+
+### 企业IM：跟同事聊
+
+- 多层组织架构、
+- 角色管理
+- 权限管理
+- 聊天记录管理
+
+### 在线客服：跟客户聊
+
+- 支持多渠道、多种路由策略、详细考核指标
+- 坐席工作台、
+- 工单系统、
+- 坐席管理、
+- 数据看板、
+- 人工知识库、
+- 技能组管理、
+- 实时监控、
+- 公告、
+- 敏感词、
+- CRM、
+- 报表功能，
+- 为客户提供一体化客服工作台服务
+
+### 智能客服
+
+- 基于大模型 LLM && RAG 的智能客服
+
+### 大模型AI助手
+
+- 更适合团队使用，一人配置，全公司使用
 
 ## 快速开始
 
@@ -25,7 +68,7 @@ git clone https://github.com/Bytedesk/bytedesk.git
 # 
 cd bytedesk
 mvn install -Dmaven.test.skip=true
-#
+# 
 cd bytedesk/starter
 mvn spring-boot:run
 # 打包jar并运行:
