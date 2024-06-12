@@ -167,18 +167,18 @@
 		<!-- //////////////////////////////////付费模块/////////////////////////////////////////// -->
 
 		<!-- service - 客服付费模块 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-vip-service</artifactId>
 			<version>${im.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- cms - 内容管理系统 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-vip-cms</artifactId>
 			<version>${im.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- cluster - 集群 -->
 		<!-- <dependency>
