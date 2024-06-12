@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 12:07:25
+ * @LastEditTime: 2024-06-12 12:08:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,11 @@ Chat as a Service
 - [中文](./README.zh.md)
 
 ## Introduction
+
+### Social IM
+
+- friend chat
+- group chat
 
 ### Enterprise Instant Messaging/IM
 
