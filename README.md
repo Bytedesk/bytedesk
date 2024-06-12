@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 11:57:36
+ * @LastEditTime: 2024-06-12 12:07:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,45 @@
 -->
 # Bytedesk
 
-Customer service based on LLM && RAG
+Chat as a Service
+
+## Language
+
+- [English](./README.md)
+- [中文](./README.zh.md)
+
+## Introduction
+
+### Enterprise Instant Messaging/IM
+
+- Multi-level organizational structure
+- role management
+- Permission management
+- Chat record management
+
+### Online customer service
+
+- Support multiple channels, multiple routing strategies, and detailed assessment indicators
+- Seating workbench
+- Work order system
+- Seat management
+- Data dashboard
+- manual knowledge base
+- Skill group management
+- Real-time monitoring
+- Announcements
+- sensitive words
+- CRM
+- Report function,
+- Provide customers with integrated customer service workbench services
+
+### Customer service assistant
+
+- Customer Service based on LLM && RAG
+
+### Large model AI assistant
+
+- More suitable for team use, one person configuration, for use throughout the company
 
 ## Getting Started
 
