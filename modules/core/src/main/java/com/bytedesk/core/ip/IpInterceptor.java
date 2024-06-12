@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-17 12:53:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-19 18:50:18
+ * @LastEditTime: 2024-05-23 23:34:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,8 @@ public class IpInterceptor implements HandlerInterceptor {
             throws Exception {
 
         String ip = ipService.getIp(request);
-        log.info("IpInterceptor ip: {}", ip);
+        String ipLocation = ipService.getIpLocation(ip);
+        log.info("IpInterceptor ip: {}, ipLocation {}", ip, ipLocation);
 
         // TODO: blacklist check
         // if (ipService.isIpInBlackList(ip)) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 14:23:21
+ * @LastEditTime: 2024-06-03 14:55:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,10 +49,27 @@ public class AuthService {
     private ModelMapper modelMapper;
 
     public User getCurrentUser() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
+        // not logged in
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            return null;
+        }
+        //
+        try {
+            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                    .getPrincipal();
 
-        return modelMapper.map(userDetails, User.class);
+            return modelMapper.map(userDetails, User.class);
+        } catch (Exception e) {
+            // TODO: handle exception
+            // FIXME: 验证码错误时会报错：java.lang.ClassCastException: class java.lang.String cannot be cast to
+            // class com.bytedesk.core.rbac.user.UserDetailsImpl (java.lang.String is in
+            // module java.base of loader 'bootstrap';
+            // com.bytedesk.core.rbac.user.UserDetailsImpl is in unnamed module of loader
+            // 'app')
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public UsernamePasswordAuthenticationToken getAuthentication(@NonNull HttpServletRequest request, String subject) {
@@ -83,7 +101,7 @@ public class AuthService {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        UserResponse userResponse = convertToUserResponse(userDetails);
+        UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
 
         String jwt = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
 
@@ -92,13 +110,5 @@ public class AuthService {
                 .user(userResponse)
                 .build();
     }
-    
 
-    public UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
-        UserResponse userResponse = modelMapper.map(userDetails, UserResponse.class);
-
-        return userResponse;
-    }
-
-    
 }

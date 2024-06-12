@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 12:57:07
+ * @LastEditTime: 2024-05-25 10:49:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,11 +21,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PushRepository extends JpaRepository<Push, Long> {
 
-    List<Push> findByStatus(String status);
+    List<Push> findByStatus(PushStatus status);
     
-    Optional<Push> findByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver, String content);
+    Optional<Push> findByStatusAndTypeAndReceiverAndContent(PushStatus status, String type, String receiver, String content);
 
-    Boolean existsByStatusAndTypeAndReceiver(String status, String type, String receiver);
+    Boolean existsByStatusAndTypeAndReceiver(PushStatus status, String type, String receiver);
 
-    Boolean existsByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver, String content);
+    Boolean existsByStatusAndTypeAndReceiverAndContent(PushStatus status, String type, String receiver, String content);
 }

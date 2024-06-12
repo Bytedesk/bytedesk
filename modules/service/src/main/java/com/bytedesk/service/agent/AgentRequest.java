@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-13 22:29:10
+ * @LastEditTime: 2024-06-12 10:16:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,21 +16,27 @@ package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.service.common.ServiceSettingsRequest;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
 @Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public class AgentRequest extends BaseRequest {
 
-    // private String uid;
-
+    @NotBlank
     private String nickname;
 
     private String password;
@@ -38,14 +44,41 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private String avatar = AvatarConsts.DEFAULT_AGENT_AVATAR_URL;
 
+    @NotBlank
     private String mobile;
 
+    @NotBlank
+    @Email(message = "email format error")
     private String email;
 
     @Builder.Default
-    private String description = BdConstants.DEFAULT_AGENT_DESCRIPTION;
+    private String description = I18Consts.I18N_AGENT_DESCRIPTION;
 
-    // organization oid
+    @Builder.Default
+    // private String status = StatusConsts.AGENT_STATUS_PENDING;
+    private AgentStatus status = AgentStatus.AVAILABLE;
+
+    @Builder.Default
+    private Integer maxThreadCount = 10;
+
+    @Builder.Default
+    private Integer currentThreadCount = 0;
+    
+    @Builder.Default
+    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
+
+    // @Builder.Default
+    // private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
+
+    // @Builder.Default
+    // private Boolean enabled = true;
+    // 
+    @NotBlank
+    private String memberUid;
+
+    // private String userUid;
+
+    @NotBlank
     private String orgUid;
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:49:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:49:13
+ * @LastEditTime: 2024-05-29 16:44:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.Date;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,7 +46,7 @@ public class ThreadLogResponse extends BaseResponse {
 
     private Integer unreadCount;
 
-    private String type;
+    private ThreadTypeEnum type;
 
     private String extra;
 

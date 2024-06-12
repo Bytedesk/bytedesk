@@ -9,19 +9,21 @@ import org.hibernate.type.SqlTypes;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.role.Role;
-import com.bytedesk.core.utils.StringSetConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-// import jakarta.persistence.UniqueConstraint;
-// import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -35,16 +37,18 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @Builder
-@EqualsAndHashCode(callSuper = true)
+// "roles",
+@EqualsAndHashCode(callSuper = true, exclude = { "password", "currentOrganization", "userOrganizationRoles" })
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ UserListener.class })
+@EntityListeners({ UserEntityListener.class })
+// @DiscriminatorValue("User")
 @Table(name = "core_user", uniqueConstraints = {
-	// num, username, email, mobile 在各个平台唯一
-	@UniqueConstraint(columnNames = { "num", "platform" }),
-	@UniqueConstraint(columnNames = { "username", "platform" }),
-	@UniqueConstraint(columnNames = { "email", "platform" }),
-	@UniqueConstraint(columnNames = { "mobile", "platform" }),
+		// num, username, email, mobile is unique combined with platform, not self
+		@UniqueConstraint(columnNames = { "num", "platform" }),
+		@UniqueConstraint(columnNames = { "username", "platform" }),
+		@UniqueConstraint(columnNames = { "email", "platform" }),
+		@UniqueConstraint(columnNames = { "mobile", "platform" }),
 })
 public class User extends BaseEntity {
 
@@ -55,7 +59,6 @@ public class User extends BaseEntity {
 
 	// used in authjwtToken, should not be null
 	@NotBlank(message = "username is required")
-	// unique = true,
 	@Column(nullable = false)
 	private String username;
 
@@ -77,7 +80,13 @@ public class User extends BaseEntity {
 	private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
 
 	@Builder.Default
-	private String description = BdConstants.DEFAULT_USER_DESCRIPTION;
+	private String description = I18Consts.I18N_USER_DESCRIPTION;
+
+	// @Embedded
+	// private UserSettings userSettings;
+
+	@Builder.Default
+	private Sex sex = Sex.UNKNOW;
 
 	@Builder.Default
 	@Column(name = "is_enabled")
@@ -98,38 +107,89 @@ public class User extends BaseEntity {
 	@Builder.Default
 	private String platform = BdConstants.PLATFORM_BYTEDESK;
 
-	@Builder.Default
-	@ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles = new HashSet<>();
-	
-	@Builder.Default
-	@Convert(converter = StringSetConverter.class)
-	private Set<String> organizations = new HashSet<>();
+	// @Builder.Default
+	// @ManyToMany(fetch = FetchType.EAGER)
+	// private Set<Role> roles = new HashSet<>();
+
+	// // TODO: restrict one user to one org? to be determinated which make roles
+	// complicated
+	// @Builder.Default
+	// @Convert(converter = StringSetConverter.class)
+	// private Set<String> organizations = new HashSet<>();
+
+	//
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Organization currentOrganization;
 
 	@Builder.Default
-    @Column(columnDefinition = "json")
-    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying
-    @JdbcTypeCode(SqlTypes.JSON)
-    private String extra = BdConstants.EMPTY_JSON_STRING;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<UserOrganizationRole> userOrganizationRoles = new HashSet<>();
+
+	// 添加方法以简化对用户组织和角色的管理
+	public void addOrganizationRole(Organization organization, Role role) {
+		UserOrganizationRole uor = UserOrganizationRole.builder().user(this).organization(organization).role(role)
+				.build();
+		this.userOrganizationRoles.add(uor);
+		//
+		if (this.currentOrganization == null) {
+			this.currentOrganization = organization;
+		}
+	}
+
+	public void removeOrganizationRole(Organization organization, Role role) {
+		UserOrganizationRole uor = UserOrganizationRole.builder().user(this).organization(organization).role(role)
+				.build();
+		if (this.userOrganizationRoles.contains(uor)) {
+			this.userOrganizationRoles.remove(uor);
+		}
+	}
+
+	@Builder.Default
+	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+	// 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
+	// of type character varying
+	@JdbcTypeCode(SqlTypes.JSON)
+	private String extra = BdConstants.EMPTY_JSON_STRING;
 
 	// return the first organization oid
 	public String getOrgUid() {
-		return this.organizations.isEmpty() ? null : this.organizations.iterator().next();
-	}
-
-	/** */
-	public void addRole(Role role) {
-        if (!this.roles.contains(role)) {
-            this.roles.add(role);
-            // role.getUsers().add(this);
-        }
-    }
-
-	public void removeRole(Role role) {
-		if (this.roles.contains(role)) {
-			this.roles.remove(role);
-			// role.getUsers().remove(this);
+		if (this.currentOrganization == null) {
+			return BdConstants.EMPTY_STRING;
 		}
+		return this.currentOrganization.getUid();
 	}
-	
+
+	// /** */
+	// public void addRole(Role role) {
+	// if (!this.roles.contains(role)) {
+	// this.roles.add(role);
+	// // role.getUsers().add(this);
+	// }
+	// }
+
+	// public void removeRole(Role role) {
+	// if (this.roles.contains(role)) {
+	// this.roles.remove(role);
+	// // role.getUsers().remove(this);
+	// }
+	// }
+
+	//
+	// 定义性别枚举
+	public enum Sex {
+		MALE,
+		FEMALE,
+		UNKNOW // unknown
+	}
+
+	@Override
+	public String toString() {
+		return "User [uid=" + this.getUid() +
+				", username=" + this.username +
+				", email=" + this.email +
+				", mobile=" + this.mobile +
+				"]";
+	}
+
 }

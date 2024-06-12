@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class TopicRequest extends BaseRequest {
 
     private String topic;
     
+    @NotBlank
     private String userUid;
 
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */

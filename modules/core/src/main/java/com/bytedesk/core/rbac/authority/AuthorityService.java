@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:39:41
+ * @LastEditTime: 2024-06-11 17:47:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,16 +36,16 @@ public class AuthorityService {
     private final UidUtils uidUtils;
 
     public Authority create(AuthorityRequest authorityRequest) {
-        // 
+        //
         Authority authority = modelMapper.map(authorityRequest, Authority.class);
         authority.setUid(uidUtils.getCacheSerialUid());
 
         return save(authority);
     }
 
-    @Cacheable(value = "authority", key = "#aid", unless = "#result == null")
-    public Optional<Authority> findByAid(String aid) {
-        return authorityRepository.findByUid(aid);
+    @Cacheable(value = "authority", key = "#uid", unless = "#result == null")
+    public Optional<Authority> findByUid(String uid) {
+        return authorityRepository.findByUid(uid);
     }
 
     @Cacheable(value = "authority", key = "#value", unless = "#result == null")
@@ -62,27 +62,27 @@ public class AuthorityService {
         if (authorityRepository.count() > 0) {
             return;
         }
-        // 
+        //
         String[] authorities = {
-            TypeConsts.AUTHORITY_SUPER,
-            TypeConsts.AUTHORITY_ADMIN,
-            TypeConsts.AUTHORITY_HR,
-            TypeConsts.AUTHORITY_ORG,
-            TypeConsts.AUTHORITY_IT,
-            TypeConsts.AUTHORITY_MONEY,
-            TypeConsts.AUTHORITY_MARKETING,
-            TypeConsts.AUTHORITY_SALES,
-            TypeConsts.AUTHORITY_CUSTOMER_SERVICE,
+                TypeConsts.SUPER,
+                TypeConsts.ADMIN,
+                TypeConsts.HR,
+                TypeConsts.ORG,
+                TypeConsts.IT,
+                TypeConsts.MONEY,
+                TypeConsts.MARKETING,
+                TypeConsts.SALES,
+                TypeConsts.CUSTOMER_SERVICE,
         };
 
         for (String authority : authorities) {
             AuthorityRequest authRequest = AuthorityRequest.builder()
-                .name(authority)
-                .value(authority)
-                .description(authority)
-                .build();
+                    .name(authority)
+                    .value(authority)
+                    .description(authority)
+                    .build();
             authRequest.setType(TypeConsts.TYPE_SYSTEM);
-            // 
+            //
             create(authRequest);
         }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-09 16:34:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 09:18:09
+ * @LastEditTime: 2024-06-07 14:48:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,9 +19,10 @@ import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.constant.StatusConsts;
-import com.bytedesk.core.constant.ThreadTypeConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.thread.ThreadStatusEnum;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -39,7 +40,8 @@ import lombok.experimental.Accessors;
 /**
  * only for customer service thread history, 只记录客服对话历史，不记录同事和群组对话历史
  * visitor service history, used for admin backend query
- * thread table in core module is used for agent client query to avoid duplication
+ * thread table in core module is used for agent client query to avoid
+ * duplication
  */
 @Entity
 @Data
@@ -55,7 +57,7 @@ public class ThreadLog extends BaseEntity {
 
     // @Column(unique = true, nullable = false)
     // private String tid;
-    
+
     /**
      * used to push message
      * topic format:
@@ -75,25 +77,28 @@ public class ThreadLog extends BaseEntity {
      * @{ThreadTypeConsts}
      */
     @Builder.Default
-    @Column(name = "by_type")
-    private String type = ThreadTypeConsts.WORKGROUP;
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    // private String type = ThreadTypeConsts.WORKGROUP;
+    private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
 
     // closed/open
     @Builder.Default
-    private String status = StatusConsts.THREAD_STATUS_OPEN;
+    // private String status = StatusConsts.THREAD_STATUS_OPEN;
+    private ThreadStatusEnum status = ThreadStatusEnum.OPEN;
 
     private String client;
 
     @Builder.Default
-    @Column(columnDefinition = "json")
-    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is of type character varying
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
+    // of type character varying
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
 
-    // 
+    //
     // h2 db 不能使用 user, 所以重定义为 by_user
     @Builder.Default
-    @Column(name = "by_user", columnDefinition = "json")
+    @Column(name = "by_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String user = BdConstants.EMPTY_JSON_STRING;
 
@@ -101,7 +106,6 @@ public class ThreadLog extends BaseEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
-
 
     /** belong to org */
     private String orgUid;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:30:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-17 17:36:41
+ * @LastEditTime: 2024-05-29 12:07:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,7 @@ package com.bytedesk.core.push;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.constant.StatusConsts;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,29 +34,35 @@ import lombok.experimental.Accessors;
 @Data
 @Entity
 @Builder
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_push")
 public class Push extends BaseEntity {
-    
+
     private static final long serialVersionUID = 1L;
 
     private String sender;
-    
+
     private String content;
 
     private String receiver;
 
-    @Column(name = "by_type")
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
-    
+
+    private String ip;
+
+    // according to ip address
+    private String ipLocation;
+
     @Builder.Default
-    private String status = StatusConsts.CODE_STATUS_PENDING;
-    
+    // private String status = StatusConsts.CODE_STATUS_PENDING;
+    private PushStatus status = PushStatus.PENDING;
+
     private String client;
 
     @Builder.Default
-	private String platform = BdConstants.PLATFORM_BYTEDESK;
+    private String platform = BdConstants.PLATFORM_BYTEDESK;
 }

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.Column;
@@ -41,9 +42,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "core_topic")
 public class Topic extends BaseEntity {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     // @NotBlank
     // @Column(unique = true, nullable = false)
     // private String tid;
@@ -52,7 +53,7 @@ public class Topic extends BaseEntity {
     // private String topic;
     /** 为防止后添加的记录，clientIds缺失，所以用数组代替，这样每个用户在topic中只有一条记录，cliendIds可共用 */
     @Builder.Default
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     @Convert(converter = StringSetConverter.class)
     private Set<String> topics = new HashSet<>();
     // private String topic;
@@ -85,6 +86,7 @@ public class Topic extends BaseEntity {
      * 用户clientId格式: uid/client/deviceUid
      */
     @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     @Convert(converter = StringSetConverter.class)
     private Set<String> clientIds = new HashSet<>();
 

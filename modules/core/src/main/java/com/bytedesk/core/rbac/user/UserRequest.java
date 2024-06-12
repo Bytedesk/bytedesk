@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 10:50:59
+ * @LastEditTime: 2024-06-03 09:58:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,8 @@ package com.bytedesk.core.rbac.user;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.rbac.user.User.Sex;
 
 // import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
@@ -50,13 +51,17 @@ public class UserRequest extends BaseRequest {
 	// country prefix, e.g. +86
 	// @Digits(message = "phone length error", fraction = 0, integer = 11)
 	private String mobile;
+	
 	private String code;
 
 	@Builder.Default
 	private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
 
 	@Builder.Default
-	private String description = BdConstants.DEFAULT_USER_DESCRIPTION;
+	private String description = I18Consts.I18N_USER_DESCRIPTION;
+
+	@Builder.Default
+	private Sex sex = Sex.UNKNOW;
 
 	private Boolean enabled;
 	
@@ -66,5 +71,7 @@ public class UserRequest extends BaseRequest {
 
 	@NotBlank(message = "platform required")
 	private String platform;
+
+	private String orgUid;
 
 }

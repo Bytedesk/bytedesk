@@ -1,6 +1,5 @@
 package com.bytedesk.core.upload.cloud;
 
-import com.bytedesk.core.constant.StatusConsts;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -121,7 +120,7 @@ public class TencentCos {
      */
     public String uploadP12(String fileName, String build, File file) {
 
-        String folder = build.equals(StatusConsts.IOS_BUILD_DEBUG) ? "apns/development/" : "apns/production/";
+        String folder = build.equals("debug") ? "apns/development/" : "apns/production/";
         return uploadCommon(folder, fileName, file);
     }
 

@@ -18,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -42,10 +44,10 @@ public class UserController {
      */
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
-        // 
+        //
         User user = authService.getCurrentUser();
 
-        UserResponse userResponse = userService.convertToUserResponse(user);
+        UserResponse userResponse = ConvertUtils.convertToUserResponse(user);
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
@@ -56,6 +58,7 @@ public class UserController {
      * @param userRequest
      * @return
      */
+    @ActionAnnotation(title = "user", action = "update", description = "update user info")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
 
@@ -65,19 +68,20 @@ public class UserController {
     }
 
     /**  */
+    @ActionAnnotation(title = "user", action = "logout", description = "logout")
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<?> logout() {
         // TODO: 清理token，使其过期
-        return ResponseEntity.ok().body("logout");
+        return ResponseEntity.ok().body(JsonResult.success());
     }
-    
+
     /** for testing，client will return 403, if dont have authority/role */
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER', 'ROLE_ADMIN')")
     // @PreAuthorize("hasAuthority('ROLE_SUPER') or hasAuthority('ROLE_ADMIN')")
     // @PreAuthorize("hasAuthority('ROLE_SUPER')")
     @GetMapping("/test/super")
     public ResponseEntity<?> testSuperAuthority() {
-       return ResponseEntity.ok("you have super authority");
+        return ResponseEntity.ok("you have super authority");
     }
 
     /** no need to add ROLE_ prefix, system will auto add */
@@ -88,5 +92,4 @@ public class UserController {
         return ResponseEntity.ok("you have admin or cs role");
     }
 
-    
 }

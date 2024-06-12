@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:27:09
+ * @LastEditTime: 2024-06-07 14:52:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,23 +35,19 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false, exclude = {"children", "parent"})
+@EqualsAndHashCode(callSuper = false, exclude = { "children", "parent" })
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "team_department")
 public class Department extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-    
-    // @NotBlank
-    // @Column(unique = true, nullable = false)
-    // private String did;
 
     private String name;
 
     private String description;
 
-    @Column(name = "by_type")
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
 
     // 关联上级部门
@@ -73,7 +70,8 @@ public class Department extends BaseEntity {
     // private String orgUid;
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
-    // // @JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    // // @JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name =
+    // "none", value = ConstraintMode.NO_CONSTRAINT))
     // @JsonBackReference("organization-departments")
     // private Organization organization;
     private String orgUid;
@@ -81,7 +79,8 @@ public class Department extends BaseEntity {
     /** created by */
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
-    // // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    // // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none",
+    // value = ConstraintMode.NO_CONSTRAINT))
     // private User user;
 
     public void addChild(Department child) {
@@ -95,14 +94,13 @@ public class Department extends BaseEntity {
     }
 
     // public void addMember(Member member) {
-    //     members.add(member);
-    //     member.addDepartment(this);
+    // members.add(member);
+    // member.addDepartment(this);
     // }
 
     // public void removeMember(Member member) {
-    //     members.remove(member);
-    //     member.removeDepartment(this);
+    // members.remove(member);
+    // member.removeDepartment(this);
     // }
 
-    
 }

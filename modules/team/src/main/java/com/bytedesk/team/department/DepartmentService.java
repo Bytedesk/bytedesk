@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-18 16:55:24
+ * @LastEditTime: 2024-06-11 22:22:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -44,53 +45,106 @@ public class DepartmentService {
 
     private final UidUtils uidUtils;
 
-    public Page<DepartmentResponse> query(DepartmentRequest departmentRequest) {
+    // public List<DepartmentResponse> queryAll(DepartmentRequest departmentRequest)
+    // {
+    // List<Department> departments = departmentRepository
+    // .findByOrgUidAndParentAndDeleted(departmentRequest.getOrgUid(), null, false);
+    // return Arrays.asList(modelMapper.map(departments,
+    // DepartmentResponse[].class));
+    // }
 
-        Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(), Sort.Direction.ASC,
+    public Page<DepartmentResponse> queryByOrg(DepartmentRequest departmentRequest) {
+
+        Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(),
+                Sort.Direction.ASC,
                 "id");
 
-        Page<Department> page = departmentRepository.findByOrgUidAndParent(departmentRequest.getOrgUid(), null, pageable);
+        Specification<Department> specification = DepartmentSpecification.search(departmentRequest);
+        Page<Department> page = departmentRepository.findAll(specification, pageable);
+        // Page<Department> page = departmentRepository.findByOrgUidAndParentAndDeleted(departmentRequest.getOrgUid(),
+        //         null, false,
+        //         pageable);
 
-        return page.map(this::convertToDepartmentResponse);
+        return page.map(this::convertToResponse);
     }
 
-    public Department create(DepartmentRequest departmentRequest) {
-
+    public DepartmentResponse create(DepartmentRequest departmentRequest) {
+        
         Department department = modelMapper.map(departmentRequest, Department.class);
         department.setUid(uidUtils.getCacheSerialUid());
 
-        if (StringUtils.hasLength(departmentRequest.getParentUid())) {
-            log.debug("parent_did {}", departmentRequest.getParentUid());
+        if (StringUtils.hasText(departmentRequest.getParentUid())) {
+            log.debug("parent_uid {}", departmentRequest.getParentUid());
             Optional<Department> parentOptional = departmentRepository.findByUid(departmentRequest.getParentUid());
             if (parentOptional.isPresent()) {
                 parentOptional.get().addChild(department);
             }
         } else {
-            log.debug("parent_did is null");
+            log.debug("parent_uid is null");
             department.setParent(null);
         }
-
         department.setOrgUid(departmentRequest.getOrgUid());
 
-        return save(department);
+        Department createdDepartment = save(department);
+        if (createdDepartment == null) {
+            log.error("department not created");
+            throw new RuntimeException("department not created");
+        }
+
+        return convertToResponse(createdDepartment);
     }
 
-    @Cacheable(value = "department", key = "#name", unless = "#result == null")
-    public Optional<Department> findByName(String name) {
-        return departmentRepository.findByName(name);
+    public DepartmentResponse update(DepartmentRequest departmentRequest) {
+        //
+        Optional<Department> optional = findByUid(departmentRequest.getUid());
+        if (optional.isPresent()) {
+            Department department = optional.get();
+            modelMapper.map(departmentRequest, Department.class);
+            return convertToResponse(save(department));
+        } else {
+            log.error("department not found");
+            throw new RuntimeException("department not found");
+        }
     }
 
-    @Cacheable(value = "department", key = "#did", unless = "#result == null")
-    public Optional<Department> findByDid(String did) {
-        return departmentRepository.findByUid(did);
+    public void deleteByUid(DepartmentRequest departmentRequest) {
+        //
+        Optional<Department> optional = findByUid(departmentRequest.getUid());
+        if (optional.isPresent()) {
+            Department department = optional.get();
+            department.setDeleted(true);
+            save(department);
+        } else {
+            log.error("department not found");
+            throw new RuntimeException("department not found");
+        }
+    }
+
+    @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
+    public Optional<Department> findByNameAndOrgUid(String name, String orgUid) {
+        return departmentRepository.findByNameAndOrgUidAndDeleted(name, orgUid, false);
+    }
+
+    @Cacheable(value = "department", key = "#uid", unless = "#result == null")
+    public Optional<Department> findByUid(String uid) {
+        return departmentRepository.findByUid(uid);
     }
 
     public Department save(Department department) {
-        return departmentRepository.save(department);
+        try {
+            return departmentRepository.save(department);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public DepartmentResponse convertToDepartmentResponse(Department department) {
-        return modelMapper.map(department, DepartmentResponse.class);
+    public DepartmentResponse convertToResponse(Department department) {
+        DepartmentResponse departmentResponse = modelMapper.map(department, DepartmentResponse.class);
+        if (department.getParent() != null) {
+            departmentResponse.setParentUid(department.getParent().getUid());
+        }
+        return departmentResponse;
     }
 
     public void initData() {
@@ -99,12 +153,14 @@ public class DepartmentService {
             log.debug("department already exist");
             return;
         }
-
-        // Optional<Organization> orgOptional = organizationService.findByName(properties.getCompany());
-        // if (orgOptional.isPresent()) {
-        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID; //orgOptional.get().getUid();
+        //
+        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
         //
         Department[] departments = new Department[] {
+                Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)
+                        .description(TypeConsts.DEPT_ADMIN)
+                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_HR)
                         .description(TypeConsts.DEPT_HR)
                         .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
@@ -136,16 +192,12 @@ public class DepartmentService {
         };
 
         Arrays.stream(departments).forEach((department) -> {
-            Optional<Department> depOptional = departmentRepository.findByName(department.getName());
+            Optional<Department> depOptional = findByNameAndOrgUid(department.getName(), orgUid);
             if (!depOptional.isPresent()) {
                 department.setUid(uidUtils.getCacheSerialUid());
-                department.setOrgUid(orgUid);
-                // department.setOrganization(orgOptional.get());
-                // department.setUser(userService.getAdmin().get());
                 departmentRepository.save(department);
             }
         });
-        // }
 
     }
 

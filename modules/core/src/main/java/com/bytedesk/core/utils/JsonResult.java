@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 21:08:37
+ * @LastEditTime: 2024-06-06 10:50:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,4 +75,5 @@ public class JsonResult<T> implements Serializable {
     public static <T> JsonResult<T> error(String message, int code, T data) {
         return new JsonResult<T>().setCode(code).setMessage(message).setData(data);
     }
+
 }

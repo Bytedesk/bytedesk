@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:06:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 10:16:34
+ * @LastEditTime: 2024-06-04 15:32:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,22 +73,16 @@ public class ChannelService {
         if (channelRepository.count() > 0) {
             return;
         }
-        
-        // Optional<User> adminOptional = userService.getAdmin();
-        
+                
         ChannelRequest channelRequest = ChannelRequest.builder()
                 .topic(TopicConsts.TOPIC_SYSTEM_NOTIFICATION)
-                .name(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
+                .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
                 .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
                 .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
-                // .orgUid(adminOptional.get().getOrgUid())
                 .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
         channelRequest.setType(TypeConsts.TYPE_SYSTEM);
         create(channelRequest);
-        // 
-        
-        
     }
     
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 11:27:30
+ * @LastEditTime: 2024-06-12 09:26:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
+
+import com.bytedesk.core.rbac.user.User;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -51,14 +53,22 @@ public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecif
     // // @PreAuthorize("#member?.user?.username == authentication?.username")
     // void delete(@Param("member") Member member);
 
-    Optional<Member> findByUid(String uid);
+    Optional<Member> findByUidAndDeleted(String uid, Boolean deleted);
 
-    Optional<Member> findByUser_Mobile(String mobile);
+    Optional<Member> findByMobileAndOrgUidAndDeleted(String mobile, String orgUid, Boolean deleted);
 
-    Optional<Member> findByUser_Email(String email);
+    Optional<Member> findByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
 
-    Page<Member> findByDepartmentsUidIn(String dids[], Pageable pageable);
+    Optional<Member> findByUserAndOrgUidAndDeleted(User user, String orgUid, Boolean deleted);
 
-    Page<Member> findByOrgUid(String orgUid, Pageable pageable);
+    Page<Member> findByDepartmentsUidInAndOrgUidAndDeleted(String dids[],
+            String orgUid, Boolean deleted, Pageable pageable);
+
+    // Page<Member> findByOrgUidAndDeleted(String orgUid, boolean deleted, Pageable
+    // pageable);
+
+    Boolean existsByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
+
+    Boolean existsByMobileAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
 
 }

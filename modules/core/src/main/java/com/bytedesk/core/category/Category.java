@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-20 10:01:28
+ * @LastEditTime: 2024-06-11 11:52:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.TypeConsts;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -50,9 +51,9 @@ public class Category extends BaseEntity {
 
     // private String description;
 
-    @Column(name = "by_type")
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
-    
+
     private String icon;
 
     // @Column(unique = true)
@@ -62,7 +63,7 @@ public class Category extends BaseEntity {
      * 排序
      */
     @Builder.Default
-    private Integer orderNo = 0;
+    private int orderNo = 0;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -75,7 +76,7 @@ public class Category extends BaseEntity {
     private List<Category> children = new ArrayList<>();
 
     @Builder.Default
-	private String platform = BdConstants.PLATFORM_BYTEDESK;
+    private String platform = BdConstants.PLATFORM_BYTEDESK;
 
     /** belong to org */
     private String orgUid;

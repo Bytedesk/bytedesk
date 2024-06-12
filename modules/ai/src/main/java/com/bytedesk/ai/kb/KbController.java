@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:46:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 09:15:35
+ * @LastEditTime: 2024-05-31 07:41:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,13 @@
  */
 package com.bytedesk.ai.kb;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.base.BaseController;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.AllArgsConstructor;
 
 /**
@@ -30,73 +29,39 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/kb")
 @AllArgsConstructor
-public class KbController {
+public class KbController extends BaseController<KbRequest> {
 
     private final KbService kbService;
 
-    /**
-     * query
-     * 
-     * @param kbRequest
-     * @return
-     */
-    @GetMapping("/query")
-    public JsonResult<?> query(KbRequest kbRequest) {
-
-        return JsonResult.success(kbService.query(kbRequest));
+    @Override
+    public ResponseEntity<?> queryByOrg(KbRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
-    /**
-     * create
-     *
-     * @param kbRequest kb
-     * @return json
-     */
-    @PostMapping("/create")
-    public JsonResult<?> create(@RequestBody KbRequest kbRequest) {
-
-        return kbService.create(kbRequest);
+    @Override
+    public ResponseEntity<?> query(KbRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
-    /**
-     * update
-     *
-     * @param kbRequest kb
-     * @return json
-     */
-    @PostMapping("/update")
-    public JsonResult<?> update(@RequestBody KbRequest kbRequest) {
-
-        //
-        return new JsonResult<>("update success", 200, false);
+    @Override
+    public ResponseEntity<?> create(@RequestBody KbRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
-    /**
-     * delete
-     *
-     * @param kbRequest kb
-     * @return json
-     */
-    @PostMapping("/delete")
-    public JsonResult<?> delete(@RequestBody KbRequest kbRequest) {
-
-        //
-
-        return new JsonResult<>("delete success", 200, true);
+    @Override
+    public ResponseEntity<?> update(@RequestBody KbRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
-    /**
-     * filter
-     *
-     * @return json
-     */
-    @GetMapping("/filter")
-    public JsonResult<?> filter(KbRequest filterParam) {
-
-        //
-        
-        //
-        return new JsonResult<>("filter success", 200, false);
+    @Override
+    public ResponseEntity<?> delete(@RequestBody KbRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
+
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-10 22:13:38
+ * @LastEditTime: 2024-05-24 15:45:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,10 +25,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.utils.BdConvertUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -39,16 +40,17 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
 
-
     public Page<MessageResponse> queryAll(MessageRequest request) {
 
         // 优先加载最新聊天记录，也即：id越大越新
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
-        
-        Page<Message> messagePage = messageRepository.findByOrgUid(request.getOrgUid(), pageable);
 
-        return messagePage.map(BdConvertUtils::convertToMessageResponse);
+        Specification<Message> specs = MessageSpecs.search(request);
+        Page<Message> messagePage = messageRepository.findAll(specs, pageable);
+        // Page<Message> messagePage = messageRepository.findByOrgUidAndDeleted(request.getOrgUid(), false, pageable);
+
+        return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
 
     public Page<MessageResponse> query(MessageRequest request) {
@@ -59,7 +61,7 @@ public class MessageService {
 
         Page<Message> messagePage = messageRepository.findByThreadsUidIn(request.getThreads(), pageable);
 
-        return messagePage.map(BdConvertUtils::convertToMessageResponse);
+        return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
@@ -87,14 +89,19 @@ public class MessageService {
             @CacheEvict(value = "message", key = "#message.uid"),
     })
     public void delete(@NonNull Message message) {
-        messageRepository.delete(message);
+        deleteByUid(message.getUid());
     }
 
     @Caching(evict = {
             @CacheEvict(value = "message", key = "#uid"),
     })
     public void deleteByUid(String uid) {
-        messageRepository.deleteByUid(uid);
+        // messageRepository.deleteByUid(uid);
+        Optional<Message> messageOptional = findByUid(uid);
+        messageOptional.ifPresent(message -> {
+            message.setDeleted(true);
+            save(message);
+        });
     }
 
     public boolean existsByUid(String uid) {

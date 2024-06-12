@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:21:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 09:20:13
+ * @LastEditTime: 2024-05-27 11:59:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.doc;
 
 import com.bytedesk.ai.file.KbFile;
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -43,15 +44,12 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "ai_kb_doc")
 public class KbDoc extends BaseEntity {
-    
-    private static final long serialVersionUID = 1L;
-    
-    // @Column(name = "did", unique = true, nullable = false)
-    // private String did;
 
-    @Column(columnDefinition = "LONGTEXT")
+    private static final long serialVersionUID = 1L;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
-    
+
     private String meta;
 
     /**
@@ -61,10 +59,19 @@ public class KbDoc extends BaseEntity {
     private KbFile kbFile;
 
     /**
+     * belong to org
+     */
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private Organization organization;
+    private String orgUid;
+
+    /**
      * 所属用户
      */
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value =
+    // ConstraintMode.NO_CONSTRAINT))
     // private User user;
 }

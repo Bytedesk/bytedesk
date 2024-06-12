@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-22 22:59:33
+ * @LastEditTime: 2024-06-08 12:37:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,13 @@
  */
 package com.bytedesk.service.quick_reply;
 
-public interface QuickReplyRepository {
+import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+public interface QuickReplyRepository extends JpaRepository<QuickReply, Long>, JpaSpecificationExecutor<QuickReply> {
+
+    Optional<QuickReply> findByUid(String uid);
+    
 }

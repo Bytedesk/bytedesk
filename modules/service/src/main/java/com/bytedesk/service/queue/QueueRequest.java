@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-22 23:04:04
+ * @LastEditTime: 2024-05-29 23:20:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,24 @@
  */
 package com.bytedesk.service.queue;
 
-public class QueueRequest {
+import com.bytedesk.core.base.BaseRequest;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class QueueRequest extends BaseRequest {
+
+    private Integer orderInQueue;
+
+    private QueueStatusEnum status;
+
+    private String orgUid;
 }

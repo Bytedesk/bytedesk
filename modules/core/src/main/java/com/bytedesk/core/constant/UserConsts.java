@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 12:21:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 10:24:18
+ * @LastEditTime: 2024-06-05 12:57:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,8 +52,11 @@ public class UserConsts {
 
     // 默认组织uid
     public static final String DEFAULT_ORGANIZATION_UID = "default_organization_uid";
+    public static final String DEFAULT_AGENT_UID = "default_agent_uid";
+    public static final String DEFAULT_WORKGROUP_UID = "default_wg_uid";
+    public static final String DEFAULT_ROBOT_UID = "default_robot_uid";
     public static final String DEFAULT_FILE_ASISTANT_UID = "default_file_asistant_uid";
-
+    public static final String DEFAULT_SYSTEM_NOTIFICATION_UID = "default_system_notification_uid";
 
 
 }

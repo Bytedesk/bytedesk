@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-28 11:19:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-28 11:19:44
+ * @LastEditTime: 2024-06-04 15:31:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ public class ChannelListener {
 
     @PostPersist
     public void onPostPersist(Channel channel) {
-        log.info("onPostPersist: {}", channel.getName());
+        log.info("onPostPersist: {}", channel.getNickname());
     }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-16 09:23:00
+ * @LastEditTime: 2024-05-30 14:18:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,8 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,12 +45,19 @@ public class MqttSessionService {
     }
 
     public boolean containsKey(String clientId) {
-        // log.debug("clientidSessionMap are: {}", clientidSessionMap);
         return clientidSessionMap.containsKey(clientId);
     }
 
     public void remove(String clientId) {
         clientidSessionMap.remove(clientId);
+    }
+
+    public List<String> getAllClientIds() {
+        if (clientidSessionMap.keySet().size() > 0) {
+            return new ArrayList<>(clientidSessionMap.keySet());
+        } else {
+            return new ArrayList<>();
+        }
     }
 
 }

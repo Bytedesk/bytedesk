@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-19 19:42:14
+ * @LastEditTime: 2024-05-29 16:26:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.uid.utils.NetUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.micrometer.core.instrument.Counter;
@@ -94,12 +95,15 @@ public class HelloController {
 	}
 
 	/**
+	 * get server host ip
+	 * http://localhost:9003/hello/host
 	 * 
 	 * @return
 	 */
-	@GetMapping("/all")
-	public String allAccess() {
-		return "Public Content.";
+	@GetMapping("/host")
+	public ResponseEntity<?> getHost() {
+		String host = NetUtils.getLocalAddress();
+		return ResponseEntity.ok(JsonResult.success("host", host));
 	}
 
 	@GetMapping("/user")

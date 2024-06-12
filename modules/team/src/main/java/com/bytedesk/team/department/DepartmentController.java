@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,15 +26,24 @@ public class DepartmentController {
 
     private final DepartmentService departmentService;
 
+    // @GetMapping("/query/all")
+    // public ResponseEntity<?> queryAll(DepartmentRequest departmentRequest) {
+    // //
+    // List<DepartmentResponse> departmentList =
+    // departmentService.queryAll(departmentRequest);
+    // //
+    // return ResponseEntity.ok(JsonResult.success(departmentList));
+    // }
+
     /**
      * query org departments
      *
      * @return json
      */
-    @GetMapping("/query")
+    @GetMapping("/query/org")
     public ResponseEntity<?> query(DepartmentRequest departmentRequest) {
         //
-        Page<DepartmentResponse> departmentPage = departmentService.query(departmentRequest);
+        Page<DepartmentResponse> departmentPage = departmentService.queryByOrg(departmentRequest);
         //
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
@@ -44,14 +54,15 @@ public class DepartmentController {
      * @param departmentRequest department
      * @return json
      */
+    @ActionAnnotation(title = "department", action = "create", description = "create department")
     @PostMapping("/create")
-    public ResponseEntity<JsonResult<?>> create(@RequestBody DepartmentRequest departmentRequest) {
+    public ResponseEntity<?> create(@RequestBody DepartmentRequest departmentRequest) {
 
-        Department department = departmentService.create(departmentRequest);
+        DepartmentResponse department = departmentService.create(departmentRequest);
         if (department == null) {
-            return ResponseEntity.ok().body(new JsonResult<>("create dep failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error("create dep failed", -1));
         }
-        return ResponseEntity.ok().body(new JsonResult<>("create dep success", 200, department));
+        return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
     /**
@@ -60,12 +71,16 @@ public class DepartmentController {
      * @param departmentRequest department
      * @return json
      */
+    @ActionAnnotation(title = "department", action = "update", description = "update department")
     @PostMapping("/update")
-    public ResponseEntity<JsonResult<?>> update(@RequestBody DepartmentRequest departmentRequest) {
+    public ResponseEntity<?> update(@RequestBody DepartmentRequest departmentRequest) {
 
-        // RoleDTO departmentDTO = departmentService.update(departmentRequest);
+        DepartmentResponse department = departmentService.update(departmentRequest);
+        if (department == null) {
+            return ResponseEntity.ok().body(JsonResult.error("update dep failed", -1));
+        }
         //
-        return ResponseEntity.ok().body(new JsonResult<>("update dep success", 200, false));
+        return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
     /**
@@ -74,27 +89,14 @@ public class DepartmentController {
      * @param departmentRequest department
      * @return json
      */
+    @ActionAnnotation(title = "department", action = "delete", description = "delete department")
     @PostMapping("/delete")
-    public ResponseEntity<JsonResult<?>> delete(@RequestBody DepartmentRequest departmentRequest) {
+    public ResponseEntity<?> delete(@RequestBody DepartmentRequest departmentRequest) {
 
-        //
-        // departmentService.deleteById(departmentRequest.getId());
+        departmentService.deleteByUid(departmentRequest);
 
-        return ResponseEntity.ok().body(new JsonResult<>("delete dep success", 200, departmentRequest.getUid()));
+        return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
     }
 
-    /**
-     * 搜索
-     *
-     * @return json
-     */
-    @GetMapping("/filter")
-    public ResponseEntity<JsonResult<?>> filter(DepartmentRequest filterParam) {
-
-        // Page<RoleDTO> departmentDTOPage =
-        // departmentService.findByNameContainingOrValueContainingAndUser(filterParam);
-        //
-        return ResponseEntity.ok().body(new JsonResult<>("filter dep success", 200, false));
-    }
 
 }

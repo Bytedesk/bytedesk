@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 12:02:09
+ * @LastEditTime: 2024-06-06 11:38:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.service.visitor;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.enums.ClientEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,8 +38,6 @@ public class VisitorResponse extends BaseResponse {
 
 	private static final long serialVersionUID = 1L;	
     
-    // private String uid;
-
 	/**
 	 * developers can set basic visitor info
 	 */
@@ -68,7 +67,8 @@ public class VisitorResponse extends BaseResponse {
 	private String note;
 	
 	// from source
-	private String client;
+	// private String client;
+	private ClientEnum client;
 
     
 }

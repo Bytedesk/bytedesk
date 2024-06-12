@@ -11,8 +11,8 @@
 					<#--  <img class="dark-mode-item h-40px" src="assets/images/logo-light.svg" alt="logo">  -->
 				</a>
 
-				<p class="my-4"><h3>微语 - 基于AI的企业IM和在线客服系统</h3></p>
-				<p ><h5>一切以服务客户为中心</h5></p>
+				<p class="my-4"><h3>微语 - 开源对话软件</h3></p>
+				<p ><h5>Chat As A Service(CAAS)</h5></p>
 				<!-- Newsletter -->
 				<#--  <form class="row row-cols-lg-auto g-2">
 					<div class="col-12">

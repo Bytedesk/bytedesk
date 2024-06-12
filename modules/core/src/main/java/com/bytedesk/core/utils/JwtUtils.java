@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 14:00:52
+ * @LastEditTime: 2024-05-22 22:35:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-// @AllArgsConstructor
 public class JwtUtils {
 
   @Value("${bytedesk.jwt-secret-key}")
@@ -42,7 +41,6 @@ public class JwtUtils {
   @Value("${bytedesk.jwt-expiration}")
   private long jwtExpirationMs;
 
-  // @SuppressWarnings("deprecation")
   /**
    * https://github.com/jwtk/jjwt?tab=readme-ov-file#creating-a-jwt
    * 
@@ -90,30 +88,6 @@ public class JwtUtils {
         .getPayload()
         .getSubject();
   }
-
-  // public String getUsernameFromJwtToken(String token) {
-  //   String subject = Jwts.parser()
-  //       // .setSigningKey(key())
-  //       .verifyWith(secretKey())
-  //       .build()
-  //       .parseSignedClaims(token)
-  //       .getPayload()
-  //       .getSubject();
-  //   JwtSubject jwtSubject = JSON.parseObject(subject, JwtSubject.class);
-  //   return jwtSubject.getUsername();
-  // }
-
-  // public String getPlatformFromJwtToken(String token) {
-  //   String subject = Jwts.parser()
-  //       // .setSigningKey(key())
-  //       .verifyWith(secretKey())
-  //       .build()
-  //       .parseSignedClaims(token)
-  //       .getPayload()
-  //       .getSubject();
-  //   JwtSubject jwtSubject = JSON.parseObject(subject, JwtSubject.class);
-  //   return jwtSubject.getPlatform();
-  // }
 
   // private Key key() {
   // return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));

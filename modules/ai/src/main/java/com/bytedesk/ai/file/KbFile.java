@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:23:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:56:57
+ * @LastEditTime: 2024-05-27 11:59:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,18 +49,12 @@ public class KbFile extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
 
-    // @Column(name = "fid", unique = true, nullable = false)
-    // private String fid;
-
     private String loader;
 
     private String splitter;
 
     private Integer docsCount;
 
-    /**
-     * 
-     */
     @JoinColumn(name = "upload_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     private Upload upload;
 
@@ -72,6 +66,14 @@ public class KbFile extends BaseEntity {
     @JoinColumn(name = "kb_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     private Kb kb;
 
+    /**
+     * belong to org
+     */
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private Organization organization;
+    private String orgUid;
+    
     /**
      * 所属用户
      */

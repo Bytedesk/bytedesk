@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 22:27:10
+ * @LastEditTime: 2024-06-05 09:21:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.team.department.Department;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -38,48 +40,51 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true, exclude = { "departments" })
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ MemberListener.class })
+@EntityListeners({ MemberEntityListener.class })
+// @DiscriminatorValue("Member")
 @Table(name = "team_member", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "email", "orgUid" })
+    @UniqueConstraint(columnNames = { "email", "orgUid" }),
+    @UniqueConstraint(columnNames = { "mobile", "orgUid" })
 })
 public class Member extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * job number
-     * 工号
-     */
-    private String jobNo;
-
-    /**
-     * realname
-     * 姓名
-     */
     private String nickname;
 
-    /**
-     * seat no
-     * 工位
-     */
+    @Builder.Default
+    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_USER_DESCRIPTION;
+
+    private String jobNo;
+
+    private String jobTitle; // 职位
+
     private String seatNo;
 
-    /**
-     * telephone
-     * 电话-分机号
-     */
     private String telephone;
 
-    /**
-     * work email
-     */
     @Email(message = "email format error")
     // @Column(unique = true)
     private String email;
 
-    /**
-     * department
-     */
+    private String mobile;
+
+    @Builder.Default
+    // private String status = StatusConsts.MEMBER_STATUS_PENDING;
+    private MemberStatusEnum status = MemberStatusEnum.PENDING;
+
+    // @Builder.Default
+    // @Column(name = "is_enabled")
+    // private boolean enabled = true;
+    
+    // // newly added user should be accepted by the user in client
+    // @Builder.Default
+    // @Column(name = "is_invite_accepted")
+    // private boolean inviteAccepted = false;
+
     @JsonIgnore
     // 关联多个Department
     @Builder.Default

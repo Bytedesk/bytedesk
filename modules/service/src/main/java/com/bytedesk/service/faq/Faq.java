@@ -14,9 +14,51 @@
  */
 package com.bytedesk.service.faq;
 
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.category.Category;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 /**
  * 常见问题
  */
-public class Faq {
+@Entity
+@Data
+@Builder
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "service_faq")
+public class Faq extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+    private String title;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String content;
+
+    @Builder.Default
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    // private String type;
+    private MessageTypeEnum type = MessageTypeEnum.TEXT;
+
+    @JsonIgnore
+    @ManyToOne
+    private Category category;
+
+    private String orgUid;
 }

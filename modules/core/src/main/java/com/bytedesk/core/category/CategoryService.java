@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-18 18:19:19
+ * @LastEditTime: 2024-06-08 16:54:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,10 +21,15 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +42,8 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     private final CategoryRepository categoryRepository;
 
     private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
     
     public List<CategoryResponse> findByNullParent(String platform) {
         // 一级分类
@@ -57,8 +64,15 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     
     @Override
     public Page<CategoryResponse> queryByOrg(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "updatedAt");
+
+        Specification<Category> specs = CategorySpecification.search(request);
+        
+        Page<Category> page = categoryRepository.findAll(specs, pageable);
+
+        return page.map(this::convertToResponse);
     }
 
     @Override
@@ -74,25 +88,56 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
 
     @Override
     public CategoryResponse create(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        
+        Category category = modelMapper.map(request, Category.class);
+        category.setUid(uidUtils.getCacheSerialUid());
+
+        Category newCategory = save(category);
+
+        return convertToResponse(newCategory);
     }
 
     @Override
     public CategoryResponse update(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Optional<Category> category = findByUid(request.getUid());
+        if (!category.isPresent()) {
+            throw new RuntimeException("category not found");
+        }
+        
+        Category entity = category.get();
+        // modelMapper.map(request, entity);
+        entity.setName(request.getName());
+        entity.setIcon(request.getIcon());
+        entity.setType(request.getType());
+        // entity.setPlatform(request.getPlatform());
+
+        // TODO: children
+
+        Category newCategory = save(entity);
+        if (newCategory == null) {
+            throw new RuntimeException("category save error");
+        }
+
+        return convertToResponse(newCategory);
     }
 
     @Override
     public Category save(Category entity) {
-        return categoryRepository.save(entity);
+        try {
+            return categoryRepository.save(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
+        }
+        return null;
     }
 
     @Override
-    public void deleteByUid(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    public void deleteByUid(String uid) {
+        Optional<Category> category = findByUid(uid);
+        if (category.isPresent()) {
+            category.get().setDeleted(true);
+            save(category.get());
+        }
     }
 
     @Override
@@ -113,7 +158,8 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
 
         log.info("{} children length {}", entity.getName(), entity.getChildren().size());
 
-        response.setChildren(convertToResponseList(entity.getChildren()));
+        // response.setChildren(convertToResponseList(entity.getChildren()));
+
         return response;
     }
 
@@ -126,9 +172,9 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     // }
 
     // 
-    public Boolean existsByPlatform(String platform) {
-        return categoryRepository.existsByPlatform(platform);
-    }
+    // public Boolean existsByPlatform(String platform) {
+    //     return categoryRepository.existsByPlatform(platform);
+    // }
     
 
 }

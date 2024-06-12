@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-18 21:45:39
+ * @LastEditTime: 2024-06-07 17:14:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,9 +44,41 @@ public class PageRouteController {
 		return "admin/index.html";
 	}
 
+	// FIXME: 在管理后台刷新页面，无法正确路由到 admin/index.html
+	// http://localhost:9003/admin/welcome
+	// @GetMapping("/admin/**")
+	// public String adminAll(HttpServletRequest request) {
+	// 	// return "admin/index.html";
+	// 	String requestURI = request.getRequestURI();
+    //     String staticResourcePath = "classpath:/templates/admin/" + requestURI.substring(requestURI.indexOf("/admin"));
+    //     try {
+    //         // 尝试访问静态资源文件，如果文件不存在，将抛出异常
+    //         UrlResource resource = new UrlResource(staticResourcePath);
+    //         if (!resource.exists()) {
+    //             throw new RuntimeException("Static resource not found");
+    //         }
+    //         // 如果静态资源存在，可以将其内容作为响应返回，或者重定向到静态资源的URL
+    //         // 这里为了简化，我们假设直接返回静态资源视图名称
+    //         return "forward:" + staticResourcePath;
+    //     } catch (Exception e) {
+    //         // 静态资源不存在，回退到控制器方法逻辑
+    //         return "admin/index.html"; // 或者其他备用逻辑
+    //     }
+	// }
+
 	/**
-	 * chat
+	 * agent
 	 * web聊天/客服端
+	 * http://localhost:9003/agent
+	 */
+	@GetMapping("/agent")
+	public String agent() {
+		return "agent/index.html";
+	}
+
+	/**
+	 * visitor
+	 * 访客对话窗口
 	 * http://localhost:9003/chat
 	 */
 	@GetMapping("/chat")
@@ -54,21 +86,11 @@ public class PageRouteController {
 		return "chat/index.html";
 	}
 
-	/**
-	 * visitor chat
-	 * 访客对话窗口
-	 * http://localhost:9003/v
-	 */
-	@GetMapping("/v")
-	public String visitor() {
-		return "visitor/index.html";
+	// http://localhost:9003/iframe
+	@GetMapping("/iframe")
+	public String iframe() {
+		return "chat/iframe.html";
 	}
-
-	// // http://localhost:9003/v/pro
-	// @GetMapping("/v/{detail}")
-	// public String visitorDetail(@PathVariable String detail) {
-	// return "/visitor/index.html";
-	// }
 
 	/**
 	 * page for development

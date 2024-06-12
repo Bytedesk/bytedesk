@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-14 15:24:43
+ * @LastEditTime: 2024-06-05 22:59:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
+// import jakarta.transaction.Transactional;
 
 /**
  * QuerydslPredicateExecutor<Message>
@@ -34,8 +34,8 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
 
     Optional<Message> findByUid(String uid);
 
-    @Transactional
-    Long deleteByUid(String uid);
+    // @Transactional
+    // Long deleteByUid(String uid);
 
     Page<Message> findByThreadsUidIn(String[] threadTids, Pageable pageable);
 
@@ -43,6 +43,6 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
 
     boolean existsByUid(String uid);
 
-    Page<Message> findByOrgUid(String orgUid, Pageable pageable);
+    // Page<Message> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable pageable);
 
 }

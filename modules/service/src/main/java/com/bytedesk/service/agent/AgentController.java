@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 09:16:00
+ * @LastEditTime: 2024-06-12 10:19:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,17 @@
  */
 package com.bytedesk.service.agent;
 
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-// import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +41,21 @@ public class AgentController {
     private final AgentService agentService;
 
     /**
-     * query
+     * query by org
+     * 
+     * @param agentRequest
+     * @return
+     */
+    @GetMapping("/query/org")
+    public ResponseEntity<?> queryByOrg(AgentRequest agentRequest) {
+
+        Page<AgentResponse> page = agentService.queryByOrg(agentRequest);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    /**
+     * query by user self
      * 
      * @param agentRequest
      * @return
@@ -46,7 +63,11 @@ public class AgentController {
     @GetMapping("/query")
     public ResponseEntity<?> query(AgentRequest agentRequest) {
 
-        return ResponseEntity.ok(JsonResult.success(agentService.query(agentRequest)));
+        Optional<AgentResponse> agentOptional = agentService.query(agentRequest);
+        if (agentOptional.isEmpty()) {
+            return ResponseEntity.ok(JsonResult.error("no agent", -1));
+        }
+        return ResponseEntity.ok(JsonResult.success(agentOptional));
     }
 
     /**
@@ -55,15 +76,16 @@ public class AgentController {
      * @param agentRequest agent
      * @return json
      */
+    @ActionAnnotation(title = "agent", action = "create", description = "create agent")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody AgentRequest agentRequest) {
 
-        Agent agent = agentService.create(agentRequest);
+        AgentResponse agent = agentService.create(agentRequest);
         if (agent == null) {
-            return ResponseEntity.ok(JsonResult.error("department not exist"));
+            return ResponseEntity.ok(JsonResult.error("create agent failed"));
         }
 
-        return ResponseEntity.ok(JsonResult.success(agentService.convertToAgentResponse(agent)));
+        return ResponseEntity.ok(JsonResult.success(agent));
     }
 
     /**
@@ -72,11 +94,13 @@ public class AgentController {
      * @param agentRequest agent
      * @return json
      */
+    @ActionAnnotation(title = "agent", action = "update", description = "update agent")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody AgentRequest agentRequest) {
 
+        AgentResponse agent = agentService.update(agentRequest);
         //
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(agent));
     }
 
     /**
@@ -85,11 +109,13 @@ public class AgentController {
      * @param agentRequest agent
      * @return json
      */
+    @ActionAnnotation(title = "agent", action = "delete", description = "delete agent")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody AgentRequest agentRequest) {
 
+        agentService.deleteByUid(agentRequest.getUid());
         //
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(agentRequest));
     }
 
     /**
@@ -99,10 +125,9 @@ public class AgentController {
      */
     @GetMapping("/filter")
     public ResponseEntity<?> filter(AgentRequest filterParam) {
-        
+
         //
         return ResponseEntity.ok(JsonResult.success());
     }
-
 
 }

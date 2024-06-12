@@ -14,7 +14,10 @@
  */
 package com.bytedesk.core.ip;
 
+import java.util.Date;
+
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,15 +38,17 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "core_ip")
 public class Ip extends BaseEntity {
-    
 
     private String ip;
 
+    // private String ipLocation;
+
     // 1: black
-    @Column(name = "by_type")
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
 
-    // TODO: time duration
+    // time duration
+    private Date blockUntilDate;
 
     /** belong to org */
     private String orgUid;

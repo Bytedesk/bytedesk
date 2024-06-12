@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-20 09:41:26
+ * @LastEditTime: 2024-06-04 15:57:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,8 +15,6 @@
 package com.bytedesk.core.rbac.user;
 
 import java.util.Optional;
-import java.util.Set;
-
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,16 +33,17 @@ import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.role.Role;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
 
 import org.modelmapper.ModelMapper;
-
-import java.util.HashSet;
 
 // @Slf4j
 @Service
@@ -60,68 +59,61 @@ public class UserService {
 
     private final RoleService roleService;
 
-    private final BytedeskProperties properties;
+    private final BytedeskProperties bytedeskProperties;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final UidUtils uidUtils;
 
-    // public Page<User> query(UserRequest userRequest) {
-
-    //     Pageable pageable = PageRequest.of(userRequest.getPageNumber(), userRequest.getPageSize(), Sort.Direction.ASC,
-    //             "updatedAt");
-
-    //     return userRepository.findAll(pageable);
-    // }
+    private final OrganizationRepository organizationRepository;
 
     @Transactional
     public UserResponse register(UserRequest userRequest) {
 
-        if (existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
+        if (StringUtils.hasText(userRequest.getEmail()) && existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
             throw new EmailExistsException("Email already exists..!!");
         }
-        if (existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
+        if (StringUtils.hasText(userRequest.getMobile()) && existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
             throw new MobileExistsException("Mobile already exists..!!");
         }
         //
         User user = modelMapper.map(userRequest, User.class);
         user.setUid(uidUtils.getCacheSerialUid());
         //
-        if (StringUtils.hasLength(userRequest.getNickname())) {
+        if (StringUtils.hasText(userRequest.getNickname())) {
             user.setNickname(userRequest.getNickname());
         } else {
             user.setNickname(createNickname());
         }
         //
-        if (StringUtils.hasLength(userRequest.getAvatar())) {
+        if (StringUtils.hasText(userRequest.getAvatar())) {
             user.setAvatar(userRequest.getAvatar());
         } else {
             user.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         }
         //
-        if (StringUtils.hasLength(userRequest.getPassword())) {
+        if (StringUtils.hasText(userRequest.getPassword())) {
             String rawPassword = userRequest.getPassword();
             String encodedPassword = passwordEncoder.encode(rawPassword);
             user.setPassword(encodedPassword);
         }
         // 只有经过验证的邮箱，才真正执行注册
-        if (StringUtils.hasLength(userRequest.getEmail())) {
+        if (StringUtils.hasText(userRequest.getEmail())) {
             user.setUsername(userRequest.getEmail());
             user.setNum(userRequest.getEmail());
             user.setEmailVerified(true);
-            user.setEnabled(true);
         }
         // 只有经过验证的手机号，才真正执行注册
-        if (StringUtils.hasLength(userRequest.getMobile())) {
+        if (StringUtils.hasText(userRequest.getMobile())) {
             user.setNum(userRequest.getMobile());
             user.setMobileVerified(true);
-            user.setEnabled(true);
         }
+        user.setEnabled(true);
         // TODO: 设置角色role
         //
-
+        user = save(user);
         //
-        return convertToUserResponse(save(user));
+        return ConvertUtils.convertToUserResponse(user);
     }
 
     @Transactional
@@ -131,76 +123,94 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            if (StringUtils.hasLength(userRequest.getNickname())) {
+            if (StringUtils.hasText(userRequest.getNickname())) {
                 user.setNickname(userRequest.getNickname());
             }
 
-            if (StringUtils.hasLength(userRequest.getAvatar())) {
+            if (StringUtils.hasText(userRequest.getAvatar())) {
                 user.setAvatar(userRequest.getAvatar());
             }
 
-            if (StringUtils.hasLength(userRequest.getPassword())) {
+            if (StringUtils.hasText(userRequest.getPassword())) {
                 String rawPassword = userRequest.getPassword();
                 String encodedPassword = passwordEncoder.encode(rawPassword);
                 user.setPassword(encodedPassword);
             }
 
-            if (StringUtils.hasLength(userRequest.getEmail())) {
+            if (StringUtils.hasText(userRequest.getEmail())) {
                 user.setEmail(userRequest.getEmail());
             }
 
-            if (StringUtils.hasLength(userRequest.getMobile())) {
+            if (StringUtils.hasText(userRequest.getMobile())) {
                 user.setMobile(userRequest.getMobile());
             }
 
-            if (StringUtils.hasLength(userRequest.getDescription())) {
+            if (StringUtils.hasText(userRequest.getDescription())) {
                 user.setDescription(userRequest.getDescription());
             }
 
             // TODO: 设置角色role
 
-            return convertToUserResponse(save(user));
+            user = save(user);
+
+            return ConvertUtils.convertToUserResponse(user);
 
         } else {
             throw new NotFoundException("User not found..!!");
         }
     }
 
+    // String nickname, String avatar, String password, String mobile, String email,
+    // String platform, String orgUid
     @Transactional
-    public User createUser(String nickname, String avatar, String password, String mobile, String email,
-            boolean isVerified, String platform, String orgUid) {
-
+    public User createUser(UserRequest userRequest) {
+        //
+        if (existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
+            throw new EmailExistsException("Email already exists..!!");
+        }
+        if (existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
+            throw new MobileExistsException("Mobile already exists..!!");
+        }
+        //
         User user = User.builder()
-                // .uid(uidUtils.getCacheSerialUid())
-                .avatar(avatar)
+                // .avatar(userRequest.getAvatar())
                 // use email as default username
-                .username(email)
-                .nickname(nickname)
-                .mobile(mobile)
-                .num(mobile)
-                .email(email)
+                .username(userRequest.getEmail())
+                // .nickname(userRequest.getNickname())
+                .mobile(userRequest.getMobile())
+                .num(userRequest.getMobile())
+                .email(userRequest.getEmail())
                 .superUser(false)
-                .emailVerified(isVerified)
-                .mobileVerified(isVerified)
-                .password(platform)
+                .emailVerified(false)
+                .mobileVerified(false)
+                .password(userRequest.getPlatform())
                 .build();
         user.setUid(uidUtils.getCacheSerialUid());
-
-        if (StringUtils.hasLength(password)) {
-            user.setPassword(passwordEncoder.encode(password));
+        user.setNickname(userRequest.getNickname());
+        user.setAvatar(userRequest.getAvatar());
+        //
+        if (StringUtils.hasText(userRequest.getPassword())) {
+            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         } else {
-            user.setPassword(passwordEncoder.encode("123456"));
+            user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
+        }
+        // user.getOrganizations().add(userRequest.getOrgUid());
+
+        Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE, UserConsts.DEFAULT_ORGANIZATION_UID);
+        if (orgOptional.isPresent() && roleOptional.isPresent()) {
+            Organization organization = orgOptional.get();
+            Role role = roleOptional.get();
+            //
+            user.addOrganizationRole(organization, role);
         }
 
-        user.getOrganizations().add(orgUid);
-
         return save(user);
-        // return user;
     }
 
     public User updateUser(User user, String password, String mobile, String email) {
 
-        if (StringUtils.hasLength(password)) {
+        if (StringUtils.hasText(password)) {
             user.setPassword(passwordEncoder.encode(password));
         }
 
@@ -213,17 +223,17 @@ public class UserService {
 
     @Cacheable(value = "user", key = "#email", unless = "#result == null")
     public Optional<User> findByEmailAndPlatform(String email, String platform) {
-        return userRepository.findByEmailAndPlatform(email, platform);
+        return userRepository.findByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
     @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
     public Optional<User> findByMobileAndPlatform(String mobile, String platform) {
-        return userRepository.findByMobileAndPlatform(mobile, platform);
+        return userRepository.findByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
     public Optional<User> findByUsernameAndPlatform(String username, String platform) {
-        return userRepository.findByUsernameAndPlatform(username, platform);
+        return userRepository.findByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
@@ -233,7 +243,7 @@ public class UserService {
 
     @Cacheable(value = "admin", unless = "#result == null")
     public Optional<User> getAdmin() {
-        return userRepository.findByUsernameAndPlatform(properties.getUsername(), BdConstants.PLATFORM_BYTEDESK);
+        return userRepository.findByUsernameAndPlatformAndDeleted(bytedeskProperties.getEmail(), BdConstants.PLATFORM_BYTEDESK, false);
     }
 
     //
@@ -253,10 +263,10 @@ public class UserService {
     }
 
     @Caching(put = {
-            @CachePut(value = "user", key = "#user.username"),
-            @CachePut(value = "user", key = "#user.mobile"),
-            @CachePut(value = "user", key = "#user.email"),
-            @CachePut(value = "user", key = "#user.uid"),
+            @CachePut(value = "user", key = "#user.username", unless = "#user.username == null"),
+            @CachePut(value = "user", key = "#user.mobile", unless = "#user.mobile == null"),
+            @CachePut(value = "user", key = "#user.email", unless = "#user.email == null"),
+            @CachePut(value = "user", key = "#user.uid", unless = "#user.uid == null"),
             // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
             // @CachePut(value = "userExists", key = "#user.username"),
             // @CachePut(value = "userExists", key = "#user.mobile"),
@@ -279,14 +289,6 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public UserResponse convertToUserResponse(User user) {
-        return modelMapper.map(user, UserResponse.class);
-    }
-
-    public UserResponseSimple convertToUserResponseSimple(User user) {
-        return modelMapper.map(user, UserResponseSimple.class);
-    }
-
     // TODO: 待完善
     public String createNickname() {
         String randomId = uidUtils.getCacheSerialUid().substring(11, 15);
@@ -295,33 +297,51 @@ public class UserService {
 
     public void initData() {
 
-        if (userRepository.count() > 0) {
+        if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), BdConstants.PLATFORM_BYTEDESK)) {
             return;
         }
 
         User admin = User.builder()
                 // .uid(uidUtils.getCacheSerialUid())
-                .email(properties.getEmail())
-                .username(properties.getUsername())
-                .password(new BCryptPasswordEncoder().encode(properties.getPassword()))
-                .nickname(properties.getNickname())
-                .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
-                .mobile(properties.getMobile())
-                .num(properties.getMobile())
+                .email(bytedeskProperties.getEmail())
+                .username(bytedeskProperties.getEmail())
+                .password(new BCryptPasswordEncoder().encode(bytedeskProperties.getPassword()))
+                // .nickname(bytedeskProperties.getNickname())
+                // .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
+                .mobile(bytedeskProperties.getMobile())
+                .num(bytedeskProperties.getMobile())
                 .superUser(true)
                 .emailVerified(true)
                 .mobileVerified(true)
                 .build();
         admin.setUid(uidUtils.getCacheSerialUid());
-        admin.getOrganizations().add(UserConsts.DEFAULT_ORGANIZATION_UID);
-        
-        Optional<Role> roleOptional = roleService.findByName(TypeConsts.ROLE_SUPER);
-        Set<Role> roles = new HashSet<>();
-        roleOptional.ifPresent(role -> {
-            roles.add(role);
-        });
-        admin.setRoles(roles);
+        admin.setNickname(bytedeskProperties.getNickname());
+        admin.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
+        // admin.getOrganizations().add(UserConsts.DEFAULT_ORGANIZATION_UID);
+
+        // Optional<Role> roleOptional = roleService.findByName(TypeConsts.ROLE_SUPER);
+        // Set<Role> roles = new HashSet<>();
+        // roleOptional.ifPresent(role -> {
+        // roles.add(role);
+        // });
+        // admin.setRoles(roles);
+        //
         save(admin);
+    }
+
+    public void updateInitData() {
+
+        Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER, UserConsts.DEFAULT_ORGANIZATION_UID);
+        Optional<User> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(), BdConstants.PLATFORM_BYTEDESK);
+        if (orgOptional.isPresent() && roleOptional.isPresent() && adminOptional.isPresent()) {
+            Organization organization = orgOptional.get();
+            Role role = roleOptional.get();
+            User user = adminOptional.get();
+            //
+            user.addOrganizationRole(organization, role);
+            save(user);
+        }
     }
 
 }

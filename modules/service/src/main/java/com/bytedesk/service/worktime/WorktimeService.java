@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:46:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-18 14:46:08
+ * @LastEditTime: 2024-06-12 15:00:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,119 @@
  */
 package com.bytedesk.service.worktime;
 
-public class WorktimeService {
-    
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.stereotype.Service;
+
+import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.DateUtils;
+
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
+public class WorktimeService extends BaseService<Worktime, WorktimeRequest, WorktimeResponse> {
+
+    private final WorktimeRepository worktimeRepository;
+
+    private final UidUtils uidUtils;
+
+    private final ModelMapper modelMapper;
+
+    @Override
+    public Page<WorktimeResponse> queryByOrg(WorktimeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public Page<WorktimeResponse> queryByUser(WorktimeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public Optional<Worktime> findByUid(String uid) {
+        return worktimeRepository.findByUid(uid);
+    }
+
+    @Override
+    public WorktimeResponse create(WorktimeRequest request) {
+
+        // Worktime worktime = modelMapper.map(request, Worktime.class);
+        Worktime worktime = Worktime.builder()
+        .startTime(DateUtils.formatStringToTime(request.getStartTime()))
+        .endTime(DateUtils.formatStringToTime(request.getEndTime()))
+        .build();
+        worktime.setUid(uidUtils.getCacheSerialUid());
+
+        return convertToResponse(save(worktime));
+    }
+
+    @Override
+    public WorktimeResponse update(WorktimeRequest request) {
+
+        Optional<Worktime> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            Worktime worktime = optional.get();
+            modelMapper.map(request, worktime);
+            return convertToResponse(save(worktime));
+        } else {
+            throw new RuntimeException("Worktime not found");
+        }
+    }
+
+    @Override
+    public Worktime save(Worktime entity) {
+        return worktimeRepository.save(entity);
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<Worktime> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            Worktime worktime = optional.get();
+            worktimeRepository.delete(worktime);
+        }
+    }
+
+    @Override
+    public void delete(Worktime entity) {
+        worktimeRepository.delete(entity);
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Worktime entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    @Override
+    public WorktimeResponse convertToResponse(Worktime entity) {
+        // return modelMapper.map(entity, WorktimeResponse.class);
+        WorktimeResponse worktimeResponse = WorktimeResponse.builder()
+                // .uid(entity.getUid())
+                .startTime(DateUtils.formatTimeToString(entity.getStartTime()))
+                .endTime(DateUtils.formatTimeToString(entity.getEndTime()))
+                .build();
+        worktimeResponse.setUid(entity.getUid());
+        return worktimeResponse;
+    }
+
+    public String createDefault() {
+
+        WorktimeRequest worktimeRequest = WorktimeRequest.builder()
+                .startTime("00:00:00")
+                .endTime("23:59:59")
+                .build();
+
+        WorktimeResponse worktimeResponse = create(worktimeRequest);
+
+        return worktimeResponse.getUid();
+    }
+
 }

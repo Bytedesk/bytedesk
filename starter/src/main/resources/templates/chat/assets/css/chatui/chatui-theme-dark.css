@@ -5,7 +5,7 @@
   --white: #9b9b9b;
   --gray-1: #ffffff;
   --gray-2: #ffffff;
-  --gray-3: #4a4a4a;
+  --gray-3: #9b9b9b;
   --blue: #4a90e2;
   --orange: #f5a623;
   --red: #d0021b;
@@ -45,8 +45,8 @@
   color: #fff;
 }
 .Message.right .Bubble {
-  background-color: #7ed321;
-  color: #000000;
+  background-color: #4a4a4a;
+  color: #ffffff;
 }
 .QuickReply.highlight {
   background-color: #4a4a4a;
@@ -55,5 +55,5 @@
 }
 .QuickReplies,
 .ChatFooter {
-  background-color: #000000;
+  background-color: #4a4a4a;
 }

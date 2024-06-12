@@ -14,6 +14,22 @@
  */
 package com.bytedesk.service.worktime;
 
-public class WorktimeResponse {
+import com.bytedesk.core.base.BaseResponse;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
+public class WorktimeResponse extends BaseResponse {
     
+    private String startTime;
+
+    private String endTime;
 }

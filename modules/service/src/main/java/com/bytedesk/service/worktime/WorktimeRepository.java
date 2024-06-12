@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:46:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-18 14:46:26
+ * @LastEditTime: 2024-06-12 11:38:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,11 @@
  */
 package com.bytedesk.service.worktime;
 
-public interface WorktimeRepository {
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface WorktimeRepository extends JpaRepository<Worktime, Long> {
     
+    Optional<Worktime> findByUid(String uid);
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 12:37:24
+ * @LastEditTime: 2024-06-01 16:15:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.utils.Utils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -43,13 +44,20 @@ public class PushServiceImplSms extends Notifier {
 
     @Async
     @Override
-    void send(String mobile, String content) {
+    void send(String mobile, String content, HttpServletRequest request) {
         log.info("send sms to {}, content: {}", mobile, content);
+
+        // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
+
+        
         // not test mobile, send sms
         if (!Utils.isTestMobile(mobile)) {
             sendValidateCode(mobile, content);
         }
     }
+
+    // @Value("${bytedesk.debug}")
+    // private Boolean debug;
     
     @Value("${aliyun.access.key.id}")
     private String accessKeyId;
@@ -64,6 +72,14 @@ public class PushServiceImplSms extends Notifier {
     private String templateCode;
 
     public void sendValidateCode(String phone, String code) {
+
+        // if (debug) {
+        //     return;
+        // }
+
+        
+
+        
 
         DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
         IAcsClient client = new DefaultAcsClient(profile);

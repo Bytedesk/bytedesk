@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-15 12:38:02
+ * @LastEditTime: 2024-06-01 16:15:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.bytedesk.core.message.Message;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -48,7 +49,7 @@ public class PushServiceImplEmail extends Notifier {
 
     @Async
     @Override
-    void send(String email, String content) {
+    void send(String email, String content, HttpServletRequest request) {
         log.info("send email to {}, content {}", email, content);
         // 
         sendValidateCode(email, content);
@@ -76,6 +77,9 @@ public class PushServiceImplEmail extends Notifier {
         if (!StringUtils.hasText(email)) {
             return;
         }
+
+        // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
+
 
         // 如果是除杭州region外的其它region（如新加坡、澳洲Region），需要将下面的"cn-hangzhou"替换为"ap-southeast-1"、或"ap-southeast-2"。
         IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);

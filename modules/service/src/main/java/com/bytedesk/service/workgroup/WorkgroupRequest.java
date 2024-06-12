@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 12:26:14
+ * @LastEditTime: 2024-06-07 10:09:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,8 +19,8 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.constant.RouteConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.service.common.ServiceSettingsRequest;
 
 import lombok.Builder;
 import lombok.Data;
@@ -33,43 +33,27 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class WorkgroupRequest extends BaseRequest {
 
-    // private String wid;
-
     private String nickname;
 
     @Builder.Default
     private String avatar = AvatarConsts.DEFAULT_WORK_GROUP_AVATAR_URL;
 
     @Builder.Default
-    private String description = BdConstants.DEFAULT_WORK_GROUP_DESCRIPTION;
+    private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
     @Builder.Default
-    private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
+    // private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
+    private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
 
     @Builder.Default
     private Boolean recent = false;
 
     @Builder.Default
-    private Boolean autoPop = false;
-
-    @Builder.Default
-    private Boolean showTopTip = false;
-
-    @Builder.Default
-    private String topTip = BdConstants.DEFAULT_WORK_GROUP_DEFAULT_TOP_TIP;
-
-    @Builder.Default
-    private String welcomeTip = BdConstants.DEFAULT_WORK_GROUP_WELCOME_TIP;
-
-    @Builder.Default
-    private Boolean defaultRobot = false;
-
-    @Builder.Default
-    private Double autoCloseMin = Double.valueOf(5);
+    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
     @Builder.Default
-    private List<String> agentAids = new ArrayList<String>();
+    private List<String> agentUids = new ArrayList<String>();
 
     // organization oid
     private String orgUid;

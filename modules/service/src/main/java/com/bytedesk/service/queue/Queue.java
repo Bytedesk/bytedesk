@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-03 22:35:18
+ * @LastEditTime: 2024-06-07 14:52:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,16 @@
 package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.visitor.Visitor;
+import com.bytedesk.service.workgroup.Workgroup;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +34,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 排队
+ * 
  */
 @Entity
 @Data
@@ -36,14 +43,36 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ QueueListener.class })
 @Table(name = "service_queue")
 public class Queue extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "qid", unique = true, nullable = false)
-    private String qid;
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    private String type;
 
-    
+    private Integer orderInQueue;
 
+    private QueueStatusEnum status;
+
+    // 排队访客
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Visitor visitor;
+
+    // 1. 被排队一对一客服
+    // 2. 或技能组中待分配客服，通过type区分
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Agent agent;
+
+    // 1. 被排队技能组
+    // 2. 或待分配客服所属技能组 通过type区分
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Workgroup workgroup;
+
+    /** belong to org */
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private Organization organization;
+    private String orgUid;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:46:28
+ * @LastEditTime: 2024-06-07 14:52:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,9 @@
 package com.bytedesk.core.asistant;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,25 +41,24 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ AsistantListener.class })
+// @DiscriminatorValue("Asistant")
 @Table(name = "core_asistant")
 public class Asistant extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-    
-    // @NotBlank
-	// @Column(unique = true, nullable = false, length = 127)
-    // private String aid;
 
     private String topic;
 
-    @Column(name = "by_type")
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
-    
-    private String name;
-    
-    private String avatar;
 
-    private String description;
+    private String nickname;
+
+    @Builder.Default
+    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_USER_DESCRIPTION;
 
     /** belong to org */
     private String orgUid;

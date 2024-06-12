@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:43:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-16 10:16:12
+ * @LastEditTime: 2024-06-01 10:17:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,22 +14,21 @@
  */
 package com.bytedesk.core.event;
 
-// import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEvent;
 
-// import lombok.Data;
-// import lombok.EqualsAndHashCode;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-// @Data
-// @EqualsAndHashCode(callSuper = false)
-// public class MqttSubscribeEvent extends ApplicationEvent {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class MqttSubscribeEvent extends ApplicationEvent {
     
-//     private String uid;
-//     private String topic;
+    private String topic;
+    private String clientId;
 
-//     public MqttSubscribeEvent(Object source, String uid, String topic) {
-//         super(source);
-//         this.uid = uid;
-//         this.topic = topic;
-//     }
-    
-// }
+    public MqttSubscribeEvent(Object source, String topic, String clientId) {
+        super(source);
+        this.topic = topic;
+        this.clientId = clientId;
+    }
+}

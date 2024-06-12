@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 11:04:38
+ * @LastEditTime: 2024-06-11 18:14:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,19 +25,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.config.BytedeskProperties;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.rbac.authority.Authority;
 import com.bytedesk.core.rbac.authority.AuthorityService;
-import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.BdConvertUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -48,10 +46,6 @@ public class RoleService {
 
         private final RoleRepository roleRepository;
 
-        private final UserRepository userRepository;
-
-        private final BytedeskProperties properties;
-
         private final ModelMapper modelMapper;
 
         private final UidUtils uidUtils;
@@ -60,17 +54,17 @@ public class RoleService {
 
         public Role create(RoleRequest rolerRequest) {
 
-                if (existsByName(rolerRequest.getName())) {
+                if (existsByNameAndOrgUid(rolerRequest.getName(), rolerRequest.getOrgUid())) {
                         throw new RuntimeException("角色已存在");
                 }
 
                 Role role = modelMapper.map(rolerRequest, Role.class);
                 role.setUid(uidUtils.getCacheSerialUid());
                 //
-                Iterator<String> iterator = rolerRequest.getAuthorityAids().iterator();
+                Iterator<String> iterator = rolerRequest.getAuthorityUids().iterator();
                 while (iterator.hasNext()) {
-                        String authorityAid = iterator.next();
-                        Optional<Authority> authorityOptional = authorityService.findByAid(authorityAid);
+                        String authorityUid = iterator.next();
+                        Optional<Authority> authorityOptional = authorityService.findByUid(authorityUid);
                         if (authorityOptional.isPresent()) {
                                 role.addAuthority(authorityOptional.get());
                         }
@@ -79,84 +73,78 @@ public class RoleService {
                 return save(role);
         }
 
-        public Page<RoleResponse> query(RoleRequest roleRequest) {
+        public Page<RoleResponse> queryByOrg(RoleRequest roleRequest) {
 
                 Pageable pageable = PageRequest.of(roleRequest.getPageNumber(), roleRequest.getPageSize(),
-                                Sort.Direction.DESC,
+                                Sort.Direction.ASC,
                                 "id");
 
-                Page<Role> rolePage = roleRepository.findByOrgUid(roleRequest.getOrgUid(), pageable);
+                Specification<Role> specification = RoleSpecification.search(roleRequest);
+                Page<Role> rolePage = roleRepository.findAll(specification, pageable);
+                // Page<Role> rolePage = roleRepository.findByOrgUidAndDeleted(roleRequest.getOrgUid(), false, pageable);
 
-                return rolePage.map(BdConvertUtils::convertToRoleResponse);
+                return rolePage.map(ConvertUtils::convertToRoleResponse);
         }
 
-        @Cacheable(value = "roleExists", key = "#name", unless = "#result == null")
-        public Boolean existsByName(String namString) {
-                return roleRepository.existsByName(namString);
+        @Cacheable(value = "roleExists", key = "#name + '-' + #orgUid", unless = "#result == null")
+        public Boolean existsByNameAndOrgUid(String name, String orgUid) {
+                return roleRepository.existsByNameAndOrgUidAndDeleted(name, orgUid, false);
         }
 
-        @Cacheable(value = "role", key = "#name", unless = "#result == null")
-        public Optional<Role> findByName(String name) {
-                return roleRepository.findByName(name);
+        @Cacheable(value = "role", key = "#name + '-' + #orgUid", unless = "#result == null")
+        public Optional<Role> findByNameAndOrgUid(String name, String orgUid) {
+                return roleRepository.findByNameAndOrgUidAndDeleted(name, orgUid, false);
         }
 
         @Caching(put = {
-                        @CachePut(value = "role", key = "#role.name"),
-                        // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
-                        // @CachePut(value = "roleExists", key = "#role.name")
+                        @CachePut(value = "role", key = "#role.name+ '-' + #role.orgUid"),
         })
         public Role save(Role role) {
                 return roleRepository.save(role);
         }
 
-        //
-        private static final String[] authorities = {
-                        TypeConsts.AUTHORITY_SUPER,
-                        TypeConsts.AUTHORITY_ADMIN,
-                        TypeConsts.AUTHORITY_HR,
-                        TypeConsts.AUTHORITY_ORG,
-                        TypeConsts.AUTHORITY_IT,
-                        TypeConsts.AUTHORITY_MONEY,
-                        TypeConsts.AUTHORITY_MARKETING,
-                        TypeConsts.AUTHORITY_SALES,
-                        TypeConsts.AUTHORITY_CUSTOMER_SERVICE,
-        };
-
-        public void initData() {
-                if (roleRepository.count() > 0) {
-                        // log.debug("role already exists");
-                        return;
-                }
+        public void initOrgRoles(String orgUid) {
                 //
                 for (String authority : authorities) {
-                        String role = TypeConsts.ROLE_PREFIX + authority;
-                        RoleRequest roleRequest = RoleRequest.builder().name(role).description(role).build();
+                        String name = TypeConsts.ROLE_PREFIX + authority;
+                        String displayName = I18Consts.I18N_PREFIX + name;
+                        RoleRequest roleRequest = RoleRequest.builder()
+                                        .name(name)
+                                        .displayName(displayName)
+                                        .orgUid(orgUid)
+                                        .description(name)
+                                        .build();
                         roleRequest.setType(TypeConsts.TYPE_SYSTEM);
                         //
                         Optional<Authority> authorityOptional = authorityService.findByValue(authority);
                         if (authorityOptional.isPresent()) {
-                                roleRequest.getAuthorityAids().add(authorityOptional.get().getUid());
+                                roleRequest.getAuthorityUids().add(authorityOptional.get().getUid());
                         }
                         //
                         create(roleRequest);
                 }
         }
 
-        public void updateInitData() {
-                //
-                Optional<User> adminOptional = userRepository.findByEmailAndPlatform(properties.getEmail(), BdConstants.PLATFORM_BYTEDESK);
-                if (adminOptional.isPresent()) {
-                        //
-                        Arrays.stream(authorities).forEach((authority) -> {
-                                String roleName = TypeConsts.ROLE_PREFIX + authority;
-                                Optional<Role> roleOptional = findByName(roleName);
-                                roleOptional.ifPresent(role -> {
-                                        role.setOrgUid(adminOptional.get().getOrgUid());
-                                        roleRepository.save(role);
-                                });
-                        });
-                }
+        //
+        private static final String[] authorities = {
+                        TypeConsts.SUPER,
+                        TypeConsts.ADMIN,
+                        TypeConsts.HR,
+                        TypeConsts.ORG,
+                        TypeConsts.IT,
+                        TypeConsts.MONEY,
+                        TypeConsts.MARKETING,
+                        TypeConsts.SALES,
+                        TypeConsts.CUSTOMER_SERVICE,
+        };
 
+        public void initData() {
+                //
+                if (roleRepository.count() > 0) {
+                        return;
+                }
+                //
+                initOrgRoles(UserConsts.DEFAULT_ORGANIZATION_UID);
         }
 
 }

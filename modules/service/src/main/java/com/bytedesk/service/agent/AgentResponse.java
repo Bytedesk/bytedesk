@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-16 17:07:56
+ * @LastEditTime: 2024-06-07 10:38:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,8 @@
 package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.service.common.ServiceSettingsResponse;
+import com.bytedesk.team.member.MemberResponseSimple;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +35,6 @@ public class AgentResponse extends BaseResponse {
 
     private static final long serialVersionUID = 94072119L;    
 
-    // private String uid;
-
     private String nickname;
 
     private String avatar;
@@ -45,11 +45,22 @@ public class AgentResponse extends BaseResponse {
 
     private String description;
 
-    private String acceptStatus;
+    // private String acceptStatus;
 
-    private boolean connected;
+    private AgentStatus status;
+    // private String status;
+    // private Boolean enabled;
+
+    private Boolean connected;
     
+    private ServiceSettingsResponse serviceSettings;
+
     private Integer maxThreadCount;
 
-    private String welcomeTip;
+    private Integer currentThreadCount;
+
+    // private String welcomeTip;
+
+    // private UserResponse user;
+    private MemberResponseSimple member;
 }

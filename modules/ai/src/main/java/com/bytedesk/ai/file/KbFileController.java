@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:48:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 09:15:24
+ * @LastEditTime: 2024-05-31 07:40:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,13 @@
  */
 package com.bytedesk.ai.file;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.base.BaseController;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.AllArgsConstructor;
 
 /**
@@ -30,74 +29,40 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/kb/file")
 @AllArgsConstructor
-public class KbFileController {
+public class KbFileController extends BaseController<KbFileRequest> {
 
     private final KbFileService kbService;
 
-    /**
-     * query
-     * 
-     * @param kbFileRequest
-     * @return
-     */
-    @GetMapping("/query")
-    public JsonResult<?> query(KbFileRequest kbFileRequest) {
-
-        return JsonResult.success(kbService.query(kbFileRequest));
+    @Override
+    public ResponseEntity<?> queryByOrg(KbFileRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
-    /**
-     * create
-     *
-     * @param kbFileRequest kb
-     * @return json
-     */
-    @PostMapping("/create")
-    public JsonResult<?> create(@RequestBody KbFileRequest kbFileRequest) {
-
-        // return kbService.create(kbFileRequest);
-        return JsonResult.success();
+    @Override
+    public ResponseEntity<?> query(KbFileRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
-    /**
-     * update
-     *
-     * @param kbFileRequest kb
-     * @return json
-     */
-    @PostMapping("/update")
-    public JsonResult<?> update(@RequestBody KbFileRequest kbFileRequest) {
-
-        //
-        return new JsonResult<>("update success", 200, false);
+    @Override
+    public ResponseEntity<?> create(@RequestBody KbFileRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
-    /**
-     * delete
-     *
-     * @param kbFileRequest kb
-     * @return json
-     */
-    @PostMapping("/delete")
-    public JsonResult<?> delete(@RequestBody KbFileRequest kbFileRequest) {
-
-        //
-
-        return new JsonResult<>("delete success", 200, true);
+    @Override
+    public ResponseEntity<?> update(@RequestBody KbFileRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
-    /**
-     * filter
-     *
-     * @return json
-     */
-    @GetMapping("/filter")
-    public JsonResult<?> filter(KbFileRequest filterParam) {
-
-        //
-        
-        //
-        return new JsonResult<>("filter success", 200, false);
+    @Override
+    public ResponseEntity<?> delete(@RequestBody KbFileRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
+    
+    
 }

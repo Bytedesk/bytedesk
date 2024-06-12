@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:59:40
+ * @LastEditTime: 2024-06-12 07:19:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,14 +15,19 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.ai.kb.Kb;
-import com.bytedesk.ai.llm.Llm;
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+// import jakarta.persistence.AssociationOverride;
+// import jakarta.persistence.AssociationOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
@@ -47,36 +52,46 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ RobotEntityListener.class })
 @Table(name = "ai_robot")
 public class Robot extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // @Column(name = "rid", unique = true, nullable = false)
-    // private String rid;
+    private String nickname;
 
-    private String name;
-    
-    private String avatar;
+    @Builder.Default
+    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
 
-    private String description;
+    @Builder.Default
+    private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
 
-    private String welcome;
+    @Embedded
+    @Builder.Default
+    private RobotServiceSettings serviceSettings = new RobotServiceSettings();
+
+    @Embedded
+    @Builder.Default
+    private RobotLlm llm = new RobotLlm();
 
     // 客服机器人、问答机器人、闲聊
     // service、ask、chat
-    @Column(name = "by_type")
-    private String type;
+    @Builder.Default
+    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    // private String type = TypeConsts.ROBOT_TYPE_SERVICE;
+    private RobotTypeEnum type = RobotTypeEnum.SERVICE;
 
     // is_published or not
-    private boolean published;
-    
-    /**
-     * llm
-     */
-    @ManyToOne()
-    @JoinColumn(name = "llm_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-    private Llm llm;
+    @Builder.Default
+    private boolean published = false;
+
+    // /**
+    // * llm
+    // */
+    // @ManyToOne()
+    // @JoinColumn(name = "llm_id", foreignKey = @ForeignKey(name = "none", value =
+    // ConstraintMode.NO_CONSTRAINT))
+    // private Llm llm;
 
     /**
      * 知识库
@@ -87,10 +102,13 @@ public class Robot extends BaseEntity {
     private Kb kb;
 
     /**
-     * 所属用户
+     * belong to org
      */
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-    private User user;
+    // @JsonIgnore
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private Organization organization;
+    private String orgUid;
+
+    
+
 }

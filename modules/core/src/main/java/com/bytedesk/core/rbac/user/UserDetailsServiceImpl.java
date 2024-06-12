@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 14:22:31
+ * @LastEditTime: 2024-05-23 13:45:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,8 +43,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		// String username = JSON.parseObject(subject, JwtSubject.class).getUsername();
-		// String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();
 		log.debug("loadUserByUsername {}", username);
 		//
 		Optional<User> userOptional = userService.findByUsernameAndPlatform(username, BdConstants.PLATFORM_BYTEDESK);
@@ -57,7 +55,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(userOptional.get());
 	}
 
-	public UserDetails loadUserByUsernameAndPlatform(String subject) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsernameAndPlatform(String subject) {
 		String username = JSON.parseObject(subject, JwtSubject.class).getUsername();
 		String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();
 		log.debug("loadUserByUsername {}, username {}, platform {}", subject, username, platform);
@@ -72,7 +70,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(userOptional.get());
 	}
 
-	public UserDetailsImpl loadUserByEmailAndPlatform(String email, String platform) throws EmailNotFoundException {
+	public UserDetailsImpl loadUserByEmailAndPlatform(String email, String platform) {
 		log.debug("loadUserByEmail {}", email);
 		//
 		Optional<User> userOptional = userService.findByEmailAndPlatform(email, platform);
@@ -85,7 +83,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(userOptional.get());
 	}
 
-	public UserDetailsImpl loadUserByMobileAndPlatform(String mobile, String platform) throws MobileNotFoundException {
+	public UserDetailsImpl loadUserByMobileAndPlatform(String mobile, String platform) {
 		log.debug("loadUserByMobile {}", mobile);
 		//
 		Optional<User> userOptional = userService.findByMobileAndPlatform(mobile, platform);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:02:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:44:06
+ * @LastEditTime: 2024-06-06 11:31:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,11 +19,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.constant.StatusConsts;
-import com.bytedesk.core.constant.ThreadTypeConsts;
+// import com.bytedesk.core.constant.ThreadTypeConsts;
 import com.bytedesk.core.message.MessageService;
+import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.socket.protobuf.model.MessageProto;
 import com.bytedesk.socket.protobuf.model.ThreadProto;
 import com.bytedesk.socket.protobuf.model.UserProto;
@@ -33,6 +35,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.Message;
 
 @Slf4j
@@ -115,16 +118,17 @@ public class MessageProtoService {
         // 持久化消息
         Message message = new Message();
         message.setUid(mid);
-        message.setType(type);
-        message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
-        message.setClient(messageProto.getClient());
+        message.setType(MessageTypeEnum.fromValue(type));
+        // message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
+        message.setStatus(MessageStatusEnum.SENT);
+        message.setClient(ClientEnum.fromValue(messageProto.getClient()));
         //
         UserResponseSimple user = UserResponseSimple.builder().nickname(nickname).avatar(avatar).build();
         user.setUid(uid);
         message.setUser(JSON.toJSONString(user));
         // message.setThread(thread);
         message.getThreads().add(thread);
-        if (thread.getType().equals(ThreadTypeConsts.MEMBER)) {
+        if (thread.getType().equals(ThreadTypeEnum.MEMBER)) {
             Thread reverseThread = threadService.getReverse(thread);
             message.getThreads().add(reverseThread);
         }

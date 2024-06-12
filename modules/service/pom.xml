@@ -27,6 +27,13 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-ai</artifactId>
+			<version>${im.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-core</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>

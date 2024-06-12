@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.event.MessageBytesEvent;
+import com.bytedesk.core.message.MessageBytesEvent;
 import com.bytedesk.local.caffeine.CaffeineCacheService;
 import com.bytedesk.socket.protobuf.model.MessageProto;
 import com.bytedesk.socket.service.MessageSocketService;

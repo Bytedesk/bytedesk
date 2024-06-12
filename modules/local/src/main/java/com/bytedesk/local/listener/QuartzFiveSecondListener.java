@@ -17,8 +17,8 @@ package com.bytedesk.local.listener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.push.PushService;
+import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
 // import com.bytedesk.socket.service.MessageSocketService;
 import com.bytedesk.local.caffeine.CaffeineCacheService;
 import com.bytedesk.service.thread_log.ThreadLogService;

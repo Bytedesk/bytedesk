@@ -7,7 +7,7 @@
 			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/">
 				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="logo">  -->
 				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="logo">  -->
-				<h5>微语-基于AI的企业IM和在线客服系统</h5>
+				<h5>微语 - 对话即服务</h5>
 			</a>
 			<!-- Logo END -->
 
@@ -87,6 +87,7 @@
 			<!-- Signin button -->
 			<div class="navbar-nav ms-3 d-none d-sm-block">
 				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/admin/')">管理后台</button>
+				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/agent/')">客服后台</button>
 			</div>
 
 		</div>

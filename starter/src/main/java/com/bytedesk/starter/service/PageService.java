@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-16 16:55:20
+ * @LastEditTime: 2024-06-01 13:21:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,6 +85,7 @@ public class PageService {
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
             // 输出文件
             String savePath = classpath + htmlSavePath + tempName + ".html";
+            // /Users/ningjinpeng/Desktop/git/private/weiyu/server/starter/target/classes//templates/
             log.info("savePath {}", savePath);
             FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath));
             IOUtils.copy(inputStream, fileOutputStream);

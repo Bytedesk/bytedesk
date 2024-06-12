@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-17 17:36:51
+ * @LastEditTime: 2024-05-29 12:07:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.core.push;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.constant.StatusConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,8 +41,14 @@ public class PushRequest extends BaseRequest {
     
     private String receiver;
 
+    private String ip;
+
+    // according to ip address
+    private String ipLocation;
+
     @Builder.Default
-    private String status = StatusConsts.CODE_STATUS_PENDING;
+    // private String status = StatusConsts.CODE_STATUS_PENDING;
+    private PushStatus status = PushStatus.PENDING;
 
     @Builder.Default
 	private String platform = BdConstants.PLATFORM_BYTEDESK;

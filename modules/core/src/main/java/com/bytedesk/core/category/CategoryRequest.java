@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-18 18:11:14
+ * @LastEditTime: 2024-06-08 15:24:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,9 +14,11 @@
  */
 package com.bytedesk.core.category;
 
-import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.BdConstants;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,9 +39,15 @@ public class CategoryRequest extends BaseRequest {
     
     private String icon;
 
-    private Integer orderNo;
+    @Builder.Default
+    private Integer orderNo = 0;
 
-    private String platform;
+    @Builder.Default
+    private String platform = BdConstants.PLATFORM_BYTEDESK;
 
-    private Set<String> children;
+    @Builder.Default
+    private List<String> children = new ArrayList<>();
+
+    /** belong to org */
+    private String orgUid;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 10:22:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 15:58:28
+ * @LastEditTime: 2024-06-01 15:32:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -71,7 +71,11 @@ public class Utils {
      * @return
      */
     public static boolean isTestMobile(String mobile) {
-        return mobile.startsWith("1888888");
+        return mobile.startsWith("12345678");
+    }
+
+    public static boolean isTestEmail(String email) {
+        return email.endsWith("@email.com");
     }
 
     /**
@@ -79,14 +83,9 @@ public class Utils {
      * @return
      */
     public static String getRandomCode(String key) {
-        int code = 123456;
-        if (isTestMobile(key)) {
-            code = 123456;
-        } else {
-            int min = 100001;
-            int max = 999998;
-            code = new Random().nextInt(max) % (max - min + 1) + min;
-        }
+        int min = 100001;
+        int max = 999998;
+        int code = new Random().nextInt(max) % (max - min + 1) + min;
         return String.valueOf(code);
     }
 

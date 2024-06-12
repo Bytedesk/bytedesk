@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 09:16:26
+ * @LastEditTime: 2024-06-07 15:33:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.service.workgroup;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.action.ActionLogAnnotation;
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -43,11 +44,12 @@ public class WorkgroupController {
      * @param workgroupRequest
      * @return
      */
-    @ActionLogAnnotation(title = "workgroup", action = "query")
-    @GetMapping("/query")
-    public ResponseEntity<?> query(WorkgroupRequest workgroupRequest) {
-        
-        return ResponseEntity.ok(JsonResult.success(workgroupService.query(workgroupRequest)));
+    @GetMapping("/query/org")
+    public ResponseEntity<?> queryByOrg(WorkgroupRequest workgroupRequest) {
+
+        Page<WorkgroupResponse> workgroups = workgroupService.queryByOrg(workgroupRequest);
+
+        return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
     /**
@@ -56,15 +58,16 @@ public class WorkgroupController {
      * @param workgroupRequest workgroup
      * @return json
      */
+    @ActionAnnotation(title = "workgroup", action = "create", description = "create workgroup")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest workgroupRequest) {
 
-        Workgroup workgroup = workgroupService.create(workgroupRequest);
+        WorkgroupResponse workgroup = workgroupService.create(workgroupRequest);
         if (workgroup == null) {
-            return ResponseEntity.ok(JsonResult.error("create failed"));
+            return ResponseEntity.ok(JsonResult.error("create workgroup failed", -1));
         }
 
-        return ResponseEntity.ok(JsonResult.success(workgroupService.convertToWorkgroupResponse(workgroup)));
+        return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
     /**
@@ -73,15 +76,16 @@ public class WorkgroupController {
      * @param workgroupRequest workgroup
      * @return json
      */
+    @ActionAnnotation(title = "workgroup", action = "update", description = "update workgroup")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest workgroupRequest) {
 
-        Workgroup workgroup = workgroupService.update(workgroupRequest);
+        WorkgroupResponse workgroup = workgroupService.update(workgroupRequest);
         if (workgroup == null) {
-            return ResponseEntity.ok(JsonResult.error("update failed"));
+            return ResponseEntity.ok(JsonResult.error("update failed", -1));
         }
         //
-        return ResponseEntity.ok(JsonResult.success(workgroupService.convertToWorkgroupResponse(workgroup)));
+        return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
     /**
@@ -90,11 +94,13 @@ public class WorkgroupController {
      * @param workgroupRequest workgroup
      * @return json
      */
+    @ActionAnnotation(title = "workgroup", action = "delete", description = "delete workgroup")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest workgroupRequest) {
 
+        workgroupService.deleteByUid(workgroupRequest.getUid());
         //
-        return ResponseEntity.ok(JsonResult.success("delete success"));
+        return ResponseEntity.ok(JsonResult.success(workgroupRequest));
     }
 
     /**
@@ -104,7 +110,7 @@ public class WorkgroupController {
      */
     @GetMapping("/filter")
     public ResponseEntity<?> filter(WorkgroupRequest filterParam) {
-        
+
         //
         return ResponseEntity.ok(JsonResult.success());
     }

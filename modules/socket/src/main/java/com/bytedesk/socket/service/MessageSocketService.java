@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:38:47
+ * @LastEditTime: 2024-05-31 18:34:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,8 +22,9 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.MqConsts;
-import com.bytedesk.core.constant.ThreadTypeConsts;
+// import com.bytedesk.core.constant.ThreadTypeConsts;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.Topic;
 import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.socket.mqtt.model.MqttSession;
@@ -63,10 +64,10 @@ public class MessageSocketService {
     public void sendJsonMessage(String messageJSON) {
         log.debug("send json message {}", messageJSON);
 
-        if (!StringUtils.hasLength(messageJSON)) {
+        if (!StringUtils.hasText(messageJSON)) {
             return;
         }
-        // 
+        //
         MessageResponse messageObject = JSON.parseObject(messageJSON, MessageResponse.class);
         String topic = MqConsts.TOPIC_PREFIX + messageObject.getThread().getTopic().replace("/", ".");
         log.debug("stomp topic {}", topic);
@@ -79,12 +80,12 @@ public class MessageSocketService {
         //
         // 广播给消息发送者的多个客户端，如：pc客户端发送消息，手机客户端可以同步收到自己发送的消息, 群组会话除外
         byte[] messageBytes = messageProto.toByteArray();
-        String threadType = messageProto.getThread().getType();
+        ThreadTypeEnum threadType = ThreadTypeEnum.valueOf(messageProto.getThread().getType());
 
         // 发送消息给订阅者
         // 只有contact会话需要替换tid/topic/nickname/avatar
         // 广播给消息接收者，一对一会话的tid互为翻转
-        if (threadType.equals(ThreadTypeConsts.MEMBER)) {
+        if (threadType.equals(ThreadTypeEnum.MEMBER)) {
             doSendToSenderClients(messageProto);
             // 广播给消息发送者的多个客户端，如：pc客户端发送消息，手机客户端可以同步收到自己发送的消息
             String tid = messageProto.getThread().getUid();
@@ -126,7 +127,7 @@ public class MessageSocketService {
         // String uid = messageProto.getUser().getUid();
         String topic = messageProto.getThread().getTopic();
         byte[] messageBytes = messageProto.toByteArray();
-        // 
+        //
         // String sid = topic.split("/")[0];
         // List<Topic> topicList = topicService.findByTopic(sid);
         Set<Topic> topicSet = topicService.findByTopic(topic);
@@ -136,11 +137,17 @@ public class MessageSocketService {
                 doSendMessage(topic, messageBytes, clientId);
             });
         });
+        //
+        if (topicSet.size() == 0) {
+            log.debug("doSendToSenderClients: no topic");
+            // TODO: 数据库中为空，尝试匹配内存
+            // doSendMessage(topic, messageBytes, topic);
+        }
     }
 
     private void doSendMessage(String topic, byte[] messageBytes, String clientId) {
         log.debug("doSendMessage: {}, {}", topic, clientId);
-        // 
+        //
         MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
         boolean dup = false;
         boolean retain = false;
@@ -154,11 +161,11 @@ public class MessageSocketService {
                     new MqttFixedHeader(MqttMessageType.PUBLISH, dup, mqttQoS, retain, 0),
                     new MqttPublishVariableHeader(topic, messageId),
                     Unpooled.buffer().writeBytes(messageBytes));
-            // 
+            //
             final MqttSession mqttSession = mqttSessionService.get(clientId);
             mqttSession.getChannel().writeAndFlush(publishMessage);
-            
+
         }
     }
-   
+
 }

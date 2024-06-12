@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 12:55:38
+ * @LastEditTime: 2024-05-29 12:10:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.message.Message;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Service
 public class PushServiceImplIos extends Notifier {
 
@@ -30,7 +32,10 @@ public class PushServiceImplIos extends Notifier {
     }
 
     @Override
-    void send(String to, String content) {
+    void send(String to, String content, HttpServletRequest request) {
+
+        // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
+        
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'send'");
     }

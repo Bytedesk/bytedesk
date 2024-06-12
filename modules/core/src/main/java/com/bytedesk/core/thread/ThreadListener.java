@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:40:48
+ * @LastEditTime: 2024-06-03 18:14:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,15 +18,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.event.BytedeskEventPublisher;
-import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
 @Async
-@Slf4j
+// @Slf4j
 @Component
 public class ThreadListener {
     
@@ -37,11 +36,7 @@ public class ThreadListener {
 
     @PostPersist
     public void postPersist(Thread thread) {
-        log.info("thread postPersist {}", thread.getUid());
-        // 这里可以记录日志
-        // create thread topic
-        TopicService topicService = ApplicationContextHolder.getBean(TopicService.class);
-        topicService.create(thread.getTopic(), thread.getOwner().getUid());
+        // log.info("thread postPersist {}", thread.getUid());
         // send notifications
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadCreateEvent(thread);
@@ -54,7 +49,7 @@ public class ThreadListener {
 
     @PostUpdate
     public void postUpdate(Thread thread) {
-        log.info("postUpdate {}", thread.getUid());
+        // log.info("postUpdate {}", thread.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadUpdateEvent(thread);

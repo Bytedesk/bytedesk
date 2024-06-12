@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 21:29:30
+ * @LastEditTime: 2024-06-11 16:28:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -79,10 +79,20 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException e) {
         return ResponseEntity.ok().body(JsonResult.error(
-                "Api Resource not found, or It's a vip api, you should contact 270580156@qq.com or visit http://www.weiyuai.cn",
+                        e.getMessage(),
                 404));
+        // // 如果你确定要进行后端跳转，并且你的应用支持这种做法，你可以使用以下方式：
+        // String redirectUrl = "/error/404.html";
+        // // 使用HttpStatus.SEE_OTHER（303）来表示重定向
+        // // 也可以使用HttpStatus.FOUND（302），但303更明确地表示应使用GET方法重定向
+        // return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(redirectUrl)).build();
     }
     
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e) {
         return ResponseEntity.ok().body(JsonResult.error("Username or password is incorrect"));

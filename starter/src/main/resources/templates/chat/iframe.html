@@ -1,0 +1,70 @@
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-05-27 18:21:49
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-06-01 12:22:13
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+-->
+<!DOCTYPE html>
+<!--[if lte IE 7]> <html class="ie7"> <![endif]-->
+<!--[if IE 8]> <html class="ie8"> <![endif]-->
+<!--[if IE 9]> <html class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html>
+<!--<![endif]-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="email=no">
+    <title>微语-智能客服</title>
+    <link rel="stylesheet" href="/chat/assets/css/iframe.css">
+    <!-- <style type="text/css"></style> -->
+</head>
+
+<body>
+    <!--  -->
+    <div id="panelHolder">
+        <iframe id="iframePanel" class="fusion" src=""></iframe>
+        <!-- 二维码 -->
+        <!-- <div id="url_qrcode">
+            <img src="./img/luobosi_mp.png" width="100px" height="100px" />
+        </div> -->
+    </div>
+    <!--  -->
+    <!-- <script type="text/javascript" src="/chat/assets/vendor/qrcode/qrcode.min.js"></script> -->
+
+    <script>
+        //
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg); //匹配目标参数
+            if (r != null) return decodeURIComponent(r[2]);
+            return null; //返回参数值
+        }
+        //
+        var t = getUrlParam('t')
+        var sid = getUrlParam('sid')
+        //
+        var websiteUrl = window.location.href
+        var websiteTitle = document.title
+        var refererUrl = document.referrer
+        var src = '/chat?t=' + t + '&sid=' + sid + '&'
+        // console.log('urll:', src)
+        document.getElementById('iframePanel').setAttribute('src', src)
+        // document.getElementById('byteDesk-iframe').setAttribute('src', '../meilele')
+        // console.log('iframe websiteUrl:', window.location.href, 'iframe refererUrl:', document.referrer)
+    </script>
+</body>
+
+</html>
