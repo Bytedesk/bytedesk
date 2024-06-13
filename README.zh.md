@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-13 17:27:43
+ * @LastEditTime: 2024-06-13 17:29:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -121,6 +121,7 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 - [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
 - [Android](https://github.com/bytedesk/bytedesk-android)
 - [Flutter](https://github.com/bytedesk/bytedesk-flutter)
+- [Vue](https://github.com/bytedesk/bytedesk-vue)
 - [React](https://github.com/bytedesk/bytedesk-react)
 - [React-native](https://github.com/bytedesk/bytedesk-react-native)
 - [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
