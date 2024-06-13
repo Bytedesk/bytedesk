@@ -122,6 +122,7 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 - [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
 - [Android](https://github.com/bytedesk/bytedesk-android)
 - [Flutter](https://github.com/bytedesk/bytedesk-flutter)
+- [Vue](https://github.com/bytedesk/bytedesk-vue)
 - [React](https://github.com/bytedesk/bytedesk-react)
 - [React-native](https://github.com/bytedesk/bytedesk-react-native)
 - [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
