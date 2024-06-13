@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 12:07:15
+ * @LastEditTime: 2024-06-13 17:27:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,15 +109,15 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 
 ## 在线客服-访客端SDK
 
-- [iOS-oc](./visitor/oc)
+<!-- - [iOS-oc](./visitor/oc)
 - [iOS-swift](./visitor/swift)
 - [Android](./visitor/android)
 - [Flutter](./visitor/flutter)
 - [React](./visitor/react)
 - [React-native](./visitor/react-native)
 - [UniApp](./visitor/uniapp)
-- [Web](./visitor/web)
-<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
+- [Web](./visitor/web) -->
+- [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
 - [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
 - [Android](https://github.com/bytedesk/bytedesk-android)
 - [Flutter](https://github.com/bytedesk/bytedesk-flutter)
@@ -126,7 +126,7 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 - [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
 - [Web](https://github.com/bytedesk/bytedesk-web)
 - [Browser-Extension](https://github.com/bytedesk/bytedesk-browser-extension)
-- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
+- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin)
 
 ## 客户端&客服端
 

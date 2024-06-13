@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 16:36:31
+ * @LastEditTime: 2024-06-13 17:27:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -110,15 +110,15 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 
 ## Customer Service Visitor SDK
 
-- [iOS-oc](./visitor/oc)
+<!-- - [iOS-oc](./visitor/oc)
 - [iOS-swift](./visitor/swift)
 - [Android](./visitor/android)
 - [Flutter](./visitor/flutter)
 - [React](./visitor/react)
 - [React-native](./visitor/react-native)
 - [UniApp](./visitor/uniapp)
-- [Web](./visitor/web)
-<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
+- [Web](./visitor/web) -->
+- [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
 - [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
 - [Android](https://github.com/bytedesk/bytedesk-android)
 - [Flutter](https://github.com/bytedesk/bytedesk-flutter)
@@ -127,7 +127,7 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 - [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
 - [Web](https://github.com/bytedesk/bytedesk-web)
 - [Browser-Extension](https://github.com/bytedesk/bytedesk-browser-extension)
-- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
+- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin)
 
 ## Download Client
 
