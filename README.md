@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-13 17:31:51
+ * @LastEditTime: 2024-06-14 14:49:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -107,6 +107,16 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 | login | chat | contact | setting |
 | :----------: | :----------: | :----------: | :----------: |
 | <img src="./images/pc/login2.png" width="100"><img src="./images/pc/switch.png" width="100"> | <img src="./images/pc/chat.png" width="250"> | <img src="./images/pc/contact.png" width="250"> | <img src="./images/pc/setting.png" width="250"> |
+
+## Web Chat
+
+| custom button color |  custom button left | custom button margin | custom iframe margin |
+| :----------: | :----------: | :----------:  | :----------: |
+| <img src="./images/visitor-web/button-color.png" width="250"> | <img src="./images/visitor-web/button-left.png" width="250"> | <img src="./images/visitor-web/button-margin.png" width="250"> | <img src="./images/visitor-web/iframe-margin.png" width="250"> |
+
+| custom iframe width |  chat full window | chat iframe window | chat embed window |
+| :----------: | :----------: | :----------:  | :----------: |
+| <img src="./images/visitor-web/iframe-width.png" width="250"> | <img src="./images/visitor-web/chat-full.png" width="250"> | <img src="./images/visitor-web/chat-iframe.png" width="250"> | <img src="./images/visitor-web/chat-embed.png" width="250"> |
 
 ## Customer Service Visitor SDK
 
