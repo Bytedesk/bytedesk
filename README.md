@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 14:49:24
+ * @LastEditTime: 2024-06-18 15:49:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -107,6 +107,10 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 | login | chat | contact | setting |
 | :----------: | :----------: | :----------: | :----------: |
 | <img src="./images/pc/login2.png" width="100"><img src="./images/pc/switch.png" width="100"> | <img src="./images/pc/chat.png" width="250"> | <img src="./images/pc/contact.png" width="250"> | <img src="./images/pc/setting.png" width="250"> |
+
+| chat-ai | chat-cs | chat-userinfo |
+| :----------: | :----------: | :----------: |
+| <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> |
 
 ## Web Chat
 
