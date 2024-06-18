@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 23:20:48
+ * @LastEditTime: 2024-06-18 15:49:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -106,6 +106,11 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 | 登录 | 对话 | 通讯录 | 设置 |
 | :----------: | :----------: | :----------: | :----------: |
 | <img src="./images/pc/login2.png" width="100"><img src="./images/pc/switch.png" width="100"> | <img src="./images/pc/chat.png" width="250"> | <img src="./images/pc/contact.png" width="250"> | <img src="./images/pc/setting.png" width="250"> |
+
+| 客服-AI助手 | 客服-常用语 | 客服-访客信息 |
+| :----------: | :----------: | :----------: |
+| <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> |
+
 
 ## Web Chat
 
