@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 12:00:04
+ * @LastEditTime: 2024-06-17 14:18:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.service.common.ServiceSettings;
+import com.bytedesk.service.settings.ServiceSettings;
 // import com.bytedesk.core.constant.StatusConsts;
 // import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.team.member.Member;
@@ -35,6 +35,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -113,9 +114,15 @@ public class Agent extends BaseEntity {
     @Builder.Default
     private int maxThreadCount = 10;
 
-    // TODO: 是否需要跟进行中thread同步
+    // current chatting thread count
+    @Transient
     @Builder.Default
     private int currentThreadCount = 0;
+
+    // today chatted & chatting thread count
+    @Transient
+    @Builder.Default
+    private int todayThreadCount = 0;
 
     /** 存储当前接待数量等 */
     @Builder.Default

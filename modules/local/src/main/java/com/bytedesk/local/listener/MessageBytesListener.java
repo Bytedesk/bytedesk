@@ -21,10 +21,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.message.MessageBytesEvent;
+import com.bytedesk.core.socket.service.MessageSocketService;
+import com.bytedesk.core.socket.utils.MessageConvertUtils;
 import com.bytedesk.local.caffeine.CaffeineCacheService;
-import com.bytedesk.socket.protobuf.model.MessageProto;
-import com.bytedesk.socket.service.MessageSocketService;
-import com.bytedesk.socket.utils.MessageConvertUtils;
+import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import lombok.AllArgsConstructor;
@@ -37,7 +37,8 @@ public class MessageBytesListener implements ApplicationListener<MessageBytesEve
 
     private final MessageSocketService messageSocketService;
 
-    // private final RedisMessageCacheProtobufService redisMessageCacheProtobufService;
+    // private final RedisMessageCacheProtobufService
+    // redisMessageCacheProtobufService;
 
     private final CaffeineCacheService caffeineCacheService;
 
@@ -47,7 +48,7 @@ public class MessageBytesListener implements ApplicationListener<MessageBytesEve
         // TODO: 拦截被拉黑/屏蔽用户消息，并给与提示
 
         // TODO: 过滤敏感词，将敏感词替换为*
-        
+
         //
         try {
             //

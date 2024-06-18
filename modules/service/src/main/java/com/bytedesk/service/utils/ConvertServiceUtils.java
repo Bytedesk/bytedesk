@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:23:45
+ * @LastEditTime: 2024-06-14 12:29:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,10 +21,12 @@ import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.agent.AgentResponseSimple;
+import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.visitor.Visitor;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
@@ -87,6 +89,10 @@ public class ConvertServiceUtils {
         return new ModelMapper().map(workgroup, WorkgroupResponseSimple.class);
     }
 
-    // 
+    //
+    public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(ServiceSettings serviceSettings) {
+        return new ModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
+    }
+    
 
 }

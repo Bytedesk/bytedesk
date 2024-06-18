@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 14:55:52
+ * @LastEditTime: 2024-06-12 17:51:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,8 +64,7 @@ public class AuthService {
             // FIXME: 验证码错误时会报错：java.lang.ClassCastException: class java.lang.String cannot be cast to
             // class com.bytedesk.core.rbac.user.UserDetailsImpl (java.lang.String is in
             // module java.base of loader 'bootstrap';
-            // com.bytedesk.core.rbac.user.UserDetailsImpl is in unnamed module of loader
-            // 'app')
+            // com.bytedesk.core.rbac.user.UserDetailsImpl is in unnamed module of loader 'app')
             e.printStackTrace();
         }
 

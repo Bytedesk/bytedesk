@@ -14,6 +14,7 @@
  */
 package com.bytedesk.ai.robot;
 
+import com.bytedesk.ai.settings.RobotServiceSettingsRequest;
 import com.bytedesk.core.base.BaseRequest;
 
 import jakarta.validation.constraints.NotBlank;

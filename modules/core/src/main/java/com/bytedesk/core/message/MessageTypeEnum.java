@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-05 22:15:10
+ * @LastEditTime: 2024-06-14 15:13:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,10 @@ public enum MessageTypeEnum {
     TYPING("typing"), // 6.正在输入
     RECALL("recall"), // 7.撤回
     RECEIPT("receipt"), // 8.消息回执
-    QA("qa"); // 问答   
+    ROBOT_QA("robot_qa"), // 9.机器人问答
+    QUICKBUTTON_QA("quickbutton_qa"), // 10.快捷按钮问答
+    QUICKBUTTON_URL("quickbutton_url"), // 11.快捷按钮URL
+    FAQ_QA("faq_qa"); // 12.常见问题问答
 
     private final String value;
 

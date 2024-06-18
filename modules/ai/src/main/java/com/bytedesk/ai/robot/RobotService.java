@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ai.kb.Kb;
 import com.bytedesk.ai.kb.KbService;
+import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;

@@ -32,13 +32,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-socket</artifactId>
-			<version>${im.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- https://search.maven.org/artifact/com.lmax/disruptor/4.0.0/jar -->
 		<dependency>
 			<groupId>com.lmax</groupId>

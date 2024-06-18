@@ -15,7 +15,7 @@
 package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.service.common.ServiceSettingsResponse;
+import com.bytedesk.service.settings.ServiceSettingsResponse;
 import com.bytedesk.team.member.MemberResponseSimple;
 
 import lombok.AllArgsConstructor;

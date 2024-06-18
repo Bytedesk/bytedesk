@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 16:28:00
+ * @LastEditTime: 2024-06-12 21:19:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,15 +30,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ControllerAdvice
 public class GlobalControllerAdvice {
+
+    @ExceptionHandler(UsernameExistsException.class)
+    public ResponseEntity<?> handleUsernameExistsException(UsernameExistsException e) {
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
     
     @ExceptionHandler(EmailExistsException.class)
     public ResponseEntity<?> handleEmailExistsException(EmailExistsException e) {
-        return ResponseEntity.ok().body(JsonResult.error("Email already exists, please login or use another one"));
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 
     @ExceptionHandler(MobileExistsException.class)
     public ResponseEntity<?> handleMobileExistsException(MobileExistsException e) {
-        return ResponseEntity.ok().body(JsonResult.error("Mobile already exists, please login or use another one"));
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)

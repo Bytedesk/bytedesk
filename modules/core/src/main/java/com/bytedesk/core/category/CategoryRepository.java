@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-08 13:29:49
+ * @LastEditTime: 2024-06-17 17:05:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,5 +23,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
     Optional<Category> findByUid(String uid);
     List<Category> findByParentAndPlatformOrderByOrderNoAsc(Category parent, String platform);
-    // Boolean existsByPlatform(String platform);
+    Optional<Category> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid, String platform);
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 13:10:43
+ * @LastEditTime: 2024-06-17 14:07:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,7 +52,8 @@ import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.common.ServiceSettings;
+import com.bytedesk.service.settings.ServiceSettings;
+import com.bytedesk.service.settings.ServiceSettingsRequest;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.worktime.Worktime;
 import com.bytedesk.service.worktime.WorktimeService;
@@ -94,9 +95,6 @@ public class AgentService {
 
         Specification<Agent> spec = AgentSpecification.search(agentRequest);
         Page<Agent> agentPage = agentRepository.findAll(spec, pageable);
-        // Page<Agent> agentPage =
-        // agentRepository.findByOrgUidAndDeleted(agentRequest.getOrgUid(), false,
-        // pageable);
 
         return agentPage.map(ConvertServiceUtils::convertToAgentResponse);
     }
@@ -144,6 +142,17 @@ public class AgentService {
             throw new RuntimeException("user not found with uid: " + memberOptional.get().getUser().getUid());
         }
         //
+        if (agentRequest.getServiceSettings() == null
+                || agentRequest.getServiceSettings().getWorktimeUids() == null
+                || agentRequest.getServiceSettings().getWorktimeUids().isEmpty()) {
+            ServiceSettingsRequest serviceSettings = ServiceSettingsRequest.builder().build();
+            List<String> worktimeUids = new ArrayList<>();
+            String worktimeUid = worktimeService.createDefault();
+            worktimeUids.add(worktimeUid);
+            serviceSettings.setWorktimeUids(worktimeUids);
+            agentRequest.setServiceSettings(serviceSettings);
+        }
+        // 
         Iterator<String> worktimeTterator = agentRequest.getServiceSettings().getWorktimeUids().iterator();
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();
@@ -274,14 +283,6 @@ public class AgentService {
         return agentRepository.findByUserUidAndOrgUidAndDeleted(userUid, orgUid, false);
     }
 
-    // public Boolean existsByEmail(String email) {
-    // return agentRepository.existsByEmailAndDeleted(email, false);
-    // }
-
-    // public Boolean existsByMobile(String mobile) {
-    // return agentRepository.existsByMobileAndDeleted(mobile, false);
-    // }
-
     public Boolean existsByUserUidAndOrgUid(String userUid, String orgUid) {
         return agentRepository.existsByUserUidAndOrgUidAndDeleted(userUid, orgUid, false);
     }
@@ -408,5 +409,9 @@ public class AgentService {
 
         create(agentRequest);
     }
+
+    // 
+    
+    
 
 }

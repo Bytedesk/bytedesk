@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 10:09:43
+ * @LastEditTime: 2024-06-17 14:13:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,10 @@ import java.util.List;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.service.common.ServiceSettingsRequest;
+import com.bytedesk.service.settings.ServiceSettingsRequest;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,6 +35,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class WorkgroupRequest extends BaseRequest {
 
+    @NotBlank
     private String nickname;
 
     @Builder.Default
@@ -52,9 +55,11 @@ public class WorkgroupRequest extends BaseRequest {
     private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
+    @NotEmpty(message = "agentUids must not be empty")
     @Builder.Default
     private List<String> agentUids = new ArrayList<String>();
 
     // organization oid
+    @NotBlank
     private String orgUid;
 }

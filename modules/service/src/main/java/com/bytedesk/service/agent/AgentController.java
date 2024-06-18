@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 10:19:17
+ * @LastEditTime: 2024-06-13 20:57:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -116,18 +116,6 @@ public class AgentController {
         agentService.deleteByUid(agentRequest.getUid());
         //
         return ResponseEntity.ok(JsonResult.success(agentRequest));
-    }
-
-    /**
-     * filter
-     *
-     * @return json
-     */
-    @GetMapping("/filter")
-    public ResponseEntity<?> filter(AgentRequest filterParam) {
-
-        //
-        return ResponseEntity.ok(JsonResult.success());
     }
 
 }

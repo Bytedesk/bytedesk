@@ -15,27 +15,27 @@
 package com.bytedesk.core.enums;
 
 public enum LanguageEnum {
-    EN("en"),
-    ZH_CN("zh-cn"),
-    ZH_TW("zh-tw");
+    EN,//("en"),
+    ZH_CN,//("zh-cn"),
+    ZH_TW,//("zh-tw");
 
-    private final String value;
+    // private final String value;
 
-    LanguageEnum(String value) {
-        this.value = value;
-    }
+    // LanguageEnum(String value) {
+    //     this.value = value;
+    // }
 
-    public String getValue() {
-        return value;
-    }
+    // public String getValue() {
+    //     return value;
+    // }
 
-    // 根据字符串查找对应的枚举常量
-    public static LanguageEnum fromValue(String value) {
-        for (LanguageEnum type : LanguageEnum.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
-                return type;
-            }
-        }
-        throw new IllegalArgumentException("No enum constant with value: " + value);
-    }
+    // // 根据字符串查找对应的枚举常量
+    // public static LanguageEnum fromValue(String value) {
+    //     for (LanguageEnum type : LanguageEnum.values()) {
+    //         if (type.getValue().equalsIgnoreCase(value)) {
+    //             return type;
+    //         }
+    //     }
+    //     throw new IllegalArgumentException("No enum constant with value: " + value);
+    // }
 }

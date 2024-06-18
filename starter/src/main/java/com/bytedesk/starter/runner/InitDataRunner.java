@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 14:25:49
+ * @LastEditTime: 2024-06-17 16:33:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.asistant.AsistantService;
+import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.channel.ChannelService;
 import com.bytedesk.core.quartz.QuartzService;
 import com.bytedesk.core.rbac.authority.AuthorityService;
@@ -30,6 +31,7 @@ import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.upload.UploadService;
 import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.service.quick_reply.QuickReplyService;
 import com.bytedesk.service.workgroup.WorkgroupService;
 import com.bytedesk.team.department.DepartmentService;
 import com.bytedesk.team.member.MemberService;
@@ -88,6 +90,12 @@ public class InitDataRunner implements ApplicationRunner {
     @Autowired
     QuartzService quartzService;
 
+    @Autowired
+    CategoryService categoryService;
+
+    @Autowired
+    QuickReplyService quickReplyService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.debug("application started, init Default data, dont change the init order");
@@ -121,6 +129,10 @@ public class InitDataRunner implements ApplicationRunner {
         threadService.initData();
 
         quartzService.initData();
+
+        categoryService.initData();
+
+        quickReplyService.initData();
     }
 
 }

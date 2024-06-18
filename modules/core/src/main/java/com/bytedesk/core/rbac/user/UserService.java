@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 15:57:38
+ * @LastEditTime: 2024-06-12 19:05:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,8 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
-import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.exception.UsernameExistsException;
+import com.bytedesk.core.rbac.auth.AuthUser;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.role.Role;
@@ -70,10 +71,12 @@ public class UserService {
     @Transactional
     public UserResponse register(UserRequest userRequest) {
 
-        if (StringUtils.hasText(userRequest.getEmail()) && existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
+        if (StringUtils.hasText(userRequest.getEmail())
+                && existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
             throw new EmailExistsException("Email already exists..!!");
         }
-        if (StringUtils.hasText(userRequest.getMobile()) && existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
+        if (StringUtils.hasText(userRequest.getMobile())
+                && existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
             throw new MobileExistsException("Mobile already exists..!!");
         }
         //
@@ -101,7 +104,8 @@ public class UserService {
         if (StringUtils.hasText(userRequest.getEmail())) {
             user.setUsername(userRequest.getEmail());
             user.setNum(userRequest.getEmail());
-            user.setEmailVerified(true);
+            // 默认注册时，仅验证手机号，无需验证邮箱
+            user.setEmailVerified(false);
         }
         // 只有经过验证的手机号，才真正执行注册
         if (StringUtils.hasText(userRequest.getMobile())) {
@@ -109,6 +113,7 @@ public class UserService {
             user.setMobileVerified(true);
         }
         user.setEnabled(true);
+        //
         // TODO: 设置角色role
         //
         user = save(user);
@@ -119,9 +124,28 @@ public class UserService {
     @Transactional
     public UserResponse update(UserRequest userRequest) {
 
-        Optional<User> userOptional = findByUid(userRequest.getUid());
+        if (StringUtils.hasText(userRequest.getUsername()) 
+                && existsByUsernameAndPlatform(userRequest.getUsername(), userRequest.getPlatform())) {
+            throw new UsernameExistsException("Username already exists..!!");
+        }
+
+        if (StringUtils.hasText(userRequest.getEmail())
+                && existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
+            throw new EmailExistsException("Email already exists..!!");
+        }
+        if (StringUtils.hasText(userRequest.getMobile())
+                && existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
+            throw new MobileExistsException("Mobile already exists..!!");
+        }
+
+        User currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
+        Optional<User> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+
+            if (StringUtils.hasText(userRequest.getUsername())) {
+                user.setUsername(userRequest.getUsername());
+            }
 
             if (StringUtils.hasText(userRequest.getNickname())) {
                 user.setNickname(userRequest.getNickname());
@@ -129,12 +153,6 @@ public class UserService {
 
             if (StringUtils.hasText(userRequest.getAvatar())) {
                 user.setAvatar(userRequest.getAvatar());
-            }
-
-            if (StringUtils.hasText(userRequest.getPassword())) {
-                String rawPassword = userRequest.getPassword();
-                String encodedPassword = passwordEncoder.encode(rawPassword);
-                user.setPassword(encodedPassword);
             }
 
             if (StringUtils.hasText(userRequest.getEmail())) {
@@ -156,7 +174,35 @@ public class UserService {
             return ConvertUtils.convertToUserResponse(user);
 
         } else {
-            throw new NotFoundException("User not found..!!");
+            throw new RuntimeException("User not found..!!");
+        }
+    }
+
+    @Transactional
+    public UserResponse changePassword(UserRequest userRequest) {
+
+        User currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
+        Optional<User> userOptional = findByUid(currentUser.getUid());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            String oldEncryptedPassword = user.getPassword(); // 假设这是数据库中加密后的密码
+            String oldRawPassword = userRequest.getOldPassword(); // 用户输入的旧密码
+            String newRawPassword = userRequest.getNewPassword(); // 用户输入的新密码
+
+            // 验证旧密码
+            if (passwordEncoder.matches(oldRawPassword, oldEncryptedPassword)) {
+                // 旧密码验证通过，设置新密码
+                String newEncryptedPassword = passwordEncoder.encode(newRawPassword);
+                user.setPassword(newEncryptedPassword); // 更新用户密码
+                user = save(user); // 保存用户信息到数据库，假设save方法已经存在
+                //
+                return ConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
+            } else {
+                // 旧密码验证失败，抛出异常或返回错误信息
+                throw new RuntimeException("old password wrong, please try again..!!");
+            }
+        } else {
+            throw new RuntimeException("User not found..!!");
         }
     }
 
@@ -194,10 +240,10 @@ public class UserService {
         } else {
             user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
         }
-        // user.getOrganizations().add(userRequest.getOrgUid());
 
         Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
-        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE, UserConsts.DEFAULT_ORGANIZATION_UID);
+        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE,
+                UserConsts.DEFAULT_ORGANIZATION_UID);
         if (orgOptional.isPresent() && roleOptional.isPresent()) {
             Organization organization = orgOptional.get();
             Role role = roleOptional.get();
@@ -243,7 +289,8 @@ public class UserService {
 
     @Cacheable(value = "admin", unless = "#result == null")
     public Optional<User> getAdmin() {
-        return userRepository.findByUsernameAndPlatformAndDeleted(bytedeskProperties.getEmail(), BdConstants.PLATFORM_BYTEDESK, false);
+        return userRepository.findByUsernameAndPlatformAndDeleted(bytedeskProperties.getEmail(),
+                BdConstants.PLATFORM_BYTEDESK, false);
     }
 
     //
@@ -332,8 +379,10 @@ public class UserService {
     public void updateInitData() {
 
         Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
-        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER, UserConsts.DEFAULT_ORGANIZATION_UID);
-        Optional<User> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(), BdConstants.PLATFORM_BYTEDESK);
+        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
+                UserConsts.DEFAULT_ORGANIZATION_UID);
+        Optional<User> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(),
+                BdConstants.PLATFORM_BYTEDESK);
         if (orgOptional.isPresent() && roleOptional.isPresent() && adminOptional.isPresent()) {
             Organization organization = orgOptional.get();
             Role role = roleOptional.get();
