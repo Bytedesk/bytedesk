@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:13:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 11:41:42
+ * @LastEditTime: 2024-06-14 12:07:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.kb;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LanguageEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -53,7 +54,8 @@ public class Kb extends BaseEntity {
     private boolean published = true;
 
     @Builder.Default
-    private String language = I18Consts.ZH_CN;
+    // private String language = I18Consts.ZH_CN;
+    private LanguageEnum language = LanguageEnum.ZH_CN;
 
     /**
      * belong to org

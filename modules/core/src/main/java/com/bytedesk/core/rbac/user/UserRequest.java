@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 09:58:47
+ * @LastEditTime: 2024-06-12 17:53:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,6 +44,10 @@ public class UserRequest extends BaseRequest {
 	private String nickname;
 
 	private String password;
+
+	// 专门用于修改密码
+	private String oldPassword;
+	private String newPassword;
 
 	@Email(message = "email format error")
 	private String email;

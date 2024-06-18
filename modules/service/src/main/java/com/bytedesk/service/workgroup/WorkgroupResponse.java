@@ -18,7 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.service.agent.AgentResponseSimple;
-import com.bytedesk.service.common.ServiceSettingsResponse;
+import com.bytedesk.service.settings.ServiceSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

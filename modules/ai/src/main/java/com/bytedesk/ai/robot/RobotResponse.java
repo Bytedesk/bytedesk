@@ -14,6 +14,7 @@
  */
 package com.bytedesk.ai.robot;
 
+import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;

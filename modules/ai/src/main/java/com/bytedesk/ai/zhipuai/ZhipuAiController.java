@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 11:00:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-06 10:48:32
+ * @LastEditTime: 2024-06-14 13:55:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,7 +93,6 @@ public class ZhipuAiController {
     }
 
     //
-
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     // http://localhost:9003/visitor/api/v1/zhipuai/sse?uid=&sid=&content=hi

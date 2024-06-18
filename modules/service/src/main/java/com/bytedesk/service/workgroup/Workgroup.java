@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-10 11:25:38
+ * @LastEditTime: 2024-06-17 14:09:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.service.workgroup;
 
 // import java.util.Set;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -29,7 +30,7 @@ import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.service.agent.Agent;
-import com.bytedesk.service.common.ServiceSettings;
+import com.bytedesk.service.settings.ServiceSettings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -72,7 +73,7 @@ public class Workgroup extends BaseEntity {
     private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
 
     /**
-     * 熟客优先
+     * recent chat agent should be routed first
      */
     @Builder.Default
     @Column(name = "is_recent")
@@ -128,10 +129,12 @@ public class Workgroup extends BaseEntity {
 
     // TODO: 根据算法选择一个agent
     // TODO: 增加agent-currentThreadCount数量
-    // TODO: 模拟测试1000个访客分配给10个客服，每个客服平均分配50个访客
+    // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
     public Agent nextAgent() {
 
         if (routeType.equals(WorkgroupRouteEnum.ROBIN)) {
+
+            return assignAgentByRobin();
 
         } else if (routeType.equals(WorkgroupRouteEnum.AVERAGE)) {
 
@@ -144,4 +147,31 @@ public class Workgroup extends BaseEntity {
         return getAgents().iterator().next();
     }
 
+
+    /**
+     * 轮询分配算法实现访客到客服的分配
+     * 
+     * @return 分配到的客服
+     */
+    public Agent assignAgentByRobin() {
+        if (agentQueue.isEmpty()) {
+            // 如果队列为空，则先将所有客服加入队列
+            // agentQueue.addAll(agents);
+            Iterator<Agent> iterator = agents.iterator();
+            while (iterator.hasNext()) {
+                Agent agent = iterator.next();
+                if (agent.isConnected() && agent.isAvailable()) {
+                    agentQueue.add(agent);
+                }
+            }
+        }
+
+        // 从队列头部获取一个客服
+        Agent assignedAgent = agentQueue.poll();
+
+        // 为了保证轮询的连续性，将该客服重新加入队列尾部
+        agentQueue.offer(assignedAgent);
+
+        return assignedAgent;
+    }
 }

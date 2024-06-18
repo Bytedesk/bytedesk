@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 18:44:32
+ * @LastEditTime: 2024-06-17 22:07:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,8 @@
  */
 package com.bytedesk.service.visitor;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,22 +25,37 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.apilimit.ApiRateLimiter;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.socket.stomp.service.StompMqService;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * anonymous api, no need to login
  * http://localhost:9003/swagger-ui/index.html
  */
-// @Slf4j
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/visitor/api/v1/")
 public class VisitorController {
 
     private final VisitorService visitorService;
+
+    private final StompMqService stompMqService;
+
+    /**
+     * pre init use in web embeded button used for tracking & pre fetch settings
+     * 
+     * @param request
+     * @return
+     */
+    @GetMapping("/pre")
+    public ResponseEntity<?> pre(HttpServletRequest request) {
+        //
+        return ResponseEntity.ok(JsonResult.success("pre"));
+    }
 
     /**
      * init visitor cookies in browser & generate visitor in db
@@ -76,6 +93,15 @@ public class VisitorController {
         return ResponseEntity.ok(JsonResult.success(messageResponse));
     }
 
+    // query visitor info by uid
+    @GetMapping("/query")
+    public ResponseEntity<?> query(VisitorRequest visitorRequest) {
+        //
+        VisitorResponse visitorResponse = visitorService.query(visitorRequest);
+        //
+        return ResponseEntity.ok(JsonResult.success(visitorResponse));
+    }
+
     /**
      * update
      *
@@ -101,14 +127,33 @@ public class VisitorController {
     }
 
     /**
-     * filter
-     *
+     * send offline message
+     * 
+     * @param map map
      * @return json
      */
-    @GetMapping("/filter")
-    public ResponseEntity<?> filter(VisitorRequest filterParam) {
+    @PostMapping("/message/send")
+    public ResponseEntity<?> sendOfflineMessage(@RequestBody Map<String, String> map) {
+        // 
+        String json = (String) map.get("json");
+        log.debug("json {}", json);
+        stompMqService.sendMessageToMq(json);
         //
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(json));
+    }
+
+    @PostMapping("/quickbutton/send")
+    public ResponseEntity<?> quickButtonMessage() {
+        // 
+
+        return ResponseEntity.ok(JsonResult.success("test success"));
+    }
+
+    @PostMapping("/faq/send")
+    public ResponseEntity<?> faqMessage() {
+
+
+        return ResponseEntity.ok(JsonResult.success("test success"));
     }
 
 }

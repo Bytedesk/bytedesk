@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-08 16:48:36
+ * @LastEditTime: 2024-06-17 17:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,11 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryService;
+import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -74,6 +78,7 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
         
         QuickReply entity = modelMapper.map(request, QuickReply.class);
         entity.setUid(uidUtils.getCacheSerialUid());
+        entity.setType(MessageTypeEnum.fromValue(request.getType()));
         // 
         // category
         Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
@@ -143,4 +148,74 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
         return modelMapper.map(entity, QuickReplyResponse.class);
     }
 
+    // 
+    public void initData() {
+        // 
+        if (quickReplyRepository.count() > 0) {
+            return;
+        }
+        // 
+        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        Optional<Category> categoryContact = categoryService.findByNameAndTypeAndOrgUidAndPlatform(
+                I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT, CategoryConsts.CATEGORY_TYPE_QUICK_REPLY, orgUid,
+                BdConstants.PLATFORM_BYTEDESK);
+        if (categoryContact.isPresent()) {
+            // 
+            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
+                    .title(I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE)
+                    .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
+                    .categoryUid(categoryContact.get().getUid())
+                    .orgUid(orgUid)
+                    .build();
+            quickReplyRequest.setType(MessageTypeEnum.TEXT.getValue());
+            create(quickReplyRequest);
+        }
+        // 
+        Optional<Category> categoryThanks = categoryService.findByNameAndTypeAndOrgUidAndPlatform(
+                I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS, CategoryConsts.CATEGORY_TYPE_QUICK_REPLY, orgUid,
+                BdConstants.PLATFORM_BYTEDESK);
+        if (categoryThanks.isPresent()) {
+            //
+            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
+                    .title(I18Consts.I18N_QUICK_REPLY_THANKS_TITLE)
+                    .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
+                    .categoryUid(categoryThanks.get().getUid())
+                    .orgUid(orgUid)
+                    .build();
+            quickReplyRequest.setType(MessageTypeEnum.TEXT.getValue());
+            create(quickReplyRequest);
+        }
+
+        Optional<Category> categoryWelcome = categoryService.findByNameAndTypeAndOrgUidAndPlatform(
+                I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME, CategoryConsts.CATEGORY_TYPE_QUICK_REPLY, orgUid,
+                BdConstants.PLATFORM_BYTEDESK);
+        if (categoryWelcome.isPresent()) {
+            //
+            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
+                    .title(I18Consts.I18N_QUICK_REPLY_WELCOME_TITLE)
+                    .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
+                    .categoryUid(categoryWelcome.get().getUid())
+                    .orgUid(orgUid)
+                    .build();
+            quickReplyRequest.setType(MessageTypeEnum.TEXT.getValue());
+            create(quickReplyRequest);
+        }
+        
+        Optional<Category> categoryBye = categoryService.findByNameAndTypeAndOrgUidAndPlatform(
+                I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE, CategoryConsts.CATEGORY_TYPE_QUICK_REPLY, orgUid,
+                BdConstants.PLATFORM_BYTEDESK);
+        if (categoryBye.isPresent()) {
+            //
+            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
+                    .title(I18Consts.I18N_QUICK_REPLY_BYE_TITLE)
+                    .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
+                    .categoryUid(categoryBye.get().getUid())
+                    .orgUid(orgUid)
+                    .build();
+            quickReplyRequest.setType(MessageTypeEnum.TEXT.getValue());
+            create(quickReplyRequest);
+        }
+
+    }
+    
 }

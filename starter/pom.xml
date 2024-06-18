@@ -95,6 +95,11 @@
 			<artifactId>spring-boot-docker-compose</artifactId>
 		</dependency> -->
 
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+
 		<!-- cloud -->
 		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -151,12 +156,6 @@
 			<version>${im.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-socket</artifactId>
-			<version>${im.version}</version>
-		</dependency>
-
 		<!-- singleton - 单机 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
@@ -167,18 +166,25 @@
 		<!-- //////////////////////////////////付费模块/////////////////////////////////////////// -->
 
 		<!-- service - 客服付费模块 -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-vip-service</artifactId>
 			<version>${im.version}</version>
-		</dependency> -->
+		</dependency>
+
+		<!-- flow - 流程引擎 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-flow</artifactId>
+			<version>${im.version}</version>
+		</dependency>
 
 		<!-- cms - 内容管理系统 -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-vip-cms</artifactId>
 			<version>${im.version}</version>
-		</dependency> -->
+		</dependency>
 
 		<!-- cluster - 集群 -->
 		<!-- <dependency>

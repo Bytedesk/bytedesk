@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 22:36:38
+ * @LastEditTime: 2024-06-17 14:52:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,12 @@
  */
 package com.bytedesk.service.queue;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface QueueRepository extends JpaRepository<Queue, Long> {
+public interface QueueRepository extends JpaRepository<Queue, Long>, JpaSpecificationExecutor<Queue> {
 
+    Optional<Queue> findByUid(String uid);
 }

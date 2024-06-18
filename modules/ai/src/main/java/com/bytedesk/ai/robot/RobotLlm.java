@@ -50,13 +50,13 @@ public class RobotLlm {
     private RobotEmbedingEnum embeddings = RobotEmbedingEnum.M3E_BASE;
 
     @Builder.Default
-    private Float temperature = 0.9f;
+    private float temperature = 0.9f;
 
     @Builder.Default
-    private Float topP = 0.7f;
+    private float topP = 0.7f;
 
     @Builder.Default
-    private String prompt = I18Consts.I18N_ROBOT_LLM_PROMPT_ZH_CN;
+    private String prompt = I18Consts.I18N_ROBOT_LLM_PROMPT;
 
     // 默认是true，表示使用自定义模型, false表示云服务（需要在配置文件中配置相关参数）
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 22:41:31
+ * @LastEditTime: 2024-06-17 14:53:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,12 @@ package com.bytedesk.service.queue;
 
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +34,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse> {
     
-    // private final QueueRepository queueRepository;
+    private final QueueRepository queueRepository;
+
+    private final ModelMapper modelMapper;
 
     @Transactional
     public void enqueue(QueueRequest request) {
@@ -49,8 +56,13 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
     
     @Override
     public Page<QueueResponse> queryByOrg(QueueRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "updatedAt");
+        Specification<Queue> specification = QueueSpecification.search(request);
+        Page<Queue> page = queueRepository.findAll(specification, pageable);
+
+        return page.map(this::convertToResponse);
     }
 
     @Override
@@ -61,8 +73,7 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
 
     @Override
     public Optional<Queue> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return queueRepository.findByUid(uid);
     }
 
     @Override
@@ -79,20 +90,26 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
 
     @Override
     public Queue save(Queue entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return queueRepository.save(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
+        }
+        return null;
     }
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<Queue> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            delete(optional.get());
+        }
     }
 
     @Override
     public void delete(Queue entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        entity.setDeleted(false);
+        save(entity);
     }
 
     @Override
@@ -103,8 +120,7 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
 
     @Override
     public QueueResponse convertToResponse(Queue entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        return modelMapper.map(entity, QueueResponse.class);
     }
 
     

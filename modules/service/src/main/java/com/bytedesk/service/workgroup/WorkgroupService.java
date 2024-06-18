@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 15:32:02
+ * @LastEditTime: 2024-06-14 12:00:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,12 +34,15 @@ import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.faq.Faq;
+import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quick_button.QuickButton;
 import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentService;
-import com.bytedesk.service.common.ServiceSettings;
+import com.bytedesk.service.settings.ServiceSettings;
+import com.bytedesk.service.settings.ServiceSettingsRequest;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.worktime.Worktime;
 import com.bytedesk.service.worktime.WorktimeService;
@@ -61,6 +64,8 @@ public class WorkgroupService {
     private final WorktimeService worktimeService;
 
     private final QuickButtonService quickButtonService;
+
+    private final FaqService faqService;
 
     private final ModelMapper modelMapper;
 
@@ -95,6 +100,17 @@ public class WorkgroupService {
             workgroup.setUid(uidUtils.getCacheSerialUid());
         } else {
             workgroup.setUid(workgroupRequest.getUid());
+        }
+        // 
+        if (workgroupRequest.getServiceSettings() == null
+                || workgroupRequest.getServiceSettings().getWorktimeUids() == null
+                || workgroupRequest.getServiceSettings().getWorktimeUids().isEmpty()) {
+            ServiceSettingsRequest serviceSettings = ServiceSettingsRequest.builder().build();
+            List<String> worktimeUids = new ArrayList<>();
+            String worktimeUid = worktimeService.createDefault();
+            worktimeUids.add(worktimeUid);
+            serviceSettings.setWorktimeUids(worktimeUids);
+            workgroupRequest.setServiceSettings(serviceSettings);
         }
         //
         Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
@@ -152,6 +168,7 @@ public class WorkgroupService {
                 throw new RuntimeException(workgroupRequest.getServiceSettings().getRobotUid() + " is not found.");
             }
         }
+        // 
         if (workgroupRequest.getServiceSettings().getQuickButtonUids() != null
                 && workgroupRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickButtonUids().iterator();
@@ -165,8 +182,21 @@ public class WorkgroupService {
                 }
             }
         }
+        // 
+        if (workgroupRequest.getServiceSettings().getFaqUids() != null
+                && workgroupRequest.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = workgroupRequest.getServiceSettings().getFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String faqUid = iterator.next();
+                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    Faq faqEntity = faqOptional.get();
+
+                    serviceSettings.getFaqs().add(faqEntity);
+                }
+            }
+        }
         //
-        workgroup.getServiceSettings().getWorktimes().clear();
         Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();

@@ -9,7 +9,7 @@
             "name": "StarterApplication",
             "request": "launch",
             "mainClass": "com.bytedesk.starter.StarterApplication",
-            "projectName": "starter"
+            "projectName": "bytedesk-starter"
         }
     ]
 }

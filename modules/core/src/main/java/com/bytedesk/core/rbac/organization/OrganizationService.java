@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 09:55:01
+ * @LastEditTime: 2024-06-12 22:38:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -136,9 +136,12 @@ public class OrganizationService {
 
         // 获取要更新的组织实体
         Organization organization = organizationOptional.get();
-
         // 使用ModelMapper进行属性拷贝，避免逐一设置字段
-        modelMapper.map(organizationRequest, organization);
+        // modelMapper.map(organizationRequest, organization); // 一些默认值会被清空，待前端支持完善之后再启用
+        organization.setName(organizationRequest.getName());
+        organization.setLogo(organizationRequest.getLogo());
+        organization.setCode(organizationRequest.getCode());
+        organization.setDescription(organizationRequest.getDescription());
 
         // 保存更新后的组织
         Organization updatedOrganization = save(organization);
@@ -206,18 +209,13 @@ public class OrganizationService {
         if (adminOptional.isPresent()) {
             //
             Organization organization = Organization.builder()
-                    // .uid(uidUtils.getCacheSerialUid())
                     .name(bytedeskProperties.getOrganizationName())
                     .code(bytedeskProperties.getOrganizationCode())
                     .description(bytedeskProperties.getOrganizationName() + " Description")
                     .user(adminOptional.get())
                     .build();
-            // organization.setUid(uidUtils.getCacheSerialUid());
             organization.setUid(UserConsts.DEFAULT_ORGANIZATION_UID);
             save(organization);
-            //
-            // adminOptional.get().getOrganizations().add(organization.getUid());
-            // userService.save(adminOptional.get());
         }
 
     }

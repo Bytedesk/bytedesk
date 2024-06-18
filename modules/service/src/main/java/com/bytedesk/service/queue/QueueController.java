@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-22 23:03:30
+ * @LastEditTime: 2024-06-17 14:47:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,56 @@
  */
 package com.bytedesk.service.queue;
 
-public class QueueController {
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.utils.JsonResult;
+
+import lombok.AllArgsConstructor;
+
+@RestController
+@AllArgsConstructor
+@RequestMapping("/api/v1/queue")
+public class QueueController extends BaseController<QueueRequest> {
+
+    private final QueueService queueService;
+
+    @Override
+    public ResponseEntity<?> queryByOrg(QueueRequest request) {
+        
+        Page<QueueResponse> page = queueService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @Override
+    public ResponseEntity<?> query(QueueRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    }
+
+    @Override
+    public ResponseEntity<?> create(QueueRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public ResponseEntity<?> update(QueueRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public ResponseEntity<?> delete(QueueRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    
+
 
 }

@@ -17,7 +17,7 @@ package com.bytedesk.service.agent;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.service.common.ServiceSettingsRequest;
+import com.bytedesk.service.settings.ServiceSettingsRequest;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

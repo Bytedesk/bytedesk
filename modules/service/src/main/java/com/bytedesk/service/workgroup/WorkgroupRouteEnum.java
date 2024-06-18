@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-30 22:48:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-30 22:51:47
+ * @LastEditTime: 2024-06-17 14:03:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@
 package com.bytedesk.service.workgroup;
 
 public enum WorkgroupRouteEnum {
-    // Round-robin, 轮询分配
+    // Round-robin, 轮询分配. 根据客服上线时间进入队列轮流分配。注意：当客服网络不稳定掉线重连之后，会重新排到队列末尾
     ROBIN,
     // 当日内按照接待个数平均分配，少者优先, 0点清空前一天，并开始新的一天计数
     AVERAGE,

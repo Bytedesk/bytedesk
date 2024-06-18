@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 10:17:53
+ * @LastEditTime: 2024-06-13 20:46:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * 
  */
 @Repository
-@Tag(name = "agent account info - 客服账号信息")
+@Tag(name = "agent account info")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecificationExecutor<Agent> {
 

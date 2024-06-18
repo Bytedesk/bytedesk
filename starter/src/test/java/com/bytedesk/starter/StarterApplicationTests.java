@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 // import org.springframework.boot.test.mock.mockito.MockBean;
 
-// import com.bytedesk.socket.mqtt.protocol.ProtocolProcess;
-// import com.bytedesk.socket.mqtt.server.MqttServer;
-// import com.bytedesk.socket.mqtt.server.MqttWebSocketServer;
+// import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
+// import com.bytedesk.core.socket.mqtt.server.MqttServer;
+// import com.bytedesk.core.socket.mqtt.server.MqttWebSocketServer;
 
 // https://springdoc.cn/spring-boot-testing-tutorial/
 @SpringBootTest

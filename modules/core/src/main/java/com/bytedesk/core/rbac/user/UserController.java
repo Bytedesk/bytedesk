@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-25 22:46:49
+ * @LastEditTime: 2024-06-12 17:44:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,6 +63,15 @@ public class UserController {
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
 
         UserResponse userResponse = userService.update(userRequest);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    @ActionAnnotation(title = "user", action = "changePassword", description = "changePassword")
+    @PostMapping("/change/password")
+    public ResponseEntity<?> changePassword(@RequestBody UserRequest userRequest) {
+
+        UserResponse userResponse = userService.changePassword(userRequest);
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }

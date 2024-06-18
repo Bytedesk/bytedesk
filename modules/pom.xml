@@ -21,7 +21,6 @@
         <module>local</module>
         <module>service</module>
         <module>social</module>
-        <module>socket</module>
         <module>team</module>
     </modules>
 
@@ -113,6 +112,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- cloud -->

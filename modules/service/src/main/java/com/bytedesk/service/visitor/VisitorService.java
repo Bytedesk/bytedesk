@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 12:02:45
+ * @LastEditTime: 2024-06-17 23:12:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,6 +78,17 @@ public class VisitorService {
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
+
+    public VisitorResponse query(VisitorRequest visitorRequest) {
+
+        Optional<Visitor> visitorOptional = findByUid(visitorRequest.getUid());
+        if (!visitorOptional.isPresent()) {
+            throw new RuntimeException("visitor not found");
+        }
+
+        return ConvertServiceUtils.convertToVisitorResponse(visitorOptional.get());
+    }
+
     /**
      * create visitor record
      * 
@@ -106,9 +117,11 @@ public class VisitorService {
             visitorRequest.setIp(ip);
             visitorRequest.setIpLocation(ipService.getIpLocation(ip));
         }
-
+        // 
         visitor = modelMapper.map(visitorRequest, Visitor.class);
         visitor.setUid(uidUtils.getCacheSerialUid());
+        visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
+        // TODO: orgUid
         //
         return ConvertServiceUtils.convertToVisitorResponseSimple(save(visitor));
     }
@@ -200,9 +213,9 @@ public class VisitorService {
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
-        thread.setExtra(JSON.toJSONString(agent.getServiceSettings()));
+        thread.setExtra(JSON.toJSONString(ConvertServiceUtils.convertToServiceSettingsResponseVisitor(agent.getServiceSettings())));
         thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToAgentResponseSimple(agent)));
-
+        // 
         return threadService.save(thread);
     }
 
@@ -224,7 +237,6 @@ public class VisitorService {
             thread = threadService.reopen(thread);
             //
             Message message = createAgentMessage(thread, agent);
-            //
             message = messageService.save(message);
 
             return ConvertServiceUtils.convertToMessageResponse(message, thread);
@@ -237,7 +249,6 @@ public class VisitorService {
         }
         // create new message
         Message message = createAgentMessage(thread, agent);
-
         message = messageService.save(message);
 
         return ConvertServiceUtils.convertToMessageResponse(message, thread);
@@ -249,7 +260,6 @@ public class VisitorService {
         Message message = Message.builder()
                 .type(MessageTypeEnum.THREAD)
                 .status(MessageStatusEnum.READ)
-                // .client(ClientConsts.CLIENT_SYSTEM)
                 .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(user))
                 .orgUid(thread.getOrgUid())
@@ -261,8 +271,8 @@ public class VisitorService {
         } else {
             message.setContent(agent.getServiceSettings().getWelcomeTip());
         }
-
         message.getThreads().add(thread);
+
         return message;
     }
 
@@ -335,7 +345,7 @@ public class VisitorService {
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
-        thread.setExtra(JSON.toJSONString(workgroup.getServiceSettings()));
+        thread.setExtra(JSON.toJSONString(ConvertServiceUtils.convertToServiceSettingsResponseVisitor(workgroup.getServiceSettings())));
         thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToWorkgroupResponseSimple(workgroup)));
 
         return threadService.save(thread);
@@ -428,7 +438,8 @@ public class VisitorService {
         //
         // thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(robot.getOrgUid());
-        thread.setExtra(JSON.toJSONString(robot.getServiceSettings()));
+        thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
+                robot.getServiceSettings())));
         thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotResponseSimple(robot)));
 
         return threadService.save(thread);
@@ -531,5 +542,29 @@ public class VisitorService {
             // 处理其他异常
         }
     }
+
+
+    // TODO: 模拟压力测试：随机生成 10000 个访客，分配给1个技能组中10个客服账号，并随机分配给1个客服账号，每秒发送1条消息
+    public void prepeareStressTest() {
+        // String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        // // 随机生成10000个访客
+        // List<Visitor> visitors = new ArrayList<>();
+        // for (int i = 0; i < 10000; i++) {
+        //     String uid = uidUtils.getCacheSerialUid();
+        //     // visitors.add(new Visitor(uid, "visitor" + i));
+        // }
+        // 随机分配给1个技能组中10个客服账号
+        // List<Robot> robots = robotService.findAllByOrgUidAndDeleted(orgUid, false);
+        // if (robots == null || robots.isEmpty()) {
+        //     return;
+        // }
+        // Random random = new Random();
+        // for (Visitor visitor : visitors) {
+        //     Robot robot = robots.get(random.nextInt(robots.size()));
+        //     visitor.setAgentUid(robot.getUid());
+        //     save(visitor);
+        // }
+    }
+
 
 }

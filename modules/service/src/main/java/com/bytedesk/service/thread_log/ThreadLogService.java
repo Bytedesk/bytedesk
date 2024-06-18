@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:47:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 17:27:51
+ * @LastEditTime: 2024-06-14 12:30:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,11 +27,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.RobotServiceSettings;
+import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.service.common.ServiceSettings;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -87,15 +86,16 @@ public class ThreadLogService {
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            // VisitorExtra extra = JSON.parseObject(thread.getExtra(), VisitorExtra.class);
             if (thread.getType() == ThreadTypeEnum.WORKGROUP || thread.getType() == ThreadTypeEnum.APPOINTED) {
-                ServiceSettings settings = JSON.parseObject(thread.getExtra(), ServiceSettings.class);
+                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(), 
+                        ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();
                 if (diffInMinutes > autoCloseMinites) {
                     threadService.autoClose(thread);
                 }
             } else if (thread.getType() == ThreadTypeEnum.ROBOT) {
-                RobotServiceSettings settings = JSON.parseObject(thread.getExtra(), RobotServiceSettings.class);
+                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(), 
+                        ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();
                 if (diffInMinutes > autoCloseMinites) {
                     threadService.autoClose(thread);

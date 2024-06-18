@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-08 12:10:12
+ * @LastEditTime: 2024-06-14 15:12:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -86,7 +87,8 @@ public class QuickButtonService extends BaseService<QuickButton, QuickButtonRequ
         // 
         entity.setTitle(request.getTitle());
         entity.setContent(request.getContent());
-        entity.setType(request.getType());
+        // entity.setType(request.getType());
+        entity.setType(MessageTypeEnum.fromValue(request.getType()));
 
         entity.setOrgUid(request.getOrgUid());
 

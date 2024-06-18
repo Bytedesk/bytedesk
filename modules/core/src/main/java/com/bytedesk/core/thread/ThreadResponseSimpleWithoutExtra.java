@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 20:49:22
+ * @LastEditTime: 2024-06-14 13:20:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,10 @@ public class ThreadResponseSimpleWithoutExtra extends BaseResponse {
 
     private static final long serialVersionUID = 1L;    
 
+    // private String title;
+
+    // private String avatar;
+    
     private String topic;
 
     private ThreadTypeEnum type;

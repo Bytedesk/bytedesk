@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:13:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:42:19
+ * @LastEditTime: 2024-06-14 15:11:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.core.quick_button;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,8 +48,10 @@ public class QuickButton extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
+    @Builder.Default
     @Column(name = TypeConsts.COLUMN_NAME_TYPE)
-    private String type;
+    // private String type;
+    private MessageTypeEnum type = MessageTypeEnum.TEXT;
 
     private String orgUid;
 }

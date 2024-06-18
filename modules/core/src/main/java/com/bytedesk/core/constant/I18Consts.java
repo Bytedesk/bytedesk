@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 07:07:56
+ * @LastEditTime: 2024-06-17 17:29:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,12 +20,12 @@ public class I18Consts {
     private I18Consts() {
     }
 
-    public static final String EN = "en";
+    // public static final String EN = "en";
     // public static final String ZH = "zh";
-    // 
-    public static final String EN_US = "en-US";
-    public static final String ZH_CN = "zh-CN";
-    public static final String ZH_TW = "zh-TW";
+    //
+    // public static final String EN_US = "en-US";
+    // public static final String ZH_CN = "zh-CN";
+    // public static final String ZH_TW = "zh-TW";
 
     public static final String I18N_PREFIX = "i18n_";
     // "文件助手"
@@ -54,18 +54,31 @@ public class I18Consts {
     //
     public static final String I18N_USER_NICKNAME = I18N_PREFIX + "user_nickname";
     public static final String I18N_USER_DESCRIPTION = I18N_PREFIX + "user_description";
-    // 
+    //
     public static final String I18N_DESCRIPTION = I18N_PREFIX + "description";
-    // "你是一个聪明、对人类有帮助的人工智能，你可以对人类提出的问题给出有用、详细、礼貌的回答"
-    // "智能问答机器人"
+    //
     public static final String I18N_ROBOT_NICKNAME = I18N_PREFIX + "robot_nickname";
     public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot_description";
-    // 
-    public static final String I18N_ROBOT_LLM_PROMPT_ZH_CN = "你是一个聪明、对人类有帮助的人工智能，你可以对人类提出的问题给出有用、详细、礼貌的回答";
-    // 
+    public static final String I18N_ROBOT_LLM_PROMPT = I18N_PREFIX + "llm_prompt";
+    //
     public static final String I18N_ADMIN = I18N_PREFIX + "admin";
     public static final String I18N_ADMIN_DESCRIPTION = I18N_PREFIX + "admin_description";
-    
-    
+    // quick reply category
+    public static final String I18N_QUICK_REPLY_CATEGORY_CONTACT = I18N_PREFIX + "contact"; // 询问联系方式
+    public static final String I18N_QUICK_REPLY_CATEGORY_THANKS = I18N_PREFIX + "thanks"; // 感谢
+    public static final String I18N_QUICK_REPLY_CATEGORY_WELCOME = I18N_PREFIX + "welcome"; // 问候
+    public static final String I18N_QUICK_REPLY_CATEGORY_BYE = I18N_PREFIX + "bye"; // 告别
+    // 
+    public static final String I18N_QUICK_REPLY_CONTACT_TITLE = I18N_PREFIX + "contact_title";//
+    public static final String I18N_QUICK_REPLY_CONTACT_CONTENT = I18N_PREFIX + "contact_content";//
+    //
+    public static final String I18N_QUICK_REPLY_THANKS_TITLE = I18N_PREFIX + "thanks_title";//
+    public static final String I18N_QUICK_REPLY_THANKS_CONTENT = I18N_PREFIX + "thanks_content";//
+    //
+    public static final String I18N_QUICK_REPLY_WELCOME_TITLE = I18N_PREFIX + "welcome_title";//
+    public static final String I18N_QUICK_REPLY_WELCOME_CONTENT = I18N_PREFIX + "welcome_content";//
+    //
+    public static final String I18N_QUICK_REPLY_BYE_TITLE = I18N_PREFIX + "bye_title";//
+    public static final String I18N_QUICK_REPLY_BYE_CONTENT = I18N_PREFIX + "bye_content";//
 
 }

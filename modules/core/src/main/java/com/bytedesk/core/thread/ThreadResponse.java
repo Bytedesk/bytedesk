@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-06 14:33:29
+ * @LastEditTime: 2024-06-14 13:10:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,6 +39,10 @@ import lombok.experimental.Accessors;
 public class ThreadResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
+
+    // private String title;
+
+    // private String avatar;
 
     private String topic;
 

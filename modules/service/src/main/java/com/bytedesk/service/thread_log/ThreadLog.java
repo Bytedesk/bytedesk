@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-09 16:34:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:48:54
+ * @LastEditTime: 2024-06-14 13:20:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,8 +56,11 @@ public class ThreadLog extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // @Column(unique = true, nullable = false)
-    // private String tid;
+    // @NotBlank
+    // private String title;
+
+    // @NotBlank
+    // private String avatar;
 
     /**
      * used to push message
@@ -65,6 +69,7 @@ public class ThreadLog extends BaseEntity {
      * agent_aid + '/' + visitor_vid
      * such as: wid/vid or aid/vid
      */
+    @NotBlank
     private String topic;
 
     @Builder.Default

@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
-// import com.bytedesk.socket.service.MessageSocketService;
+import com.bytedesk.core.socket.service.MessageJsonService;
+// import com.bytedesk.core.socket.service.MessageSocketService;
 import com.bytedesk.local.caffeine.CaffeineCacheService;
 import com.bytedesk.service.thread_log.ThreadLogService;
-import com.bytedesk.socket.service.MessageJsonService;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class QuartzFiveSecondListener implements ApplicationListener<QuartzFiveS
         threadLogService.autoCloseThread();
         // auto outdate code
         pushService.autoOutdateCode();
-        // 
+        //
         String json = cacheService.getFirst();
         if (json == null) {
             return;

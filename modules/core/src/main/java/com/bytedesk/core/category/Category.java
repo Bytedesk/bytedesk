@@ -51,6 +51,7 @@ public class Category extends BaseEntity {
 
     // private String description;
 
+    // this category type may be user defined, so it should not be enum
     @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
 
@@ -59,9 +60,6 @@ public class Category extends BaseEntity {
     // @Column(unique = true)
     // private String path;
 
-    /**
-     * 排序
-     */
     @Builder.Default
     private int orderNo = 0;
 

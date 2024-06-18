@@ -46,9 +46,11 @@ public class MessageService {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
-        Specification<Message> specs = MessageSpecs.search(request);
+        Specification<Message> specs = MessageSpecification.search(request);
         Page<Message> messagePage = messageRepository.findAll(specs, pageable);
-        // Page<Message> messagePage = messageRepository.findByOrgUidAndDeleted(request.getOrgUid(), false, pageable);
+        // Page<Message> messagePage =
+        // messageRepository.findByOrgUidAndDeleted(request.getOrgUid(), false,
+        // pageable);
 
         return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
