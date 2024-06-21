@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-18 15:49:15
+ * @LastEditTime: 2024-06-21 09:08:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -122,7 +122,7 @@ h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 | :----------: | :----------: | :----------:  | :----------: |
 | <img src="./images/visitor-web/iframe-width.png" width="250"> | <img src="./images/visitor-web/chat-full.png" width="250"> | <img src="./images/visitor-web/chat-iframe.png" width="250"> | <img src="./images/visitor-web/chat-embed.png" width="250"> |
 
-## Customer Service Visitor SDK
+## Chat SDK
 
 <!-- - [iOS-oc](./visitor/oc)
 - [iOS-swift](./visitor/swift)
