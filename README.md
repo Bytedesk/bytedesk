@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 09:08:50
+ * @LastEditTime: 2024-06-21 18:22:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,25 +69,26 @@ git clone https://github.com/Bytedesk/bytedesk.git
 # use maven && vscode
 cd bytedesk
 mvn install -Dmaven.test.skip=true
+# protobuf is used to generate java code, you may need to install protobuf on your machine
 # 
 cd bytedesk/starter
 mvn spring-boot:run
 # release jar:
 cd bytedesk/starter
 mvn package -Dmaven.test.skip=true
-java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
 # background run:
-# nohup java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+# nohup java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
 # 
 # local preview:
-developer: http://localhost:9003/dev
-web: http://localhost:9003/
-admin: http://localhost:9003/admin, user/password: admin@email.com/admin
-agent: http://localhost:9003/agent, user/password: admin@email.com/admin
-chat: http://localhost:9003/chat?t=0&sid=default_agent_uid&
-api docs: http://localhost:9003/swagger-ui/index.html
-actuator: http://localhost:9003/actuator
-h2-console: http://localhost:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
+developer: http://127.0.0.1:9003/dev
+web: http://127.0.0.1:9003/
+admin: http://127.0.0.1:9003/admin, user/password: admin@email.com/admin
+agent: http://127.0.0.1:9003/agent, user/password: admin@email.com/admin
+chat: http://127.0.0.1:9003/chat?t=0&sid=default_agent_uid&
+api docs: http://127.0.0.1:9003/swagger-ui/index.html
+actuator: http://127.0.0.1:9003/actuator
+h2-console: http://127.0.0.1:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
 ```
 
 ## Docs

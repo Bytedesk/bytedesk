@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 09:08:58
+ * @LastEditTime: 2024-06-21 18:22:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,25 +68,26 @@ git clone https://github.com/Bytedesk/bytedesk.git
 # use maven && vscode
 cd bytedesk
 mvn install -Dmaven.test.skip=true
+# 项目使用了protobuf，可能需要安装 protobuf 编译工具
 # 
 cd bytedesk/starter
 mvn spring-boot:run
 # 打包jar并运行:
 cd bytedesk/starter
 mvn package -Dmaven.test.skip=true
-java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
 # 后台运行
-nohup java -jar bytedesk-starter-0.0.1-SNAPSHOT.jar
+nohup java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
 # 
 # 本地预览
-开发者入口: http://localhost:9003/dev
-web: http://localhost:9003/
-管理后台: http://localhost:9003/admin, 用户名: admin@email.com, 密码: admin
-客服端: http://localhost:9003/agent, 用户名: admin@email.com, 密码: admin
-访客: http://localhost:9003/chat?t=0&sid=default_agent_uid&
-api文档: http://localhost:9003/swagger-ui/index.html
-actuator: http://localhost:9003/actuator
-h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
+开发者入口: http://127.0.0.1:9003/dev
+web: http://127.0.0.1:9003/
+管理后台: http://127.0.0.1:9003/admin, 用户名: admin@email.com, 密码: admin
+客服端: http://127.0.0.1:9003/agent, 用户名: admin@email.com, 密码: admin
+访客: http://127.0.0.1:9003/chat?t=0&sid=default_agent_uid&
+api文档: http://127.0.0.1:9003/swagger-ui/index.html
+actuator: http://127.0.0.1:9003/actuator
+h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
 ```
 
 ## 文档
@@ -144,7 +145,7 @@ h2数据库: http://localhost:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 - [Browser-Extension](https://github.com/Bytedesk/bytedesk-browser-extention)
 - [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin)
 
-## 客户端&客服端
+## 客户端
 
 - [Windows](https://www.weiyuai.cn/download.html)
 - [Mac](https://www.weiyuai.cn/download.html)
