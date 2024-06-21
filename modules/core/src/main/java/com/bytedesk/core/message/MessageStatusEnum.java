@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:33:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 11:19:54
+ * @LastEditTime: 2024-06-21 17:25:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,12 +15,12 @@
 package com.bytedesk.core.message;
 
 public enum MessageStatusEnum {
-    PENDING, // 发送中
-    ERROR, // 发送失败
-    SENT, // 发送成功
-    RECALL, // 撤回
-    DELIVERED, // 已送达
-    READ, // 已读
-    DESTROYED, // 已销毁
-    LEAVE_MSG, // 离线留言
+    PENDING, // sending
+    FAILED, // send failed
+    SUCCESS, // send success
+    RECALL, // recall back
+    DELIVERED, // send to the other client
+    READ, // read by the other client
+    DESTROYED, // destroyed after read
+    // LEAVE_MSG, // leave message
 }

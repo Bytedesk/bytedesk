@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:31:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:44:36
+ * @LastEditTime: 2024-06-20 18:10:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,11 +20,14 @@ import org.hibernate.type.SqlTypes;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -78,6 +81,9 @@ public class Action extends BaseEntity {
 
     private String orgUid;
 
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private String platform = BdConstants.PLATFORM_BYTEDESK;
+    private PlatformEnum platform = PlatformEnum.BYTEDESK;
+
+    
 }

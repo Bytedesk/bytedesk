@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 // @Slf4j
 @RestController
@@ -52,9 +52,10 @@ public class MessageController {
     }
 
     /**
-     * TODO: 
+     * TODO:
      * 1. 判断是否有更新，如果有，则读取缓存
      * 2. 如果没有更新，则返回提示：无需更新
+     * 
      * @return json
      */
     @GetMapping("/query")
@@ -64,10 +65,5 @@ public class MessageController {
         //
         return ResponseEntity.ok(JsonResult.success(messagePage));
     }
-
-
-    
-
-
 
 }

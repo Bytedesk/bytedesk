@@ -14,7 +14,8 @@
     <a href="/agent" target="_blank">客服端</a><br/>
     <h3>访客</h3>
     <a href="/chat?t=0&sid=default_agent_uid&" target="_blank">访客端</a><br/>
-     <a href="/iframe?t=0&sid=default_agent_uid&" target="_blank">访客端-iframe</a><br/>
+    <a href="/frame?t=0&sid=default_agent_uid&" target="_blank">访客端-iframe</a><br/>
+    <a href="/float?t=0&sid=default_agent_uid&" target="_blank">访客端-float</a><br/>
     <h3>开发</h3>
     <a href="/swagger-ui/index.html" target="_blank">api</a><br/>
     <a href="/actuator" target="_blank">监控</a>

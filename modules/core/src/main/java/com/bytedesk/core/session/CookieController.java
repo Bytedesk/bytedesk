@@ -41,19 +41,19 @@ public class CookieController {
 
     /**
      * v_vid = visitor_vid
-     * http://localhost:9003/cookie/
+     * http://127.0.0.1:9003/cookie/
      * 
      * @param username
      * @return
      */
     @GetMapping("/")
     public ResponseEntity<?> getCookie(@CookieValue(value = "v_vid", defaultValue = "no vid") String vid) {
-        
+
         return ResponseEntity.ok(JsonResult.success("get cookie", 200, vid));
     }
 
     /**
-     * http://localhost:9003/cookie/set
+     * http://127.0.0.1:9003/cookie/set
      * 
      * @param response
      * @return
@@ -67,14 +67,14 @@ public class CookieController {
         // cookie.setHttpOnly(true);
         cookie.setPath("/");
 
-        //add cookie to response
+        // add cookie to response
         response.addCookie(cookie);
 
         return ResponseEntity.ok(JsonResult.success("visitor vid is changed"));
     }
 
     /**
-     * http://localhost:9003/cookie/all
+     * http://127.0.0.1:9003/cookie/all
      * 
      * @param request
      * @return
@@ -88,17 +88,17 @@ public class CookieController {
 
             Arrays.stream(cookies).forEach(c -> {
                 jsonObject.put(c.getName(), c.getValue());
-            });;
-            
+            });
+            ;
+
             return ResponseEntity.ok(JsonResult.success(jsonObject));
         }
 
         return ResponseEntity.ok(JsonResult.success("no cookies"));
     }
 
-
     /**
-     * http://localhost:9003/cookie/delete
+     * http://127.0.0.1:9003/cookie/delete
      * 
      * @param request
      * @param response
@@ -114,6 +114,5 @@ public class CookieController {
 
         return ResponseEntity.ok(JsonResult.success("cookie is deleted!"));
     }
-    
-    
+
 }

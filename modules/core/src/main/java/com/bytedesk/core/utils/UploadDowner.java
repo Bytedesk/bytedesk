@@ -35,11 +35,11 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/file")
 public class UploadDowner {
 
-    private final UploadService uploadService;
+	private final UploadService uploadService;
 
-	/**  
+	/**
 	 * 浏览器下载文件，或放到 <img src> 标签中在线展示
-	 * http://localhost:9003/file/20240319162820_img-service2.png
+	 * http://127.0.0.1:9003/file/20240319162820_img-service2.png
 	 * 
 	 * @param filename
 	 * @return
@@ -56,6 +56,5 @@ public class UploadDowner {
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"" + file.getFilename() + "\"").body(file);
 	}
-
 
 }

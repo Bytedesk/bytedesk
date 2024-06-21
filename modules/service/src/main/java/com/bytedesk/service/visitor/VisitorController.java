@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * anonymous api, no need to login
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @Slf4j
 @RestController
@@ -62,7 +62,7 @@ public class VisitorController {
      * 
      * considering multi request from different clients, including ios/android/web,
      * apis should not use cookies which is specific to web browsers
-     * http://localhost:9003/visitor/api/v1/init
+     * http://127.0.0.1:9003/visitor/api/v1/init
      * 
      * @param visitorRequest
      * @return
@@ -134,7 +134,7 @@ public class VisitorController {
      */
     @PostMapping("/message/send")
     public ResponseEntity<?> sendOfflineMessage(@RequestBody Map<String, String> map) {
-        // 
+        //
         String json = (String) map.get("json");
         log.debug("json {}", json);
         stompMqService.sendMessageToMq(json);
@@ -144,14 +144,13 @@ public class VisitorController {
 
     @PostMapping("/quickbutton/send")
     public ResponseEntity<?> quickButtonMessage() {
-        // 
+        //
 
         return ResponseEntity.ok(JsonResult.success("test success"));
     }
 
     @PostMapping("/faq/send")
     public ResponseEntity<?> faqMessage() {
-
 
         return ResponseEntity.ok(JsonResult.success("test success"));
     }

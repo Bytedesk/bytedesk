@@ -53,7 +53,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	// https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
 	implementation 'org.springframework.session:spring-session-data-redis'
-	// http://localhost:9003/actuator
+	// http://127.0.0.1:9003/actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -72,8 +72,8 @@ dependencies {
 	// for api docs
 	// https://springdoc.org/
 	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
-	// http://localhost:9003/swagger-ui/index.html
-	// http://localhost:9003/v3/api-docs
+	// http://127.0.0.1:9003/swagger-ui/index.html
+	// http://127.0.0.1:9003/v3/api-docs
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
 	// 

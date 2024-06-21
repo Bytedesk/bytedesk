@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 17:33:00
+ * @LastEditTime: 2024-06-21 14:21:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,8 +29,10 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -47,7 +49,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
 
     private final UidUtils uidUtils;
 
-    public List<CategoryResponse> findByNullParent(String platform) {
+    public List<CategoryResponse> findByNullParent(PlatformEnum platform) {
         // 一级分类
         List<Category> firstCategoriesList = categoryRepository.findByParentAndPlatformOrderByOrderNoAsc(null,
                 platform);
@@ -62,7 +64,6 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
                 category.setChildren(secondCategoriesSet);
             }
         }
-
         return convertToResponseList(firstCategoriesList);
     }
 
@@ -95,6 +96,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
 
         Category category = modelMapper.map(request, Category.class);
         category.setUid(uidUtils.getCacheSerialUid());
+        category.setPlatform(PlatformEnum.fromValue(request.getPlatform()));
 
         Category newCategory = save(category);
         if (newCategory == null) {
@@ -104,8 +106,14 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         return convertToResponse(newCategory);
     }
 
-    public Optional<Category> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid, String platform) {
+    public Optional<Category> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid,
+            PlatformEnum platform) {
         return categoryRepository.findByNameAndTypeAndOrgUidAndPlatform(name, type, orgUid, platform);
+    }
+    
+    public Optional<Category> findByNameAndTypeAndLevelAndPlatform(String name, String type, LevelEnum level,
+            PlatformEnum platform) {
+        return categoryRepository.findByNameAndTypeAndLevelAndPlatform(name, type, level, platform);
     }
 
     @Override
@@ -175,51 +183,53 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         return list.stream().map(city -> convertToResponse(city)).collect(Collectors.toList());
     }
 
-    // public Set<CategoryResponse> convertToResponseSet(Set<Category> set) {
-    //     return set.stream().map(city -> convertToResponse(city)).collect(Collectors.toSet());
-    // }
-
-    // 
-    // public Boolean existsByPlatform(String platform) {
-    //     return categoryRepository.existsByPlatform(platform);
-    // }
-
     // 
     public void initData() {
         if (categoryRepository.count() > 0) {
             return;
         }
 
-        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        // String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
         // init quick reply categories
         CategoryRequest categoryContact = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
-                .orgUid(orgUid)
+                .orderNo(0)
+                .level(LevelEnum.PLATFORM)
+                .platform(BdConstants.PLATFORM_BYTEDESK)
+                // .orgUid(orgUid)
                 .build();
         categoryContact.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
         create(categoryContact);
 
         CategoryRequest categoryThanks = CategoryRequest.builder()
-            .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
-                .orgUid(orgUid)
+                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
+                .orderNo(1)
+                .level(LevelEnum.PLATFORM)
+                .platform(BdConstants.PLATFORM_BYTEDESK)
+                // .orgUid(orgUid)
                 .build();
         categoryThanks.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
         create(categoryThanks);
 
         CategoryRequest categoryWelcome = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
-                .orgUid(orgUid)
+                .orderNo(2)
+                // .orgUid(orgUid)
+                .level(LevelEnum.PLATFORM)
+                .platform(BdConstants.PLATFORM_BYTEDESK)
                 .build();
         categoryWelcome.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
         create(categoryWelcome);
 
         CategoryRequest categoryBye = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
-                .orgUid(orgUid)
+                .orderNo(3)
+                // .orgUid(orgUid)
+                .level(LevelEnum.PLATFORM)
+                .platform(BdConstants.PLATFORM_BYTEDESK)
                 .build();
         categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
         create(categoryBye);
-
     }
 
 

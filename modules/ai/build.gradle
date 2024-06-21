@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.bytedesk'
-version = '0.0.1-SNAPSHOT'
+version = '0.2.3-BYTEDESK'
 
 java {
 	sourceCompatibility = '17'
@@ -26,8 +26,8 @@ dependencies {
 	// for api docs
 	// https://springdoc.org/
 	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
-	// http://localhost:9003/swagger-ui/index.html
-	// http://localhost:9003/v3/api-docs
+	// http://127.0.0.1:9003/swagger-ui/index.html
+	// http://127.0.0.1:9003/v3/api-docs
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 	// 
 	compileOnly 'org.projectlombok:lombok'

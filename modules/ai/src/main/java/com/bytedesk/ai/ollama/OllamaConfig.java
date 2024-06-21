@@ -30,7 +30,7 @@ public class OllamaConfig {
 
     @Bean
     OllamaApi ollamaApi() {
-        return new OllamaApi("http://localhost:11434");
+        return new OllamaApi("http://127.0.0.1:11434");
     }
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
@@ -54,6 +54,5 @@ public class OllamaConfig {
     OllamaEmbeddingModel ollamaEmbeddingModel() {
         return new OllamaEmbeddingModel(ollamaApi());
     }
-    
 
 }

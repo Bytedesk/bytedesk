@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * https://docs.spring.io/spring-session/reference/guides/boot-redis.html
  * 
- * @description 
+ * @description
  * @author jackning
  * @date 2024-04-05 00:15:55
  */
@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SessionController {
 
     /**
-     * http://localhost:9003/session/
+     * http://127.0.0.1:9003/session/
      * 
      * @param session
      * @return
@@ -49,21 +49,21 @@ public class SessionController {
     @GetMapping("/")
     public ResponseEntity<?> getSession(HttpSession session) {
         log.info("sessionId:[{}]", session.getId());
-        // 
+        //
         String username = (String) session.getAttribute("username");
         if (username == null) {
             return ResponseEntity.ok(JsonResult.error("session is null"));
         }
-        // 
+        //
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("username", username);
         jsonObject.put("sessionId", session.getId());
-        // 
+        //
         return ResponseEntity.ok(JsonResult.success(jsonObject));
     }
 
     /**
-     * http://localhost:9003/session/set?username=chrome
+     * http://127.0.0.1:9003/session/set?username=chrome
      * 
      * @param username
      * @param session
@@ -72,14 +72,14 @@ public class SessionController {
     @GetMapping("/set")
     public ResponseEntity<?> setSession(@RequestParam String username, HttpSession session) {
         log.info("sessionId:[{}]", session.getId());
-        // 
+        //
         session.setAttribute("username", username);
-        // 
+        //
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("username", username);
         jsonObject.put("sessionId", session.getId());
 
         return ResponseEntity.ok(JsonResult.success(jsonObject));
     }
-    
+
 }

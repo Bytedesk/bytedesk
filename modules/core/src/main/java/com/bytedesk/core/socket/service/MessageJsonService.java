@@ -100,7 +100,7 @@ public class MessageJsonService {
 
         Message message = modelMapper.map(messageResponse, Message.class);
         // message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
-        message.setStatus(MessageStatusEnum.SENT);
+        message.setStatus(MessageStatusEnum.SUCCESS);
         message.getThreads().add(thread);
         message.setUser(JSON.toJSONString(messageResponse.getUser()));
         message.setOrgUid(thread.getOrgUid());

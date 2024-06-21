@@ -42,19 +42,20 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/visitor/api/v1/ai/ollama")
 @AllArgsConstructor
 public class OllamaController {
-    
+
     private final OllamaEmbeddingModel ollamaEmbeddingModel;
 
     private final ChatClient chatClient;
 
     private final OllamaChatModel chatModel;
 
-    // public OllamaController(EmbeddingModel embeddingModel, ChatClient.Builder chatClientbBuilder) {
-    //     this.embeddingModel = embeddingModel;
-    //     this.chatClient = chatClientbBuilder.build();
+    // public OllamaController(EmbeddingModel embeddingModel, ChatClient.Builder
+    // chatClientbBuilder) {
+    // this.embeddingModel = embeddingModel;
+    // this.chatClient = chatClientbBuilder.build();
     // }
 
-    // http://localhost:9003/visitor/api/v1/ai/ollama/chat?input=hello
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/chat?input=hello
     @GetMapping("/chat")
     public ResponseEntity<?> generation(@RequestParam("input") String input) {
         String content = this.chatClient.prompt()
@@ -64,36 +65,39 @@ public class OllamaController {
         return ResponseEntity.ok(JsonResult.success(content));
     }
 
-    // http://localhost:9003/visitor/api/v1/ai/ollama/simple
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/simple
     @GetMapping("/simple")
     public Map<String, String> completion(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         return Map.of("completion", chatClient.prompt().user(message).call().content());
     }
 
-    // http://localhost:9003/visitor/api/v1/ai/ollama/generate
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/generate
     @GetMapping("/generate")
     public Map<?, ?> generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         return Map.of("generation", chatModel.call(message));
     }
 
-    // http://localhost:9003/visitor/api/v1/ai/ollama/generateStream
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/generateStream
     @GetMapping("/generateStream")
-	public Flux<ChatResponse> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+    public Flux<ChatResponse> generateStream(
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
         return chatModel.stream(prompt);
     }
 
     /*
-     * http://localhost:9003/visitor/api/v1/ai/ollama/embedding
+     * http://127.0.0.1:9003/visitor/api/v1/ai/ollama/embedding
      */
     @GetMapping("/embedding")
     public Map<?, ?> embed(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        // EmbeddingResponse embeddingResponse = embeddingModel.embedForResponse(List.of(message));
-        // 
-        EmbeddingResponse embeddingResponse = ollamaEmbeddingModel.call(new EmbeddingRequest(List.of("Hello World", "World is big and salvation is near"),
-                OllamaOptions.create().withModel("qwen:7b")));
-        
+        // EmbeddingResponse embeddingResponse =
+        // embeddingModel.embedForResponse(List.of(message));
+        //
+        EmbeddingResponse embeddingResponse = ollamaEmbeddingModel
+                .call(new EmbeddingRequest(List.of("Hello World", "World is big and salvation is near"),
+                        OllamaOptions.create().withModel("qwen:7b")));
+
         return Map.of("embedding", embeddingResponse);
     }
 }

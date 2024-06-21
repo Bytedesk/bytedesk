@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:40:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-23 23:37:53
+ * @LastEditTime: 2024-06-20 18:11:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@
 package com.bytedesk.core.action;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.enums.PlatformEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,5 +50,5 @@ public class ActionRequest extends BaseRequest {
     private String nickname;
 
     @Builder.Default
-    private String platform = BdConstants.PLATFORM_BYTEDESK;
+    private PlatformEnum platform = PlatformEnum.BYTEDESK;
 }

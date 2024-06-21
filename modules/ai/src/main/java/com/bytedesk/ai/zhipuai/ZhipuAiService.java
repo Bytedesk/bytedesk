@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 10:28:33
+ * @LastEditTime: 2024-06-21 17:26:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,7 +90,7 @@ public class ZhipuAiService {
         String messageUid = uidUtils.getCacheSerialUid();
         Message message = Message.builder()
                 .type(MessageTypeEnum.ROBOT_QA)
-                .status(MessageStatusEnum.SENT)
+                .status(MessageStatusEnum.SUCCESS)
                 .client(ClientEnum.SYSTEM)
                 .orgUid(thread.getOrgUid())
                 .user(JSON.toJSONString(user))

@@ -38,6 +38,8 @@ public class QuickReplyResponse extends BaseResponse {
 
     private String type;
 
+    private String level;
+
     private CategoryResponse category;
     
     private String orgUid;

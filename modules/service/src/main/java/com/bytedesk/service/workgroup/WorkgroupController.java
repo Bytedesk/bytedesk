@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @AllArgsConstructor
@@ -101,6 +101,5 @@ public class WorkgroupController {
         //
         return ResponseEntity.ok(JsonResult.success(workgroupRequest));
     }
-
 
 }

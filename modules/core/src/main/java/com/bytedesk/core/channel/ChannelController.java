@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @RequiredArgsConstructor
@@ -50,6 +50,4 @@ public class ChannelController {
         return ResponseEntity.ok(JsonResult.success(channelPage));
     }
 
- 
-    
 }

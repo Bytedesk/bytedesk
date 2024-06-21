@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 11:29:48
+ * @LastEditTime: 2024-06-20 10:25:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +39,7 @@ import com.bytedesk.core.rbac.user.User.Sex;
 public class UserResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
-
+    // 
     private String username;
     private String nickname;
     private String email;
@@ -54,7 +55,6 @@ public class UserResponse extends BaseResponse {
     private Boolean mobileVerified;
     //
     private OrganizationResponse currentOrganization;
-
     private Set<UserOrganizationRoleResponse> userOrganizationRoles;
 
     // used by other plafroms other than bytedesk, like liangshibao/tiku/zhaobiao
@@ -62,7 +62,8 @@ public class UserResponse extends BaseResponse {
     //
     // @Builder.Default
     // private Set<RoleResponse> roles = new HashSet<>();
-
     // @Builder.Default
     // private Set<String> organizations = new HashSet<>();
+
+    private Date createdAt;
 }

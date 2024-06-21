@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:42:00
+ * @LastEditTime: 2024-06-20 16:26:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,9 @@ package com.bytedesk.service.quick_reply;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.category.Category;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -56,9 +58,19 @@ public class QuickReply extends BaseEntity {
     // private String type;
     private MessageTypeEnum type = MessageTypeEnum.TEXT;
 
+    @Builder.Default
+    private LevelEnum level = LevelEnum.ORGNIZATION;
+
     @JsonIgnore
     @ManyToOne
     private Category category;
-
+    
+    // belongs to org
     private String orgUid;
+
+    // added by user
+    @JsonIgnore
+    @ManyToOne
+    private User user;
+
 }

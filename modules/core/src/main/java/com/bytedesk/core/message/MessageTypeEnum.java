@@ -15,19 +15,20 @@
 package com.bytedesk.core.message;
 
 public enum MessageTypeEnum {
-    TEXT("text"), // 0.文本
-    IMAGE("image"), // 1.图片
-    FILE("file"), // 2.文件
-    VOICE("voice"), // 3.语音
-    VIDEO("video"), // 4.视频
-    THREAD("thread"), // 5.新会话
-    TYPING("typing"), // 6.正在输入
-    RECALL("recall"), // 7.撤回
-    RECEIPT("receipt"), // 8.消息回执
-    ROBOT_QA("robot_qa"), // 9.机器人问答
-    QUICKBUTTON_QA("quickbutton_qa"), // 10.快捷按钮问答
-    QUICKBUTTON_URL("quickbutton_url"), // 11.快捷按钮URL
-    FAQ_QA("faq_qa"); // 12.常见问题问答
+    TEXT("text"), 
+    IMAGE("image"),
+    FILE("file"),
+    VOICE("voice"), 
+    VIDEO("video"), 
+    THREAD("thread"),
+    TYPING("typing"), 
+    RECALL("recall"), 
+    RECEIPT("receipt"), 
+    ROBOT_QA("robot_qa"), 
+    QUICKBUTTON_QA("quickbutton_qa"), 
+    QUICKBUTTON_URL("quickbutton_url"),
+    FAQ_QA("faq_qa"),
+    RATE_INVITE("rate_invite"); 
 
     private final String value;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 21:19:37
+ * @LastEditTime: 2024-06-20 11:53:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,15 +14,18 @@
  */
 package com.bytedesk.core.exception;
 
-import org.apache.coyote.BadRequestException;
+import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
+// import org.apache.coyote.BadRequestException; // tomcat
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.extern.slf4j.Slf4j;
@@ -83,9 +86,12 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error(
-                        e.getMessage(),
-                404));
+        // 
+        if (e.getMessage().contains("/vip/")) {
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
+        }
+        // 
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage(),404));
         // // 如果你确定要进行后端跳转，并且你的应用支持这种做法，你可以使用以下方式：
         // String redirectUrl = "/error/404.html";
         // // 使用HttpStatus.SEE_OTHER（303）来表示重定向
@@ -108,10 +114,16 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(JsonResult.error("Null Pointer Exception"));
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    // @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
-        return ResponseEntity.badRequest().body(JsonResult.error("Bad request Exception"));
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error("Response Status Exception"));
+    }
+
+    // org.eclipse.jetty.websocket.api.exceptions.WebSocketTimeoutException: Connection Idle Timeout
+    // java.util.concurrent.TimeoutException: Idle timeout expired: 30004/30000 ms
+    @ExceptionHandler(WebSocketTimeoutException.class)
+    public ResponseEntity<?> handleWebSocketTimeoutException(WebSocketTimeoutException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error("TODO: jetty Websocket Timeout Exception"));
     }
 
     @ExceptionHandler(Exception.class)

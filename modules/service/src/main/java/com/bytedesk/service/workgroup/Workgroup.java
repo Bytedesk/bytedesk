@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 14:09:26
+ * @LastEditTime: 2024-06-21 09:56:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -77,7 +77,7 @@ public class Workgroup extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_recent")
-    private Boolean recent = false;
+    private boolean recent = false;
 
     @Embedded
     @Builder.Default
@@ -134,7 +134,7 @@ public class Workgroup extends BaseEntity {
 
         if (routeType.equals(WorkgroupRouteEnum.ROBIN)) {
 
-            return assignAgentByRobin();
+            // return assignAgentByRobin();
 
         } else if (routeType.equals(WorkgroupRouteEnum.AVERAGE)) {
 

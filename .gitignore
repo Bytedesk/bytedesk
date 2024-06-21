@@ -27,6 +27,8 @@ h2db/
 application-prod.properties
 application-dev-mysql.properties
 application-dev-pg.properties
+application-prod-pg.properties
+application-prod-mysql.properties
 projects/*
 liangshibao/*
 tiku/*

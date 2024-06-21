@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @AllArgsConstructor
@@ -91,7 +91,7 @@ public class ThreadController extends BaseController<ThreadRequest> {
 
     @PostMapping("/close")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
-        
+
         ThreadResponse threadResponse = threadService.close(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
@@ -110,9 +110,9 @@ public class ThreadController extends BaseController<ThreadRequest> {
 
         // query data to export
         Page<ThreadResponse> threadPage = threadService.queryByOrg(pageParam);
-        
+
         try {
-            // 
+            //
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
@@ -126,16 +126,16 @@ public class ThreadController extends BaseController<ThreadRequest> {
 
             // write to excel
             EasyExcel.write(response.getOutputStream(), ThreadExcel.class)
-                .autoCloseStream(Boolean.FALSE)
-                .sheet("Thread")
-                .doWrite(excelList);
-        
+                    .autoCloseStream(Boolean.FALSE)
+                    .sheet("Thread")
+                    .doWrite(excelList);
+
         } catch (Exception e) {
             // reset response
             response.reset();
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
-            // 
+            //
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("status", "failure");
             jsonObject.put("message", "download faied " + e.getMessage());
@@ -149,5 +149,4 @@ public class ThreadController extends BaseController<ThreadRequest> {
         return "";
     }
 
-    
 }

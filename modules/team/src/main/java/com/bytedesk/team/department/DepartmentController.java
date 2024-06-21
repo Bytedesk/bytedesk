@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @RequiredArgsConstructor
@@ -97,6 +97,5 @@ public class DepartmentController {
 
         return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
     }
-
 
 }
