@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @Slf4j
 @Tag(name = "hello - 测试")
@@ -46,13 +46,13 @@ public class HelloController {
 
 	Counter visitCounter;
 
-    public HelloController(MeterRegistry registry) {
-        visitCounter = Counter.builder("visit_counter")
-            .description("Number of visits to the site")
-            .register(registry);
-    }
+	public HelloController(MeterRegistry registry) {
+		visitCounter = Counter.builder("visit_counter")
+				.description("Number of visits to the site")
+				.register(registry);
+	}
 
-	// http://localhost:9003/hello
+	// http://127.0.0.1:9003/hello
 	@GetMapping("")
 	@Operation(summary = "hello world test")
 	public Map<String, Object> greeting() {
@@ -65,10 +65,10 @@ public class HelloController {
 		return Collections.singletonMap("message", "Hello, World");
 	}
 
-	// http://localhost:9003/hello/visits
+	// http://127.0.0.1:9003/hello/visits
 	@GetMapping("/visits")
 	public ResponseEntity<?> visitCount() {
-		return ResponseEntity.ok(JsonResult.success("visitor counts",visitCounter.count()));
+		return ResponseEntity.ok(JsonResult.success("visitor counts", visitCounter.count()));
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class HelloController {
 
 	/**
 	 * get server host ip
-	 * http://localhost:9003/hello/host
+	 * http://127.0.0.1:9003/hello/host
 	 * 
 	 * @return
 	 */
@@ -128,19 +128,23 @@ public class HelloController {
 	// private static final String template = "Hello, %s!";
 	// private final AtomicLong counter = new AtomicLong();
 
-	// // http://localhost:9003/greeting
-	// @CrossOrigin(origins = "http://localhost:9000")
+	// // http://127.0.0.1:9003/greeting
+	// @CrossOrigin(origins = "http://127.0.0.1:9000")
 	// @GetMapping("/greeting")
-	// public Greeting greeting(@RequestParam(required = false, defaultValue = "World") String name) {
-	// 	log.info("==== get greeting ====");
-	// 	return new Greeting(counter.incrementAndGet(), String.format(template, name));
+	// public Greeting greeting(@RequestParam(required = false, defaultValue =
+	// "World") String name) {
+	// log.info("==== get greeting ====");
+	// return new Greeting(counter.incrementAndGet(), String.format(template,
+	// name));
 	// }
 
-	// // http://localhost:9003/greeting-javaconfig
+	// // http://127.0.0.1:9003/greeting-javaconfig
 	// @GetMapping("/greeting-javaconfig")
-	// public Greeting greetingWithJavaconfig(@RequestParam(required = false, defaultValue = "World") String name) {
-	// 	log.info("==== in greeting ====");
-	// 	return new Greeting(counter.incrementAndGet(), String.format(template, name));
+	// public Greeting greetingWithJavaconfig(@RequestParam(required = false,
+	// defaultValue = "World") String name) {
+	// log.info("==== in greeting ====");
+	// return new Greeting(counter.incrementAndGet(), String.format(template,
+	// name));
 	// }
 
 }

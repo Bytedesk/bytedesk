@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-18 11:26:26
+ * @LastEditTime: 2024-06-20 17:24:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,9 @@ package com.bytedesk.core.tag;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.bytedesk.core.enums.PlatformEnum;
+
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
-    Boolean existsByPlatform(String platform);
+    Boolean existsByPlatform(PlatformEnum platform);
 }

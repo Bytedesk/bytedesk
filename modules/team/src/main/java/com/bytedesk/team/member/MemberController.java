@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  * https://www.bezkoder.com/swagger-3-annotations/#Swagger_3_annotations
  */
 @RestController
@@ -64,10 +64,11 @@ public class MemberController {
      */
     // @GetMapping("/query/dept")
     // public ResponseEntity<?> queryByDepartments(MemberRequest memberRequest) {
-    //     //
-    //     Page<MemberResponse> memberResponse = memberService.queryByDepartments(memberRequest);
-    //     //
-    //     return ResponseEntity.ok(JsonResult.success(memberResponse));
+    // //
+    // Page<MemberResponse> memberResponse =
+    // memberService.queryByDepartments(memberRequest);
+    // //
+    // return ResponseEntity.ok(JsonResult.success(memberResponse));
     // }
 
     @GetMapping("/query")

@@ -58,7 +58,7 @@ public class ZhipuAiController {
 
     private final ZhipuAiService zhipuAiService;
 
-    // http://localhost:9003/visitor/api/v1/zhipuai/chat
+    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/chat
     @GetMapping("/chat")
     public ResponseEntity<?> generation() {
         ChatResponse response = chatModel.call(
@@ -71,13 +71,13 @@ public class ZhipuAiController {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // http://localhost:9003/visitor/api/v1/zhipuai/generate?content=hello
+    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/generate?content=hello
     @GetMapping("/generate")
     public Map<?, ?> generate(@RequestParam(value = "content", defaultValue = "讲个笑话") String content) {
         return Map.of("generation", chatModel.call(content));
     }
 
-    // http://localhost:9003/visitor/api/v1/zhipuai/generateStream?content=讲个笑话
+    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/generateStream?content=讲个笑话
     @GetMapping("/generateStream")
     public Flux<ChatResponse> generateStream(
             @RequestParam(value = "content", defaultValue = "讲个笑话") String content) {
@@ -85,7 +85,7 @@ public class ZhipuAiController {
         return chatModel.stream(prompt);
     }
 
-    // http://localhost:9003/visitor/api/v1/zhipuai/image
+    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/image
     @GetMapping("/image")
     public ResponseEntity<?> image() {
         ImageResponse response = zhiPuAiImageModel.call(new ImagePrompt("A light cream colored mini golden doodle"));
@@ -95,7 +95,7 @@ public class ZhipuAiController {
     //
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    // http://localhost:9003/visitor/api/v1/zhipuai/sse?uid=&sid=&content=hi
+    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/sse?uid=&sid=&content=hi
     @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> sseEndpoint(
             @RequestParam(value = "uid", required = true) String uid,

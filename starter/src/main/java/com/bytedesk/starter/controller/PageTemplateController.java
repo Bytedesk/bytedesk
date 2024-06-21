@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
 
 /**
- * http://localhost:8011/swagger-ui/index.html
+ * http://127.0.0.1:8011/swagger-ui/index.html
  * 
  * @author
  */
@@ -41,7 +41,7 @@ public class PageTemplateController {
     /**
      * generate html static file
      * 模板静态化
-     * http://localhost:9003/temp/static
+     * http://127.0.0.1:9003/temp/static
      * 
      * @return
      */

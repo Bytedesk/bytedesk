@@ -11,6 +11,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,6 +20,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -104,8 +107,9 @@ public class User extends BaseEntity {
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
 
+	@Enumerated(EnumType.STRING)
 	@Builder.Default
-	private String platform = BdConstants.PLATFORM_BYTEDESK;
+	private PlatformEnum platform = PlatformEnum.BYTEDESK;
 
 	// @Builder.Default
 	// @ManyToMany(fetch = FetchType.EAGER)

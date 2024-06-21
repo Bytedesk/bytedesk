@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:15:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-08 00:08:19
+ * @LastEditTime: 2024-06-20 14:15:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,13 +24,13 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
-// @Slf4j
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/ip/api/v1")
@@ -39,7 +39,7 @@ public class IpController {
     private final IpService ipService;
     
     /**
-     * http://localhost:9003/ip/api/v1/
+     * http://127.0.0.1:9003/ip/api/v1/
      *
      * @return json
      */
@@ -50,7 +50,8 @@ public class IpController {
     }
 
     /**
-     * http://localhost:9003/ip/api/v1/location
+     * http://127.0.0.1:9003/ip/api/v1/location
+     * https://api.weiyuai.cn/ip/api/v1/location
      * location: "国家|区域|省份|城市|ISP"
      * location: "中国|0|湖北省|武汉市|联通"
      * 
@@ -72,7 +73,7 @@ public class IpController {
     }
 
     /**
-     * http://localhost:9003/ip/api/v1/ip/location?ip=103.46.244.251
+     * http://127.0.0.1:9003/ip/api/v1/ip/location?ip=103.46.244.251
      * 
      * @param request
      * @return
@@ -91,10 +92,38 @@ public class IpController {
         return new JsonResult<>("ip location", 200, jsonObject);
     }
 
+    // for testing
+    // http://127.0.0.1:9003/ip/api/v1/ip/province?ip=103.46.244.251
+    @GetMapping("/ip/province")
+    public JsonResult<?> ipProvince(@RequestParam String ip) {
+
+        // location: "国家|区域|省份|城市|ISP"
+        // location: "中国|0|湖北省|武汉市|联通"
+        // 0|0|0|内网IP|内网IP
+        String location = ipService.getIpLocation(ip);
+        // 
+        String[] locals = location.split("\\|");
+        log.info("locals {}", (Object[]) locals); // Cast to Object[] to confirm the non-varargs invocation
+        String province = "";
+        if (locals.length > 2) {
+            if (locals[2].equals("0")) {
+                province = "Local";
+            } else {
+                province = locals[2];
+            }
+        }
+        //
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ip", ip);
+        jsonObject.put("province", province);
+
+        return new JsonResult<>("ip nickname", 200, jsonObject);
+    }
+
     /**
      * comment out for safety reason
      * server host info
-     * http://localhost:9003/ip/api/v1/server
+     * http://127.0.0.1:9003/ip/api/v1/server
      * @return
      */
     // @GetMapping("/server")

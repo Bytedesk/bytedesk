@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:17:57
+ * @LastEditTime: 2024-06-21 11:12:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,6 +41,9 @@ public class BaseServiceSettingsResponse {
      * TODO: set different tips for different lang
      */
     private Boolean showTopTip = false;
+
+    // show rate btn on chat toolbar
+    private Boolean showRateBtn = false;
 
     private String topTip = I18Consts.I18N_TOP_TIP;
 

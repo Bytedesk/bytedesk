@@ -18,9 +18,12 @@ import java.util.Optional;
 
 // import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 // import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
+
+import com.bytedesk.core.enums.PlatformEnum;
 
 /**
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
@@ -30,20 +33,20 @@ import org.springframework.stereotype.Repository;
 // @RepositoryRestResource(exported = false)
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-
-    Optional<User> findByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
-
-    Optional<User> findByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
-
-    Optional<User> findByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     Optional<User> findByUid(String uid);
 
-    Boolean existsByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
+    Optional<User> findByEmailAndPlatformAndDeleted(String email, PlatformEnum platform, Boolean deleted);
 
-    Boolean existsByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
+    Optional<User> findByMobileAndPlatformAndDeleted(String mobile, PlatformEnum platform, Boolean deleted);
 
-    Boolean existsByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
+    Optional<User> findByUsernameAndPlatformAndDeleted(String username, PlatformEnum platform, Boolean deleted);
+
+    Boolean existsByUsernameAndPlatformAndDeleted(String username, PlatformEnum platform, Boolean deleted);
+
+    Boolean existsByMobileAndPlatformAndDeleted(String mobile, PlatformEnum platform, Boolean deleted);
+
+    Boolean existsByEmailAndPlatformAndDeleted(String email, PlatformEnum platform, Boolean deleted);
 
 }

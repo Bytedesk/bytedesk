@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 17:30:21
+ * @LastEditTime: 2024-06-21 14:23:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.service.quick_reply;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.enums.LevelEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +37,9 @@ public class QuickReplyRequest extends BaseRequest {
     // @Builder.Default
     // private String type;
     // private MessageTypeEnum type = MessageTypeEnum.TEXT;
+
+    @Builder.Default
+    private LevelEnum level = LevelEnum.ORGNIZATION;
 
     private String categoryUid;
 

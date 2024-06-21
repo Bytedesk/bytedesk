@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-04 12:07:11
+ * @LastEditTime: 2024-06-19 16:16:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,12 +27,12 @@ import io.netty.handler.codec.mqtt.MqttEncoder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import com.bytedesk.core.socket.mqtt.handler.MqttTransportHandler;
+import com.bytedesk.core.socket.mqtt.initializer.websocket.BinaryWebSocketFrameHandler;
+import com.bytedesk.core.socket.mqtt.initializer.websocket.ByteBufToWebSocketFrameEncoder;
+import com.bytedesk.core.socket.mqtt.initializer.websocket.ContinuationWebSocketFrameHandler;
+import com.bytedesk.core.socket.mqtt.initializer.websocket.TextWebSocketFrameHandler;
 import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
 import com.bytedesk.core.socket.mqtt.util.MqttConsts;
-import com.bytedesk.core.socket.mqtt.websocket.BinaryWebSocketFrameHandler;
-import com.bytedesk.core.socket.mqtt.websocket.ContinuationWebSocketFrameHandler;
-import com.bytedesk.core.socket.mqtt.websocket.ByteBufToWebSocketFrameEncoder;
-import com.bytedesk.core.socket.mqtt.websocket.TextWebSocketFrameHandler;
 
 /**
  * @author bytedesk.com on 2019-07-05

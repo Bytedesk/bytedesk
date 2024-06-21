@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 11:52:28
+ * @LastEditTime: 2024-06-20 18:10:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,13 +18,16 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -51,7 +54,7 @@ public class Category extends BaseEntity {
 
     // private String description;
 
-    // this category type may be user defined, so it should not be enum
+    // this category type may be user defined, so it should use string type, not enum
     @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     private String type;
 
@@ -74,7 +77,11 @@ public class Category extends BaseEntity {
     private List<Category> children = new ArrayList<>();
 
     @Builder.Default
-    private String platform = BdConstants.PLATFORM_BYTEDESK;
+    private LevelEnum level = LevelEnum.ORGNIZATION;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private PlatformEnum platform = PlatformEnum.BYTEDESK;
 
     /** belong to org */
     private String orgUid;

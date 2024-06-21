@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-17 12:53:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-23 23:34:16
+ * @LastEditTime: 2024-06-21 12:12:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.ip;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -33,24 +36,44 @@ public class IpInterceptor implements HandlerInterceptor {
     
     private final IpService ipService;
 
+    // 要拦截的IP列表
+    private static final List<String> BLACKLISTED_IPS = Arrays.asList(
+            "175.27.32.31",
+            "112.53.2.93"
+    // 可以根据需要动态配置这个列表，例如从数据库或配置文件中加载
+    );
+
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
         String ip = ipService.getIp(request);
+
+        // 检查IP是否在黑名单中
+        if (BLACKLISTED_IPS.contains(ip)) {
+            log.warn("Blocked IP address: {}", ip);
+            response.sendError(403, "Forbidden: IP address is blacklisted.");
+            return false;
+        }
+
         String ipLocation = ipService.getIpLocation(ip);
         log.info("IpInterceptor ip: {}, ipLocation {}", ip, ipLocation);
 
-        // TODO: blacklist check
-        // if (ipService.isIpInBlackList(ip)) {
-        //     response.sendError(403, "Forbidden");
-        //     return false;
-        // }
-
-        // TODO: restrict login ip, white ip list
-        
-
+        // 其他的拦截逻辑可以在这里添加，例如检查用户是否登录，或者请求是否包含某些参数等
 
         return true;
     }
+    
+    // @Override
+    // public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    //     // 在请求处理之后调用，但在视图渲染之前
+    // }
+
+    // @Override
+    // public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+    //         throws Exception {
+    //     // 在整个请求处理完毕之后调用，即视图渲染之后
+    // }
+    
 }

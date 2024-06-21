@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-24 16:29:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-18 15:37:32
+ * @LastEditTime: 2024-06-21 18:02:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="email=no">
   <title>微语</title>
-  <script type="module" crossorigin src="/chat/assets/index-Bnk-JrDk.js"></script>
+  <script type="module" crossorigin src="/chat/assets/index-_xJAQzp2.js"></script>
   <link rel="stylesheet" crossorigin href="/chat/assets/index-DanrKteA.css">
 </head>
 
@@ -36,6 +36,10 @@
   <!-- 默认输入框右侧图标不显示，需要添加下面js -->
   <script src="/chat/assets/js/0.3.5/sdk.js"></script>
   <script src="/chat/assets/js/2.0.2/index.js" async></script>
+  <script>
+    // for sockjs-client, global is not defined
+    // var global = window;
+  </script>
 </body>
 
 </html>

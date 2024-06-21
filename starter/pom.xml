@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.bytedesk</groupId>
 		<artifactId>im</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.2.3-BYTEDESK</version>
 	</parent>
 
 	<artifactId>bytedesk-starter</artifactId>
@@ -19,11 +19,26 @@
 
 	<!--  -->
 	<dependencies>
+		<!-- <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jetty</artifactId>
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
@@ -162,6 +177,7 @@
 			<artifactId>bytedesk-module-local</artifactId>
 			<version>${im.version}</version>
 		</dependency>
+
 
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 

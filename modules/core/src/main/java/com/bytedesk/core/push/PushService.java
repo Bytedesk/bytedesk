@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-01 16:15:31
+ * @LastEditTime: 2024-06-20 17:08:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.ip.IpService;
@@ -60,18 +61,20 @@ public class PushService {
 
     private final IpService ipService;
 
-    public Boolean sendEmailCode(String email, String client, String authType, String platform,
+    public Boolean sendEmailCode(String email, String client, String authType, PlatformEnum platform,
             HttpServletRequest request) {
 
         return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform, request);
     }
 
-    public Boolean sendSmsCode(String mobile, String client, String authType, String platform, HttpServletRequest request) {
+    public Boolean sendSmsCode(String mobile, String client, String authType, 
+            PlatformEnum platform, HttpServletRequest request) {
 
         return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, request);
     }
 
-    public Boolean sendCode(String receiver, String type, String client, String authType, String platform,
+    public Boolean sendCode(String receiver, String type, String client, String authType, 
+            PlatformEnum platform,
             HttpServletRequest request) {
 
         // 注册验证码，如果账号已经存在，则直接抛出异常

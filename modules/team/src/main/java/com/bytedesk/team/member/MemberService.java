@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 10:12:18
+ * @LastEditTime: 2024-06-20 17:21:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,10 +31,10 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.enums.PlatformEnum;
 // import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
@@ -130,15 +130,17 @@ public class MemberService {
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = modelMapper.map(memberRequest, UserRequest.class);
         userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
-        userRequest.setPlatform(BdConstants.PLATFORM_BYTEDESK);
+        userRequest.setPlatform(PlatformEnum.BYTEDESK.getValue());
         userRequest.setOrgUid(depOptional.get().getOrgUid());
 
         User user = null;
         if (StringUtils.hasText(memberRequest.getMobile())) {
-            user = userService.findByMobileAndPlatform(memberRequest.getMobile(), BdConstants.PLATFORM_BYTEDESK)
+            user = userService.findByMobileAndPlatform(memberRequest.getMobile(), 
+                    PlatformEnum.BYTEDESK)
                     .orElseGet(() -> userService.createUser(userRequest));
         } else if (StringUtils.hasText(memberRequest.getEmail())) {
-            user = userService.findByEmailAndPlatform(memberRequest.getEmail(), BdConstants.PLATFORM_BYTEDESK)
+            user = userService.findByEmailAndPlatform(memberRequest.getEmail(), 
+                    PlatformEnum.BYTEDESK)
                     .orElseGet(() -> userService.createUser(userRequest));
         } else {
             throw new RuntimeException("mobile and email should not be both null.");

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 16:33:22
+ * @LastEditTime: 2024-06-19 16:04:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.starter.runner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class InitDataRunner implements ApplicationRunner {
+
+    @Value("${server.port}")
+    private String port;
 
     @Autowired
     AsistantService asistantService;
@@ -83,10 +87,10 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Autowired
     UploadService uploadService;
-    
+
     @Autowired
     ThreadService threadService;
-    
+
     @Autowired
     QuartzService quartzService;
 
@@ -98,14 +102,14 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.debug("application started, init Default data, dont change the init order");
+        // log.debug("application started, initiating data...");
 
         asistantService.initData();
 
         channelService.initData();
 
         authorityService.initData();
-        
+
         roleService.initData();
 
         userService.initData();
@@ -133,6 +137,8 @@ public class InitDataRunner implements ApplicationRunner {
         categoryService.initData();
 
         quickReplyService.initData();
+
+        log.debug("application started. you can now open: http://127.0.0.1:{}/dev", port);
     }
 
 }

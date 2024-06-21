@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 17:29:38
+ * @LastEditTime: 2024-06-20 14:43:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,5 +80,31 @@ public class I18Consts {
     //
     public static final String I18N_QUICK_REPLY_BYE_TITLE = I18N_PREFIX + "bye_title";//
     public static final String I18N_QUICK_REPLY_BYE_CONTENT = I18N_PREFIX + "bye_content";//
+    // 
+    public static final String I18N_VIP_REST_API = I18N_PREFIX + "vip_api";
+    // 
+    public static final String I18N_FAQ_CATEGORY_1 = I18N_PREFIX + "faq_category_1";
+    public static final String I18N_FAQ_CATEGORY_2 = I18N_PREFIX + "faq_category_2";
+    // 
+    public static final String I18N_FAQ_TITLE_1 = I18N_PREFIX + "faq_title_1";
+    public static final String I18N_FAQ_CONTENT_1 = I18N_PREFIX + "faq_content_1";
+    public static final String I18N_FAQ_TITLE_2 = I18N_PREFIX + "faq_title_2";
+    public static final String I18N_FAQ_CONTENT_2 = I18N_PREFIX + "faq_content_2";
+    // 
+    public static final String I18N_QUICK_BUTTON_CATEGORY_1 = I18N_PREFIX + "quick_button_category_1";
+    public static final String I18N_QUICK_BUTTON_CATEGORY_2 = I18N_PREFIX + "quick_button_category_2";
+    // 
+    public static final String I18N_QUICK_BUTTON_TITLE_1 = I18N_PREFIX + "quick_button_title_1";
+    public static final String I18N_QUICK_BUTTON_CONTENT_1 = I18N_PREFIX + "quick_button_content_1";
+    public static final String I18N_QUICK_BUTTON_TITLE_2 = I18N_PREFIX + "quick_button_title_2";
+    public static final String I18N_QUICK_BUTTON_CONTENT_2 = I18N_PREFIX + "quick_button_content_2";
+    // 
+    public static final String I18N_QUICK_REPLY_CATEGORY_1 = I18N_PREFIX + "quick_reply_category_1";
+    public static final String I18N_QUICK_REPLY_CATEGORY_2 = I18N_PREFIX + "quick_reply_category_2";
+    // 
+    public static final String I18N_QUICK_REPLY_TITLE_1 = I18N_PREFIX + "quick_reply_title_1";
+    public static final String I18N_QUICK_REPLY_CONTENT_1 = I18N_PREFIX + "quick_reply_content_1";
+    public static final String I18N_QUICK_REPLY_TITLE_2 = I18N_PREFIX + "quick_reply_title_2";
+    public static final String I18N_QUICK_REPLY_CONTENT_2 = I18N_PREFIX + "quick_reply_content_2";
 
 }

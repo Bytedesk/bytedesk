@@ -12,6 +12,9 @@
             <column name="test_column" type="INT" />
         </createTable>
     </changeSet> -->
+    <!--  -->
     <!-- <include file="db/changelog/migration/_0.0.1_migrate.sql" />  -->
+     <include file="db/changelog/migration/240621_rename_isautopop.xml" />
+     <include file="db/changelog/migration/240621-convert-message-type-to-enumstring.xml" />
 
 </databaseChangeLog>

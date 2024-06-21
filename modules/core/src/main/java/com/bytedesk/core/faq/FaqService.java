@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 11:39:31
+ * @LastEditTime: 2024-06-20 13:28:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -142,5 +142,6 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     public FaqResponse convertToResponse(Faq entity) {
         return modelMapper.map(entity, FaqResponse.class);
     }
+
 
 }

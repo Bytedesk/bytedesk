@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:48:34
+ * @LastEditTime: 2024-06-21 17:23:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,8 +48,8 @@ public class Message extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
-    // 尽管注释掉此行，在数据库中使用int类型存储，但前端查询的时候还是显示为字符串类型
-    // @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
+    // 如果使用int存储，enum中类型的顺序改变，会导致数据库中的数据类型改变，导致无法查询到数据
+    @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
     @Column(name = TypeConsts.COLUMN_NAME_TYPE)
     // private String type;
     private MessageTypeEnum type = MessageTypeEnum.TEXT;
@@ -64,7 +64,7 @@ public class Message extends BaseEntity {
     // private String extra = BdConstants.EMPTY_JSON_STRING;
 
     @Builder.Default
-    private MessageStatusEnum status = MessageStatusEnum.SENT;
+    private MessageStatusEnum status = MessageStatusEnum.SUCCESS;
 
     // private String client;
     private ClientEnum client;

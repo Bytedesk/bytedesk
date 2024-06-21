@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:21:50
+ * @LastEditTime: 2024-06-21 11:37:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,22 +41,31 @@ public class BaseServiceSettings {
     // private String language = I18Consts.ZH_CN;
     private LanguageEnum language = LanguageEnum.ZH_CN;
 
-    @Column(name = "is_auto_pop")
+    @NotBlank
     private boolean autoPop = false;
 
     /**
      * TODO: set different tips for different lang
      */
+    @NotBlank
     private boolean showTopTip = false;
 
+    // show rate btn on chat toolbar
+    @NotBlank
+    private boolean showRateBtn = false;
+
+    @NotBlank
     private String topTip = I18Consts.I18N_TOP_TIP;
 
+    @NotBlank
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
 
+    @NotBlank
     private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;
 
     /** auto close time in minutes */
+    @NotBlank
     private Double autoCloseMin = Double.valueOf(25);
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -65,6 +74,7 @@ public class BaseServiceSettings {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Faq> faqs = new ArrayList<>();
 
+    @NotBlank
     private boolean showLogo = true;
 
     // validate until date, when expire the service will be disabled

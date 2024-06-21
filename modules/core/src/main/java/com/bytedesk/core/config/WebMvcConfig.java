@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-26 15:28:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-17 12:57:20
+ * @LastEditTime: 2024-06-18 21:44:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     // @Autowired
     // private BytedeskProperties bytedeskProperties;
-    
+
     // https://www.baeldung.com/spring-mvc-static-resources
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
             "classpath:/META-INF/resources/",
@@ -45,7 +45,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
             "classpath:/static/",
             "classpath:/templates/",
             "classpath:/public/",
-            // "classpath:/bytedesk-projects-meiyu-0.0.1-SNAPSHOT/templates/",
     };
 
     @Autowired
@@ -63,15 +62,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     // https://spring.io/guides/gs/rest-service-cors
     // @Override
     // public void addCorsMappings(CorsRegistry registry) {
-    //     // 
-    //     registry.addMapping("/**")
-    //             .allowedMethods("*")
-    //             .allowedOriginPatterns("*")
-    //             // allow cookies
-    //             .allowCredentials(true);
+    // //
+    // registry.addMapping("/**")
+    // .allowedMethods("*")
+    // .allowedOriginPatterns("*")
+    // // allow cookies
+    // .allowCredentials(true);
     // }
 
-	/**
+    /**
      * https://www.baeldung.com/spring-mvc-static-resources
      * spring.mvc.static-path-pattern=/**
      * 静态资源的配置 - 使得可以从磁盘中读取 Html、图片、视频、音频等
@@ -79,10 +78,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // for (String path : CLASSPATH_RESOURCE_LOCATIONS) {
-        //     log.info("CLASSPATH_RESOURCE_LOCATIONS: {}", path);
+        // log.info("CLASSPATH_RESOURCE_LOCATIONS: {}", path);
         // }
         registry.addResourceHandler("/**")
-            .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+                .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
     }
 
 }

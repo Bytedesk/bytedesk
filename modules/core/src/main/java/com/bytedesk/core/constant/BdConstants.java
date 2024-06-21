@@ -224,26 +224,11 @@ public class BdConstants {
     // public static final String TOPIC_PROTOBUF_PREFIX = "protobuf/";
     // public static final String TOPIC_JSON_PREFIX = "json/";
 
-    // 微语
-    public static final String PLATFORM_BYTEDESK = "bytedesk";
-    // 良师宝
-    public static final String PLATFORM_LIANGSHIBAO = "liangshibao";
-    // 招投标
-    public static final String PLATFORM_ZHAOBIAO = "zhaobiao";
-    // 今日美语
-    public static final String PLATFORM_MEIYU = "meiyu";
-    // 微语题库
-    public static final String PLATFORM_TIKU = "tiku";
-    // 
-    public static final String PLATFORM_WEITONGBU = "weitongbu";
-    // 
-    public static final String PLATFORM_WEIYU_AI = "weiyu_ai";
-    // 微语TTS-文字转语音
-    public static final String PLATFORM_WEIYU_TTS = "weiyu_tts";
-    
+    // bytedesk
+    public static final String PLATFORM_BYTEDESK = "BYTEDESK";
 
     /**
-     * 华为推送
+     * huawei push
      */
     public static final String HW_PUSH_TOKEN_SERVER = "https://oauth-login.cloud.huawei.com/oauth2/v3/token";
     public static final String HW_PUSH_OPEN_URL = "https://push-api.cloud.huawei.com";

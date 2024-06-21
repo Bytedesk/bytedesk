@@ -301,6 +301,9 @@ public class VisitorService {
             throw new RuntimeException("No agents found in workgroup with uid " + sid);
         }
         Agent agent = workgroup.nextAgent();
+        if (agent == null) {
+            throw new RuntimeException("No available agent found in workgroup with uid " + sid);
+        }
         //
         Thread thread = getWorkgroupThread(visitorRequest, topic, type, agent, workgroup);
         //

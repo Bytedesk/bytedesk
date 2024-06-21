@@ -30,7 +30,7 @@ package com.bytedesk.core.socket.controller;
 
 // /**
 // *
-// * http://localhost:9003/swagger-ui/index.html
+// * http://127.0.0.1:9003/swagger-ui/index.html
 // */
 // @Slf4j
 // @RestController

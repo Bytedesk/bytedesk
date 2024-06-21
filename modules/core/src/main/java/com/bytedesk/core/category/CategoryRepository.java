@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 17:05:32
+ * @LastEditTime: 2024-06-20 17:09:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,14 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
+
 public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
     Optional<Category> findByUid(String uid);
-    List<Category> findByParentAndPlatformOrderByOrderNoAsc(Category parent, String platform);
-    Optional<Category> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid, String platform);
+    List<Category> findByParentAndPlatformOrderByOrderNoAsc(Category parent, PlatformEnum platform);
+    Optional<Category> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid, 
+            PlatformEnum platform);
+    Optional<Category> findByNameAndTypeAndLevelAndPlatform(String name, String type, LevelEnum level,
+            PlatformEnum platform);
 }

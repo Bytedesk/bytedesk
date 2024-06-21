@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:02:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-15 16:33:37
+ * @LastEditTime: 2024-06-21 17:25:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -119,8 +119,7 @@ public class MessageProtoService {
         Message message = new Message();
         message.setUid(mid);
         message.setType(MessageTypeEnum.fromValue(type));
-        // message.setStatus(StatusConsts.MESSAGE_STATUS_STORED);
-        message.setStatus(MessageStatusEnum.SENT);
+        message.setStatus(MessageStatusEnum.SUCCESS);
         message.setClient(ClientEnum.fromValue(messageProto.getClient()));
         //
         UserResponseSimple user = UserResponseSimple.builder().nickname(nickname).avatar(avatar).build();

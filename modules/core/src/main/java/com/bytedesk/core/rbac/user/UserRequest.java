@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 17:53:51
+ * @LastEditTime: 2024-06-20 17:18:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.user;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.User.Sex;
 
@@ -73,9 +74,13 @@ public class UserRequest extends BaseRequest {
 
 	private Boolean mobileVerified;
 
+	// 需要前端传递字符串的情况下，使用string类型
 	@NotBlank(message = "platform required")
-	private String platform;
-
+	@Builder.Default
+	private String platform = BdConstants.PLATFORM_BYTEDESK;
+	// @Builder.Default
+	// private PlatformEnum platform = PlatformEnum.BYTEDESK;
+	
 	private String orgUid;
 
 }

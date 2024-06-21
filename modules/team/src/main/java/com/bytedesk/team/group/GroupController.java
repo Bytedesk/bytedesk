@@ -15,7 +15,7 @@ import lombok.AllArgsConstructor;
 
 /**
  * 
- * http://localhost:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @AllArgsConstructor
@@ -50,6 +50,5 @@ public class GroupController {
         //
         return ResponseEntity.ok().body(new JsonResult<>("query group by page success", 200, groupPage));
     }
-
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:00:28
+ * @LastEditTime: 2024-06-21 16:51:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,10 +81,7 @@ public class WorkgroupService {
 
         Specification<Workgroup> specs = WorkgroupSpecification.search(workgroupRequest);
         Page<Workgroup> workgroupPage = workgroupRepository.findAll(specs, pageable);
-        // Page<Workgroup> workgroupPage =
-        // workgroupRepository.findByOrgUidAndDeleted(workgroupRequest.getOrgUid(),
-        // false, pageable);
-
+        
         return workgroupPage.map(ConvertServiceUtils::convertToWorkgroupResponse);
     }
 

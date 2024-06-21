@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-27 18:21:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-01 12:22:13
+ * @LastEditTime: 2024-06-18 17:57:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,14 +36,7 @@
     <!--  -->
     <div id="panelHolder">
         <iframe id="iframePanel" class="fusion" src=""></iframe>
-        <!-- 二维码 -->
-        <!-- <div id="url_qrcode">
-            <img src="./img/luobosi_mp.png" width="100px" height="100px" />
-        </div> -->
     </div>
-    <!--  -->
-    <!-- <script type="text/javascript" src="/chat/assets/vendor/qrcode/qrcode.min.js"></script> -->
-
     <script>
         //
         function getUrlParam(name) {
@@ -56,14 +49,12 @@
         var t = getUrlParam('t')
         var sid = getUrlParam('sid')
         //
-        var websiteUrl = window.location.href
-        var websiteTitle = document.title
-        var refererUrl = document.referrer
+        //var websiteUrl = window.location.href
+        //var websiteTitle = document.title
+        //var refererUrl = document.referrer
         var src = '/chat?t=' + t + '&sid=' + sid + '&'
         // console.log('urll:', src)
         document.getElementById('iframePanel').setAttribute('src', src)
-        // document.getElementById('byteDesk-iframe').setAttribute('src', '../meilele')
-        // console.log('iframe websiteUrl:', window.location.href, 'iframe refererUrl:', document.referrer)
     </script>
 </body>
 

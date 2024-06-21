@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 22:38:38
+ * @LastEditTime: 2024-06-21 14:31:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -114,6 +114,7 @@ public class OrganizationService {
                 log.info("roleOptional fail");
             }
             // 放到listener中会报错，所以放在此处
+            // event listener order 1. member, 2. robot, 3. agent, 4. category, 5. faq, 6. quickbutton, 7. workgroup, 
             bytedeskEventPublisher.publishOrganizationCreateEvent(organization);
             //
             return convertToResponse(savedOrganization);

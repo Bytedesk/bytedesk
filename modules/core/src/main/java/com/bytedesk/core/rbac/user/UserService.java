@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 19:05:22
+ * @LastEditTime: 2024-06-21 15:15:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,9 +27,9 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.UsernameExistsException;
@@ -49,7 +49,7 @@ import org.modelmapper.ModelMapper;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class UserService {
+public class UserService  {
 
     // cycle dependency - 循环引用，不能使用
     // private final AuthService authService;
@@ -72,16 +72,17 @@ public class UserService {
     public UserResponse register(UserRequest userRequest) {
 
         if (StringUtils.hasText(userRequest.getEmail())
-                && existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
+                && existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             throw new EmailExistsException("Email already exists..!!");
         }
         if (StringUtils.hasText(userRequest.getMobile())
-                && existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
+                && existsByMobileAndPlatform(userRequest.getMobile(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             throw new MobileExistsException("Mobile already exists..!!");
         }
         //
         User user = modelMapper.map(userRequest, User.class);
         user.setUid(uidUtils.getCacheSerialUid());
+        user.setPlatform(PlatformEnum.fromValue(userRequest.getPlatform()));
         //
         if (StringUtils.hasText(userRequest.getNickname())) {
             user.setNickname(userRequest.getNickname());
@@ -125,16 +126,16 @@ public class UserService {
     public UserResponse update(UserRequest userRequest) {
 
         if (StringUtils.hasText(userRequest.getUsername()) 
-                && existsByUsernameAndPlatform(userRequest.getUsername(), userRequest.getPlatform())) {
+                && existsByUsernameAndPlatform(userRequest.getUsername(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             throw new UsernameExistsException("Username already exists..!!");
         }
 
         if (StringUtils.hasText(userRequest.getEmail())
-                && existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
+                && existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             throw new EmailExistsException("Email already exists..!!");
         }
         if (StringUtils.hasText(userRequest.getMobile())
-                && existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
+                && existsByMobileAndPlatform(userRequest.getMobile(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             throw new MobileExistsException("Mobile already exists..!!");
         }
 
@@ -190,7 +191,7 @@ public class UserService {
             String newRawPassword = userRequest.getNewPassword(); // 用户输入的新密码
 
             // 验证旧密码
-            if (passwordEncoder.matches(oldRawPassword, oldEncryptedPassword)) {
+            if (oldEncryptedPassword == null || passwordEncoder.matches(oldRawPassword, oldEncryptedPassword)) {
                 // 旧密码验证通过，设置新密码
                 String newEncryptedPassword = passwordEncoder.encode(newRawPassword);
                 user.setPassword(newEncryptedPassword); // 更新用户密码
@@ -211,10 +212,10 @@ public class UserService {
     @Transactional
     public User createUser(UserRequest userRequest) {
         //
-        if (existsByEmailAndPlatform(userRequest.getEmail(), userRequest.getPlatform())) {
+        if (existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             throw new EmailExistsException("Email already exists..!!");
         }
-        if (existsByMobileAndPlatform(userRequest.getMobile(), userRequest.getPlatform())) {
+        if (existsByMobileAndPlatform(userRequest.getMobile(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             throw new MobileExistsException("Mobile already exists..!!");
         }
         //
@@ -229,7 +230,7 @@ public class UserService {
                 .superUser(false)
                 .emailVerified(false)
                 .mobileVerified(false)
-                .password(userRequest.getPlatform())
+                .password(userRequest.getPassword())
                 .build();
         user.setUid(uidUtils.getCacheSerialUid());
         user.setNickname(userRequest.getNickname());
@@ -268,17 +269,17 @@ public class UserService {
     }
 
     @Cacheable(value = "user", key = "#email", unless = "#result == null")
-    public Optional<User> findByEmailAndPlatform(String email, String platform) {
+    public Optional<User> findByEmailAndPlatform(String email, PlatformEnum platform) {
         return userRepository.findByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
     @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
-    public Optional<User> findByMobileAndPlatform(String mobile, String platform) {
+    public Optional<User> findByMobileAndPlatform(String mobile, PlatformEnum platform) {
         return userRepository.findByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
-    public Optional<User> findByUsernameAndPlatform(String username, String platform) {
+    public Optional<User> findByUsernameAndPlatform(String username, PlatformEnum platform) {
         return userRepository.findByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
@@ -290,22 +291,22 @@ public class UserService {
     @Cacheable(value = "admin", unless = "#result == null")
     public Optional<User> getAdmin() {
         return userRepository.findByUsernameAndPlatformAndDeleted(bytedeskProperties.getEmail(),
-                BdConstants.PLATFORM_BYTEDESK, false);
+                PlatformEnum.BYTEDESK, false);
     }
 
     //
     @Cacheable(value = "userExists", key = "#username", unless = "#result == null")
-    public Boolean existsByUsernameAndPlatform(String username, String platform) {
+    public Boolean existsByUsernameAndPlatform(String username, PlatformEnum platform) {
         return userRepository.existsByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
     @Cacheable(value = "userExists", key = "#mobile", unless = "#result == null")
-    public Boolean existsByMobileAndPlatform(String mobile, String platform) {
+    public Boolean existsByMobileAndPlatform(String mobile, PlatformEnum platform) {
         return userRepository.existsByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
     @Cacheable(value = "userExists", key = "#email", unless = "#result == null")
-    public Boolean existsByEmailAndPlatform(String email, String platform) {
+    public Boolean existsByEmailAndPlatform(String email, PlatformEnum platform) {
         return userRepository.existsByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
@@ -344,7 +345,7 @@ public class UserService {
 
     public void initData() {
 
-        if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), BdConstants.PLATFORM_BYTEDESK)) {
+        if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), PlatformEnum.BYTEDESK)) {
             return;
         }
 
@@ -382,7 +383,7 @@ public class UserService {
         Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
                 UserConsts.DEFAULT_ORGANIZATION_UID);
         Optional<User> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(),
-                BdConstants.PLATFORM_BYTEDESK);
+                PlatformEnum.BYTEDESK);
         if (orgOptional.isPresent() && roleOptional.isPresent() && adminOptional.isPresent()) {
             Organization organization = orgOptional.get();
             Role role = roleOptional.get();
@@ -392,5 +393,6 @@ public class UserService {
             save(user);
         }
     }
+
 
 }
