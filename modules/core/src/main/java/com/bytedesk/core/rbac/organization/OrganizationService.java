@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 14:31:46
+ * @LastEditTime: 2024-06-24 23:49:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
@@ -38,7 +39,6 @@ import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,15 +77,14 @@ public class OrganizationService {
 
     @Transactional
     public OrganizationResponse create(OrganizationRequest organizationRequest) {
-
+        // 
         if (existsByName(organizationRequest.getName())) {
             throw new RuntimeException("Organization with name: " + organizationRequest.getName() + " already exists.");
         }
-
         if (existsByCode(organizationRequest.getCode())) {
             throw new RuntimeException("Organization with code: " + organizationRequest.getCode() + " already exists.");
         }
-
+        // 
         User user = authService.getCurrentUser();
         String orgUid = uidUtils.getCacheSerialUid();
         // 

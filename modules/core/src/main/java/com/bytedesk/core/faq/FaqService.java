@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 13:28:41
+ * @LastEditTime: 2024-06-24 09:56:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,10 +24,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.category.Category;
 import com.bytedesk.core.category.CategoryService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -73,7 +76,10 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     public FaqResponse create(FaqRequest request) {
 
         Faq entity = modelMapper.map(request, Faq.class);
-        entity.setUid(uidUtils.getCacheSerialUid());
+        if (!StringUtils.hasText(request.getUid())) {
+            entity.setUid(uidUtils.getDefaultSerialUid());
+        }
+        entity.setType(MessageTypeEnum.fromValue(request.getType()));
         //
         // category
         Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
@@ -143,5 +149,32 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         return modelMapper.map(entity, FaqResponse.class);
     }
 
+    public void initData() {
+        if (faqRepository.count() > 0) {
+            return;
+        }
+
+        // 
+        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        FaqRequest faqDemo1 = FaqRequest.builder()
+                .title(I18Consts.I18N_FAQ_DEMO_TITLE_1)
+                .content(I18Consts.I18N_FAQ_DEMO_CONTENT_1)
+                .type(MessageTypeEnum.TEXT.getValue())
+                .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
+                .orgUid(orgUid)
+                .build();
+        faqDemo1.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1);
+        create(faqDemo1);
+        //
+        FaqRequest faqDemo2 = FaqRequest.builder()
+                .title(I18Consts.I18N_FAQ_DEMO_TITLE_2)
+                .content(I18Consts.I18N_FAQ_DEMO_CONTENT_2)
+                .type(MessageTypeEnum.IMAGE.getValue())
+                .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
+                .orgUid(orgUid)
+                .build();
+        faqDemo2.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+        create(faqDemo2);
+    }
 
 }

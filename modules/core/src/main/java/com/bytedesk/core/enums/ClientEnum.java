@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-06 11:40:46
+ * @LastEditTime: 2024-06-24 22:36:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,10 @@ public enum ClientEnum {
     H5("h5"),
     IOS("ios"),
     ANDROID("android"),
+    ELECTRON("electron"),
+    LINUX("linux"),
+    MACOS("macos"),
+    WINDOWS("windows"),
     FLUTTER_WEB("flutter_web"),
     FLUTTER_ANDROID("flutter_android"),
     FLUTTER_IOS("flutter_ios"),
@@ -30,7 +34,8 @@ public enum ClientEnum {
     WECHAT_MINI("wechat_mini"),
     WECHAT_MP("wechat_mp"),
     WECHAT_WORK("wechat_work"),
-    WECHAT_KEFU("wechat_kefu");
+    WECHAT_KEFU("wechat_kefu"),
+    ;
             
     private final String value;
 

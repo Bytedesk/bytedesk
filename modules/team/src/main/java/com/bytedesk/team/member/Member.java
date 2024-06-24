@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-05 09:21:40
+ * @LastEditTime: 2024-06-22 16:18:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,7 +67,6 @@ public class Member extends BaseEntity {
     private String telephone;
 
     @Email(message = "email format error")
-    // @Column(unique = true)
     private String email;
 
     private String mobile;
@@ -75,15 +74,6 @@ public class Member extends BaseEntity {
     @Builder.Default
     // private String status = StatusConsts.MEMBER_STATUS_PENDING;
     private MemberStatusEnum status = MemberStatusEnum.PENDING;
-
-    // @Builder.Default
-    // @Column(name = "is_enabled")
-    // private boolean enabled = true;
-    
-    // // newly added user should be accepted by the user in client
-    // @Builder.Default
-    // @Column(name = "is_invite_accepted")
-    // private boolean inviteAccepted = false;
 
     @JsonIgnore
     // 关联多个Department
@@ -95,7 +85,8 @@ public class Member extends BaseEntity {
      * login user info
      */
     // @JsonIgnore
-    @OneToOne(fetch = FetchType.EAGER)
+    // @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     /**
@@ -104,7 +95,7 @@ public class Member extends BaseEntity {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgUid;
+    // private String orgUid;
 
      // 添加、移除部门的方法
     public void addDepartment(Department department) {

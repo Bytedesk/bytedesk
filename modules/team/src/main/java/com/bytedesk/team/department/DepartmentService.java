@@ -159,35 +159,35 @@ public class DepartmentService {
         Department[] departments = new Department[] {
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)
                         .description(TypeConsts.DEPT_ADMIN)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_HR)
                         .description(TypeConsts.DEPT_HR)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ORG)
                         .description(TypeConsts.DEPT_ORG)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_IT)
                         .description(TypeConsts.DEPT_IT)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_MONEY)
                         .description(TypeConsts.DEPT_MONEY)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_MARKETING)
                         .description(TypeConsts.DEPT_MARKETING)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_SALES)
                         .description(TypeConsts.DEPT_SALES)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build(),
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_CUSTOMER_SERVICE)
                         .description(TypeConsts.DEPT_CUSTOMER_SERVICE)
-                        .orgUid(orgUid).type(TypeConsts.TYPE_SYSTEM)
+                        .type(TypeConsts.TYPE_SYSTEM)
                         .build()
         };
 
@@ -195,6 +195,7 @@ public class DepartmentService {
             Optional<Department> depOptional = findByNameAndOrgUid(department.getName(), orgUid);
             if (!depOptional.isPresent()) {
                 department.setUid(uidUtils.getCacheSerialUid());
+                department.setOrgUid(orgUid);
                 departmentRepository.save(department);
             }
         });

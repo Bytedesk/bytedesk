@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 16:56:56
+ * @LastEditTime: 2024-06-23 11:10:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.core.rbac.organization;
 
 import java.util.Date;
 
-import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.User;
@@ -40,7 +39,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ OrganizationListener.class })
 @Table(name = "core_organization")
-public class Organization extends BaseEntity {
+public class Organization extends OrganizationEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -97,7 +96,6 @@ public class Organization extends BaseEntity {
 
     // 认证失败原因
     private String rejectReason;
-
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

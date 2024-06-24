@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:48:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 16:43:25
+ * @LastEditTime: 2024-06-23 10:09:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,5 +29,5 @@ public class ThreadLogRequest extends BaseRequest {
     
 
     // organization oid
-    private String orgUid;
+    // private String orgUid;
 }

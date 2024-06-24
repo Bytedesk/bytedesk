@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 14:21:49
+ * @LastEditTime: 2024-06-24 09:36:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,10 +27,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -95,7 +97,9 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     public CategoryResponse create(CategoryRequest request) {
 
         Category category = modelMapper.map(request, Category.class);
-        category.setUid(uidUtils.getCacheSerialUid());
+        if (!StringUtils.hasText(request.getUid())) {
+            category.setUid(uidUtils.getDefaultSerialUid());
+        }
         category.setPlatform(PlatformEnum.fromValue(request.getPlatform()));
 
         Category newCategory = save(category);
@@ -189,7 +193,6 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
             return;
         }
 
-        // String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
         // init quick reply categories
         CategoryRequest categoryContact = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
@@ -230,6 +233,32 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
                 .build();
         categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
         create(categoryBye);
+
+        //
+        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        CategoryRequest categoryFaqDemoRequest1 = CategoryRequest.builder()
+                .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
+                .orderNo(0)
+                .level(LevelEnum.ORGNIZATION)
+                .platform(BdConstants.PLATFORM_BYTEDESK)
+                // .orgUid(orgUid)
+                .build();
+        categoryFaqDemoRequest1.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+        categoryFaqDemoRequest1.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1);
+        categoryFaqDemoRequest1.setOrgUid(orgUid);
+        create(categoryFaqDemoRequest1);
+        //
+        CategoryRequest categoryFaqDemoRequest2 = CategoryRequest.builder()
+                .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
+                .orderNo(0)
+                .level(LevelEnum.ORGNIZATION)
+                .platform(BdConstants.PLATFORM_BYTEDESK)
+                // .orgUid(orgUid)
+                .build();
+        categoryFaqDemoRequest2.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+        categoryFaqDemoRequest2.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2);
+        categoryFaqDemoRequest1.setOrgUid(orgUid);
+        create(categoryFaqDemoRequest2);
     }
 
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:52:40
+ * @LastEditTime: 2024-06-23 11:18:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,7 +46,7 @@ public class Department extends BaseEntity {
 
     private String description;
 
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "department_type")
     private String type;
 
     // 关联上级部门
@@ -67,14 +66,13 @@ public class Department extends BaseEntity {
     // @ManyToMany(mappedBy = "departments", fetch = FetchType.LAZY)
     // private Set<Member> members = new HashSet<>();
 
-    // private String orgUid;
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // // @JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name =
     // "none", value = ConstraintMode.NO_CONSTRAINT))
     // @JsonBackReference("organization-departments")
     // private Organization organization;
-    private String orgUid;
+    // private String orgUid;
 
     /** created by */
     // @JsonIgnore

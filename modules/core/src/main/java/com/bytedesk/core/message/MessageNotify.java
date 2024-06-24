@@ -14,16 +14,15 @@
  */
 package com.bytedesk.core.message;
 
+import java.io.Serializable;
 import java.util.Date;
 
-import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.thread.ThreadResponseSimpleWithoutExtra;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
@@ -37,10 +36,11 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class MessageNotify extends BaseResponse {
+public class MessageNotify implements Serializable {
 
 	private static final long serialVersionUID = 1L;	
+
+	private String uid;
 
 	// private String type;
 	private MessageTypeEnum type;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 17:03:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-22 16:31:49
+ * @LastEditTime: 2024-06-23 10:11:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.team.department;
 
 import com.bytedesk.core.base.BaseRequest;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,7 +37,7 @@ public class DepartmentRequest extends BaseRequest  {
     // 
     private String parentUid;
 
-    @NotEmpty
-    private String orgUid;
+    // @NotBlank
+    // private String orgUid;
 
 }

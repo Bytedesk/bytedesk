@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 09:45:24
+ * @LastEditTime: 2024-06-23 11:16:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,6 +46,7 @@ public class RobotEventListener {
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();
         // User user = organization.getUser();
+        String orgUid = organization.getUid();
         log.info("robot - organization created: {}", organization.getName());
         // 
         Kb kb = kbService.getKb(I18Consts.I18N_ROBOT_NICKNAME, organization.getUid());
@@ -55,11 +56,12 @@ public class RobotEventListener {
                 // .nickname(I18Consts.I18N_ROBOT_NICKNAME)
                 .description(I18Consts.I18N_ROBOT_DESCRIPTION)
                 .type(RobotTypeEnum.SERVICE)
-                .orgUid(organization.getUid())
+                // .orgUid(organization.getUid())
                 .kb(kb)
                 .llm(llm)
                 .build();
         robot.setUid(uidUtils.getCacheSerialUid());
+        robot.setOrgUid(orgUid);
         robot.setNickname(I18Consts.I18N_ROBOT_NICKNAME);
         robot.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         //

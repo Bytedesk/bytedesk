@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:52:30
+ * @LastEditTime: 2024-06-23 11:12:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.visitor.Visitor;
 import com.bytedesk.service.workgroup.Workgroup;
@@ -49,7 +48,7 @@ public class Queue extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "queue_type")
     private String type;
 
     private Integer orderInQueue;
@@ -74,5 +73,5 @@ public class Queue extends BaseEntity {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgUid;
+    // private String orgUid;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-13 20:43:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-14 14:58:37
+ * @LastEditTime: 2024-06-23 11:11:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,7 +89,7 @@ public class QuartzEntity extends BaseEntity {
     private String misfirePolicy = QuartzConsts.MISFIRE_DEFAULT;
 
     /** belong to org */
-    @Column(nullable = false)
-    private String orgUid;
+    // @Column(nullable = false)
+    // private String orgUid;
     
 }

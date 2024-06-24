@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:52:08
+ * @LastEditTime: 2024-06-23 11:15:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ package com.bytedesk.core.asistant;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,7 +48,7 @@ public class Asistant extends BaseEntity {
 
     private String topic;
 
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "action_type", nullable = false)
     private String type;
 
     private String nickname;
@@ -61,5 +60,5 @@ public class Asistant extends BaseEntity {
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
     /** belong to org */
-    private String orgUid;
+    // private String orgUid;
 }

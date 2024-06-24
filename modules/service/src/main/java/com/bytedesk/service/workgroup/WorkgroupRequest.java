@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 14:13:37
+ * @LastEditTime: 2024-06-23 10:09:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,6 +60,6 @@ public class WorkgroupRequest extends BaseRequest {
     private List<String> agentUids = new ArrayList<String>();
 
     // organization oid
-    @NotBlank
-    private String orgUid;
+    // @NotBlank
+    // private String orgUid;
 }

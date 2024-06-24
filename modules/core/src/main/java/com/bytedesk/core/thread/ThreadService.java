@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-06 14:44:34
+ * @LastEditTime: 2024-06-23 11:14:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -141,9 +141,7 @@ public class ThreadService {
         //
         Thread thread = modelMapper.map(threadRequest, Thread.class);
         thread.setUid(uidUtils.getCacheSerialUid());
-        // thread.setStatus(StatusConsts.THREAD_STATUS_INIT);
         thread.setStatus(ThreadStatusEnum.OPEN);
-
         //
         String user = JSON.toJSONString(threadRequest.getUser());
         log.info("request {}, user {}", threadRequest.toString(), user);
@@ -153,6 +151,9 @@ public class ThreadService {
         thread.setOrgUid(owner.getOrgUid());
         //
         Thread result = save(thread);
+        if (result == null) {
+            throw new RuntimeException("thread save failed");
+        }
         //
         return convertToResponse(result);
     }
@@ -179,9 +180,10 @@ public class ThreadService {
                 // .user(userSimple)
                 // .user(asistant)
                 .owner(user)
-                .orgUid(user.getOrgUid())
+                // .orgUid(user.getOrgUid())
                 .build();
         thread.setUid(uidUtils.getCacheSerialUid());
+        thread.setOrgUid(user.getOrgUid());
 
         return save(thread);
     }
@@ -193,7 +195,7 @@ public class ThreadService {
                 .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
                 .build();
         userSimple.setUid(UserConsts.DEFAULT_SYSTEM_NOTIFICATION_UID);
-        // //
+        //
         Thread thread = Thread.builder()
                 // .tid(uidUtils.getCacheSerialUid())
                 // .type(ThreadTypeConsts.CHANNEL)
@@ -206,9 +208,10 @@ public class ThreadService {
                 .user(JSON.toJSONString(userSimple))
                 // .user(channel)
                 .owner(user)
-                .orgUid(user.getOrgUid())
+                // .orgUid(user.getOrgUid())
                 .build();
         thread.setUid(uidUtils.getCacheSerialUid());
+        thread.setOrgUid(user.getOrgUid());
 
         return save(thread);
     }
@@ -222,16 +225,7 @@ public class ThreadService {
         }
         //
         Thread thread = threadOptional.get();
-        //
-        // if (ThreadStatusEnum.AGENT_CLOSED.equals(thread.getStatus())) {
-        //     log.info("thread {} is already closed", uid);
-        //     throw new RuntimeException("thread is already closed");
-        // }
-        // //
-        // modelMapper.map(threadRequest, Thread.class);
-
         thread.setStatus(threadRequest.getStatus());
-
         //
         Thread updateThread = save(thread);
         if (updateThread == null) {

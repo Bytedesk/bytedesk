@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:59:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-31 07:40:45
+ * @LastEditTime: 2024-06-23 11:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class KbDocController extends BaseController<KbDocRequest> {
 
-    private final KbDocService kbDocService;
+    // private final KbDocService kbDocService;
 
     @Override
     public ResponseEntity<?> queryByOrg(KbDocRequest request) {

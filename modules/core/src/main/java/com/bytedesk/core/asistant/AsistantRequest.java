@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 15:31:02
+ * @LastEditTime: 2024-06-23 10:05:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,5 +38,5 @@ public class AsistantRequest extends BaseRequest {
     private String description;
 
     /** belong to org */
-    private String orgUid;
+    // private String orgUid;
 }

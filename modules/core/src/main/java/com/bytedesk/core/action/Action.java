@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:31:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 18:10:50
+ * @LastEditTime: 2024-06-23 11:15:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,7 @@ public class Action extends BaseEntity {
     private String ipLocation;
 
     @Builder.Default
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "action_type", nullable = false)
     private String type = TypeConsts.ACTION_TYPE_LOG;
 
     // action failed object
@@ -79,7 +79,7 @@ public class Action extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    private String orgUid;
+    // private String orgUid;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default

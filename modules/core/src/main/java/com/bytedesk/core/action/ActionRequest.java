@@ -45,7 +45,7 @@ public class ActionRequest extends BaseRequest {
 
     private String extra;
     
-    private String orgUid;
+    // private String orgUid;
 
     private String nickname;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 15:13:30
+ * @LastEditTime: 2024-06-22 12:02:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,10 +15,11 @@
 package com.bytedesk.core.message;
 
 public enum MessageTypeEnum {
+    SYSTEM("system"), 
     TEXT("text"), 
     IMAGE("image"),
     FILE("file"),
-    VOICE("voice"), 
+    AUDIO("audio"), 
     VIDEO("video"), 
     THREAD("thread"),
     TYPING("typing"), 
@@ -28,7 +29,9 @@ public enum MessageTypeEnum {
     QUICKBUTTON_QA("quickbutton_qa"), 
     QUICKBUTTON_URL("quickbutton_url"),
     FAQ_QA("faq_qa"),
-    RATE_INVITE("rate_invite"); 
+    RATE_INVITE("rate_invite"), // 被邀请评价
+    RATE_INITIATIVE("rate_initiative"), // 主动评价
+    ; 
 
     private final String value;
 

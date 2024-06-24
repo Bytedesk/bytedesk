@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- add changeset -->
+     <changeSet id="20240622-migrate-robot-type" author="jackning">
+        <!-- Add a new column to store the string value -->
+        <addColumn tableName="ai_robot">
+            <column name="type_string" type="varchar(255)" />
+        </addColumn>
+
+        <!-- Migrate data from the old integer column to the new string column -->
+        <sql>
+            UPDATE ai_robot SET type_string = CASE
+            WHEN by_type = 0 THEN 'SERVICE'
+            WHEN by_type = 1 THEN 'MARKETING'
+            WHEN by_type = 2 THEN 'KNOWLEDGEBASE'
+            WHEN by_type = 3 THEN 'QA'
+            ELSE 'UNKNOWN'
+            END;
+        </sql>
+
+        <!-- Drop the old integer column -->
+        <dropColumn tableName="ai_robot" columnName="by_type" />
+
+        <!-- Rename the new column to the old column name -->
+        <renameColumn tableName="ai_robot" oldColumnName="type_string" newColumnName="by_type" />
+
+        <!-- Optionally, if you want to set a not-null constraint and/or a default value -->
+        <!-- <modifyColumn tableName="ai_robot" columnName="by_type" type="varchar(255)" notNull="true"
+            defaultValue="SERVICE" /> -->
+    </changeSet>
+
+</databaseChangeLog>

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:40:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-24 15:46:40
+ * @LastEditTime: 2024-06-24 23:50:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,8 +19,6 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-// import jakarta.transaction.Transactional;
 
 public interface QuartzRepository extends JpaRepository<QuartzEntity, Long> {
     

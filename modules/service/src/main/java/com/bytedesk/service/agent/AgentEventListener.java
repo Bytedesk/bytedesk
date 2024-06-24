@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 13:06:31
+ * @LastEditTime: 2024-06-23 10:08:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,6 +59,7 @@ public class AgentEventListener {
         Organization organization = (Organization) event.getSource();
         User user = organization.getUser();
         //
+        String orgUid = organization.getUid();
         log.info("agent - organization created: {}", organization.getName());
         //
         Optional<Member> memberOptional = memberService.findByMobileAndOrgUid(user.getMobile(), organization.getUid());
@@ -74,9 +75,10 @@ public class AgentEventListener {
                 .password(bytedeskProperties.getPasswordDefault())
                 .memberUid(member.getUid())
                 // .userUid(user.getUid())
-                .orgUid(organization.getUid())
+                // .orgUid(organization.getUid())
                 .build();
         agent1Request.setUid(uidUtils.getCacheSerialUid());
+        agent1Request.setOrgUid(orgUid);
 
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();

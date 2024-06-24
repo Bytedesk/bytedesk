@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 17:16:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:34:02
+ * @LastEditTime: 2024-06-24 22:41:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,57 +34,13 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class RobotServiceSettingsResponse extends BaseServiceSettingsResponse {
 
-    // @Builder.Default
-    // // private String language = I18Consts.ZH_CN;
-    // private LanguageEnum language = LanguageEnum.ZH_CN;
-
-    // @Builder.Default
-    // @Column(name = "is_auto_pop")
-    // private boolean autoPop = false;
-
-    // /**
-    //  * TODO: set different tips for different lang
-    //  */
-    // @Builder.Default
-    // private boolean showTopTip = false;
-
-    // @Builder.Default
-    // @Column(length = 512)
-    // private String topTip = I18Consts.I18N_TOP_TIP;
-
-    // @Builder.Default
-    // private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
-
-    // @Builder.Default
-    // private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;
-
-    // /** auto close time in min - 默认自动关闭时间，单位分钟 */
-    // @Builder.Default
-    // private Double autoCloseMin = Double.valueOf(25);
-
-    // @Builder.Default
-    // @OneToMany(fetch = FetchType.LAZY)
-    // private List<QuickButtonResponse> quickButtons = new ArrayList<>();
-
-    // @Builder.Default
-    // @ManyToMany(fetch = FetchType.LAZY)
-    // private List<FaqResponse> faqs = new ArrayList<>();
-
     // 是否允许转人工
-    @Builder.Default
-    private boolean allowTransferToAgent = true;
+    private boolean allowTransferToAgent;
 
     // 限制仅允许：workgroup、appointed
-    @Builder.Default
-    private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
+    private ThreadTypeEnum transferType;
 
     // agentUid or workgroupUid
     private String transferToUid;
 
-    // //
-    // @Builder.Default
-    // private boolean showLogo = true;
-
-    // // 有效日期
-    // private Date validateUntil;
 }

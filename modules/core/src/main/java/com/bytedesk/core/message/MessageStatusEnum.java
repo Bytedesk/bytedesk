@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:33:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 17:25:42
+ * @LastEditTime: 2024-06-21 18:34:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@
 package com.bytedesk.core.message;
 
 public enum MessageStatusEnum {
-    PENDING, // sending
+    SENDING, // sending
     FAILED, // send failed
     SUCCESS, // send success
     RECALL, // recall back
