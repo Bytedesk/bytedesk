@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 17:21:14
+ * @LastEditTime: 2024-06-24 23:55:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,10 +109,12 @@ public class MemberService {
     @Transactional
     public MemberResponse create(MemberRequest memberRequest) {
         //
-        if (StringUtils.hasText(memberRequest.getEmail()) && existsByEmailAndOrgUid(memberRequest.getEmail(), memberRequest.getOrgUid())) {
+        if (StringUtils.hasText(memberRequest.getEmail())
+                && existsByEmailAndOrgUid(memberRequest.getEmail(), memberRequest.getOrgUid())) {
             throw new EmailExistsException("Email " + memberRequest.getEmail() + " already exists..!!");
         }
-        if (StringUtils.hasText(memberRequest.getMobile()) && existsByMobileAndOrgUid(memberRequest.getMobile(), memberRequest.getOrgUid())) {
+        if (StringUtils.hasText(memberRequest.getMobile())
+                && existsByMobileAndOrgUid(memberRequest.getMobile(), memberRequest.getOrgUid())) {
             throw new MobileExistsException("Mobile " + memberRequest.getMobile() + " already exists..!!");
         }
         // 查找部门信息
@@ -132,7 +134,7 @@ public class MemberService {
         userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         userRequest.setPlatform(PlatformEnum.BYTEDESK.getValue());
         userRequest.setOrgUid(depOptional.get().getOrgUid());
-
+        // 
         User user = null;
         if (StringUtils.hasText(memberRequest.getMobile())) {
             user = userService.findByMobileAndPlatform(memberRequest.getMobile(), 
@@ -272,7 +274,6 @@ public class MemberService {
         }
         //
         String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
-
         for (int i = 0; i < departments.length; i++) {
             String department = departments[i];
             Optional<Department> depOptional = departmentService.findByNameAndOrgUid(department, orgUid);
@@ -286,9 +287,10 @@ public class MemberService {
                             .telephone("000")
                             .mobile(bytedeskProperties.getMobile())
                             .email(bytedeskProperties.getEmail())
-                            .orgUid(orgUid)
+                            // .orgUid(orgUid)
                             .depUid(depOptional.get().getUid())
                             .build();
+                    memberRequest.setOrgUid(orgUid);
                     create(memberRequest);
                 } else {
                     String userNo = String.format("%03d", i);
@@ -300,9 +302,10 @@ public class MemberService {
                             .telephone(userNo)
                             .mobile("12345678" + userNo)
                             .email(userNo + "@email.com")
-                            .orgUid(orgUid)
+                            // .orgUid(orgUid)
                             .depUid(depOptional.get().getUid())
                             .build();
+                    memberRequest.setOrgUid(orgUid);
                     create(memberRequest);
                 }
 

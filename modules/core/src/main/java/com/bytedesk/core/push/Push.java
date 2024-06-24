@@ -15,7 +15,6 @@
 package com.bytedesk.core.push;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.persistence.Column;
@@ -51,7 +50,7 @@ public class Push extends BaseEntity {
 
     private String receiver;
 
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "push_type")
     private String type;
 
     private String ip;

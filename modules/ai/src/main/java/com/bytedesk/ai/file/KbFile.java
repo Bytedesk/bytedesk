@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:23:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-27 11:59:22
+ * @LastEditTime: 2024-06-23 11:15:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,7 +72,7 @@ public class KbFile extends BaseEntity {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgUid;
+    // private String orgUid;
     
     /**
      * 所属用户

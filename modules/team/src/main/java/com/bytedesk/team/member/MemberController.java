@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 10:11:18
+ * @LastEditTime: 2024-06-22 16:03:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mem")
-@Tag(name = "member - 成员", description = "member apis")
+@Tag(name = "member", description = "member apis")
 public class MemberController {
 
     private final MemberService memberService;
@@ -57,20 +57,7 @@ public class MemberController {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
-    /**
-     * query department users
-     *
-     * @return json
-     */
-    // @GetMapping("/query/dept")
-    // public ResponseEntity<?> queryByDepartments(MemberRequest memberRequest) {
-    // //
-    // Page<MemberResponse> memberResponse =
-    // memberService.queryByDepartments(memberRequest);
-    // //
-    // return ResponseEntity.ok(JsonResult.success(memberResponse));
-    // }
-
+    
     @GetMapping("/query")
     public ResponseEntity<?> query(MemberRequest memberRequest) {
         //

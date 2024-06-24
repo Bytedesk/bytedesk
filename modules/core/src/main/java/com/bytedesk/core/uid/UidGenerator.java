@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2021-02-24 15:52:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:52:01
+ * @LastEditTime: 2024-06-23 10:32:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ package com.bytedesk.core.uid;
 import java.util.Date;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.uid.worker.WorkerNodeType;
 
 import jakarta.persistence.Column;
@@ -60,7 +59,7 @@ public class UidGenerator extends BaseEntity {
     /**
      * type of {@link WorkerNodeType}
      */
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "generator_type")
     private int type;
 
     /**

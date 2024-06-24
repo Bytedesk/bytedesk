@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:20:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 14:32:35
+ * @LastEditTime: 2024-06-23 10:10:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +53,7 @@ public class WorkgroupEventListener {
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();
         User user = organization.getUser();
+        String orgUid = organization.getUid();
         // 创建默认workgroup
         log.info("workgroup - organization created: {}", organization.getName());
 
@@ -60,21 +62,34 @@ public class WorkgroupEventListener {
         agentOptional.ifPresent(agent -> {
             agentUids.add(agent.getUid());
         });
-
+        // 
+        List<String> faqUids = Arrays.asList(
+            orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+            orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2
+        );
+        // 
+        List<String> quickButtonUids = Arrays.asList(
+            orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+            orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2
+        );
+        // 
+        List<String> worktimeUids = new ArrayList<>();
+        String worktimeUid = worktimeService.createDefault();
+        worktimeUids.add(worktimeUid);
+        
         // // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_DESCRIPTION)
                 .agentUids(agentUids)
-                .orgUid(organization.getUid())
+                // .orgUid(organization.getUid())
                 .build();
         workgroupRequest.setUid(uidUtils.getCacheSerialUid());
-
-        List<String> worktimeUids = new ArrayList<>();
-        String worktimeUid = worktimeService.createDefault();
-        worktimeUids.add(worktimeUid);
+        workgroupRequest.setOrgUid(orgUid);
+        workgroupRequest.getServiceSettings().setFaqUids(faqUids);
+        workgroupRequest.getServiceSettings().setQuickButtonUids(quickButtonUids);
         workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
-        
+
         workgroupService.create(workgroupRequest);
     }
 

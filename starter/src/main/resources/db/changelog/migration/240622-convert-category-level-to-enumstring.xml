@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- add changeset -->
+     <changeSet id="20240622-migrate-category-level" author="jackning">
+        <!-- Add a new column to store the string value -->
+        <addColumn tableName="core_category">
+            <column name="level_string" type="varchar(255)" />
+        </addColumn>
+
+        <!-- Migrate data from the old integer column to the new string column -->
+        <sql>
+            UPDATE core_category SET level_string = CASE
+            WHEN level = 0 THEN 'PLATFORM'
+            WHEN level = 1 THEN 'ORGNIZATION'
+            WHEN level = 2 THEN 'DEPARTMENT'
+            WHEN level = 3 THEN 'WORKGROUP'
+            ELSE 'UNKNOWN'
+            END;
+        </sql>
+
+        <!-- Drop the old integer column -->
+        <dropColumn tableName="core_category" columnName="level" />
+
+        <!-- Rename the new column to the old column name -->
+        <renameColumn tableName="core_category" oldColumnName="level_string" newColumnName="level" />
+
+        <!-- Optionally, if you want to set a not-null constraint and/or a default value -->
+        <!-- <modifyColumn tableName="core_category" columnName="level" type="varchar(255)" notNull="true"
+            defaultValue="SERVICE" /> -->
+    </changeSet>
+
+</databaseChangeLog>

@@ -262,9 +262,10 @@ public class VisitorService {
                 .status(MessageStatusEnum.READ)
                 .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(user))
-                .orgUid(thread.getOrgUid())
+                // .orgUid(thread.getOrgUid())
                 .build();
         message.setUid(uidUtils.getCacheSerialUid());
+        message.setOrgUid(thread.getOrgUid());
 
         if (!agent.isConnected() || !agent.isAvailable()) {
             message.setContent(agent.getServiceSettings().getLeavemsgTip());
@@ -396,9 +397,10 @@ public class VisitorService {
                 // .client(ClientConsts.CLIENT_SYSTEM)
                 .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(user))
-                .orgUid(thread.getOrgUid())
+                // .orgUid(thread.getOrgUid())
                 .build();
         message.setUid(uidUtils.getCacheSerialUid());
+        message.setOrgUid(thread.getOrgUid());
 
         if (!agent.isConnected() || !agent.isAvailable()) {
             message.setContent(workgroup.getServiceSettings().getLeavemsgTip());
@@ -495,9 +497,10 @@ public class VisitorService {
                 // .client(ClientConsts.CLIENT_SYSTEM)
                 .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(user))
-                .orgUid(thread.getOrgUid())
+                // .orgUid(thread.getOrgUid())
                 .build();
         message.setUid(uidUtils.getCacheSerialUid());
+        message.setOrgUid(thread.getOrgUid());
 
         message.getThreads().add(thread);
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 13:19:38
+ * @LastEditTime: 2024-06-24 22:43:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -76,20 +76,23 @@ public class Thread extends BaseEntity {
      * @{ThreadTypeConsts}
      */
     @Builder.Default
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "thread_type", nullable = false)
     // private String type = ThreadTypeConsts.WORKGROUP;
     private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
 
     /** closed/open, agent closed/auto closed */
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     // private String status = StatusConsts.THREAD_STATUS_OPEN;
     private ThreadStatusEnum status = ThreadStatusEnum.OPEN;
 
     // private String client;
+    @Enumerated(EnumType.STRING)
     private ClientEnum client;
 
     /**
-     * 用途：
+     * 
      */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
@@ -131,7 +134,7 @@ public class Thread extends BaseEntity {
     private User owner;
 
     /** belong to org */
-    private String orgUid;
+    // private String orgUid;
 
     //
     public Boolean isClosed() {

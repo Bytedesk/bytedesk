@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 11:52:16
+ * @LastEditTime: 2024-06-24 22:39:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,8 @@ import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,9 +45,11 @@ public class RobotLlm {
     private Double scoreThreshold = 0.5;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private RobotModelEnum model = RobotModelEnum.ZHIPUAI_GLM_3_TURBO;
     
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     // private String embeddings = "m3e-base";
     private RobotEmbedingEnum embeddings = RobotEmbedingEnum.M3E_BASE;
 

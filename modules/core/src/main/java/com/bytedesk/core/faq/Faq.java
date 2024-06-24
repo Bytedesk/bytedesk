@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-22 16:21:54
+ * @LastEditTime: 2024-06-23 11:11:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -52,7 +54,8 @@ public class Faq extends BaseEntity {
     private String content;
 
     @Builder.Default
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "faq_type", nullable = false)
     // private String type;
     private MessageTypeEnum type = MessageTypeEnum.TEXT;
 
@@ -60,5 +63,5 @@ public class Faq extends BaseEntity {
     @ManyToOne
     private Category category;
 
-    private String orgUid;
+    // private String orgUid;
 }

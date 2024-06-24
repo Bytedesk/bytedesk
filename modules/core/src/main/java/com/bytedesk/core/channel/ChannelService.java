@@ -79,9 +79,10 @@ public class ChannelService {
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
                 .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
                 .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
-                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
+                // .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
         channelRequest.setType(TypeConsts.TYPE_SYSTEM);
+        channelRequest.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
         create(channelRequest);
     }
     

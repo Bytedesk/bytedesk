@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:13:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 21:09:22
+ * @LastEditTime: 2024-06-24 22:38:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,8 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.enums.LanguageEnum;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,6 +55,7 @@ public class Kb extends BaseEntity {
     private boolean published = true;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     // private String language = I18Consts.ZH_CN;
     private LanguageEnum language = LanguageEnum.ZH_CN;
 
@@ -62,7 +65,7 @@ public class Kb extends BaseEntity {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgUid;
+    // private String orgUid;
     
     /**
      * 所属用户

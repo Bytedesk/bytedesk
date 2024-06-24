@@ -92,10 +92,11 @@ public class ZhipuAiService {
                 .type(MessageTypeEnum.ROBOT_QA)
                 .status(MessageStatusEnum.SUCCESS)
                 .client(ClientEnum.SYSTEM)
-                .orgUid(thread.getOrgUid())
+                // .orgUid(thread.getOrgUid())
                 .user(JSON.toJSONString(user))
                 .build();
         message.setUid(messageUid);
+        message.setOrgUid(thread.getOrgUid());
         // 
         message.getThreads().add(thread);
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 15:12:54
+ * @LastEditTime: 2024-06-24 21:58:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,8 +24,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -69,9 +72,11 @@ public class QuickButtonService extends BaseService<QuickButton, QuickButtonRequ
     public QuickButtonResponse create(QuickButtonRequest request) {
     
         QuickButton quickButton = modelMapper.map(request, QuickButton.class);
-    
-        quickButton.setUid(uidUtils.getCacheSerialUid());
-    
+        if (!StringUtils.hasText(request.getUid())) {
+            quickButton.setUid(uidUtils.getCacheSerialUid());
+        }
+        quickButton.setType(MessageTypeEnum.fromValue(request.getType()));
+        
         return convertToResponse(save(quickButton));
     }
 
@@ -128,6 +133,33 @@ public class QuickButtonService extends BaseService<QuickButton, QuickButtonRequ
     @Override
     public QuickButtonResponse convertToResponse(QuickButton entity) {
         return modelMapper.map(entity, QuickButtonResponse.class);
+    }
+
+
+    public void initData() {
+        if (quickButtonRepository.count() > 0) {
+            return;
+        }
+
+        //
+        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        QuickButtonRequest quickButtonDemo1 = QuickButtonRequest.builder()
+                .title(I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1)
+                .content(I18Consts.I18N_QUICK_BUTTON_DEMO_CONTENT_1)
+                .type(MessageTypeEnum.QUICKBUTTON_QA.getValue())
+                .orgUid(orgUid)
+                .build();
+        quickButtonDemo1.setUid(orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1);
+        create(quickButtonDemo1);
+        //
+        QuickButtonRequest quickButtonDemo2 = QuickButtonRequest.builder()
+                .title(I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2)
+                .content(I18Consts.I18N_QUICK_BUTTON_DEMO_CONTENT_2)
+                .type(MessageTypeEnum.QUICKBUTTON_URL.getValue())
+                .orgUid(orgUid)
+                .build();
+        quickButtonDemo2.setUid(orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
+        create(quickButtonDemo2);
     }
 
 }

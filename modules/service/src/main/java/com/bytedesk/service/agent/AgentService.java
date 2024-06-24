@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 14:07:27
+ * @LastEditTime: 2024-06-24 23:58:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.service.agent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +48,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.event.BytedeskEventPublisher;
+import com.bytedesk.core.faq.Faq;
+import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quick_button.QuickButton;
 import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -81,6 +84,8 @@ public class AgentService {
     private final AuthService authService;
 
     private final RobotService robotService;
+
+    private final FaqService faqService;
 
     private final WorktimeService worktimeService;
 
@@ -152,7 +157,7 @@ public class AgentService {
             serviceSettings.setWorktimeUids(worktimeUids);
             agentRequest.setServiceSettings(serviceSettings);
         }
-        // 
+        //
         Iterator<String> worktimeTterator = agentRequest.getServiceSettings().getWorktimeUids().iterator();
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();
@@ -162,6 +167,34 @@ public class AgentService {
                 agent.getServiceSettings().getWorktimes().add(worktimeEntity);
             } else {
                 throw new RuntimeException(worktimeUid + " is not found.");
+            }
+        }
+        //
+        if (agentRequest.getServiceSettings().getQuickButtonUids() != null
+                && agentRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
+            while (iterator.hasNext()) {
+                String quickButtonUid = iterator.next();
+                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
+                if (quickButtonOptional.isPresent()) {
+                    QuickButton quickButtonEntity = quickButtonOptional.get();
+
+                    agent.getServiceSettings().getQuickButtons().add(quickButtonEntity);
+                }
+            }
+        }
+        //
+        if (agentRequest.getServiceSettings().getFaqUids() != null
+                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String faqUid = iterator.next();
+                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    Faq faqEntity = faqOptional.get();
+
+                    agent.getServiceSettings().getFaqs().add(faqEntity);
+                }
             }
         }
         // 保存Agent并检查返回值
@@ -214,6 +247,20 @@ public class AgentService {
                     QuickButton quickButtonEntity = quickButtonOptional.get();
 
                     serviceSettings.getQuickButtons().add(quickButtonEntity);
+                }
+            }
+        }
+        //
+        if (agentRequest.getServiceSettings().getFaqUids() != null
+                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String faqUid = iterator.next();
+                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    Faq faqEntity = faqOptional.get();
+
+                    serviceSettings.getFaqs().add(faqEntity);
                 }
             }
         }
@@ -385,11 +432,23 @@ public class AgentService {
         }
 
         String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
-        // 
         Optional<Member> memberOptional = memberService.findByMobileAndOrgUid(bytedeskProperties.getMobile(), orgUid);
         if (!memberOptional.isPresent()) {
             return;
         }
+        //
+        List<String> faqUids = Arrays.asList(
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+        //
+        List<String> quickButtonUids = Arrays.asList(
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
+        //
+        List<String> worktimeUids = new ArrayList<>();
+        String worktimeUid = worktimeService.createDefault();
+        worktimeUids.add(worktimeUid);
+        //
         Member member = memberOptional.get();
         // add agent
         AgentRequest agentRequest = AgentRequest.builder()
@@ -398,20 +457,18 @@ public class AgentService {
                 .mobile(member.getMobile())
                 .password(bytedeskProperties.getPasswordDefault())
                 .memberUid(member.getUid())
-                .orgUid(orgUid)
+                // .orgUid(orgUid)
                 .build();
         agentRequest.setUid(UserConsts.DEFAULT_AGENT_UID);
-
-        List<String> worktimeUids = new ArrayList<>();
-        String worktimeUid = worktimeService.createDefault();
-        worktimeUids.add(worktimeUid);
+        agentRequest.setOrgUid(orgUid);
+        //
+        agentRequest.getServiceSettings().setFaqUids(faqUids);
+        agentRequest.getServiceSettings().setQuickButtonUids(quickButtonUids);
         agentRequest.getServiceSettings().setWorktimeUids(worktimeUids);
-
+        //
         create(agentRequest);
     }
 
-    // 
-    
-    
+    //
 
 }

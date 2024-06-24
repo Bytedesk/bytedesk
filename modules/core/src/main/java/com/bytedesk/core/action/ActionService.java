@@ -40,7 +40,7 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
     private final ActionRepository actionRepository;
 
     private final ModelMapper modelMapper;
-  
+
     private final UidUtils uidUtils;
 
     private final AuthService authService;
@@ -49,7 +49,7 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
 
         Action action = modelMapper.map(actionRequest, Action.class);
         action.setUid(uidUtils.getCacheSerialUid());
-        // 
+        //
         User user = authService.getCurrentUser();
         if (user != null) {
             action.setUser(user);
@@ -57,7 +57,7 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
         } else {
             action.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
         }
-        // 
+        //
         return convertToResponse(save(action));
     }
 
@@ -71,10 +71,10 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
 
     @Override
     public Page<ActionResponse> queryByOrg(ActionRequest request) {
-        
+
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
-        // 
-        Specification<Action> spec = ActionSpecs.search(request);
+        //
+        Specification<Action> spec = ActionSpecification.search(request);
         Page<Action> page = actionRepository.findAll(spec, pageable);
 
         return page.map(action -> convertToResponse(action));
@@ -115,5 +115,5 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
-    
+
 }

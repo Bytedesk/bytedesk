@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 18:10:35
+ * @LastEditTime: 2024-06-23 11:12:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.core.tag;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.persistence.Column;
@@ -45,7 +44,7 @@ public class Tag extends BaseEntity {
     /**
      * 类别：会话标签 or 客户标签 or 学校 or 课程 or 老师
      */
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "tag_type")
     private String type;
 
     /**
@@ -59,6 +58,6 @@ public class Tag extends BaseEntity {
     private PlatformEnum platform = PlatformEnum.BYTEDESK;
 
     /** belong to org */
-    private String orgUid;
+    // private String orgUid;
 
 }

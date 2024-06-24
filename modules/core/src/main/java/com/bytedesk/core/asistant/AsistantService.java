@@ -86,10 +86,10 @@ public class AsistantService {
                 .nickname(I18Consts.I18N_FILE_ASISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .description(I18Consts.I18N_FILE_ASISTANT_DESCRIPTION)
-                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
         asistantRequest.setUid(UserConsts.DEFAULT_FILE_ASISTANT_UID);
         asistantRequest.setType(TypeConsts.TYPE_SYSTEM);
+        asistantRequest.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
         create(asistantRequest);
 
     }

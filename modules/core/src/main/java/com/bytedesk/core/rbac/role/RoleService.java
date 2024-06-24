@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 18:14:34
+ * @LastEditTime: 2024-06-23 10:52:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,11 +55,12 @@ public class RoleService {
         public Role create(RoleRequest rolerRequest) {
 
                 if (existsByNameAndOrgUid(rolerRequest.getName(), rolerRequest.getOrgUid())) {
-                        throw new RuntimeException("角色已存在");
+                        throw new RuntimeException("role " + rolerRequest.getName() + " already exists");
                 }
 
                 Role role = modelMapper.map(rolerRequest, Role.class);
                 role.setUid(uidUtils.getCacheSerialUid());
+                role.setType(RoleTypeEnum.fromValue(rolerRequest.getType()));
                 //
                 Iterator<String> iterator = rolerRequest.getAuthorityUids().iterator();
                 while (iterator.hasNext()) {
@@ -81,7 +82,6 @@ public class RoleService {
 
                 Specification<Role> specification = RoleSpecification.search(roleRequest);
                 Page<Role> rolePage = roleRepository.findAll(specification, pageable);
-                // Page<Role> rolePage = roleRepository.findByOrgUidAndDeleted(roleRequest.getOrgUid(), false, pageable);
 
                 return rolePage.map(ConvertUtils::convertToRoleResponse);
         }
@@ -111,10 +111,11 @@ public class RoleService {
                         RoleRequest roleRequest = RoleRequest.builder()
                                         .name(name)
                                         .displayName(displayName)
-                                        .orgUid(orgUid)
+                                        // .orgUid(orgUid)
                                         .description(name)
                                         .build();
                         roleRequest.setType(TypeConsts.TYPE_SYSTEM);
+                        roleRequest.setOrgUid(orgUid);
                         //
                         Optional<Authority> authorityOptional = authorityService.findByValue(authority);
                         if (authorityOptional.isPresent()) {

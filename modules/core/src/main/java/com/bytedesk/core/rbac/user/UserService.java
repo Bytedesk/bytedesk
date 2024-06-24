@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 15:15:51
+ * @LastEditTime: 2024-06-22 16:52:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -212,12 +212,21 @@ public class UserService  {
     @Transactional
     public User createUser(UserRequest userRequest) {
         //
-        if (existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new EmailExistsException("Email already exists..!!");
-        }
         if (existsByMobileAndPlatform(userRequest.getMobile(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new MobileExistsException("Mobile already exists..!!");
+            Optional<User> userOptional = findByMobileAndPlatform(userRequest.getMobile(),
+                    PlatformEnum.fromValue(userRequest.getPlatform()));
+            return userOptional.get();
+            // throw new MobileExistsException("Mobile " + userRequest.getMobile() + " on "
+            // + userRequest.getPlatform()+" already exists..!!");
         }
+        
+        if (existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
+            Optional<User> userOptional = findByEmailAndPlatform(userRequest.getEmail(),
+                    PlatformEnum.fromValue(userRequest.getPlatform()));
+            return userOptional.get();
+            // throw new EmailExistsException("Email " + userRequest.getEmail() + " on " + userRequest.getPlatform() + " already exists..!!");
+        }
+        
         //
         User user = User.builder()
                 // .avatar(userRequest.getAvatar())

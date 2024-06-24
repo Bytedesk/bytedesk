@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:51:55
+ * @LastEditTime: 2024-06-23 10:32:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.Column;
@@ -57,7 +56,7 @@ public class Token extends BaseEntity {
 
     private String refreshToken;
 
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "token_type")
     private String type;
 
     private Long expireTime;

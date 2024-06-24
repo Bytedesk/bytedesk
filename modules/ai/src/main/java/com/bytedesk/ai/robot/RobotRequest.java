@@ -17,7 +17,6 @@ package com.bytedesk.ai.robot;
 import com.bytedesk.ai.settings.RobotServiceSettingsRequest;
 import com.bytedesk.core.base.BaseRequest;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -47,6 +46,6 @@ public class RobotRequest extends BaseRequest {
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
     
-    @NotBlank
-    private String orgUid;
+    // @NotBlank
+    // private String orgUid;
 }

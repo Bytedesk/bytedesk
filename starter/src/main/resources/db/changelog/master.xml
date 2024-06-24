@@ -14,7 +14,12 @@
     </changeSet> -->
     <!--  -->
     <!-- <include file="db/changelog/migration/_0.0.1_migrate.sql" />  -->
-     <include file="db/changelog/migration/240621_rename_isautopop.xml" />
-     <include file="db/changelog/migration/240621-convert-message-type-to-enumstring.xml" />
+     <!-- <include file="db/changelog/migration/240621_rename_isautopop.xml" /> -->
+     <!-- <include file="db/changelog/migration/240621-convert-message-type-to-enumstring.xml" /> -->
+     <!-- <include file="db/changelog/migration/240621-convert-message-status-to-enumstring.xml" /> -->
+     <!-- <include file="db/changelog/migration/240622-convert-robot-type-to-enumstring.xml" /> -->
+     <!-- <include file="db/changelog/migration/240622-convert-category-level-to-enumstring.xml" /> -->
+     <!-- <include file="db/changelog/migration/240622-convert-faq-type-to-enumstring.xml" /> -->
+     <!-- <include file="db/changelog/migration/240622-convert-quick-button-type-to-enumstring.xml" /> -->
 
 </databaseChangeLog>

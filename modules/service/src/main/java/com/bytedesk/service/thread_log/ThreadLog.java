@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-09 16:34:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 13:20:12
+ * @LastEditTime: 2024-06-24 22:44:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import org.hibernate.type.SqlTypes;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.thread.ThreadStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -27,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -82,16 +85,19 @@ public class ThreadLog extends BaseEntity {
      * @{ThreadTypeConsts}
      */
     @Builder.Default
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "thread_type", nullable = false)
     // private String type = ThreadTypeConsts.WORKGROUP;
     private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
 
     // closed/open
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     // private String status = StatusConsts.THREAD_STATUS_OPEN;
     private ThreadStatusEnum status = ThreadStatusEnum.OPEN;
 
-    private String client;
+    @Enumerated(EnumType.STRING)
+    private ClientEnum client;
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
@@ -113,6 +119,6 @@ public class ThreadLog extends BaseEntity {
     private User owner;
 
     /** belong to org */
-    private String orgUid;
+    // private String orgUid;
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 07:19:14
+ * @LastEditTime: 2024-06-23 11:16:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 // import jakarta.persistence.AssociationOverride;
@@ -29,6 +28,8 @@ import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
@@ -43,8 +44,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 机器人
- *
+ * 
  */
 @Entity
 @Data
@@ -78,7 +78,8 @@ public class Robot extends BaseEntity {
     // 客服机器人、问答机器人、闲聊
     // service、ask、chat
     @Builder.Default
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "robot_type", nullable = false)
     // private String type = TypeConsts.ROBOT_TYPE_SERVICE;
     private RobotTypeEnum type = RobotTypeEnum.SERVICE;
 
@@ -108,7 +109,7 @@ public class Robot extends BaseEntity {
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
-    private String orgUid;
+    // private String orgUid;
 
     
 

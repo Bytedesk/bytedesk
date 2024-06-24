@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:42:31
+ * @LastEditTime: 2024-06-24 23:17:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,9 +18,10 @@ import java.io.Serializable;
 
 import lombok.Data;
 
-
 @Data
 public abstract class BaseResponse implements Serializable {
 
     private String uid;
+
+    // private String orgUid;
 }

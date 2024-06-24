@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 18:10:45
+ * @LastEditTime: 2024-06-23 11:11:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,7 +54,7 @@ public class Category extends BaseEntity {
     // private String description;
 
     // this category type may be user defined, so it should use string type, not enum
-    @Column(name = TypeConsts.COLUMN_NAME_TYPE)
+    @Column(name = "category_type", nullable = false)
     private String type;
 
     private String icon;
@@ -76,6 +75,7 @@ public class Category extends BaseEntity {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     private LevelEnum level = LevelEnum.ORGNIZATION;
 
@@ -84,7 +84,7 @@ public class Category extends BaseEntity {
     private PlatformEnum platform = PlatformEnum.BYTEDESK;
 
     /** belong to org */
-    private String orgUid;
+    // private String orgUid;
 
     public void addChild(Category child) {
         children.add(child);

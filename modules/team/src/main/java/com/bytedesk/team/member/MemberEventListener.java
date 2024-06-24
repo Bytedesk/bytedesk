@@ -49,15 +49,17 @@ public class MemberEventListener {
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();
         User user = organization.getUser();
+        String orgUid = organization.getUid();
         log.info("organization created: {}", organization.getName());
         // 
         Department department = Department.builder()
                         .name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)
                         .description(TypeConsts.DEPT_ADMIN)
-                        .orgUid(organization.getUid())
+                        // .orgUid(organization.getUid())
                         .type(TypeConsts.TYPE_SYSTEM)
                 .build();
         department.setUid(uidUtils.getCacheSerialUid());
+        department.setOrgUid(orgUid);
         departmentService.save(department);
 
         // 创建团队成员
@@ -69,7 +71,7 @@ public class MemberEventListener {
         memberRequest.setTelephone("001");
         memberRequest.setMobile(user.getMobile());
         memberRequest.setDepUid(department.getUid());
-        memberRequest.setOrgUid(organization.getUid());
+        memberRequest.setOrgUid(orgUid);
         memberService.create(memberRequest);
     }
 

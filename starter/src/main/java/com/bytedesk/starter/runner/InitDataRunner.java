@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-19 16:04:24
+ * @LastEditTime: 2024-06-24 23:55:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,9 @@ import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.asistant.AsistantService;
 import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.channel.ChannelService;
+import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quartz.QuartzService;
+import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.authority.AuthorityService;
 import com.bytedesk.core.rbac.organization.OrganizationService;
 import com.bytedesk.core.rbac.role.RoleService;
@@ -83,6 +85,15 @@ public class InitDataRunner implements ApplicationRunner {
     AgentService agentService;
 
     @Autowired
+    CategoryService categoryService;
+
+    @Autowired
+    FaqService faqService;
+
+    @Autowired
+    QuickButtonService quickButtonService;
+
+    @Autowired
     WorkgroupService workgroupService;
 
     @Autowired
@@ -94,8 +105,7 @@ public class InitDataRunner implements ApplicationRunner {
     @Autowired
     QuartzService quartzService;
 
-    @Autowired
-    CategoryService categoryService;
+    
 
     @Autowired
     QuickReplyService quickReplyService;
@@ -122,9 +132,15 @@ public class InitDataRunner implements ApplicationRunner {
 
         memberService.initData();
 
+        categoryService.initData();
+
+        faqService.initData();
+
         robotService.initData();
 
         agentService.initData();
+
+        quickButtonService.initData();
 
         workgroupService.initData();
 
@@ -133,8 +149,6 @@ public class InitDataRunner implements ApplicationRunner {
         threadService.initData();
 
         quartzService.initData();
-
-        categoryService.initData();
 
         quickReplyService.initData();
 

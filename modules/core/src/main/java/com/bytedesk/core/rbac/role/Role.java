@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 18:06:55
+ * @LastEditTime: 2024-06-23 11:11:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.authority.Authority;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -64,8 +63,11 @@ public class Role extends BaseEntity {
 
 	private String description;
 
-	@Column(name = TypeConsts.COLUMN_NAME_TYPE)
-	private String type;
+	@Builder.Default
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role_type", nullable = false)
+	// private String type;
+	private RoleTypeEnum type = RoleTypeEnum.SYSTEM;
 
 	@JsonIgnore
 	@Builder.Default
@@ -80,7 +82,7 @@ public class Role extends BaseEntity {
 	// @ManyToOne(fetch = FetchType.LAZY)
 	// @JsonBackReference("user-roles") // 避免无限递归
 	// private User user;
-	private String orgUid;
+	// private String orgUid;
 
 	public void addAuthority(Authority authority) {
 		this.authorities.add(authority);
