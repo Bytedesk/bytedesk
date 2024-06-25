@@ -36,6 +36,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,7 +47,6 @@ import lombok.experimental.Accessors;
 
 /**
  * human agent, not ai agent
- * 客服账号-关联信息
  */
 // @Slf4j
 @Entity
@@ -61,6 +61,7 @@ import lombok.experimental.Accessors;
 @Table(name = "service_agent", uniqueConstraints = {
 // @UniqueConstraint(columnNames = { "email", "orgUid" }),
 // @UniqueConstraint(columnNames = { "mobile", "orgUid" })
+    @UniqueConstraint(columnNames = { "userUid", "orgUid" })
 })
 public class Agent extends BaseEntity {
 

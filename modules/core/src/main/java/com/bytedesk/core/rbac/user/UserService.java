@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-22 16:52:58
+ * @LastEditTime: 2024-06-25 17:25:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ import org.modelmapper.ModelMapper;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class UserService  {
+public class UserService {
 
     // cycle dependency - 循环引用，不能使用
     // private final AuthService authService;
@@ -72,12 +72,14 @@ public class UserService  {
     public UserResponse register(UserRequest userRequest) {
 
         if (StringUtils.hasText(userRequest.getEmail())
-                && existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new EmailExistsException("Email already exists..!!");
+                && existsByEmailAndPlatform(userRequest.getEmail(),
+                        PlatformEnum.fromValue(userRequest.getPlatform()))) {
+            throw new EmailExistsException("Email " + userRequest.getEmail() + " already exists..!!");
         }
         if (StringUtils.hasText(userRequest.getMobile())
-                && existsByMobileAndPlatform(userRequest.getMobile(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new MobileExistsException("Mobile already exists..!!");
+                && existsByMobileAndPlatform(userRequest.getMobile(),
+                        PlatformEnum.fromValue(userRequest.getPlatform()))) {
+            throw new MobileExistsException("Mobile " + userRequest.getMobile() + " already exists..!!");
         }
         //
         User user = modelMapper.map(userRequest, User.class);
@@ -125,26 +127,20 @@ public class UserService  {
     @Transactional
     public UserResponse update(UserRequest userRequest) {
 
-        if (StringUtils.hasText(userRequest.getUsername()) 
-                && existsByUsernameAndPlatform(userRequest.getUsername(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new UsernameExistsException("Username already exists..!!");
-        }
-
-        if (StringUtils.hasText(userRequest.getEmail())
-                && existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new EmailExistsException("Email already exists..!!");
-        }
-        if (StringUtils.hasText(userRequest.getMobile())
-                && existsByMobileAndPlatform(userRequest.getMobile(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new MobileExistsException("Mobile already exists..!!");
-        }
-
         User currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
         Optional<User> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
             if (StringUtils.hasText(userRequest.getUsername())) {
+                // 如果新用户名跟旧用户名不同，需要首先判断新用户名是否已经存在，如果存在则抛出异常
+                if (!userRequest.getUsername().equals(user.getUsername())) {
+                    if (existsByUsernameAndPlatform(userRequest.getUsername(),
+                            PlatformEnum.fromValue(userRequest.getPlatform()))) {
+                        throw new UsernameExistsException(
+                                "Username " + userRequest.getUsername() + " already exists..!!");
+                    }
+                }
                 user.setUsername(userRequest.getUsername());
             }
 
@@ -157,10 +153,24 @@ public class UserService  {
             }
 
             if (StringUtils.hasText(userRequest.getEmail())) {
+                // 如果新邮箱跟旧邮箱不同，需要首先判断新邮箱是否已经存在，如果存在则抛出异常
+                if (!userRequest.getEmail().equals(user.getEmail())) {
+                    if (existsByEmailAndPlatform(userRequest.getEmail(),
+                            PlatformEnum.fromValue(userRequest.getPlatform()))) {
+                        throw new EmailExistsException("Email " + userRequest.getEmail() + " already exists..!!");
+                    }
+                }
                 user.setEmail(userRequest.getEmail());
             }
 
             if (StringUtils.hasText(userRequest.getMobile())) {
+                // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
+                if (!userRequest.getMobile().equals(user.getMobile())) {
+                    if (existsByMobileAndPlatform(userRequest.getMobile(),
+                            PlatformEnum.fromValue(userRequest.getPlatform()))) {
+                        throw new MobileExistsException("Mobile " + userRequest.getMobile() + " already exists..!!");
+                    }
+                }
                 user.setMobile(userRequest.getMobile());
             }
 
@@ -170,7 +180,10 @@ public class UserService  {
 
             // TODO: 设置角色role
 
-            user = save(user);
+            User updatedUser = save(user);
+            if (updatedUser == null) {
+                throw new RuntimeException("User update failed..!!");
+            }
 
             return ConvertUtils.convertToUserResponse(user);
 
@@ -219,14 +232,15 @@ public class UserService  {
             // throw new MobileExistsException("Mobile " + userRequest.getMobile() + " on "
             // + userRequest.getPlatform()+" already exists..!!");
         }
-        
+
         if (existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
             Optional<User> userOptional = findByEmailAndPlatform(userRequest.getEmail(),
                     PlatformEnum.fromValue(userRequest.getPlatform()));
             return userOptional.get();
-            // throw new EmailExistsException("Email " + userRequest.getEmail() + " on " + userRequest.getPlatform() + " already exists..!!");
+            // throw new EmailExistsException("Email " + userRequest.getEmail() + " on " +
+            // userRequest.getPlatform() + " already exists..!!");
         }
-        
+
         //
         User user = User.builder()
                 // .avatar(userRequest.getAvatar())
@@ -402,6 +416,5 @@ public class UserService  {
             save(user);
         }
     }
-
 
 }

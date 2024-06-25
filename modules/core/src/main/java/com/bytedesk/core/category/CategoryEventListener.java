@@ -20,7 +20,7 @@ public class CategoryEventListener {
 
     private final CategoryService categoryService;
 
-    @Order(4)
+    @Order(2)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();

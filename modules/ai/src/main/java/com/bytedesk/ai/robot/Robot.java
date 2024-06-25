@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:16:25
+ * @LastEditTime: 2024-06-25 16:13:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,25 +75,18 @@ public class Robot extends BaseEntity {
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
 
-    // 客服机器人、问答机器人、闲聊
     // service、ask、chat
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "robot_type", nullable = false)
-    // private String type = TypeConsts.ROBOT_TYPE_SERVICE;
     private RobotTypeEnum type = RobotTypeEnum.SERVICE;
+
+    // TODO: private、team、public
+
 
     // is_published or not
     @Builder.Default
     private boolean published = false;
-
-    // /**
-    // * llm
-    // */
-    // @ManyToOne()
-    // @JoinColumn(name = "llm_id", foreignKey = @ForeignKey(name = "none", value =
-    // ConstraintMode.NO_CONSTRAINT))
-    // private Llm llm;
 
     /**
      * 知识库
@@ -110,7 +103,5 @@ public class Robot extends BaseEntity {
     // @ManyToOne(fetch = FetchType.LAZY)
     // private Organization organization;
     // private String orgUid;
-
-    
 
 }

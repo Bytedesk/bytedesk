@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 13:57:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 07:04:38
+ * @LastEditTime: 2024-06-25 10:32:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class OrganizationListener {
+public class OrganizationEntityListener {
 
     // 这允许你执行一些后续操作，比如发布事件、更新缓存、触发其他业务逻辑等
     @PostPersist
@@ -40,7 +40,8 @@ public class OrganizationListener {
         }
 
         // 放在此处会报错，直接放到service Create中
-        // BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        // BytedeskEventPublisher bytedeskEventPublisher =
+        // ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         // bytedeskEventPublisher.publishOrganizationCreateEvent(organization);
     }
 
