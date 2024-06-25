@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:46:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 15:00:27
+ * @LastEditTime: 2024-06-25 09:27:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.service.worktime;
 
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
 
     private final UidUtils uidUtils;
 
-    private final ModelMapper modelMapper;
+    // private final ModelMapper modelMapper;
 
     @Override
     public Page<WorktimeResponse> queryByOrg(WorktimeRequest request) {
@@ -73,7 +72,10 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
         Optional<Worktime> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             Worktime worktime = optional.get();
-            modelMapper.map(request, worktime);
+            // modelMapper.map(request, worktime);
+            worktime.setStartTime(DateUtils.formatStringToTime(request.getStartTime()));
+            worktime.setEndTime(DateUtils.formatStringToTime(request.getEndTime()));
+            // 
             return convertToResponse(save(worktime));
         } else {
             throw new RuntimeException("Worktime not found");
@@ -90,7 +92,9 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
         Optional<Worktime> optional = findByUid(uid);
         if (optional.isPresent()) {
             Worktime worktime = optional.get();
-            worktimeRepository.delete(worktime);
+            worktime.setDeleted(true);
+            // worktimeRepository.delete(worktime);
+            save(worktime);
         }
     }
 

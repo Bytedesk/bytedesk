@@ -39,7 +39,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ AsistantListener.class })
+@EntityListeners({ AsistantEntityListener.class })
 // @DiscriminatorValue("Asistant")
 @Table(name = "core_asistant")
 public class Asistant extends BaseEntity {

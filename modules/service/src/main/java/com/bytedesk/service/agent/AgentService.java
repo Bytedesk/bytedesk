@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 23:58:43
+ * @LastEditTime: 2024-06-25 14:35:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,7 +43,6 @@ import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.action.ActionRequest;
 import com.bytedesk.core.config.BytedeskProperties;
-import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.constant.UserConsts;
@@ -63,6 +62,7 @@ import com.bytedesk.service.worktime.WorktimeService;
 import com.bytedesk.team.member.Member;
 import com.bytedesk.team.member.MemberService;
 
+// import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -128,23 +128,74 @@ public class AgentService {
             throw new RuntimeException("user already has an agent..!!");
         }
         //
-        if (!StringUtils.hasText(agentRequest.getAvatar())) {
-            agentRequest.setAvatar(AvatarConsts.DEFAULT_AGENT_AVATAR_URL);
-        }
-        if (!StringUtils.hasText(agentRequest.getDescription())) {
-            agentRequest.setDescription(I18Consts.I18N_AGENT_DESCRIPTION);
-        }
+        // if (!StringUtils.hasText(agentRequest.getAvatar())) {
+        // agentRequest.setAvatar(AvatarConsts.DEFAULT_AGENT_AVATAR_URL);
+        // }
+        // if (!StringUtils.hasText(agentRequest.getDescription())) {
+        // agentRequest.setDescription(I18Consts.I18N_AGENT_DESCRIPTION);
+        // }
         //
-        Agent agent = modelMapper.map(agentRequest, Agent.class);
-        if (!StringUtils.hasText(agent.getUid())) {
+        // Agent agent = modelMapper.map(agentRequest, Agent.class);
+        Agent agent = Agent.builder()
+                .nickname(agentRequest.getNickname())
+                // .avatar(agentRequest.getAvatar())
+                // .description(agentRequest.getDescription())
+                .email(agentRequest.getEmail())
+                .mobile(agentRequest.getMobile())
+                .build();
+        if (StringUtils.hasText(agentRequest.getUid())) {
+            agent.setUid(agentRequest.getUid());
+        } else {
             agent.setUid(uidUtils.getCacheSerialUid());
         }
+        agent.setOrgUid(agentRequest.getOrgUid());
         //
         agent.setMember(memberOptional.get());
         if (memberOptional.get().getUser() != null) {
             agent.setUserUid(memberOptional.get().getUser().getUid());
         } else {
             throw new RuntimeException("user not found with uid: " + memberOptional.get().getUser().getUid());
+        }
+        //
+        if (agentRequest.getServiceSettings() != null
+                && agentRequest.getServiceSettings().getQuickButtonUids() != null
+                && agentRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
+            while (iterator.hasNext()) {
+                String quickButtonUid = iterator.next();
+                // log.info("quickButtonUid: {}", quickButtonUid);
+                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
+                if (quickButtonOptional.isPresent()) {
+                    QuickButton quickButtonEntity = quickButtonOptional.get();
+                    log.info("quickButtonUid added: {}", quickButtonUid);
+
+                    agent.getServiceSettings().getQuickButtons().add(quickButtonEntity);
+                } else {
+                    throw new RuntimeException("quickButtonUid " + quickButtonUid + " not found");
+                }
+            }
+        } else {
+            log.info("agent quickButtonUids is null");
+        }
+        //
+        if (agentRequest.getServiceSettings() != null
+                && agentRequest.getServiceSettings().getFaqUids() != null
+                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String faqUid = iterator.next();
+                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    Faq faqEntity = faqOptional.get();
+                    log.info("faqUid added {}", faqUid);
+
+                    agent.getServiceSettings().getFaqs().add(faqEntity);
+                } else {
+                    throw new RuntimeException("faq " + faqUid + " not found");
+                }
+            }
+        } else {
+            log.info("agent faquids is null");
         }
         //
         if (agentRequest.getServiceSettings() == null
@@ -161,40 +212,14 @@ public class AgentService {
         Iterator<String> worktimeTterator = agentRequest.getServiceSettings().getWorktimeUids().iterator();
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();
+            // log.info("worktimeUid {}", worktimeUid);
             Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
                 Worktime worktimeEntity = worktimeOptional.get();
+
                 agent.getServiceSettings().getWorktimes().add(worktimeEntity);
             } else {
                 throw new RuntimeException(worktimeUid + " is not found.");
-            }
-        }
-        //
-        if (agentRequest.getServiceSettings().getQuickButtonUids() != null
-                && agentRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
-            Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
-            while (iterator.hasNext()) {
-                String quickButtonUid = iterator.next();
-                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
-                if (quickButtonOptional.isPresent()) {
-                    QuickButton quickButtonEntity = quickButtonOptional.get();
-
-                    agent.getServiceSettings().getQuickButtons().add(quickButtonEntity);
-                }
-            }
-        }
-        //
-        if (agentRequest.getServiceSettings().getFaqUids() != null
-                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
-                if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
-
-                    agent.getServiceSettings().getFaqs().add(faqEntity);
-                }
             }
         }
         // 保存Agent并检查返回值
@@ -208,6 +233,7 @@ public class AgentService {
         return ConvertServiceUtils.convertToAgentResponse(savedAgent);
     }
 
+    @Transactional
     public AgentResponse update(AgentRequest agentRequest) {
 
         Optional<Agent> agentOptional = findByUid(agentRequest.getUid());
@@ -224,7 +250,7 @@ public class AgentService {
         agent.setMobile(agentRequest.getMobile());
         agent.setEmail(agentRequest.getEmail());
         agent.setDescription(agentRequest.getDescription());
-        agent.setStatus(agentRequest.getStatus());
+        // agent.setStatus(agentRequest.getStatus());
         agent.setMaxThreadCount(agentRequest.getMaxThreadCount());
 
         ServiceSettings serviceSettings = modelMapper.map(agentRequest.getServiceSettings(), ServiceSettings.class);
@@ -235,33 +261,6 @@ public class AgentService {
                 serviceSettings.setRobot(robot);
             } else {
                 throw new RuntimeException(agentRequest.getServiceSettings().getRobotUid() + " is not found.");
-            }
-        }
-        if (agentRequest.getServiceSettings().getQuickButtonUids() != null
-                && agentRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
-            Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
-            while (iterator.hasNext()) {
-                String quickButtonUid = iterator.next();
-                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
-                if (quickButtonOptional.isPresent()) {
-                    QuickButton quickButtonEntity = quickButtonOptional.get();
-
-                    serviceSettings.getQuickButtons().add(quickButtonEntity);
-                }
-            }
-        }
-        //
-        if (agentRequest.getServiceSettings().getFaqUids() != null
-                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
-                if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
-
-                    serviceSettings.getFaqs().add(faqEntity);
-                }
             }
         }
         //
@@ -276,6 +275,44 @@ public class AgentService {
                 throw new RuntimeException(worktimeUid + " is not found.");
             }
         }
+        //
+        if (agentRequest.getServiceSettings() != null
+                && agentRequest.getServiceSettings().getQuickButtonUids() != null
+                && agentRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
+            while (iterator.hasNext()) {
+                String quickButtonUid = iterator.next();
+                log.info("quickButtonUid: {}", quickButtonUid);
+                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
+                if (quickButtonOptional.isPresent()) {
+                    QuickButton quickButtonEntity = quickButtonOptional.get();
+
+                    serviceSettings.getQuickButtons().add(quickButtonEntity);
+                } else {
+                    throw new RuntimeException("quickButtonUid " + quickButtonUid + " not found");
+                }
+            }
+        }
+        //
+        if (agentRequest.getServiceSettings() != null
+                && agentRequest.getServiceSettings().getFaqUids() != null
+                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String faqUid = iterator.next();
+                log.info("update faq {}", faqUid);
+                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    Faq faqEntity = faqOptional.get();
+
+                    log.info("save update faq {}", faqEntity.getUid());
+                    serviceSettings.getFaqs().add(faqEntity);
+                } else {
+                    throw new RuntimeException("faq " + faqUid + " not found");
+                }
+            }
+        }
+        //
         agent.setServiceSettings(serviceSettings);
 
         // 暂不允许修改绑定成员
@@ -432,6 +469,7 @@ public class AgentService {
         }
 
         String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        //
         Optional<Member> memberOptional = memberService.findByMobileAndOrgUid(bytedeskProperties.getMobile(), orgUid);
         if (!memberOptional.isPresent()) {
             return;
@@ -455,7 +493,7 @@ public class AgentService {
                 .nickname(I18Consts.I18N_AGENT_NICKNAME)
                 .email(member.getEmail())
                 .mobile(member.getMobile())
-                .password(bytedeskProperties.getPasswordDefault())
+                // .password(bytedeskProperties.getPasswordDefault())
                 .memberUid(member.getUid())
                 // .orgUid(orgUid)
                 .build();

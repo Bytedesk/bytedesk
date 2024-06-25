@@ -25,6 +25,8 @@ import com.bytedesk.core.faq.Faq;
 import com.bytedesk.core.quick_button.QuickButton;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MappedSuperclass;
@@ -38,6 +40,7 @@ import lombok.EqualsAndHashCode;
 public class BaseServiceSettings {
 
     @NotBlank
+    @Enumerated(EnumType.STRING)
     // private String language = I18Consts.ZH_CN;
     private LanguageEnum language = LanguageEnum.ZH_CN;
 

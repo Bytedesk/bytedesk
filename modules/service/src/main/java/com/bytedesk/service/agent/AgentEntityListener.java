@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 09:16:55
+ * @LastEditTime: 2024-06-25 10:25:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,9 +20,9 @@ import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+// @Slf4j
 @Component
 public class AgentEntityListener {
 
@@ -36,7 +36,7 @@ public class AgentEntityListener {
 
     @PostPersist
     public void postPersist(Agent agent) {
-        log.info("postPersist {}", agent.getUid());
+        // log.info("postPersist {}", agent.getUid());
         // topicService.create(agent.getUid(), agent.getUser().getUid());
         // 这里可以记录日志、发送通知等
         // create agent topic

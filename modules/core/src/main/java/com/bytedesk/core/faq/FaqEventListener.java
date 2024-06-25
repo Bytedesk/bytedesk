@@ -34,7 +34,7 @@ public class FaqEventListener {
 
     private final FaqService faqService;
 
-    @Order(5)
+    @Order(3)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();

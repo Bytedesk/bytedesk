@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:16:55
+ * @LastEditTime: 2024-06-25 12:40:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -41,13 +44,22 @@ public class RobotEventListener {
 
     private final UidUtils uidUtils;
 
-    @Order(2)
+    @Order(5)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();
         // User user = organization.getUser();
         String orgUid = organization.getUid();
         log.info("robot - organization created: {}", organization.getName());
+        // 
+        //
+        List<String> faqUids = Arrays.asList(
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+        //
+        List<String> quickButtonUids = Arrays.asList(
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
         // 
         Kb kb = kbService.getKb(I18Consts.I18N_ROBOT_NICKNAME, organization.getUid());
         RobotLlm llm = RobotLlm.builder().build();

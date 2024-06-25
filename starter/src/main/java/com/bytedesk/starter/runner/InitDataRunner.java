@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 23:55:02
+ * @LastEditTime: 2024-06-25 11:00:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -105,8 +105,6 @@ public class InitDataRunner implements ApplicationRunner {
     @Autowired
     QuartzService quartzService;
 
-    
-
     @Autowired
     QuickReplyService quickReplyService;
 
@@ -136,11 +134,11 @@ public class InitDataRunner implements ApplicationRunner {
 
         faqService.initData();
 
+        quickButtonService.initData();
+
         robotService.initData();
 
         agentService.initData();
-
-        quickButtonService.initData();
 
         workgroupService.initData();
 

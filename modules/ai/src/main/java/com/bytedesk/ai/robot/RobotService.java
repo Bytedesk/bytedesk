@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 00:02:45
+ * @LastEditTime: 2024-06-25 12:45:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,9 @@
  */
 package com.bytedesk.ai.robot;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -41,7 +43,9 @@ import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse> {
@@ -97,35 +101,52 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         robot.setUid(uidUtils.getCacheSerialUid());
         robot.setOrgUid(request.getOrgUid());
         // 
-        // if (robot.getServiceSettings().getQuickButtonUids() != null
-        //         && robot.getServiceSettings().getQuickButtonUids().size() > 0) {
-        //     Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
-        //     while (iterator.hasNext()) {
-        //         String quickButtonUid = iterator.next();
-        //         Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
-        //         if (quickButtonOptional.isPresent()) {
-        //             QuickButton quickButtonEntity = quickButtonOptional.get();
+        if (request.getServiceSettings() != null
+                && request.getServiceSettings().getQuickButtonUids() != null
+                && request.getServiceSettings().getQuickButtonUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getQuickButtonUids().iterator();
+            while (iterator.hasNext()) {
+                String quickButtonUid = iterator.next();
+                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
+                if (quickButtonOptional.isPresent()) {
+                    QuickButton quickButtonEntity = quickButtonOptional.get();
+                    log.info("quickButtonUid added: {}", quickButtonUid);
 
-        //             agent.getServiceSettings().getQuickButtons().add(quickButtonEntity);
-        //         }
-        //     }
-        // }
-        // //
-        // if (agentRequest.getServiceSettings().getFaqUids() != null
-        //         && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
-        //     Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
-        //     while (iterator.hasNext()) {
-        //         String faqUid = iterator.next();
-        //         Optional<Faq> faqOptional = faqService.findByUid(faqUid);
-        //         if (faqOptional.isPresent()) {
-        //             Faq faqEntity = faqOptional.get();
+                    robot.getServiceSettings().getQuickButtons().add(quickButtonEntity);
+                } else {
+                    throw new RuntimeException("quickButtonUid " + quickButtonUid + " not found");
+                }
+            }
+        } else {
+            log.info("robot quickButtonUid is null");
+        }
+        //
+        if (request.getServiceSettings() != null
+                && request.getServiceSettings().getFaqUids() != null
+                && request.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String faqUid = iterator.next();
+                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    Faq faqEntity = faqOptional.get();
+                    log.info("faqUid added {}", faqUid);
 
-        //             agent.getServiceSettings().getFaqs().add(faqEntity);
-        //         }
-        //     }
-        // }
+                    robot.getServiceSettings().getFaqs().add(faqEntity);
+                } else {
+                    throw new RuntimeException("faq " + faqUid + " not found");
+                }
+            }
+        } else {
+            log.info("robot faquids is null");
+        }
+
+        Robot updatedRobot = save(robot);
+        if (updatedRobot == null) {
+            throw new RuntimeException("save robot failed");
+        }
         
-        return convertToResponse(save(robot));
+        return convertToResponse(updatedRobot);
     }
 
     @Override
@@ -153,10 +174,15 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
                 Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
                 if (quickButtonOptional.isPresent()) {
                     QuickButton quickButtonEntity = quickButtonOptional.get();
+                    log.info("quickButtonUid added: {}", quickButtonUid);
 
                     serviceSettings.getQuickButtons().add(quickButtonEntity);
+                } else {
+                    throw new RuntimeException("quickButtonUid " + quickButtonUid + " not found");
                 }
             }
+        } else {
+            log.info("robot quickButtonUid is null");
         }
         //
         if (robotRequest.getServiceSettings().getFaqUids() != null
@@ -167,10 +193,15 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
                 Optional<Faq> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
                     Faq faqEntity = faqOptional.get();
+                    log.info("faqUid added {}", faqUid);
 
                     serviceSettings.getFaqs().add(faqEntity);
+                } else {
+                    throw new RuntimeException("faq " + faqUid + " not found");
                 }
             }
+        } else {
+            log.info("robot faquids is null");
         }
         robot.setServiceSettings(serviceSettings);
         // 
@@ -236,6 +267,16 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         if (robotRepository.count() > 0) {
             return;
         }
+        //
+        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        List<String> faqUids = Arrays.asList(
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+        //
+        List<String> quickButtonUids = Arrays.asList(
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
+        // 
 
         Kb kb = kbService.getKb(I18Consts.I18N_ROBOT_NICKNAME, UserConsts.DEFAULT_ORGANIZATION_UID);
         RobotLlm llm = RobotLlm.builder().build();

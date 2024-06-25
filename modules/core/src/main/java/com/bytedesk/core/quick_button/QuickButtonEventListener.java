@@ -33,7 +33,7 @@ public class QuickButtonEventListener {
 
     private final QuickButtonService quickButtonService;
 
-    @Order(6)
+    @Order(4)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();

@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+// @Slf4j
 @Component
 public class MemberEntityListener {
 
@@ -31,7 +31,7 @@ public class MemberEntityListener {
 
     @PostPersist
     public void postPersist(Member member) {
-        log.info("postPersist {}", member.getUid());
+        // log.info("postPersist {}", member.getUid());
     }
 
     // @PreUpdate
@@ -41,7 +41,7 @@ public class MemberEntityListener {
 
     @PostUpdate
     public void postUpdate(Member member) {
-        log.info("postUpdate {}", member.getUid());
+        // log.info("postUpdate {}", member.getUid());
     }
 
     // @PreRemove

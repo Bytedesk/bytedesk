@@ -34,12 +34,12 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false, exclude = {"user"})
+@EqualsAndHashCode(callSuper = false, exclude = { "user" })
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ OrganizationListener.class })
+@EntityListeners({ OrganizationEntityListener.class })
 @Table(name = "core_organization")
-public class Organization extends OrganizationEntity {
+public class Organization extends OrganizationBase {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,7 +69,6 @@ public class Organization extends OrganizationEntity {
     // @Builder.Default
     // @OneToMany(fetch = FetchType.LAZY)
     // private Set<Department> departments = new HashSet<>();
-
 
     // Identity Verification 实名认证
 
@@ -104,8 +103,8 @@ public class Organization extends OrganizationEntity {
     @Override
     public String toString() {
         return "Organization{" +
-        "id=" + super.getId() +
-        ", uid=" + super.getUid() +
+                "id=" + super.getId() +
+                ", uid=" + super.getUid() +
                 ", name='" + name + '\'' +
                 ", logo=" + logo +
                 '}';

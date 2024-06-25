@@ -39,7 +39,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ ChannelListener.class })
+@EntityListeners({ ChannelEntityListener.class })
 // @DiscriminatorValue("Channel")
 @Table(name = "core_channel")
 public class Channel extends BaseEntity {

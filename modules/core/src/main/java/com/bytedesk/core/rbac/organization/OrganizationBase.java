@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 15:11:50
+ * @LastEditTime: 2024-06-25 10:32:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,31 +44,32 @@ import java.util.Date;
  * 
  * //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = timezone)
  * config in properties
+ * 
  * @see https://docs.spring.io/spring-data/jpa/reference/auditing.html
  * @author im.bytedesk.com
  */
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class OrganizationEntity implements Serializable {
+public abstract class OrganizationBase implements Serializable {
 
     // @Value("${bytedesk.timezone}")
     // private static final String timezone = "GMT+8";
 
     @Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     // @NotBlank 在应用层（业务逻辑或表单验证）确保uid字段在提交时必须是非空且去除空格后有实际内容的。
-	// nullable = false 通过@Column注解告知JPA，数据库中的uuid列不允许NULL值，这是一个数据库级别的约束
-	@NotBlank(message = "uid is required")
-	@Column(name = "uuid", unique = true, nullable = false)
-	private String uid;
-    
+    // nullable = false 通过@Column注解告知JPA，数据库中的uuid列不允许NULL值，这是一个数据库级别的约束
+    @NotBlank(message = "uid is required")
+    @Column(name = "uuid", unique = true, nullable = false)
+    private String uid;
+
     // 乐观锁版本字段，每次更新时版本号加1
     @Version
     private int version;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
     @CreatedDate
@@ -80,10 +81,9 @@ public abstract class OrganizationEntity implements Serializable {
     private Date updatedAt;
 
     /**
-	 * soft delete
-	 */
-	@Column(name = "is_deleted")
-	private boolean deleted = false;
+     * soft delete
+     */
+    @Column(name = "is_deleted")
+    private boolean deleted = false;
 
-    
 }
