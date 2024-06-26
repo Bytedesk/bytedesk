@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 18:22:36
+ * @LastEditTime: 2024-06-26 09:53:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,17 +23,13 @@ Chat as a Service
 
 ## Introduction
 
-### Social IM
+### LLM & RAG
 
-- friend chat
-- group chat
+- Customer Service based on LLM && RAG
 
-### Enterprise Instant Messaging/IM
+### Large model AI assistant
 
-- Multi-level organizational structure
-- role management
-- Permission management
-- Chat record management
+- More suitable for team use, one person configuration, for use throughout the company
 
 ### Online customer service
 
@@ -51,13 +47,17 @@ Chat as a Service
 - Report function,
 - Provide customers with integrated customer service workbench services
 
-### Customer service assistant
+### Social IM
 
-- Customer Service based on LLM && RAG
+- friend chat
+- group chat
 
-### Large model AI assistant
+### Enterprise Instant Messaging/IM
 
-- More suitable for team use, one person configuration, for use throughout the company
+- Multi-level organizational structure
+- role management
+- Permission management
+- Chat record management
 
 ## Getting Started
 
