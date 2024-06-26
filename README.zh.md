@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 18:22:44
+ * @LastEditTime: 2024-06-26 09:57:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,21 +23,23 @@
 
 ## 介绍
 
-### 社交IM：跟好友聊
+### 智能客服
 
-- 好友、
-- 群组、
+- 基于大模型 LLM && RAG 的智能客服
 
-### 企业IM：跟同事聊
+### AI助手
 
-- 多层组织架构、
-- 角色管理
-- 权限管理
-- 聊天记录管理
+- 更适合团队使用，一人配置，多人使用。完美权限控制，即可私用，也可公用
 
 ### 在线客服：跟客户聊
 
-- 支持多渠道、多种路由策略、详细考核指标
+- 支持多渠道：
+  - 平台渠道：Web/H5/React/Android/iOS/Uniapp/Flutter、
+  - 社交渠道：微信公众号/小程序/企业微信/小红书/抖音/快手/百度/微博/知乎、
+  - 电商渠道：淘宝/天猫/京东/千牛/抖店
+  - 海外渠道：Facebook/Instagram//Whatsapp/Line
+- 多种路由策略、
+- 详细考核指标
 - 坐席工作台、
 - 工单系统、
 - 坐席管理、
@@ -51,13 +53,17 @@
 - 报表功能，
 - 为客户提供一体化客服工作台服务
 
-### 智能客服
+### 社交IM：跟好友聊
 
-- 基于大模型 LLM && RAG 的智能客服
+- 好友、
+- 群组、
 
-### 大模型AI助手
+### 企业IM：跟同事聊
 
-- 更适合团队使用，一人配置，全公司使用
+- 多层组织架构、
+- 角色管理
+- 权限管理
+- 聊天记录管理
 
 ## 快速开始
 
