@@ -20,8 +20,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.bytedesk.core.constant.TypeConsts;
-
 /**
  * record for action and failed operations
  * 
@@ -39,5 +37,5 @@ public @interface ActionAnnotation {
 
     public String description() default "";
 
-    public String type() default TypeConsts.ACTION_TYPE_LOG;
+    public ActionTypeEnum type() default ActionTypeEnum.LOG; //TypeConsts.ACTION_TYPE_LOG;
 }

@@ -45,19 +45,20 @@ public class VisitorResponse extends BaseResponse {
 
 	private String avatar;
 
+	private VisitorDevice device;
 	// location info
-	private String ip;
+	// private String ip;
 
-	private String ipLocation;
+	// private String ipLocation;
 
-	// device info
-	private String browser;
+	// // device info
+	// private String browser;
 
-	private String os;
+	// private String os;
 
-	private String device;
+	// private String device;
 
-	private String referrer;
+	// private String referrer;
 
 	// used for agent notation
 	private String mobile;

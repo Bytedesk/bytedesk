@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 17:25:23
+ * @LastEditTime: 2024-07-03 06:40:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,6 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
@@ -220,8 +219,6 @@ public class UserService {
         }
     }
 
-    // String nickname, String avatar, String password, String mobile, String email,
-    // String platform, String orgUid
     @Transactional
     public User createUser(UserRequest userRequest) {
         //
@@ -243,10 +240,9 @@ public class UserService {
 
         //
         User user = User.builder()
-                // .avatar(userRequest.getAvatar())
-                // use email as default username
+                .avatar(userRequest.getAvatar())
                 .username(userRequest.getEmail())
-                // .nickname(userRequest.getNickname())
+                .nickname(userRequest.getNickname())
                 .mobile(userRequest.getMobile())
                 .num(userRequest.getMobile())
                 .email(userRequest.getEmail())
@@ -256,15 +252,13 @@ public class UserService {
                 .password(userRequest.getPassword())
                 .build();
         user.setUid(uidUtils.getCacheSerialUid());
-        user.setNickname(userRequest.getNickname());
-        user.setAvatar(userRequest.getAvatar());
         //
         if (StringUtils.hasText(userRequest.getPassword())) {
             user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         } else {
             user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
         }
-
+        // 
         Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
         Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE,
                 UserConsts.DEFAULT_ORGANIZATION_UID);
@@ -274,7 +268,7 @@ public class UserService {
             //
             user.addOrganizationRole(organization, role);
         }
-
+        // 
         return save(user);
     }
 
@@ -344,7 +338,13 @@ public class UserService {
             // @CachePut(value = "userExists", key = "#user.email"),
     })
     public User save(@NonNull User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Caching(evict = {
@@ -357,7 +357,9 @@ public class UserService {
             @CacheEvict(value = "userExists", key = "#user.email"),
     })
     public void delete(@NonNull User user) {
-        userRepository.delete(user);
+        // userRepository.delete(user);
+        user.setDeleted(true);
+        save(user);
     }
 
     // TODO: 待完善
@@ -373,12 +375,11 @@ public class UserService {
         }
 
         User admin = User.builder()
-                // .uid(uidUtils.getCacheSerialUid())
                 .email(bytedeskProperties.getEmail())
                 .username(bytedeskProperties.getEmail())
                 .password(new BCryptPasswordEncoder().encode(bytedeskProperties.getPassword()))
-                // .nickname(bytedeskProperties.getNickname())
-                // .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
+                .nickname(bytedeskProperties.getNickname())
+                .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
                 .mobile(bytedeskProperties.getMobile())
                 .num(bytedeskProperties.getMobile())
                 .superUser(true)
@@ -386,22 +387,12 @@ public class UserService {
                 .mobileVerified(true)
                 .build();
         admin.setUid(uidUtils.getCacheSerialUid());
-        admin.setNickname(bytedeskProperties.getNickname());
-        admin.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
-        // admin.getOrganizations().add(UserConsts.DEFAULT_ORGANIZATION_UID);
-
-        // Optional<Role> roleOptional = roleService.findByName(TypeConsts.ROLE_SUPER);
-        // Set<Role> roles = new HashSet<>();
-        // roleOptional.ifPresent(role -> {
-        // roles.add(role);
-        // });
-        // admin.setRoles(roles);
         //
         save(admin);
     }
 
     public void updateInitData() {
-
+        // 
         Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
         Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
                 UserConsts.DEFAULT_ORGANIZATION_UID);
@@ -413,6 +404,7 @@ public class UserService {
             User user = adminOptional.get();
             //
             user.addOrganizationRole(organization, role);
+            // 
             save(user);
         }
     }

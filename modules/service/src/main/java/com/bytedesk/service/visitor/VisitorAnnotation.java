@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-04 12:52:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-23 12:11:22
+ * @LastEditTime: 2024-06-29 11:43:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,4 +29,8 @@ import java.lang.annotation.Target;
 public @interface VisitorAnnotation {
 
     public String title() default "";
+
+    public String action() default "";
+
+    public String description() default "";
 }

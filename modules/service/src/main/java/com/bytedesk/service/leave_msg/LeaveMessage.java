@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-03 22:34:46
+ * @LastEditTime: 2024-07-02 17:40:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,11 @@
 package com.bytedesk.service.leave_msg;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.thread.Thread;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +43,15 @@ public class LeaveMessage extends BaseEntity {
 
    private static final long serialVersionUID = 1L;
 
-    @Column(name = "lid", unique = true, nullable = false)
-    private String lid;
+   // 联系方式
+   private String contact;
 
+   // 留言内容
+   private String content;
+
+   @JsonIgnore
+   @ManyToOne
+   // private Visitor visitor;
+   private Thread thread;
+   
 }

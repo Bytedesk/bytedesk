@@ -23,8 +23,6 @@ import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.service.settings.ServiceSettings;
-// import com.bytedesk.core.constant.StatusConsts;
-// import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.team.member.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

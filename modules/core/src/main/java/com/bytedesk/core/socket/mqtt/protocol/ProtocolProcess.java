@@ -1,7 +1,7 @@
 package com.bytedesk.core.socket.mqtt.protocol;
 
-import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.socket.mqtt.service.*;
+import com.bytedesk.core.socket.service.MqService;
 
 import lombok.Data;
 
@@ -19,39 +19,18 @@ public class ProtocolProcess {
 
     @Autowired
     private MqttSessionService mqttSessionStoreService;
-
-    // @Autowired
-    // private MqttSubscribeService mqttSubscribeStoreService;
-
+    
     @Autowired
     private MqttAuthService mqttAuthService;
-
-    // @Autowired
-    // private RedisBlockService redisBlockService;
-
-    // @Autowired
-    // private RedisAutoReplyService redisAutoReplyService;
 
     @Autowired
     private MqttMessageIdService mqttMessageIdService;
 
     // @Autowired
-    // private MqttRetainMessageStoreService mqttRetainMessageStoreService;
-
-    // @Autowired
-    // private MqttDupPublishMessageStoreService mqttDupPublishMessageStoreService;
-
-    // @Autowired
-    // private MqttDupPubRelMessageStoreService mqttDupPubRelMessageStoreService;
-
-    // @Autowired
-    // private MqttClientIdService mqttClientIdStoreService;
-
-    // @Autowired
-    // private TopicService topicService;
+    // private BytedeskEventPublisher bytedeskEventPublisher;
 
     @Autowired
-    private BytedeskEventPublisher bytedeskEventPublisher;
+    private MqService mqService;
 
     private Connect connect;
 
@@ -78,12 +57,7 @@ public class ProtocolProcess {
             connect = new Connect(
                     mqttAuthService,
                     mqttSessionStoreService,
-                    // mqttDupPublishMessageStoreService,
-                    // mqttDupPubRelMessageStoreService,
-                    // mqttSubscribeStoreService,
-                    // mqttClientIdStoreService,
-                    bytedeskEventPublisher
-            // topicService
+                    mqService
             );
         }
         return connect;
@@ -91,36 +65,21 @@ public class ProtocolProcess {
 
     public Subscribe subscribe() {
         if (subscribe == null) {
-            subscribe = new Subscribe(
-                    // mqttMessageIdService,
-                    // mqttSubscribeStoreService
-                    // mqttRetainMessageStoreService
-                    // redisUserService
-                    // topicService
-                    bytedeskEventPublisher);
+            subscribe = new Subscribe(mqService);
         }
         return subscribe;
     }
 
     public UnSubscribe unSubscribe() {
         if (unSubscribe == null) {
-            unSubscribe = new UnSubscribe(
-                    // mqttSubscribeStoreService
-                    // topicService
-                    bytedeskEventPublisher);
+            unSubscribe = new UnSubscribe(mqService);
         }
         return unSubscribe;
     }
 
     public Publish publish() {
         if (publish == null) {
-            publish = new Publish(
-                    // mqttRetainMessageStoreService,
-                    bytedeskEventPublisher
-            // mqttMessageIdService,
-            // mqttClientIdStoreService,
-            // mqttSessionStoreService
-            );
+            publish = new Publish(mqService);
         }
         return publish;
     }
@@ -129,12 +88,7 @@ public class ProtocolProcess {
         if (disConnect == null) {
             disConnect = new DisConnect(
                     mqttSessionStoreService,
-                    // topicService,
-                    bytedeskEventPublisher
-            // mqttSubscribeStoreService,
-            // mqttDupPublishMessageStoreService,
-            // mqttDupPubRelMessageStoreService,
-            // mqttClientIdStoreService
+                    mqService
             );
         }
         return disConnect;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-28 11:40:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-28 11:40:49
+ * @LastEditTime: 2024-07-05 14:47:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,3 +13,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 -->
 # open source modules - 开源模块
+
+- ai AI机器人模块
+- core 核心模块
+- service 在线客服模块
+- social 社交im模块
+- team 企业IM模块

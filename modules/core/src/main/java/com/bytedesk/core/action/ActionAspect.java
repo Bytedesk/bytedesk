@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-17 16:53:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-30 14:03:30
+ * @LastEditTime: 2024-07-02 22:37:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author jackning
  */
 @Slf4j
-// @Async
 @Aspect
 @Component
 @AllArgsConstructor
@@ -71,7 +70,7 @@ public class ActionAspect {
                 .action(actionAnnotation.action())
                 .description(actionAnnotation.description())
                 .build();
-        actionRequest.setType(actionAnnotation.type());
+        actionRequest.setType(actionAnnotation.type().name());
         // 
         // 获取方法签名
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();

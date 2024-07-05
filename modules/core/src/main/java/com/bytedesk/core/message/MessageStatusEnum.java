@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:33:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 18:34:59
+ * @LastEditTime: 2024-07-02 11:24:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,11 +16,16 @@ package com.bytedesk.core.message;
 
 public enum MessageStatusEnum {
     SENDING, // sending
-    FAILED, // send failed
+    TIMEOUT, // network send failed
+    BLOCKED, // in black list
+    NOTFRIEND, // not friend
+    ERROR, // other send error
     SUCCESS, // send success
     RECALL, // recall back
+    UNPRECESSED, // leave message unprocessed
     DELIVERED, // send to the other client
     READ, // read by the other client
     DESTROYED, // destroyed after read
-    // LEAVE_MSG, // leave message
+    PROCESSED, // leave message processed
+    RATED, // robot/rate message rated
 }

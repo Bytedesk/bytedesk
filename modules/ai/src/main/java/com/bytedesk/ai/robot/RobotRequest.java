@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 12:27:10
+ * @LastEditTime: 2024-06-29 20:07:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,9 @@ package com.bytedesk.ai.robot;
 
 import com.bytedesk.ai.settings.RobotServiceSettingsRequest;
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 
 import lombok.Builder;
 import lombok.Data;
@@ -30,22 +33,24 @@ public class RobotRequest extends BaseRequest {
 
     private String nickname;
     
-    private String avatar;
-
-    private String description;
-
-    // @Builder.Default
-    // private RobotTypeEnum type = RobotTypeEnum.SERVICE;
-    
     @Builder.Default
-    private Boolean published = false;
+    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
 
     @Builder.Default
     private RobotServiceSettingsRequest serviceSettings = new RobotServiceSettingsRequest();
 
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
+
+    @Builder.Default
+    private LevelEnum level = LevelEnum.ORGNIZATION;
     
-    // @NotBlank
-    // private String orgUid;
+    @Builder.Default
+    private Boolean published = false;
+
+    
+
 }

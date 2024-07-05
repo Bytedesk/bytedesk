@@ -15,6 +15,7 @@
 package com.bytedesk.team.member;
 
 public enum MemberStatusEnum {
+    NORMAL,
     PENDING,
     ACTIVE,
     INACTIVE,

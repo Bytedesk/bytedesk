@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 17:16:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 12:09:34
+ * @LastEditTime: 2024-07-01 18:34:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ public class RobotServiceSettingsRequest extends BaseServiceSettingsRequest {
     @Builder.Default
     private boolean allowTransferToAgent = true;
 
-    // 限制仅允许：workgroup、appointed
+    // 限制仅允许：workgroup、agent
     @Builder.Default
     private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
 

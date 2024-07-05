@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 14:25:48
+ * @LastEditTime: 2024-06-29 20:04:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -155,7 +155,6 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
             return;
         }
         // 
-        // String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
         Optional<Category> categoryContact = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT,
                 CategoryConsts.CATEGORY_TYPE_QUICK_REPLY,

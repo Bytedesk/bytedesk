@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 23:55:34
+ * @LastEditTime: 2024-06-28 12:19:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,13 +33,13 @@ import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.enums.PlatformEnum;
 // import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
@@ -85,25 +85,21 @@ public class MemberService {
         return memberPage.map(this::convertToResponse);
     }
 
-    // public Page<MemberResponse> queryByDepartments(MemberRequest memberRequest) {
-    // Pageable pageable = PageRequest.of(memberRequest.getPageNumber(),
-    // memberRequest.getPageSize(),
-    // Sort.Direction.ASC,
-    // "id");
-    // // Page<Member> memberPage =
-    // memberRepository.findByDepartmentsUidInAndDeleted(new String[] {
-    // memberRequest.getDepUid() }, false, pageable);
-    // return memberPage.map(this::convertToResponse);
-    // }
-
-    public Optional<MemberResponse> query(MemberRequest memberRequest) {
-
+    public MemberResponse query(MemberRequest memberRequest) {
         User user = authService.getCurrentUser();
         Optional<Member> memberOptional = findByUserAndOrgUid(user, memberRequest.getOrgUid());
-        if (memberOptional.isPresent()) {
-            return Optional.of(convertToResponse(memberOptional.get()));
+        if (!memberOptional.isPresent()) {
+            throw new RuntimeException("Member does not exist."); // 抛出具体的异常
         }
-        return Optional.empty();
+        return convertToResponse(memberOptional.get());
+    }
+
+    public MemberResponse queryByUserUid(MemberRequest memberRequest) {
+        Optional<Member> memberOptional = findByUserUid(memberRequest.getUid());
+        if (!memberOptional.isPresent()) {
+            throw new RuntimeException("Member does not exist."); // 抛出具体的异常
+        }
+        return convertToResponse(memberOptional.get());
     }
 
     @Transactional
@@ -134,14 +130,14 @@ public class MemberService {
         userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         userRequest.setPlatform(PlatformEnum.BYTEDESK.getValue());
         userRequest.setOrgUid(depOptional.get().getOrgUid());
-        // 
+        //
         User user = null;
         if (StringUtils.hasText(memberRequest.getMobile())) {
-            user = userService.findByMobileAndPlatform(memberRequest.getMobile(), 
+            user = userService.findByMobileAndPlatform(memberRequest.getMobile(),
                     PlatformEnum.BYTEDESK)
                     .orElseGet(() -> userService.createUser(userRequest));
         } else if (StringUtils.hasText(memberRequest.getEmail())) {
-            user = userService.findByEmailAndPlatform(memberRequest.getEmail(), 
+            user = userService.findByEmailAndPlatform(memberRequest.getEmail(),
                     PlatformEnum.BYTEDESK)
                     .orElseGet(() -> userService.createUser(userRequest));
         } else {
@@ -173,7 +169,7 @@ public class MemberService {
         }
         //
         Member member = memberOptional.get();
-        // 
+        //
         modelMapper.map(memberRequest, member);
         // member.setJobNo(memberRequest.getJobNo());
         // member.setNickname(memberRequest.getNickname());
@@ -190,10 +186,14 @@ public class MemberService {
         return convertToResponse(result);
     }
 
-
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
     public Optional<Member> findByUid(String uid) {
         return memberRepository.findByUidAndDeleted(uid, false);
+    }
+
+    @Cacheable(value = "member", key = "#uid", unless = "#result == null")
+    public Optional<Member> findByUserUid(String uid) {
+        return memberRepository.findByUser_UidAndDeleted(uid, false);
     }
 
     @Cacheable(value = "member", key = "#mobile", unless = "#result == null")

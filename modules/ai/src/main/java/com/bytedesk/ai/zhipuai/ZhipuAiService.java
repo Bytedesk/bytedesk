@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 17:26:11
+ * @LastEditTime: 2024-07-04 14:59:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,7 @@ import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
@@ -85,7 +85,7 @@ public class ZhipuAiService {
         RobotResponseSimple robotSimple = JSON.parseObject(thread.getAgent(), RobotResponseSimple.class);
         log.info("robotSimple {}", robotSimple);
 
-        UserResponseSimple user = modelMapper.map(thread.getAgent(), UserResponseSimple.class);
+        UserProtobuf user = modelMapper.map(thread.getAgent(), UserProtobuf.class);
         // 
         String messageUid = uidUtils.getCacheSerialUid();
         Message message = Message.builder()
@@ -98,7 +98,8 @@ public class ZhipuAiService {
         message.setUid(messageUid);
         message.setOrgUid(thread.getOrgUid());
         // 
-        message.getThreads().add(thread);
+        // message.getThreads().add(thread);
+        message.setThreadTopic(thread.getTopic());
 
         if (!robotSimple.getLlm().isEnabled()) {
             // 机器人未开启

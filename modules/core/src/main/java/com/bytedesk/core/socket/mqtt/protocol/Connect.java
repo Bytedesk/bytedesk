@@ -8,12 +8,12 @@ import io.netty.util.CharsetUtil;
 
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.event.BytedeskEventPublisher;
 // import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.socket.mqtt.handler.MqttIdleStateHandler;
 import com.bytedesk.core.socket.mqtt.model.MqttSession;
 import com.bytedesk.core.socket.mqtt.service.*;
 import com.bytedesk.core.socket.mqtt.util.MqttConsts;
+import com.bytedesk.core.socket.service.MqService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,19 +30,8 @@ public class Connect {
 
     private final MqttSessionService mqttSessionStoreService;
 
-    // private final MqttDupPublishMessageStoreService
-    // mqttDupPublishMessageStoreService;
-
-    // private final MqttDupPubRelMessageStoreService
-    // mqttDupPubRelMessageStoreService;
-
-    // private final MqttSubscribeService mqttSubscribeStoreService;
-
-    // private final MqttClientIdService mqttClientIdStoreService;
-
-    private final BytedeskEventPublisher bytedeskEventPublisher;
-
-    // private final TopicService topicService;
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final MqService mqService;
 
     /**
      * TODO: 重构，每个功能独立成一个函数，精简此函数体
@@ -184,7 +173,7 @@ public class Connect {
         // 存储clientId
         // mqttClientIdStoreService.put(clientId);
         // topicService.addClientId(clientId);
-        bytedeskEventPublisher.publishMqttConnectedEvent(clientId);
+        mqService.publishMqttConnectedEvent(clientId);
 
         // 用户clientId格式: uid/client/deviceUid
         // final String uid = clientId.split("/")[0];

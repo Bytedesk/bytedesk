@@ -25,8 +25,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.bytedesk.core.constant.QuartzConsts;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

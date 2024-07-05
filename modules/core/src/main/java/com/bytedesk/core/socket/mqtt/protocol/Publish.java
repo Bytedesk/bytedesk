@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-15 16:30:45
+ * @LastEditTime: 2024-06-30 10:08:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,9 +17,8 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
-import com.bytedesk.core.event.BytedeskEventPublisher;
-// import com.bytedesk.core.socket.mqtt.service.*;
 import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.service.MqService;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -28,19 +27,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class Publish {
 
-    // private final MqttRetainMessageStoreService mqttRetainMessageStoreService;
-
-    private final BytedeskEventPublisher bytedeskEventPublisher;;
+    private final MqService mqService;
 
     //
     public void processPublish(Channel channel, MqttPublishMessage mqttPublishMessage) {
         // log.debug("processPublish {}", mqttPublishMessage.toString());
-        //
         // TODO: 发送：消息发送成功回执
         // String clientId = (String)
         // channel.attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).get();
         byte[] messageBytes = new byte[mqttPublishMessage.payload().readableBytes()];
         this.sendMqMessage(mqttPublishMessage, messageBytes);
+        //
         // QoS=0
         if (mqttPublishMessage.fixedHeader().qosLevel() == MqttQoS.AT_MOST_ONCE) {
             // this.sendMqMessage(clientId, mqttPublishMessage, messageBytes);
@@ -55,20 +52,8 @@ public class Publish {
         }
         // retain=1, 保留消息
         if (mqttPublishMessage.fixedHeader().isRetain()) {
-            //
             mqttPublishMessage.payload().getBytes(mqttPublishMessage.payload().readerIndex(), messageBytes);
-            //
-            // if (messageBytes.length == 0) {
-            // mqttRetainMessageStoreService.remove(mqttPublishMessage.variableHeader().topicName());
-            // } else {
-            // MqttRetainMessage retainMessageStore = new MqttRetainMessage()
-            // .setTopic(mqttPublishMessage.variableHeader().topicName())
-            // .setMqttQoS(mqttPublishMessage.fixedHeader().qosLevel().value()).setMessageBytes(messageBytes);
-            // mqttRetainMessageStoreService.put(mqttPublishMessage.variableHeader().topicName(),
-            // retainMessageStore);
-            // }
         }
-
     }
 
     // 下列过滤不能从直接数据库中读取，否则会增加数据库压力，影响消息发送速度，务必从内存或redis中读取
@@ -76,7 +61,7 @@ public class Publish {
         // 注意：不能去掉，否则无法解析protobuf
         publishMessage.payload().getBytes(publishMessage.payload().readerIndex(), messageBytes);
         // publish messsage event, developers can listener to new message
-        bytedeskEventPublisher.publishMessageBytesEvent(messageBytes);
+        mqService.sendProtoMessageToMq(messageBytes);
     }
 
 }

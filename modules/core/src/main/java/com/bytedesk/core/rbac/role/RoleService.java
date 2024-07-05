@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 10:52:08
+ * @LastEditTime: 2024-06-29 16:49:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,9 +30,9 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.rbac.authority.Authority;
 import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -103,6 +103,19 @@ public class RoleService {
                 return roleRepository.save(role);
         }
 
+        //
+        private static final String[] authorities = {
+                        TypeConsts.SUPER,
+                        TypeConsts.ADMIN,
+                        TypeConsts.HR,
+                        TypeConsts.ORG,
+                        TypeConsts.IT,
+                        TypeConsts.MONEY,
+                        TypeConsts.MARKETING,
+                        TypeConsts.SALES,
+                        TypeConsts.CUSTOMER_SERVICE,
+        };
+
         public void initOrgRoles(String orgUid) {
                 //
                 for (String authority : authorities) {
@@ -111,7 +124,6 @@ public class RoleService {
                         RoleRequest roleRequest = RoleRequest.builder()
                                         .name(name)
                                         .displayName(displayName)
-                                        // .orgUid(orgUid)
                                         .description(name)
                                         .build();
                         roleRequest.setType(TypeConsts.TYPE_SYSTEM);
@@ -125,19 +137,6 @@ public class RoleService {
                         create(roleRequest);
                 }
         }
-
-        //
-        private static final String[] authorities = {
-                        TypeConsts.SUPER,
-                        TypeConsts.ADMIN,
-                        TypeConsts.HR,
-                        TypeConsts.ORG,
-                        TypeConsts.IT,
-                        TypeConsts.MONEY,
-                        TypeConsts.MARKETING,
-                        TypeConsts.SALES,
-                        TypeConsts.CUSTOMER_SERVICE,
-        };
 
         public void initData() {
                 //

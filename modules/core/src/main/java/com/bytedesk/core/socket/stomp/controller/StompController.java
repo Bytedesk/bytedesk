@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-16 16:51:36
+ * @LastEditTime: 2024-06-29 22:04:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,12 +18,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.lang.NonNull;
-// import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import com.bytedesk.core.socket.stomp.service.StompMqService;
+import com.bytedesk.core.socket.service.MqService;
 
 import java.security.Principal;
 
@@ -37,7 +36,7 @@ import java.security.Principal;
 @Controller
 public class StompController {
 
-    private final StompMqService stompMqService;
+    private final MqService mqService;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
@@ -65,7 +64,7 @@ public class StompController {
         // simpMessagingTemplate.convertAndSend(MqConsts.TOPIC_PREFIX + sid + '.' + uid,
         // ackObject);
         // 转发给mq
-        stompMqService.sendMessageToMq(message);
+        mqService.sendJsonMessageToMq(message);
     }
 
     /**

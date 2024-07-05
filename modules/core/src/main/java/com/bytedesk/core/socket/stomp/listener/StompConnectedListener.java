@@ -14,17 +14,16 @@
  */
 package com.bytedesk.core.socket.stomp.listener;
 
-// import com.bytedesk.core.model.entity.User;
-// import com.bytedesk.core.publisher.EventPublisher;
-// import com.bytedesk.core.service.*;
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 // import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
+
+// import com.bytedesk.core.event.BytedeskEventPublisher;
 
 /**
  * published shortly after a SessionConnectEvent when the broker has sent a
@@ -33,14 +32,17 @@ import org.springframework.web.socket.messaging.SessionConnectedEvent;
  *
  * @author bytedesk.com
  */
-// @Slf4j
+@Slf4j
 @Component
 @AllArgsConstructor
 public class StompConnectedListener implements ApplicationListener<SessionConnectedEvent> {
 
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
     @Override
     public void onApplicationEvent(@NonNull SessionConnectedEvent sessionConnectedEvent) {
-        // log.debug(sessionConnectedEvent.toString());
+        log.debug(sessionConnectedEvent.toString());
+        // 
+        // bytedeskEventPublisher.publishStompConnectedEvent(null);
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-22 16:03:10
+ * @LastEditTime: 2024-06-28 12:18:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,8 +13,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.team.member;
-
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -57,14 +55,18 @@ public class MemberController {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
-    
     @GetMapping("/query")
     public ResponseEntity<?> query(MemberRequest memberRequest) {
         //
-        Optional<MemberResponse> memberResponse = memberService.query(memberRequest);
-        if (memberResponse.isEmpty()) {
-            return ResponseEntity.ok(JsonResult.error("member not found", -1));
-        }
+        MemberResponse memberResponse = memberService.query(memberRequest);
+        //
+        return ResponseEntity.ok(JsonResult.success(memberResponse));
+    }
+
+    @GetMapping("/query/userUid")
+    public ResponseEntity<?> queryByUserUid(MemberRequest memberRequest) {
+        //
+        MemberResponse memberResponse = memberService.queryByUserUid(memberRequest);
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:03:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 16:03:51
+ * @LastEditTime: 2024-07-03 07:22:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ package com.bytedesk.core.topic;
 import java.util.Set;
 import java.util.HashSet;
 
-import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.utils.StringSetConverter;
 
@@ -41,13 +41,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "core_topic")
-public class Topic extends BaseEntity {
+public class Topic extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
-
-    // @NotBlank
-    // @Column(unique = true, nullable = false)
-    // private String tid;
 
     // @Column(nullable = false)
     // private String topic;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-24 15:45:13
+ * @LastEditTime: 2024-07-04 15:42:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.core.message;
 
 import java.util.Optional;
-
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CachePut;
@@ -27,43 +26,61 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
 
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageService {
+public class MessageService extends BaseService<Message, MessageRequest, MessageResponse> {
+
+    // private AuthService authService;
 
     private final MessageRepository messageRepository;
 
-    public Page<MessageResponse> queryAll(MessageRequest request) {
+    // private final ExceptionHandlerUtils exceptionHandlerUtils;
+
+    public Page<MessageResponse> queryByOrg(MessageRequest request) {
 
         // 优先加载最新聊天记录，也即：id越大越新
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
         Specification<Message> specs = MessageSpecification.search(request);
+
         Page<Message> messagePage = messageRepository.findAll(specs, pageable);
-        // Page<Message> messagePage =
-        // messageRepository.findByOrgUidAndDeleted(request.getOrgUid(), false,
-        // pageable);
 
         return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
 
-    public Page<MessageResponse> query(MessageRequest request) {
+    @Cacheable(value = "message", key = "#request.threadTopic", unless = "#result == null")
+    public Page<MessageResponse> queryByThreadTopic(MessageRequest request) {
 
         // 优先加载最新聊天记录，也即：id越大越新
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
-        Page<Message> messagePage = messageRepository.findByThreadsUidIn(request.getThreads(), pageable);
+        Page<Message> messagePage = messageRepository.findByThreadTopic(request.getThreadTopic(), pageable);
 
         return messagePage.map(ConvertUtils::convertToMessageResponse);
+    }
+
+    public Page<MessageResponse> queryUnread(MessageRequest request) {
+
+        // 优先加载最新聊天记录，也即：id越大越新
+        // Pageable pageable = PageRequest.of(request.getPageNumber(),
+        // request.getPageSize(), Sort.Direction.DESC,"createdAt");
+        // Specification<Message> specs = MessageSpecification.unread(request);
+        // Page<Message> messagePage = messageRepository.findAll(specs, pageable);
+        // return messagePage.map(ConvertUtils::convertToMessageResponse);
+
+        return null;
     }
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
@@ -75,16 +92,23 @@ public class MessageService {
      * find the last message in the thread
      * 找到当前会话中最新一条聊天记录
      */
-    @Cacheable(value = "message", key = "#threadTid", unless = "#result == null")
-    public Optional<Message> findByThreadsUidInOrderByCreatedAtDesc(String threadTid) {
-        return messageRepository.findFirstByThreadsUidInOrderByCreatedAtDesc(new String[] { threadTid });
-    }
+    // @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
+    // public Optional<Message> findByThreadsUidInOrderByCreatedAtDesc(String
+    // threadUid) {
+    // return messageRepository.findFirstByThreadsUidInOrderByCreatedAtDesc(new
+    // String[] { threadUid });
+    // }
 
     @Caching(put = {
             @CachePut(value = "message", key = "#message.uid"),
     })
     public Message save(@NonNull Message message) {
-        return messageRepository.save(message);
+        try {
+            return messageRepository.save(message);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, message);
+        }
+        return null;
     }
 
     @Caching(evict = {
@@ -110,8 +134,43 @@ public class MessageService {
         return messageRepository.existsByUid(uid);
     }
 
-    // public MessageResponse convertToMessageResponse(Message message) {
-    // return modelMapper.map(message, MessageResponse.class);
+    // public int ping() {
+
+    // User user = authService.getCurrentUser();
+
+    // int count = messageCacheService.getUnreadCount(user.getUid());
+
+    // return count;
     // }
+
+    @Override
+    public Page<MessageResponse> queryByUser(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public MessageResponse create(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public MessageResponse update(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public MessageResponse convertToResponse(Message entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Message message) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
 
 }

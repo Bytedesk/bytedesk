@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 07:22:52
+ * @LastEditTime: 2024-07-03 07:50:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,13 +17,15 @@ package com.bytedesk.ai.robot;
 import org.springframework.stereotype.Component;
 
 import jakarta.persistence.PostPersist;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class RobotEntityListener {
 
     @PostPersist
     public void onPostPersist(Robot robot) {
-        System.out.println("RobotListener: onPostPersist");
+        log.info("RobotListener: onPostPersist");
     }
 
 }

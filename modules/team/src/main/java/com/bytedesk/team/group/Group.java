@@ -2,7 +2,7 @@
  * @Author: jack ning github@bytedesk.com
  * @Date: 2024-01-23 14:53:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:27:41
+ * @LastEditTime: 2024-06-28 14:22:53
  * @FilePath: /server/plugins/im/src/main/java/com/bytedesk/im/group/Group.java
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,7 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.team.member.Member;
+import com.bytedesk.ai.robot.Robot;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -33,47 +37,50 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({ GroupListener.class })
-// 注：group为mysql保留关键字, groups在mysql8启动报错，所有表名修改为groupes
-@Table(name = "team_groupes")
+@EntityListeners({ GroupEntityListener.class })
+@Table(name = "team_groups")
 public class Group extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // @Column(unique = true, nullable = false)
-    // private String gid;
+    @Builder.Default
+    private String name = I18Consts.I18N_GROUP_NAME;
 
-    private String name;
+    @Builder.Default
+    private String avatar = AvatarConsts.DEFAULT_GROUP_AVATAR_URL;
 
-    private String avatar;
+    @Builder.Default
+    private String description = I18Consts.I18N_GROUP_DESCRIPTION;
 
-    private String description;
+    @Builder.Default
+    private boolean showTopTip = false;
 
-    /**
-     * 群成员
-     */
+    private String topTip;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "group_type", nullable = false)
+    private GroupTypeEnum type = GroupTypeEnum.MEMBER;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private GroupStatusEnum status = GroupStatusEnum.NORMAL;
+
     @JsonIgnore
     @Builder.Default
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
-    // @JoinTable(name = "team_group_members", 
-    //     joinColumns = @JoinColumn(name = "group_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT)), 
-    //     inverseJoinColumns = @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT)))
-    private List<User> members = new ArrayList<>();
+    private List<Member> members = new ArrayList<>();
 
-    /**
-     * 群创建者
-     */
+    @Builder.Default
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    private List<User> admins = new ArrayList<>();
+
+    @Builder.Default
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    private List<Robot> robots = new ArrayList<>();
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-    private User user;
-
-    /**
-     * 所属管理员id，后台管理查看
-     */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "admin_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-    // private User admin;
+    private User creator;
 
 }

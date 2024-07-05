@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:17:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-03 22:33:42
+ * @LastEditTime: 2024-06-26 09:42:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,8 +15,9 @@
 package com.bytedesk.service.browse;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.service.visitor.VisitorDevice;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 访客网站浏览日志
+ * visitor website browse record
  */
 @Entity
 @Data
@@ -40,9 +41,23 @@ import lombok.experimental.Accessors;
 public class Browse extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    @Column(name = "bid", unique = true, nullable = false)
-    private String bid;
     
+    private String url;
 
+    @Embedded
+    private VisitorDevice device;
+    
+    // @Column(name = "ip", nullable = false)
+    // private String ip;
+
+    // private String userAgent;
+
+    // device info
+    // private String browser;
+
+    // private String os;
+
+    // private String device;
+
+    // private String referrer;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:09:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 15:29:07
+ * @LastEditTime: 2024-07-02 23:05:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,8 +17,10 @@ package com.bytedesk.service.thread_log;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadUpdateEvent;
+import com.bytedesk.core.thread.Thread;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,13 +34,31 @@ public class ThreadLogEventListener {
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
-        log.info("ThreadCreateEvent: {}", event.getThread().getUid());
-        threadLogService.create(event.getThread());
+        Thread thread = event.getThread();
+        log.info("thread log ThreadCreateEvent: {}", thread.getUid());
+        // 
+        threadLogService.create(thread);
     }
 
     @EventListener
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-        // log.info("onThreadUpdateEvent: {}", event.getThread().getUid());
+        Thread thread = event.getThread();
+        log.info("thread log onThreadUpdateEvent: {}", thread.getUid());
+        // 
+        // 访客之前会话已经关闭，重新请求会话，则重新创建一条threadlog
+        // if (thread.getStatus().equals(ThreadStatusEnum.REENTER)) {
+        //     threadLogService.create(thread);
+        // }
+        // TODO: 更新threadlog
+        
     }
+    
+    @EventListener
+    public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
+        // log.info("threadlog quartz five second event: " + event);
+        // auto close thread
+        threadLogService.autoCloseThread();
+    }
+    
     
 }

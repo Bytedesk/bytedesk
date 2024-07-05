@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 15:31:23
+ * @LastEditTime: 2024-06-29 16:44:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,9 +24,9 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TopicConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -73,7 +73,6 @@ public class AsistantService {
         return modelMapper.map(asistant, AsistantResponse.class);
     }
 
-
     // 
     public void initData() {
         
@@ -82,7 +81,7 @@ public class AsistantService {
         }
 
         AsistantRequest asistantRequest = AsistantRequest.builder()
-                .topic(TopicConsts.TOPIC_FILE_ASISTANT)
+                .topic(TopicUtils.TOPIC_FILE_ASISTANT)
                 .nickname(I18Consts.I18N_FILE_ASISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .description(I18Consts.I18N_FILE_ASISTANT_DESCRIPTION)

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 11:48:19
+ * @LastEditTime: 2024-07-01 15:56:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,10 +38,13 @@ public class I18Consts {
     //
     public static final String I18N_THREAD_CONTENT_IMAGE = I18N_PREFIX + "thread.content.image";
     public static final String I18N_THREAD_CONTENT_FILE = I18N_PREFIX + "thread.content.file";
+    public static final String I18N_THREAD_CONTENT_AUDIO = I18N_PREFIX + "thread.content.audio";
+    public static final String I18N_THREAD_CONTENT_VIDEO = I18N_PREFIX + "thread.content.video";
     //
     public static final String I18N_WELCOME_TIP = I18N_PREFIX + "welcome.tip";
     public static final String I18N_TOP_TIP = I18N_PREFIX + "top.tip";
     public static final String I18N_LEAVEMSG_TIP = I18N_PREFIX + "leavemsg.tip";
+    public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip";
     //
     public static final String I18N_WORKGROUP_NICKNAME = I18N_PREFIX + "workgroup.nickname";
     public static final String I18N_WORKGROUP_DESCRIPTION = I18N_PREFIX + "workgroup.description";
@@ -96,5 +99,7 @@ public class I18Consts {
     public static final String I18N_QUICK_BUTTON_DEMO_TITLE_2 = I18N_PREFIX + "quick.button.demo.title.2";
     public static final String I18N_QUICK_BUTTON_DEMO_CONTENT_2 = I18N_PREFIX + "quick.button.demo.content.2";
     // 
+    public static final String I18N_GROUP_NAME = I18N_PREFIX + "group.name";
+    public static final String I18N_GROUP_DESCRIPTION = I18N_PREFIX + "group.description";
 
 }

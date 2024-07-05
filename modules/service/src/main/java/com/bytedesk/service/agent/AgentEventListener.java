@@ -25,11 +25,11 @@ import org.springframework.stereotype.Component;
 
 // import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.event.MqttConnectedEvent;
-import com.bytedesk.core.event.MqttDisconnectedEvent;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.worktime.WorktimeService;
 import com.bytedesk.team.member.Member;

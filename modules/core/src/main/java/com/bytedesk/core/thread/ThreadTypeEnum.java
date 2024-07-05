@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 16:32:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-30 16:26:12
+ * @LastEditTime: 2024-07-01 18:33:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@
 package com.bytedesk.core.thread;
 
 public enum ThreadTypeEnum {
-    APPOINTED(0),
+    AGENT(0),
     WORKGROUP(1),
     ROBOT(2),
     MEMBER(3),
@@ -24,7 +24,8 @@ public enum ThreadTypeEnum {
     FEEDBACK(6),
     ASISTANT(7),
     CHANNEL(8),
-    LOCAL(9);
+    LOCAL(9),
+    FRIEND(10);
 
     private final int value;
 

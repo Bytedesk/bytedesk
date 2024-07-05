@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 22:43:27
+ * @LastEditTime: 2024-07-04 13:59:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,15 +44,13 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ ThreadListener.class })
+@EntityListeners({ ThreadEntityListener.class })
 @Table(name = "core_thread")
 public class Thread extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
     // @NotBlank
     // private String title;
-
     // @NotBlank
     // private String avatar;
 
@@ -69,9 +67,6 @@ public class Thread extends BaseEntity {
     @Builder.Default
     private String content = BdConstants.EMPTY_STRING;
 
-    @Builder.Default
-    private Integer unreadCount = 0;
-
     /**
      * @{ThreadTypeConsts}
      */
@@ -85,15 +80,44 @@ public class Thread extends BaseEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     // private String status = StatusConsts.THREAD_STATUS_OPEN;
-    private ThreadStatusEnum status = ThreadStatusEnum.OPEN;
+    private ThreadStatusEnum status = ThreadStatusEnum.NORMAL;
 
-    // private String client;
+    // 置顶
+    @Builder.Default
+    @Column(name = "is_top")
+    private boolean top = false;
+
+    // 未读
+    @Builder.Default
+    @Column(name = "is_unread")
+    private boolean unread = false;
+
+    // 客户端需要此字段，暂时保留，TODO: 需要与真实未读消息数同步
+    @Builder.Default
+    private int unreadCount = 1;
+
+    // 免打扰
+    @Builder.Default
+    @Column(name = "is_mute")
+    private boolean mute = false;
+
+    // 不在会话列表显示
+    @Builder.Default
+    @Column(name = "is_hide")
+    private boolean hide = false;
+
+    // 星标
+    @Builder.Default
+    private int star = 0;
+
+    // 类似微信折叠会话
+    @Builder.Default
+    @Column(name = "is_folded")
+    private boolean folded = false;
+
     @Enumerated(EnumType.STRING)
     private ClientEnum client;
 
-    /**
-     * 
-     */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
@@ -104,21 +128,22 @@ public class Thread extends BaseEntity {
     /**
      * 在客服会话中，存储访客信息
      * 在同事会话中，存储同事信息
+     * 在用户私聊中，存储对方用户信息
+     * 机器人会话中，存储访客信息
+     * 群组会话中，存储群组信息
      * FIXME: 同事对话中，对方更新头像之后，不能及时同步更新
-     * 注意：h2 db 不能使用 user, 所以重定义为 by_user
+     * 注意：h2 db 不能使用 user, 所以重定义为 thread_user
      */
     @Builder.Default
-    @Column(name = "by_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String user = BdConstants.EMPTY_JSON_STRING;
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private BaseUser user;
 
     /**
      * 一对一客服对话中，存储客服信息
-     * 技能组对话中，存储技能组信息
+     * 技能组客服对话中，存储技能组信息
      * 机器人对话中，存储机器人信息
+     * 用户私聊、群聊、同事会话中，无需存储，使用owner字段信息
      * FIXME: 头像、昵称和机器人大模型中参数修改之后，不能及时同步更新
      */
     @Builder.Default
@@ -126,19 +151,18 @@ public class Thread extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String agent = BdConstants.EMPTY_JSON_STRING;
 
-    /**
-     * belongs to user
-     */
+    // belongs to user
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
-    /** belong to org */
-    // private String orgUid;
+    public Boolean isInit() {
+        return this.status == ThreadStatusEnum.NORMAL;
+    }
 
     //
     public Boolean isClosed() {
-        return this.status != ThreadStatusEnum.OPEN;
+        return this.status == ThreadStatusEnum.AGENT_CLOSED || this.status == ThreadStatusEnum.AUTO_CLOSED;
     }
 
 }

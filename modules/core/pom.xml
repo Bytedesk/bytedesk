@@ -13,7 +13,7 @@
 
 	<artifactId>bytedesk-module-core</artifactId>
 
-	<name>core</name>
+	<name>bytedesk-module-core</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>

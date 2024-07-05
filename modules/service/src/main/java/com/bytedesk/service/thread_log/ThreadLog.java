@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-09 16:34:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 22:44:33
+ * @LastEditTime: 2024-07-04 21:58:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,10 +42,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * only for customer service thread history, 只记录客服对话历史，不记录同事和群组对话历史
- * visitor service history, used for admin backend query
- * thread table in core module is used for agent client query to avoid
- * duplication
+ * 记录thread的创建、更新、删除等操作
+ * thread主表对于一个访客和客服之间的对话仅存放一条，当存在访客多次请求会话的情况时，在主表中仅修改主表thread状态status，
+ * 在此表记录多次会话情况，便于统计，减少thread表数据量，提高查询效率。
  */
 @Entity
 @Data
@@ -61,16 +60,11 @@ public class ThreadLog extends BaseEntity {
 
     // @NotBlank
     // private String title;
-
     // @NotBlank
     // private String avatar;
 
     /**
-     * used to push message
-     * topic format:
-     * workgroup_wid + '/' + visitor_vid
-     * agent_aid + '/' + visitor_vid
-     * such as: wid/vid or aid/vid
+     * @{TopicConsts}
      */
     @NotBlank
     private String topic;
@@ -94,7 +88,7 @@ public class ThreadLog extends BaseEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     // private String status = StatusConsts.THREAD_STATUS_OPEN;
-    private ThreadStatusEnum status = ThreadStatusEnum.OPEN;
+    private ThreadStatusEnum status = ThreadStatusEnum.NORMAL;
 
     @Enumerated(EnumType.STRING)
     private ClientEnum client;
@@ -107,9 +101,9 @@ public class ThreadLog extends BaseEntity {
     private String extra = BdConstants.EMPTY_JSON_STRING;
 
     //
-    // h2 db 不能使用 user, 所以重定义为 by_user
+    // h2 db 不能使用 user, 所以重定义为 _user
     @Builder.Default
-    @Column(name = "by_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String user = BdConstants.EMPTY_JSON_STRING;
 

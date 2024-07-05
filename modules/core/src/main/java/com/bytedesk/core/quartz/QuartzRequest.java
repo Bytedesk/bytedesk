@@ -15,7 +15,6 @@
 package com.bytedesk.core.quartz;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.QuartzConsts;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

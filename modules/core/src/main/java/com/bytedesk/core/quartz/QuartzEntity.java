@@ -15,7 +15,6 @@
 package com.bytedesk.core.quartz;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.QuartzConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

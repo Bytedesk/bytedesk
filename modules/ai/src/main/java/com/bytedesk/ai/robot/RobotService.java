@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 12:45:36
+ * @LastEditTime: 2024-06-29 20:16:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,18 +28,16 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.kb.Kb;
-import com.bytedesk.ai.kb.KbService;
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.faq.Faq;
 import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quick_button.QuickButton;
 import com.bytedesk.core.quick_button.QuickButtonService;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -52,7 +50,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
 
     private final RobotRepository robotRepository;
 
-    private final KbService kbService;
+    // private final KbService kbService;
 
     private final QuickButtonService quickButtonService;
 
@@ -70,7 +68,6 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         
         Specification<Robot> specification = RobotSpecification.search(request);
         Page<Robot> page = robotRepository.findAll(specification, pageable);
-        // Page<Robot> page = robotRepository.findByOrgUidAndDeleted(request.getOrgUid(), false, pageable);
 
         return page.map(robot -> modelMapper.map(robot, RobotResponse.class));
     }
@@ -88,18 +85,28 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             throw new RuntimeException("robot name already exists, please find another name");
         }
         // 
-        Kb kb = kbService.getKb(request.getNickname(), request.getOrgUid());
+        // Kb kb = kbService.getKb(request.getNickname(), request.getOrgUid());
         RobotLlm llm = RobotLlm.builder().build();
         // 
-        Robot robot = Robot.builder()
-                .nickname(request.getNickname())
-                .type(RobotTypeEnum.fromString(request.getType()))
-                // .orgUid(request.getOrgUid())
-                .kb(kb)
-                .llm(llm)
-                .build();
-        robot.setUid(uidUtils.getCacheSerialUid());
+        // Robot robot = modelMapper.map(request, Robot.class);
+        Robot robot = Robot.builder().build();
+        if (StringUtils.hasText(request.getUid())) {
+            robot.setUid(request.getUid());
+        } else {
+            robot.setUid(uidUtils.getCacheSerialUid());
+        }
+        robot.setNickname(request.getNickname());
+        robot.setType(RobotTypeEnum.fromValue(request.getType()));
         robot.setOrgUid(request.getOrgUid());
+        robot.setLlm(llm);
+        // Robot robot = Robot.builder()
+        //         .nickname(request.getNickname())
+        //         .type(RobotTypeEnum.fromString(request.getType()))
+        //         // .kb(kb)
+        //         .llm(llm)
+        //         .build();
+        // robot.setUid(uidUtils.getCacheSerialUid());
+        // robot.setOrgUid(request.getOrgUid());
         // 
         if (request.getServiceSettings() != null
                 && request.getServiceSettings().getQuickButtonUids() != null
@@ -277,24 +284,23 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
                 orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
                 orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
         // 
-
-        Kb kb = kbService.getKb(I18Consts.I18N_ROBOT_NICKNAME, UserConsts.DEFAULT_ORGANIZATION_UID);
-        RobotLlm llm = RobotLlm.builder().build();
-
-        Robot robot = Robot.builder()
-                // .nickname(I18Consts.I18N_ROBOT_NICKNAME)
-                .description(I18Consts.I18N_ROBOT_DESCRIPTION)
-                .type(RobotTypeEnum.SERVICE)
-                // .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
-                .kb(kb)
-                .llm(llm)
+        // Kb kb = kbService.getKb(I18Consts.I18N_ROBOT_NICKNAME, UserConsts.DEFAULT_ORGANIZATION_UID);
+        // RobotLlm llm = RobotLlm.builder().build();
+        RobotRequest robotRequest = RobotRequest.builder()
+                .nickname(I18Consts.I18N_ROBOT_NICKNAME)
+                // .description(I18Consts.I18N_ROBOT_DESCRIPTION)
+                // .kb(kb)
+                // .llm(llm)
                 .build();
-        robot.setUid(UserConsts.DEFAULT_ROBOT_UID);
-        robot.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
-        robot.setNickname(I18Consts.I18N_ROBOT_NICKNAME);
-        robot.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
-        //
-        save(robot);
+        robotRequest.setUid(UserConsts.DEFAULT_ROBOT_UID);
+        robotRequest.setType(RobotTypeEnum.SERVICE.name());
+        robotRequest.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+        // 
+        robotRequest.getServiceSettings().setFaqUids(faqUids);
+        robotRequest.getServiceSettings().setQuickButtonUids(quickButtonUids);
+        // 
+        create(robotRequest);
+        // save(robotRequest);
 
     }
 

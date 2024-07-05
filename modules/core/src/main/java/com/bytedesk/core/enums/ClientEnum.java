@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 22:36:35
+ * @LastEditTime: 2024-06-26 17:06:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,9 +14,10 @@
  */
 package com.bytedesk.core.enums;
 
-
 public enum ClientEnum {
     SYSTEM("system"),
+    SYSTEM_AUTO("system_auto"), // auto reply
+    SYSTEM_BOT("system_bot"), // robot reply
     WEB("web"),
     H5("h5"),
     IOS("ios"),
@@ -25,12 +26,14 @@ public enum ClientEnum {
     LINUX("linux"),
     MACOS("macos"),
     WINDOWS("windows"),
+    FLUTTER("flutter"),
     FLUTTER_WEB("flutter_web"),
     FLUTTER_ANDROID("flutter_android"),
     FLUTTER_IOS("flutter_ios"),
+    UNI("uni"),
     UNI_WEB("uni_web"),
     UNI_ANDROID("uni_android"),
-    UNI_IOS("uni_ios"),     
+    UNI_IOS("uni_ios"),
     WECHAT_MINI("wechat_mini"),
     WECHAT_MP("wechat_mp"),
     WECHAT_WORK("wechat_work"),

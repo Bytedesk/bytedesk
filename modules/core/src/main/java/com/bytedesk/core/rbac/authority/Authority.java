@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 10:31:12
+ * @LastEditTime: 2024-06-29 16:47:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,12 +42,11 @@ public class Authority extends BaseEntity {
 
     private String name;
 
-    /** value is a keyword in h2 db */
-    @Column(name = "by_value")
+    @Column(name = "authority_value")
     private String value;
 
     // private Integer status = 1;
-
+    
     private String description;
 
     @Column(name = "authority_type")

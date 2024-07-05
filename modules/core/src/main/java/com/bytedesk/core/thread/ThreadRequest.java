@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 10:07:42
+ * @LastEditTime: 2024-07-04 09:55:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,11 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,19 +37,43 @@ public class ThreadRequest extends BaseRequest {
 
     // @NotBlank
     // private String title;
-
     // @NotBlank
     // private String avatar;
     
+    // 
     private String topic;
 
     private ThreadStatusEnum status;
 
-    private UserResponseSimple user;
+    private UserProtobuf user;
     
     private String userNickname;
 
-    // private String memberUid;
+    private String ownerNickname;
 
-    // private String orgUid;
+    // 
+    @Builder.Default
+    private Boolean top = false;
+
+    @Builder.Default
+    private Boolean unread = false;
+
+    @Builder.Default
+    private Integer unreadCount = 0;
+
+    @Builder.Default
+    private Boolean mute = false;
+
+    @Builder.Default
+    private boolean hide = false;
+
+    @Builder.Default
+    private Integer star = 0;
+
+    @Builder.Default
+    private Boolean folded = false;
+
+    // group member uids
+    @Builder.Default
+    private List<String> memberUids = new ArrayList<>();
 }

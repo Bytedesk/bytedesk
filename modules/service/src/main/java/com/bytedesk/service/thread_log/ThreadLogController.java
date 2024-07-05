@@ -14,6 +14,47 @@
  */
 package com.bytedesk.service.thread_log;
 
-public class ThreadLogController {
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bytedesk.core.base.BaseController;
+
+import lombok.AllArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v1/thread_log")
+@AllArgsConstructor
+public class ThreadLogController extends BaseController<ThreadLogRequest> {
+
+    @Override
+    public ResponseEntity<?> queryByOrg(ThreadLogRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public ResponseEntity<?> query(ThreadLogRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    }
+
+    @Override
+    public ResponseEntity<?> create(ThreadLogRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public ResponseEntity<?> update(ThreadLogRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public ResponseEntity<?> delete(ThreadLogRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
     
 }

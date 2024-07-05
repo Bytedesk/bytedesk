@@ -12,7 +12,7 @@
 
 	<artifactId>bytedesk-module-ai</artifactId>
 
-	<name>ai</name>
+	<name>bytedesk-module-ai</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>

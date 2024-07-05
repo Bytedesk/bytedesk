@@ -28,8 +28,8 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;

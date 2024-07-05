@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 18:56:04
+ * @LastEditTime: 2024-06-29 11:41:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,15 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.bytedesk.core.ip.IpService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,14 +35,43 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Aspect
 @Component
+@AllArgsConstructor
 public class VisitorAspect {
 
+    private final IpService ipService;
+
     /**
-     * 处理请求前执行
+     * 处理会话请求前执行
      */
     @Before(value = "@annotation(visitorAnnotation)")
     public void doBefore(JoinPoint joinPoint, VisitorAnnotation visitorAnnotation) {
         log.debug("VisitorFilterAspect before: model {}, ", visitorAnnotation.title());
+        // 
+        // 获取方法签名
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        // 获取方法参数列表
+        Object[] args = joinPoint.getArgs();
+        // 遍历参数
+        for (int i = 0; i < args.length; i++) {
+            // 获取参数名
+            String paramName = signature.getParameterNames()[i];
+            // 获取参数值
+            Object paramValue = args[i];
+            // 参数名: authRequest, 参数值: AuthRequest(username=admin@email.com, password=admin,
+            // mobile=null, email=null, code=null, platform=bytedesk)
+            log.debug("TODO: 参数名: {}, 参数值: {}", paramName, paramValue);
+        }
+        // 
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            // 注意：不能在类上注解@Async，否则会获取不到 HttpServletRequest，attributes为空
+            HttpServletRequest request = attributes.getRequest();
+            String ipAddress = request.getRemoteAddr();
+            String ip = ipService.getIp(request);
+            String ipLocation = ipService.getIpLocation(ip);
+            log.info("ipAddress {}, ip {}, ipLocation {}", ipAddress, ip, ipLocation);
+            // 接下来的操作...
+        }
 
         // TODO: check if visitor is banned
 

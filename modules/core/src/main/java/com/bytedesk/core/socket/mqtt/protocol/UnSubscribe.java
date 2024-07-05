@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-01 10:22:17
+ * @LastEditTime: 2024-06-30 10:23:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,11 +17,12 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
-import com.bytedesk.core.event.BytedeskEventPublisher;
 // import com.bytedesk.core.topic.TopicService;
 // import com.bytedesk.core.redis.RedisUserService;
 // import com.bytedesk.core.socket.mqtt.service.MqttSubscribeService;
 import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.service.MqService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +38,8 @@ public class UnSubscribe {
 
     // private final TopicService topicService;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final MqService mqService;
 
     public void processUnSubscribe(Channel channel, MqttUnsubscribeMessage mqttUnsubscribeMessage) {
         // log.debug("processUnSubscribe {}", mqttUnsubscribeMessage.toString());
@@ -51,7 +53,7 @@ public class UnSubscribe {
             //
             // mqttSubscribeStoreService.remove(topicFilter, clientId);
             // topicService.unsubscribe(topicFilter, clientId);
-            bytedeskEventPublisher.publishMqttUnsubscribeEvent(topicFilter, clientId);
+            mqService.publishMqttUnsubscribeEvent(topicFilter, clientId);
             // 移除缓存
             // redisUserService.removeTopic(uid, topicFilter);
             log.debug("UNSUBSCRIBE - clientId: {}, topicFilter: {}", clientId, topicFilter);
