@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 09:55:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-08 16:02:21
+ * @LastEditTime: 2024-06-28 14:23:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,13 @@
  */
 package com.bytedesk.team.group;
 
+import java.util.List;
+import java.util.Date;
+
+import com.bytedesk.ai.robot.RobotResponseSimple;
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.team.member.MemberResponseSimple;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,5 +37,27 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class GroupResponse extends BaseResponse {
 
-    private String gid;
+    private String name;
+
+    private String avatar;
+
+    private String description;
+
+    private Boolean showTopTip;
+
+    private String topTip;
+
+    private GroupTypeEnum type;
+
+    private GroupStatusEnum status;
+
+    private List<MemberResponseSimple> members;
+
+    private List<UserProtobuf> admins;
+
+    private List<RobotResponseSimple> robots;
+
+    private UserProtobuf creator;
+
+    private Date createdAt;
 }

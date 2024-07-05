@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 09:19:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 15:05:43
+ * @LastEditTime: 2024-07-03 22:22:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.rbac.user;
+
+import java.io.Serializable;
 
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.role.Role;
@@ -37,7 +39,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "core_user_org_role")
-public class UserOrganizationRole {
+public class UserOrganizationRole implements Serializable  {
 
     @Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

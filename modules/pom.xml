@@ -18,7 +18,6 @@
     <modules>
         <module>ai</module>
         <module>core</module>
-        <module>local</module>
         <module>service</module>
         <module>social</module>
         <module>team</module>

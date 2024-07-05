@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:10:02
+ * @LastEditTime: 2024-07-04 21:59:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,7 +68,7 @@ public class Upload extends BaseEntity {
     /**
      * 类型：图片、文件、语音、视频等
      */
-    @Column(name = "by_type")
+    @Column(name = "upload_type")
     private String type;
 
     /**

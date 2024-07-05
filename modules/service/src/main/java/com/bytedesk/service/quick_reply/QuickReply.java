@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:12:49
+ * @LastEditTime: 2024-06-26 11:34:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -54,11 +56,13 @@ public class QuickReply extends BaseEntity {
     private String content;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     @Column(name = "reply_type", nullable = false)
     // private String type;
     private MessageTypeEnum type = MessageTypeEnum.TEXT;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private LevelEnum level = LevelEnum.ORGNIZATION;
 
     @JsonIgnore
@@ -68,7 +72,7 @@ public class QuickReply extends BaseEntity {
     // belongs to org
     // private String orgUid;
 
-    // added by user
+    // only used when created by user, not by org
     @JsonIgnore
     @ManyToOne
     private User user;

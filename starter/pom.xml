@@ -171,16 +171,93 @@
 			<version>${im.version}</version>
 		</dependency>
 
-		<!-- singleton - 单机 -->
+		<!-- //////////////////////////////////付费模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
+
+		<!-- core - admin -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-local</artifactId>
+			<artifactId>bytedesk-vip-core</artifactId>
 			<version>${im.version}</version>
 		</dependency>
 
-		<!-- //////////////////////////////////付费模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
+		<!-- service - 客服付费模块 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-service</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- flow - 流程引擎 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-flow</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- cms - 内容管理系统 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-cms</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- pay - 支付 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-pay</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- team - 团队付费模块 -->
+		<!-- <dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-team</artifactId>
+			<version>${im.version}</version>
+		</dependency> -->
+
+		<!-- cluster - 集群 -->
+		<!-- <dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-cluster</artifactId>
+			<version>${im.version}</version>
+		</dependency> -->
+
+		<!-- ticket - 工单 -->
+		<!-- <dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-ticket</artifactId>
+			<version>${im.version}</version>
+		</dependency> -->
 
 		<!-- //////////////////////////////////Side项目模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
+
+		<!-- 良师宝 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-liangshibao</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 今日美语 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-meiyu</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 微语题库 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-tiku</artifactId>
+			<version>${im.version}</version>
+		</dependency>
+
+		<!-- 微语招标 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-zhaobiao</artifactId>
+			<version>${im.version}</version>
+		</dependency>
 
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 

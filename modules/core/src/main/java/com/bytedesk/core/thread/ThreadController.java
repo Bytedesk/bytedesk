@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-22 15:50:18
+ * @LastEditTime: 2024-06-28 16:08:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.Utils;
@@ -37,7 +38,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 /**
- * 
  * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
@@ -52,41 +52,46 @@ public class ThreadController extends BaseController<ThreadRequest> {
     /**
      * 管理后台 根据 orgUids 查询
      * 
-     * @param pageParam
+     * @param request
      * @return
      */
-    @GetMapping("/org")
-    public ResponseEntity<?> queryByOrg(ThreadRequest pageParam) {
+    @GetMapping("/query/org")
+    public ResponseEntity<?> queryByOrg(ThreadRequest request) {
 
-        Page<ThreadResponse> threadPage = threadService.queryByOrg(pageParam);
+        Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
     @GetMapping("/query")
-    public ResponseEntity<?> query(ThreadRequest pageParam) {
+    public ResponseEntity<?> query(ThreadRequest request) {
 
-        Page<ThreadResponse> threadPage = threadService.query(pageParam);
+        Page<ThreadResponse> threadPage = threadService.query(request);
         //
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
+    @ActionAnnotation(title = "thread", action = "create", description = "create thread")
     @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = threadService.createMemberThread(request);
+        ThreadResponse thread = threadService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
 
+    @ActionAnnotation(title = "thread", action = "update", description = "update thread")
     @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(ThreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public ResponseEntity<?> update(@RequestBody ThreadRequest request) {
+
+        ThreadResponse threadResponse = threadService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
+    @ActionAnnotation(title = "thread", action = "close", description = "close thread")
     @PostMapping("/close")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
 
@@ -103,11 +108,12 @@ public class ThreadController extends BaseController<ThreadRequest> {
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
+    @ActionAnnotation(title = "thread", action = "export", description = "export thread")
     @GetMapping("/export")
-    public Object export(ThreadRequest pageParam, HttpServletResponse response) {
+    public Object export(ThreadRequest request, HttpServletResponse response) {
 
         // query data to export
-        Page<ThreadResponse> threadPage = threadService.queryByOrg(pageParam);
+        Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
 
         try {
             //

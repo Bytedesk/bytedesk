@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 16:13:47
+ * @LastEditTime: 2024-06-29 17:08:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,25 +14,29 @@
  */
 package com.bytedesk.ai.robot;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bytedesk.ai.kb.Kb;
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.rbac.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 // import jakarta.persistence.AssociationOverride;
 // import jakarta.persistence.AssociationOverrides;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -81,27 +85,27 @@ public class Robot extends BaseEntity {
     @Column(name = "robot_type", nullable = false)
     private RobotTypeEnum type = RobotTypeEnum.SERVICE;
 
-    // TODO: private、team、public
+    // private、team、public
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private LevelEnum level = LevelEnum.ORGNIZATION;
 
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String flow = BdConstants.EMPTY_JSON_STRING;
 
     // is_published or not
     @Builder.Default
     private boolean published = false;
 
-    /**
-     * 知识库
-     */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kb_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     private Kb kb;
 
-    /**
-     * belong to org
-     */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private Organization organization;
-    // private String orgUid;
+    // only used when created by user, not by org
+    @JsonIgnore
+    @ManyToOne
+    private User user;
 
 }

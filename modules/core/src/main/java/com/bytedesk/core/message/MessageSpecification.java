@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 10:22:07
+ * @LastEditTime: 2024-06-28 15:19:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,10 +34,6 @@ public class MessageSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
             }
-            //
-            // if (StringUtils.hasText(request.getType())) {
-            // predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
-            // }
             //
             if (StringUtils.hasText(request.getClient())) {
                 predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getClient() + "%"));

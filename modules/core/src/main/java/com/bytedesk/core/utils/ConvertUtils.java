@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:24:36
+ * @LastEditTime: 2024-07-05 14:05:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,28 +22,29 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.message_unread.MessageUnread;
 import com.bytedesk.core.rbac.role.Role;
 import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.Thread;
-import com.bytedesk.core.thread.ThreadResponseSimple;
+import com.bytedesk.core.thread.ThreadProtobuf;
 
 public class ConvertUtils {
-    
+
     private ConvertUtils() {
     }
 
-     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
+    public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
         UserResponse userResponse = new ModelMapper().map(userDetails, UserResponse.class);
 
         return userResponse;
     }
-
 
     public static UserResponse convertToUserResponse(User user) {
         UserResponse userResponse = new ModelMapper().map(user, UserResponse.class);
@@ -55,32 +56,50 @@ public class ConvertUtils {
         return userResponse;
     }
 
-    public static UserResponseSimple convertToUserResponseSimple(User user) {
-        return new ModelMapper().map(user, UserResponseSimple.class);
+    public static UserProtobuf convertToUserResponseSimple(User user) {
+        return new ModelMapper().map(user, UserProtobuf.class);
     }
 
-    public static ThreadResponseSimple convertToThreadResponseSimple(Thread thread) {
-        return new ModelMapper().map(thread, ThreadResponseSimple.class);
+    public static ThreadProtobuf convertToThreadProtobuf(Thread thread) {
+        ThreadProtobuf threadProtobuf = new ModelMapper().map(thread, ThreadProtobuf.class);
+        // 
+        UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
+        if (user.getExtra() == null) {
+            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+        }
+        threadProtobuf.setUser(user);
+        // 
+        return threadProtobuf;
     }
 
     public static RoleResponse convertToRoleResponse(Role role) {
         return new ModelMapper().map(role, RoleResponse.class);
     }
-    
+
     public static MessageResponse convertToMessageResponse(Message message) {
 
         MessageResponse messageResponse = new ModelMapper().map(message, MessageResponse.class);
 
-        if (message.getThreads() != null && message.getThreads().size() > 0) {
-            messageResponse.setThread(convertToThreadResponseSimple(message.getThreads().get(0)));
+        UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
+        if (user.getExtra() == null) {
+            user.setExtra(BdConstants.EMPTY_JSON_STRING);
         }
-        
-        UserResponseSimple user = JSON.parseObject(message.getUser(), UserResponseSimple.class);
         messageResponse.setUser(user);
 
         return messageResponse;
     }
 
-   
+    public static MessageResponse convertToMessageResponse(MessageUnread message) {
+
+        MessageResponse messageResponse = new ModelMapper().map(message, MessageResponse.class);
+
+        UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
+        if (user.getExtra() == null) {
+            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+        }
+        messageResponse.setUser(user);
+
+        return messageResponse;
+    }
 
 }

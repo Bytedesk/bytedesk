@@ -15,7 +15,9 @@
 package com.bytedesk.core.topic;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -37,16 +39,18 @@ public class TopicResponse extends BaseResponse {
     
     // private String uid;
     
-    private String topic;
+    @Builder.Default
+    // private String topic;
+    private Set<String> topics = new HashSet<>();
     
     private String userUid;
 
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
-    private int qos;
+    // private int qos;
 
     // private boolean subscribed;
 
-    private boolean wildcard;
+    // private boolean wildcard;
 
     /**
      * current online clientIds

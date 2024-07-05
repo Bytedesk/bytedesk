@@ -17,7 +17,7 @@ package com.bytedesk.core.action;
 import java.util.Date;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,7 +51,7 @@ public class ActionResponse extends BaseResponse {
     
     private String extra;
 
-    private UserResponseSimple user;
+    private UserProtobuf user;
 
     public Date createdAt;
 }

@@ -17,7 +17,7 @@ package com.bytedesk.team.member;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.team.department.DepartmentResponse;
 
 import lombok.AllArgsConstructor;
@@ -59,5 +59,5 @@ public class MemberResponse extends BaseResponse {
 
     private Set<DepartmentResponse> departments;
 
-    private UserResponseSimple user;
+    private UserProtobuf user;
 }

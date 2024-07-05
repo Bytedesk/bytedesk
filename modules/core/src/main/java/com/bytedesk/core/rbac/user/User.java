@@ -6,7 +6,7 @@ import java.util.Set;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
@@ -53,7 +53,7 @@ import lombok.experimental.Accessors;
 		@UniqueConstraint(columnNames = { "email", "platform" }),
 		@UniqueConstraint(columnNames = { "mobile", "platform" }),
 })
-public class User extends BaseEntity {
+public class User extends BaseEntityNoOrg {
 
 	private static final long serialVersionUID = 1L;
 

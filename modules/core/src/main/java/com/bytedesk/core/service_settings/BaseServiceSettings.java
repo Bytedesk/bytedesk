@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 11:37:11
+ * @LastEditTime: 2024-07-04 12:42:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.service_settings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +38,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @MappedSuperclass
-public class BaseServiceSettings {
+public class BaseServiceSettings implements Serializable {
 
     @NotBlank
     @Enumerated(EnumType.STRING)
@@ -48,17 +49,20 @@ public class BaseServiceSettings {
     private boolean autoPop = false;
 
     /**
-     * TODO: set different tips for different lang
+     * 公告栏是否显示
      */
     @NotBlank
     private boolean showTopTip = false;
+
+    // 公告
+    @NotBlank
+    private String topTip = I18Consts.I18N_TOP_TIP;
 
     // show rate btn on chat toolbar
     @NotBlank
     private boolean showRateBtn = false;
 
-    @NotBlank
-    private String topTip = I18Consts.I18N_TOP_TIP;
+    
 
     @NotBlank
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

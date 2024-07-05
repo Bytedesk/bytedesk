@@ -11,8 +11,8 @@ option java_outer_classname = "ThreadProto";
 // [START objc_declaration]
 //option objc_class_prefix = "Proto";
 // [END objc_declaration]
-
-// import "user.proto";
+// 
+import "user.proto";
 // import "group.proto";
 //import "google/protobuf/any.proto";
 
@@ -28,5 +28,11 @@ message Thread {
     string topic = 2;
     // 会话类型
     string type = 3;
+    // 会话状态
+    string status = 4;
+    // 头像昵称等信息
+    User user = 5;
+    // 自定义扩展/附加信息
+    string extra = 6;
 }
 //

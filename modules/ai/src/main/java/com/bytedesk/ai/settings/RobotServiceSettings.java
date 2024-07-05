@@ -40,7 +40,7 @@ public class RobotServiceSettings extends BaseServiceSettings {
     @Builder.Default
     private boolean allowTransferToAgent = true;
 
-    // 限制仅允许：workgroup、appointed
+    // 限制仅允许：workgroup、agent
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:49:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 13:20:28
+ * @LastEditTime: 2024-06-29 13:40:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ package com.bytedesk.service.thread_log;
 import java.util.Date;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class ThreadLogResponse extends BaseResponse {
     
-    private static final long serialVersionUID = 7910814181L;
+    private static final long serialVersionUID = 1L;
     
     // private String title;
 
@@ -54,5 +54,5 @@ public class ThreadLogResponse extends BaseResponse {
 
 	private Date createdAt;
 
-    private UserResponseSimple user;
+    private UserProtobuf user;
 }

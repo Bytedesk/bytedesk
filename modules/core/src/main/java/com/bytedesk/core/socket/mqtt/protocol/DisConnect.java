@@ -6,28 +6,10 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessage;
 
-import com.bytedesk.core.event.BytedeskEventPublisher;
-// import com.bytedesk.core.topic.Topic;
-// import com.bytedesk.core.topic.TopicService;
-// import com.bytedesk.core.constant.StatusConsts;
-// import com.bytedesk.core.model.entity.User;
-// import com.bytedesk.core.service.MessageService;
-// import com.bytedesk.core.publisher.EventPublisher;
-// import com.bytedesk.core.service.MessageService;
-// import com.bytedesk.core.service.UserService;
-// import com.bytedesk.core.redis.RedisConnectService;
-// import com.bytedesk.core.redis.RedisHostService;
-// import com.bytedesk.core.redis.RedisRoutingRoundRobin;
-// import com.bytedesk.core.redis.RedisService;
-// import com.bytedesk.core.redis.RedisStatisticService;
-// import com.bytedesk.core.redis.RedisUserService;
-// import com.bytedesk.core.socket.mqtt.model.MqttSession;
-// import com.bytedesk.core.socket.mqtt.service.MqttClientIdService;
-// import com.bytedesk.core.socket.mqtt.service.MqttDupPubRelMessageStoreService;
-// import com.bytedesk.core.socket.mqtt.service.MqttDupPublishMessageStoreService;
 import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
-// import com.bytedesk.core.socket.mqtt.service.MqttSubscribeService;
 import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.service.MqService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,35 +22,7 @@ public class DisConnect {
 
     private final MqttSessionService mqttSessionStoreService;
 
-    // private final TopicService topicService;
-
-    private final BytedeskEventPublisher bytedeskEventPublisher;
-
-    // private final MqttSubscribeService mqttSubscribeStoreService;
-
-    // private final MqttDupPublishMessageStoreService
-    // mqttDupPublishMessageStoreService;
-
-    // private final MqttDupPubRelMessageStoreService
-    // mqttDupPubRelMessageStoreService;
-
-    // private final MqttClientIdService mqttClientIdStoreService;
-
-    // private final UserService userService;
-
-    // private final RedisUserService redisUserService;
-
-    // private final RedisRoutingRoundRobin redisRoutingRoundRobin;
-
-    // private final RedisStatisticService redisStatisticService;
-
-    // private final RedisHostService redisHostService;
-
-    // private final RedisConnectService redisConnectService;
-
-    // private final MessageService messageService;
-
-    // private final EventPublisher eventPublisher;
+    private final MqService mqService;
 
     /**
      * TODO: 清空redis中缓存的用户连接状态
@@ -96,7 +50,7 @@ public class DisConnect {
         mqttSessionStoreService.remove(clientId);
         // mqttClientIdStoreService.remove(clientId);
         // topicService.removeClientId(clientId);
-        bytedeskEventPublisher.publishMqttDisconnectedEvent(clientId);
+        mqService.publishMqttDisconnectedEvent(clientId);
 
         channel.close();
 

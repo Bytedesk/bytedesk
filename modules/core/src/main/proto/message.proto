@@ -54,5 +54,7 @@ message Message {
     Thread thread = 7;
     // 发送者
     User user = 8;
+    // 自定义扩展/附加信息
+    string extra = 9;
 }
 // [END messages]

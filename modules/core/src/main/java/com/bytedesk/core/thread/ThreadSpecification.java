@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 12:51:20
+ * @LastEditTime: 2024-06-28 16:15:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,13 +34,24 @@ public class ThreadSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             // FIXME: user是json，无法使用like查询
-            if (StringUtils.hasText(request.getUserNickname())) {
-                predicates.add(criteriaBuilder.like(root.get("user").get("nickname"),
-                        "%" + request.getUserNickname() + "%"));
+            // if (StringUtils.hasText(request.getUserNickname())) {
+            //     predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUserNickname() + "%"));
+            // }
+            if (StringUtils.hasText(request.getUid())) {
+                predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
             }
-            // FIXME: client是enums，无法使用like查询
+            if (StringUtils.hasText(request.getTopic())) {
+                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
+            }
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            if (StringUtils.hasText(request.getOwnerNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("owner").get("nickname"),
+                        "%" + request.getOwnerNickname() + "%"));
+            }
             if (StringUtils.hasText(request.getClient())) {
-                predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getClient() + "%"));
+                predicates.add(criteriaBuilder.equal(root.get("client"), request.getClient()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

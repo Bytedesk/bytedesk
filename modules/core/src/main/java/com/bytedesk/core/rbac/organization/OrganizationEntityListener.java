@@ -16,7 +16,7 @@ package com.bytedesk.core.rbac.organization;
 
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.rbac.user.UserConsts;
 
 // import com.bytedesk.core.event.BytedeskEventPublisher;
 // import com.bytedesk.core.utils.ApplicationContextHolder;

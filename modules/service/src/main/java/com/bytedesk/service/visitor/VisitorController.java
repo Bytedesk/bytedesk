@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 22:07:03
+ * @LastEditTime: 2024-07-04 15:03:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.service.visitor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -24,9 +25,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.apilimit.ApiRateLimiter;
+import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.socket.stomp.service.StompMqService;
+import com.bytedesk.core.message_unread.MessageUnreadService;
+import com.bytedesk.core.socket.service.MqService;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.leave_msg.LeaveMessageRequest;
+import com.bytedesk.service.leave_msg.LeaveMessageResponse;
+import com.bytedesk.service.leave_msg.LeaveMessageService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,14 +47,25 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/visitor/api/v1/")
-public class VisitorController {
+public class VisitorController extends BaseController<VisitorRequest> {
 
     private final VisitorService visitorService;
 
-    private final StompMqService stompMqService;
+    private final MqService stompMqService;
+
+    private final MessageUnreadService messageUnreadService;
+
+    private final LeaveMessageService leaveMessageService;
+
+    @Override
+    public ResponseEntity<?> queryByOrg(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
 
     /**
-     * pre init use in web embeded button used for tracking & pre fetch settings
+     * TODO: pre init use in web embeded button used for tracking & pre fetch
+     * settings
      * 
      * @param request
      * @return
@@ -71,7 +90,7 @@ public class VisitorController {
     @GetMapping("/init")
     public ResponseEntity<?> init(VisitorRequest visitorRequest, HttpServletRequest request) {
         //
-        VisitorResponseSimple visitor = visitorService.create(visitorRequest, request);
+        VisitorProtobuf visitor = visitorService.create(visitorRequest, request);
         if (visitor == null) {
             return ResponseEntity.ok(JsonResult.error("init visitor failed", -1));
         }
@@ -84,13 +103,13 @@ public class VisitorController {
      * @param visitorRequest
      * @return
      */
-    @VisitorAnnotation(title = "visitor filter")
+    @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
     @GetMapping("/thread")
     public ResponseEntity<?> requestThread(VisitorRequest visitorRequest, HttpServletRequest request) {
         //
-        MessageResponse messageResponse = visitorService.createCustomerServiceThread(visitorRequest);
+        MessageProtobuf messageProtobuf = visitorService.createCsThread(visitorRequest);
         //
-        return ResponseEntity.ok(JsonResult.success(messageResponse));
+        return ResponseEntity.ok(JsonResult.success(messageProtobuf));
     }
 
     // query visitor info by uid
@@ -127,21 +146,73 @@ public class VisitorController {
     }
 
     /**
+     * 客户端定期ping，返回未读消息数，如果大于0，则客户端拉取未读消息
+     * 
+     * @return
+     */
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping(VisitorRequest request) {
+
+        int count = messageUnreadService.getUnreadCount(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success("pong", count));
+    }
+
+    // 访客拉取未读消息
+     @GetMapping("/message/unread")
+    public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
+        //
+        List<MessageResponse> messages = messageUnreadService.getMessages(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
+    }
+
+
+    /**
      * send offline message
      * 
      * @param map map
      * @return json
      */
+    @VisitorAnnotation(title = "visitor", action = "sendOfflineMessage", description = "in order to filter visitor")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendOfflineMessage(@RequestBody Map<String, String> map) {
         //
         String json = (String) map.get("json");
         log.debug("json {}", json);
-        stompMqService.sendMessageToMq(json);
+        stompMqService.sendJsonMessageToMq(json);
         //
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
+    
+    // 访客留言
+    @VisitorAnnotation(title = "visitor", action = "leaveMessage", description = "leave_msg")
+    @PostMapping("/leavemsg")
+    public ResponseEntity<?> leaveMessage(@RequestBody LeaveMessageRequest request) {
+
+        LeaveMessageResponse response = leaveMessageService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @VisitorAnnotation(title = "visitor", action = "rateInitiative", description = "rateInitiative")
+    // 访客主动发起评价
+    @PostMapping("/rate/initiative")
+    public ResponseEntity<?> rateInitiative(@RequestBody Map<String, String> map) {
+        //
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @VisitorAnnotation(title = "visitor", action = "rateDo", description = "rateDo")
+    // 访客提交评价
+    @PostMapping("/rate/do")
+    public ResponseEntity<?> rateDo(@RequestBody Map<String, String> map) {
+        //
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @VisitorAnnotation(title = "visitor", action = "quickButtonMessage", description = "quickButtonMessage")
     @PostMapping("/quickbutton/send")
     public ResponseEntity<?> quickButtonMessage() {
         //
@@ -149,10 +220,17 @@ public class VisitorController {
         return ResponseEntity.ok(JsonResult.success("test success"));
     }
 
+    @VisitorAnnotation(title = "visitor", action = "faqMessage", description = "faqMessage")
     @PostMapping("/faq/send")
     public ResponseEntity<?> faqMessage() {
 
         return ResponseEntity.ok(JsonResult.success("test success"));
+    }
+
+    @Override
+    public ResponseEntity<?> create(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
 }

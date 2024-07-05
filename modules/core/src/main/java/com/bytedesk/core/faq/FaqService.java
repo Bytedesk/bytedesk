@@ -30,8 +30,8 @@ import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.category.Category;
 import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -150,6 +150,7 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     }
 
     public void initData() {
+        
         if (faqRepository.count() > 0) {
             return;
         }

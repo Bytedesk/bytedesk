@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:45:18
+ * @LastEditTime: 2024-07-02 19:28:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,6 +49,10 @@ public class ServiceSettingsResponseVisitor {
 
     @Builder.Default
     private String topTip = I18Consts.I18N_TOP_TIP;
+
+    // show rate btn on chat toolbar
+    @Builder.Default
+    private boolean showRateBtn = false;
 
     // 存储到thread_log方便定时关闭会话
     /** auto close time in min - 默认自动关闭时间，单位分钟 */

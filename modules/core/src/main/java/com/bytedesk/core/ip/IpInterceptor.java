@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-17 12:53:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 12:12:56
+ * @LastEditTime: 2024-06-27 17:04:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,20 +36,29 @@ public class IpInterceptor implements HandlerInterceptor {
     
     private final IpService ipService;
 
-    // 要拦截的IP列表
+    // 测试：要拦截的IP列表
     private static final List<String> BLACKLISTED_IPS = Arrays.asList(
             "175.27.32.31",
             "112.53.2.93"
     // 可以根据需要动态配置这个列表，例如从数据库或配置文件中加载
     );
 
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+        // 获取当前请求的URL
+        // String requestURL = request.getRequestURL().toString();
+        // String queryString = request.getQueryString(); // 获取URL中的参数部分
+        // if (queryString != null) {
+        //     requestURL += "?" + queryString; // 将URL和参数拼接起来
+        // }
+        // log.info("当前请求的完整URL（包括参数）：" + requestURL);
+
+        // // 如果需要获取具体的参数值，可以使用以下方法：
+        // String orgUid = request.getParameter("orgUid"); // 将"paramName"替换为实际的参数名
+        // log.info("参数'orgUid'的值为：" + orgUid);
 
         String ip = ipService.getIp(request);
-
         // 检查IP是否在黑名单中
         if (BLACKLISTED_IPS.contains(ip)) {
             log.warn("Blocked IP address: {}", ip);

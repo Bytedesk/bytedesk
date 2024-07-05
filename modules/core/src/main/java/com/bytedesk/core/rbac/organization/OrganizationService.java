@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 12:39:48
+ * @LastEditTime: 2024-06-29 16:55:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,14 +28,14 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.UserConsts;
-import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.role.Role;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -215,6 +215,7 @@ public class OrganizationService {
                     .user(adminOptional.get())
                     .build();
             organization.setUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+            // 
             save(organization);
         }
 

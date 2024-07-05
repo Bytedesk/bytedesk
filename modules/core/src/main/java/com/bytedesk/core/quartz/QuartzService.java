@@ -37,8 +37,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.QuartzConsts;
-import com.bytedesk.core.constant.UserConsts;
+import com.bytedesk.core.rbac.user.UserConsts;
 // import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 

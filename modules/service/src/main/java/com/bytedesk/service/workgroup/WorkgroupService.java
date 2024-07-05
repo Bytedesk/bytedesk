@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 10:06:32
+ * @LastEditTime: 2024-06-29 20:03:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,11 +34,11 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.UserConsts;
 import com.bytedesk.core.faq.Faq;
 import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quick_button.QuickButton;
 import com.bytedesk.core.quick_button.QuickButtonService;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentService;
@@ -313,11 +313,6 @@ public class WorkgroupService {
 
         String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
         // 
-        // List<String> agentUids = new ArrayList<>();
-        // Optional<Agent> agentOptional = agentService.findByMobileAndOrgUid(bytedeskProperties.getMobile(), orgUid);
-        // agentOptional.ifPresent(agent -> {
-        //     agentUids.add(agent.getUid());
-        // });
         List<String> agentUids = Arrays.asList(
             UserConsts.DEFAULT_AGENT_UID
         );
@@ -339,7 +334,6 @@ public class WorkgroupService {
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
-                // .description(I18Consts.I18N_WORKGROUP_DESCRIPTION)
                 .agentUids(agentUids)
                 .build();
         workgroupRequest.setUid(UserConsts.DEFAULT_WORKGROUP_UID);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 09:55:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 11:38:58
+ * @LastEditTime: 2024-06-28 14:23:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,12 @@
  */
 package com.bytedesk.team.group;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
 
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +32,29 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class GroupRequest extends BaseRequest {
 
-    // private String gid;
+    @Builder.Default
+    private String name = I18Consts.I18N_GROUP_NAME;
 
-    private String name;
+    @Builder.Default
+    private String avatar = AvatarConsts.DEFAULT_GROUP_AVATAR_URL;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_GROUP_DESCRIPTION;
+
+    @Builder.Default
+    private Boolean showTopTip = false;
+
+    private String topTip;
+
+    @Builder.Default
+    private GroupStatusEnum status = GroupStatusEnum.NORMAL;
+
+    @Builder.Default
+    private List<String> memberUids = new ArrayList<>();
+
+    @Builder.Default
+    private List<String> adminUids = new ArrayList<>();
+
+    @Builder.Default
+    private List<String> robotUids = new ArrayList<>();
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-13 20:57:41
+ * @LastEditTime: 2024-06-29 20:21:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,8 +13,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.service.agent;
-
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -63,11 +61,9 @@ public class AgentController {
     @GetMapping("/query")
     public ResponseEntity<?> query(AgentRequest agentRequest) {
 
-        Optional<AgentResponse> agentOptional = agentService.query(agentRequest);
-        if (agentOptional.isEmpty()) {
-            return ResponseEntity.ok(JsonResult.error("no agent", -1));
-        }
-        return ResponseEntity.ok(JsonResult.success(agentOptional));
+        AgentResponse agentResponse = agentService.query(agentRequest);
+        
+        return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
 
     /**

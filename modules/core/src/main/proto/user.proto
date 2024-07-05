@@ -20,10 +20,12 @@ option java_outer_classname = "UserProto";
 // types: bool, int32/int64/uint32/uint64/sint32/sint64/fixed32/fixed64/sfixed32/sfixed64, bytes, float, double, and string
 
 message User {
-    //uuID
+    // uuID
     string uid = 1;
     // 昵称
     string nickname = 2;
     // 头像
     string avatar = 3;
+    // 自定义扩展/附加信息
+    string extra = 4;
 }

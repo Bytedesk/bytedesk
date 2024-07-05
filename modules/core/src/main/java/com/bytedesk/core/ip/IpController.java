@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:15:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 14:15:19
+ * @LastEditTime: 2024-06-27 11:33:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,10 @@
  */
 package com.bytedesk.core.ip;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +40,29 @@ import lombok.extern.slf4j.Slf4j;
 public class IpController {
 
     private final IpService ipService;
+
+    @PostMapping("/block")
+    public ResponseEntity<?> blockIp(@RequestBody IpRequest request) {
+
+        ipService.blockIp(request);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @PostMapping("/unblock")
+    public ResponseEntity<?> unblockIp(@RequestBody IpRequest request) {
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @PostMapping("/white")
+    public ResponseEntity<?> whiteIp(@RequestBody IpRequest request) {
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @PostMapping("/unwhite")
+    public ResponseEntity<?> unwhiteIp(@RequestBody IpRequest request) {
+        return ResponseEntity.ok(JsonResult.success());
+    }
     
     /**
      * http://127.0.0.1:9003/ip/api/v1/
@@ -90,6 +116,19 @@ public class IpController {
         jsonObject.put("location", location);
 
         return new JsonResult<>("ip location", 200, jsonObject);
+    }
+
+    // http://127.0.0.1:9003/ip/api/v1/ip/inrange?ip=192.168.1.100
+    @GetMapping("/ip/inrange")
+    public JsonResult<?> ipInRange(@RequestParam String ip) {
+
+        boolean isInRange = IpService.testIsIpInRange(ip);
+        //
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ip", ip);
+        jsonObject.put("isInRange", isInRange);
+
+        return new JsonResult<>("ip isInRange", 200, jsonObject);
     }
 
     // for testing

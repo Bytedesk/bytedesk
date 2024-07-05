@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-01 11:35:43
+ * @LastEditTime: 2024-07-05 11:40:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,12 +29,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.event.BytedeskEventPublisher;
+import com.bytedesk.core.action.ActionTypeEnum;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -59,17 +58,11 @@ public class TopicService {
         TopicRequest topicRequest = TopicRequest.builder()
                 .topic(topic)
                 .userUid(uid)
-                // .qos(1)
                 .build();
         create(topicRequest);
     }
 
-    @Transactional
-    private void create(TopicRequest topicRequest) {
-
-        // if (existsByTopicAndUid(topicRequest.getTopic(), topicRequest.getUid())) {
-        //     return;
-        // }
+    public void create(TopicRequest topicRequest) {
 
         Optional<Topic> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
@@ -79,7 +72,6 @@ public class TopicService {
                 return;
             }
             topicElement.getTopics().add(topicRequest.getTopic());
-            // 
             save(topicElement);
             // 
             return;
@@ -89,9 +81,6 @@ public class TopicService {
         // 
         Topic topic = modelMapper.map(topicRequest, Topic.class);
         topic.getTopics().add(topicRequest.getTopic());
-        // Topics topicsObject = new Topics();
-        // topicsObject.getTopics().add(topicRequest.getTopic());
-        // topic.setTopic(JSON.toJSONString(topicsObject));
         // 
         save(topic);
     }
@@ -202,9 +191,8 @@ public class TopicService {
 
     @Cacheable(value = "topic", key = "#topic", unless="#result == null")
     public Set<Topic> findByTopic(String topic) {
-        // List<Topic> topics = topicRepository.findByTopicStartsWith(topic);
-        Set<Topic> topics = topicRepository.findByTopicsContains(topic);
-        return topics;
+        return topicRepository.findByTopicsContains(topic);
+        // return topics;
         // return topics.stream().map(this::convertToTopicResponse).toList();
     }
 
@@ -280,7 +268,7 @@ public class TopicService {
                 .description("All retry attempts failed for optimistic locking")
                 .extra(topicJSON)
                 .build();
-        actionRequest.setType(TypeConsts.ACTION_TYPE_FAILED);
+        actionRequest.setType(ActionTypeEnum.FAILED.name());
         bytedeskEventPublisher.publishActionEvent(actionRequest);
         log.error("All retry attempts failed for optimistic locking of topic: {}", topic.getUserUid());
         // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作

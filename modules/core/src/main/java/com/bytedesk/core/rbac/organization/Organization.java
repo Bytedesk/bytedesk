@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.organization;
 
 import java.util.Date;
 
+import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.User;
@@ -39,7 +40,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ OrganizationEntityListener.class })
 @Table(name = "core_organization")
-public class Organization extends OrganizationBase {
+public class Organization extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
 

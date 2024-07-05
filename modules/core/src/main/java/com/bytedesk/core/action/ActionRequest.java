@@ -45,6 +45,7 @@ public class ActionRequest extends BaseRequest {
 
     private String extra;
     
+    // private ActionTypeEnum type;
     // private String orgUid;
 
     private String nickname;

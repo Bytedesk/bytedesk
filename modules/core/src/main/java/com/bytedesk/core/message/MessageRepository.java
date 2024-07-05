@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 23:49:42
+ * @LastEditTime: 2024-07-05 11:04:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,17 +28,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * QuerydslPredicateExecutor<Message>
  */
 @Repository
-@Tag(name = "message - 消息")
+@Tag(name = "message")
 public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpecificationExecutor<Message> {
 
     Optional<Message> findByUid(String uid);
 
-    Page<Message> findByThreadsUidIn(String[] threadTids, Pageable pageable);
+    Page<Message> findByThreadTopic(String topic, Pageable pageable);
+    // Page<Message> findByThreadsUidIn(String[] threadTids, Pageable pageable);
 
-    Optional<Message> findFirstByThreadsUidInOrderByCreatedAtDesc(String[] threadTids);
+    // Optional<Message> findFirstByThreadsUidInOrderByCreatedAtDesc(String[]
+    // threadTids);
 
     boolean existsByUid(String uid);
 
-    // Page<Message> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable pageable);
+    // Page<Message> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable
+    // pageable);
 
 }

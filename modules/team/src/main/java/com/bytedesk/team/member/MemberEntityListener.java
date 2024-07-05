@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:46:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 07:23:27
+ * @LastEditTime: 2024-07-04 11:51:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,25 @@
  */
 package com.bytedesk.team.member;
 
+
+import java.util.Iterator;
+
+// import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
+
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.team.department.Department;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+// @Async
+@Slf4j
 @Component
 public class MemberEntityListener {
 
@@ -31,7 +43,22 @@ public class MemberEntityListener {
 
     @PostPersist
     public void postPersist(Member member) {
-        // log.info("postPersist {}", member.getUid());
+        Member clonedMember = SerializationUtils.clone(member);
+        User user = clonedMember.getUser();
+        log.info("postPersist member {}, user {}", clonedMember.getUid(), user.getUid());
+        // 
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        // 默认订阅成员主题
+        bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getMemberTopic(clonedMember.getUid()), user.getUid());
+        // 
+        Iterator<Department> iterator = clonedMember.getDepartments().iterator();
+        while (iterator.hasNext()) {
+            Department department = iterator.next();
+            // 订阅部门主题
+            bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getDepartmentTopic(department
+                    .getUid()),
+                    user.getUid());
+        }
     }
 
     // @PreUpdate
@@ -41,7 +68,20 @@ public class MemberEntityListener {
 
     @PostUpdate
     public void postUpdate(Member member) {
-        // log.info("postUpdate {}", member.getUid());
+        // log.info("postUpdate member {}", member.getUid());
+        Member clonedMember = SerializationUtils.clone(member);
+        User user = clonedMember.getUser();
+        log.info("postUpdate member {}, user {}", clonedMember.getUid(), user.getUid());
+        // TODO: 删除旧的部门主题
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        Iterator<Department> iterator = clonedMember.getDepartments().iterator();
+        while (iterator.hasNext()) {
+            Department department = iterator.next();
+            // 订阅部门主题
+            bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getDepartmentTopic(department
+                    .getUid()),
+                    user.getUid());
+        }
     }
 
     // @PreRemove

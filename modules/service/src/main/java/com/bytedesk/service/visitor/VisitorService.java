@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 23:12:38
+ * @LastEditTime: 2024-07-05 09:47:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,13 @@
  */
 package com.bytedesk.service.visitor;
 
+import java.util.Date;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 // import org.springframework.util.SerializationUtils;
@@ -27,23 +30,25 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
+import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.message.Message;
-import com.bytedesk.core.message.MessageNotify;
-import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.message.MessageService;
+import com.bytedesk.core.message.MessageExtra;
+import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
-import com.bytedesk.service.agent.AgentExceptionRobot;
 import com.bytedesk.service.agent.AgentService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.workgroup.Workgroup;
@@ -56,7 +61,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class VisitorService {
+public class VisitorService extends BaseService<Visitor, VisitorRequest, VisitorResponse> {
 
     private final VisitorRepository visitorRepository;
 
@@ -74,10 +79,15 @@ public class VisitorService {
 
     private final RobotService robotService;
 
-    private final MessageService messageService;
+    // private final CaffeineCacheService caffeineCacheService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
+    @Override
+    public Page<VisitorResponse> queryByOrg(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
 
     public VisitorResponse query(VisitorRequest visitorRequest) {
 
@@ -95,14 +105,14 @@ public class VisitorService {
      * @param visitorRequest
      * @return
      */
-    public VisitorResponseSimple create(VisitorRequest visitorRequest, HttpServletRequest request) {
-
+    public VisitorProtobuf create(VisitorRequest visitorRequest, HttpServletRequest request) {
+        //
         String uid = visitorRequest.getUid();
         log.info("visitor init, uid: {}", uid);
         //
         Visitor visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
-            return ConvertServiceUtils.convertToVisitorResponseSimple(visitor);
+            return ConvertServiceUtils.convertToVisitorProtobuf(visitor);
         }
         //
         if (!StringUtils.hasText(visitorRequest.getNickname())) {
@@ -117,33 +127,40 @@ public class VisitorService {
             visitorRequest.setIp(ip);
             visitorRequest.setIpLocation(ipService.getIpLocation(ip));
         }
-        // 
+        //
+        log.info("visitorRequest {}", visitorRequest);
         visitor = modelMapper.map(visitorRequest, Visitor.class);
         visitor.setUid(uidUtils.getCacheSerialUid());
         visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
-        // TODO: orgUid
+        visitor.setOrgUid(visitorRequest.getOrgUid());
         //
-        return ConvertServiceUtils.convertToVisitorResponseSimple(save(visitor));
+        VisitorDevice device = modelMapper.map(visitorRequest, VisitorDevice.class);
+        visitor.setDevice(device);
+        //
+        Visitor savedVisitor = save(visitor);
+        if (savedVisitor == null) {
+            throw new RuntimeException("visitor not saved");
+        }
+        //
+        return ConvertServiceUtils.convertToVisitorProtobuf(savedVisitor);
     }
 
     /** */
-    public MessageResponse createCustomerServiceThread(VisitorRequest visitorRequest) {
+    public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
         //
-        String topic = visitorRequest.formatTopic();
         ThreadTypeEnum type = visitorRequest.formatType();
-        String sid = visitorRequest.getSid();
         //
-        if (type.equals(ThreadTypeEnum.APPOINTED)) {
+        if (type.equals(ThreadTypeEnum.AGENT)) {
             // 一对一客服
-            return createAgentCsThread(visitorRequest, topic, type, sid);
+            return createAgentCsThread(visitorRequest);
             //
         } else if (type.equals(ThreadTypeEnum.WORKGROUP)) {
             // 技能组
-            return createWorkgroupCsThread(visitorRequest, topic, type, sid);
+            return createWorkgroupCsThread(visitorRequest);
             //
         } else if (type.equals(ThreadTypeEnum.ROBOT)) {
             // 机器人对话
-            return createRobotCsThread(visitorRequest, topic, type, sid);
+            return createRobotCsThread(visitorRequest);
             //
         } else {
             throw new RuntimeException("Thread type " + type.name() + " not supported");
@@ -152,359 +169,362 @@ public class VisitorService {
 
     //////////////////// Agent/////////////////////
 
-    public MessageResponse createAgentCsThread(VisitorRequest visitorRequest, String topic, ThreadTypeEnum type,
-            String sid) {
-
-        Agent agent = agentService.findByUid(sid)
-                .orElseThrow(() -> new RuntimeException("Agent uid " + sid + " not found"));
+    public MessageProtobuf createAgentCsThread(VisitorRequest visitorRequest) {
+        //
+        String agentUid = visitorRequest.getSid();
+        Agent agent = agentService.findByUid(agentUid)
+                .orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
         if (agent.getServiceSettings().isDefaultRobot()) {
+            throw new RuntimeException("TODO: 默认机器人即将上线，敬请期待");
             // 默认转机器人优先接待
-            Robot robot = agent.getServiceSettings().getRobot();
-            if (robot != null) {
-                //
-                Thread thread = getRobotThread(visitorRequest, topic, type, robot);
-                //
-                return getRobotMessage(visitorRequest, thread, robot);
-            } else {
-                throw new AgentExceptionRobot("route " + sid + " to a robot");
-            }
+            // Robot robot = agent.getServiceSettings().getRobot();
+            // if (robot != null) {
+            // //
+            // Thread thread = getRobotThread(visitorRequest, topic, type, robot);
+            // //
+            // return getRobotMessage(visitorRequest, thread, robot);
+            // } else {
+            // throw new AgentExceptionRobot("route " + agentUid + " to a robot");
+            // }
         } else if (agent.getServiceSettings().isOfflineRobot()) {
             // TODO: 人工离线期间转机器人
+            throw new RuntimeException("TODO: 人工离线期间转机器人即将上线，敬请期待");
         } else if (agent.getServiceSettings().isNonWorktimeRobot()) {
             // TODO: 非工作时间转接机器人
+            throw new RuntimeException("TODO: 非工作时间转接机器人即将上线，敬请期待");
         }
         //
-        Thread thread = getAgentThread(visitorRequest, topic, type, agent);
+        Thread thread = getAgentThread(visitorRequest, agent);
         //
-        MessageResponse messageResponse = getAgentMessage(visitorRequest, thread, agent);
+        MessageProtobuf messageProtobuf = getAgentMessage(visitorRequest, thread, agent);
         //
         if (agent.isConnected() && agent.isAvailable()) {
             // notify agent - 通知客服
-            notifyAgent(thread, messageResponse);
-        } else if (agent.isAvailable()) {
-            // TODO: 断开连接，但是接待状态，判断是否有客服移动端token，有则发送通知
+            notifyAgent(thread, messageProtobuf);
         }
+        // else if (agent.isAvailable()) {
+        // // TODO: 断开连接，但是接待状态，判断是否有客服移动端token，有则发送通知
+        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
+        // } else {
+        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
+        // }
 
-        return messageResponse;
+        return messageProtobuf;
     }
 
-    private Thread getAgentThread(VisitorRequest visitorRequest, String topic, ThreadTypeEnum type, Agent agent) {
+    private Thread getAgentThread(VisitorRequest visitorRequest, Agent agent) {
         //
+        String topic = TopicUtils.getAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
+        // TODO: 到visitor thread表中拉取
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadOptional.get();
         }
         //
-        Thread thread = new Thread();
+        Thread thread = Thread.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
-        thread.setType(type);
+        thread.setType(ThreadTypeEnum.AGENT);
         thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
         //
-        VisitorResponseSimple visitor = ConvertServiceUtils.convertToVisitorResponseSimple(visitorRequest);
+        VisitorProtobuf visitor = ConvertServiceUtils.convertToVisitorProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
-        // thread.setUser(visitor);
-        //
-        if (!agent.isConnected() || !agent.isAvailable()) {
-            thread.setContent(agent.getServiceSettings().getLeavemsgTip());
-        } else {
-            thread.setContent(agent.getServiceSettings().getWelcomeTip());
-        }
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
-        thread.setExtra(JSON.toJSONString(ConvertServiceUtils.convertToServiceSettingsResponseVisitor(agent.getServiceSettings())));
+        thread.setExtra(JSON
+                .toJSONString(ConvertServiceUtils.convertToServiceSettingsResponseVisitor(agent.getServiceSettings())));
         thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToAgentResponseSimple(agent)));
-        // 
-        return threadService.save(thread);
+        //
+        return thread;
     }
 
-    private MessageResponse getAgentMessage(VisitorRequest visitorRequest, Thread thread, Agent agent) {
+    private MessageProtobuf getAgentMessage(VisitorRequest visitorRequest, Thread thread, Agent agent) {
+        //
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
         }
+        if (agent == null) {
+            throw new RuntimeException("Agent cannot be null");
+        }
+        //
+        boolean isReenter = true;
+        if (thread.isInit()) {
+            // 访客首次进入会话
+            isReenter = false;
+        }
         //
         if (!agent.isConnected() || !agent.isAvailable()) {
+            // 离线状态永远显示离线提示语，不显示“继续会话”
+            isReenter = false;
+            // 客服离线 或 非接待状态
             thread.setContent(agent.getServiceSettings().getLeavemsgTip());
+            thread.setStatus(ThreadStatusEnum.OFFLINE);
         } else {
+            // 客服在线 且 接待状态
+            thread.setUnreadCount(1);
             thread.setContent(agent.getServiceSettings().getWelcomeTip());
+            // if thread is closed, reopen it and then create a new message
+            if (thread.isClosed()) {
+                // 访客会话关闭之后，重新进入
+                isReenter = false;
+                //
+                thread.setExtra(JSON
+                        .toJSONString(
+                                ConvertServiceUtils
+                                        .convertToServiceSettingsResponseVisitor(agent.getServiceSettings())));
+                thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToAgentResponseSimple(agent)));
+                thread.setStatus(ThreadStatusEnum.REOPEN);
+            } else {
+                thread.setStatus(isReenter ? ThreadStatusEnum.REENTER : ThreadStatusEnum.NORMAL);
+            }
         }
-
-        // if thread is closed, reopen it and then create a new message
-        if (thread.isClosed()) {
-            thread.setExtra(JSON.toJSONString(agent.getServiceSettings()));
-            thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToAgentResponseSimple(agent)));
-            thread = threadService.reopen(thread);
-            //
-            Message message = createAgentMessage(thread, agent);
-            message = messageService.save(message);
-
-            return ConvertServiceUtils.convertToMessageResponse(message, thread);
-        }
-
-        // find the last message
-        Optional<Message> messageOptional = messageService.findByThreadsUidInOrderByCreatedAtDesc(thread.getUid());
-        if (messageOptional.isPresent()) {
-            return ConvertServiceUtils.convertToMessageResponse(messageOptional.get(), thread);
-        }
-        // create new message
-        Message message = createAgentMessage(thread, agent);
-        message = messageService.save(message);
-
-        return ConvertServiceUtils.convertToMessageResponse(message, thread);
-    }
-
-    private Message createAgentMessage(Thread thread, Agent agent) {
-        UserResponseSimple user = modelMapper.map(agent, UserResponseSimple.class);
-
-        Message message = Message.builder()
-                .type(MessageTypeEnum.THREAD)
-                .status(MessageStatusEnum.READ)
-                .client(ClientEnum.SYSTEM)
-                .user(JSON.toJSONString(user))
-                // .orgUid(thread.getOrgUid())
-                .build();
-        message.setUid(uidUtils.getCacheSerialUid());
-        message.setOrgUid(thread.getOrgUid());
-
-        if (!agent.isConnected() || !agent.isAvailable()) {
-            message.setContent(agent.getServiceSettings().getLeavemsgTip());
-        } else {
-            message.setContent(agent.getServiceSettings().getWelcomeTip());
-        }
-        message.getThreads().add(thread);
-
-        return message;
+        threadService.save(thread);
+        //
+        UserProtobuf user = modelMapper.map(agent, UserProtobuf.class);
+        //
+        return getThreadMessage(user, thread, isReenter);
     }
 
     ///////////////////// Workgroup///////////////////
 
-    public MessageResponse createWorkgroupCsThread(VisitorRequest visitorRequest, String topic, ThreadTypeEnum type,
-            String sid) {
-
-        Workgroup workgroup = workgroupService.findByUid(sid)
-                .orElseThrow(() -> new RuntimeException("Workgroup uid " + sid + " not found"));
+    public MessageProtobuf createWorkgroupCsThread(VisitorRequest visitorRequest) {
+        //
+        String workgroupUid = visitorRequest.getSid();
+        Workgroup workgroup = workgroupService.findByUid(workgroupUid)
+                .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
         if (workgroup.getServiceSettings().isDefaultRobot()) {
-            // 默认机器人优先接待
-            Robot robot = workgroup.getServiceSettings().getRobot();
-            if (robot != null) {
-                Thread thread = getRobotThread(visitorRequest, topic, type, robot);
-                return getRobotMessage(visitorRequest, thread, robot);
-            } else {
-                throw new AgentExceptionRobot("route " + sid + " to a robot");
-            }
+            throw new RuntimeException("TODO: 默认机器人即将上线，敬请期待");
+            // // 默认机器人优先接待
+            // Robot robot = workgroup.getServiceSettings().getRobot();
+            // if (robot != null) {
+            // Thread thread = getRobotThread(visitorRequest, topic, type, robot);
+            // return getRobotMessage(visitorRequest, thread, robot);
+            // } else {
+            // throw new AgentExceptionRobot("route " + workgroupUid + " to a robot");
+            // }
         } else if (workgroup.getServiceSettings().isOfflineRobot()) {
             // TODO: 人工离线期间转机器人
+            throw new RuntimeException("TODO: 人工离线期间转机器人即将上线，敬请期待");
         } else if (workgroup.getServiceSettings().isNonWorktimeRobot()) {
             // TODO: 非工作时间转接机器人
+            throw new RuntimeException("TODO: 非工作时间转接机器人即将上线，敬请期待");
         }
         if (workgroup.getAgents().isEmpty()) {
-            throw new RuntimeException("No agents found in workgroup with uid " + sid);
+            throw new RuntimeException("No agents found in workgroup with uid " + workgroupUid);
         }
+        //
         Agent agent = workgroup.nextAgent();
         if (agent == null) {
-            throw new RuntimeException("No available agent found in workgroup with uid " + sid);
+            throw new RuntimeException("No available agent found in workgroup with uid " + workgroupUid);
         }
         //
-        Thread thread = getWorkgroupThread(visitorRequest, topic, type, agent, workgroup);
+        Thread thread = getWorkgroupThread(visitorRequest, agent, workgroup);
         //
-        MessageResponse messageResponse = getWorkgroupMessage(visitorRequest, thread, agent, workgroup);
+        MessageProtobuf messageProtobuf = getWorkgroupMessage(visitorRequest, thread, agent, workgroup);
         //
         if (agent.isConnected() && agent.isAvailable()) {
             log.info("agent is connected and available");
             // notify agent - 通知客服
-            notifyAgent(thread, messageResponse);
-        } else if (agent.isAvailable()) {
-            // TODO: 断开连接，但是接待状态，判断是否有客服移动端token，有则发送通知
-            log.info("agent is available");
+            notifyAgent(thread, messageProtobuf);
         }
+        // else if (agent.isAvailable()) {
+        // // TODO: 断开连接，但是接待状态，判断是否有客服移动端token，有则发送通知
+        // log.info("agent is available");
+        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
+        // } else {
+        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
+        // }
 
-        return messageResponse;
+        return messageProtobuf;
     }
 
-    private Thread getWorkgroupThread(
-            VisitorRequest visitorRequest, String topic, ThreadTypeEnum type, Agent agent,
-            Workgroup workgroup) {
+    private Thread getWorkgroupThread(VisitorRequest visitorRequest, Agent agent, Workgroup workgroup) {
         //
+        String topic = TopicUtils.getWorkgroupThreadTopic(workgroup.getUid(), agent.getUid(), visitorRequest.getUid());
+        // TODO: 到visitor thread表中拉取
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadOptional.get();
         }
         //
-        Thread thread = new Thread();
+        Thread thread = Thread.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
-        thread.setType(type);
+        thread.setType(ThreadTypeEnum.WORKGROUP);
         thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
         //
-        VisitorResponseSimple visitor = ConvertServiceUtils.convertToVisitorResponseSimple(visitorRequest);
+        VisitorProtobuf visitor = ConvertServiceUtils.convertToVisitorProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
-        // thread.setUser(visitor);
-        //
-        if (!agent.isConnected() || !agent.isAvailable()) {
-            thread.setContent(workgroup.getServiceSettings().getLeavemsgTip());
-        } else {
-            thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
-        }
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
-        thread.setExtra(JSON.toJSONString(ConvertServiceUtils.convertToServiceSettingsResponseVisitor(workgroup.getServiceSettings())));
+        thread.setExtra(JSON.toJSONString(
+                ConvertServiceUtils.convertToServiceSettingsResponseVisitor(workgroup.getServiceSettings())));
         thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToWorkgroupResponseSimple(workgroup)));
+        //
+        return thread;
 
-        return threadService.save(thread);
+        // Thread savedThread = threadService.save(thread);
+        // if (savedThread == null) {
+        // throw new RuntimeException("crate workgroup thread error, topic " + topic);
+        // }
+        // return savedThread;
     }
 
-    private MessageResponse getWorkgroupMessage(VisitorRequest visitorRequest, Thread thread,
-            Agent agent, Workgroup workgroup) {
+    private MessageProtobuf getWorkgroupMessage(VisitorRequest visitorRequest, Thread thread, Agent agent,
+            Workgroup workgroup) {
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
         }
-
-        // if thread is closed, reopen it and then create a new message
-        if (thread.isClosed()) {
-            thread.setExtra(JSON.toJSONString(workgroup.getServiceSettings()));
-            thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToWorkgroupResponseSimple(workgroup)));
-            thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
-            thread = threadService.reopen(thread);
-            //
-            Message message = createWorkgroupMessage(thread, agent, workgroup);
-
-            message = messageService.save(message);
-
-            return ConvertServiceUtils.convertToMessageResponse(message, thread);
+        if (agent == null) {
+            throw new RuntimeException("Agent cannot be null");
         }
-
-        // find the last message
-        Optional<Message> messageOptional = messageService.findByThreadsUidInOrderByCreatedAtDesc(thread.getUid());
-        if (messageOptional.isPresent()) {
-            return ConvertServiceUtils.convertToMessageResponse(messageOptional.get(), thread);
+        if (workgroup == null) {
+            throw new RuntimeException("Workgroup cannot be null");
         }
-        // create new message
-        Message message = createWorkgroupMessage(thread, agent, workgroup);
-
-        message = messageService.save(message);
-
-        return ConvertServiceUtils.convertToMessageResponse(message, thread);
-    }
-
-    private Message createWorkgroupMessage(Thread thread, Agent agent, Workgroup workgroup) {
-        UserResponseSimple user = modelMapper.map(agent, UserResponseSimple.class);
-
-        Message message = Message.builder()
-                .type(MessageTypeEnum.THREAD)
-                .status(MessageStatusEnum.READ)
-                // .client(ClientConsts.CLIENT_SYSTEM)
-                .client(ClientEnum.SYSTEM)
-                .user(JSON.toJSONString(user))
-                // .orgUid(thread.getOrgUid())
-                .build();
-        message.setUid(uidUtils.getCacheSerialUid());
-        message.setOrgUid(thread.getOrgUid());
-
+        //
+        boolean isReenter = true;
+        if (thread.isInit()) {
+            // 访客首次进入会话
+            isReenter = false;
+        }
+        //
         if (!agent.isConnected() || !agent.isAvailable()) {
-            message.setContent(workgroup.getServiceSettings().getLeavemsgTip());
+            // 离线状态永远显示离线提示语，不显示“继续会话”
+            isReenter = false;
+            // 客服离线 或 非接待状态
+            thread.setContent(workgroup.getServiceSettings().getLeavemsgTip());
+            thread.setStatus(ThreadStatusEnum.OFFLINE);
         } else {
-            message.setContent(workgroup.getServiceSettings().getWelcomeTip());
+            // 客服在线 且 接待状态
+            thread.setUnreadCount(1);
+            thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
+            // if thread is closed, reopen it and then create a new message
+            if (thread.isClosed()) {
+                // 访客会话关闭之后，重新进入
+                isReenter = false;
+                thread.setExtra(JSON.toJSONString(
+                        ConvertServiceUtils.convertToServiceSettingsResponseVisitor(workgroup.getServiceSettings())));
+                thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToWorkgroupResponseSimple(workgroup)));
+                thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
+                // thread = threadService.reenter(thread);
+                thread.setStatus(ThreadStatusEnum.REOPEN);
+            } else {
+                thread.setStatus(isReenter ? ThreadStatusEnum.REENTER : ThreadStatusEnum.NORMAL);
+            }
         }
-
-        message.getThreads().add(thread);
-        return message;
+        threadService.save(thread);
+        //
+        UserProtobuf user = modelMapper.map(agent, UserProtobuf.class);
+        //
+        return getThreadMessage(user, thread, isReenter);
     }
 
     //////////////////// Robot/////////////////////////
 
-    public MessageResponse createRobotCsThread(VisitorRequest visitorRequest, String topic, ThreadTypeEnum type,
-            String sid) {
-        Robot robot = robotService.findByUid(sid)
-                .orElseThrow(() -> new RuntimeException("Robot uid " + sid + " not found"));
+    public MessageProtobuf createRobotCsThread(VisitorRequest visitorRequest) {
         //
-        Thread thread = getRobotThread(visitorRequest, topic, type, robot);
+        String robotUid = visitorRequest.getSid();
+        Robot robot = robotService.findByUid(robotUid)
+                .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
-        return getRobotMessage(visitorRequest, thread, robot);
+        Thread thread = getRobotThread(visitorRequest, robot);
+        //
+        MessageProtobuf messageProtobuf = getRobotMessage(visitorRequest, thread, robot);
+        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
+
+        return messageProtobuf;
     }
 
-    private Thread getRobotThread(VisitorRequest visitorRequest, String topic, ThreadTypeEnum type, Robot robot) {
+    private Thread getRobotThread(VisitorRequest visitorRequest, Robot robot) {
         //
+        String topic = TopicUtils.getOrgRobotTopic(robot.getUid(), visitorRequest.getUid());
+        // TODO: 到visitor thread表中拉取
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadOptional.get();
         }
         //
-        Thread thread = new Thread();
+        Thread thread = Thread.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
-        thread.setType(type);
+        thread.setType(ThreadTypeEnum.ROBOT);
+        thread.setUnreadCount(0);
         thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
         //
-        VisitorResponseSimple visitor = ConvertServiceUtils.convertToVisitorResponseSimple(visitorRequest);
+        VisitorProtobuf visitor = ConvertServiceUtils.convertToVisitorProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
-        // thread.setUser(visitor);
         //
-        // thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(robot.getOrgUid());
         thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
                 robot.getServiceSettings())));
         thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotResponseSimple(robot)));
-
-        return threadService.save(thread);
+        //
+        return thread;
     }
 
-    private MessageResponse getRobotMessage(VisitorRequest visitorRequest, Thread thread, Robot robot) {
+    private MessageProtobuf getRobotMessage(VisitorRequest visitorRequest, Thread thread, Robot robot) {
 
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
         }
-
+        if (robot == null) {
+            throw new RuntimeException("Robot cannot be null");
+        }
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
-
+        //
+        boolean isReenter = true;
+        if (thread.isInit()) {
+            isReenter = false;
+        }
         // if thread is closed, reopen it and then create a new message
         if (thread.isClosed()) {
+            isReenter = false;
             // 更新机器人配置+大模型相关信息
-            thread.setExtra(JSON.toJSONString(robot.getServiceSettings()));
+            thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
+                    robot.getServiceSettings())));
             thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotResponseSimple(robot)));
-            thread = threadService.reopen(thread);
-            //
-            Message message = createRobotMessage(thread, robot);
-            //
-            message = messageService.save(message);
-
-            return ConvertServiceUtils.convertToMessageResponse(message, thread);
+            // thread = threadService.reenter(thread);
+            thread.setStatus(ThreadStatusEnum.REOPEN);
+        } else {
+            thread.setStatus(isReenter ? ThreadStatusEnum.REENTER : ThreadStatusEnum.NORMAL);
         }
-
-        // find the last message
-        Optional<Message> messageOptional = messageService.findByThreadsUidInOrderByCreatedAtDesc(thread.getUid());
-        if (messageOptional.isPresent()) {
-            return ConvertServiceUtils.convertToMessageResponse(messageOptional.get(), thread);
-        }
-
-        // create new message
-        Message message = createRobotMessage(thread, robot);
-
-        message = messageService.save(message);
-
-        return ConvertServiceUtils.convertToMessageResponse(message, thread);
+        thread.setContent(robot.getServiceSettings().getWelcomeTip());
+        threadService.save(thread);
+        //
+        UserProtobuf user = modelMapper.map(robot, UserProtobuf.class);
+        //
+        return getThreadMessage(user, thread, isReenter);
     }
 
-    private Message createRobotMessage(Thread thread, Robot robot) {
+    //////////////////// Common /////////////////////////
 
-        UserResponseSimple user = modelMapper.map(robot, UserResponseSimple.class);
-
+    // thread
+    private MessageProtobuf getThreadMessage(UserProtobuf user, Thread thread, boolean isReenter) {
+        //
         Message message = Message.builder()
-                .type(MessageTypeEnum.THREAD)
-                .content(robot.getServiceSettings().getWelcomeTip())
+                .content(isReenter ? I18Consts.I18N_REENTER_TIP : thread.getContent())
+                .type(isReenter ? MessageTypeEnum.CONTINUE : MessageTypeEnum.WELCOME)
                 .status(MessageStatusEnum.READ)
-                // .client(ClientConsts.CLIENT_SYSTEM)
                 .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(user))
-                // .orgUid(thread.getOrgUid())
                 .build();
         message.setUid(uidUtils.getCacheSerialUid());
         message.setOrgUid(thread.getOrgUid());
-
-        message.getThreads().add(thread);
-
-        return message;
+        message.setCreatedAt(new Date());
+        message.setUpdatedAt(new Date());
+        //
+        if (thread.getStatus().equals(ThreadStatusEnum.OFFLINE)) {
+            message.setType(MessageTypeEnum.LEAVE_MSG);
+        }
+        // message.getThreads().add(thread);
+        message.setThreadTopic(thread.getTopic());
+        // 
+        MessageExtra extraObject = MessageExtra.builder().orgUid(thread.getOrgUid()).build();
+        message.setExtra(JSON.toJSONString(extraObject));
+        //
+        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
     }
 
     @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
@@ -515,40 +535,24 @@ public class VisitorService {
     @Caching(put = {
             @CachePut(value = "visitor", key = "#visitor.uid"),
     })
-    private Visitor save(Visitor visitor) {
-        return visitorRepository.save(visitor);
-    }
-
-    public void notifyAgent(Thread thread, MessageResponse messageResponse) {
+    @Override
+    public Visitor save(Visitor visitor) {
         try {
-            MessageNotify agentMessageResponse = modelMapper.map(messageResponse, MessageNotify.class);
-            // 克隆MessageResponse对象
-            // MessageNotify agentMessageResponse = SerializationUtils.clone(messageNotify);
-
-            // 验证并解析extra为VisitorExtra对象
-            String userJson = thread.getUser();
-            if (StringUtils.hasText(userJson) && JSON.isValid(userJson)) {
-                // 验证Visitor对象并转换
-                VisitorResponseSimple visitor = JSON.parseObject(userJson, VisitorResponseSimple.class);
-                if (visitor != null) {
-                    // user替换成访客，否则客服端会显示客服自己的头像
-                    UserResponseSimple user = ConvertServiceUtils.convertToUserResponseSimple(visitor);
-                    agentMessageResponse.setUser(user);
-
-                    // 发布消息事件
-                    String json = JSON.toJSONString(agentMessageResponse);
-                    bytedeskEventPublisher.publishMessageJsonEvent(json);
-                } else {
-                    // 处理visitor为空的情况
-                }
-            } else {
-                // 处理extraJson为空或无效的情况
-            }
+            return visitorRepository.save(visitor);
         } catch (Exception e) {
-            // 处理其他异常
+            // TODO: handle exception
+            e.printStackTrace();
         }
+        return null;
     }
 
+    public void notifyAgent(Thread thread, MessageProtobuf messageProtobuf) {
+        //
+        // MessageProtobuf messageProtobuf = modelMapper.map(messageProtobuf,
+        // MessageProtobuf.class);
+        String json = JSON.toJSONString(messageProtobuf);
+        bytedeskEventPublisher.publishMessageJsonEvent(json);
+    }
 
     // TODO: 模拟压力测试：随机生成 10000 个访客，分配给1个技能组中10个客服账号，并随机分配给1个客服账号，每秒发送1条消息
     public void prepeareStressTest() {
@@ -556,21 +560,62 @@ public class VisitorService {
         // // 随机生成10000个访客
         // List<Visitor> visitors = new ArrayList<>();
         // for (int i = 0; i < 10000; i++) {
-        //     String uid = uidUtils.getCacheSerialUid();
-        //     // visitors.add(new Visitor(uid, "visitor" + i));
+        // String uid = uidUtils.getCacheSerialUid();
+        // // visitors.add(new Visitor(uid, "visitor" + i));
         // }
         // 随机分配给1个技能组中10个客服账号
         // List<Robot> robots = robotService.findAllByOrgUidAndDeleted(orgUid, false);
         // if (robots == null || robots.isEmpty()) {
-        //     return;
+        // return;
         // }
         // Random random = new Random();
         // for (Visitor visitor : visitors) {
-        //     Robot robot = robots.get(random.nextInt(robots.size()));
-        //     visitor.setAgentUid(robot.getUid());
-        //     save(visitor);
+        // Robot robot = robots.get(random.nextInt(robots.size()));
+        // visitor.setAgentUid(robot.getUid());
+        // save(visitor);
         // }
     }
 
+    @Override
+    public Page<VisitorResponse> queryByUser(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public VisitorResponse create(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public VisitorResponse update(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    }
+
+    @Override
+    public void delete(Visitor entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Visitor entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    @Override
+    public VisitorResponse convertToResponse(Visitor entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+    }
 
 }

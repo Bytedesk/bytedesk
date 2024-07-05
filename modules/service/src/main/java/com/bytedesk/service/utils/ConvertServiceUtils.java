@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:29:35
+ * @LastEditTime: 2024-07-04 20:28:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,11 +18,13 @@ import org.modelmapper.ModelMapper;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.Thread;
-import com.bytedesk.core.message.Message;
-import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.rbac.user.UserResponseSimple;
-import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.agent.AgentResponseSimple;
@@ -30,7 +32,7 @@ import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.visitor.Visitor;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
-import com.bytedesk.service.visitor.VisitorResponseSimple;
+import com.bytedesk.service.visitor.VisitorProtobuf;
 import com.bytedesk.service.workgroup.Workgroup;
 import com.bytedesk.service.workgroup.WorkgroupResponse;
 import com.bytedesk.service.workgroup.WorkgroupResponseSimple;
@@ -44,28 +46,45 @@ public class ConvertServiceUtils {
         return new ModelMapper().map(visitor, VisitorResponse.class);
     }
 
-    public static VisitorResponseSimple convertToVisitorResponseSimple(Visitor visitor) {
-        return new ModelMapper().map(visitor, VisitorResponseSimple.class);
+    public static VisitorProtobuf convertToVisitorProtobuf(Visitor visitor) {
+        return new ModelMapper().map(visitor, VisitorProtobuf.class);
     }
 
-    public static VisitorResponseSimple convertToVisitorResponseSimple(VisitorRequest visitorRequest) {
-        return new ModelMapper().map(visitorRequest, VisitorResponseSimple.class);
+    public static VisitorProtobuf convertToVisitorProtobuf(VisitorRequest visitorRequest) {
+        return new ModelMapper().map(visitorRequest, VisitorProtobuf.class);
     }
 
-    public static UserResponseSimple convertToUserResponseSimple(AgentResponseSimple agentResponseSimple) {
-        return new ModelMapper().map(agentResponseSimple, UserResponseSimple.class);
+    public static UserProtobuf convertToUserResponseSimple(AgentResponseSimple agentResponseSimple) {
+        return new ModelMapper().map(agentResponseSimple, UserProtobuf.class);
     }
 
-    public static UserResponseSimple convertToUserResponseSimple(VisitorResponseSimple visitorResponseSimple) {
-        return new ModelMapper().map(visitorResponseSimple, UserResponseSimple.class);
+    public static UserProtobuf convertToUserResponseSimple(VisitorProtobuf visitorResponseSimple) {
+        return new ModelMapper().map(visitorResponseSimple, UserProtobuf.class);
+    }
+
+    public static MessageProtobuf convertToMessageProtobuf(Message lastMessage, Thread thread) {
+        //
+        MessageProtobuf messageProtobuf = new ModelMapper().map(lastMessage, MessageProtobuf.class);
+        messageProtobuf.setThread(ConvertUtils.convertToThreadProtobuf(thread));
+        //
+        UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
+        if (user.getExtra() == null) {
+            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+        }
+        messageProtobuf.setUser(user);
+        
+        return messageProtobuf;
     }
 
     public static MessageResponse convertToMessageResponse(Message lastMessage, Thread thread) {
         //
         MessageResponse messageResponse = new ModelMapper().map(lastMessage, MessageResponse.class);
-        messageResponse.setThread(ConvertUtils.convertToThreadResponseSimple(thread));
+        // messageResponse.setThread(ConvertUtils.convertToThreadProtobuf(thread));
         //
-        UserResponseSimple user = JSON.parseObject(lastMessage.getUser(), UserResponseSimple.class);
+        UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
+        if (user.getExtra() == null) {
+            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+        }
         messageResponse.setUser(user);
 
         return messageResponse;
@@ -80,7 +99,7 @@ public class ConvertServiceUtils {
         return new ModelMapper().map(agent, AgentResponseSimple.class);
     }
 
-    // 
+    //
     public static WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
         return new ModelMapper().map(workgroup, WorkgroupResponse.class);
     }
@@ -90,9 +109,9 @@ public class ConvertServiceUtils {
     }
 
     //
-    public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(ServiceSettings serviceSettings) {
+    public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
+            ServiceSettings serviceSettings) {
         return new ModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
-    
 
 }

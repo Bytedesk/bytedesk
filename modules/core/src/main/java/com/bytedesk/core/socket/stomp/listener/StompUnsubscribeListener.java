@@ -19,6 +19,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
+// import com.bytedesk.core.event.BytedeskEventPublisher;
+
+import lombok.AllArgsConstructor;
+
 // import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -30,8 +34,10 @@ import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
  */
 // @Slf4j
 @Component
+@AllArgsConstructor
 public class StompUnsubscribeListener implements ApplicationListener<SessionUnsubscribeEvent> {
 
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
     /**
      * 监听来自stomp，也即web端的取消订阅事件
      *

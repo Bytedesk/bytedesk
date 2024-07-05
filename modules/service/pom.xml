@@ -13,7 +13,7 @@
 
 	<artifactId>bytedesk-module-service</artifactId>
 
-	<name>service</name>
+	<name>bytedesk-module-service</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 14:35:31
+ * @LastEditTime: 2024-07-03 08:01:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,17 +42,17 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.action.ActionRequest;
+import com.bytedesk.core.action.ActionTypeEnum;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.UserConsts;
-import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.faq.Faq;
 import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quick_button.QuickButton;
 import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.settings.ServiceSettingsRequest;
@@ -104,23 +104,21 @@ public class AgentService {
         return agentPage.map(ConvertServiceUtils::convertToAgentResponse);
     }
 
-    public Optional<AgentResponse> query(AgentRequest agentRequest) {
-
+    public AgentResponse query(AgentRequest agentRequest) {
+        // 
         User user = authService.getCurrentUser();
-
         Optional<Agent> agentOptional = findByUserUidAndOrgUid(user.getUid(), agentRequest.getOrgUid());
-        if (agentOptional.isPresent()) {
-            return Optional.of(ConvertServiceUtils.convertToAgentResponse(agentOptional.get()));
+        if (!agentOptional.isPresent()) {
+            throw new RuntimeException("agent not found");
         }
-
-        return Optional.empty();
+        return ConvertServiceUtils.convertToAgentResponse(agentOptional.get());
     }
 
     @Transactional
     public AgentResponse create(AgentRequest agentRequest) {
 
         Optional<Member> memberOptional = memberService.findByUid(agentRequest.getMemberUid());
-        if (!memberOptional.isPresent()) {
+        if (!memberOptional.isPresent() || memberOptional.get().getUser() == null) {
             throw new RuntimeException("member uid: " + agentRequest.getMemberUid() + " not found");
         }
         // 一个user仅能绑定一个坐席
@@ -128,18 +126,9 @@ public class AgentService {
             throw new RuntimeException("user already has an agent..!!");
         }
         //
-        // if (!StringUtils.hasText(agentRequest.getAvatar())) {
-        // agentRequest.setAvatar(AvatarConsts.DEFAULT_AGENT_AVATAR_URL);
-        // }
-        // if (!StringUtils.hasText(agentRequest.getDescription())) {
-        // agentRequest.setDescription(I18Consts.I18N_AGENT_DESCRIPTION);
-        // }
-        //
         // Agent agent = modelMapper.map(agentRequest, Agent.class);
         Agent agent = Agent.builder()
                 .nickname(agentRequest.getNickname())
-                // .avatar(agentRequest.getAvatar())
-                // .description(agentRequest.getDescription())
                 .email(agentRequest.getEmail())
                 .mobile(agentRequest.getMobile())
                 .build();
@@ -149,54 +138,8 @@ public class AgentService {
             agent.setUid(uidUtils.getCacheSerialUid());
         }
         agent.setOrgUid(agentRequest.getOrgUid());
-        //
         agent.setMember(memberOptional.get());
-        if (memberOptional.get().getUser() != null) {
-            agent.setUserUid(memberOptional.get().getUser().getUid());
-        } else {
-            throw new RuntimeException("user not found with uid: " + memberOptional.get().getUser().getUid());
-        }
-        //
-        if (agentRequest.getServiceSettings() != null
-                && agentRequest.getServiceSettings().getQuickButtonUids() != null
-                && agentRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
-            Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
-            while (iterator.hasNext()) {
-                String quickButtonUid = iterator.next();
-                // log.info("quickButtonUid: {}", quickButtonUid);
-                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
-                if (quickButtonOptional.isPresent()) {
-                    QuickButton quickButtonEntity = quickButtonOptional.get();
-                    log.info("quickButtonUid added: {}", quickButtonUid);
-
-                    agent.getServiceSettings().getQuickButtons().add(quickButtonEntity);
-                } else {
-                    throw new RuntimeException("quickButtonUid " + quickButtonUid + " not found");
-                }
-            }
-        } else {
-            log.info("agent quickButtonUids is null");
-        }
-        //
-        if (agentRequest.getServiceSettings() != null
-                && agentRequest.getServiceSettings().getFaqUids() != null
-                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
-                if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
-                    log.info("faqUid added {}", faqUid);
-
-                    agent.getServiceSettings().getFaqs().add(faqEntity);
-                } else {
-                    throw new RuntimeException("faq " + faqUid + " not found");
-                }
-            }
-        } else {
-            log.info("agent faquids is null");
-        }
+        agent.setUserUid(memberOptional.get().getUser().getUid());
         //
         if (agentRequest.getServiceSettings() == null
                 || agentRequest.getServiceSettings().getWorktimeUids() == null
@@ -222,6 +165,49 @@ public class AgentService {
                 throw new RuntimeException(worktimeUid + " is not found.");
             }
         }
+        //
+        if (agentRequest.getServiceSettings() != null
+                && agentRequest.getServiceSettings().getQuickButtonUids() != null
+                && agentRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getQuickButtonUids().iterator();
+            while (iterator.hasNext()) {
+                String quickButtonUid = iterator.next();
+                // log.info("quickButtonUid: {}", quickButtonUid);
+                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
+                if (quickButtonOptional.isPresent()) {
+                    QuickButton quickButtonEntity = quickButtonOptional.get();
+                    log.info("agent quickButtonUid added: {}", quickButtonUid);
+
+                    agent.getServiceSettings().getQuickButtons().add(quickButtonEntity);
+                } else {
+                    throw new RuntimeException("agent quickButtonUid " + quickButtonUid + " not found");
+                }
+            }
+        } else {
+            log.info("agent quickButtonUids is null");
+        }
+        //
+        if (agentRequest.getServiceSettings() != null
+                && agentRequest.getServiceSettings().getFaqUids() != null
+                && agentRequest.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String faqUid = iterator.next();
+                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    Faq faqEntity = faqOptional.get();
+                    log.info("agent faqUid added {}", faqUid);
+
+                    agent.getServiceSettings().getFaqs().add(faqEntity);
+                } else {
+                    throw new RuntimeException("agent faq " + faqUid + " not found");
+                }
+            }
+        } else {
+            log.info("agent faquids is null");
+        }
+        // log.info("agent {}", agent);
+        
         // 保存Agent并检查返回值
         Agent savedAgent = save(agent);
         if (savedAgent == null) {
@@ -252,6 +238,9 @@ public class AgentService {
         agent.setDescription(agentRequest.getDescription());
         // agent.setStatus(agentRequest.getStatus());
         agent.setMaxThreadCount(agentRequest.getMaxThreadCount());
+        // 暂不允许修改绑定成员
+        // agent.setMember(memberOptional.get());
+        // agent.setUserUid(memberOptional.get().getUser().getUid());
 
         ServiceSettings serviceSettings = modelMapper.map(agentRequest.getServiceSettings(), ServiceSettings.class);
         if (StringUtils.hasText(agentRequest.getServiceSettings().getRobotUid())) {
@@ -314,10 +303,6 @@ public class AgentService {
         }
         //
         agent.setServiceSettings(serviceSettings);
-
-        // 暂不允许修改绑定成员
-        // agent.setMember(memberOptional.get());
-        // agent.setUserUid(memberOptional.get().getUser().getUid());
         //
         // 保存Agent，并检查返回值
         Agent updatedAgent = save(agent);
@@ -360,9 +345,6 @@ public class AgentService {
     }
 
     @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
-    // public Optional<Agent> findByUser_Uid(String userUid) {
-    // return agentRepository.findByUser_Uid(userUid);
-    // }
     public Optional<Agent> findByUserUidAndOrgUid(String userUid, String orgUid) {
         return agentRepository.findByUserUidAndOrgUidAndDeleted(userUid, orgUid, false);
     }
@@ -455,7 +437,7 @@ public class AgentService {
                 .description("All retry attempts failed for optimistic locking")
                 .extra(agentJSON)
                 .build();
-        actionRequest.setType(TypeConsts.ACTION_TYPE_FAILED);
+        actionRequest.setType(ActionTypeEnum.FAILED.name());
         bytedeskEventPublisher.publishActionEvent(actionRequest);
         log.error("All retry attempts failed for optimistic locking of agent: {}", agent.getUid());
         // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
@@ -493,9 +475,7 @@ public class AgentService {
                 .nickname(I18Consts.I18N_AGENT_NICKNAME)
                 .email(member.getEmail())
                 .mobile(member.getMobile())
-                // .password(bytedeskProperties.getPasswordDefault())
                 .memberUid(member.getUid())
-                // .orgUid(orgUid)
                 .build();
         agentRequest.setUid(UserConsts.DEFAULT_AGENT_UID);
         agentRequest.setOrgUid(orgUid);

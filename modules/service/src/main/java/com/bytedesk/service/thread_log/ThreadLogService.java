@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:47:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 12:30:12
+ * @LastEditTime: 2024-06-29 13:25:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,20 +40,23 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class ThreadLogService {
-    
+
     private final ThreadLogRepository threadLogRepository;
 
     private final ModelMapper modelMapper;
 
     private final ThreadService threadService;
 
-    public Page<ThreadLogResponse> query(ThreadLogRequest threadLogRequest) {
+    public Page<ThreadLogResponse> queryByOrg(ThreadLogRequest threadLogRequest) {
 
         Pageable pageable = PageRequest.of(threadLogRequest.getPageNumber(),
                 threadLogRequest.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Page<ThreadLog> threadLogPage = threadLogRepository.findByOrgUid(threadLogRequest.getOrgUid(), pageable);
+        Specification<ThreadLog> spec = ThreadLogSpecification.search(threadLogRequest);
+        Page<ThreadLog> threadLogPage = threadLogRepository.findAll(spec, pageable);
+        // Page<ThreadLog> threadLogPage =
+        // threadLogRepository.findByOrgUid(threadLogRequest.getOrgUid(), pageable);
 
         return threadLogPage.map(this::convertThreadLogResponse);
     }
@@ -86,15 +90,15 @@ public class ThreadLogService {
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            if (thread.getType() == ThreadTypeEnum.WORKGROUP || thread.getType() == ThreadTypeEnum.APPOINTED) {
-                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(), 
+            if (thread.getType() == ThreadTypeEnum.WORKGROUP || thread.getType() == ThreadTypeEnum.AGENT) {
+                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();
                 if (diffInMinutes > autoCloseMinites) {
                     threadService.autoClose(thread);
                 }
             } else if (thread.getType() == ThreadTypeEnum.ROBOT) {
-                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(), 
+                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();
                 if (diffInMinutes > autoCloseMinites) {
@@ -111,6 +115,5 @@ public class ThreadLogService {
     public ThreadLogResponse convertThreadLogResponse(ThreadLog threadLog) {
         return modelMapper.map(threadLog, ThreadLogResponse.class);
     }
-    
 
 }
