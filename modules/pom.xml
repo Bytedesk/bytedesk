@@ -4,9 +4,6 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <parent.version>${im.version}</parent.version>
-    </properties>
     <parent>
         <groupId>com.bytedesk</groupId>
         <artifactId>im</artifactId>
@@ -15,8 +12,8 @@
 
     <artifactId>modules</artifactId>
     <packaging>pom</packaging>
-
     <version>${parent.version}</version>
+
     <modules>
         <module>ai</module>
         <module>core</module>
@@ -24,6 +21,10 @@
         <module>social</module>
         <module>team</module>
     </modules>
+
+    <properties>
+        <parent.version>${im.version}</parent.version>
+    </properties>
 
     <dependencies>
 
