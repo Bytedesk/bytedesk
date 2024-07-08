@@ -41,3 +41,11 @@ modules/local/target/bytedesk-module-local-1.0-SNAPSHOT.jar
 modules/local/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
 modules/local/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
 modules/local/target/maven-archiver/pom.properties
+logs/
+*.log
+logs/*
+back/
+uploader/
+*.tmp
+h2db/
+.DS_Store
