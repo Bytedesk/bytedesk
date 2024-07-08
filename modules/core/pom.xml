@@ -6,14 +6,14 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-		<artifactId>modules</artifactId>
-		<!-- <version>${im.version}</version> -->
-		<version>0.2.3-BYTEDESK</version>
+    	<artifactId>modules</artifactId>
+    	<version>${parent.version}</version>
 	</parent>
 
 	<artifactId>bytedesk-module-core</artifactId>
 
-	<name>bytedesk-module-core</name>
+	<name>core</name>
+	
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
