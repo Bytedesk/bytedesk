@@ -7,9 +7,9 @@
 	<parent>
 		<groupId>com.bytedesk</groupId>
 		<artifactId>im</artifactId>
-		<version>0.2.3-BYTEDESK</version>
+   		<version>${im.version}</version>
 	</parent>
-
+	
 	<artifactId>bytedesk-starter</artifactId>
 	<packaging>jar</packaging>
 

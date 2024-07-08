@@ -4,26 +4,21 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<!-- <parent>
+		<groupId>com.bytedesk</groupId>
+		<artifactId>modules</artifactId>
+		<version>0.2.3-BYTEDESK</version>
+	</parent> -->
 	<parent>
 		<groupId>com.bytedesk</groupId>
     	<artifactId>modules</artifactId>
     	<version>${parent.version}</version>
 	</parent>
-	<artifactId>bytedesk-module-team</artifactId>
-
-	<name>bytedesk-module-team</name>
+	<artifactId>bytedesk-module-local</artifactId>
+	<name>local</name>
 	<description>Demo project for Spring Boot</description>
 
 	<dependencies>
-
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
-
-		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
@@ -34,27 +29,35 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-ai</artifactId>
+			<artifactId>bytedesk-module-service</artifactId>
 			<version>${im.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- ///////////////////////////////////////////////////////////////////////////// -->
-
+		<!-- https://search.maven.org/artifact/com.lmax/disruptor/4.0.0/jar -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>4.0.0</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.25.2</version>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
+
 			<!-- <plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin> -->
-
 		</plugins>
 	</build>
 
