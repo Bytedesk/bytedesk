@@ -20,8 +20,7 @@
 
     <groupId>com.bytedesk</groupId>
     <artifactId>im</artifactId>
-    <!-- <version>${im.version}</version> -->
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2.3-BYTEDESK</version>
 
     <packaging>pom</packaging>
 
@@ -40,7 +39,7 @@
         <!--  -->
         <querydsl.version>5.1.0</querydsl.version>
         <!--  -->
-        <im.version>0.0.1-SNAPSHOT</im.version>
+        <im.version>0.2.3-BYTEDESK</im.version>
     </properties>
 
     <dependencies>
