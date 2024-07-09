@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 17:16:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 22:41:06
+ * @LastEditTime: 2024-07-06 11:08:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,8 @@
  */
 package com.bytedesk.ai.settings;
 
-import com.bytedesk.core.service_settings.BaseServiceSettings;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.service_settings.BaseServiceSettings;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

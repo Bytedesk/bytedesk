@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.bytedesk</groupId>
         <artifactId>im</artifactId>
-   		<version>${im.version}</version>
+        <version>${im.version}</version>
     </parent>
 
     <artifactId>modules</artifactId>
@@ -28,6 +28,11 @@
 
     <dependencies>
 
+        <!-- <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
+        </dependency> -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -289,6 +294,30 @@
             <version>7.0.0</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- 验证码 -->
+        <!-- https://mvnrepository.com/artifact/pro.fessional/kaptcha -->
+        <dependency>
+            <groupId>pro.fessional</groupId>
+            <artifactId>kaptcha</artifactId>
+            <version>2.3.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- https://doc.hutool.cn/pages/captcha/#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E7%A0%81 -->
+        <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-captcha -->
+        <!-- <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-captcha</artifactId>
+            <version>5.8.29</version>
+        </dependency> -->
+
 
         <!--  -->
         <dependency>

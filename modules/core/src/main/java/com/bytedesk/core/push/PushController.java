@@ -14,6 +14,46 @@
  */
 package com.bytedesk.core.push;
 
-public class PushController {
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bytedesk.core.base.BaseController;
+
+@RestController
+@RequestMapping("/api/v1/push")
+public class PushController extends BaseController<PushRequest> {
+
+    @Override
+    public ResponseEntity<?> queryByOrg(PushRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public ResponseEntity<?> query(PushRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    }
+
+    @Override
+    public ResponseEntity<?> create(PushRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public ResponseEntity<?> update(PushRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public ResponseEntity<?> delete(PushRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    
     
 }

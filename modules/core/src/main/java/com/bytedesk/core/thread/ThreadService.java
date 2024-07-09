@@ -354,7 +354,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         // return threadRepository.findByStatusAndDeleted(ThreadStatusEnum.NORMAL,
         // false);
         List<ThreadStatusEnum> statuses = Arrays
-                .asList(new ThreadStatusEnum[] { ThreadStatusEnum.NORMAL, ThreadStatusEnum.REENTER });
+                .asList(new ThreadStatusEnum[] { ThreadStatusEnum.NORMAL, ThreadStatusEnum.CONTINUE });
         return threadRepository.findByStatusesAndDeleted(statuses, false);
     }
 

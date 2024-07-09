@@ -40,7 +40,7 @@ public class FaqEventListener {
         Organization organization = (Organization) event.getSource();
         String orgUid = organization.getUid();
         log.info("faq - organization created: {}", organization.getName());
-        // 
+        //
         FaqRequest faqDemo1 = FaqRequest.builder()
                 .title(I18Consts.I18N_FAQ_DEMO_TITLE_1)
                 .content(I18Consts.I18N_FAQ_DEMO_CONTENT_1)
@@ -60,8 +60,7 @@ public class FaqEventListener {
                 .build();
         faqDemo2.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
         faqService.create(faqDemo2);
-        // 
+        //
     }
 
-    
 }

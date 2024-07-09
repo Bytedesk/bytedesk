@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-02 19:28:29
+ * @LastEditTime: 2024-07-08 09:47:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,8 +19,9 @@ import java.util.List;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.faq.FaqResponseVisitor;
 import com.bytedesk.core.quick_button.QuickButtonResponseVisitor;
+
+import com.bytedesk.core.faq.FaqResponseVisitor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,9 +42,6 @@ public class ServiceSettingsResponseVisitor {
     @Builder.Default
     private Boolean autoPop = false;
 
-    /**
-     * TODO: set different tips for different lang
-     */
     @Builder.Default
     private Boolean showTopTip = false;
 
@@ -60,12 +58,46 @@ public class ServiceSettingsResponseVisitor {
     private Double autoCloseMin = Double.valueOf(25);
 
     @Builder.Default
+    private boolean showQuickButtons = true;
+    
+    @Builder.Default
     private List<QuickButtonResponseVisitor> quickButtons = new ArrayList<>();
 
     @Builder.Default
+    private boolean showFaqs = true;
+
+    @Builder.Default
     private List<FaqResponseVisitor> faqs = new ArrayList<>();
+    // 
+    @Builder.Default
+    private boolean showGuessFaqs = true;
+    // 猜你想问
+    @Builder.Default
+    private List<FaqResponseVisitor> guessFaqs = new ArrayList<>();
+    // 
+    @Builder.Default
+    private boolean showHotFaqs = true;
+    // 热门问题
+    @Builder.Default
+    private List<FaqResponseVisitor> hotFaqs = new ArrayList<>();
+    // 
+    @Builder.Default
+    private boolean showShortcutFaqs = true;
+    // 快捷功能
+    @Builder.Default
+    private List<FaqResponseVisitor> shortcutFaqs = new ArrayList<>();
 
     @Builder.Default
     private Boolean showLogo = true;
+
+    // robot
+    // 是否允许转人工
+    // private boolean allowTransferToAgent;
+
+    // // 限制仅允许：workgroup、appointed
+    // private ThreadTypeEnum transferType;
+
+    // // agentUid or workgroupUid
+    // private String transferToUid;
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-26 22:54:06
+ * @LastEditTime: 2024-07-09 10:52:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 
- * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @RequiredArgsConstructor

@@ -26,9 +26,6 @@ public class ProtocolProcess {
     @Autowired
     private MqttMessageIdService mqttMessageIdService;
 
-    // @Autowired
-    // private BytedeskEventPublisher bytedeskEventPublisher;
-
     @Autowired
     private MqService mqService;
 

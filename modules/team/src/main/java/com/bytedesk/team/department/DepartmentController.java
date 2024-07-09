@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 
- * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @RequiredArgsConstructor

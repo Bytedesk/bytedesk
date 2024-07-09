@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 17:08:29
+ * @LastEditTime: 2024-07-08 10:24:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,6 +73,7 @@ public class PushService {
         return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, request);
     }
 
+    // TODO: 验证限制同一个ip发送数量、频率
     public Boolean sendCode(String receiver, String type, String client, String authType, 
             PlatformEnum platform,
             HttpServletRequest request) {

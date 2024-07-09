@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-01 15:56:20
+ * @LastEditTime: 2024-07-06 13:15:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,6 +63,7 @@ public class I18Consts {
     public static final String I18N_ROBOT_NICKNAME = I18N_PREFIX + "robot.nickname";
     public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description";
     public static final String I18N_ROBOT_LLM_PROMPT = I18N_PREFIX + "llm.prompt";
+    public static final String I18N_ROBOT_REPLY = I18N_PREFIX + "robot.reply";
     //
     public static final String I18N_ADMIN = I18N_PREFIX + "admin";
     public static final String I18N_ADMIN_DESCRIPTION = I18N_PREFIX + "admin.description";

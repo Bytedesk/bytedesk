@@ -26,12 +26,14 @@ import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Description: file upload - 文件上传
  *               https://spring.io/guides/gs/uploading-files
  * 
  */
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/upload")
@@ -46,6 +48,7 @@ public class UploadController {
 			@RequestParam("file") MultipartFile file,
 			@RequestParam("file_name") String fileName,
 			@RequestParam("file_type") String type) {
+		log.info("upload fileName: {}, type: {}", fileName, type);
 
 		// TODO: image/avatar/file/video/voice
 

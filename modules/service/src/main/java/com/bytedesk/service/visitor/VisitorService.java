@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 09:47:47
+ * @LastEditTime: 2024-07-06 14:56:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
@@ -204,9 +205,6 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         }
         // else if (agent.isAvailable()) {
         // // TODO: 断开连接，但是接待状态，判断是否有客服移动端token，有则发送通知
-        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
-        // } else {
-        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
         // }
 
         return messageProtobuf;
@@ -276,7 +274,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
                 thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToAgentResponseSimple(agent)));
                 thread.setStatus(ThreadStatusEnum.REOPEN);
             } else {
-                thread.setStatus(isReenter ? ThreadStatusEnum.REENTER : ThreadStatusEnum.NORMAL);
+                thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
             }
         }
         threadService.save(thread);
@@ -411,7 +409,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
                 // thread = threadService.reenter(thread);
                 thread.setStatus(ThreadStatusEnum.REOPEN);
             } else {
-                thread.setStatus(isReenter ? ThreadStatusEnum.REENTER : ThreadStatusEnum.NORMAL);
+                thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
             }
         }
         threadService.save(thread);
@@ -432,7 +430,6 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         Thread thread = getRobotThread(visitorRequest, robot);
         //
         MessageProtobuf messageProtobuf = getRobotMessage(visitorRequest, thread, robot);
-        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
 
         return messageProtobuf;
     }
@@ -459,7 +456,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         thread.setOrgUid(robot.getOrgUid());
         thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
                 robot.getServiceSettings())));
-        thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotResponseSimple(robot)));
+        thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
         //
         return thread;
     }
@@ -484,16 +481,19 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             // 更新机器人配置+大模型相关信息
             thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
                     robot.getServiceSettings())));
-            thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotResponseSimple(robot)));
+            thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
             // thread = threadService.reenter(thread);
             thread.setStatus(ThreadStatusEnum.REOPEN);
         } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.REENTER : ThreadStatusEnum.NORMAL);
+            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
         }
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         threadService.save(thread);
         //
         UserProtobuf user = modelMapper.map(robot, UserProtobuf.class);
+        JSONObject userExtra = new JSONObject();
+        userExtra.put("llm", robot.getLlm().isEnabled());
+        user.setExtra(JSON.toJSONString(userExtra));
         //
         return getThreadMessage(user, thread, isReenter);
     }
@@ -520,7 +520,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         }
         // message.getThreads().add(thread);
         message.setThreadTopic(thread.getTopic());
-        // 
+        //
         MessageExtra extraObject = MessageExtra.builder().orgUid(thread.getOrgUid()).build();
         message.setExtra(JSON.toJSONString(extraObject));
         //

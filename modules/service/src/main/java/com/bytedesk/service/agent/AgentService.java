@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-03 08:01:12
+ * @LastEditTime: 2024-07-08 11:12:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,14 +46,14 @@ import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.faq.Faq;
-import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quick_button.QuickButton;
 import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.faq.Faq;
+import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.settings.ServiceSettingsRequest;
 import com.bytedesk.service.utils.ConvertServiceUtils;
@@ -105,7 +105,7 @@ public class AgentService {
     }
 
     public AgentResponse query(AgentRequest agentRequest) {
-        // 
+        //
         User user = authService.getCurrentUser();
         Optional<Agent> agentOptional = findByUserUidAndOrgUid(user.getUid(), agentRequest.getOrgUid());
         if (!agentOptional.isPresent()) {
@@ -207,7 +207,7 @@ public class AgentService {
             log.info("agent faquids is null");
         }
         // log.info("agent {}", agent);
-        
+
         // 保存Agent并检查返回值
         Agent savedAgent = save(agent);
         if (savedAgent == null) {
@@ -243,6 +243,7 @@ public class AgentService {
         // agent.setUserUid(memberOptional.get().getUser().getUid());
 
         ServiceSettings serviceSettings = modelMapper.map(agentRequest.getServiceSettings(), ServiceSettings.class);
+        // 
         if (StringUtils.hasText(agentRequest.getServiceSettings().getRobotUid())) {
             Optional<Robot> robotOptional = robotService.findByUid(agentRequest.getServiceSettings().getRobotUid());
             if (robotOptional.isPresent()) {
@@ -298,6 +299,54 @@ public class AgentService {
                     serviceSettings.getFaqs().add(faqEntity);
                 } else {
                     throw new RuntimeException("faq " + faqUid + " not found");
+                }
+            }
+        }
+        //
+        if (agentRequest.getServiceSettings().getGuessFaqUids() != null
+                && agentRequest.getServiceSettings().getGuessFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getGuessFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String guessFaqUid = iterator.next();
+                Optional<Faq> guessFaqOptional = faqService.findByUid(guessFaqUid);
+                if (guessFaqOptional.isPresent()) {
+                    Faq guessFaq = guessFaqOptional.get();
+                    log.info("guessFaqUid added {}", guessFaqUid);
+                    serviceSettings.getGuessFaqs().add(guessFaq);
+                } else {
+                    throw new RuntimeException("guessFaq " + guessFaqUid + " not found");
+                }
+            }
+        }
+        //
+        if (agentRequest.getServiceSettings().getHotFaqUids() != null
+                && agentRequest.getServiceSettings().getHotFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getHotFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String hotFaqUid = iterator.next();
+                Optional<Faq> hotFaqOptional = faqService.findByUid(hotFaqUid);
+                if (hotFaqOptional.isPresent()) {
+                    Faq hotFaq = hotFaqOptional.get();
+                    log.info("hotFaqUid added {}", hotFaqUid);
+                    serviceSettings.getHotFaqs().add(hotFaq);
+                } else {
+                    throw new RuntimeException("hotFaq " + hotFaqUid + " not found");
+                }
+            }
+        }
+        //
+        if (agentRequest.getServiceSettings().getShortcutFaqUids() != null
+                && agentRequest.getServiceSettings().getShortcutFaqUids().size() > 0) {
+            Iterator<String> iterator = agentRequest.getServiceSettings().getShortcutFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String shortcutFaqUid = iterator.next();
+                Optional<Faq> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
+                if (shortcutFaqOptional.isPresent()) {
+                    Faq shortcutFaq = shortcutFaqOptional.get();
+                    log.info("shortcutFaqUid added {}", shortcutFaqUid);
+                    serviceSettings.getShortcutFaqs().add(shortcutFaq);
+                } else {
+                    throw new RuntimeException("shortcutFaq " + shortcutFaqUid + " not found");
                 }
             }
         }

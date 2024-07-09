@@ -8,7 +8,6 @@ import io.netty.util.CharsetUtil;
 
 import org.springframework.util.StringUtils;
 
-// import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.socket.mqtt.handler.MqttIdleStateHandler;
 import com.bytedesk.core.socket.mqtt.model.MqttSession;
 import com.bytedesk.core.socket.mqtt.service.*;
@@ -30,7 +29,6 @@ public class Connect {
 
     private final MqttSessionService mqttSessionStoreService;
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
     private final MqService mqService;
 
     /**

@@ -6,12 +6,12 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-    	<artifactId>modules</artifactId>
-    	<version>${parent.version}</version>
+		<artifactId>modules</artifactId>
+		<version>${parent.version}</version>
 	</parent>
 
 	<artifactId>bytedesk-module-core</artifactId>
-
+	
 	<name>bytedesk-module-core</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -41,6 +41,9 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
+
+
+		
 
 		<!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
 		<dependency>

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 22:39:03
+ * @LastEditTime: 2024-07-06 13:27:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -34,6 +35,7 @@ import lombok.NoArgsConstructor;
 public class RobotLlm {
 
     // 默认不起用llm问答，需要管理后台手动启动
+    // 不起用llm的情况，默认使用关键词匹配
     @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = false;
@@ -60,7 +62,16 @@ public class RobotLlm {
     private float topP = 0.7f;
 
     @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String prompt = I18Consts.I18N_ROBOT_LLM_PROMPT;
+
+    // 上下文消息数，默认3条。一同传递给大模型
+    @Builder.Default
+    private int contextMsgCount = 3;
+
+    // 等待时间，单位为秒。超过此等待时间大模型没有回复，则自动转接人工
+    // @Builder.Default
+    // private int waitSeconds = 10;
 
     // 默认是true，表示使用自定义模型, false表示云服务（需要在配置文件中配置相关参数）
     @Builder.Default
