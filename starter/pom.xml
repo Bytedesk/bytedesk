@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.bytedesk</groupId>
 		<artifactId>im</artifactId>
-   		<version>${im.version}</version>
+   		<version>${revision}</version>
 	</parent>
 	
 	<artifactId>bytedesk-starter</artifactId>
@@ -148,27 +148,27 @@
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-ai</artifactId>
-			<version>${im.version}</version>
+			<version>${revision}</version>
 		</dependency>
 
 		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-core</artifactId>
-			<version>${im.version}</version>
+			<version>${revision}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-team</artifactId>
-			<version>${im.version}</version>
+			<version>${revision}</version>
 		</dependency>
 
 		<!-- customer service - 在线客服 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-service</artifactId>
-			<version>${im.version}</version>
+			<version>${revision}</version>
 		</dependency>
 
 		<!-- //////////////////////////////////付费模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
