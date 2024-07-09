@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-27 18:21:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 16:56:11
+ * @LastEditTime: 2024-07-09 10:11:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,13 +46,14 @@
             return null; //返回参数值
         }
         //
+        var org = getUrlParam('org')
         var t = getUrlParam('t')
         var sid = getUrlParam('sid')
         //
         //var websiteUrl = window.location.href
         //var websiteTitle = document.title
         //var refererUrl = document.referrer
-        var src = '/chat?t=' + t + '&sid=' + sid + '&'
+        var src = '/chat?org=' + org + '&t=' + t + '&sid=' + sid + '&'
         // console.log('urll:', src)
         document.getElementById('iframePanel').setAttribute('src', src)
     </script>
