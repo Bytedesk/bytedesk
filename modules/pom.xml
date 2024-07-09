@@ -23,10 +23,6 @@
         <module>team</module>
     </modules>
 
-    <properties>
-        <parent.version>${im.version}</parent.version>
-    </properties>
-
     <dependencies>
 
         <!-- <dependency>

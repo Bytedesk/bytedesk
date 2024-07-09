@@ -50,3 +50,4 @@ h2db/
 .DS_Store
 modules/local/target/*
 .flattened-pom.xml
+effective-pom.xml
