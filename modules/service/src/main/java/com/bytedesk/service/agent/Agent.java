@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:12:23
+ * @LastEditTime: 2024-07-06 18:46:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,8 +57,6 @@ import lombok.experimental.Accessors;
 @EntityListeners({ AgentEntityListener.class })
 // @DiscriminatorValue("Agent")
 @Table(name = "service_agent", uniqueConstraints = {
-// @UniqueConstraint(columnNames = { "email", "orgUid" }),
-// @UniqueConstraint(columnNames = { "mobile", "orgUid" })
     @UniqueConstraint(columnNames = { "userUid", "orgUid" })
 })
 public class Agent extends BaseEntity {

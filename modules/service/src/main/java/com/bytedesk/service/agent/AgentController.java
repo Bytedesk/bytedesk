@@ -29,7 +29,6 @@ import lombok.AllArgsConstructor;
 
 /**
  * 
- * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @RestController
 @AllArgsConstructor

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 12:48:20
+ * @LastEditTime: 2024-07-09 11:07:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,8 @@
  */
 package com.bytedesk.team.department;
 
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 // import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -47,8 +44,8 @@ public interface DepartmentRepository extends JpaRepository<Department, Long>, J
 
     Optional<Department> findByUid(String uid);
 
-    Page<Department> findByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted, Pageable pageable);
+    // Page<Department> findByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted, Pageable pageable);
 
-    List<Department> findByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted);
+    // List<Department> findAllByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted);
 
 }

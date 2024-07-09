@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 12:42:44
+ * @LastEditTime: 2024-07-06 19:02:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,8 +22,8 @@ import java.util.List;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.faq.Faq;
 import com.bytedesk.core.quick_button.QuickButton;
+import com.bytedesk.core.faq.Faq;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
@@ -62,8 +62,6 @@ public class BaseServiceSettings implements Serializable {
     @NotBlank
     private boolean showRateBtn = false;
 
-    
-
     @NotBlank
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
@@ -75,11 +73,37 @@ public class BaseServiceSettings implements Serializable {
     @NotBlank
     private Double autoCloseMin = Double.valueOf(25);
 
+    // TODO: 一条消息最大长度，超过此长度，则自动截断成多条消息发送
+    // @Builder.Default
+    // private int msgMaxLength = 1024;
+    // 
+    private boolean showQuickButtons = true;
+    // TODO: 快捷按钮
     @ManyToMany(fetch = FetchType.LAZY)
     private List<QuickButton> quickButtons = new ArrayList<>();
-
+    // 常见问题
+    private boolean showFaqs = true;
+    // TODO: 常见问题
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Faq> faqs = new ArrayList<>();
+    // 
+    private boolean showGuessFaqs = true;
+    // TODO: 猜你想问
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Faq> guessFaqs = new ArrayList<>();
+    // 
+    private boolean showHotFaqs = true;
+    // TODO: 热门问题
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Faq> hotFaqs = new ArrayList<>();
+    // 
+    private boolean showShortcutFaqs = true;
+    // TODO: 快捷功能
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Faq> shortcutFaqs = new ArrayList<>();
+    /**
+     * 是否显示logo
+     */
 
     @NotBlank
     private boolean showLogo = true;

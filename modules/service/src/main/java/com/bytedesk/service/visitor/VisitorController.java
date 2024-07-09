@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 15:03:22
+ * @LastEditTime: 2024-07-09 10:50:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,20 +16,27 @@ package com.bytedesk.service.visitor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.bytedesk.ai.keyword.KeywordResponse;
+import com.bytedesk.ai.keyword.KeywordService;
 import com.bytedesk.core.apilimit.ApiRateLimiter;
 import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadService;
 import com.bytedesk.core.socket.service.MqService;
+import com.bytedesk.core.upload.UploadService;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.leave_msg.LeaveMessageRequest;
 import com.bytedesk.service.leave_msg.LeaveMessageResponse;
@@ -41,12 +48,11 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * anonymous api, no need to login
- * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/visitor/api/v1/")
+@RequestMapping("/visitor/api/v1")
 public class VisitorController extends BaseController<VisitorRequest> {
 
     private final VisitorService visitorService;
@@ -56,6 +62,12 @@ public class VisitorController extends BaseController<VisitorRequest> {
     private final MessageUnreadService messageUnreadService;
 
     private final LeaveMessageService leaveMessageService;
+
+    private final KeywordService keywordService;
+
+    private final UploadService uploadService;
+
+    private final BytedeskProperties bytedeskProperties;
 
     @Override
     public ResponseEntity<?> queryByOrg(VisitorRequest request) {
@@ -159,7 +171,7 @@ public class VisitorController extends BaseController<VisitorRequest> {
     }
 
     // 访客拉取未读消息
-     @GetMapping("/message/unread")
+    @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
         //
         List<MessageResponse> messages = messageUnreadService.getMessages(request.getUid());
@@ -167,16 +179,15 @@ public class VisitorController extends BaseController<VisitorRequest> {
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
     }
 
-
     /**
-     * send offline message
+     * 客户端长连接断开，调用此接口发送消息
      * 
      * @param map map
      * @return json
      */
-    @VisitorAnnotation(title = "visitor", action = "sendOfflineMessage", description = "in order to filter visitor")
+    @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
-    public ResponseEntity<?> sendOfflineMessage(@RequestBody Map<String, String> map) {
+    public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
         //
         String json = (String) map.get("json");
         log.debug("json {}", json);
@@ -185,7 +196,33 @@ public class VisitorController extends BaseController<VisitorRequest> {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
-    
+    // 机器人关键词问答
+    @VisitorAnnotation(title = "visitor", action = "sendKeywordMessage", description = "sendKeywordMessage")
+    @PostMapping("/message/keyword")
+    public ResponseEntity<?> sendKeywordMessage(@RequestBody VisitorRequest request) {
+        //
+        String keyword = request.getContent();
+        String robotUid = request.getSid();
+        String orgUid = request.getOrgUid();
+        List<KeywordResponse> keywordList = keywordService.ask(keyword, robotUid, orgUid);
+
+        // 随机从keywordList中选择一个元素
+        Random random = new Random();
+        KeywordResponse randomKeywordResponse = null;
+        if (!keywordList.isEmpty()) {
+            int randomIndex = random.nextInt(keywordList.size());
+            randomKeywordResponse = keywordList.get(randomIndex);
+        }
+
+        // 返回随机选择的元素或空列表（如果keywordList为空）
+        if (randomKeywordResponse != null) {
+            return ResponseEntity.ok(JsonResult.success(randomKeywordResponse.getReply()));
+        } else {
+            // 如果keywordList为空，你可以根据需要返回适当的信息，比如一个空对象或者错误信息
+            return ResponseEntity.ok(JsonResult.success(400));
+        }
+    }
+
     // 访客留言
     @VisitorAnnotation(title = "visitor", action = "leaveMessage", description = "leave_msg")
     @PostMapping("/leavemsg")
@@ -226,6 +263,23 @@ public class VisitorController extends BaseController<VisitorRequest> {
 
         return ResponseEntity.ok(JsonResult.success("test success"));
     }
+
+    @PostMapping("/upload/file")
+	public ResponseEntity<?> upload(
+			@RequestParam("file") MultipartFile file,
+			@RequestParam("file_name") String fileName,
+            @RequestParam("file_type") String type) {
+        log.info("fileName {}, type {}", fileName, type);
+
+		// TODO: image/avatar/file/video/voice
+
+		// http://localhost:9003/file/20240319162820_img-service2.png
+		String uploadPath = uploadService.store(file, fileName);
+		// http://localhost:9003
+		String url = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+
+		return ResponseEntity.ok(JsonResult.success("upload success", url));
+	}
 
     @Override
     public ResponseEntity<?> create(VisitorRequest request) {

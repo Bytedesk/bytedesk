@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 20:03:19
+ * @LastEditTime: 2024-07-08 11:12:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,14 +34,14 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.faq.Faq;
-import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quick_button.QuickButton;
 import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.core.faq.Faq;
+import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.settings.ServiceSettingsRequest;
 import com.bytedesk.service.utils.ConvertServiceUtils;
@@ -49,9 +49,9 @@ import com.bytedesk.service.worktime.Worktime;
 import com.bytedesk.service.worktime.WorktimeService;
 
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @Service
 @AllArgsConstructor
 public class WorkgroupService {
@@ -82,7 +82,7 @@ public class WorkgroupService {
 
         Specification<Workgroup> specs = WorkgroupSpecification.search(workgroupRequest);
         Page<Workgroup> workgroupPage = workgroupRepository.findAll(specs, pageable);
-        
+
         return workgroupPage.map(ConvertServiceUtils::convertToWorkgroupResponse);
     }
 
@@ -101,7 +101,7 @@ public class WorkgroupService {
             workgroup.setUid(workgroupRequest.getUid());
         }
         workgroup.setOrgUid(workgroupRequest.getOrgUid());
-        // 
+        //
         if (workgroupRequest.getServiceSettings() == null
                 || workgroupRequest.getServiceSettings().getWorktimeUids() == null
                 || workgroupRequest.getServiceSettings().getWorktimeUids().isEmpty()) {
@@ -119,7 +119,7 @@ public class WorkgroupService {
             Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
                 Worktime worktimeEntity = worktimeOptional.get();
-                
+
                 workgroup.getServiceSettings().getWorktimes().add(worktimeEntity);
             } else {
                 throw new RuntimeException(worktimeUid + " is not found.");
@@ -188,7 +188,7 @@ public class WorkgroupService {
         }
         //
         Workgroup workgroup = workgroupOptional.get();
-        // 
+        //
         // modelMapper.map(workgroupRequest, workgroup); // 会把orgUid给清空为null
         workgroup.setNickname(workgroupRequest.getNickname());
         workgroup.setAvatar(workgroupRequest.getAvatar());
@@ -206,7 +206,7 @@ public class WorkgroupService {
                 throw new RuntimeException(workgroupRequest.getServiceSettings().getRobotUid() + " is not found.");
             }
         }
-        // 
+        //
         if (workgroupRequest.getServiceSettings() != null
                 && workgroupRequest.getServiceSettings().getQuickButtonUids() != null
                 && workgroupRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
@@ -223,7 +223,7 @@ public class WorkgroupService {
                 }
             }
         }
-        // 
+        //
         if (workgroupRequest.getServiceSettings() != null
                 && workgroupRequest.getServiceSettings().getFaqUids() != null
                 && workgroupRequest.getServiceSettings().getFaqUids().size() > 0) {
@@ -252,6 +252,55 @@ public class WorkgroupService {
                 throw new RuntimeException(worktimeUid + " is not found.");
             }
         }
+        //
+        if (workgroupRequest.getServiceSettings().getGuessFaqUids() != null
+                && workgroupRequest.getServiceSettings().getGuessFaqUids().size() > 0) {
+            Iterator<String> iterator = workgroupRequest.getServiceSettings().getGuessFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String guessFaqUid = iterator.next();
+                Optional<Faq> guessFaqOptional = faqService.findByUid(guessFaqUid);
+                if (guessFaqOptional.isPresent()) {
+                    Faq guessFaq = guessFaqOptional.get();
+                    log.info("guessFaqUid added {}", guessFaqUid);
+                    serviceSettings.getGuessFaqs().add(guessFaq);
+                } else {
+                    throw new RuntimeException("guessFaq " + guessFaqUid + " not found");
+                }
+            }
+        }
+        //
+        if (workgroupRequest.getServiceSettings().getHotFaqUids() != null
+                && workgroupRequest.getServiceSettings().getHotFaqUids().size() > 0) {
+            Iterator<String> iterator = workgroupRequest.getServiceSettings().getHotFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String hotFaqUid = iterator.next();
+                Optional<Faq> hotFaqOptional = faqService.findByUid(hotFaqUid);
+                if (hotFaqOptional.isPresent()) {
+                    Faq hotFaq = hotFaqOptional.get();
+                    log.info("hotFaqUid added {}", hotFaqUid);
+                    serviceSettings.getHotFaqs().add(hotFaq);
+                } else {
+                    throw new RuntimeException("hotFaq " + hotFaqUid + " not found");
+                }
+            }
+        }
+        //
+        if (workgroupRequest.getServiceSettings().getShortcutFaqUids() != null
+                && workgroupRequest.getServiceSettings().getShortcutFaqUids().size() > 0) {
+            Iterator<String> iterator = workgroupRequest.getServiceSettings().getShortcutFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String shortcutFaqUid = iterator.next();
+                Optional<Faq> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
+                if (shortcutFaqOptional.isPresent()) {
+                    Faq shortcutFaq = shortcutFaqOptional.get();
+                    log.info("shortcutFaqUid added {}", shortcutFaqUid);
+                    serviceSettings.getShortcutFaqs().add(shortcutFaq);
+                } else {
+                    throw new RuntimeException("shortcutFaq " + shortcutFaqUid + " not found");
+                }
+            }
+        }
+        // 
         workgroup.setServiceSettings(serviceSettings);
         //
         workgroup.getAgents().clear();
@@ -312,25 +361,22 @@ public class WorkgroupService {
         }
 
         String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
-        // 
+        //
         List<String> agentUids = Arrays.asList(
-            UserConsts.DEFAULT_AGENT_UID
-        );
-        // 
+                UserConsts.DEFAULT_AGENT_UID);
+        //
         List<String> faqUids = Arrays.asList(
-            orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
-            orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2
-        );
-        // 
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+        //
         List<String> quickButtonUids = Arrays.asList(
-            orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
-            orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2
-        );
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
         //
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();
         worktimeUids.add(worktimeUid);
-        // 
+        //
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
@@ -338,11 +384,11 @@ public class WorkgroupService {
                 .build();
         workgroupRequest.setUid(UserConsts.DEFAULT_WORKGROUP_UID);
         workgroupRequest.setOrgUid(orgUid);
-        // 
+        //
         workgroupRequest.getServiceSettings().setFaqUids(faqUids);
         workgroupRequest.getServiceSettings().setQuickButtonUids(quickButtonUids);
         workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
-        // 
+        //
         create(workgroupRequest);
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 11:12:42
+ * @LastEditTime: 2024-07-06 18:47:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,9 +53,25 @@ public class BaseServiceSettingsRequest {
 
     private List<String> worktimeUids = new ArrayList<>();
 
+    private boolean showQuickButtons = true;
+
     private List<String> quickButtonUids = new ArrayList<>();
 
+    private boolean showFaqs = true;
+
     private List<String> faqUids = new ArrayList<>();
+
+    private boolean showGuessFaqs = true;
+
+    private List<String> guessFaqUids = new ArrayList<>();
+    
+    private boolean showHotFaqs = true;
+
+    private List<String> hotFaqUids = new ArrayList<>();
+
+    private boolean showShortcutFaqs = true;
+    
+    private List<String> shortcutFaqUids = new ArrayList<>();
 
     // 访客对话底部页面显示logo
     private Boolean showLogo = true;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 21:59:59
+ * @LastEditTime: 2024-07-08 16:14:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,48 +46,24 @@ public class Upload extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
 
-    // @NotBlank
-    // @Column(name = "uuid", unique = true, nullable = false)
-    // private String uid;
-
-    /**
-     * 文件名
-     */
     private String name;
 
-    /**
-     * 文件大小
-     */
     private String size;
 
-    /**
-     * URL网址
-     */
     private String url;
 
-    /**
-     * 类型：图片、文件、语音、视频等
-     */
     @Column(name = "upload_type")
     private String type;
 
-    /**
-     *  备注
-     */
     private String note;
 
-    /**
-     * 来源客户端
-     */
     private String client;
 
     /**
-     * 所属用户
+     * 上传用户
      */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     private User user;
 
-    
 }

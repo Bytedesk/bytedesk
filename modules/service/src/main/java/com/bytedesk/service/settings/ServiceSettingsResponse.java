@@ -17,7 +17,7 @@ package com.bytedesk.service.settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.ai.robot.RobotResponseSimple;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.service_settings.BaseServiceSettingsResponse;
 import com.bytedesk.service.worktime.WorktimeResponse;
 
@@ -39,7 +39,6 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceSettingsResponse extends BaseServiceSettingsResponse {
-    
 
     @Builder.Default
     private List<WorktimeResponse> worktimes = new ArrayList<>();
@@ -59,10 +58,7 @@ public class ServiceSettingsResponse extends BaseServiceSettingsResponse {
     @Builder.Default
     private Boolean nonWorktimeRobot = false;
 
-    
-
     @ManyToOne(fetch = FetchType.LAZY)
-    private RobotResponseSimple robot;
+    private RobotProtobuf robot;
 
-    
 }

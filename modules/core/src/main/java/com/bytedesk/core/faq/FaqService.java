@@ -150,12 +150,12 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     }
 
     public void initData() {
-        
+
         if (faqRepository.count() > 0) {
             return;
         }
 
-        // 
+        //
         String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
         FaqRequest faqDemo1 = FaqRequest.builder()
                 .title(I18Consts.I18N_FAQ_DEMO_TITLE_1)

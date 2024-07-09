@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 17:08:56
+ * @LastEditTime: 2024-07-06 13:14:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,6 +78,10 @@ public class Robot extends BaseEntity {
     @Embedded
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
+
+    // 如果未匹配到关键词，默认回复内容
+    @Builder.Default
+    private String defaultReply = I18Consts.I18N_ROBOT_REPLY;
 
     // service、ask、chat
     @Builder.Default

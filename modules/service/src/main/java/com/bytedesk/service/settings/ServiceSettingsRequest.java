@@ -32,7 +32,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceSettingsRequest extends BaseServiceSettingsRequest {
-    
+
     /**
      * robot
      * 是否默认机器人接待
@@ -50,5 +50,4 @@ public class ServiceSettingsRequest extends BaseServiceSettingsRequest {
 
     private String robotUid;
 
-    
 }

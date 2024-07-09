@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-17 11:33:34
+ * @LastEditTime: 2024-07-08 17:32:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,12 +34,12 @@ import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
 import com.bytedesk.core.upload.storage.UploadStorageProperties;
 
+// https://spring.io/guides/gs/uploading-files
 @Service
 public class UploadService {
 
 	private final Path rootLocation;
 
-	// @Autowired
 	// private UploadReposistory uploadReposistory;
 
 	@Autowired

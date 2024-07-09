@@ -25,7 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotMessage;
-import com.bytedesk.ai.robot.RobotResponseSimple;
+import com.bytedesk.ai.robot.RobotProtobuf;
 // import com.bytedesk.ai.robot.RobotResponseSimple;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.thread.Thread;
@@ -78,15 +78,16 @@ public class ZhipuAiService {
      */
     public void getSseAnswer(String uid, String sid, String question, SseEmitter emitter) {
         String topic = sid + "/" + uid;
-        Thread thread = threadService.findByTopic(topic).orElseThrow(() -> new RuntimeException("thread with topic: " + topic+ " not found"));
+        Thread thread = threadService.findByTopic(topic)
+                .orElseThrow(() -> new RuntimeException("thread with topic: " + topic + " not found"));
 
         RobotMessage robotMessage = RobotMessage.builder().question(question).build();
 
-        RobotResponseSimple robotSimple = JSON.parseObject(thread.getAgent(), RobotResponseSimple.class);
+        RobotProtobuf robotSimple = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
         log.info("robotSimple {}", robotSimple);
 
         UserProtobuf user = modelMapper.map(thread.getAgent(), UserProtobuf.class);
-        // 
+        //
         String messageUid = uidUtils.getCacheSerialUid();
         Message message = Message.builder()
                 .type(MessageTypeEnum.ROBOT_QA)
@@ -97,7 +98,7 @@ public class ZhipuAiService {
                 .build();
         message.setUid(messageUid);
         message.setOrgUid(thread.getOrgUid());
-        // 
+        //
         // message.getThreads().add(thread);
         message.setThreadTopic(thread.getTopic());
 
@@ -107,7 +108,8 @@ public class ZhipuAiService {
             try {
                 emitter.send(SseEmitter.event()
                         .data(JsonResult.success(
-                                JsonResultCodeEnum.ROBOT_DISABLED.getName(), JsonResultCodeEnum.ROBOT_DISABLED.getValue(), message)));
+                                JsonResultCodeEnum.ROBOT_DISABLED.getName(),
+                                JsonResultCodeEnum.ROBOT_DISABLED.getValue(), message)));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -118,7 +120,7 @@ public class ZhipuAiService {
 
             return;
         }
-        
+
         //
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), question);
@@ -147,7 +149,8 @@ public class ZhipuAiService {
                                 robotMessage.clearAnswer();
                                 message.setContent(JsonResultCodeEnum.ROBOT_ANSWER_START.getName());
                                 emitter.send(SseEmitter.event().data(JsonResult.success(
-                                        JsonResultCodeEnum.ROBOT_ANSWER_START.getName(), JsonResultCodeEnum.ROBOT_ANSWER_START.getValue(), message)));
+                                        JsonResultCodeEnum.ROBOT_ANSWER_START.getName(),
+                                        JsonResultCodeEnum.ROBOT_ANSWER_START.getValue(), message)));
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
                                 String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
@@ -160,7 +163,8 @@ public class ZhipuAiService {
                                 message.setContent(JSON.toJSONString(robotMessage));
                                 log.info("delta {} answerContent {}", accumulator.getDelta().toString(), answerContent);
                                 emitter.send(SseEmitter.event().data(JsonResult.success(
-                                        JsonResultCodeEnum.ROBOT_ANSWER_CONTINUE.getName(), JsonResultCodeEnum.ROBOT_ANSWER_CONTINUE.getValue(), message)));
+                                        JsonResultCodeEnum.ROBOT_ANSWER_CONTINUE.getName(),
+                                        JsonResultCodeEnum.ROBOT_ANSWER_CONTINUE.getValue(), message)));
                             }
                         }
                     })
@@ -168,7 +172,8 @@ public class ZhipuAiService {
                         log.info("answer end");
                         message.setContent(JsonResultCodeEnum.ROBOT_ANSWER_END.getName());
                         emitter.send(SseEmitter.event().data(JsonResult.success(
-                                JsonResultCodeEnum.ROBOT_ANSWER_END.getName(), JsonResultCodeEnum.ROBOT_ANSWER_END.getValue(), message)));
+                                JsonResultCodeEnum.ROBOT_ANSWER_END.getName(),
+                                JsonResultCodeEnum.ROBOT_ANSWER_END.getValue(), message)));
                         // 完成后完成SSE流
                         emitter.complete();
                     })
@@ -188,7 +193,7 @@ public class ZhipuAiService {
             robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
             robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
             robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
-            // 
+            //
             message.setContent(JSON.toJSONString(robotMessage));
             messageService.save(message);
         }

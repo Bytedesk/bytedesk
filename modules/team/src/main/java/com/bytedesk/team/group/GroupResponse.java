@@ -17,7 +17,7 @@ package com.bytedesk.team.group;
 import java.util.List;
 import java.util.Date;
 
-import com.bytedesk.ai.robot.RobotResponseSimple;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.team.member.MemberResponseSimple;
@@ -55,7 +55,7 @@ public class GroupResponse extends BaseResponse {
 
     private List<UserProtobuf> admins;
 
-    private List<RobotResponseSimple> robots;
+    private List<RobotProtobuf> robots;
 
     private UserProtobuf creator;
 

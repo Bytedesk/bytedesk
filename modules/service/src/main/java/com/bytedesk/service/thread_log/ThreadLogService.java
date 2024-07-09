@@ -28,10 +28,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;

@@ -4,18 +4,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- <parent>
-		<groupId>com.bytedesk</groupId>
-		<artifactId>modules</artifactId>
-		<version>0.2.3-BYTEDESK</version>
-	</parent> -->
 	<parent>
 		<groupId>com.bytedesk</groupId>
-    	<artifactId>modules</artifactId>
-    	<version>${parent.version}</version>
+		<artifactId>modules</artifactId>
+		<version>${parent.version}</version>
 	</parent>
-	
+
 	<artifactId>bytedesk-module-social</artifactId>
+	
 	<name>bytedesk-module-social</name>
 	<description>Demo project for Spring Boot</description>
 

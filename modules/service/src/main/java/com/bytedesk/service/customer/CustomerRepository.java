@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-08 21:14:45
+ * @LastEditTime: 2024-07-09 10:50:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 /**
  * https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html
  */
-public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer>
-{
+public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
 
     // Collection<CustomerNameOnly> findByNickname(String name);
     

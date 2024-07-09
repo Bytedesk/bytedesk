@@ -24,10 +24,10 @@ import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.agent.AgentResponseSimple;
+import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.visitor.Visitor;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -72,7 +72,7 @@ public class ConvertServiceUtils {
             user.setExtra(BdConstants.EMPTY_JSON_STRING);
         }
         messageProtobuf.setUser(user);
-        
+
         return messageProtobuf;
     }
 

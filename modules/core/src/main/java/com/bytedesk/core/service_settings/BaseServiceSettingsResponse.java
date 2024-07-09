@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 11:12:50
+ * @LastEditTime: 2024-07-06 19:04:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,8 @@ import java.util.List;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.faq.FaqResponse;
 import com.bytedesk.core.quick_button.QuickButtonResponse;
+import com.bytedesk.core.faq.FaqResponse;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
@@ -32,14 +32,10 @@ import lombok.EqualsAndHashCode;
 @MappedSuperclass
 public class BaseServiceSettingsResponse {
 
-    // private String language = I18Consts.ZH_CN;
     private LanguageEnum language = LanguageEnum.ZH_CN;
 
     private Boolean autoPop = false;
 
-    /**
-     * TODO: set different tips for different lang
-     */
     private Boolean showTopTip = false;
 
     // show rate btn on chat toolbar
@@ -54,9 +50,25 @@ public class BaseServiceSettingsResponse {
     /** auto close time in min - 默认自动关闭时间，单位分钟 */
     private Double autoCloseMin = Double.valueOf(25);
 
+    private boolean showQuickButtons = true;
+    
     private List<QuickButtonResponse> quickButtons = new ArrayList<>();
 
+    private boolean showFaqs = true;
+
     private List<FaqResponse> faqs = new ArrayList<>();
+
+    private boolean showGuessFaqs = true;
+
+    private List<FaqResponse> guessFaqs = new ArrayList<>();
+    
+    private boolean showHotFaqs = true;
+
+    private List<FaqResponse> hotFaqs = new ArrayList<>();
+
+    private boolean showShortcutFaqs = true;
+    
+    private List<FaqResponse> shortcutFaqs = new ArrayList<>();
 
     private Boolean showLogo = true;
 
