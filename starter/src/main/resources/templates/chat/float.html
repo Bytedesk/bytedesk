@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-18 17:56:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 16:56:05
+ * @LastEditTime: 2024-07-09 10:11:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,9 +34,10 @@
             return null; //返回参数值
         }
         //
+        var org = getUrlParam('org')
         var t = getUrlParam('t')
         var sid = getUrlParam('sid')
-        var src = '/chat?t=' + t + '&sid=' + sid + '&'
+        var src = '/chat?org=' + org + '&t=' + t + '&sid=' + sid + '&'
         // init chatfloat, and init params
         window.ChatFloat({
             chatUrl: src, // custom chat url
