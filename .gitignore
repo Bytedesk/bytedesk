@@ -36,7 +36,6 @@ meiyu/*
 zhaobiao/*
 vip/*
 integrations/*
-modules/local/target/bytedesk-module-local-1.0-SNAPSHOT.jar
 .gitignore
 modules/local/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
 modules/local/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
@@ -49,3 +48,5 @@ uploader/
 *.tmp
 h2db/
 .DS_Store
+modules/local/target/*
+.flattened-pom.xml

@@ -6,8 +6,8 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-		<artifactId>modules</artifactId>
-		<version>${parent.version}</version>
+    	<artifactId>modules</artifactId>
+    	<version>${revision}</version>
 	</parent>
 
 	<artifactId>bytedesk-module-service</artifactId>
@@ -27,21 +27,21 @@
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-ai</artifactId>
-			<version>${im.version}</version>
+			<version>${revision}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-core</artifactId>
-			<version>${im.version}</version>
+			<version>${revision}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-team</artifactId>
-			<version>${im.version}</version>
+			<version>${revision}</version>
 			<scope>provided</scope>
 		</dependency>
 
