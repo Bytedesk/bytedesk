@@ -81,7 +81,6 @@ git clone https://github.com/Bytedesk/bytedesk.git
 # 
 cd bytedesk
 mvn install -Dmaven.test.skip=true
-# protobuf is used to generate java code, you may need to install protobuf on your machine
 # 
 cd bytedesk/starter
 mvn spring-boot:run
