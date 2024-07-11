@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-11 14:42:41
+ * @LastEditTime: 2024-07-11 14:44:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,7 +86,6 @@ git clone https://github.com/Bytedesk/bytedesk.git
 # 
 cd bytedesk
 mvn install -Dmaven.test.skip=true
-# 项目使用了protobuf，可能需要安装 protobuf 编译工具
 # 
 cd bytedesk/starter
 mvn spring-boot:run
