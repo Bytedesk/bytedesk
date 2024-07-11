@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-26 09:57:42
+ * @LastEditTime: 2024-07-11 14:42:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,6 +72,18 @@
 git clone https://github.com/Bytedesk/bytedesk.git
 # 配置文件: bytedesk/starter/src/main/resources/application-dev.properties
 # use maven && vscode
+# 
+# % mvn --version
+# Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
+# Maven home: /opt/homebrew/Cellar/maven/3.8.4/libexec
+# Java version: 17.0.4, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/jdk-17.0.4.jdk/Contents/Home
+# Default locale: zh_CN_#Hans, platform encoding: UTF-8
+# OS name: "mac os x", version: "14.2.1", arch: "aarch64", family: "mac"
+# 
+# 项目使用了protobuf，可能需要安装 protobuf 编译工具
+# % protoc --version
+# libprotoc 25.3
+# 
 cd bytedesk
 mvn install -Dmaven.test.skip=true
 # 项目使用了protobuf，可能需要安装 protobuf 编译工具
