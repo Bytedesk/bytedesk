@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-26 09:53:46
+ * @LastEditTime: 2024-07-11 14:42:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,6 +67,18 @@ Chat as a Service
 git clone https://github.com/Bytedesk/bytedesk.git
 # config file: bytedesk/starter/src/main/resources/application-dev.properties
 # use maven && vscode
+# 
+# % mvn --version
+# Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
+# Maven home: /opt/homebrew/Cellar/maven/3.8.4/libexec
+# Java version: 17.0.4, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/jdk-17.0.4.jdk/Contents/Home
+# Default locale: zh_CN_#Hans, platform encoding: UTF-8
+# OS name: "mac os x", version: "14.2.1", arch: "aarch64", family: "mac"
+# 
+# protobuf is used to generate java code, you may need to install protobuf on your machine
+# % protoc --version
+# libprotoc 25.3
+# 
 cd bytedesk
 mvn install -Dmaven.test.skip=true
 # protobuf is used to generate java code, you may need to install protobuf on your machine
