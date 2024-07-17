@@ -101,7 +101,7 @@ nohup java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
 web: http://127.0.0.1:9003/
 管理后台: http://127.0.0.1:9003/admin, 用户名: admin@email.com, 密码: admin
 客服端: http://127.0.0.1:9003/agent, 用户名: admin@email.com, 密码: admin
-访客: http://127.0.0.1:9003/chat?t=0&sid=default_agent_uid&
+访客: http://127.0.0.1:9003/chat?org=df_org_uid&t=0&sid=df_ag_uid&
 api文档: http://127.0.0.1:9003/swagger-ui/index.html
 actuator: http://127.0.0.1:9003/actuator
 h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa

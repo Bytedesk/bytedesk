@@ -96,7 +96,7 @@ developer: http://127.0.0.1:9003/dev
 web: http://127.0.0.1:9003/
 admin: http://127.0.0.1:9003/admin, user/password: admin@email.com/admin
 agent: http://127.0.0.1:9003/agent, user/password: admin@email.com/admin
-chat: http://127.0.0.1:9003/chat?t=0&sid=default_agent_uid&
+chat: http://127.0.0.1:9003/chat?org=df_org_uid&t=0&sid=df_ag_uid&
 api docs: http://127.0.0.1:9003/swagger-ui/index.html
 actuator: http://127.0.0.1:9003/actuator
 h2-console: http://127.0.0.1:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
