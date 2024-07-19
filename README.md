@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-11 14:42:29
+ * @LastEditTime: 2024-07-19 14:50:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -87,9 +87,9 @@ mvn spring-boot:run
 # release jar:
 cd bytedesk/starter
 mvn package -Dmaven.test.skip=true
-java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
+java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
 # background run:
-# nohup java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
+# nohup java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
 # 
 # local preview:
 developer: http://127.0.0.1:9003/dev

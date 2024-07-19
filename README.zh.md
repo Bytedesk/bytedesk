@@ -92,9 +92,9 @@ mvn spring-boot:run
 # 打包jar并运行:
 cd bytedesk/starter
 mvn package -Dmaven.test.skip=true
-java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
+java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
 # 后台运行
-nohup java -jar bytedesk-starter-0.2.3-BYTEDESK.jar
+nohup java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
 # 
 # 本地预览
 开发者入口: http://127.0.0.1:9003/dev
