@@ -5,18 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2-Release-Notes -->
-    <!-- <parent>
+    <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
-    </parent> -->
+        <version>3.2.2</version>
+    </parent>
 
     <!-- https://www.sofastack.tech/projects/sofa-boot/quick-start/ -->
-    <parent>
+    <!-- <parent>
         <groupId>com.alipay.sofa</groupId>
         <artifactId>sofaboot-dependencies</artifactId>
         <version>4.2.0</version>
-    </parent>
+    </parent> -->
 
     <groupId>com.bytedesk</groupId>
     <artifactId>im</artifactId>
