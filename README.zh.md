@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-26 16:36:53
+ * @LastEditTime: 2024-07-26 16:43:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,7 +78,6 @@ git clone https://github.com/Bytedesk/bytedesk.git
 # 
 # % mvn --version
 # Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
-# Maven home: /opt/homebrew/Cellar/maven/3.8.4/libexec
 # OS name: "mac os x", version: "14.2.1", arch: "aarch64", family: "mac"
 # 
 # 项目使用了protobuf，可能需要安装 protobuf 编译工具
