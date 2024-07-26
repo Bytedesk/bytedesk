@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-19 14:50:18
+ * @LastEditTime: 2024-07-26 12:24:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,6 +67,11 @@ Chat as a Service
 git clone https://github.com/Bytedesk/bytedesk.git
 # config file: bytedesk/starter/src/main/resources/application-dev.properties
 # use maven && vscode
+#
+# java --version
+# java 17.0.4 2022-07-19 LTS
+# Java(TM) SE Runtime Environment (build 17.0.4+11-LTS-179)
+# Java HotSpot(TM) 64-Bit Server VM (build 17.0.4+11-LTS-179, mixed mode, sharing)
 # 
 # % mvn --version
 # Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
@@ -84,12 +89,6 @@ mvn install -Dmaven.test.skip=true
 # 
 cd bytedesk/starter
 mvn spring-boot:run
-# release jar:
-cd bytedesk/starter
-mvn package -Dmaven.test.skip=true
-java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
-# background run:
-# nohup java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
 # 
 # local preview:
 developer: http://127.0.0.1:9003/dev

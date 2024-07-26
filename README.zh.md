@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-11 14:44:31
+ * @LastEditTime: 2024-07-26 11:31:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,6 +72,11 @@
 git clone https://github.com/Bytedesk/bytedesk.git
 # 配置文件: bytedesk/starter/src/main/resources/application-dev.properties
 # use maven && vscode
+#
+# java --version
+# java 17.0.4 2022-07-19 LTS
+# Java(TM) SE Runtime Environment (build 17.0.4+11-LTS-179)
+# Java HotSpot(TM) 64-Bit Server VM (build 17.0.4+11-LTS-179, mixed mode, sharing)
 # 
 # % mvn --version
 # Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
@@ -89,12 +94,6 @@ mvn install -Dmaven.test.skip=true
 # 
 cd bytedesk/starter
 mvn spring-boot:run
-# 打包jar并运行:
-cd bytedesk/starter
-mvn package -Dmaven.test.skip=true
-java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
-# 后台运行
-nohup java -jar bytedesk-starter-0.3.0-BYTEDESK.jar
 # 
 # 本地预览
 开发者入口: http://127.0.0.1:9003/dev
