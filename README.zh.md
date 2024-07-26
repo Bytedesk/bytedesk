@@ -75,14 +75,10 @@ git clone https://github.com/Bytedesk/bytedesk.git
 #
 # java --version
 # java 17.0.4 2022-07-19 LTS
-# Java(TM) SE Runtime Environment (build 17.0.4+11-LTS-179)
-# Java HotSpot(TM) 64-Bit Server VM (build 17.0.4+11-LTS-179, mixed mode, sharing)
 # 
 # % mvn --version
 # Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
 # Maven home: /opt/homebrew/Cellar/maven/3.8.4/libexec
-# Java version: 17.0.4, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/jdk-17.0.4.jdk/Contents/Home
-# Default locale: zh_CN_#Hans, platform encoding: UTF-8
 # OS name: "mac os x", version: "14.2.1", arch: "aarch64", family: "mac"
 # 
 # 项目使用了protobuf，可能需要安装 protobuf 编译工具
