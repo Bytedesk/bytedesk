@@ -71,12 +71,12 @@ git clone https://github.com/Bytedesk/bytedesk.git
 # java --version
 # java 17.0.4 2022-07-19 LTS
 # 
-# % mvn --version
+# mvn --version
 # Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
 # OS name: "mac os x", version: "14.2.1", arch: "aarch64", family: "mac"
 # 
 # protobuf is used to generate java code, you may need to install protobuf on your machine
-# % protoc --version
+# protoc --version
 # libprotoc 25.3
 # 
 cd bytedesk
