@@ -14,9 +14,6 @@
  */
 package com.bytedesk.service.workgroup_message;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -26,15 +23,10 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.service.visitor_thread.VisitorThread;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,6 +48,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "service_workgroup_message")
 public class WorkgroupMessage extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
 
     @Builder.Default
     // 如果使用int存储，enum中类型的顺序改变，会导致数据库中的数据类型改变，导致无法查询到数据
@@ -81,10 +75,7 @@ public class WorkgroupMessage extends BaseEntity {
     private ClientEnum client;
 
     /** message belongs to */
-    @JsonIgnore
-    @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<VisitorThread> threads = new ArrayList<>();
+    private String threadTopic;
 
     /**
      * sender

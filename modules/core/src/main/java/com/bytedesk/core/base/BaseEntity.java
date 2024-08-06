@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:10:49
+ * @LastEditTime: 2024-07-23 14:02:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,6 +69,8 @@ public abstract class BaseEntity implements Serializable {
     @Version
     private int version;
     
+    // 在配置文件中存储时区信息，TODO: 应用层处理时区转换？
+    // 数据库DDL中： created_at timestamp(6) without time zone,
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
     @CreatedDate
@@ -79,12 +81,9 @@ public abstract class BaseEntity implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    /**
-	 * soft delete
-	 */
+    // soft delete
 	@Column(name = "is_deleted")
 	private boolean deleted = false;
 
-    //
     private String orgUid;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 10:22:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-01 15:32:32
+ * @LastEditTime: 2024-07-23 18:08:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,9 +14,6 @@
  */
 package com.bytedesk.core.utils;
 
-import com.bytedesk.core.utils.id.DefaultIdGenerator;
-import com.bytedesk.core.utils.id.IdGenerator;
-
 import java.util.Random;
 import java.util.UUID;
 
@@ -25,20 +22,20 @@ public class Utils {
     private Utils() {
     }
 
-    /**
-     * ID 生成器
-     */
-    private static final IdGenerator ID_GENERATOR = new DefaultIdGenerator();
+    // /**
+    //  * ID 生成器
+    //  */
+    // private static final IdGenerator ID_GENERATOR = new DefaultIdGenerator();
 
-    /**
-     * 根据时间戳，生成随机唯一id 如：202009151044291
-     * 必须只能返回数字串，不能包含字母标点符号等
-     *
-     * @return 随机
-     */
-    public static String timeSerialId() {
-        return ID_GENERATOR.next();
-    }
+    // /**
+    //  * 根据时间戳，生成随机唯一id 如：202009151044291
+    //  * 必须只能返回数字串，不能包含字母标点符号等
+    //  *
+    //  * @return 随机
+    //  */
+    // public static String timeSerialId() {
+    //     return ID_GENERATOR.next();
+    // }
 
     /**
      * UUID
@@ -55,9 +52,9 @@ public class Utils {
      * 
      * @return uuid
      */
-    public static String timeUuid() {
-        return ID_GENERATOR.next() + UUID.randomUUID().toString().replace("-", "");// .substring(0, 18);
-    }
+    // public static String timeUuid() {
+    //     return ID_GENERATOR.next() + UUID.randomUUID().toString().replace("-", "");// .substring(0, 18);
+    // }
 
     public static String getUid() {
         return UUID.randomUUID().toString().replaceAll("-", "");

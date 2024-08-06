@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 14:05:35
+ * @LastEditTime: 2024-07-26 11:45:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,19 +56,19 @@ public class ConvertUtils {
         return userResponse;
     }
 
-    public static UserProtobuf convertToUserResponseSimple(User user) {
+    public static UserProtobuf convertToUserProtobuf(User user) {
         return new ModelMapper().map(user, UserProtobuf.class);
     }
 
     public static ThreadProtobuf convertToThreadProtobuf(Thread thread) {
         ThreadProtobuf threadProtobuf = new ModelMapper().map(thread, ThreadProtobuf.class);
-        // 
+        //
         UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
             user.setExtra(BdConstants.EMPTY_JSON_STRING);
         }
         threadProtobuf.setUser(user);
-        // 
+        //
         return threadProtobuf;
     }
 

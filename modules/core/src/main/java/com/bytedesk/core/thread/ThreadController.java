@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 10:50:29
+ * @LastEditTime: 2024-08-04 15:37:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,8 +31,8 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.Utils;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -54,7 +54,7 @@ public class ThreadController extends BaseController<ThreadRequest> {
      * @param request
      * @return
      */
-    @GetMapping("/query/org")
+    @Override
     public ResponseEntity<?> queryByOrg(ThreadRequest request) {
 
         Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
@@ -62,7 +62,7 @@ public class ThreadController extends BaseController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
-    @GetMapping("/query")
+    @Override
     public ResponseEntity<?> query(ThreadRequest request) {
 
         Page<ThreadResponse> threadPage = threadService.query(request);
@@ -71,7 +71,6 @@ public class ThreadController extends BaseController<ThreadRequest> {
     }
 
     @ActionAnnotation(title = "thread", action = "create", description = "create thread")
-    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody ThreadRequest request) {
         //
@@ -81,7 +80,6 @@ public class ThreadController extends BaseController<ThreadRequest> {
     }
 
     @ActionAnnotation(title = "thread", action = "update", description = "update thread")
-    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody ThreadRequest request) {
 
@@ -110,16 +108,15 @@ public class ThreadController extends BaseController<ThreadRequest> {
     @ActionAnnotation(title = "thread", action = "export", description = "export thread")
     @GetMapping("/export")
     public Object export(ThreadRequest request, HttpServletResponse response) {
-
         // query data to export
         Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
-
+        // 
         try {
             //
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "Thread-" + Utils.timeSerialId() + ".xlsx";
+            String fileName = "Thread-" + DateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
@@ -152,4 +149,5 @@ public class ThreadController extends BaseController<ThreadRequest> {
         return "";
     }
 
+    
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:14:00
+ * @LastEditTime: 2024-07-11 18:35:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -147,10 +147,8 @@ public class Workgroup extends BaseEntity {
         return getAgents().iterator().next();
     }
 
-
     /**
      * 轮询分配算法实现访客到客服的分配
-     * 
      * @return 分配到的客服
      */
     public Agent assignAgentByRobin() {
@@ -174,4 +172,12 @@ public class Workgroup extends BaseEntity {
 
         return assignedAgent;
     }
+
+    public boolean isConnected() {
+        if (this.agents == null || this.agents.isEmpty()) {
+            return false;
+        }
+        return this.agents.stream().anyMatch(agent -> agent.isConnected());
+    }
+    
 }

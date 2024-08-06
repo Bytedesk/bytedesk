@@ -17,7 +17,7 @@ package com.bytedesk.core.rbac.role;
 /**
  * 角色类型常量
  *
- * @author xiaper.io
+ * @author bytedesk.com
  */
 public class RoleConsts {
 

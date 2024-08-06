@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 12:36:07
+ * @LastEditTime: 2024-07-30 16:57:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,11 @@
  */
 package com.bytedesk.core.message;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +27,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.message_unread.MessageUnreadService;
-import com.bytedesk.core.socket.service.MqService;
+import com.bytedesk.core.socket.MqService;
+import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +55,8 @@ public class MessageController extends BaseController<MessageRequest> {
     private final MqService stompMqService;
 
     private final MessageUnreadService messageUnreadService;
+
+    private final ModelMapper modelMapper;
 
     /**
      * 管理后台 根据 orgUids 查询
@@ -71,17 +82,6 @@ public class MessageController extends BaseController<MessageRequest> {
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }
-
-    // @GetMapping("/query/unread")
-    // public ResponseEntity<?> queryUnread(MessageRequest request) {
-    // String threadsKey = String.join("-", request.getThreads()); //
-    // 使用"-"或其他分隔符连接数组元素
-    // Page<MessageResponse> response = messageService.queryByThread(request,
-    // threadsKey);
-    // // Page<MessageResponse> response = messageService.queryUnread(request);
-    // //
-    // return ResponseEntity.ok(JsonResult.success(response));
-    // }
 
     @Override
     public ResponseEntity<?> create(MessageRequest request) {
@@ -133,4 +133,53 @@ public class MessageController extends BaseController<MessageRequest> {
         //
         return ResponseEntity.ok(JsonResult.success(json));
     }
+
+
+    // https://github.com/alibaba/easyexcel
+    // https://easyexcel.opensource.alibaba.com/docs/current/
+    @ActionAnnotation(title = "message", action = "export", description = "export message")
+    @GetMapping("/export")
+    public Object export(MessageRequest request, HttpServletResponse response) {
+        // query data to export
+        Page<MessageResponse> messagePage = messageService.queryByOrg(request);
+        // 
+        try {
+            //
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            // download filename
+            String fileName = "Message-" + DateUtils.formatDatetimeUid() + ".xlsx";
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
+
+            // 转换数据
+            List<MessageExcel> excelList = messagePage.getContent().stream().map(messageResponse -> {
+                return modelMapper.map(messageResponse, MessageExcel.class);
+            }).toList();
+
+            // write to excel
+            EasyExcel.write(response.getOutputStream(), MessageExcel.class)
+                    .autoCloseStream(Boolean.FALSE)
+                    .sheet("Message")
+                    .doWrite(excelList);
+
+        } catch (Exception e) {
+            // reset response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            //
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("status", "failure");
+            jsonObject.put("message", "download faied " + e.getMessage());
+            try {
+                response.getWriter().println(JSON.toJSONString(jsonObject));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        return "";
+    }
+
+    
 }

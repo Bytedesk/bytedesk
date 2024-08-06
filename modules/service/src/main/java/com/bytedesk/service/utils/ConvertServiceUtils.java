@@ -27,7 +27,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.agent.AgentResponseSimple;
-import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.visitor.Visitor;
 import com.bytedesk.service.visitor.VisitorRequest;

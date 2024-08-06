@@ -14,28 +14,28 @@
  */
 package com.bytedesk.ai.robot;
 
-public enum RobotEmbedingEnum {
-    M3E_BASE("m3e-base");
+// embedings无法枚举，只能使用字符串
+// public enum RobotEmbedingEnum {
+//     M3E_BASE("m3e-base");
 
+//     private final String value;
 
-    private final String value;
+//     RobotEmbedingEnum(String value) {
+//         this.value = value;
+//     }
 
-    RobotEmbedingEnum(String value) {
-        this.value = value;
-    }
+//     // 获取枚举常量的整型值
+//     public String getValue() {
+//         return value;
+//     }
 
-    // 获取枚举常量的整型值
-    public String getValue() {
-        return value;
-    }
-
-    // 根据整型值查找对应的枚举常量
-    public static RobotEmbedingEnum fromValue(String value) {
-        for (RobotEmbedingEnum type : RobotEmbedingEnum.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
-                return type;
-            }
-        }
-        throw new IllegalArgumentException("No RobotEmbedingEnum constant with value " + value);
-    }
-}
+//     // 根据整型值查找对应的枚举常量
+//     public static RobotEmbedingEnum fromValue(String value) {
+//         for (RobotEmbedingEnum type : RobotEmbedingEnum.values()) {
+//             if (type.getValue().equalsIgnoreCase(value)) {
+//                 return type;
+//             }
+//         }
+//         throw new IllegalArgumentException("No RobotEmbedingEnum constant with value " + value);
+//     }
+// }

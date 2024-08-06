@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 11:39:31
+ * @LastEditTime: 2024-08-01 07:26:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,11 +22,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.cache.CaffeineCacheService;
 import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
-import com.bytedesk.core.socket.utils.MessageConvertUtils;
 import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.utils.MessageConvertUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import lombok.AllArgsConstructor;
@@ -37,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageEventListener {
 
-    private final CaffeineCacheService caffeineCacheService;
+    private final MessageCacheService messageCacheService;
 
     private final MessagePersistService messagePersistService;
 
@@ -78,7 +77,6 @@ public class MessageEventListener {
                 messageProto = MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(), messageJson);
                 messageSocketService.sendProtoMessage(messageProto);
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             //
@@ -93,7 +91,7 @@ public class MessageEventListener {
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
         }
-        // 
+        //
         ThreadProtobuf thread = messageProtobuf.getThread();
         if (thread == null) {
             throw new RuntimeException("thread is null");
@@ -101,28 +99,24 @@ public class MessageEventListener {
         // 替换掉客户端时间戳，统一各个客户端时间戳，防止出现因为客户端时间戳不一致导致的消息乱序
         messageProtobuf.setCreatedAt(new Date());
 
-        // TODO: 拦截被拉黑/屏蔽用户消息，并给与提示
-
-        // TODO: 过滤敏感词，将敏感词替换为*
+        // 1. 拦截黑名单用户消息
+        // 2. 过滤敏感词，将敏感词替换为*
         // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-
-        // TODO: 自动回复
-
-        // TODO: 离线推送
-
-        // TODO: webhook
+        // 3. 自动回复
+        // 4. 关键词回复
+        // 5. 大模型回复
 
         String msgJson = JSON.toJSONString(messageProtobuf);
         // 缓存消息，用于定期持久化到数据库
-        caffeineCacheService.pushForPersist(msgJson);
-        // 
+        messageCacheService.pushForPersist(msgJson);
+        //
         return msgJson;
     }
 
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
         // log.info("message quartz five second event: " + event);
-        List<String> messageJsonList = caffeineCacheService.getListForPersist();
+        List<String> messageJsonList = messageCacheService.getListForPersist();
         if (messageJsonList == null || messageJsonList.isEmpty()) {
             return;
         }

@@ -20,7 +20,7 @@ import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.settings.RobotServiceSettings;
-import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 
 public class ConvertAiUtils {
     private ConvertAiUtils() {

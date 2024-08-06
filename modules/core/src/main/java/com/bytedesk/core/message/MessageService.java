@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 15:42:11
+ * @LastEditTime: 2024-07-16 11:03:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,11 +40,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MessageService extends BaseService<Message, MessageRequest, MessageResponse> {
 
-    // private AuthService authService;
-
     private final MessageRepository messageRepository;
-
-    // private final ExceptionHandlerUtils exceptionHandlerUtils;
 
     public Page<MessageResponse> queryByOrg(MessageRequest request) {
 

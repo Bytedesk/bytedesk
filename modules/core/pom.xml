@@ -6,12 +6,12 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-    	<artifactId>modules</artifactId>
-    	<version>${revision}</version>
+		<artifactId>modules</artifactId>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>bytedesk-module-core</artifactId>
-	
+
 	<name>bytedesk-module-core</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -42,8 +42,6 @@
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 
-
-		
 
 		<!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
 		<dependency>
@@ -132,14 +130,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- 导入、导出Excel -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba/easyexcel -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>easyexcel</artifactId>
-			<version>3.3.4</version>
-		</dependency>
-
 		<!-- 上传图片到阿里云OSS -->
 		<!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
 		<dependency>
@@ -176,7 +166,6 @@
 			<artifactId>ip2region</artifactId>
 			<version>2.7.0</version>
 		</dependency>
-
 
 	</dependencies>
 

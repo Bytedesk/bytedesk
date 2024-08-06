@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 13:47:16
+ * @LastEditTime: 2024-07-12 11:35:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,9 +68,13 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
         return visitorThreadRepository.findByUid(uid);
     }
 
+    public Boolean existsByUid(String uid) {
+        return visitorThreadRepository.existsByUid(uid);
+    }
+
     public VisitorThread create(Thread thread) {
 
-        if (visitorThreadRepository.existsByUid(thread.getUid())) {
+        if (existsByUid(thread.getUid())) {
             return null;
         }
         //
@@ -87,6 +91,18 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
         }
         //
         return save(visitorThread);
+    }
+
+    public VisitorThread update(Thread thread) {
+        Optional<VisitorThread> visitorThreadOpt = findByUid(thread.getUid());
+        if (visitorThreadOpt.isPresent()) {
+            VisitorThread visitorThread = visitorThreadOpt.get();
+            visitorThread.setStatus(thread.getStatus());
+            //
+            
+            return save(visitorThread);
+        }
+        return null;
     }
 
     @Override

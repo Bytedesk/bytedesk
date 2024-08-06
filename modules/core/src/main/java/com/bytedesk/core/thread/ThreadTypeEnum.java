@@ -25,7 +25,8 @@ public enum ThreadTypeEnum {
     ASISTANT(7),
     CHANNEL(8),
     LOCAL(9),
-    FRIEND(10);
+    FRIEND(10),
+    TICKET(11);
 
     private final int value;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-17 17:37:27
+ * @LastEditTime: 2024-07-09 22:23:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,26 +14,45 @@
  */
 package com.bytedesk.core.push;
 
-import com.bytedesk.core.base.BaseResponse;
+import java.util.Date;
 
+import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.enums.PlatformEnum;
+
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
 @Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public class PushResponse extends BaseResponse {
     
     private static final long serialVersionUID = 1L;
         
+    private String sender;
+
     private String content;
 
-    private String type;
-    
-    private String status;
+    private String receiver;
 
-    private String platform;
+    private String type;
+
+    private String ip;
+
+    private String ipLocation;
+
+    private PushStatus status;
+
+    private String client;
+
+    private PlatformEnum platform;
+
+    private Date createdAt;
 }

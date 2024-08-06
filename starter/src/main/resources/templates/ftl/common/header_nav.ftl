@@ -31,7 +31,7 @@
 						<a class="nav-link active" href="https://www.weiyuai.cn" id="demoMenu">首页</a>
 					</li>
 					<!-- Nav item 1 Demos -->
-					<li class="nav-item dropdown">
+					<#--  <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="demoMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">方案</a>
 						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoMenu">
 							<li> <a class="dropdown-item" href="./plan/im-social.html" target="_blank">社交IM</a></li>
@@ -39,7 +39,7 @@
 							<li> <a class="dropdown-item" href="./plan/cs.html" target="_blank">在线客服</a></li>
 							<li> <a class="dropdown-item" href="./plan/ai.html" target="_blank">AI助手</a></li>
 						</ul>
-					</li>
+					</li>  -->
 					<!-- Nav item 2 Course -->
 					<li class="nav-item dropdown"><a class="nav-link" href="./docs/" target="_blank">文档</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank">下载</a></li>

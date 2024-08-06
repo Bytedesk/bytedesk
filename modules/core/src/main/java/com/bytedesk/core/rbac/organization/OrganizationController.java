@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 10:50:20
+ * @LastEditTime: 2024-08-04 12:24:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,6 @@ import lombok.AllArgsConstructor;
  */
 // @Slf4j
 @AllArgsConstructor
-// @RepositoryRestController("/v1/org")
 @RestController
 @RequestMapping("/api/v1/org")
 @Tag(name = "organization - 组织", description = "organization apis")

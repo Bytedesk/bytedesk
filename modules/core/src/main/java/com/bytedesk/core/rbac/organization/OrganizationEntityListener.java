@@ -16,7 +16,7 @@ package com.bytedesk.core.rbac.organization;
 
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.constant.BdConstants;
 
 // import com.bytedesk.core.event.BytedeskEventPublisher;
 // import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -35,7 +35,7 @@ public class OrganizationEntityListener {
     public void onPostCreate(Organization organization) {
         log.info("onPostCreate: {}", organization);
 
-        if (UserConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid())) {
+        if (BdConstants.DEFAULT_ORGANIZATION_UID.equals(organization.getUid())) {
             return;
         }
 

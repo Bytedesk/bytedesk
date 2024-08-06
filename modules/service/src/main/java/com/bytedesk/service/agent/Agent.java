@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-06 18:46:15
+ * @LastEditTime: 2024-08-05 11:52:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,8 +22,10 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.kbase.auto_reply.AutoReplySettings;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.team.member.Member;
+// import com.bytedesk.core.rbac.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -57,14 +59,14 @@ import lombok.experimental.Accessors;
 @EntityListeners({ AgentEntityListener.class })
 // @DiscriminatorValue("Agent")
 @Table(name = "service_agent", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "userUid", "orgUid" })
+        @UniqueConstraint(columnNames = { "userUid", "orgUid" })
 })
 public class Agent extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * visible to visitors
+     * 展示给访客端
      */
     private String nickname;
 
@@ -82,21 +84,8 @@ public class Agent extends BaseEntity {
     /**
      * @{AgentConsts}
      */
-    // @Builder.Default
-    // private String acceptStatus = AgentConsts.ACCEPT_STATUS_ACCEPTING;
     @Builder.Default
-    private AgentStatus status = AgentStatus.AVAILABLE;
-
-    /**
-     * @{AgentConsts}
-     */
-    // @Builder.Default
-    // private String status = StatusConsts.AGENT_STATUS_PENDING;
-    // @Builder.Default
-    // private String status = StatusConsts.AGENT_STATUS_PENDING;
-    // @Builder.Default
-    // @Column(name = "is_enabled")
-    // private boolean enabled = true;
+    private AgentStatusEnum status = AgentStatusEnum.AVAILABLE;
 
     // TODO:是否需要跟内存中mqttsession同步
     @Builder.Default
@@ -106,6 +95,10 @@ public class Agent extends BaseEntity {
     @Embedded
     @Builder.Default
     private ServiceSettings serviceSettings = new ServiceSettings();
+
+    @Embedded
+    @Builder.Default
+    private AutoReplySettings autoReplySettings = new AutoReplySettings();
 
     // max concurrent chatting thread count
     @Builder.Default
@@ -134,17 +127,13 @@ public class Agent extends BaseEntity {
      */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    // private User user;
     private Member member;
 
     // for quick query, space exchange for speed
-    private String userUid;
-
-    /** belong to org */
     // @JsonIgnore
     // @ManyToOne(fetch = FetchType.LAZY)
-    // private Organization organization;
-    // private String orgUid;
+    // private User user;
+    private String userUid;
 
     public void incrementThreadCount() {
         this.currentThreadCount++;
@@ -155,7 +144,7 @@ public class Agent extends BaseEntity {
     }
 
     public Boolean isAvailable() {
-        return this.status == AgentStatus.AVAILABLE;
+        return this.status == AgentStatusEnum.AVAILABLE;
     }
 
     public Boolean canAcceptMore() {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 11:22:31
+ * @LastEditTime: 2024-08-04 11:59:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,28 +34,12 @@ public class UserEntityListener {
 
     @PostPersist
     public void postPersist(User user) {
-        // log.info("user postPersist {}", user.getUid());
         // 这里可以记录日志、发送通知等
-        // create user topic
         User clonedUser = SerializationUtils.clone(user);
+        // log.info("user postPersist {}", user.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishUserCreateEvent(clonedUser);
-
-        // TopicService topicService = ApplicationContextHolder.getBean(TopicService.class);
-        // // 默认订阅用户主题
-        // topicService.create(TopicUtils.getUserTopic(user.getUid()), user.getUid());
-        // // 默认订阅组织主题
-        // if (StringUtils.hasText(user.getOrgUid())) {
-        //     topicService.create(TopicUtils.getOrgTopic(user.getOrgUid()), user.getUid());
-        // }
-        //
-        // // 每创建一个用户，自动给此用户生成一条文件助理的会话
-        // ThreadService threadService =
-        // ApplicationContextHolder.getBean(ThreadService.class);
-        // threadService.createFileAsistantThread(user);
-        // // 每创建一个用户，自动给此用户生成一条系统通知的会话
-        // threadService.createSystemNotificationChannelThread(user);
     }
 
     // @PreUpdate
@@ -65,18 +49,12 @@ public class UserEntityListener {
 
     @PostUpdate
     public void postUpdate(User user) {
-        // log.info("postUpdate {}", user.getUid());
         // create user topic
         User clonedUser = SerializationUtils.clone(user);
+        // log.info("postUpdate {}", user.getUid());
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishUserUpdateEvent(clonedUser);
-        // 
-        // TopicService topicService = ApplicationContextHolder.getBean(TopicService.class);
-        // // 默认订阅组织主题
-        // if (StringUtils.hasText(user.getOrgUid())) {
-        //     topicService.create(TopicUtils.getOrgTopic(user.getOrgUid()), user.getUid());
-        // }
     }
 
     // @PreRemove

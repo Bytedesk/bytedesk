@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:42:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 10:45:20
+ * @LastEditTime: 2024-07-28 07:28:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,8 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.action.ActionEvent;
 import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.cache.CaffeineCacheGroupEvent;
+import com.bytedesk.core.event.GenericApplicationEvent;
+// import com.bytedesk.core.cache.CaffeineCacheGroupEvent;
 import com.bytedesk.core.message.MessageProtoEvent;
 import com.bytedesk.core.message.MessageUpdateEvent;
 import com.bytedesk.core.message.Message;
@@ -33,14 +34,14 @@ import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserCreateEvent;
 import com.bytedesk.core.rbac.user.UserUpdateEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttSubscribeEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttUnsubscribeEvent;
-import com.bytedesk.core.socket.stomp.event.StompConnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompDisconnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompSubscribeEvent;
-import com.bytedesk.core.socket.stomp.event.StompUnsubscribeEvent;
+import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
+import com.bytedesk.core.socket.mqtt.MqttSubscribeEvent;
+import com.bytedesk.core.socket.mqtt.MqttUnsubscribeEvent;
+import com.bytedesk.core.socket.stomp.StompConnectedEvent;
+import com.bytedesk.core.socket.stomp.StompDisconnectedEvent;
+import com.bytedesk.core.socket.stomp.StompSubscribeEvent;
+import com.bytedesk.core.socket.stomp.StompUnsubscribeEvent;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadUpdateEvent;
@@ -55,6 +56,10 @@ import lombok.AllArgsConstructor;
 public class BytedeskEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public void publishGenericApplicationEvent(GenericApplicationEvent<?> event) {
+        applicationEventPublisher.publishEvent(event);
+    }
 
     public void publishTopicCreateEvent(String topic, String userUid) {
         applicationEventPublisher.publishEvent(new TopicCreateEvent(this, topic, userUid));
@@ -144,8 +149,8 @@ public class BytedeskEventPublisher {
     //     applicationEventPublisher.publishEvent(new EmailAlreadyExistsEvent(this, email));
     // }
 
-    public void publishCaffeineCacheGroupEvent(String groupUid, String messageJson) {
-        applicationEventPublisher.publishEvent(new CaffeineCacheGroupEvent(this, groupUid, messageJson));
-    }
+    // public void publishCaffeineCacheGroupEvent(String groupUid, String messageJson) {
+    //     applicationEventPublisher.publishEvent(new CaffeineCacheGroupEvent(this, groupUid, messageJson));
+    // }
 
 }

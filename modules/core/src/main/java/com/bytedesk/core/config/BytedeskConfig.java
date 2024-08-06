@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 07:52:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-22 23:32:51
+ * @LastEditTime: 2024-07-30 09:11:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.core.config;
 import java.nio.charset.StandardCharsets;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -28,6 +29,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import lombok.Getter;
 
 /**
@@ -36,6 +39,9 @@ import lombok.Getter;
 @Getter
 @Configuration
 public class BytedeskConfig {
+
+    @Value("${application.version}")
+    private String appVersion;
 
     @Bean
     public ModelMapper modelMapper() {
@@ -52,7 +58,6 @@ public class BytedeskConfig {
         return config.getAuthenticationManager();
     }
 
-    // @SuppressWarnings("null")
     @Bean
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory()); //
@@ -64,5 +69,18 @@ public class BytedeskConfig {
     public ApplicationContextHolder applicationContextHolder() {
         return new ApplicationContextHolder();
     }
+
+    @Bean
+	public OpenAPI apiInfo() {
+		return new OpenAPI().info(new Info().title("bytedesk apis").version(appVersion));
+	}
+
+	// @Bean
+	// public GroupedOpenApi httpApi() {
+	// 	return GroupedOpenApi.builder()
+	// 			.group("http")
+	// 			.pathsToMatch("/**")
+	// 			.build();
+	// }
 
 }

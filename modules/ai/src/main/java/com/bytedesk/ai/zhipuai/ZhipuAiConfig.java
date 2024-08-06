@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-31 11:17:06
+ * @LastEditTime: 2024-07-23 09:00:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,17 +28,17 @@ import org.springframework.context.annotation.Configuration;
 import com.zhipu.oapi.ClientV4;
 
 /**
+ * https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
  * https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
  */
 @Configuration
-public class ZhipuAiConfig {
+public class ZhipuaiConfig {
 
-    @Value("${spring.ai.zhipu.api-key}")
+    @Value("${spring.ai.zhipuai.api-key}")
     String zhiPuAiApiKey;
 
     @Bean
     ZhiPuAiApi zhipuaiApi() {
-        // return new ZhiPuAiApi(System.getenv("ZHIPU_AI_API_KEY"));
         return new ZhiPuAiApi(zhiPuAiApiKey);
     }
 

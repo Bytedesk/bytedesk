@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:20:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 10:10:10
+ * @LastEditTime: 2024-07-12 17:27:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,10 +68,10 @@ public class WorkgroupEventListener {
             orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2
         );
         // 
-        List<String> quickButtonUids = Arrays.asList(
-            orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
-            orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2
-        );
+        // List<String> quickButtonUids = Arrays.asList(
+        //     orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+        //     orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2
+        // );
         // 
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();
@@ -87,7 +87,7 @@ public class WorkgroupEventListener {
         workgroupRequest.setUid(uidUtils.getCacheSerialUid());
         workgroupRequest.setOrgUid(orgUid);
         workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setQuickButtonUids(quickButtonUids);
+        workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
         workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
 
         workgroupService.create(workgroupRequest);

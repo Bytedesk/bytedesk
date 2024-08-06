@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-20 15:55:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 16:27:38
+ * @LastEditTime: 2024-07-24 14:12:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,27 +15,17 @@
 package com.bytedesk.core.enums;
 
 public enum LevelEnum {
-    PLATFORM("platform"),
-    ORGNIZATION("organization"),
-    DEPARTMENT("department"),
-    WORKGROUP("workgroup"),
-    GROUP("group"),
-    USER("user");
-
-    private final String value;
-
-    LevelEnum(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
+    PLATFORM,
+    ORGNIZATION,
+    DEPARTMENT,
+    WORKGROUP,
+    GROUP,
+    USER;
 
     // 根据字符串查找对应的枚举常量
     public static LevelEnum fromValue(String value) {
         for (LevelEnum type : LevelEnum.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
+            if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }
         }

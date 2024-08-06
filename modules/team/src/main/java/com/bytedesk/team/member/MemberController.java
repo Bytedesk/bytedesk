@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-28 12:18:53
+ * @LastEditTime: 2024-08-01 06:47:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,18 +14,26 @@
  */
 package com.bytedesk.team.member;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
+import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -37,7 +45,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mem")
 @Tag(name = "member", description = "member apis")
-public class MemberController {
+public class MemberController extends BaseController<MemberRequest> {
 
     private final MemberService memberService;
 
@@ -47,7 +55,7 @@ public class MemberController {
      * @param memberRequest
      * @return
      */
-    @GetMapping("/query/org")
+    @Override
     public ResponseEntity<?> queryByOrg(MemberRequest memberRequest) {
         //
         Page<MemberResponse> memberResponse = memberService.queryByOrg(memberRequest);
@@ -55,7 +63,7 @@ public class MemberController {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
-    @GetMapping("/query")
+    @Override
     public ResponseEntity<?> query(MemberRequest memberRequest) {
         //
         MemberResponse memberResponse = memberService.query(memberRequest);
@@ -78,7 +86,7 @@ public class MemberController {
      * @return json
      */
     @ActionAnnotation(title = "member", action = "create", description = "create member")
-    @PostMapping("/create")
+    @Override
     public ResponseEntity<?> create(@RequestBody MemberRequest memberRequest) {
 
         MemberResponse member = memberService.create(memberRequest);
@@ -93,7 +101,7 @@ public class MemberController {
      * @return json
      */
     @ActionAnnotation(title = "member", action = "update", description = "update member")
-    @PostMapping("/update")
+    @Override
     public ResponseEntity<?> update(@RequestBody MemberRequest memberRequest) {
 
         MemberResponse member = memberService.update(memberRequest);
@@ -108,7 +116,7 @@ public class MemberController {
      * @return json
      */
     @ActionAnnotation(title = "member", action = "delete", description = "delete member")
-    @PostMapping("/delete")
+    @Override
     public ResponseEntity<?> delete(@RequestBody MemberRequest memberRequest) {
 
         memberService.deleteByUid(memberRequest.getUid());
@@ -116,16 +124,49 @@ public class MemberController {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    /**
-     * filter
-     *
-     * @return json
-     */
-    @GetMapping("/filter")
-    public ResponseEntity<?> filter(MemberRequest filterParam) {
+    // https://github.com/alibaba/easyexcel
+    // https://easyexcel.opensource.alibaba.com/docs/current/
+    @ActionAnnotation(title = "member", action = "export", description = "export member")
+    @GetMapping("/export")
+    public Object export(MemberRequest request, HttpServletResponse response) {
+        // query data to export
+        Page<MemberResponse> memberPage = memberService.queryByOrg(request);
+        // 
+        try {
+            //
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            // download filename
+            String fileName = "Member-" + DateUtils.formatDatetimeUid() + ".xlsx";
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
-        //
-        return ResponseEntity.ok(JsonResult.success());
+            // 转换数据
+            List<MemberExcel> excelList = memberPage.getContent().stream().map(memberResponse -> memberService.convertToExcel(memberResponse)).toList();
+
+            // write to excel
+            EasyExcel.write(response.getOutputStream(), MemberExcel.class)
+                    .autoCloseStream(Boolean.FALSE)
+                    .sheet("Member")
+                    .doWrite(excelList);
+
+        } catch (Exception e) {
+            // reset response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            //
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("status", "failure");
+            jsonObject.put("message", "download faied " + e.getMessage());
+            try {
+                response.getWriter().println(JSON.toJSONString(jsonObject));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        return "";
     }
 
+    
 }

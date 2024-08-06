@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 17:08:48
+ * @LastEditTime: 2024-07-26 10:10:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.kaptcha.KaptchaCacheService;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
@@ -55,13 +55,20 @@ public class AuthController {
 
     private PushService pushService;
 
+    private KaptchaCacheService kaptchaCacheService;
+
     /**
      * 
      * @param userRequest
      * @return
      */
+    @ActionAnnotation(title = "auth", action = "register", description = "register")
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest) {
+
+        if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode())) {
+            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+        }
 
         // validate sms code
         // 验证手机验证码
@@ -79,6 +86,10 @@ public class AuthController {
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());
 
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode())) {
+            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         //
@@ -87,13 +98,21 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
+    @ActionAnnotation(title = "auth", action = "sendMobileCode", description = "Send mobile code")
     @PostMapping("/send/mobile")
     public ResponseEntity<?> sendMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
-        log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getClient(), authRequest.getType());
+        log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getClient(),
+                authRequest.getType());
+
+        // TODO: 暂未考虑手机客服端登录，发送短信验证码 不需要填写CaptchaCode的情况
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode())) {
+            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+        }
 
         // send mobile code
-        Boolean result = pushService.sendSmsCode(authRequest.getMobile(), authRequest.getClient(), authRequest.getType(), 
-                PlatformEnum.fromValue(authRequest.getPlatform()), request);
+        Boolean result = pushService.sendSmsCode(authRequest.getMobile(), authRequest.getClient(),
+                authRequest.getType(),
+                authRequest.getPlatform(), request);
         if (!result) {
             return ResponseEntity.ok().body(JsonResult.error("already send, dont repeat", -1, false));
         }
@@ -106,6 +125,10 @@ public class AuthController {
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest) {
         log.debug("login mobile {}", authRequest.toString());
 
+        // TODO: 暂未考虑手机客服端登录，发送短信验证码 不需要填写CaptchaCode的情况
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode())) {
+            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+        }
         // validate mobile & code
         // 验证手机验证码
         if (!pushService.validateSmsCode(authRequest.getMobile(), authRequest.getCode())) {
@@ -114,29 +137,32 @@ public class AuthController {
 
         // if mobile already exists, if none, then registe
         // 手机号是否已经注册，如果没有，则自动注册
-        if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), PlatformEnum.fromValue(authRequest.getPlatform()))) {
+        if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())) {
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getMobile());
+            userRequest.setNum(authRequest.getMobile());
             userRequest.setMobile(authRequest.getMobile());
             userRequest.setPlatform(authRequest.getPlatform());
             userService.register(userRequest);
         }
-        
-        Authentication authentication = authService.authenticationWithMobileAndPlatform(authRequest.getMobile(), 
-                PlatformEnum.fromValue(authRequest.getPlatform()));
+
+        Authentication authentication = authService.authenticationWithMobileAndPlatform(authRequest.getMobile(),
+                authRequest.getPlatform());
         //
         AuthResponse authResponse = authService.formatResponse(authentication);
 
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
+    @ActionAnnotation(title = "auth", action = "sendEmailCode", description = "Send email code")
     @PostMapping("/send/email")
     public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
 
         // send email code
-        Boolean result = pushService.sendEmailCode(authRequest.getEmail(), authRequest.getClient(), authRequest.getType(), 
-                PlatformEnum.fromValue(authRequest.getPlatform()), request);
+        Boolean result = pushService.sendEmailCode(authRequest.getEmail(), authRequest.getClient(),
+                authRequest.getType(),
+                authRequest.getPlatform(), request);
         if (!result) {
             return ResponseEntity.ok(JsonResult.error("already send, dont repeat", -1, false));
         }
@@ -155,22 +181,23 @@ public class AuthController {
         }
 
         // 邮箱是否已经注册，如果没有，则自动注册
-        if (!userService.existsByEmailAndPlatform(authRequest.getEmail(), PlatformEnum.fromValue(authRequest.getPlatform()))) {
+        if (!userService.existsByEmailAndPlatform(authRequest.getEmail(),
+                authRequest.getPlatform())) {
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getEmail());
+            userRequest.setNum(authRequest.getEmail());
             userRequest.setEmail(authRequest.getEmail());
             userRequest.setPlatform(authRequest.getPlatform());
             userService.register(userRequest);
         }
 
-        Authentication authentication = authService.authenticationWithEmailAndPlatform(authRequest.getEmail(), 
-                PlatformEnum.fromValue(authRequest.getPlatform()));
+        Authentication authentication = authService.authenticationWithEmailAndPlatform(authRequest.getEmail(),
+                authRequest.getPlatform());
         //
         AuthResponse authResponse = authService.formatResponse(authentication);
 
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
-
 
     // @PostMapping("/refreshToken")
     // public JwtResponse refreshToken(@RequestBody RefreshTokenRequest

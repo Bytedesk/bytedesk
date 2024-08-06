@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:06:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 16:46:59
+ * @LastEditTime: 2024-08-04 12:15:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -36,22 +35,21 @@ public class ChannelService {
 
     private final ChannelRepository channelRepository;
 
-    // private final UserService userService;
-
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
     public Page<ChannelResponse> query(ChannelRequest channelRequest) {
 
-        Pageable pageable = PageRequest.of(channelRequest.getPageNumber(), channelRequest.getPageSize(), Sort.Direction.ASC,
+        Pageable pageable = PageRequest.of(channelRequest.getPageNumber(), channelRequest.getPageSize(),
+                Sort.Direction.ASC,
                 "id");
 
         Page<Channel> channelPage = channelRepository.findAll(pageable);
 
-        return channelPage.map(channel -> convertToChannelResponse(channel));
+        return channelPage.map(channel -> convertToResponse(channel));
     }
-    
+
     public Channel create(ChannelRequest channelRequest) {
 
         Channel channel = modelMapper.map(channelRequest, Channel.class);
@@ -64,16 +62,16 @@ public class ChannelService {
         return channelRepository.save(channel);
     }
 
-    public ChannelResponse convertToChannelResponse(Channel channel) {
+    public ChannelResponse convertToResponse(Channel channel) {
         return modelMapper.map(channel, ChannelResponse.class);
     }
-  
+
     public void initData() {
 
         if (channelRepository.count() > 0) {
             return;
         }
-                
+
         ChannelRequest channelRequest = ChannelRequest.builder()
                 .topic(TopicUtils.TOPIC_SYSTEM_NOTIFICATION)
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
@@ -81,9 +79,8 @@ public class ChannelService {
                 .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
                 .build();
         channelRequest.setType(TypeConsts.TYPE_SYSTEM);
-        channelRequest.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+        // channelRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
         create(channelRequest);
     }
-    
-    
+
 }

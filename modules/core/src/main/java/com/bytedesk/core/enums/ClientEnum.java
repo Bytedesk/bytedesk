@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-26 17:06:43
+ * @LastEditTime: 2024-07-27 21:59:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,45 +15,35 @@
 package com.bytedesk.core.enums;
 
 public enum ClientEnum {
-    SYSTEM("system"),
-    SYSTEM_AUTO("system_auto"), // auto reply
-    SYSTEM_BOT("system_bot"), // robot reply
-    WEB("web"),
-    H5("h5"),
-    IOS("ios"),
-    ANDROID("android"),
-    ELECTRON("electron"),
-    LINUX("linux"),
-    MACOS("macos"),
-    WINDOWS("windows"),
-    FLUTTER("flutter"),
-    FLUTTER_WEB("flutter_web"),
-    FLUTTER_ANDROID("flutter_android"),
-    FLUTTER_IOS("flutter_ios"),
-    UNI("uni"),
-    UNI_WEB("uni_web"),
-    UNI_ANDROID("uni_android"),
-    UNI_IOS("uni_ios"),
-    WECHAT_MINI("wechat_mini"),
-    WECHAT_MP("wechat_mp"),
-    WECHAT_WORK("wechat_work"),
-    WECHAT_KEFU("wechat_kefu"),
+    SYSTEM,
+    SYSTEM_AUTO, // auto reply
+    SYSTEM_BOT, // robot reply
+    WEB,
+    H5,
+    IOS,
+    ANDROID,
+    ELECTRON,
+    LINUX,
+    MACOS,
+    WINDOWS,
+    FLUTTER,
+    FLUTTER_WEB,
+    FLUTTER_ANDROID,
+    FLUTTER_IOS,
+    UNI,
+    UNI_WEB,
+    UNI_ANDROID,
+    UNI_IOS,
+    WECHAT_MINI,
+    WECHAT_MP,
+    WECHAT_WORK,
+    WECHAT_KEFU,
     ;
-            
-    private final String value;
-
-    ClientEnum(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
 
     // 根据字符串查找对应的枚举常量
     public static ClientEnum fromValue(String value) {
         for (ClientEnum type : ClientEnum.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
+            if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }
         }

@@ -26,9 +26,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -55,14 +55,23 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
             action.setUser(user);
             action.setOrgUid(user.getOrgUid());
         } else {
-            action.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+            action.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        }
+        Action savedAction = save(action);
+        if (savedAction == null) {
+            // TODO: handle exception
         }
         //
-        return convertToResponse(save(action));
+        return convertToResponse(savedAction);
     }
 
     public Action save(Action action) {
-        return actionRepository.save(action);
+        try {
+            return actionRepository.save(action);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
     }
 
     public ActionResponse convertToResponse(Action action) {

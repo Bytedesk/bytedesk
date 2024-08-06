@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-21 10:26:16
+ * @LastEditTime: 2024-08-05 21:33:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,11 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.ai.robot.Robot;
-import com.bytedesk.core.service_settings.BaseServiceSettings;
+import com.bytedesk.kbase.service_settings.BaseServiceSettings;
+import com.bytedesk.service.leave_msg.LeaveMsgSettings;
 import com.bytedesk.service.worktime.Worktime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -42,30 +44,39 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class ServiceSettings extends BaseServiceSettings {
 
-    /**
-     * default robot chat
-     */
+    // 开启机器人之后，robot字段为必填
     @Builder.Default
     private boolean defaultRobot = false;
-
     @Builder.Default
     private boolean offlineRobot = false;
-
     @Builder.Default
     private boolean nonWorktimeRobot = false;
+
+    // TODO: 当排队人数超过指定值时，自动分配机器人
+    // @Builder.Default
+    // private boolean queueRobot = false;
+    // @Builder.Default
+    // private int queueRobotCount = 100;
 
     /** work time */
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY)
     private List<Worktime> worktimes = new ArrayList<>();
 
-    // TODO: 留言设置
-
-    // TODO: 评价设置
-
-    // TODO: 询前问卷
+    // 留言设置
+    @Embedded
+    @Builder.Default
+    private LeaveMsgSettings leaveMsgSettings = new LeaveMsgSettings();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Robot robot;
+
+    //
+    public boolean isWorkTime() {
+        if (this.worktimes == null || this.worktimes.isEmpty()) {
+            return true;
+        }
+        return this.worktimes.stream().anyMatch(w -> w.isWorkTime());
+    }
 }

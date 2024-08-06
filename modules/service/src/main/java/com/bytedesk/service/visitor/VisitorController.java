@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 10:50:51
+ * @LastEditTime: 2024-08-04 10:46:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,8 +16,7 @@ package com.bytedesk.service.visitor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,23 +24,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.bytedesk.ai.keyword.KeywordResponse;
-import com.bytedesk.ai.keyword.KeywordService;
 import com.bytedesk.core.apilimit.ApiRateLimiter;
 import com.bytedesk.core.base.BaseController;
-import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadService;
-import com.bytedesk.core.socket.service.MqService;
-import com.bytedesk.core.upload.UploadService;
+import com.bytedesk.core.socket.MqService;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.service.leave_msg.LeaveMessageRequest;
-import com.bytedesk.service.leave_msg.LeaveMessageResponse;
-import com.bytedesk.service.leave_msg.LeaveMessageService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,18 +50,12 @@ public class VisitorController extends BaseController<VisitorRequest> {
 
     private final MessageUnreadService messageUnreadService;
 
-    private final LeaveMessageService leaveMessageService;
-
-    private final KeywordService keywordService;
-
-    private final UploadService uploadService;
-
-    private final BytedeskProperties bytedeskProperties;
-
     @Override
     public ResponseEntity<?> queryByOrg(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+
+        Page<VisitorResponse> page = visitorService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     /**
@@ -126,35 +109,12 @@ public class VisitorController extends BaseController<VisitorRequest> {
 
     // query visitor info by uid
     @GetMapping("/query")
+    @Override
     public ResponseEntity<?> query(VisitorRequest visitorRequest) {
         //
         VisitorResponse visitorResponse = visitorService.query(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
-    }
-
-    /**
-     * update
-     *
-     * @param visitorRequest visitor
-     * @return json
-     */
-    @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
-        //
-        return ResponseEntity.ok(JsonResult.success("update success"));
-    }
-
-    /**
-     * delete
-     *
-     * @param visitorRequest visitor
-     * @return json
-     */
-    @PostMapping("/delete")
-    public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
-        //
-        return ResponseEntity.ok(JsonResult.success("delete success"));
     }
 
     /**
@@ -173,7 +133,7 @@ public class VisitorController extends BaseController<VisitorRequest> {
     // 访客拉取未读消息
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
-        //
+        // TODO: 拉取visitor_message表，非消息主表
         List<MessageResponse> messages = messageUnreadService.getMessages(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
@@ -197,94 +157,67 @@ public class VisitorController extends BaseController<VisitorRequest> {
     }
 
     // 机器人关键词问答
-    @VisitorAnnotation(title = "visitor", action = "sendKeywordMessage", description = "sendKeywordMessage")
-    @PostMapping("/message/keyword")
-    public ResponseEntity<?> sendKeywordMessage(@RequestBody VisitorRequest request) {
-        //
-        String keyword = request.getContent();
-        String robotUid = request.getSid();
-        String orgUid = request.getOrgUid();
-        List<KeywordResponse> keywordList = keywordService.ask(keyword, robotUid, orgUid);
+    // TODO: 写入聊天记录
+    // @VisitorAnnotation(title = "visitor", action = "sendKeywordMessage", description = "sendKeywordMessage")
+    // @PostMapping("/message/keyword")
+    // public ResponseEntity<?> sendKeywordMessage(@RequestBody VisitorRequest request) {
+    //     //
+    //     String keyword = request.getContent();
+    //     String robotUid = request.getSid();
+    //     String orgUid = request.getOrgUid();
+    //     List<KeywordResponse> keywordList = keywordService.ask(keyword, robotUid, orgUid);
 
-        // 随机从keywordList中选择一个元素
-        Random random = new Random();
-        KeywordResponse randomKeywordResponse = null;
-        if (!keywordList.isEmpty()) {
-            int randomIndex = random.nextInt(keywordList.size());
-            randomKeywordResponse = keywordList.get(randomIndex);
-        }
+    //     // 随机从keywordList中选择一个元素
+    //     Random random = new Random();
+    //     KeywordResponse randomKeywordResponse = null;
+    //     if (!keywordList.isEmpty()) {
+    //         int randomIndex = random.nextInt(keywordList.size());
+    //         randomKeywordResponse = keywordList.get(randomIndex);
+    //     }
 
-        // 返回随机选择的元素或空列表（如果keywordList为空）
-        if (randomKeywordResponse != null) {
-            return ResponseEntity.ok(JsonResult.success(randomKeywordResponse.getReply()));
-        } else {
-            // 如果keywordList为空，你可以根据需要返回适当的信息，比如一个空对象或者错误信息
-            return ResponseEntity.ok(JsonResult.success(400));
-        }
-    }
+    //     // 返回随机选择的元素或空列表（如果keywordList为空）
+    //     if (randomKeywordResponse != null) {
+    //         return ResponseEntity.ok(JsonResult.success(randomKeywordResponse.getReply()));
+    //     } else {
+    //         // 如果keywordList为空，你可以根据需要返回适当的信息，比如一个空对象或者错误信息
+    //         return ResponseEntity.ok(JsonResult.error());
+    //     }
+    // }
 
-    // 访客留言
-    @VisitorAnnotation(title = "visitor", action = "leaveMessage", description = "leave_msg")
-    @PostMapping("/leavemsg")
-    public ResponseEntity<?> leaveMessage(@RequestBody LeaveMessageRequest request) {
-
-        LeaveMessageResponse response = leaveMessageService.create(request);
-
-        return ResponseEntity.ok(JsonResult.success(response));
-    }
-
-    @VisitorAnnotation(title = "visitor", action = "rateInitiative", description = "rateInitiative")
-    // 访客主动发起评价
-    @PostMapping("/rate/initiative")
-    public ResponseEntity<?> rateInitiative(@RequestBody Map<String, String> map) {
+    // TODO: 访客输入关联/联想
+    // https://github.com/redis/redis-om-springURL_ADDRESS
+    // https://redis.io/docs/latest/integrate/redisom-for-java/
+    @VisitorAnnotation(title = "visitor", action = "inputAssociation", description = "inputAssociation")
+    @GetMapping("/input/association")
+    public ResponseEntity<?> inputAssociation() {
         //
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @VisitorAnnotation(title = "visitor", action = "rateDo", description = "rateDo")
-    // 访客提交评价
-    @PostMapping("/rate/do")
-    public ResponseEntity<?> rateDo(@RequestBody Map<String, String> map) {
-        //
-        return ResponseEntity.ok(JsonResult.success());
-    }
-
-    @VisitorAnnotation(title = "visitor", action = "quickButtonMessage", description = "quickButtonMessage")
-    @PostMapping("/quickbutton/send")
-    public ResponseEntity<?> quickButtonMessage() {
-        //
+    // 热门问题-换一换
+    @VisitorAnnotation(title = "visitor", action = "faqChange", description = "faqChange")
+    @PostMapping("/faq/change")
+    public ResponseEntity<?> faqChange(@RequestParam("orgUid") String orgUid) {
 
         return ResponseEntity.ok(JsonResult.success("test success"));
     }
-
-    @VisitorAnnotation(title = "visitor", action = "faqMessage", description = "faqMessage")
-    @PostMapping("/faq/send")
-    public ResponseEntity<?> faqMessage() {
-
-        return ResponseEntity.ok(JsonResult.success("test success"));
-    }
-
-    @PostMapping("/upload/file")
-	public ResponseEntity<?> upload(
-			@RequestParam("file") MultipartFile file,
-			@RequestParam("file_name") String fileName,
-            @RequestParam("file_type") String type) {
-        log.info("fileName {}, type {}", fileName, type);
-
-		// TODO: image/avatar/file/video/voice
-
-		// http://localhost:9003/file/20240319162820_img-service2.png
-		String uploadPath = uploadService.store(file, fileName);
-		// http://localhost:9003
-		String url = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
-
-		return ResponseEntity.ok(JsonResult.success("upload success", url));
-	}
 
     @Override
     public ResponseEntity<?> create(VisitorRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
+        //
+        return ResponseEntity.ok(JsonResult.success("update success"));
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
+        //
+        return ResponseEntity.ok(JsonResult.success("delete success"));
     }
 
 }

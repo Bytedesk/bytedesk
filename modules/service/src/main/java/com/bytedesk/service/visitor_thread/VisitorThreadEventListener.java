@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-03 09:27:37
+ * @LastEditTime: 2024-07-12 11:37:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class VisitorThreadEventListener {
 
-    // private final VisitorThreadService visitorThreadService;
+    private final VisitorThreadService visitorThreadService;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
@@ -37,18 +37,21 @@ public class VisitorThreadEventListener {
         log.info("visitor ThreadCreateEvent: {}", thread.getUid());
 
         // 仅同步客服会话
-        // if (thread.getType().equals(ThreadTypeEnum.AGENT)
-        //         || thread.getType().equals(ThreadTypeEnum.WORKGROUP)) {
-        //     visitorThreadService.create(event.getThread());
-        // }
+        if (thread.isCustomerService()) {
+            visitorThreadService.create(event.getThread());
+        }
     }
 
     @EventListener
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-        // log.info("onThreadUpdateEvent: {}", event.getThread().getUid());
+        Thread thread = event.getThread();
+        log.info("onThreadUpdateEvent: {}", thread.getUid());
 
-        // TODO: 更新visitor_thread表
-        // visitorThreadService.update(event.getThread());
+        // 更新visitor_thread表
+        if (thread.isCustomerService()) {
+            visitorThreadService.update(event.getThread());
+        }
+        
 
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 14:19:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 14:20:31
+ * @LastEditTime: 2024-07-24 14:12:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,27 +15,17 @@
 package com.bytedesk.core.enums;
 
 public enum LanguageEnum {
-    EN,//("en"),
-    ZH_CN,//("zh-cn"),
-    ZH_TW,//("zh-tw");
+    EN,
+    ZH_CN,
+    ZH_TW;
 
-    // private final String value;
-
-    // LanguageEnum(String value) {
-    //     this.value = value;
-    // }
-
-    // public String getValue() {
-    //     return value;
-    // }
-
-    // // 根据字符串查找对应的枚举常量
-    // public static LanguageEnum fromValue(String value) {
-    //     for (LanguageEnum type : LanguageEnum.values()) {
-    //         if (type.getValue().equalsIgnoreCase(value)) {
-    //             return type;
-    //         }
-    //     }
-    //     throw new IllegalArgumentException("No enum constant with value: " + value);
-    // }
+    // 根据字符串查找对应的枚举常量
+    public static LanguageEnum fromValue(String value) {
+        for (LanguageEnum type : LanguageEnum.values()) {
+            if (type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant with value: " + value);
+    }
 }

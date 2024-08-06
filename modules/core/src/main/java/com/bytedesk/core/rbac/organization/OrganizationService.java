@@ -35,7 +35,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.role.Role;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -77,29 +77,29 @@ public class OrganizationService {
 
     @Transactional
     public OrganizationResponse create(OrganizationRequest organizationRequest) {
-        // 
+        //
         if (existsByName(organizationRequest.getName())) {
             throw new RuntimeException("Organization with name: " + organizationRequest.getName() + " already exists.");
         }
         if (existsByCode(organizationRequest.getCode())) {
             throw new RuntimeException("Organization with code: " + organizationRequest.getCode() + " already exists.");
         }
-        // 
+        //
         User user = authService.getCurrentUser();
         String orgUid = uidUtils.getCacheSerialUid();
-        // 
+        //
         Organization organization = modelMapper.map(organizationRequest, Organization.class);
         organization.setUid(orgUid);
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
-        // 
+        //
         try {
             //
             Organization savedOrganization = save(organization);
             if (savedOrganization == null) {
                 throw new RuntimeException("Failed to create organization.");
             }
-            // 
+            //
             log.info("Organization created with UID: {}", orgUid);
             // 初始化组织的角色
             roleService.initOrgRoles(orgUid);
@@ -113,7 +113,8 @@ public class OrganizationService {
                 log.info("roleOptional fail");
             }
             // 放到listener中会报错，所以放在此处
-            // event listener order 1. member, 2. category, 3. faq, 4. quickbutton, 5. robot, 6. agent, 7. workgroup, 
+            // event listener order 1. member, 2. category, 3. faq, 4. quickbutton, 5.
+            // robot, 6. agent, 7. workgroup,
             bytedeskEventPublisher.publishOrganizationCreateEvent(organization);
             //
             return convertToResponse(savedOrganization);
@@ -189,8 +190,8 @@ public class OrganizationService {
         }
         return null;
     }
-    
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, 
+
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             Organization organization) {
         log.info("handleOptimisticLockingFailureException: " + e.getMessage());
     }
@@ -214,8 +215,8 @@ public class OrganizationService {
                     .description(bytedeskProperties.getOrganizationName() + " Description")
                     .user(adminOptional.get())
                     .build();
-            organization.setUid(UserConsts.DEFAULT_ORGANIZATION_UID);
-            // 
+            organization.setUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            //
             save(organization);
         }
 

@@ -8,8 +8,8 @@ import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
-// 
-import com.bytedesk.core.socket.mqtt.model.MqttSession;
+
+import com.bytedesk.core.socket.mqtt.MqttSession;
 import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
 import com.bytedesk.core.socket.mqtt.util.MqttConsts;
 import lombok.extern.slf4j.Slf4j;

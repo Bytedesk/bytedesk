@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-24 09:36:10
+ * @LastEditTime: 2024-07-24 20:43:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,6 @@ import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.rbac.user.UserConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -114,7 +113,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
             PlatformEnum platform) {
         return categoryRepository.findByNameAndTypeAndOrgUidAndPlatform(name, type, orgUid, platform);
     }
-    
+
     public Optional<Category> findByNameAndTypeAndLevelAndPlatform(String name, String type, LevelEnum level,
             PlatformEnum platform) {
         return categoryRepository.findByNameAndTypeAndLevelAndPlatform(name, type, level, platform);
@@ -130,7 +129,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         Category entity = category.get();
         // modelMapper.map(request, entity);
         entity.setName(request.getName());
-        entity.setIcon(request.getIcon());
+        // entity.setIcon(request.getIcon());
         entity.setType(request.getType());
         // entity.setPlatform(request.getPlatform());
 
@@ -178,7 +177,8 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     @Override
     public CategoryResponse convertToResponse(Category entity) {
         CategoryResponse response = modelMapper.map(entity, CategoryResponse.class);
-        // log.info("{} children length {}", entity.getName(), entity.getChildren().size());
+        // log.info("{} children length {}", entity.getName(),
+        // entity.getChildren().size());
         // response.setChildren(convertToResponseList(entity.getChildren()));
         return response;
     }
@@ -187,21 +187,24 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         return list.stream().map(city -> convertToResponse(city)).collect(Collectors.toList());
     }
 
-    // 
+    //
     public void initData() {
+
         if (categoryRepository.count() > 0) {
             return;
         }
 
+        //
+        // level = platform, 不需要设置orgUid
         // init quick reply categories
         CategoryRequest categoryContact = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
                 .orderNo(0)
                 .level(LevelEnum.PLATFORM)
                 .platform(BdConstants.PLATFORM_BYTEDESK)
-                // .orgUid(orgUid)
                 .build();
         categoryContact.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
+        // categoryContact.setOrgUid(orgUid);
         create(categoryContact);
 
         CategoryRequest categoryThanks = CategoryRequest.builder()
@@ -209,39 +212,38 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
                 .orderNo(1)
                 .level(LevelEnum.PLATFORM)
                 .platform(BdConstants.PLATFORM_BYTEDESK)
-                // .orgUid(orgUid)
                 .build();
         categoryThanks.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
+        // categoryThanks.setOrgUid(orgUid);
         create(categoryThanks);
 
         CategoryRequest categoryWelcome = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
                 .orderNo(2)
-                // .orgUid(orgUid)
                 .level(LevelEnum.PLATFORM)
                 .platform(BdConstants.PLATFORM_BYTEDESK)
                 .build();
         categoryWelcome.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
+        // categoryWelcome.setOrgUid(orgUid);
         create(categoryWelcome);
 
         CategoryRequest categoryBye = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
                 .orderNo(3)
-                // .orgUid(orgUid)
                 .level(LevelEnum.PLATFORM)
                 .platform(BdConstants.PLATFORM_BYTEDESK)
                 .build();
         categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICK_REPLY);
+        // categoryBye.setOrgUid(orgUid);
         create(categoryBye);
 
-        //
-        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        // 
+        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
         CategoryRequest categoryFaqDemoRequest1 = CategoryRequest.builder()
                 .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
                 .orderNo(0)
                 .level(LevelEnum.ORGNIZATION)
                 .platform(BdConstants.PLATFORM_BYTEDESK)
-                // .orgUid(orgUid)
                 .build();
         categoryFaqDemoRequest1.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
         categoryFaqDemoRequest1.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1);
@@ -253,13 +255,11 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
                 .orderNo(0)
                 .level(LevelEnum.ORGNIZATION)
                 .platform(BdConstants.PLATFORM_BYTEDESK)
-                // .orgUid(orgUid)
                 .build();
         categoryFaqDemoRequest2.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
         categoryFaqDemoRequest2.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2);
-        categoryFaqDemoRequest1.setOrgUid(orgUid);
+        categoryFaqDemoRequest2.setOrgUid(orgUid);
         create(categoryFaqDemoRequest2);
     }
-
 
 }

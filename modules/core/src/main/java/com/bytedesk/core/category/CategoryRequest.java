@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 10:06:10
+ * @LastEditTime: 2024-07-24 21:27:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,8 +38,7 @@ import lombok.experimental.Accessors;
 public class CategoryRequest extends BaseRequest {
 
     private String name;
-    
-    private String icon;
+    // private String icon;
 
     @Builder.Default
     private Integer orderNo = 0;
@@ -51,11 +50,10 @@ public class CategoryRequest extends BaseRequest {
     @NotBlank
     @Builder.Default
     private String platform = BdConstants.PLATFORM_BYTEDESK;
-    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
 
     @Builder.Default
     private List<String> children = new ArrayList<>();
 
-    /** belong to org */
-    // private String orgUid;
+    // knowledge base uid
+    private String kbUid;
 }

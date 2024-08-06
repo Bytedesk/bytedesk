@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:12:05
+ * @LastEditTime: 2024-07-24 10:16:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,8 +43,9 @@ public class Tag extends BaseEntity {
 
     /**
      * 类别：会话标签 or 客户标签 or 学校 or 课程 or 老师
+     * 不固定，暂时不能使用枚举类型，因为需要动态扩展
      */
-    @Column(name = "tag_type")
+    @Column(name = "tag_type", nullable = false)
     private String type;
 
     /**
@@ -53,11 +54,9 @@ public class Tag extends BaseEntity {
     // @Column(length = 25)
     // private String color;
 
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private PlatformEnum platform = PlatformEnum.BYTEDESK;
-
-    /** belong to org */
-    // private String orgUid;
 
 }

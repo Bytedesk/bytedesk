@@ -31,10 +31,10 @@ public class AgentEntityListener {
 
     // 无法注入bean，否则报错
     // private final TopicService topicService;
-    
+
     // @PrePersist
     // public void prePersist(Agent agent) {
-    //     log.info("prePersist {}", agent.getUid());
+    // log.info("prePersist {}", agent.getUid());
     // }
 
     @PostPersist
@@ -44,33 +44,34 @@ public class AgentEntityListener {
         User user = cloneAgent.getMember().getUser();
         log.info("agent postPersist {} user {}", cloneAgent.getUid(), user.getUid());
         // 这里可以记录日志、发送通知等
-        // 
+        //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         // 默认订阅客服主题
-        bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getAgentTopic(cloneAgent.getUid()), user.getUid());
+        bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getOrgAgentTopic(cloneAgent.getUid()), user.getUid());
     }
 
     // @PreUpdate
     // public void preUpdate(Agent agent) {
-    //     log.info("preUpdate {}", agent.getUid());
+    // log.info("preUpdate {}", agent.getUid());
     // }
 
     // @PostUpdate
     // public void postUpdate(Agent agent) {
-    //     log.info("postUpdate {}", agent.getUid());
-    //     // TODO: 切换agent对应的user时，需要更新topic：从原user缓存中删除，然后添加到新user缓存中
-    //     // topicService.update(agent.getUid(), agent.getUser().getUid());
+    // log.info("postUpdate {}", agent.getUid());
+    // // TODO: 切换agent对应的user时，需要更新topic：从原user缓存中删除，然后添加到新user缓存中
+    // // topicService.update(agent.getUid(), agent.getUser().getUid());
     // }
 
     // @PreRemove
     // public void preRemove(Agent agent) {
-    //     log.info("preRemove {}", agent.getUid());
+    // log.info("preRemove {}", agent.getUid());
     // }
 
     // @PostRemove
     // public void postRemove(Agent agent) {
-    //     log.info("postRemove {}", agent.getUid());
-    //     // topicService.deleteByTopicAndUid(agent.getUid(), agent.getUser().getUid());
+    // log.info("postRemove {}", agent.getUid());
+    // // topicService.deleteByTopicAndUid(agent.getUid(),
+    // agent.getUser().getUid());
     // }
-    
+
 }

@@ -40,12 +40,10 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @Builder
-// "roles",
 @EqualsAndHashCode(callSuper = true, exclude = { "password", "currentOrganization", "userOrganizationRoles" })
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ UserEntityListener.class })
-// @DiscriminatorValue("User")
 @Table(name = "core_user", uniqueConstraints = {
 		// num, username, email, mobile is unique combined with platform, not self
 		@UniqueConstraint(columnNames = { "num", "platform" }),
@@ -57,7 +55,8 @@ public class User extends BaseEntityNoOrg {
 
 	private static final long serialVersionUID = 1L;
 
-	// @Column(unique = true)
+	// 用于搜索用户，添加好友
+	// @Column(unique = true) // num + platform unique
 	private String num;
 
 	// used in authjwtToken, should not be null
@@ -71,12 +70,12 @@ public class User extends BaseEntityNoOrg {
 	private String password;
 
 	@Email(message = "email format error")
-	// @Column(unique = true)
+	// @Column(unique = true) // email + platform unique
 	private String email;
 
 	// TODO: including country
 	// @Digits(message = "phone length error", fraction = 0, integer = 11)
-	// @Column(unique = true)
+	// @Column(unique = true) // mobile + platform unique
 	private String mobile;
 
 	@Builder.Default
@@ -85,11 +84,9 @@ public class User extends BaseEntityNoOrg {
 	@Builder.Default
 	private String description = I18Consts.I18N_USER_DESCRIPTION;
 
-	// @Embedded
-	// private UserSettings userSettings;
-
 	@Builder.Default
-	private Sex sex = Sex.UNKNOW;
+	@Enumerated(EnumType.STRING)
+	private Sex sex = Sex.UNKNOWN;
 
 	@Builder.Default
 	@Column(name = "is_enabled")
@@ -107,20 +104,9 @@ public class User extends BaseEntityNoOrg {
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
 
-	@Enumerated(EnumType.STRING)
 	@Builder.Default
+	@Enumerated(EnumType.STRING)
 	private PlatformEnum platform = PlatformEnum.BYTEDESK;
-
-	// @Builder.Default
-	// @ManyToMany(fetch = FetchType.EAGER)
-	// private Set<Role> roles = new HashSet<>();
-
-	// // TODO: restrict one user to one org? to be determinated which make roles
-	// complicated
-	// @Builder.Default
-	// @Convert(converter = StringSetConverter.class)
-	// private Set<String> organizations = new HashSet<>();
-
 	//
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -164,27 +150,12 @@ public class User extends BaseEntityNoOrg {
 		return this.currentOrganization.getUid();
 	}
 
-	// /** */
-	// public void addRole(Role role) {
-	// if (!this.roles.contains(role)) {
-	// this.roles.add(role);
-	// // role.getUsers().add(this);
-	// }
-	// }
-
-	// public void removeRole(Role role) {
-	// if (this.roles.contains(role)) {
-	// this.roles.remove(role);
-	// // role.getUsers().remove(this);
-	// }
-	// }
-
 	//
 	// 定义性别枚举
 	public enum Sex {
 		MALE,
 		FEMALE,
-		UNKNOW // unknown
+		UNKNOWN // unknown
 	}
 
 	@Override

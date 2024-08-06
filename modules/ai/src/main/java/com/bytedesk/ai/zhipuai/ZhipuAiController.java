@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 11:00:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 13:55:30
+ * @LastEditTime: 2024-08-02 10:03:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,11 @@
  */
 package com.bytedesk.ai.zhipuai;
 
-import java.util.Map;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImagePrompt;
@@ -36,9 +36,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.core.utils.JsonResult;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
 
 /**
  * https://open.bigmodel.cn/dev/api#sdk_install
@@ -50,13 +53,13 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/visitor/api/v1/zhipuai")
 @AllArgsConstructor
-public class ZhipuAiController {
+public class ZhipuaiController {
 
     private final ZhiPuAiChatModel chatModel;
 
     private final ZhiPuAiImageModel zhiPuAiImageModel;
 
-    private final ZhipuAiService zhipuAiService;
+    private final ZhipuaiService zhipuaiService;
 
     // http://127.0.0.1:9003/visitor/api/v1/zhipuai/chat
     @GetMapping("/chat")
@@ -69,20 +72,6 @@ public class ZhipuAiController {
                                 .withTemperature(0.5f)
                                 .build()));
         return ResponseEntity.ok(JsonResult.success(response));
-    }
-
-    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/generate?content=hello
-    @GetMapping("/generate")
-    public Map<?, ?> generate(@RequestParam(value = "content", defaultValue = "讲个笑话") String content) {
-        return Map.of("generation", chatModel.call(content));
-    }
-
-    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/generateStream?content=讲个笑话
-    @GetMapping("/generateStream")
-    public Flux<ChatResponse> generateStream(
-            @RequestParam(value = "content", defaultValue = "讲个笑话") String content) {
-        var prompt = new Prompt(new UserMessage(content));
-        return chatModel.stream(prompt);
     }
 
     // http://127.0.0.1:9003/visitor/api/v1/zhipuai/image
@@ -104,13 +93,51 @@ public class ZhipuAiController {
         // TODO: 根据uid和ip判断此visitor是否骚扰用户，如果骚扰则拒绝响应
 
         log.info("sseEndpoint sid: {}, uid: {}, question {}", sid, uid, question);
-
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
         executorService.submit(() -> {
             try {
                 // 调用你的服务方法来获取SSE数据
-                zhipuAiService.getSseAnswer(uid, sid, question, emitter);
+                zhipuaiService.getSseAnswer(uid, sid, question, emitter);
+                // 将数据作为SSE事件发送
+                // emitter.send(SseEmitter.event().data(sseData));
+                // 完成后完成SSE流
+                // emitter.complete();
+            } catch (Exception e) {
+                // 如果发生错误，则发送错误事件
+                // emitter.send(SseEmitter.event().error(e));
+                emitter.completeWithError(e);
+            } finally {
+                // 确保清理资源
+                emitter.complete();
+            }
+        });
+
+        return ResponseEntity.ok().body(emitter);
+    }
+
+    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/sse/test
+    @GetMapping(value = "/sse/test", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> sseTest(@RequestParam(value = "q", defaultValue = "讲个笑话") String question) {
+        log.info("sseTest question {}", question);
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+
+        executorService.submit(() -> {
+            try {
+                for (int i = 0; i < 10; i++) {
+                    // 将数据作为SSE事件发送
+                    String sseData = "emitter: " + System.currentTimeMillis() + "\n\n";
+                    // emitter.send(sseData);
+                    emitter.send(
+                            SseEmitter.event().name("testname").id(String.valueOf(i)).comment("comment").data(sseData));
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // 完成后完成SSE流
+                emitter.complete();
                 //
                 // 将数据作为SSE事件发送
                 // emitter.send(SseEmitter.event().data(sseData));
@@ -134,4 +161,25 @@ public class ZhipuAiController {
         executorService.shutdown();
     }
 
+    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/stream-sse
+    @GetMapping("/stream-sse")
+    public void streamSse(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/event-stream");
+        response.setCharacterEncoding("UTF-8");
+
+        PrintWriter writer = response.getWriter();
+        for (int i = 0; i < 10; i++) {
+            writer.write("data: " + System.currentTimeMillis() + "\n\n");
+            writer.flush();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        writer.close();
+    }
+
+    
 }

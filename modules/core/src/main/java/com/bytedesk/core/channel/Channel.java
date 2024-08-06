@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:34:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 16:47:36
+ * @LastEditTime: 2024-08-04 12:13:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.channel;
 
-import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 
@@ -40,9 +40,8 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ ChannelEntityListener.class })
-// @DiscriminatorValue("Channel")
 @Table(name = "core_channel")
-public class Channel extends BaseEntity {
+public class Channel extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
 

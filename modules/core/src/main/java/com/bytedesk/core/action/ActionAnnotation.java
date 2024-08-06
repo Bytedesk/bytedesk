@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-17 16:53:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 12:53:51
+ * @LastEditTime: 2024-07-10 19:55:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,5 +37,5 @@ public @interface ActionAnnotation {
 
     public String description() default "";
 
-    public ActionTypeEnum type() default ActionTypeEnum.LOG; //TypeConsts.ACTION_TYPE_LOG;
+    public ActionTypeEnum type() default ActionTypeEnum.LOG;
 }

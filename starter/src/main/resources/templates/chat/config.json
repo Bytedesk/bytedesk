@@ -1,3 +1,9 @@
 {
-    "server": ""
+    "BASE_HOST":"127.0.0.1:9003",
+    "BASE_URL":"http://127.0.0.1:9003",
+    "STOMP_WS_URL":"ws://127.0.0.1:9003/stomp",
+    "STOMP_SOCKJS_URL":"http://127.0.0.1:9003/sockjs",
+    "IS_DEBUG":false,
+    "UPLOAD_FILE_URL":"http://127.0.0.1:9003/visitor/api/v1/upload/file",
+    "CLIENT":"web"
 }
