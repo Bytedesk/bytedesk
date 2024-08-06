@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-31 11:12:19
+ * @LastEditTime: 2024-08-02 09:41:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,17 +15,8 @@
 package com.bytedesk.ai.ollama;
 
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.embedding.EmbeddingRequest;
-import org.springframework.ai.embedding.EmbeddingResponse;
-import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.OllamaEmbeddingModel;
-import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,71 +24,121 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.kbase.upload.UploadVectorStore;
 
 import lombok.AllArgsConstructor;
-import reactor.core.publisher.Flux;
+import lombok.extern.slf4j.Slf4j;
 
 // https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html
+@Slf4j
 @RestController
 @RequestMapping("/visitor/api/v1/ai/ollama")
 @AllArgsConstructor
 public class OllamaController {
 
-    private final OllamaEmbeddingModel ollamaEmbeddingModel;
-
     private final ChatClient chatClient;
 
-    private final OllamaChatModel chatModel;
+    // private final ChatModel chatModel;
 
-    // public OllamaController(EmbeddingModel embeddingModel, ChatClient.Builder
-    // chatClientbBuilder) {
-    // this.embeddingModel = embeddingModel;
-    // this.chatClient = chatClientbBuilder.build();
-    // }
+    private final UploadVectorStore uploadVectorStore;
 
-    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/chat?input=hello
-    @GetMapping("/chat")
-    public ResponseEntity<?> generation(@RequestParam("input") String input) {
-        String content = this.chatClient.prompt()
-                .user(input)
-                .call()
-                .content();
+    private final String PROMPT_BLUEPRINT = """
+              Answer the query strictly referring the provided context:
+              {context}
+              Query:
+              {query}
+              In case you don't have any answer from the context provided, just say:
+              I'm sorry I don't have the information you are looking for.
+            """;
+    // private final String PROMPT_BLUEPRINT = """
+    // 根据提供的文档信息回答问题，文档信息如下:
+    // {context}
+    // 问题:
+    // {query}
+    // 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复不知道即可.
+    // """;
+
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/simple?message=讲一个笑话
+    @GetMapping("/simple")
+    public ResponseEntity<?> getSimpleCompletion(
+            @RequestParam(value = "message", defaultValue = "讲一个笑话") String message) {
+
+        String content = chatClient.prompt().user(message).call().content();
+
         return ResponseEntity.ok(JsonResult.success(content));
     }
 
-    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/simple
-    @GetMapping("/simple")
-    public Map<String, String> completion(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        return Map.of("completion", chatClient.prompt().user(message).call().content());
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/rich
+    @GetMapping("/rich")
+    public ResponseEntity<?> getRichCompletion(
+            @RequestParam(value = "message", defaultValue = "讲一个笑话") String message) {
+
+        ChatResponse chatResponse = chatClient.prompt().user(message).call().chatResponse();
+        // ChatResponse chatResponse = chatModel.call(
+        // new Prompt(message,
+        // OllamaOptions.builder()
+        // .withModel(OllamaModel.MISTRAL)
+        // // .withTemperature(0.4)
+        // .build()));
+        return ResponseEntity.ok(JsonResult.success(chatResponse));
     }
 
-    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/generate
-    @GetMapping("/generate")
-    public Map<?, ?> generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        return Map.of("generation", chatModel.call(message));
-    }
-
-    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/generateStream
-    @GetMapping("/generateStream")
-    public Flux<ChatResponse> generateStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        Prompt prompt = new Prompt(new UserMessage(message));
-        return chatModel.stream(prompt);
-    }
-
-    /*
-     * http://127.0.0.1:9003/visitor/api/v1/ai/ollama/embedding
-     */
-    @GetMapping("/embedding")
-    public Map<?, ?> embed(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        // EmbeddingResponse embeddingResponse =
-        // embeddingModel.embedForResponse(List.of(message));
+    // 参考
+    // https://github.com/habuma/spring-ai-rag-example/blob/main/src/main/java/com/example/springairag/AskController.java
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/chat?query=考试日期
+    @GetMapping("/chat")
+    public ResponseEntity<?> chat(@RequestParam(value = "query", defaultValue = "考试日期") String query) {
         //
-        EmbeddingResponse embeddingResponse = ollamaEmbeddingModel
-                .call(new EmbeddingRequest(List.of("Hello World", "World is big and salvation is near"),
-                        OllamaOptions.create().withModel("qwen:7b")));
+        List<String> contentList = uploadVectorStore.searchText(query);
 
-        return Map.of("embedding", embeddingResponse);
+        ChatResponse response = chatClient.prompt()
+                .user(userSpec -> userSpec
+                        .text(PROMPT_BLUEPRINT)
+                        .param("query", query)
+                        .param("context", String.join("\n", contentList)))
+                .call()
+                .chatResponse();
+        log.info("chat response: {}", response);
+        String answer = response.getResult().getOutput().getContent();
+        // 
+        return ResponseEntity.ok(JsonResult.success("chat success", answer));
     }
+
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/chat/stream?query=考试日期
+    // @GetMapping("/chat/stream")
+    // public void chatStream(@RequestParam(value = "query", defaultValue = "考试日期") String query) {
+    //     //
+    //     List<String> contentList = uploadVectorStore.searchText(query);
+    //     // 
+    //     SystemPromptTemplate promoptTemplate = new SystemPromptTemplate(PROMPT_BLUEPRINT);
+    //     Message message = promoptTemplate.createMessage(Map.of("query", query, "context", contentList));
+    //     log.info("query: {}, message {}", query, message);
+    //     // 
+    //     chatModel.stream(new Prompt(message)).subscribe(response -> {
+    //         log.info(query + " : " + response.getResult().getOutput().getContent());
+    //     });
+    // }
+
+    // public Generation retrieve(String message) {
+    // SearchRequest request = SearchRequest.query(message).withTopK(topK);
+    // // Query Redis for the top K documents most relevant to the input message
+    // List<Document> docs = store.similaritySearch(request);
+    // Message systemMessage = getSystemMessage(docs);
+    // UserMessage userMessage = new UserMessage(message);
+    // // Assemble the complete prompt using a template
+    // Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
+    // // Call the autowired chat client with the prompt
+    // ChatResponse response = client.call(prompt);
+    // return response.getResult();
+    // }
+    // // end::retrieve[]
+
+    // private Message getSystemMessage(List<Document> similarDocuments) {
+    // String documents =
+    // similarDocuments.stream().map(Document::getContent).collect(Collectors.joining("\n"));
+    // SystemPromptTemplate systemPromptTemplate = new
+    // SystemPromptTemplate(systemBeerPrompt);
+    // return systemPromptTemplate.createMessage(Map.of("documents", documents));
+    // }
+
 }

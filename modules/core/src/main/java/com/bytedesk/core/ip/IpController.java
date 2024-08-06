@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:15:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-27 11:33:19
+ * @LastEditTime: 2024-07-31 12:29:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,9 +41,7 @@ public class IpController {
 
     @PostMapping("/block")
     public ResponseEntity<?> blockIp(@RequestBody IpRequest request) {
-
         ipService.blockIp(request);
-
         return ResponseEntity.ok(JsonResult.success());
     }
 
@@ -69,7 +67,6 @@ public class IpController {
      */
     @GetMapping("/")
     public JsonResult<?> ip(HttpServletRequest request) {
-
         return new JsonResult<>("your ip", 200, IpUtils.clientIp(request));
     }
 
@@ -97,7 +94,7 @@ public class IpController {
     }
 
     /**
-     * http://127.0.0.1:9003/ip/api/v1/ip/location?ip=103.46.244.251
+     * http://127.0.0.1:9003/ip/api/v1/ip/location?ip=202.106.212.226
      * 
      * @param request
      * @return
@@ -130,7 +127,7 @@ public class IpController {
     }
 
     // for testing
-    // http://127.0.0.1:9003/ip/api/v1/ip/province?ip=103.46.244.251
+    // http://127.0.0.1:9003/ip/api/v1/ip/province?ip=202.106.212.226
     @GetMapping("/ip/province")
     public JsonResult<?> ipProvince(@RequestParam String ip) {
 
@@ -140,7 +137,7 @@ public class IpController {
         String location = ipService.getIpLocation(ip);
         // 
         String[] locals = location.split("\\|");
-        log.info("locals {}", (Object[]) locals); // Cast to Object[] to confirm the non-varargs invocation
+        log.info("location {} locals {}", location, (Object[]) locals); // Cast to Object[] to confirm the non-varargs invocation
         String province = "";
         if (locals.length > 2) {
             if (locals[2].equals("0")) {

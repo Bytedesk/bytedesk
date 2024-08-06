@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-06 14:56:20
+ * @LastEditTime: 2024-08-04 07:45:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
@@ -80,14 +84,17 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
 
     private final RobotService robotService;
 
-    // private final CaffeineCacheService caffeineCacheService;
-
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     public Page<VisitorResponse> queryByOrg(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "updatedAt");
+        Specification<Visitor> spec = VisitorSpecification.search(request);
+        Page<Visitor> page = visitorRepository.findAll(spec, pageable);
+
+        return page.map(ConvertServiceUtils::convertToVisitorResponse);
     }
 
     public VisitorResponse query(VisitorRequest visitorRequest) {
@@ -146,7 +153,27 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         return ConvertServiceUtils.convertToVisitorProtobuf(savedVisitor);
     }
 
-    /** */
+    // private Map<ThreadTypeEnum, CsThreadCreationStrategy> strategyMap = new
+    // HashMap<>();
+
+    // public VisitorService() {
+    // // 在构造函数中初始化策略映射
+    // strategyMap.put(ThreadTypeEnum.AGENT, new AgentCsThreadCreationStrategy());
+    // strategyMap.put(ThreadTypeEnum.WORKGROUP, new
+    // WorkgroupCsThreadCreationStrategy());
+    // strategyMap.put(ThreadTypeEnum.ROBOT, new RobotCsThreadCreationStrategy());
+    // }
+
+    // public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
+    // ThreadTypeEnum type = visitorRequest.formatType();
+    // CsThreadCreationStrategy strategy = strategyMap.get(type);
+    // if (strategy == null) {
+    // throw new RuntimeException("Thread type " + type.name() + " not supported");
+    // }
+    // return strategy.createCsThread(visitorRequest);
+    // }
+
+    /** TODO: 重构策略模式？ */
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
         //
         ThreadTypeEnum type = visitorRequest.formatType();
@@ -168,41 +195,55 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         }
     }
 
-    //////////////////// Agent/////////////////////
+    ////////////////// Agent/////////////////////
 
     public MessageProtobuf createAgentCsThread(VisitorRequest visitorRequest) {
         //
         String agentUid = visitorRequest.getSid();
         Agent agent = agentService.findByUid(agentUid)
                 .orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
+        //
+        boolean transferToRobot = false;
         if (agent.getServiceSettings().isDefaultRobot()) {
-            throw new RuntimeException("TODO: 默认机器人即将上线，敬请期待");
             // 默认转机器人优先接待
-            // Robot robot = agent.getServiceSettings().getRobot();
-            // if (robot != null) {
-            // //
-            // Thread thread = getRobotThread(visitorRequest, topic, type, robot);
-            // //
-            // return getRobotMessage(visitorRequest, thread, robot);
-            // } else {
-            // throw new AgentExceptionRobot("route " + agentUid + " to a robot");
-            // }
+            transferToRobot = true;
         } else if (agent.getServiceSettings().isOfflineRobot()) {
-            // TODO: 人工离线期间转机器人
-            throw new RuntimeException("TODO: 人工离线期间转机器人即将上线，敬请期待");
-        } else if (agent.getServiceSettings().isNonWorktimeRobot()) {
-            // TODO: 非工作时间转接机器人
-            throw new RuntimeException("TODO: 非工作时间转接机器人即将上线，敬请期待");
+            // 设置客服离线机器人，且当前客服离线，转机器人
+            if (!agent.isConnected() || !agent.isAvailable()) {
+                // 离线转机器人
+                transferToRobot = true;
+            }
+        } else if (!agent.getServiceSettings().isWorkTime()
+                && agent.getServiceSettings().isNonWorktimeRobot()) {
+            // 当前非工作时间，且设置非工作时间转机器人，转机器人
+            transferToRobot = true;
         }
         //
+        if (transferToRobot) {
+            // 转机器人
+            Robot robot = agent.getServiceSettings().getRobot();
+            if (robot != null) {
+                Thread thread = getRobotThread(visitorRequest, robot);
+                return getRobotMessage(visitorRequest, thread, robot);
+            } else {
+                throw new RuntimeException("route " + agentUid + " to a robot");
+            }
+        }
+        // 下面进入人工接待
+
+        // TODO: 判断是否达到最大接待人数，如果达到则进入排队
+
         Thread thread = getAgentThread(visitorRequest, agent);
         //
         MessageProtobuf messageProtobuf = getAgentMessage(visitorRequest, thread, agent);
-        //
-        if (agent.isConnected() && agent.isAvailable()) {
-            // notify agent - 通知客服
-            notifyAgent(thread, messageProtobuf);
-        }
+        // 广播消息，由消息通道统一处理
+        notifyAgent(messageProtobuf);
+        // if (agent.isConnected() && agent.isAvailable()) {
+        // // notify agent - 通知客服
+        // notifyAgent(messageProtobuf);
+        // } else {
+        // // 离线状态
+        // }
         // else if (agent.isAvailable()) {
         // // TODO: 断开连接，但是接待状态，判断是否有客服移动端token，有则发送通知
         // }
@@ -212,7 +253,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
 
     private Thread getAgentThread(VisitorRequest visitorRequest, Agent agent) {
         //
-        String topic = TopicUtils.getAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
         // TODO: 到visitor thread表中拉取
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
@@ -262,16 +303,13 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             // 客服在线 且 接待状态
             thread.setUnreadCount(1);
             thread.setContent(agent.getServiceSettings().getWelcomeTip());
+            thread.setExtra(JSON.toJSONString(
+                    ConvertServiceUtils.convertToServiceSettingsResponseVisitor(agent.getServiceSettings())));
+            thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToAgentResponseSimple(agent)));
             // if thread is closed, reopen it and then create a new message
             if (thread.isClosed()) {
                 // 访客会话关闭之后，重新进入
                 isReenter = false;
-                //
-                thread.setExtra(JSON
-                        .toJSONString(
-                                ConvertServiceUtils
-                                        .convertToServiceSettingsResponseVisitor(agent.getServiceSettings())));
-                thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToAgentResponseSimple(agent)));
                 thread.setStatus(ThreadStatusEnum.REOPEN);
             } else {
                 thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
@@ -291,23 +329,34 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         String workgroupUid = visitorRequest.getSid();
         Workgroup workgroup = workgroupService.findByUid(workgroupUid)
                 .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
+        //
+        boolean transferToRobot = false;
         if (workgroup.getServiceSettings().isDefaultRobot()) {
-            throw new RuntimeException("TODO: 默认机器人即将上线，敬请期待");
-            // // 默认机器人优先接待
-            // Robot robot = workgroup.getServiceSettings().getRobot();
-            // if (robot != null) {
-            // Thread thread = getRobotThread(visitorRequest, topic, type, robot);
-            // return getRobotMessage(visitorRequest, thread, robot);
-            // } else {
-            // throw new AgentExceptionRobot("route " + workgroupUid + " to a robot");
-            // }
-        } else if (workgroup.getServiceSettings().isOfflineRobot()) {
-            // TODO: 人工离线期间转机器人
-            throw new RuntimeException("TODO: 人工离线期间转机器人即将上线，敬请期待");
-        } else if (workgroup.getServiceSettings().isNonWorktimeRobot()) {
-            // TODO: 非工作时间转接机器人
-            throw new RuntimeException("TODO: 非工作时间转接机器人即将上线，敬请期待");
+            // 默认机器人优先接待
+            transferToRobot = true;
+        } else if (!workgroup.isConnected()
+                && workgroup.getServiceSettings().isOfflineRobot()) {
+            // 所有客服离线，且设置机器人离线优先接待
+            transferToRobot = true;
+        } else if (!workgroup.getServiceSettings().isWorkTime()
+                && workgroup.getServiceSettings().isNonWorktimeRobot()) {
+            // 设置非工作时间机器人接待，且当前非工作时间，转机器人
+            transferToRobot = true;
         }
+        //
+        if (transferToRobot) {
+            // 转机器人
+            Robot robot = workgroup.getServiceSettings().getRobot();
+            if (robot != null) {
+                Thread thread = getRobotThread(visitorRequest, robot);
+                return getRobotMessage(visitorRequest, thread, robot);
+            } else {
+                throw new RuntimeException("route " + workgroupUid + " to a robot");
+            }
+        }
+        // 下面人工接待
+        // TODO: 所有客服都达到最大接待人数，则进入排队
+
         if (workgroup.getAgents().isEmpty()) {
             throw new RuntimeException("No agents found in workgroup with uid " + workgroupUid);
         }
@@ -320,26 +369,28 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         Thread thread = getWorkgroupThread(visitorRequest, agent, workgroup);
         //
         MessageProtobuf messageProtobuf = getWorkgroupMessage(visitorRequest, thread, agent, workgroup);
-        //
-        if (agent.isConnected() && agent.isAvailable()) {
-            log.info("agent is connected and available");
-            // notify agent - 通知客服
-            notifyAgent(thread, messageProtobuf);
-        }
+        // 广播消息，由消息通道统一处理
+        notifyAgent(messageProtobuf);
+        // if (agent.isConnected() && agent.isAvailable()) {
+        // log.info("agent is connected and available");
+        // // notify agent - 通知客服
+        // notifyAgent(messageProtobuf);
+        // }
         // else if (agent.isAvailable()) {
         // // TODO: 断开连接，但是接待状态，判断是否有客服移动端token，有则发送通知
         // log.info("agent is available");
-        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
+        // cacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
         // } else {
-        // caffeineCacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
+        // cacheService.pushForPersist(JSON.toJSONString(messageProtobuf));
         // }
-
+        //
         return messageProtobuf;
     }
 
     private Thread getWorkgroupThread(VisitorRequest visitorRequest, Agent agent, Workgroup workgroup) {
         //
-        String topic = TopicUtils.getWorkgroupThreadTopic(workgroup.getUid(), agent.getUid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroup.getUid(), agent.getUid(),
+                visitorRequest.getUid());
         // TODO: 到visitor thread表中拉取
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
@@ -398,15 +449,13 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             // 客服在线 且 接待状态
             thread.setUnreadCount(1);
             thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
+            thread.setExtra(JSON.toJSONString(
+                    ConvertServiceUtils.convertToServiceSettingsResponseVisitor(workgroup.getServiceSettings())));
+            thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToWorkgroupResponseSimple(workgroup)));
             // if thread is closed, reopen it and then create a new message
             if (thread.isClosed()) {
                 // 访客会话关闭之后，重新进入
                 isReenter = false;
-                thread.setExtra(JSON.toJSONString(
-                        ConvertServiceUtils.convertToServiceSettingsResponseVisitor(workgroup.getServiceSettings())));
-                thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToWorkgroupResponseSimple(workgroup)));
-                thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
-                // thread = threadService.reenter(thread);
                 thread.setStatus(ThreadStatusEnum.REOPEN);
             } else {
                 thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
@@ -429,14 +478,15 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         //
         Thread thread = getRobotThread(visitorRequest, robot);
         //
-        MessageProtobuf messageProtobuf = getRobotMessage(visitorRequest, thread, robot);
-
-        return messageProtobuf;
+        return getRobotMessage(visitorRequest, thread, robot);
     }
 
     private Thread getRobotThread(VisitorRequest visitorRequest, Robot robot) {
+        if (robot == null) {
+            throw new RuntimeException("Robot cannot be null");
+        }
         //
-        String topic = TopicUtils.getOrgRobotTopic(robot.getUid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
         // TODO: 到visitor thread表中拉取
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
@@ -462,7 +512,6 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
     }
 
     private MessageProtobuf getRobotMessage(VisitorRequest visitorRequest, Thread thread, Robot robot) {
-
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
         }
@@ -475,24 +524,25 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         if (thread.isInit()) {
             isReenter = false;
         }
+        // 更新机器人配置+大模型相关信息
+        thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
+                robot.getServiceSettings())));
+        thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
+        thread.setContent(robot.getServiceSettings().getWelcomeTip());
         // if thread is closed, reopen it and then create a new message
         if (thread.isClosed()) {
             isReenter = false;
-            // 更新机器人配置+大模型相关信息
-            thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
-                    robot.getServiceSettings())));
-            thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
-            // thread = threadService.reenter(thread);
             thread.setStatus(ThreadStatusEnum.REOPEN);
         } else {
             thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
         }
-        thread.setContent(robot.getServiceSettings().getWelcomeTip());
         threadService.save(thread);
         //
         UserProtobuf user = modelMapper.map(robot, UserProtobuf.class);
+        //
         JSONObject userExtra = new JSONObject();
         userExtra.put("llm", robot.getLlm().isEnabled());
+        userExtra.put("defaultReply", robot.getDefaultReply());
         user.setExtra(JSON.toJSONString(userExtra));
         //
         return getThreadMessage(user, thread, isReenter);
@@ -546,17 +596,15 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         return null;
     }
 
-    public void notifyAgent(Thread thread, MessageProtobuf messageProtobuf) {
+    public void notifyAgent(MessageProtobuf messageProtobuf) {
         //
-        // MessageProtobuf messageProtobuf = modelMapper.map(messageProtobuf,
-        // MessageProtobuf.class);
         String json = JSON.toJSONString(messageProtobuf);
         bytedeskEventPublisher.publishMessageJsonEvent(json);
     }
 
     // TODO: 模拟压力测试：随机生成 10000 个访客，分配给1个技能组中10个客服账号，并随机分配给1个客服账号，每秒发送1条消息
     public void prepeareStressTest() {
-        // String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        // String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
         // // 随机生成10000个访客
         // List<Visitor> visitors = new ArrayList<>();
         // for (int i = 0; i < 10000; i++) {

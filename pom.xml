@@ -36,20 +36,20 @@
         <spring.boot.version>3.2.0</spring.boot.version>
         <sofa.boot.version>4.2.0</sofa.boot.version>
         <querydsl.version>5.1.0</querydsl.version>
-        <revision>0.3.0-BYTEDESK</revision>
+        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <revision>0.3.5-SNAPSHOT</revision>
     </properties>
 
     <dependencies>
-        
+
     </dependencies>
 
     <build>
         <plugins>
-            <!-- 添加flatten-maven-plugin插件 -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.3.0</version>
+                <version>${flatten-maven-plugin.version}</version>
                 <inherited>true</inherited>
                 <executions>
                     <execution>
@@ -59,7 +59,6 @@
                             <goal>flatten</goal>
                         </goals>
                         <configuration>
-                            <!-- 避免IDE将 .flattened-pom.xml 自动识别为功能模块 -->
                             <updatePomFile>true</updatePomFile>
                             <flattenMode>resolveCiFriendliesOnly</flattenMode>
                             <pomElements>

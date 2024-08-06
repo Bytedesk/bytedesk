@@ -24,7 +24,7 @@ import io.netty.util.ResourceLeakDetector;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
-import com.bytedesk.core.socket.mqtt.config.MqttProperties;
+import com.bytedesk.core.socket.mqtt.MqttProperties;
 import com.bytedesk.core.socket.mqtt.initializer.MqttServerInitializer;
 import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
 import lombok.extern.slf4j.Slf4j;

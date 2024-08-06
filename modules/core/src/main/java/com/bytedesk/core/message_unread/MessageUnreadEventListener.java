@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 12:14:03
+ * @LastEditTime: 2024-08-05 12:24:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,8 +23,8 @@ import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageUpdateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompConnectedEvent;
+import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
+import com.bytedesk.core.socket.stomp.StompConnectedEvent;
 // import com.bytedesk.core.topic.Topic;
 // import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.topic.TopicUtils;
@@ -39,19 +39,17 @@ public class MessageUnreadEventListener {
 
     private final MessageUnreadService messageUnreadService;
 
-    // private final TopicService topicService;
-
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
         Message message = event.getMessage();
         log.info("message unread create event: {}", message.getContent());
-        //
+        // 缓存未读消息
         String threadTopic = message.getThreadTopic();
         String userString = message.getUser();
         UserProtobuf user = JSONObject.parseObject(userString, UserProtobuf.class);
         String userUid = user.getUid();
         //
-        if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_AGENT_PREFIX)) {
+        if (TopicUtils.isOrgAgentTopic(threadTopic)) {
             // 一对一客服消息 org/agent/default_agent_uid/1420995827073219
             String[] splits = threadTopic.split("/");
             if (splits.length < 4) {
@@ -68,7 +66,7 @@ public class MessageUnreadEventListener {
                 messageUnreadService.create(message, agentUid);
             }
             //
-        } else if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_WORKGROUP_PREFIX)) {
+        } else if (TopicUtils.isOrgWorkgroupTopic(threadTopic)) {
             // 技能组客服 topic格式：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
             String[] splits = threadTopic.split("/");
             if (splits.length < 5) {
@@ -87,7 +85,7 @@ public class MessageUnreadEventListener {
                 messageUnreadService.create(message, agentUid);
             }
 
-        } else if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_GROUP_PREFIX)) {
+        } else if (TopicUtils.isOrgGroupTopic(threadTopic)) {
             // 群组消息 topic格式：org/group/{group_uid}
             String[] splits = threadTopic.split("/");
             if (splits.length < 3) {
@@ -106,8 +104,8 @@ public class MessageUnreadEventListener {
             // messageUnreadService.create(message, userUid);
             // }
             // }
-        } else if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_PRIVATE_PREFIX)) {
-            // 同事私聊 topic格式：org/private/{self_member_uid}/{other_member_uid}
+        } else if (TopicUtils.isOrgMemberTopic(threadTopic)) {
+            // 同事私聊 topic格式：org/member/{self_member_uid}/{other_member_uid}
             String[] splits = threadTopic.split("/");
             if (splits.length < 3) {
                 throw new RuntimeException("member topic format error");
@@ -132,8 +130,8 @@ public class MessageUnreadEventListener {
         if (messageStatus.ordinal() < MessageStatusEnum.DELIVERED.ordinal()) {
             return;
         }
-        //
-        if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_AGENT_PREFIX)) {
+        // 删除已读消息
+        if (TopicUtils.isOrgAgentTopic(threadTopic)) {
             // 一对一客服消息 org/agent/default_agent_uid/1420995827073219
             String[] splits = threadTopic.split("/");
             if (splits.length < 4) {
@@ -146,7 +144,7 @@ public class MessageUnreadEventListener {
             messageUnreadService.delete(agentUid);
             messageUnreadService.delete(visitorUid);
             //
-        } else if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_WORKGROUP_PREFIX)) {
+        } else if (TopicUtils.isOrgWorkgroupTopic(threadTopic)) {
             // 技能组客服 topic格式：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
             String[] splits = threadTopic.split("/");
             if (splits.length < 5) {
@@ -160,7 +158,7 @@ public class MessageUnreadEventListener {
             messageUnreadService.delete(agentUid);
             messageUnreadService.delete(visitorUid);
 
-        } else if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_GROUP_PREFIX)) {
+        } else if (TopicUtils.isOrgGroupTopic(threadTopic)) {
             // 群组消息 topic格式：org/group/{group_uid}
             String[] splits = threadTopic.split("/");
             if (splits.length < 3) {
@@ -170,8 +168,8 @@ public class MessageUnreadEventListener {
             log.info("groupUid {}", groupUid);
             // TODO: 群聊消息删除未读
 
-        } else if (threadTopic.startsWith(TopicUtils.TOPIC_ORG_PRIVATE_PREFIX)) {
-            // 同事私聊 topic格式：org/private/{self_member_uid}/{other_member_uid}
+        } else if (TopicUtils.isOrgMemberTopic(threadTopic)) {
+            // 同事私聊 topic格式：org/member/{self_member_uid}/{other_member_uid}
             String[] splits = threadTopic.split("/");
             if (splits.length < 3) {
                 throw new RuntimeException("member topic format error");
@@ -188,31 +186,6 @@ public class MessageUnreadEventListener {
     // @EventListener
     // public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
     // // log.info("message quartz five second event: " + event);
-    // List<String> keys = caffeineCacheService.getAllKeyList();
-    // for (String key : keys) {
-    // // log.info("message cache key: " + key);
-    // List<String> messages = caffeineCacheService.getList(key);
-    // if (messages == null || messages.isEmpty() || messages.size() == 0) {
-    // continue;
-    // }
-    // Iterator<String> iterator = messages.iterator();
-    // while (iterator.hasNext()) {
-    // String messageJson = iterator.next();
-    // // log.info("message cache value: " + message);
-    // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson,
-    // MessageProtobuf.class);
-    // // 仅存储指定类型
-    // if (messageProtobuf.getType() == MessageTypeEnum.TEXT
-    // || messageProtobuf.getType() == MessageTypeEnum.IMAGE
-    // || messageProtobuf.getType() == MessageTypeEnum.FILE
-    // || messageProtobuf.getType() == MessageTypeEnum.AUDIO
-    // || messageProtobuf.getType() == MessageTypeEnum.VIDEO) {
-    // // messageUnreadService.add(messageJson, key);
-    // //
-
-    // }
-    // }
-    // }
     // }
 
     @EventListener

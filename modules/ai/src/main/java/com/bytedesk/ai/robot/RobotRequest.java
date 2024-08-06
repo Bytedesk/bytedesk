@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-06 13:13:08
+ * @LastEditTime: 2024-08-02 22:15:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,6 +55,6 @@ public class RobotRequest extends BaseRequest {
     @Builder.Default
     private Boolean published = false;
 
-    
+    private String kbUid; // 对应知识库
 
 }

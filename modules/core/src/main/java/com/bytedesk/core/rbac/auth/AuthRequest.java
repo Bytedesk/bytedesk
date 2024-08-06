@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 16:21:08
+ * @LastEditTime: 2024-07-26 10:09:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.core.rbac.auth;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -40,6 +41,11 @@ public class AuthRequest extends BaseRequest {
 
     // 
     @NotBlank
-    private String platform;
+    // private String platform;
+    private PlatformEnum platform = PlatformEnum.BYTEDESK;
+
+    // 登录验证码
+    private String captchaUid;
+    private String captchaCode;
 
 }

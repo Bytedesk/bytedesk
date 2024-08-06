@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 18:57:28
+ * @LastEditTime: 2024-07-31 17:25:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.starter.service.PageService;
+import com.bytedesk.starter.service.PageTemplateService;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -36,12 +36,13 @@ import lombok.AllArgsConstructor;
 public class PageTemplateController {
 
     //
-    private PageService pageService;
+    private PageTemplateService pageService;
 
     /**
      * generate html static file
      * 模板静态化
      * http://127.0.0.1:9003/temp/static
+     * TODO: 多语言生成静态文件
      * 
      * @return
      */

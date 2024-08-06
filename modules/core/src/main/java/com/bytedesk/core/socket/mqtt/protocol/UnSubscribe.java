@@ -17,11 +17,11 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
+import com.bytedesk.core.socket.MqService;
 // import com.bytedesk.core.topic.TopicService;
 // import com.bytedesk.core.redis.RedisUserService;
 // import com.bytedesk.core.socket.mqtt.service.MqttSubscribeService;
 import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
-import com.bytedesk.core.socket.service.MqService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

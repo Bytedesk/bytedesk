@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 20:26:48
+ * @LastEditTime: 2024-08-02 11:55:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MessageExtra {
+    
+    private Boolean isAutoReply;
+
+    private String autoReplyType;
     
     private String orgUid;
 }

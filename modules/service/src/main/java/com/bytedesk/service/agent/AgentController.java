@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 20:21:31
+ * @LastEditTime: 2024-08-04 13:17:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,13 +16,13 @@ package com.bytedesk.service.agent;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
+import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -33,20 +33,20 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/agent")
-public class AgentController {
+public class AgentController extends BaseController<AgentRequest> {
 
     private final AgentService agentService;
 
     /**
      * query by org
      * 
-     * @param agentRequest
+     * @param request
      * @return
      */
-    @GetMapping("/query/org")
-    public ResponseEntity<?> queryByOrg(AgentRequest agentRequest) {
+    @Override
+    public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
-        Page<AgentResponse> page = agentService.queryByOrg(agentRequest);
+        Page<AgentResponse> page = agentService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -54,13 +54,13 @@ public class AgentController {
     /**
      * query by user self
      * 
-     * @param agentRequest
+     * @param request
      * @return
      */
-    @GetMapping("/query")
-    public ResponseEntity<?> query(AgentRequest agentRequest) {
+    @Override
+    public ResponseEntity<?> query(AgentRequest request) {
 
-        AgentResponse agentResponse = agentService.query(agentRequest);
+        AgentResponse agentResponse = agentService.query(request);
         
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
@@ -68,14 +68,14 @@ public class AgentController {
     /**
      * create
      *
-     * @param agentRequest agent
+     * @param request agent
      * @return json
      */
     @ActionAnnotation(title = "agent", action = "create", description = "create agent")
-    @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody AgentRequest agentRequest) {
+    @Override
+    public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.create(agentRequest);
+        AgentResponse agent = agentService.create(request);
         if (agent == null) {
             return ResponseEntity.ok(JsonResult.error("create agent failed"));
         }
@@ -86,31 +86,40 @@ public class AgentController {
     /**
      * update
      *
-     * @param agentRequest agent
+     * @param request agent
      * @return json
      */
     @ActionAnnotation(title = "agent", action = "update", description = "update agent")
-    @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody AgentRequest agentRequest) {
+    @Override
+    public ResponseEntity<?> update(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.update(agentRequest);
+        AgentResponse agent = agentService.update(request);
         //
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
+    @ActionAnnotation(title = "agent", action = "updateAutoReply", description = "update agent autoreply")
+    @PostMapping("/update/autoreply")
+    public ResponseEntity<?> updateAutoReply(@RequestBody AgentRequest request) {
+
+        AgentResponse agent = agentService.updateAutoReply(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(agent));
+    }
+    
     /**
      * delete
      *
-     * @param agentRequest agent
+     * @param request agent
      * @return json
      */
     @ActionAnnotation(title = "agent", action = "delete", description = "delete agent")
-    @PostMapping("/delete")
-    public ResponseEntity<?> delete(@RequestBody AgentRequest agentRequest) {
+    @Override
+    public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
 
-        agentService.deleteByUid(agentRequest.getUid());
+        agentService.deleteByUid(request.getUid());
         //
-        return ResponseEntity.ok(JsonResult.success(agentRequest));
+        return ResponseEntity.ok(JsonResult.success(request));
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 07:30:54
+ * @LastEditTime: 2024-08-05 22:40:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,9 +24,16 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.thread.ThreadCreateEvent;
+import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.topic.TopicCacheService;
+import com.bytedesk.core.topic.TopicRequest;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.department.Department;
 import com.bytedesk.team.department.DepartmentService;
@@ -44,6 +51,8 @@ public class MemberEventListener {
 
     private final UidUtils uidUtils;
 
+    private final TopicCacheService topicCacheService;
+
     @Order(1)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -51,12 +60,12 @@ public class MemberEventListener {
         User user = organization.getUser();
         String orgUid = organization.getUid();
         log.info("organization created: {}", organization.getName());
-        // 
+        //
         Department department = Department.builder()
-                        .name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)
-                        .description(TypeConsts.DEPT_ADMIN)
-                        // .orgUid(organization.getUid())
-                        .type(TypeConsts.TYPE_SYSTEM)
+                .name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)
+                .description(TypeConsts.DEPT_ADMIN)
+                // .orgUid(organization.getUid())
+                .type(TypeConsts.TYPE_SYSTEM)
                 .build();
         department.setUid(uidUtils.getCacheSerialUid());
         department.setOrgUid(orgUid);
@@ -73,6 +82,58 @@ public class MemberEventListener {
         memberRequest.setDepUid(department.getUid());
         memberRequest.setOrgUid(orgUid);
         memberService.create(memberRequest);
+    }
+
+    @EventListener
+    public void onThreadCreateEvent(ThreadCreateEvent event) {
+        Thread thread = event.getThread();
+        // User user = thread.getOwner();
+        log.info("thread ThreadCreateEvent: {}", thread.getUid());
+        //
+        if (thread.getType().equals(ThreadTypeEnum.MEMBER)) {
+            memberService.createMemberReverseThread(thread);
+        }
+    }
+
+    @EventListener
+    public void onMemberCreateEvent(GenericApplicationEvent<MemberCreateEvent> event) {
+        MemberCreateEvent memberCreateEvent = (MemberCreateEvent) event.getObject();
+        Member member = memberCreateEvent.getMember();
+        User user = member.getUser();
+        log.info("member created: {}", memberCreateEvent);
+        // 默认订阅成员主题
+        TopicRequest request = TopicRequest.builder()
+                .topic(TopicUtils.formatOrgMemberTopic(member.getUid()))
+                .userUid(user.getUid())
+                .build();
+        topicCacheService.pushRequest(request);
+        // 订阅部门主题
+        // Iterator<Department> iterator = member.getDepartments().iterator();
+        // while (iterator.hasNext()) {
+        // Department department = iterator.next();
+        // TopicRequest departRequest = TopicRequest.builder()
+        // .topic(TopicUtils.getDepartmentTopic(department.getUid()))
+        // .userUid(user.getUid())
+        // .build();
+        // topicCacheService.pushRequest(departRequest);
+        // }
+    }
+
+    @EventListener
+    public void onMemberUpdateEvent(GenericApplicationEvent<MemberUpdateEvent> event) {
+        MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent) event.getObject();
+        log.info("member updated: {}", memberUpdateEvent);
+        // TODO: 删除旧的部门主题
+        // 订阅部门主题
+        // Iterator<Department> iterator = member.getDepartments().iterator();
+        // while (iterator.hasNext()) {
+        // Department department = iterator.next();
+        // TopicRequest departRequest = TopicRequest.builder()
+        // .topic(TopicUtils.getDepartmentTopic(department.getUid()))
+        // .userUid(user.getUid())
+        // .build();
+        // topicCacheService.pushRequest(departRequest);
+        // }
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 12:08:11
+ * @LastEditTime: 2024-07-28 17:00:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,12 +24,12 @@ import lombok.Data;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "bytedesk")
+@ConfigurationProperties(BytedeskProperties.CONFIG_PREFIX)
 public class BytedeskProperties {
 
-    private Boolean debug;
+    public static final String CONFIG_PREFIX = "bytedesk";
 
-    // private String username;
+    private Boolean debug;
 
     private String email;
 
@@ -56,7 +56,6 @@ public class BytedeskProperties {
 
     // jwt
     private String jwtSecretKey;
-
     private String jwtExpiration;
 
     // cache

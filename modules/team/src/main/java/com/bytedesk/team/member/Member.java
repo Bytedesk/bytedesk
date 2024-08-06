@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-01 07:11:32
+ * @LastEditTime: 2024-08-04 13:09:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,7 +72,7 @@ public class Member extends BaseEntity {
     private String mobile;
 
     @Builder.Default
-    private MemberStatusEnum status = MemberStatusEnum.NORMAL;
+    private MemberStatusEnum status = MemberStatusEnum.PENDING;
 
     @JsonIgnore
     // 关联多个Department
@@ -87,14 +87,6 @@ public class Member extends BaseEntity {
     // @OneToOne(fetch = FetchType.EAGER)
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
-    /**
-     * belong to org
-     */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private Organization organization;
-    // private String orgUid;
 
      // 添加、移除部门的方法
     public void addDepartment(Department department) {

@@ -1,3 +1,12 @@
 {
-    "server": ""
+    "SERVER_MODE": "opensource",
+    "BASE_URL": "",
+    "UPLOAD_FILE_URL": "/api/v1/upload/file",
+    "UPLOAD_AVATAR_URL": "/api/v1/upload/file",
+    "IS_DEBUG": false,
+    "CS_CHAT_URL": "http://127.0.0.1:9003/chat",
+    "CS_FRAME_URL": "http://127.0.0.1:9003/frame",
+    "CS_FLOAT_URL": "http://127.0.0.1:9003/float",
+    "CS_FLOAT_JS_URL": "http://127.0.0.1:9003/chat/assets/js/float/index.min.js",
+    "AGENT_CLIENT_URL": "http://127.0.0.1:9003/agent"
 }

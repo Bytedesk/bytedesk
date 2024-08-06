@@ -37,7 +37,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.constant.BdConstants;
 // import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -62,8 +62,9 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
 
     @Override
     public Page<QuartzResponse> queryByOrg(QuartzRequest request) {
-        
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC, "updatedAt");
+
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "updatedAt");
 
         Page<QuartzEntity> page = quartzRepository.findByOrgUidAndDeleted(request.getOrgUid(), false, pageable);
 
@@ -73,7 +74,8 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
     @Override
     public Page<QuartzResponse> queryByUser(QuartzRequest request) {
 
-        // Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC, "updatedAt");
+        // Pageable pageable = PageRequest.of(request.getPageNumber(),
+        // request.getPageSize(), Sort.Direction.DESC, "updatedAt");
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
@@ -96,7 +98,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
         log.info("deleteByUid {}", uid);
         // quartzRepository.deleteByUid(quartzRequest.getUid());
     }
-    
+
     @Override
     public void delete(QuartzEntity object) {
         // quartzRepository.delete(object);
@@ -123,14 +125,14 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
         if (!quartzOptional.isPresent()) {
             return null;
         }
-        // 
+        //
         quartzOptional.get().setJobName(quartzRequest.getJobName());
         quartzOptional.get().setJobGroup(quartzRequest.getJobGroup());
         quartzOptional.get().setDescription(quartzRequest.getDescription());
         quartzOptional.get().setJobClassName(quartzRequest.getJobClassName());
         quartzOptional.get().setJobMethodName(quartzRequest.getJobMethodName());
         quartzOptional.get().setCronExpression(quartzRequest.getCronExpression());
-        // 
+        //
         quartzOptional.get().setTriggerName(quartzRequest.getTriggerName());
         quartzOptional.get().setTriggerGroup(quartzRequest.getTriggerGroup());
         quartzOptional.get().setTriggerType(quartzRequest.getTriggerType());
@@ -154,7 +156,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
     public void startJob(QuartzRequest quartzRequest) {
         log.info("startJob: {}", quartzRequest);
         update(quartzRequest);
-        
+
         try {
 
             JobKey jobKey = new JobKey(quartzRequest.getJobName(), quartzRequest.getJobGroup());
@@ -166,7 +168,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
             @SuppressWarnings("unchecked")
             Class<? extends Job> cls = (Class<? extends Job>) Class.forName(quartzRequest.getJobClassName());
             // cls.getDeclaredConstructor().newInstance();
-            // 
+            //
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put(QuartzConsts.JOB_METHORD_NAME, quartzRequest.getJobMethodName());
             JobDetail jobDetail = JobBuilder
@@ -228,7 +230,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
 
     public void deleteJob(QuartzRequest quartzRequest) {
         log.info("deleteJob: {}", quartzRequest);
-       
+
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(quartzRequest.getTriggerName(),
                     quartzRequest.getTriggerGroup());
@@ -249,10 +251,9 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
             // TODO: handle exception
             e.printStackTrace();
         }
-        // 
+        //
         deleteByUid(quartzRequest.getUid());
     }
-
 
     //
     public void initData() {
@@ -274,12 +275,11 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
                 .triggerGroup(group)
                 .triggerType("cron")
                 .triggerState("started")
-                .orgUid(UserConsts.DEFAULT_ORGANIZATION_UID)
+                .orgUid(BdConstants.DEFAULT_ORGANIZATION_UID)
                 .build();
         create(quartzRequest);
         //
         // startJob(quartzRequest);
     }
 
-    
 }

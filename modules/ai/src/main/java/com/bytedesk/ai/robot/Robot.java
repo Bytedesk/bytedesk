@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-06 13:14:24
+ * @LastEditTime: 2024-08-02 22:14:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ package com.bytedesk.ai.robot;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.bytedesk.ai.kb.Kb;
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -25,19 +24,12 @@ import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.rbac.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-// import jakarta.persistence.AssociationOverride;
-// import jakarta.persistence.AssociationOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -99,17 +91,11 @@ public class Robot extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String flow = BdConstants.EMPTY_JSON_STRING;
 
-    // is_published or not
     @Builder.Default
     private boolean published = false;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Kb kb;
+    private String kbUid; // 对应知识库
 
     // only used when created by user, not by org
-    @JsonIgnore
-    @ManyToOne
-    private User user;
-
+    // private String userUid; // 创建用户
 }

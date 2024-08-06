@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 16:52:59
+ * @LastEditTime: 2024-08-05 13:33:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,33 +52,33 @@ public class TopicUtils {
     private static final String TOPIC_USER_PATTERN = "user/%s";
     private static final String TOPIC_FILE_PATTERN = "file/%s";
     private static final String TOPIC_SYSTEM_PATTERN = "system/%s";
-    // private static final String TOPIC_GROUP_PATTERN = "group/%s";
-    // private static final String TOPIC_PRIVATE_PATTERN = "private/%s/%s";
-    // private static final String TOPIC_ROBOT_PATTERN = "robot/%s/%s";
+    private static final String TOPIC_GROUP_PATTERN = "group/%s";
+    private static final String TOPIC_PRIVATE_PATTERN = "private/%s/%s";
+    private static final String TOPIC_ROBOT_PATTERN = "robot/%s/%s";
 
     // 企业消息: 所有uid全平台唯一，包括不同表之间uid也唯一，所以未在企业topic中添加org_uid前缀为前缀
     // 用户默认订阅组织uid：org/{org_uid}
     // 用户默认订阅成员uid：org/member/{member_uid}
     // 部门消息：org/department/{department_uid}
     // 同事群组会话：org/group/{group_uid}
-    // 同事私聊会话：org/private/{self_user_uid}/{other_user_uid}
+    // 同事私聊会话：org/member/{self_member_uid}/{other_member_uid}
     // 机器人会话：org/robot/{robot_uid}/{visitor_uid}
-    private static final String TOPIC_ORG_PATTERN = "org/%s";
-    private static final String TOPIC_ORG_MEMBER_PATTERN = "org/member/%s";
-    private static final String TOPIC_ORG_DEPARTMENT_PATTERN = "org/department/%s";
-    private static final String TOPIC_ORG_GROUP_PATTERN = "org/group/%s";
-    private static final String TOPIC_ORG_PRIVATE_PATTERN = "org/private/%s/%s";
-    private static final String TOPIC_ORG_ROBOT_PATTERN = "org/robot/%s/%s";
+    private static final String TOPIC_ORG_PATTERN = TOPIC_ORG_PREFIX + "%s"; // "org/%s";
+    private static final String TOPIC_ORG_MEMBER_PATTERN = TOPIC_ORG_MEMBER_PREFIX + "%s"; // "org/member/%s";
+    private static final String TOPIC_ORG_MEMBER_THREAD_PATTERN = TOPIC_ORG_MEMBER_PREFIX + "%s/%s"; // "org/member/%s/%s";
+    private static final String TOPIC_ORG_DEPARTMENT_PATTERN = TOPIC_ORG_DEPARTMENT_PREFIX + "%s"; // "org/department/%s";
+    private static final String TOPIC_ORG_GROUP_PATTERN = TOPIC_ORG_GROUP_PREFIX + "%s"; // "org/group/%s";
+    private static final String TOPIC_ORG_ROBOT_THREAD_PATTERN = TOPIC_ORG_ROBOT_PREFIX + "%s/%s"; // "org/robot/%s/%s";
 
     // 客服:
     // 用户默认订阅客服uid：org/agent/{agent_uid}
     // 一对一客服会话：org/agent/{agent_uid}/{visitor_uid}
     // 用户默认订阅技能组uid：org/workgroup/{workgroup_uid}
     // 技能组客服会话：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
-    private static final String TOPIC_ORG_AGENT_PATTERN = "org/agent/%s";
-    private static final String TOPIC_ORG_AGENT_THREAD_PATTERN = "org/agent/%s/%s";
-    private static final String TOPIC_ORG_WORKGROUP_PATTERN = "org/workgroup/%s";
-    private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = "org/workgroup/%s/%s/%s";
+    private static final String TOPIC_ORG_AGENT_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s"; // "org/agent/%s";
+    private static final String TOPIC_ORG_AGENT_THREAD_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s/%s"; // "org/agent/%s/%s";
+    private static final String TOPIC_ORG_WORKGROUP_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s"; // "org/workgroup/%s";
+    private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s/%s"; // "org/workgroup/%s/%s/%s";
 
     //
     public static String getUserTopic(String userUid) {
@@ -93,63 +93,97 @@ public class TopicUtils {
         return String.format(TOPIC_SYSTEM_PATTERN, userUid);
     }
 
-    // public static String getGroupTopic(String groupUid) {
-    //     return String.format(TOPIC_GROUP_PATTERN, groupUid);
-    // }
-
-    // public static String getPrivateTopic(String selfUid, String otherUid) {
-    //     return String.format(TOPIC_PRIVATE_PATTERN, selfUid, otherUid);
-    // }
-
-    // public static String getRobotTopic(String robotUid, String visitorUid) {
-    //     return String.format(TOPIC_ROBOT_PATTERN, robotUid, visitorUid);
-    // }
-
     public static String getOrgTopic(String orgUid) {
         return String.format(TOPIC_ORG_PATTERN, orgUid);
     }
 
-    public static String getMemberTopic(String memberUid) {
+    public static String getGroupTopic(String groupUid) {
+        return String.format(TOPIC_GROUP_PATTERN, groupUid);
+    }
+
+    public static String getPrivateTopic(String selfUid, String otherUid) {
+        return String.format(TOPIC_PRIVATE_PATTERN, selfUid, otherUid);
+    }
+
+    public static String getRobotTopic(String robotUid, String visitorUid) {
+        return String.format(TOPIC_ROBOT_PATTERN, robotUid, visitorUid);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    public static String formatOrgDepartmentTopic(String departmentUid) {
+        return String.format(TOPIC_ORG_DEPARTMENT_PATTERN, departmentUid);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgMemberTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_MEMBER_PATTERN);
+    }
+    public static String formatOrgMemberTopic(String memberUid) {
         return String.format(TOPIC_ORG_MEMBER_PATTERN, memberUid);
     }
 
-    public static String getDepartmentTopic(String departmentUid) {
-        return String.format(TOPIC_ORG_DEPARTMENT_PATTERN, departmentUid);
+    public static String formatOrgMemberThreadTopic(String selfMemberUid, String otherMemberUid) {
+        return String.format(TOPIC_ORG_MEMBER_THREAD_PATTERN, selfMemberUid, otherMemberUid);
+    }
+
+    public static String getOrgMemberTopicReverse(String topic) {
+        String[] topicArr = topic.split("/");
+        if (topicArr.length != 4) {
+            throw new RuntimeException("Invalid private topic: " + topic);
+        }
+        return String.format(TOPIC_ORG_MEMBER_THREAD_PATTERN, topicArr[3], topicArr[2]);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgGroupTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_GROUP_PREFIX);
     }
 
     public static String getOrgGroupTopic(String groupUid) {
         return String.format(TOPIC_ORG_GROUP_PATTERN, groupUid);
     }
+    
+    //////////////////////////////////////////////////////////////////////////
 
-    public static String getOrgPrivateTopic(String selfUid, String otherUid) {
-        return String.format(TOPIC_ORG_PRIVATE_PATTERN, selfUid, otherUid);
+    
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgRobotTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_ROBOT_PREFIX);
     }
 
-    public static String getOrgPrivateTopicReverse(String topic) {
-        String[] topicArr = topic.split("/");
-        if (topicArr.length != 4) {
-            throw new RuntimeException("Invalid private topic: " + topic);
-        }
-        return String.format(TOPIC_ORG_PRIVATE_PATTERN, topicArr[3], topicArr[2]);
+    public static String formatOrgRobotThreadTopic(String robotUid, String visitorUid) {
+        return String.format(TOPIC_ORG_ROBOT_THREAD_PATTERN, robotUid, visitorUid);
     }
 
-    public static String getOrgRobotTopic(String robotUid, String visitorUid) {
-        return String.format(TOPIC_ORG_ROBOT_PATTERN, robotUid, visitorUid);
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgAgentTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_AGENT_PREFIX);
     }
 
-    public static String getAgentTopic(String agentUid) {
+    public static String getOrgAgentTopic(String agentUid) {
         return String.format(TOPIC_ORG_AGENT_PATTERN, agentUid);
     }
 
-    public static String getAgentThreadTopic(String agentUid, String visitorUid) {
+    public static String formatOrgAgentThreadTopic(String agentUid, String visitorUid) {
         return String.format(TOPIC_ORG_AGENT_THREAD_PATTERN, agentUid, visitorUid);
     }
 
-    public static String getWorkgroupTopic(String workgroupUid) {
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgWorkgroupTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_WORKGROUP_PREFIX);
+    }
+
+    public static String getOrgWorkgroupTopic(String workgroupUid) {
         return String.format(TOPIC_ORG_WORKGROUP_PATTERN, workgroupUid);
     }
 
-    public static String getWorkgroupThreadTopic(String workgroupUid, String agentUid, String visitorUid) {
+    public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String agentUid, String visitorUid) {
         return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, agentUid, visitorUid);
     }
 

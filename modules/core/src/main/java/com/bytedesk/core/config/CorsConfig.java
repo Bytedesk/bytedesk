@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-19 11:39:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-19 16:20:13
+ * @LastEditTime: 2024-07-29 17:10:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ public class CorsConfig {
      * 经测试：仅有此处起作用，corsFilter()和WebMvcConfig.addCorsMappings()不起作用
      * @return
      */
-     // https://docs.spring.io/spring-security/reference/reactive/integrations/cors.html
+    // https://docs.spring.io/spring-security/reference/reactive/integrations/cors.html
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -48,22 +48,23 @@ public class CorsConfig {
         return source;
     }
 
-//     @Bean
-//     public CorsFilter corsFilter() {
-//         log.info("CorsConfig.corsFilter()");
-//         CorsConfiguration corsConfiguration = new CorsConfiguration();
-//         //1,允许任何来源
-//         corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
-//         //2,允许任何请求头
-//         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
-//         //3,允许任何方法
-//         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
-//         //4,允许凭证
-//         corsConfiguration.setAllowCredentials(true);
-//         // 
-//         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//         source.registerCorsConfiguration("/**", corsConfiguration);
-//         // 
-//         return new CorsFilter(source);
-//     }
+    //     @Bean
+    //     public CorsFilter corsFilter() {
+    //         log.info("CorsConfig.corsFilter()");
+    //         CorsConfiguration corsConfiguration = new CorsConfiguration();
+    //         //1,允许任何来源
+    //         corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
+    //         //2,允许任何请求头
+    //         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+    //         //3,允许任何方法
+    //         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
+    //         //4,允许凭证
+    //         corsConfiguration.setAllowCredentials(true);
+    //         // 
+    //         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    //         source.registerCorsConfiguration("/**", corsConfiguration);
+    //         // 
+    //         return new CorsFilter(source);
+    //     }
+
 }

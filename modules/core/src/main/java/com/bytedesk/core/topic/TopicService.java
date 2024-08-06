@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 11:40:59
+ * @LastEditTime: 2024-08-05 18:40:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,26 +63,37 @@ public class TopicService {
     }
 
     public void create(TopicRequest topicRequest) {
-
         Optional<Topic> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
             Topic topicElement = topicOptional.get();
             if (topicElement.getTopics().contains(topicRequest.getTopic())) {
-                log.info("create: {}", topicRequest.getTopic());
                 return;
             }
+            log.info("add topic: {}", topicRequest.getTopic());
             topicElement.getTopics().add(topicRequest.getTopic());
             save(topicElement);
             // 
             return;
         }
-        // 
         topicRequest.setUid(uidUtils.getCacheSerialUid());
         // 
         Topic topic = modelMapper.map(topicRequest, Topic.class);
         topic.getTopics().add(topicRequest.getTopic());
         // 
         save(topic);
+    }
+
+    public void remove(String topic, String userUid) {
+        Optional<Topic> topicOptional = findByUserUid(userUid);
+        if (topicOptional.isPresent()) {
+            Topic topicElement = topicOptional.get();
+            if (!topicElement.getTopics().contains(topic)) {
+                return;
+            }
+            log.info("remove topic: {}, userUid {}", topic, userUid);
+            topicElement.getTopics().remove(topic);
+            save(topicElement);
+        }
     }
     
     public void subscribe(String topic, String clientId) {

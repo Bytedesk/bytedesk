@@ -15,7 +15,7 @@
 package com.bytedesk.ai.settings;
 
 import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.core.service_settings.BaseServiceSettingsResponse;
+import com.bytedesk.kbase.service_settings.BaseServiceSettingsResponse;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

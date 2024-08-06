@@ -14,16 +14,16 @@
  */
 package com.bytedesk.core.tag;
 
-import com.bytedesk.core.base.BaseRequest;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+// import com.bytedesk.core.base.BaseRequest;
+// import lombok.Builder;
+// import lombok.Data;
+// import lombok.EqualsAndHashCode;
+// import lombok.experimental.Accessors;
 
-@Data
-@Builder
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
-public class TagRequest extends BaseRequest {
+// @Data
+// @Builder
+// @Accessors(chain = true)
+// @EqualsAndHashCode(callSuper = false)
+// public class TagRequest extends BaseRequest {
 
-}
+// }

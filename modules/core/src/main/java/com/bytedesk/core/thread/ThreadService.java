@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 15:13:58
+ * @LastEditTime: 2024-08-05 22:39:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,22 +31,19 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.asistant.Asistant;
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.channel.Channel;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 
 import io.jsonwebtoken.lang.Arrays;
 import lombok.AllArgsConstructor;
@@ -61,8 +58,6 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     private ModelMapper modelMapper;
 
-    private UserService userService;
-
     private ThreadRepository threadRepository;
 
     private UidUtils uidUtils;
@@ -74,6 +69,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
                 "updatedAt");
 
         Specification<Thread> specs = ThreadSpecification.search(request);
+
         Page<Thread> threadPage = threadRepository.findAll(specs, pageable);
 
         return threadPage.map(this::convertToResponse);
@@ -95,6 +91,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     /**
      * create thread
+     * 同事会话、机器人会话、群聊会话
      * 
      * @{TopicUtils}
      * 
@@ -129,7 +126,8 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         //
         return convertToResponse(savedThread);
     }
-
+    
+   
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
     public ThreadResponse createGroupMemberThread(Thread thread, User owner) {
@@ -137,6 +135,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         Thread groupThread = Thread.builder()
                 .type(thread.getType())
                 .topic(thread.getTopic())
+                .unreadCount(0)
                 .status(thread.getStatus())
                 .client(ClientEnum.SYSTEM)
                 .user(thread.getUser())
@@ -154,10 +153,10 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     }
 
     /** 文件助手会话：file/{user_uid} */
-    public ThreadResponse createFileAsistantThread(User user, Asistant asistant) {
+    public ThreadResponse createFileAsistantThread(User user) {
 
         UserProtobuf userSimple = UserProtobuf.builder()
-                // .uid(UserConsts.DEFAULT_FILE_ASISTANT_UID)
+                // .uid(BdConstants.DEFAULT_FILE_ASISTANT_UID)
                 .nickname(I18Consts.I18N_FILE_ASISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .build();
@@ -165,13 +164,18 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         Thread asistantThread = Thread.builder()
                 .type(ThreadTypeEnum.ASISTANT)
                 .topic(TopicUtils.TOPIC_FILE_PREFIX + user.getUid())
+                .unreadCount(0)
                 .status(ThreadStatusEnum.NORMAL)
                 .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
         asistantThread.setUid(uidUtils.getCacheSerialUid());
-        asistantThread.setOrgUid(user.getOrgUid());
+        if (StringUtils.hasText(user.getOrgUid())) {
+            asistantThread.setOrgUid(user.getOrgUid());
+        } else {
+            asistantThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        }
 
         Thread updateThread = save(asistantThread);
         if (updateThread == null) {
@@ -182,25 +186,30 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     }
 
     // 系统通知会话：system/{user_uid}
-    public ThreadResponse createSystemNotificationChannelThread(User user, Channel channel) {
+    public ThreadResponse createSystemChannelThread(User user) {
 
         UserProtobuf userSimple = UserProtobuf.builder()
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
                 .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
                 .build();
-        userSimple.setUid(UserConsts.DEFAULT_SYSTEM_NOTIFICATION_UID);
+        userSimple.setUid(BdConstants.DEFAULT_SYSTEM_UID);
         //
         Thread noticeThread = Thread.builder()
                 .type(ThreadTypeEnum.CHANNEL)
                 .topic(TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid())
+                .unreadCount(0)
                 .status(ThreadStatusEnum.NORMAL)
                 .client(ClientEnum.SYSTEM)
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
         noticeThread.setUid(uidUtils.getCacheSerialUid());
-        noticeThread.setOrgUid(user.getOrgUid());
-
+        if (StringUtils.hasText(user.getOrgUid())) {
+            noticeThread.setOrgUid(user.getOrgUid());
+        } else {
+            noticeThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        }
+        // 
         Thread updateThread = save(noticeThread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
@@ -209,60 +218,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         return convertToResponse(updateThread);
     }
 
-    /** 同事私聊会话：org/private/{self_user_uid}/{other_user_uid} */
-    public Thread getMemberReverseThread(Thread thread) {
-        String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
-        Optional<Thread> reverseThreadOptional = findByUid(reverseUid);
-        if (!reverseThreadOptional.isPresent()) {
-            throw new RuntimeException("reverseThread not found");
-        }
-        return reverseThreadOptional.get();
-    }
-
-    /** 同事私聊会话：org/private/{self_user_uid}/{other_user_uid} */
-    public Thread createMemberReverseThread(Thread thread) {
-
-        String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
-        if (existsByUid(reverseUid)) {
-            return getMemberReverseThread(thread);
-        }
-
-        // 同事私聊会话：org/private/{self_user_uid}/{other_user_uid}
-        String[] splits = thread.getTopic().split("/");
-        if (splits.length != 4) {
-            throw new RuntimeException("reverse thread topic format error");
-        }
-        //
-        String userUid = splits[3];
-        String reverseTopic = TopicUtils.TOPIC_ORG_PRIVATE_PREFIX + splits[3] + "/" + splits[2];
-        Optional<User> userOptional = userService.findByUid(userUid);
-        if (!userOptional.isPresent()) {
-            throw new RuntimeException("getMemberReverseThread user not found");
-        }
-        Thread reverseThread = Thread.builder().build();
-        reverseThread.setUid(reverseUid);
-        reverseThread.setTopic(reverseTopic);
-        //
-        UserProtobuf user = ConvertUtils.convertToUserResponseSimple(thread.getOwner());
-        reverseThread.setUser(JSON.toJSONString(user));
-        //
-        reverseThread.setContent(thread.getContent());
-        // reverseThread.setExtra(thread.getExtra());
-        reverseThread.setType(thread.getType());
-        // TODO: 同事私聊被动方默认不显示会话，直到收到一条消息
-        // reverseThread.setHide(true);
-        reverseThread.setClient(ClientEnum.SYSTEM);
-        reverseThread.setOrgUid(thread.getOrgUid());
-        reverseThread.setOwner(userOptional.get());
-        //
-        Thread savedTherad = save(reverseThread);
-        if (savedTherad == null) {
-            throw new RuntimeException("reverseThread save error");
-        }
-        return savedTherad;
-
-    }
-
+   
     public ThreadResponse update(ThreadRequest threadRequest) {
         Optional<Thread> threadOptional = findByUid(threadRequest.getUid());
         if (!threadOptional.isPresent()) {
@@ -351,8 +307,6 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     // TODO: 更新缓存
     // @Cacheable(value = "threadOpen")
     public List<Thread> findStatusOpen() {
-        // return threadRepository.findByStatusAndDeleted(ThreadStatusEnum.NORMAL,
-        // false);
         List<ThreadStatusEnum> statuses = Arrays
                 .asList(new ThreadStatusEnum[] { ThreadStatusEnum.NORMAL, ThreadStatusEnum.CONTINUE });
         return threadRepository.findByStatusesAndDeleted(statuses, false);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:11:15
+ * @LastEditTime: 2024-07-24 21:26:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,14 +51,11 @@ public class Category extends BaseEntity {
 
     private String name;
 
-    // private String description;
-
     // this category type may be user defined, so it should use string type, not enum
     @Column(name = "category_type", nullable = false)
     private String type;
 
-    private String icon;
-
+    // private String icon;
     // @Column(unique = true)
     // private String path;
 
@@ -83,8 +80,8 @@ public class Category extends BaseEntity {
     @Builder.Default
     private PlatformEnum platform = PlatformEnum.BYTEDESK;
 
-    /** belong to org */
-    // private String orgUid;
+    // knowledge base uid
+    private String kbUid;
 
     public void addChild(Category child) {
         children.add(child);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-31 11:11:28
+ * @LastEditTime: 2024-07-29 11:04:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,40 +19,74 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
+ * https://ollama.com/
+ * https://www.promptingguide.ai/
  * https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
  */
 @Configuration
 public class OllamaConfig {
 
+    @Value("${spring.ai.ollama.base-url}")
+    private String ollamaBaseUrl;
+
+    @Value("${spring.ai.ollama.chat.options.model}")
+    private String ollamaChatModel;
+
+    @Value("${spring.ai.ollama.embedding.options.model}")
+    private String ollamaEmbeddingModel;
+
+    // @Value("${spring.ai.vectorstore.pgvector.dimensions}")
+    // private int pgVectorDimensions;
+
+    // @Autowired
+    // VectorStore vectorStore;
+
     @Bean
     OllamaApi ollamaApi() {
-        return new OllamaApi("http://127.0.0.1:11434");
+        return new OllamaApi(ollamaBaseUrl);
     }
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
+    // @Bean
+    // ChatClient chatClient(ChatClient.Builder builder) {
+    //     // return builder.defaultSystem("You are a friendly chat bot that answers question").build();
+    //     return builder
+    //         .defaultSystem("""
+    //                 You are a customer chat support agent. Respond in a friendly, helpful, and joyful manner.
+    //                 """)
+    //         // .defaultAdvisors(
+    //         //         // new PromptChatMemoryAdvisor(chatMemory),
+    //         //         // new MessageChatMemoryAdvisor(chatMemory), // CHAT MEMORY
+    //         //         // new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults())
+    //         //             // new LoggingAdvisor()
+    //         //         ) // RAG
+    //         // .defaultFunctions("getBookingDetails", "changeBooking", "cancelBooking") // FUNCTION CALLING
+    //         .build();
+    // }
     @Bean
-    ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.defaultSystem("You are a friendly chat bot that answers question")
-                .build();
+    ChatClient ollamaChatClient() {
+        return ChatClient.create(ollamaChatModel());
     }
 
     @Bean
-    OllamaChatModel chatModel() {
-        return new OllamaChatModel(ollamaApi(),
-                OllamaOptions.create()
-                        // .withModel(OllamaOptions.DEFAULT_MODEL)
-                        .withModel("qwen:7b")
-                        .withTemperature(0.9f));
+    @Primary
+    OllamaChatModel ollamaChatModel() {
+        return new OllamaChatModel(ollamaApi(), OllamaOptions.create().withModel(
+                ollamaChatModel).withTemperature(0.9f));
     }
 
     // https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
     @Bean
+    @Primary
     OllamaEmbeddingModel ollamaEmbeddingModel() {
-        return new OllamaEmbeddingModel(ollamaApi());
+        return new OllamaEmbeddingModel(ollamaApi(), OllamaOptions.create().withModel(
+                ollamaEmbeddingModel).withTemperature(0.9f));
     }
 
 }

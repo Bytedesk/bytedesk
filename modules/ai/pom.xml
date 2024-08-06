@@ -6,58 +6,44 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-    	<artifactId>modules</artifactId>
-    	<version>${revision}</version>
+		<artifactId>modules</artifactId>
+		<version>${revision}</version>
 	</parent>
 
+	<groupId>com.bytedesk</groupId>
 	<artifactId>bytedesk-module-ai</artifactId>
-	
+	<version>${revision}</version>
+
 	<name>bytedesk-module-ai</name>
-	<description>Demo project for Spring Boot</description>
+	<description>ai module for https://www.weiyuai.cn</description>
 
 	<properties>
-		<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
-		<!-- <spring-ai.version>1.0.0-M1</spring-ai.version> -->
-		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
+		  <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 	</properties>
 
 	<dependencies>
 
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
-		</dependency> -->
+			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
-		<!-- https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-ollama-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-openai-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-postgresml-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-redis-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html -->
+		<!-- Spring AI ZhiPuAI Auto Configuration -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
@@ -69,6 +55,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-kbase</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<!-- https://open.bigmodel.cn/dev/api#sdk_install -->
@@ -76,7 +69,15 @@
 		<dependency>
 			<groupId>cn.bigmodel.openapi</groupId>
 			<artifactId>oapi-java-sdk</artifactId>
-			<version>release-V4-2.1.0</version>
+			<version>release-V4-2.2.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.25.2</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
@@ -87,6 +88,7 @@
 		</dependency>
 
 	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -98,7 +100,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
+	
 	<build>
 		<plugins>
 			<!-- <plugin>

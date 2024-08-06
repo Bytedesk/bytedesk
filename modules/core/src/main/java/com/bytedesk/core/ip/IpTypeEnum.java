@@ -15,25 +15,15 @@
 package com.bytedesk.core.ip;
 
 public enum IpTypeEnum {
-    WHITELIST("whichlist"),
-    WHITERANGE("whiterange"),
-    BLACKLIST("blacklist"),
-    BLACKRANGE("blackrange");
-
-    private final String value;
-
-    IpTypeEnum(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
+    WHITELIST,
+    WHITERANGE,
+    BLACKLIST,
+    BLACKRANGE;
 
     // 根据字符串查找对应的枚举常量
     public static IpTypeEnum fromValue(String value) {
         for (IpTypeEnum type : IpTypeEnum.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
+            if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }
         }

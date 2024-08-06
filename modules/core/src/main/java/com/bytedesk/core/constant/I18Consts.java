@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-06 13:15:13
+ * @LastEditTime: 2024-08-02 07:46:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,14 +59,18 @@ public class I18Consts {
     public static final String I18N_USER_DESCRIPTION = I18N_PREFIX + "user.description";
     //
     public static final String I18N_DESCRIPTION = I18N_PREFIX + "description";
+    public static final String I18N_TODO = I18N_PREFIX + "todo";
     //
     public static final String I18N_ROBOT_NICKNAME = I18N_PREFIX + "robot.nickname";
     public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description";
     public static final String I18N_ROBOT_LLM_PROMPT = I18N_PREFIX + "llm.prompt";
     public static final String I18N_ROBOT_REPLY = I18N_PREFIX + "robot.reply";
+    public static final String I18N_ROBOT_NO_REPLY = I18N_PREFIX + "robot.noreply";
     //
     public static final String I18N_ADMIN = I18N_PREFIX + "admin";
     public static final String I18N_ADMIN_DESCRIPTION = I18N_PREFIX + "admin.description";
+    public static final String I18N_MEMBER = I18N_PREFIX + "member";
+    public static final String I18N_MEMBER_DESCRIPTION = I18N_PREFIX + "member.description";
     // quick reply category
     public static final String I18N_QUICK_REPLY_CATEGORY_CONTACT = I18N_PREFIX + "contact"; // 询问联系方式
     public static final String I18N_QUICK_REPLY_CATEGORY_THANKS = I18N_PREFIX + "thanks"; // 感谢

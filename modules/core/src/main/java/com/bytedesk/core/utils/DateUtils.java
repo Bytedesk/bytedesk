@@ -19,6 +19,8 @@ public class DateUtils {
 
     private static final String datetimeFormat = "yyyy-MM-dd HH:mm:ss";
 
+    private static final String datetimeUidFormat = "yyyyMMddHHmmss";
+
     private static final String dtFormat = "yyyy-MM-dd";
 
     private static final String dtFormatSlash = "yyyy/MM/dd";
@@ -45,6 +47,11 @@ public class DateUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String formatDatetimeUid() {
+        SimpleDateFormat dateFormater = new SimpleDateFormat(datetimeUidFormat);
+        return dateFormater.format(new Date());
     }
 
     public static String formatDateNow() {

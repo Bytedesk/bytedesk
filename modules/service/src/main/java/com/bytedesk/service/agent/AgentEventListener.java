@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 10:23:48
+ * @LastEditTime: 2024-08-04 10:46:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,11 +25,14 @@ import org.springframework.stereotype.Component;
 
 // import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
+import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
+import com.bytedesk.core.thread.ThreadCreateEvent;
+import com.bytedesk.core.thread.ThreadUpdateEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.worktime.WorktimeService;
 import com.bytedesk.team.member.Member;
@@ -49,8 +52,6 @@ public class AgentEventListener {
 
     private final WorktimeService worktimeService;
     
-    // private final BytedeskProperties bytedeskProperties;
-
     private final UidUtils uidUtils;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
@@ -72,10 +73,8 @@ public class AgentEventListener {
                 .nickname(I18Consts.I18N_AGENT_NICKNAME)
                 .email(member.getEmail())
                 .mobile(member.getMobile())
-                // .password(bytedeskProperties.getPasswordDefault())
                 .memberUid(member.getUid())
                 // .userUid(user.getUid())
-                // .orgUid(organization.getUid())
                 .build();
         agent1Request.setUid(uidUtils.getCacheSerialUid());
         agent1Request.setOrgUid(orgUid);
@@ -84,19 +83,37 @@ public class AgentEventListener {
                 orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
                 orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
         //
-        List<String> quickButtonUids = Arrays.asList(
-                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
-                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
+        // List<String> quickButtonUids = Arrays.asList(
+        //         orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+        //         orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
 
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();
         worktimeUids.add(worktimeUid);
         //
         agent1Request.getServiceSettings().setFaqUids(faqUids);
-        agent1Request.getServiceSettings().setQuickButtonUids(quickButtonUids);
+        agent1Request.getServiceSettings().setQuickFaqUids(faqUids);
         agent1Request.getServiceSettings().setWorktimeUids(worktimeUids);
         // 
         agentService.create(agent1Request);
+    }
+
+    // TODO: 定时ping客服，检查在线状态
+    @EventListener
+    public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
+        // log.info("agent quartz five second event: " + event);
+    }
+
+    // TODO: 新创建会话，更新客服当前接待数量
+    @EventListener
+    public void onThreadCreateEvent(ThreadCreateEvent event) {
+        // log.info("agent onThreadCreateEvent: " + event);
+    }
+
+    // TODO: 会话关闭，更新客服当前接待数量
+    @EventListener
+    public void onThreadUpdateEvent(ThreadUpdateEvent event) {
+        // log.info("agent onThreadUpdateEvent: " + event);
     }
 
     @EventListener
@@ -119,4 +136,5 @@ public class AgentEventListener {
         agentService.updateConnect(uid, false);
     }
 
+    
 }

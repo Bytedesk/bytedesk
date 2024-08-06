@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:47:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 13:25:20
+ * @LastEditTime: 2024-07-12 11:54:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.core.service_settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -82,7 +82,6 @@ public class ThreadLogService {
     // TODO: 频繁查库，待优化
     @Async
     public void autoCloseThread() {
-        // List<Thread> threads = threadService.findByExtraClosed();
         List<Thread> threads = threadService.findStatusOpen();
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 09:53:18
+ * @LastEditTime: 2024-08-04 15:47:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.service.agent;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.kbase.auto_reply.AutoReplySettings;
 import com.bytedesk.service.settings.ServiceSettingsRequest;
 
 import jakarta.validation.constraints.Email;
@@ -38,7 +39,6 @@ public class AgentRequest extends BaseRequest {
 
     @NotBlank
     private String nickname;
-
     // private String password;
 
     @Builder.Default
@@ -55,30 +55,24 @@ public class AgentRequest extends BaseRequest {
     private String description = I18Consts.I18N_AGENT_DESCRIPTION;
 
     @Builder.Default
-    // private String status = StatusConsts.AGENT_STATUS_PENDING;
-    private AgentStatus status = AgentStatus.AVAILABLE;
+    private AgentStatusEnum status = AgentStatusEnum.AVAILABLE;
 
     @Builder.Default
     private Integer maxThreadCount = 10;
 
     @Builder.Default
     private Integer currentThreadCount = 0;
-    
+
     @Builder.Default
     private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
 
-    // @Builder.Default
-    // private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
+    @Builder.Default
+    private AutoReplySettings autoReplySettings = new AutoReplySettings();
 
     // @Builder.Default
     // private Boolean enabled = true;
-    // 
+    //
     @NotBlank
     private String memberUid;
-
-    // private String userUid;
-
-    // @NotBlank
-    // private String orgUid;
 
 }

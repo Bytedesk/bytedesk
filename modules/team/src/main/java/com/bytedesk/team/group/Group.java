@@ -2,7 +2,7 @@
  * @Author: jack ning github@bytedesk.com
  * @Date: 2024-01-23 14:53:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-28 14:22:53
+ * @LastEditTime: 2024-07-19 08:37:19
  * @FilePath: /server/plugins/im/src/main/java/com/bytedesk/im/group/Group.java
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.team.member.Member;
@@ -52,10 +53,13 @@ public class Group extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_GROUP_DESCRIPTION;
 
+    // 是否显示顶部通知提示
     @Builder.Default
     private boolean showTopTip = false;
 
-    private String topTip;
+    // 通知栏提示
+    @Builder.Default
+    private String topTip = BdConstants.EMPTY_STRING;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)

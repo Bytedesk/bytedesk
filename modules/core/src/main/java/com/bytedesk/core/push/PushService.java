@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-08 10:24:56
+ * @LastEditTime: 2024-07-09 22:11:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,9 +23,16 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -43,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class PushService {
+public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     private final PushRepository pushRepository;
 
@@ -67,14 +74,14 @@ public class PushService {
         return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform, request);
     }
 
-    public Boolean sendSmsCode(String mobile, String client, String authType, 
+    public Boolean sendSmsCode(String mobile, String client, String authType,
             PlatformEnum platform, HttpServletRequest request) {
 
         return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, request);
     }
 
     // TODO: 验证限制同一个ip发送数量、频率
-    public Boolean sendCode(String receiver, String type, String client, String authType, 
+    public Boolean sendCode(String receiver, String type, String client, String authType,
             PlatformEnum platform,
             HttpServletRequest request) {
 
@@ -113,7 +120,7 @@ public class PushService {
 
         String ip = ipService.getIp(request);
         String ipLocation = ipService.getIpLocation(ip);
-        // 
+        //
         PushRequest pushRequest = new PushRequest();
         pushRequest.setType(type);
         pushRequest.setSender(TypeConsts.TYPE_SYSTEM);
@@ -127,15 +134,19 @@ public class PushService {
 
         return true;
     }
-    
-    public Push create(PushRequest pushRequest) {
+
+    public PushResponse create(PushRequest pushRequest) {
         log.info("pushRequest {}", pushRequest.toString());
 
         Push push = modelMapper.map(pushRequest, Push.class);
         push.setUid(uidUtils.getCacheSerialUid());
         push.setClient(pushRequest.getClient());
 
-        return save(push);
+        Push savedPush = save(push);
+        if (savedPush == null) {
+            throw new RuntimeException("create push failed");
+        }
+        return convertToResponse(savedPush);
     }
 
     public Boolean validateEmailCode(String email, String code) {
@@ -148,15 +159,17 @@ public class PushService {
 
     public Boolean validateCode(String receiver, String type, String code) {
         // check if has already send validate code within 15min
-        
-        // Boolean result = pushRepository.existsByStatusAndTypeAndReceiverAndContent(StatusConsts.CODE_STATUS_PENDING,
-        //         type, receiver, code);
+
+        // Boolean result =
+        // pushRepository.existsByStatusAndTypeAndReceiverAndContent(StatusConsts.CODE_STATUS_PENDING,
+        // type, receiver, code);
         // if (result) {
-        //     // TODO: 更新状态
+        // // TODO: 更新状态
         // }
         // return result;
-        // 
-        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatus.PENDING, type, receiver, code);
+        //
+        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatus.PENDING, type, receiver,
+                code);
         if (pushOptional.isPresent()) {
             // pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
             pushOptional.get().setStatus(PushStatus.CONFIRMED);
@@ -166,23 +179,30 @@ public class PushService {
         return false;
     }
 
-    // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result == null")
-    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(PushStatus status, String type, String receiver, String content) {
+    // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result
+    // == null")
+    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(PushStatus status, String type, String receiver,
+            String content) {
         return pushRepository.findByStatusAndTypeAndReceiverAndContent(status, type, receiver, content);
     }
 
     public Boolean existsByStatusAndTypeAndReceiver(PushStatus status, String type, String receiver) {
         return pushRepository.existsByStatusAndTypeAndReceiver(status, type, receiver);
     }
-    
+
     @Caching(put = {
         @CachePut(value = "push", key = "#push.receiver"),
         // TODO: 根据status, 缓存或清空缓存，clear or cache according to status
     })
     public Push save(Push push) {
-       return pushRepository.save(push);
+        try {
+            return pushRepository.save(push);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
     }
-    
+
     // TODO: 更新缓存
     @Cacheable(value = "pushPending")
     public List<Push> findStatusPending() {
@@ -210,9 +230,56 @@ public class PushService {
         });
     }
 
+    @Override
+    public Page<PushResponse> queryByOrg(PushRequest request) {
 
-    public PushResponse convertToPushResponse(Push push) {
-        return modelMapper.map(push, PushResponse.class);
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "updatedAt");
+        Specification<Push> specification = PushSpecification.search(request);
+        Page<Push> page = pushRepository.findAll(specification, pageable);
+
+        return page.map(push -> convertToResponse(push));
     }
-    
+
+    @Override
+    public Page<PushResponse> queryByUser(PushRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public Optional<Push> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+    }
+
+    @Override
+    public PushResponse update(PushRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    }
+
+    @Override
+    public void delete(Push entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Push entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    @Override
+    public PushResponse convertToResponse(Push entity) {
+        return modelMapper.map(entity, PushResponse.class);
+    }
+
 }

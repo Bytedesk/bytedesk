@@ -8,11 +8,12 @@ import io.netty.util.CharsetUtil;
 
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.socket.MqService;
+import com.bytedesk.core.socket.mqtt.MqttAuthService;
+import com.bytedesk.core.socket.mqtt.MqttSession;
+import com.bytedesk.core.socket.mqtt.MqttSessionService;
 import com.bytedesk.core.socket.mqtt.handler.MqttIdleStateHandler;
-import com.bytedesk.core.socket.mqtt.model.MqttSession;
-import com.bytedesk.core.socket.mqtt.service.*;
 import com.bytedesk.core.socket.mqtt.util.MqttConsts;
-import com.bytedesk.core.socket.service.MqService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

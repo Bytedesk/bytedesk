@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>联系微语 - 对话即服务 - 社交IM、企业IM、在线客服、AI助手</title>
+	<title>联系微语 - 对话即服务 - 企业IM、在线客服、AI客服、知识库AI问答</title>
 
 	<#--  Header  -->
 	<#include "./common/header_meta.ftl" />
@@ -34,7 +34,7 @@ Main Banner START -->
 			<div class="col-md-5">
 				<!-- Title -->
 				<h1 class="mb-3">基于AI全新打造</h1>
-				<h4 class="mb-3">社交IM、企业IM、在线客服、AI助手</h4>
+				<h4 class="mb-3">企业IM、在线客服、AI客服、知识库AI问答</h4>
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->
 				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>

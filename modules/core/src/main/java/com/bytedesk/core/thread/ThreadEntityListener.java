@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 09:58:01
+ * @LastEditTime: 2024-08-05 11:37:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,9 +14,7 @@
  */
 package com.bytedesk.core.thread;
 
-// import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.util.SerializationUtils;
-// import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -31,7 +29,6 @@ import jakarta.persistence.PostUpdate;
 @Component
 public class ThreadEntityListener {
     
-    // 需要传递 ThreadRequest 对象, 此处无法传递，故修改到 ThreadService 层
     @PostPersist
     public void postPersist(Thread thread) {
         // log.info("thread postPersist {}", thread.getUid());

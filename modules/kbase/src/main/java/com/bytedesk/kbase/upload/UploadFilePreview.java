@@ -1,0 +1,105 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-03-19 17:02:05
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-07-28 12:17:58
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.kbase.upload;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+
+/**
+ * 
+ */
+@RestController
+@AllArgsConstructor
+@RequestMapping("/file")
+public class UploadFilePreview {
+
+	private final UploadService uploadService;
+
+	/**
+	 * 浏览器下载文件
+	 * http://127.0.0.1:9003/file/download/20240319162820_img-service2.png
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	@GetMapping("/download/{filename:.+}")
+	@ResponseBody
+	public ResponseEntity<Resource> download(@PathVariable String filename) throws UnsupportedEncodingException {
+		Resource fileResource = uploadService.loadAsResource(filename);
+
+		if (fileResource == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		// 对文件名进行URL编码，以确保中文字符能够正确传输
+		String encodedFilename = URLEncoder.encode(fileResource.getFilename(), "UTF-8").replace("+", "%20");
+
+		// 设置HTTP响应头，包含经过编码的文件名
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentDispositionFormData("attachment", encodedFilename);
+
+		return ResponseEntity.ok().headers(headers).body(fileResource);
+	}
+
+	/**
+	 * 浏览器预览文件，或放到 <img src> 标签中在线展示
+	 * http://127.0.0.1:9003/file/20240319162820_img-service2.png
+	 * 
+	 * @param filename
+	 * @return
+	 * @throws IOException
+	 */
+	@GetMapping("/{filename:.+}")
+	@ResponseBody
+	public void preview(@PathVariable String filename, HttpServletResponse response) throws IOException {
+
+		Resource fileResource = uploadService.loadAsResource(filename);
+
+		// 文件预览
+		File file = fileResource.getFile();
+		FileInputStream fileInputStream = new FileInputStream(file);
+		// 清空response
+		response.reset();
+		// 2、设置文件下载方式
+		response.setCharacterEncoding("utf-8");
+		// response.setContentType("application/pdf");
+		OutputStream outputStream = response.getOutputStream();
+		int count = 0;
+		byte[] buffer = new byte[1024 * 1024];
+		while ((count = fileInputStream.read(buffer)) != -1) {
+			outputStream.write(buffer, 0, count);
+		}
+		outputStream.flush();
+		outputStream.close();
+		fileInputStream.close();
+	}
+
+}

@@ -14,12 +14,13 @@
     </changeSet> -->
     <!--  -->
     <!-- <include file="db/changelog/migration/_0.0.1_migrate.sql" />  -->
-     <!-- <include file="db/changelog/migration/240621_rename_isautopop.xml" /> -->
-     <!-- <include file="db/changelog/migration/240621-convert-message-type-to-enumstring.xml" /> -->
-     <!-- <include file="db/changelog/migration/240621-convert-message-status-to-enumstring.xml" /> -->
-     <!-- <include file="db/changelog/migration/240622-convert-robot-type-to-enumstring.xml" /> -->
-     <!-- <include file="db/changelog/migration/240622-convert-category-level-to-enumstring.xml" /> -->
-     <!-- <include file="db/changelog/migration/240622-convert-faq-type-to-enumstring.xml" /> -->
-     <!-- <include file="db/changelog/migration/240622-convert-quick-button-type-to-enumstring.xml" /> -->
+    <!-- <include file="db/changelog/migration/240621_rename_isautopop.xml" /> -->
+    <!-- <include file="db/changelog/migration/240621-convert-message-type-to-enumstring.xml" /> -->
+    <!-- <include file="db/changelog/migration/240711-create-oauth-table.xml" /> -->
+    <!-- <include file="db/changelog/migration/240713_add_auto_reply_enabled_to_agent_table.xml" /> -->
+    <!-- <include file="db/changelog/migration/240715_add_input_association_to_robot_agent_workgroup_table.xml" /> -->
+    <!-- <include file="db/changelog/migration/240715_add_show_history_to_service_settings_table.xml" /> -->
+    <!-- <include file="db/changelog/migration/240715_add_show_captcha_to_service_settings_table.xml" /> -->
+    <!-- <include file="db/changelog/migration/240715_add_rate_msg_count_to_service_settings_table.xml" /> -->
 
 </databaseChangeLog>

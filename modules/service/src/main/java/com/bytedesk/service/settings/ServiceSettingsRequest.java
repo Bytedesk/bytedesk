@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-22 09:13:10
+ * @LastEditTime: 2024-08-01 12:18:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,11 @@
  */
 package com.bytedesk.service.settings;
 
-import com.bytedesk.core.service_settings.BaseServiceSettingsRequest;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bytedesk.kbase.service_settings.BaseServiceSettingsRequest;
+import com.bytedesk.service.leave_msg.LeaveMsgSettings;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -33,10 +37,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class ServiceSettingsRequest extends BaseServiceSettingsRequest {
 
-    /**
-     * robot
-     * 是否默认机器人接待
-     */
+    // 默认机器人接待
     @Builder.Default
     private Boolean defaultRobot = false;
 
@@ -47,6 +48,15 @@ public class ServiceSettingsRequest extends BaseServiceSettingsRequest {
     /** 非工作时间段，是否启用机器人接待 */
     @Builder.Default
     private Boolean nonWorktimeRobot = false;
+
+    @Builder.Default
+    private List<String> worktimeUids = new ArrayList<>();
+
+    // @Builder.Default
+    // private AutoReplySettings autoReplySettings = new AutoReplySettings();
+
+    @Builder.Default
+    private LeaveMsgSettings LeaveMsgSettings = new LeaveMsgSettings();
 
     private String robotUid;
 

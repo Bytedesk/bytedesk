@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 16:44:40
+ * @LastEditTime: 2024-08-04 12:16:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -34,25 +34,22 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class AsistantService {
-    
+
     private final AsistantRepository asistantRepository;
 
-    // private final UserService userService;
-
-    // private final ThreadService threadService;
-
     private final ModelMapper modelMapper;
-    
+
     private final UidUtils uidUtils;
 
     public Page<AsistantResponse> query(AsistantRequest asistantRequest) {
-        
-        Pageable pageable = PageRequest.of(asistantRequest.getPageNumber(), asistantRequest.getPageSize(), Sort.Direction.ASC,
+
+        Pageable pageable = PageRequest.of(asistantRequest.getPageNumber(), asistantRequest.getPageSize(),
+                Sort.Direction.ASC,
                 "id");
 
         Page<Asistant> asistantPage = asistantRepository.findAll(pageable);
 
-        return asistantPage.map(asistant -> convertToAsistantResponse(asistant));
+        return asistantPage.map(asistant -> convertToResponse(asistant));
     }
 
     public Asistant create(AsistantRequest asistantRequest) {
@@ -61,21 +58,21 @@ public class AsistantService {
         if (!StringUtils.hasText(asistant.getUid())) {
             asistant.setUid(uidUtils.getCacheSerialUid());
         }
-        
+
         return save(asistant);
     }
-    
+
     private Asistant save(Asistant asistant) {
         return asistantRepository.save(asistant);
     }
 
-    public AsistantResponse convertToAsistantResponse(Asistant asistant) {
+    public AsistantResponse convertToResponse(Asistant asistant) {
         return modelMapper.map(asistant, AsistantResponse.class);
     }
 
-    // 
+    //
     public void initData() {
-        
+
         if (asistantRepository.count() > 0) {
             return;
         }
@@ -86,13 +83,10 @@ public class AsistantService {
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .description(I18Consts.I18N_FILE_ASISTANT_DESCRIPTION)
                 .build();
-        asistantRequest.setUid(UserConsts.DEFAULT_FILE_ASISTANT_UID);
+        asistantRequest.setUid(BdConstants.DEFAULT_FILE_ASISTANT_UID);
         asistantRequest.setType(TypeConsts.TYPE_SYSTEM);
-        asistantRequest.setOrgUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+        // asistantRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
         create(asistantRequest);
-
     }
-
-
 
 }

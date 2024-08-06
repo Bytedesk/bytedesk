@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 22:22:08
+ * @LastEditTime: 2024-07-17 23:50:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,14 +45,6 @@ public class DepartmentService {
 
     private final UidUtils uidUtils;
 
-    // public List<DepartmentResponse> queryAll(DepartmentRequest departmentRequest)
-    // {
-    // List<Department> departments = departmentRepository
-    // .findByOrgUidAndParentAndDeleted(departmentRequest.getOrgUid(), null, false);
-    // return Arrays.asList(modelMapper.map(departments,
-    // DepartmentResponse[].class));
-    // }
-
     public Page<DepartmentResponse> queryByOrg(DepartmentRequest departmentRequest) {
 
         Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(),
@@ -61,15 +53,12 @@ public class DepartmentService {
 
         Specification<Department> specification = DepartmentSpecification.search(departmentRequest);
         Page<Department> page = departmentRepository.findAll(specification, pageable);
-        // Page<Department> page = departmentRepository.findByOrgUidAndParentAndDeleted(departmentRequest.getOrgUid(),
-        //         null, false,
-        //         pageable);
 
         return page.map(this::convertToResponse);
     }
 
     public DepartmentResponse create(DepartmentRequest departmentRequest) {
-        
+
         Department department = modelMapper.map(departmentRequest, Department.class);
         department.setUid(uidUtils.getCacheSerialUid());
 
@@ -150,11 +139,10 @@ public class DepartmentService {
     public void initData() {
 
         if (departmentRepository.count() > 0) {
-            log.debug("department already exist");
             return;
         }
         //
-        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
         //
         Department[] departments = new Department[] {
                 Department.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)

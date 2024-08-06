@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-28 12:19:22
+ * @LastEditTime: 2024-08-05 22:55:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.team.member;
 
+import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,22 +30,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-// import com.bytedesk.core.event.BytedeskEventPublisher;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.department.Department;
 import com.bytedesk.team.department.DepartmentService;
+import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,21 +60,21 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MemberService {
 
-    private UserService userService;
+    private final UserService userService;
 
-    private DepartmentService departmentService;
+    private final DepartmentService departmentService;
 
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    private UidUtils uidUtils;
+    private final UidUtils uidUtils;
 
-    private AuthService authService;
+    private final AuthService authService;
 
-    private BytedeskProperties bytedeskProperties;
+    private final BytedeskProperties bytedeskProperties;
 
-    // private BytedeskEventPublisher bytedeskEventPublisher;
+    private final ThreadService threadService;
 
     public Page<MemberResponse> queryByOrg(MemberRequest memberRequest) {
 
@@ -78,9 +84,6 @@ public class MemberService {
 
         Specification<Member> spec = MemberSpecification.search(memberRequest);
         Page<Member> memberPage = memberRepository.findAll(spec, pageable);
-        // Page<Member> memberPage =
-        // memberRepository.findByOrgUidAndDeleted(memberRequest.getOrgUid(), false,
-        // pageable);
 
         return memberPage.map(this::convertToResponse);
     }
@@ -128,7 +131,7 @@ public class MemberService {
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = modelMapper.map(memberRequest, UserRequest.class);
         userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
-        userRequest.setPlatform(PlatformEnum.BYTEDESK.getValue());
+        userRequest.setPlatform(PlatformEnum.BYTEDESK);
         userRequest.setOrgUid(depOptional.get().getOrgUid());
         //
         User user = null;
@@ -234,6 +237,10 @@ public class MemberService {
         return null;
     }
 
+    public void save(List<Member> members) {
+        memberRepository.saveAll(members);
+    }
+
     public void deleteByUid(String uid) {
         Optional<Member> memberOptional = findByUid(uid);
         memberOptional.ifPresent(member -> {
@@ -246,6 +253,20 @@ public class MemberService {
         return modelMapper.map(member, MemberResponse.class);
     }
 
+    public Member convertExcelToMember(MemberExcel memberExcel, String orgUid) {
+        // Member member = Member.builder().build();
+        Member member = modelMapper.map(memberExcel, Member.class);
+        member.setUid(uidUtils.getCacheSerialUid());
+        member.setOrgUid(orgUid);
+        // TODO: 生成user
+
+        return member;
+    }
+
+    public MemberExcel convertToExcel(MemberResponse member) {
+        return modelMapper.map(member, MemberExcel.class);
+    }
+
     // TODO: 待处理
     private void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Member member) {
         // 可以在这里实现重试逻辑，例如使用递归调用或定时任务
@@ -253,6 +274,66 @@ public class MemberService {
         log.error("Optimistic locking failure for member: {}", member.getUid());
         // e.printStackTrace();
         // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
+    }
+
+     /** 同事私聊会话：org/member/{self_member_uid}/{other_member_uid} */
+    public Thread createMemberReverseThread(Thread thread) {
+        // 
+        String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
+        if (threadService.existsByUid(reverseUid)) {
+            return getMemberReverseThread(thread);
+        }
+        String[] splits = thread.getTopic().split("/");
+        if (splits.length != 4) {
+            throw new RuntimeException("reverse thread topic format error");
+        }
+        //
+        String originalMemberUid = splits[2];
+        String reverseMemberUid = splits[3];
+        String reverseTopic = TopicUtils.TOPIC_ORG_MEMBER_PREFIX + reverseMemberUid + "/" + originalMemberUid;
+        Optional<Member> reverseMemberOptional = findByUid(reverseMemberUid);
+        if (!reverseMemberOptional.isPresent()) {
+            throw new RuntimeException("getMemberReverseThread member not found");
+        }
+        Thread reverseThread = Thread.builder().build();
+        reverseThread.setUid(reverseUid);
+        reverseThread.setTopic(reverseTopic);
+        reverseThread.setUnreadCount(0);
+        //
+        Optional<Member> originalMemberOptional = findByUid(originalMemberUid);
+        if (originalMemberOptional.isPresent()) {
+            UserProtobuf user = UserProtobuf.builder()
+                    .nickname(originalMemberOptional.get().getNickname())
+                    .avatar(originalMemberOptional.get().getAvatar())
+                    .build();
+            user.setUid(originalMemberOptional.get().getUid());
+            reverseThread.setUser(JSON.toJSONString(user));
+        }
+        //
+        reverseThread.setContent(thread.getContent());
+        // reverseThread.setExtra(thread.getExtra());
+        reverseThread.setType(thread.getType());
+        // TODO: 同事私聊被动方默认不显示会话，直到收到一条消息
+        // reverseThread.setHide(true);
+        reverseThread.setClient(ClientEnum.SYSTEM);
+        reverseThread.setOrgUid(thread.getOrgUid());
+        reverseThread.setOwner(reverseMemberOptional.get().getUser());
+        //
+        Thread savedTherad = threadService.save(reverseThread);
+        if (savedTherad == null) {
+            throw new RuntimeException("reverseThread save error");
+        }
+        return savedTherad;
+    }
+
+    /** 同事私聊会话：org/member/{self_member_uid}/{other_member_uid} */
+    public Thread getMemberReverseThread(Thread thread) {
+        String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
+        Optional<Thread> reverseThreadOptional = threadService.findByUid(reverseUid);
+        if (!reverseThreadOptional.isPresent()) {
+            throw new RuntimeException("reverseThread not found");
+        }
+        return reverseThreadOptional.get();
     }
 
     //
@@ -273,7 +354,7 @@ public class MemberService {
             return;
         }
         //
-        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
         for (int i = 0; i < departments.length; i++) {
             String department = departments[i];
             Optional<Department> depOptional = departmentService.findByNameAndOrgUid(department, orgUid);
@@ -287,7 +368,6 @@ public class MemberService {
                             .telephone("000")
                             .mobile(bytedeskProperties.getMobile())
                             .email(bytedeskProperties.getEmail())
-                            // .orgUid(orgUid)
                             .depUid(depOptional.get().getUid())
                             .build();
                     memberRequest.setOrgUid(orgUid);
@@ -296,13 +376,13 @@ public class MemberService {
                     String userNo = String.format("%03d", i);
                     MemberRequest memberRequest = MemberRequest.builder()
                             .jobNo(userNo)
+                            .jobTitle(I18Consts.I18N_MEMBER)
                             .password(bytedeskProperties.getPasswordDefault())
                             .nickname("User" + userNo)
                             .seatNo(userNo)
                             .telephone(userNo)
                             .mobile("12345678" + userNo)
                             .email(userNo + "@email.com")
-                            // .orgUid(orgUid)
                             .depUid(depOptional.get().getUid())
                             .build();
                     memberRequest.setOrgUid(orgUid);

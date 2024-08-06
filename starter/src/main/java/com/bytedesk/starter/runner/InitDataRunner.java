@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 11:00:07
+ * @LastEditTime: 2024-08-02 09:54:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,17 +24,18 @@ import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.asistant.AsistantService;
 import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.channel.ChannelService;
-import com.bytedesk.core.faq.FaqService;
 import com.bytedesk.core.quartz.QuartzService;
-import com.bytedesk.core.quick_button.QuickButtonService;
+// import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.authority.AuthorityService;
 import com.bytedesk.core.rbac.organization.OrganizationService;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.upload.UploadService;
 import com.bytedesk.service.agent.AgentService;
-import com.bytedesk.service.quick_reply.QuickReplyService;
+import com.bytedesk.kbase.faq.FaqService;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
+import com.bytedesk.kbase.quick_reply.QuickReplyService;
+import com.bytedesk.kbase.upload.UploadService;
 import com.bytedesk.service.workgroup.WorkgroupService;
 import com.bytedesk.team.department.DepartmentService;
 import com.bytedesk.team.member.MemberService;
@@ -79,6 +80,9 @@ public class InitDataRunner implements ApplicationRunner {
     MemberService memberService;
 
     @Autowired
+    KnowledgebaseService kownledgebaseService;
+
+    @Autowired
     RobotService robotService;
 
     @Autowired
@@ -89,9 +93,6 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Autowired
     FaqService faqService;
-
-    @Autowired
-    QuickButtonService quickButtonService;
 
     @Autowired
     WorkgroupService workgroupService;
@@ -107,6 +108,9 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Autowired
     QuickReplyService quickReplyService;
+
+    // @Autowired
+    // LogEventProducer logEventProducer;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -130,11 +134,13 @@ public class InitDataRunner implements ApplicationRunner {
 
         memberService.initData();
 
+        kownledgebaseService.initData();
+
         categoryService.initData();
 
         faqService.initData();
 
-        quickButtonService.initData();
+        // quickButtonService.initData();
 
         robotService.initData();
 
@@ -149,6 +155,8 @@ public class InitDataRunner implements ApplicationRunner {
         quartzService.initData();
 
         quickReplyService.initData();
+
+        // logEventProducer.simulate();
 
         log.debug("application started. you can now open: http://127.0.0.1:{}/dev", port);
     }

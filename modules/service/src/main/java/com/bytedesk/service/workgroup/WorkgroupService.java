@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-08 11:12:26
+ * @LastEditTime: 2024-07-12 17:51:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,14 +34,14 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.quick_button.QuickButton;
-import com.bytedesk.core.quick_button.QuickButtonService;
-import com.bytedesk.core.rbac.user.UserConsts;
+// import com.bytedesk.core.quick_button.QuickButton;
+// import com.bytedesk.core.quick_button.QuickButtonService;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentService;
-import com.bytedesk.core.faq.Faq;
-import com.bytedesk.core.faq.FaqService;
+import com.bytedesk.kbase.faq.Faq;
+import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.settings.ServiceSettingsRequest;
 import com.bytedesk.service.utils.ConvertServiceUtils;
@@ -64,7 +64,7 @@ public class WorkgroupService {
 
     private final WorktimeService worktimeService;
 
-    private final QuickButtonService quickButtonService;
+    // private final QuickButtonService quickButtonService;
 
     private final FaqService faqService;
 
@@ -126,22 +126,25 @@ public class WorkgroupService {
             }
         }
         //
-        if (workgroupRequest.getServiceSettings() != null
-                && workgroupRequest.getServiceSettings().getQuickButtonUids() != null
-                && workgroupRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
-            Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickButtonUids().iterator();
-            while (iterator.hasNext()) {
-                String quickButtonUid = iterator.next();
-                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
-                if (quickButtonOptional.isPresent()) {
-                    QuickButton quickButtonEntity = quickButtonOptional.get();
+        // if (workgroupRequest.getServiceSettings() != null
+        // && workgroupRequest.getServiceSettings().getQuickButtonUids() != null
+        // && workgroupRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
+        // Iterator<String> iterator =
+        // workgroupRequest.getServiceSettings().getQuickButtonUids().iterator();
+        // while (iterator.hasNext()) {
+        // String quickButtonUid = iterator.next();
+        // Optional<QuickButton> quickButtonOptional =
+        // quickButtonService.findByUid(quickButtonUid);
+        // if (quickButtonOptional.isPresent()) {
+        // QuickButton quickButtonEntity = quickButtonOptional.get();
 
-                    workgroup.getServiceSettings().getQuickButtons().add(quickButtonEntity);
-                } else {
-                    throw new RuntimeException("quickButtonUid " + quickButtonUid + " not found");
-                }
-            }
-        }
+        // workgroup.getServiceSettings().getQuickButtons().add(quickButtonEntity);
+        // } else {
+        // throw new RuntimeException("quickButtonUid " + quickButtonUid + " not
+        // found");
+        // }
+        // }
+        // }
         //
         if (workgroupRequest.getServiceSettings() != null
                 && workgroupRequest.getServiceSettings().getFaqUids() != null
@@ -156,6 +159,22 @@ public class WorkgroupService {
                     workgroup.getServiceSettings().getFaqs().add(faqEntity);
                 } else {
                     throw new RuntimeException("faq " + faqUid + " not found");
+                }
+            }
+        }
+        if (workgroupRequest.getServiceSettings() != null
+                && workgroupRequest.getServiceSettings().getQuickFaqUids() != null
+                && workgroupRequest.getServiceSettings().getQuickFaqUids().size() > 0) {
+            Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String quickFaqUid = iterator.next();
+                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                if (quickFaqOptional.isPresent()) {
+                    Faq quickFaqEntity = quickFaqOptional.get();
+                    log.info("quickFaqUid added {}", quickFaqUid);
+                    workgroup.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
+                } else {
+                    throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
                 }
             }
         }
@@ -207,22 +226,25 @@ public class WorkgroupService {
             }
         }
         //
-        if (workgroupRequest.getServiceSettings() != null
-                && workgroupRequest.getServiceSettings().getQuickButtonUids() != null
-                && workgroupRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
-            Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickButtonUids().iterator();
-            while (iterator.hasNext()) {
-                String quickButtonUid = iterator.next();
-                Optional<QuickButton> quickButtonOptional = quickButtonService.findByUid(quickButtonUid);
-                if (quickButtonOptional.isPresent()) {
-                    QuickButton quickButtonEntity = quickButtonOptional.get();
+        // if (workgroupRequest.getServiceSettings() != null
+        // && workgroupRequest.getServiceSettings().getQuickButtonUids() != null
+        // && workgroupRequest.getServiceSettings().getQuickButtonUids().size() > 0) {
+        // Iterator<String> iterator =
+        // workgroupRequest.getServiceSettings().getQuickButtonUids().iterator();
+        // while (iterator.hasNext()) {
+        // String quickButtonUid = iterator.next();
+        // Optional<QuickButton> quickButtonOptional =
+        // quickButtonService.findByUid(quickButtonUid);
+        // if (quickButtonOptional.isPresent()) {
+        // QuickButton quickButtonEntity = quickButtonOptional.get();
 
-                    serviceSettings.getQuickButtons().add(quickButtonEntity);
-                } else {
-                    throw new RuntimeException("quickButtonUid " + quickButtonUid + " not found");
-                }
-            }
-        }
+        // serviceSettings.getQuickButtons().add(quickButtonEntity);
+        // } else {
+        // throw new RuntimeException("quickButtonUid " + quickButtonUid + " not
+        // found");
+        // }
+        // }
+        // }
         //
         if (workgroupRequest.getServiceSettings() != null
                 && workgroupRequest.getServiceSettings().getFaqUids() != null
@@ -237,6 +259,22 @@ public class WorkgroupService {
                     serviceSettings.getFaqs().add(faqEntity);
                 } else {
                     throw new RuntimeException("faq " + faqUid + " not found");
+                }
+            }
+        }
+        if (workgroupRequest.getServiceSettings() != null
+                && workgroupRequest.getServiceSettings().getQuickFaqUids() != null
+                && workgroupRequest.getServiceSettings().getQuickFaqUids().size() > 0) {
+            Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickFaqUids().iterator();
+            while (iterator.hasNext()) {
+                String quickFaqUid = iterator.next();
+                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                if (quickFaqOptional.isPresent()) {
+                    Faq quickFaqEntity = quickFaqOptional.get();
+                    log.info("quickFaqUid added {}", quickFaqUid);
+                    serviceSettings.getQuickFaqs().add(quickFaqEntity);
+                } else {
+                    throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
                 }
             }
         }
@@ -300,7 +338,7 @@ public class WorkgroupService {
                 }
             }
         }
-        // 
+        //
         workgroup.setServiceSettings(serviceSettings);
         //
         workgroup.getAgents().clear();
@@ -360,18 +398,18 @@ public class WorkgroupService {
             return;
         }
 
-        String orgUid = UserConsts.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
         //
         List<String> agentUids = Arrays.asList(
-                UserConsts.DEFAULT_AGENT_UID);
+                BdConstants.DEFAULT_AGENT_UID);
         //
         List<String> faqUids = Arrays.asList(
                 orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
                 orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
         //
-        List<String> quickButtonUids = Arrays.asList(
-                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
-                orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
+        // List<String> quickButtonUids = Arrays.asList(
+        // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+        // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
         //
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();
@@ -382,11 +420,11 @@ public class WorkgroupService {
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
                 .agentUids(agentUids)
                 .build();
-        workgroupRequest.setUid(UserConsts.DEFAULT_WORKGROUP_UID);
+        workgroupRequest.setUid(BdConstants.DEFAULT_WORKGROUP_UID);
         workgroupRequest.setOrgUid(orgUid);
         //
         workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setQuickButtonUids(quickButtonUids);
+        workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
         workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
         //
         create(workgroupRequest);

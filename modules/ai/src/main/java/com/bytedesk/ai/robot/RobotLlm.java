@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-06 13:27:21
+ * @LastEditTime: 2024-07-25 06:55:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,8 +19,6 @@ import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,15 +43,16 @@ public class RobotLlm {
 
     @Builder.Default
     private Double scoreThreshold = 0.5;
-
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private RobotModelEnum model = RobotModelEnum.ZHIPUAI_GLM_3_TURBO;
     
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    // private String embeddings = "m3e-base";
-    private RobotEmbedingEnum embeddings = RobotEmbedingEnum.M3E_BASE;
+    // @Enumerated(EnumType.STRING)
+    private String model = "ZHIPUAI_GLM_3_TURBO";
+    // private RobotModelEnum model = RobotModelEnum.ZHIPUAI_GLM_3_TURBO;
+    
+    // @Builder.Default
+    // // @Enumerated(EnumType.STRING)
+    // private String embeddings = "M3E_BASE";
+    // // private RobotEmbedingEnum embeddings = RobotEmbedingEnum.M3E_BASE;
 
     @Builder.Default
     private float temperature = 0.9f;
@@ -64,6 +63,8 @@ public class RobotLlm {
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String prompt = I18Consts.I18N_ROBOT_LLM_PROMPT;
+    // private String promptTemplate =
+    // "请根据上下文信息回答问题：\n\n上下文信息：\n{context}\n\n问题：{question}\n\n答案：";
 
     // 上下文消息数，默认3条。一同传递给大模型
     @Builder.Default

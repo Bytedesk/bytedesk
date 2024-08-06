@@ -23,7 +23,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -46,15 +45,12 @@ public class UserOrganizationRole implements Serializable  {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "organization_id")
     private Organization organization;
 
     @ManyToOne
-    @JoinColumn(name = "role_id")
     private Role role;
     
     // 可能还有其他字段，如权限、有效期等

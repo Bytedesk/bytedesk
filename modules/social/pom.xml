@@ -6,12 +6,12 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-    	<artifactId>modules</artifactId>
-    	<version>${revision}</version>
+		<artifactId>modules</artifactId>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>bytedesk-module-social</artifactId>
-	
+
 	<name>bytedesk-module-social</name>
 	<description>Demo project for Spring Boot</description>
 

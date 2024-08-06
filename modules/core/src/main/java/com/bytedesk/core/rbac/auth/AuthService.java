@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 17:06:16
+ * @LastEditTime: 2024-07-24 17:58:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -103,7 +103,7 @@ public class AuthService {
 
         UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
 
-        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform().getValue());
+        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform().name());
 
         return AuthResponse.builder()
                 .accessToken(jwt)

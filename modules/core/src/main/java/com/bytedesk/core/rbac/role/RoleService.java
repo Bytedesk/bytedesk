@@ -32,7 +32,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.authority.Authority;
 import com.bytedesk.core.rbac.authority.AuthorityService;
-import com.bytedesk.core.rbac.user.UserConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -144,7 +144,7 @@ public class RoleService {
                         return;
                 }
                 //
-                initOrgRoles(UserConsts.DEFAULT_ORGANIZATION_UID);
+                initOrgRoles(BdConstants.DEFAULT_ORGANIZATION_UID);
         }
 
 }

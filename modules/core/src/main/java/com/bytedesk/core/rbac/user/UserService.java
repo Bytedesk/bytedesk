@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-03 06:40:12
+ * @LastEditTime: 2024-07-26 18:46:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
@@ -68,50 +69,52 @@ public class UserService {
     private final OrganizationRepository organizationRepository;
 
     @Transactional
-    public UserResponse register(UserRequest userRequest) {
+    public UserResponse register(UserRequest request) {
 
-        if (StringUtils.hasText(userRequest.getEmail())
-                && existsByEmailAndPlatform(userRequest.getEmail(),
-                        PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new EmailExistsException("Email " + userRequest.getEmail() + " already exists..!!");
+        if (StringUtils.hasText(request.getEmail())
+                && existsByEmailAndPlatform(request.getEmail(),
+                        request.getPlatform())) {
+            throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
         }
-        if (StringUtils.hasText(userRequest.getMobile())
-                && existsByMobileAndPlatform(userRequest.getMobile(),
-                        PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            throw new MobileExistsException("Mobile " + userRequest.getMobile() + " already exists..!!");
+        if (StringUtils.hasText(request.getMobile())
+                && existsByMobileAndPlatform(request.getMobile(),
+                        request.getPlatform())) {
+            throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         //
-        User user = modelMapper.map(userRequest, User.class);
+        User user = modelMapper.map(request, User.class);
         user.setUid(uidUtils.getCacheSerialUid());
-        user.setPlatform(PlatformEnum.fromValue(userRequest.getPlatform()));
+        user.setPlatform(request.getPlatform());
         //
-        if (StringUtils.hasText(userRequest.getNickname())) {
-            user.setNickname(userRequest.getNickname());
+        if (StringUtils.hasText(request.getNickname())) {
+            user.setNickname(request.getNickname());
+        } else if (StringUtils.hasText(request.getMobile())) {
+            user.setNickname("User" + request.getMobile().substring(7));
         } else {
             user.setNickname(createNickname());
         }
         //
-        if (StringUtils.hasText(userRequest.getAvatar())) {
-            user.setAvatar(userRequest.getAvatar());
+        if (StringUtils.hasText(request.getAvatar())) {
+            user.setAvatar(request.getAvatar());
         } else {
             user.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         }
         //
-        if (StringUtils.hasText(userRequest.getPassword())) {
-            String rawPassword = userRequest.getPassword();
+        if (StringUtils.hasText(request.getPassword())) {
+            String rawPassword = request.getPassword();
             String encodedPassword = passwordEncoder.encode(rawPassword);
             user.setPassword(encodedPassword);
         }
         // 只有经过验证的邮箱，才真正执行注册
-        if (StringUtils.hasText(userRequest.getEmail())) {
-            user.setUsername(userRequest.getEmail());
-            user.setNum(userRequest.getEmail());
+        if (StringUtils.hasText(request.getEmail())) {
+            user.setUsername(request.getEmail());
+            user.setNum(request.getEmail());
             // 默认注册时，仅验证手机号，无需验证邮箱
             user.setEmailVerified(false);
         }
         // 只有经过验证的手机号，才真正执行注册
-        if (StringUtils.hasText(userRequest.getMobile())) {
-            user.setNum(userRequest.getMobile());
+        if (StringUtils.hasText(request.getMobile())) {
+            user.setNum(request.getMobile());
             user.setMobileVerified(true);
         }
         user.setEnabled(true);
@@ -124,57 +127,57 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse update(UserRequest userRequest) {
+    public UserResponse update(UserRequest request) {
 
         User currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
         Optional<User> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            if (StringUtils.hasText(userRequest.getUsername())) {
+            if (StringUtils.hasText(request.getUsername())) {
                 // 如果新用户名跟旧用户名不同，需要首先判断新用户名是否已经存在，如果存在则抛出异常
-                if (!userRequest.getUsername().equals(user.getUsername())) {
-                    if (existsByUsernameAndPlatform(userRequest.getUsername(),
-                            PlatformEnum.fromValue(userRequest.getPlatform()))) {
+                if (!request.getUsername().equals(user.getUsername())) {
+                    if (existsByUsernameAndPlatform(request.getUsername(),
+                            request.getPlatform())) {
                         throw new UsernameExistsException(
-                                "Username " + userRequest.getUsername() + " already exists..!!");
+                                "Username " + request.getUsername() + " already exists..!!");
                     }
                 }
-                user.setUsername(userRequest.getUsername());
+                user.setUsername(request.getUsername());
             }
 
-            if (StringUtils.hasText(userRequest.getNickname())) {
-                user.setNickname(userRequest.getNickname());
+            if (StringUtils.hasText(request.getNickname())) {
+                user.setNickname(request.getNickname());
             }
 
-            if (StringUtils.hasText(userRequest.getAvatar())) {
-                user.setAvatar(userRequest.getAvatar());
+            if (StringUtils.hasText(request.getAvatar())) {
+                user.setAvatar(request.getAvatar());
             }
 
-            if (StringUtils.hasText(userRequest.getEmail())) {
+            if (StringUtils.hasText(request.getEmail())) {
                 // 如果新邮箱跟旧邮箱不同，需要首先判断新邮箱是否已经存在，如果存在则抛出异常
-                if (!userRequest.getEmail().equals(user.getEmail())) {
-                    if (existsByEmailAndPlatform(userRequest.getEmail(),
-                            PlatformEnum.fromValue(userRequest.getPlatform()))) {
-                        throw new EmailExistsException("Email " + userRequest.getEmail() + " already exists..!!");
+                if (!request.getEmail().equals(user.getEmail())) {
+                    if (existsByEmailAndPlatform(request.getEmail(),
+                            request.getPlatform())) {
+                        throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
                     }
                 }
-                user.setEmail(userRequest.getEmail());
+                user.setEmail(request.getEmail());
             }
 
-            if (StringUtils.hasText(userRequest.getMobile())) {
+            if (StringUtils.hasText(request.getMobile())) {
                 // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
-                if (!userRequest.getMobile().equals(user.getMobile())) {
-                    if (existsByMobileAndPlatform(userRequest.getMobile(),
-                            PlatformEnum.fromValue(userRequest.getPlatform()))) {
-                        throw new MobileExistsException("Mobile " + userRequest.getMobile() + " already exists..!!");
+                if (!request.getMobile().equals(user.getMobile())) {
+                    if (existsByMobileAndPlatform(request.getMobile(),
+                            request.getPlatform())) {
+                        throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
                     }
                 }
-                user.setMobile(userRequest.getMobile());
+                user.setMobile(request.getMobile());
             }
 
-            if (StringUtils.hasText(userRequest.getDescription())) {
-                user.setDescription(userRequest.getDescription());
+            if (StringUtils.hasText(request.getDescription())) {
+                user.setDescription(request.getDescription());
             }
 
             // TODO: 设置角色role
@@ -192,15 +195,15 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse changePassword(UserRequest userRequest) {
+    public UserResponse changePassword(UserRequest request) {
 
         User currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
         Optional<User> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             String oldEncryptedPassword = user.getPassword(); // 假设这是数据库中加密后的密码
-            String oldRawPassword = userRequest.getOldPassword(); // 用户输入的旧密码
-            String newRawPassword = userRequest.getNewPassword(); // 用户输入的新密码
+            String oldRawPassword = request.getOldPassword(); // 用户输入的旧密码
+            String newRawPassword = request.getNewPassword(); // 用户输入的新密码
 
             // 验证旧密码
             if (oldEncryptedPassword == null || passwordEncoder.matches(oldRawPassword, oldEncryptedPassword)) {
@@ -220,55 +223,56 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(UserRequest userRequest) {
+    public User createUser(UserRequest request) {
         //
-        if (existsByMobileAndPlatform(userRequest.getMobile(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            Optional<User> userOptional = findByMobileAndPlatform(userRequest.getMobile(),
-                    PlatformEnum.fromValue(userRequest.getPlatform()));
+        if (StringUtils.hasText(request.getMobile())
+            && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
+            Optional<User> userOptional = findByMobileAndPlatform(request.getMobile(), request.getPlatform());
             return userOptional.get();
-            // throw new MobileExistsException("Mobile " + userRequest.getMobile() + " on "
-            // + userRequest.getPlatform()+" already exists..!!");
         }
 
-        if (existsByEmailAndPlatform(userRequest.getEmail(), PlatformEnum.fromValue(userRequest.getPlatform()))) {
-            Optional<User> userOptional = findByEmailAndPlatform(userRequest.getEmail(),
-                    PlatformEnum.fromValue(userRequest.getPlatform()));
+        if (StringUtils.hasText(request.getEmail())
+                && existsByEmailAndPlatform(request.getEmail(), request.getPlatform())) {
+            Optional<User> userOptional = findByEmailAndPlatform(request.getEmail(),
+                    request.getPlatform());
             return userOptional.get();
-            // throw new EmailExistsException("Email " + userRequest.getEmail() + " on " +
-            // userRequest.getPlatform() + " already exists..!!");
         }
-
         //
         User user = User.builder()
-                .avatar(userRequest.getAvatar())
-                .username(userRequest.getEmail())
-                .nickname(userRequest.getNickname())
-                .mobile(userRequest.getMobile())
-                .num(userRequest.getMobile())
-                .email(userRequest.getEmail())
+                .avatar(request.getAvatar())
+                // .username(request.getEmail())
+                .nickname(request.getNickname())
+                .mobile(request.getMobile())
+                .num(request.getMobile())
+                .email(request.getEmail())
                 .superUser(false)
                 .emailVerified(false)
                 .mobileVerified(false)
-                .password(userRequest.getPassword())
+                .password(request.getPassword())
                 .build();
         user.setUid(uidUtils.getCacheSerialUid());
+        // 
+        if (StringUtils.hasText(request.getEmail())) {
+            user.setUsername(request.getEmail());
+        } else if (StringUtils.hasText(request.getMobile())) {
+            user.setUsername(request.getMobile());
+        }
         //
-        if (StringUtils.hasText(userRequest.getPassword())) {
-            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        if (StringUtils.hasText(request.getPassword())) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         } else {
             user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
         }
-        // 
-        Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
-        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE,
-                UserConsts.DEFAULT_ORGANIZATION_UID);
+        //
+        Optional<Organization> orgOptional = organizationRepository.findByUid(request.getOrgUid());
+        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE, request.getOrgUid());
         if (orgOptional.isPresent() && roleOptional.isPresent()) {
             Organization organization = orgOptional.get();
             Role role = roleOptional.get();
             //
             user.addOrganizationRole(organization, role);
         }
-        // 
+        //
         return save(user);
     }
 
@@ -313,17 +317,26 @@ public class UserService {
 
     //
     @Cacheable(value = "userExists", key = "#username", unless = "#result == null")
-    public Boolean existsByUsernameAndPlatform(String username, PlatformEnum platform) {
+    public Boolean existsByUsernameAndPlatform(@NonNull String username, @NonNull PlatformEnum platform) {
+        if (!StringUtils.hasText(username)) {
+            return false;
+        }
         return userRepository.existsByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
     @Cacheable(value = "userExists", key = "#mobile", unless = "#result == null")
-    public Boolean existsByMobileAndPlatform(String mobile, PlatformEnum platform) {
+    public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull PlatformEnum platform) {
+        if (!StringUtils.hasText(mobile)) {
+            return false;
+        }
         return userRepository.existsByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
     @Cacheable(value = "userExists", key = "#email", unless = "#result == null")
-    public Boolean existsByEmailAndPlatform(String email, PlatformEnum platform) {
+    public Boolean existsByEmailAndPlatform(@NonNull String email, @NonNull PlatformEnum platform) {
+        if (!StringUtils.hasText(email)) {
+            return false;
+        }
         return userRepository.existsByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
@@ -392,10 +405,10 @@ public class UserService {
     }
 
     public void updateInitData() {
-        // 
-        Optional<Organization> orgOptional = organizationRepository.findByUid(UserConsts.DEFAULT_ORGANIZATION_UID);
+        //
+        Optional<Organization> orgOptional = organizationRepository.findByUid(BdConstants.DEFAULT_ORGANIZATION_UID);
         Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
-                UserConsts.DEFAULT_ORGANIZATION_UID);
+                BdConstants.DEFAULT_ORGANIZATION_UID);
         Optional<User> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(),
                 PlatformEnum.BYTEDESK);
         if (orgOptional.isPresent() && roleOptional.isPresent() && adminOptional.isPresent()) {
@@ -404,7 +417,7 @@ public class UserService {
             User user = adminOptional.get();
             //
             user.addOrganizationRole(organization, role);
-            // 
+            //
             save(user);
         }
     }
