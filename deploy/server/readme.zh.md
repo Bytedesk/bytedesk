@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-09 10:08:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-09 12:32:39
+ * @LastEditTime: 2024-08-10 05:46:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,7 +12,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 -->
-# Jar 部署
+# 微语Jar包部署
+
+[微语](https://www.weiyuai.cn)是开源免费的企业协作系统，支持企业IM、在线客服、AI助手、知识库、帮助中心、工单系统等。
 
 ## 下载 [server](https://cdn.weiyuai.cn/server.zip)
 
@@ -32,7 +34,13 @@ spring.data.redis.password=password
 chmod +x start.sh
 chmod +x stop.sh
 # 启动
+# 在Mac或Linux上运行
 ./start.sh
+# 在Windows上运行
+start.bat
 # 停止
+# 在Mac或Linux上运行
 ./stop.sh
+# 在Windows上运行
+stop.bat
 ```
