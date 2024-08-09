@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-09 10:08:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-09 10:53:33
+ * @LastEditTime: 2024-08-09 12:32:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,10 @@
 -->
 # jar deploy
 
+## download [server](https://cdn.weiyuai.cn/server.zip)
+
 ```bash
+# if jar not found, download from: https://cdn.weiyuai.cn/server.zip
 # edit config/application.properties
 # change mysql credentials
 spring.datasource.url=jdbc:mysql://127.0.0.1:3306/bytedesk_im
