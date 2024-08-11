@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-09 17:54:52
+ * @LastEditTime: 2024-08-11 15:44:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -113,7 +113,7 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 | :----------: | :----------: | :----------: |
 | <img src="./images/admin/team.png" width="250"> | <img src="./images/admin/service.png" width="250"> | <img src="./images/admin/ai.png" width="250"> |
 
-## 桌面客户端
+## [桌面客户端](https://github.com/Bytedesk/bytedesk-desktop)
 
 | 登录 | 对话 | 通讯录 | 设置 |
 | :----------: | :----------: | :----------: | :----------: |
@@ -123,6 +123,9 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 | :----------: | :----------: | :----------: |
 | <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> |
 
+## [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
+
+TODO:
 
 ## Web Chat
 
