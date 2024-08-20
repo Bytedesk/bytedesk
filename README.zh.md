@@ -169,14 +169,12 @@ TODO:
 
 ## 技术栈 - 基于金融级云原生架构
 
-<!-- - [springboot-3.2.0 jdk17/maven/h2/mysql8.0/postgresql/oracle(jpa支持的所有数据库)](https://spring.io/projects/spring-boot) for 后端 -->
-- [sofaboot-4.2.0(springboot-3.2.2) jdk17/maven/h2/mysql8.0/postgresql/oracle(jpa支持的所有数据库)](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for 后端
-<!-- - [python-3.10](https://docs.python.org/zh-cn/3/) for AI助手 -->
-- [react-18.2.0](https://reactjs.org/) for web前端
-- [react-native-0.73.4](https://reactnative.dev/) for 移动客户端(ios&android)
-- [electron-29.1.1](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
-
-<!-- 有兴趣的同学，特别是独立开发者，欢迎加入，共同开发，利润共享。 -->
+<!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
+- [springboot-3.x](https://www.spring.io) for 后端
+- [python](https://www.python.org/) for ai
+- [react](https://reactjs.org/) for web前端
+- [flutter](https://reactnative.dev/) for 移动客户端(ios&android)
+- [electron](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
 
 ## 联系
 
