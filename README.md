@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-11 15:43:56
+ * @LastEditTime: 2024-08-20 09:35:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -161,6 +161,15 @@ TODO:
 - [Linux](https://www.weiyuai.cn/download.html)
 - [Android](https://www.weiyuai.cn/download.html)
 - [IOS](https://www.weiyuai.cn/download.html)
+
+## Dev Stack
+
+<!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
+- [springboot-3.x](https://www.spring.io) for im server
+- [python](https://www.python.org/) for ai
+- [react](https://reactjs.org/) for web
+- [flutter](https://reactnative.dev/) for ios&android
+- [electron](https://www.electronjs.org/) for windows&mac&linux
 
 ## Contact
 
