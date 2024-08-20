@@ -17,10 +17,10 @@
 name: mycicd
 on:
   push:
-    # branches: main
+    branches: main
     # 打标签的时候触发
-    tags:
-      - '*'
+    # tags:
+    #   - '*'
 jobs:
   build:
     runs-on: ubuntu-latest # 运行环境
