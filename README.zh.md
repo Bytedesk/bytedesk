@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-11 15:44:11
+ * @LastEditTime: 2024-08-23 09:40:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,8 @@
 ### 智能客服
 
 - 基于大模型 LLM && RAG 的智能客服
+- 支持Ollama
+- 智谱AI
 
 ### AI助手
 
@@ -55,8 +57,8 @@
 
 ### 社交IM：跟好友聊
 
-- 好友、
-- 群组、
+- 好友
+- 群组
 
 ### 企业IM：跟同事聊
 
@@ -64,6 +66,7 @@
 - 角色管理
 - 权限管理
 - 聊天记录管理
+- 同事对话、同事群组
 
 ## 快速开始
 
@@ -127,7 +130,7 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 
 TODO:
 
-## Web Chat
+## [网页版](https://github.com/bytedesk/bytedesk-react)
 
 | 自定义按钮颜色 |  按钮放在窗口左下角 | 自定义按钮边距 | 自定义聊天窗口边距 |
 | :----------: | :----------: | :----------:  | :----------: |
@@ -170,11 +173,11 @@ TODO:
 ## 技术栈 - 基于金融级云原生架构
 
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
-- [springboot-3.x](https://www.spring.io) for 后端
-- [python](https://www.python.org/) for ai
-- [react](https://reactjs.org/) for web前端
-- [flutter](https://reactnative.dev/) for 移动客户端(ios&android)
-- [electron](https://www.electronjs.org/) for 桌面客户端(windows&mac&linux)
+- springboot-3.x for 后端
+- python for ai
+- react for web前端
+- flutter for 移动客户端(ios&android)
+- electron for 桌面客户端(windows&mac&linux)
 
 ## 联系
 
@@ -185,4 +188,6 @@ TODO:
 
 - 在保留原有商标logo等信息前提下，支持免费商用。如需移除，需要获得授权
 - 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权
+- 代理合作：您负责销售，我方负责售后，维护等，五五分成
+- 此软件可能存在bug或不完善的地方，如造成损失，需自行负责
 - 请勿用于非法用途

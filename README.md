@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-20 09:35:55
+ * @LastEditTime: 2024-08-22 12:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,8 +26,9 @@ Chat as a Service
 ### LLM & RAG
 
 - Customer Service based on LLM && RAG
+  - already supported llm: ZhipuAI
 
-### Large model AI assistant
+### AI Copilots
 
 - More suitable for team use, one person configuration, for use throughout the company
 
@@ -122,7 +123,7 @@ h2-console: http://127.0.0.1:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 
 TODO:
 
-## Web Chat
+## [Web Chat](https://github.com/bytedesk/bytedesk-react)
 
 | custom button color |  custom button left | custom button margin | custom iframe margin |
 | :----------: | :----------: | :----------:  | :----------: |
@@ -165,11 +166,11 @@ TODO:
 ## Dev Stack
 
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
-- [springboot-3.x](https://www.spring.io) for im server
-- [python](https://www.python.org/) for ai
-- [react](https://reactjs.org/) for web
-- [flutter](https://reactnative.dev/) for ios&android
-- [electron](https://www.electronjs.org/) for windows&mac&linux
+- springboot-3.x for im server
+- python for ai
+- react for web
+- flutter for ios&android
+- electron for windows&mac&linux
 
 ## Contact
 
