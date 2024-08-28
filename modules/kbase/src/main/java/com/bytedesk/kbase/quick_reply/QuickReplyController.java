@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 15:49:12
+ * @LastEditTime: 2024-08-27 22:01:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,6 +42,7 @@ public class QuickReplyController extends BaseController<QuickReplyRequest> {
 
     private final QuickReplyService quickReplyService;
 
+    // 管理后台加载
     @Override
     public ResponseEntity<?> queryByOrg(QuickReplyRequest request) {
         
@@ -50,10 +51,11 @@ public class QuickReplyController extends BaseController<QuickReplyRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    // 客服端加载
     @Override
     public ResponseEntity<?> query(QuickReplyRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+        
+        return ResponseEntity.ok(JsonResult.success(false));
     }
 
     @ActionAnnotation(title = "quick_reply", action = "create", description = "create quick_reply")

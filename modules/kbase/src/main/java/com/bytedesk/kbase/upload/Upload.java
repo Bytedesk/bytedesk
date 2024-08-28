@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 12:18:08
+ * @LastEditTime: 2024-08-26 06:30:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,8 +30,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,19 +62,22 @@ public class Upload extends BaseEntity {
 
     private String fileType;
 
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Builder.Default
-    private ClientEnum client = ClientEnum.WEB;
+    // private ClientEnum client = ClientEnum.WEB;
+    private String client = ClientEnum.WEB.name();
 
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Builder.Default
     // private boolean isLlm = false;
     @Column(name ="upload_type")
-    private UploadTypeEnum type = UploadTypeEnum.LLM;
+    // private UploadTypeEnum type = UploadTypeEnum.LLM;
+    private String type = UploadTypeEnum.LLM.name();
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private UploadStatusEnum status = UploadStatusEnum.UPLOADED;
+    // @Enumerated(EnumType.STRING)
+    // private UploadStatusEnum status = UploadStatusEnum.UPLOADED;
+    private String status = UploadStatusEnum.UPLOADED.name();
 
     private String categoryUid; // 所属分类
 

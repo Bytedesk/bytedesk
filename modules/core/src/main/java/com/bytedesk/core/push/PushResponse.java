@@ -33,9 +33,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PushResponse extends BaseResponse {
-    
+
     private static final long serialVersionUID = 1L;
-        
+
     private String sender;
 
     private String content;
@@ -48,7 +48,7 @@ public class PushResponse extends BaseResponse {
 
     private String ipLocation;
 
-    private PushStatus status;
+    private PushStatusEnum status;
 
     private String client;
 

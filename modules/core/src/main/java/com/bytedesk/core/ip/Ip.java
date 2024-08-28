@@ -25,8 +25,6 @@ import com.bytedesk.core.utils.StringSetConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,10 +55,11 @@ public class Ip extends BaseEntity {
     private String ipRangeEnd;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "ip_type")
     // private String type;
-    private IpTypeEnum type = IpTypeEnum.BLACKLIST;
+    // private IpTypeEnum type = IpTypeEnum.BLACKLIST;
+     private String type = IpTypeEnum.BLACKLIST.toString();
 
     private String reason;
 

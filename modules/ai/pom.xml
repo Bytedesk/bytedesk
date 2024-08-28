@@ -37,7 +37,14 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Spring AI ZhiPuAI Auto Configuration -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-moonshot-spring-boot-starter -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-moonshot-spring-boot-starter</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai-spring-boot-starter -->
 		<dependency>
@@ -69,7 +76,7 @@
 		<dependency>
 			<groupId>cn.bigmodel.openapi</groupId>
 			<artifactId>oapi-java-sdk</artifactId>
-			<version>release-V4-2.2.0</version>
+			<version>release-V4-2.3.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->

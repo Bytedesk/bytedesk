@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 11:37:00
+ * @LastEditTime: 2024-08-24 07:15:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,9 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class QuickReplyExcelListener implements ReadListener<QuickReplyExcel> {
 
-    private final QuickReplyService keywordService;
+    private final QuickReplyService quickreplyService;
 
-    private final String categoryUid;
+    // private final String categoryUid;
 
     private final String kbUid;
 
@@ -53,7 +53,8 @@ public class QuickReplyExcelListener implements ReadListener<QuickReplyExcel> {
     @Override
     public void invoke(QuickReplyExcel data, AnalysisContext context) {
         log.info("QuickReplyExcelListener invoke: {}", JSON.toJSONString(data));
-        QuickReply quickReply = keywordService.convertExcelToQuickReply(data, categoryUid, kbUid, orgUid);
+        // categoryUid,
+        QuickReply quickReply = quickreplyService.convertExcelToQuickReply(data, kbUid, orgUid);
         cachedDataList.add(quickReply);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
@@ -83,7 +84,7 @@ public class QuickReplyExcelListener implements ReadListener<QuickReplyExcel> {
         //     cachedDataList.remove(0);
         // }
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
-        keywordService.save(cachedDataList);
+        quickreplyService.save(cachedDataList);
         log.info("存储数据库成功！");
     }
 

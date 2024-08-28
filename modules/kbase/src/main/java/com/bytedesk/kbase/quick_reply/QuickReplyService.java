@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 15:48:38
+ * @LastEditTime: 2024-08-27 22:02:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.category.Category;
 import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
@@ -36,7 +39,6 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-
 import lombok.AllArgsConstructor;
 
 @Service
@@ -53,23 +55,25 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
 
     @Override
     public Page<QuickReplyResponse> queryByOrg(QuickReplyRequest request) {
-        
+
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
-        
+
         Specification<QuickReply> spec = QuickReplySpecification.search(request);
 
         Page<QuickReply> page = quickReplyRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
-
+    
     @Override
     public Page<QuickReplyResponse> queryByUser(QuickReplyRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    
+    @Cacheable(value = "quickreply", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QuickReply> findByUid(String uid) {
         return quickReplyRepository.findByUid(uid);
@@ -77,36 +81,24 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
 
     @Override
     public QuickReplyResponse create(QuickReplyRequest request) {
-        
+
         QuickReply entity = modelMapper.map(request, QuickReply.class);
         entity.setUid(uidUtils.getCacheSerialUid());
-        entity.setType(MessageTypeEnum.fromValue(request.getType()));
-        // 
-        // category
-        // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
-        // if (categoryOptional.isPresent()) {
-        //     entity.setCategory(categoryOptional.get());
-        // }
+        entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
 
         return convertToResponse(save(entity));
     }
 
     @Override
     public QuickReplyResponse update(QuickReplyRequest request) {
-        
+
         Optional<QuickReply> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             QuickReply entity = optional.get();
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
             entity.setContent(request.getContent());
-            entity.setType(MessageTypeEnum.fromValue(request.getType()));
-
-            // category
-            // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
-            // if (categoryOptional.isPresent()) {
-            //     entity.setCategory(categoryOptional.get());
-            // }
+            entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
 
             return convertToResponse(save(entity));
         } else {
@@ -139,8 +131,7 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
 
     @Override
     public void delete(QuickReply entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(entity.getUid());
     }
 
     @Override
@@ -158,50 +149,70 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
         return modelMapper.map(quickReply, QuickReplyExcel.class);
     }
 
-    public QuickReply convertExcelToQuickReply(QuickReplyExcel excel, String categoryUid, String kbUid, String orgUid) {
+    // String categoryUid,
+    public QuickReply convertExcelToQuickReply(QuickReplyExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, QuickReply.class);
         QuickReply quickReply = QuickReply.builder().build();
         quickReply.setUid(uidUtils.getCacheSerialUid());
         quickReply.setTitle(excel.getTitle());
         quickReply.setContent(excel.getContent());
-        // 
-        quickReply.setType(MessageTypeEnum.TEXT); // TODO: 根据实际类型设置
-        // 
-        quickReply.setCategoryUid(categoryUid);
+        // quickReply.setType(MessageTypeEnum.TEXT); // TODO: 根据实际类型设置
+        quickReply.setType(MessageTypeEnum.fromValue(excel.getType()).name());
+        //
+        // quickReply.setCategoryUid(categoryUid);
+        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        if (categoryOptional.isPresent()) {
+            quickReply.setCategoryUid(categoryOptional.get().getUid());
+        } else {
+            // create category
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(excel.getCategory())
+                    .kbUid(kbUid)
+                    .build();
+            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+            categoryRequest.setOrgUid(orgUid);
+            //
+            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            quickReply.setCategoryUid(categoryResponse.getUid());
+        }
+
         quickReply.setKbUid(kbUid);
         quickReply.setOrgUid(orgUid);
 
         return quickReply;
     }
 
-    // 
+    //
     public void initData() {
-        // 
+        //
         if (quickReplyRepository.count() > 0) {
             return;
         }
-        // 
+
+        // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
         Optional<Category> categoryContact = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT,
-                CategoryConsts.CATEGORY_TYPE_QUICK_REPLY,
+                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryContact.isPresent()) {
-            // 
+            //
             QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
                     .title(I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
                     .categoryUid(categoryContact.get().getUid())
+                    .kbUid(BdConstants.DEFAULT_KB_UID)
                     .level(LevelEnum.PLATFORM)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
+            // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
-        // 
+        //
         Optional<Category> categoryThanks = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS,
-                CategoryConsts.CATEGORY_TYPE_QUICK_REPLY, 
+                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryThanks.isPresent()) {
@@ -211,15 +222,17 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
                     .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
                     .categoryUid(categoryThanks.get().getUid())
                     .level(LevelEnum.PLATFORM)
+                    .kbUid(BdConstants.DEFAULT_KB_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
+            // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
-        // 
+        //
         Optional<Category> categoryWelcome = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME,
-                CategoryConsts.CATEGORY_TYPE_QUICK_REPLY,
+                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryWelcome.isPresent()) {
@@ -229,15 +242,17 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
                     .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
                     .categoryUid(categoryWelcome.get().getUid())
                     .level(LevelEnum.PLATFORM)
+                    .kbUid(BdConstants.DEFAULT_KB_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
+            // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
-        
+
         Optional<Category> categoryBye = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE,
-                CategoryConsts.CATEGORY_TYPE_QUICK_REPLY,
+                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryBye.isPresent()) {
@@ -247,12 +262,14 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
                     .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
                     .categoryUid(categoryBye.get().getUid())
                     .level(LevelEnum.PLATFORM)
+                    .kbUid(BdConstants.DEFAULT_KB_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
+            // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
 
     }
-    
+
 }

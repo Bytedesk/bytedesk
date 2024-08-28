@@ -31,7 +31,7 @@ public class TabooExcelListener implements ReadListener<TabooExcel> {
 
     private final TabooService tabooService;
 
-    private final String categoryUid;
+    // private final String categoryUid;
 
     private final String kbUid;
 
@@ -53,8 +53,8 @@ public class TabooExcelListener implements ReadListener<TabooExcel> {
     @Override
     public void invoke(TabooExcel data, AnalysisContext context) {
         log.info("TabooExcelListener invoke: {}", JSON.toJSONString(data));
-        Taboo taboo = tabooService.convertExcelToTaboo(data, categoryUid, kbUid, orgUid);
-        cachedDataList.add(taboo);
+        Taboo taboo = tabooService.convertExcelToTaboo(data, kbUid, orgUid); // categoryUid,
+                cachedDataList.add(taboo);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
             saveData();

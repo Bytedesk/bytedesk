@@ -19,10 +19,8 @@ import com.bytedesk.core.rbac.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,8 +50,9 @@ public class OAuth extends BaseEntity {
     private String refreshToken;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private OAuthProviderEnum provider = OAuthProviderEnum.GITHUB;
+    // @Enumerated(EnumType.STRING)
+    // private OAuthProviderEnum provider = OAuthProviderEnum.GITHUB;
+    private String provider = OAuthProviderEnum.GITHUB.name();
 
     // private String scope;
     // private String tokenType;

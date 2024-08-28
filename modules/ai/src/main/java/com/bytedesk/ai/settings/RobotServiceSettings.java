@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 17:16:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-23 12:37:07
+ * @LastEditTime: 2024-08-26 06:10:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,6 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.kbase.service_settings.BaseServiceSettings;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,8 +40,9 @@ public class RobotServiceSettings extends BaseServiceSettings {
 
     // 限制仅允许：workgroup、agent
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
+    // @Enumerated(EnumType.STRING)
+    // private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
+    private String transferType = ThreadTypeEnum.WORKGROUP.name();
 
     // agentUid or workgroupUid
     private String transferToUid;

@@ -30,8 +30,6 @@ import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -75,14 +73,16 @@ public class MessageUnread implements Serializable  {
 
     @Builder.Default
     // 如果使用int存储，enum中类型的顺序改变，会导致数据库中的数据类型改变，导致无法查询到数据
-    @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
+    // @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
     @Column(name = "message_type", nullable = false)
-    private MessageTypeEnum type = MessageTypeEnum.TEXT;
+    // private MessageTypeEnum type = MessageTypeEnum.TEXT;
+    private String type = MessageTypeEnum.TEXT.name();
 
     // 仅对一对一/客服/技能组聊天有效，表示对方是否已读。群聊无效
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private MessageStatusEnum status = MessageStatusEnum.SUCCESS;
+    // @Enumerated(EnumType.STRING)
+    // private MessageStatusEnum status = MessageStatusEnum.SUCCESS;
+    private String status = MessageStatusEnum.SUCCESS.name();
 
     // 复杂类型可以使用json存储在此，通过type字段区分
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -93,8 +93,10 @@ public class MessageUnread implements Serializable  {
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
 
-    @Enumerated(EnumType.STRING)
-    private ClientEnum client;
+    @Builder.Default
+    // @Enumerated(EnumType.STRING)
+    // private ClientEnum client;
+    private String client = ClientEnum.WEB.name();
 
     private String threadTopic;
 

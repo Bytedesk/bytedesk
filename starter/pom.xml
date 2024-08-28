@@ -107,10 +107,10 @@
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-docker-compose -->
 		<!-- https://hub.docker.com/r/jackning/bytedesk -->
 		<!-- https://springdoc.cn/docker-compose-support-spring-boot/ -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-docker-compose</artifactId>
-		</dependency> -->
+		</dependency>
 
 		<dependency>
 			<groupId>org.liquibase</groupId>
@@ -147,7 +147,8 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- /////////////////////////////////////Spring AI 模块//////////////////////////////////////// -->
+		<!-- /////////////////////////////////////Spring AI
+		模块//////////////////////////////////////// -->
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -169,6 +170,11 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-moonshot-spring-boot-starter</artifactId>
 		</dependency>
 
 		<dependency>
@@ -463,6 +469,13 @@
 			<version>7.0.0</version>
 		</dependency> -->
 
+		<!-- 配置文件敏感信息加密 https://github.com/ulisesbocchio/jasypt-spring-boot -->
+		<!-- <dependency>
+			<groupId>com.github.ulisesbocchio</groupId>
+			<artifactId>jasypt-spring-boot-starter</artifactId>
+			<version>3.0.5</version>
+		</dependency> -->
+
 		<!-- 验证码 -->
 		<!-- https://mvnrepository.com/artifact/pro.fessional/kaptcha -->
 		<dependency>
@@ -485,9 +498,32 @@
 			<version>5.1.3</version>
 		</dependency>
 
+		<!-- redis search https://github.com/redis/lettucemod -->
+		<dependency>
+			<groupId>com.redis</groupId>
+			<artifactId>lettucemod-spring</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+
+		<!-- https://github.com/redis/redis-om-spring?tab=readme-ov-file -->
+		<!-- https://mvnrepository.com/artifact/com.redis.om/redis-om-spring -->
+		<!-- <dependency>
+            <groupId>com.redis.om</groupId>
+            <artifactId>redis-om-spring</artifactId>
+            <version>0.9.4</version>
+        </dependency> -->
+
+		<!-- jedis pool config -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+			<scope>provided</scope>
 		</dependency>
 		<!-- devtools-热加载容易导致fastjson2类型转换失败，暂时禁用吧 -->
 		<!-- <dependency>
@@ -536,6 +572,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			<!-- ip2region.xdb -->
 			<!-- 不需要编译的资源文件 -->
@@ -548,6 +592,12 @@
 					</nonFilteredFileExtensions>
 				</configuration>
 			</plugin>
+			<!-- jasypt配置文件加密 -->
+			<!-- <plugin>
+				<groupId>com.github.ulisesbocchio</groupId>
+				<artifactId>jasypt-maven-plugin</artifactId>
+				<version>3.0.5</version>
+			</plugin> -->
 		</plugins>
 	</build>
 
@@ -558,7 +608,6 @@
 			<url>https://jitpack.io</url>
 		</repository>
 	</repositories> -->
-
 
 	<repositories>
 		<repository>

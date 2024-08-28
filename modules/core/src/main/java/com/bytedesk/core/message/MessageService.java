@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-16 11:03:15
+ * @LastEditTime: 2024-08-24 09:18:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,12 @@
  */
 package com.bytedesk.core.message;
 
+import java.util.Date;
 import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CachePut;
-// import org.modelmapper.ModelMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,11 +30,19 @@ import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
 
 // @Slf4j
 @Service
@@ -41,6 +50,14 @@ import lombok.AllArgsConstructor;
 public class MessageService extends BaseService<Message, MessageRequest, MessageResponse> {
 
     private final MessageRepository messageRepository;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final ThreadService threadService;
+
+    private final UidUtils uidUtils;
+
+    private final ModelMapper modelMapper;
 
     public Page<MessageResponse> queryByOrg(MessageRequest request) {
 
@@ -131,11 +148,8 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
     }
 
     // public int ping() {
-
     // User user = authService.getCurrentUser();
-
     // int count = messageCacheService.getUnreadCount(user.getUid());
-
     // return count;
     // }
 
@@ -168,5 +182,60 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
+
+    //
+    public void notifyUser(MessageProtobuf messageProtobuf) {
+        String json = JSON.toJSONString(messageProtobuf);
+        bytedeskEventPublisher.publishMessageJsonEvent(json);
+    }
+
+    // 通知消息：登录
+    public MessageProtobuf createNoticeMessage(User user, String content) {
+        //
+        ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
+        ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
+        UserProtobuf sender = thread.getUser();
+        // 
+        MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
+        //
+        MessageProtobuf message = MessageProtobuf.builder()
+                .uid(uidUtils.getCacheSerialUid())
+                .type(MessageTypeEnum.NOTICE)
+                .content(content)
+                .status(MessageStatusEnum.SUCCESS)
+                .createdAt(new Date())
+                .client(ClientEnum.SYSTEM)
+                .thread(thread)
+                .user(sender)
+                .extra(JSON.toJSONString(extra))
+                .build();
+
+        return message;
+    }
+
+    // TODO: 事件消息：访客离线、访客上线
+    public MessageProtobuf createEventMessage(User user, String content) {
+        //
+        ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
+        ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
+        UserProtobuf sender = thread.getUser();
+        //
+        MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
+        //
+        MessageProtobuf message = MessageProtobuf.builder()
+                .uid(uidUtils.getCacheSerialUid())
+                .type(MessageTypeEnum.EVENT)
+                .content(content)
+                .status(MessageStatusEnum.SUCCESS)
+                .createdAt(new Date())
+                .client(ClientEnum.SYSTEM)
+                .thread(thread)
+                .user(sender)
+                .extra(JSON.toJSONString(extra))
+                .build();
+
+        return message;
+    }
+    
 
 }

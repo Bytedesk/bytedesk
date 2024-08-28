@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 11:37:23
+ * @LastEditTime: 2024-08-27 13:07:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,16 +22,16 @@ import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 // @Async
-// @Slf4j
+@Slf4j
 @Component
 public class ThreadEntityListener {
     
     @PostPersist
     public void postPersist(Thread thread) {
-        // log.info("thread postPersist {}", thread.getUid());
+        log.info("thread postPersist {}", thread.getUid());
         // send notifications
         Thread clonedThread = SerializationUtils.clone(thread);
         
@@ -41,7 +41,7 @@ public class ThreadEntityListener {
 
     @PostUpdate
     public void postUpdate(Thread thread) {
-        // log.info("postUpdate {}", thread.getUid());
+        log.info("postUpdate {}", thread.getUid());
         // send notifications
         Thread clonedThread = SerializationUtils.clone(thread);
         // 

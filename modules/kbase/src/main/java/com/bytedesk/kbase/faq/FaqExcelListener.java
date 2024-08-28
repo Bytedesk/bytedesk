@@ -31,7 +31,7 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
 
     private final FaqService faqService;
 
-    private final String categoryUid;
+    // private final String categoryUid;
 
     private final String kbUid;
 
@@ -53,7 +53,7 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
     @Override
     public void invoke(FaqExcel data, AnalysisContext context) {
         log.info("FaqExcelListener invoke: {}", JSON.toJSONString(data));
-        Faq faq = faqService.convertExcelToFaq(data, categoryUid, kbUid, orgUid);
+        Faq faq = faqService.convertExcelToFaq(data, kbUid, orgUid);
         cachedDataList.add(faq);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

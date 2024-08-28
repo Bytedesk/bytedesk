@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 11:52:08
+ * @LastEditTime: 2024-08-14 06:46:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -130,9 +130,6 @@ public class Agent extends BaseEntity {
     private Member member;
 
     // for quick query, space exchange for speed
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private User user;
     private String userUid;
 
     public void incrementThreadCount() {

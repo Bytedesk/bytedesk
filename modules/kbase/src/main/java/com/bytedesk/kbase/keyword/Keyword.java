@@ -24,8 +24,6 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,12 +62,14 @@ public class Keyword extends BaseEntity {
     private List<String> replyList = new ArrayList<>();
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private KeywordMatchEnum matchType = KeywordMatchEnum.EXACT;
+    // @Enumerated(EnumType.STRING)
+    // private KeywordMatchEnum matchType = KeywordMatchEnum.EXACT;
+    private String matchType = KeywordMatchEnum.EXACT.name();
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
+    // @Enumerated(EnumType.STRING)
+    // private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
+    private String contentType = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
     @Column(name = "is_enabled")

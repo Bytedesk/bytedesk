@@ -84,7 +84,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-
 		<!-- https://github.com/redisson/redisson?tab=readme-ov-file -->
 		<!-- https://mvnrepository.com/artifact/org.redisson/redisson -->
 		<!-- <dependency>

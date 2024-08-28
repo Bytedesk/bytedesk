@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 12:57:27
+ * @LastEditTime: 2024-08-27 14:34:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,11 +49,6 @@ import lombok.experimental.Accessors;
 public class Thread extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-    // @NotBlank
-    // private String title;
-    // @NotBlank
-    // private String avatar;
-
     /**
      * used to push message
      * topic format:
@@ -71,14 +66,16 @@ public class Thread extends BaseEntity {
      * @{ThreadTypeConsts}
      */
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "thread_type", nullable = false)
-    private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
+    // private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
+    private String type = ThreadTypeEnum.WORKGROUP.name();
 
     /** closed/open, agent closed/auto closed */
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private ThreadStatusEnum status = ThreadStatusEnum.NORMAL;
+    // @Enumerated(EnumType.STRING)
+    // private ThreadStatusEnum status = ThreadStatusEnum.NORMAL;
+    private String status = ThreadStatusEnum.NORMAL.name();
 
     // 置顶
     @Builder.Default
@@ -113,8 +110,10 @@ public class Thread extends BaseEntity {
     @Column(name = "is_folded")
     private boolean folded = false;
 
-    @Enumerated(EnumType.STRING)
-    private ClientEnum client;
+    @Builder.Default
+    // @Enumerated(EnumType.STRING)
+    // private ClientEnum client;
+    private String client = ClientEnum.WEB.name();
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
@@ -155,17 +154,17 @@ public class Thread extends BaseEntity {
     private User owner;
 
     public Boolean isInit() {
-        return this.status == ThreadStatusEnum.NORMAL;
+        return this.status == ThreadStatusEnum.NORMAL.name();
         // return !StringUtils.hasText(this.content);
     }
 
     //
     public Boolean isClosed() {
-        return this.status == ThreadStatusEnum.AGENT_CLOSED || this.status == ThreadStatusEnum.AUTO_CLOSED;
+        return this.status == ThreadStatusEnum.AGENT_CLOSED.name() || this.status == ThreadStatusEnum.AUTO_CLOSED.name();
     }
 
     public Boolean isCustomerService() {
-        return this.type == ThreadTypeEnum.AGENT || this.type == ThreadTypeEnum.WORKGROUP;
+        return this.type == ThreadTypeEnum.AGENT.name() || this.type == ThreadTypeEnum.WORKGROUP.name();
     }
 
 }

@@ -125,7 +125,7 @@ public class MessageUnreadEventListener {
         log.info("message unread update event: {}", message.getContent());
         //
         String threadTopic = message.getThreadTopic();
-        MessageStatusEnum messageStatus = message.getStatus();
+        MessageStatusEnum messageStatus = MessageStatusEnum.fromValue(message.getStatus());
         //
         if (messageStatus.ordinal() < MessageStatusEnum.DELIVERED.ordinal()) {
             return;

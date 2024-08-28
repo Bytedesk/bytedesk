@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 22:27:48
+ * @LastEditTime: 2024-08-26 06:47:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,9 +60,9 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 
 		Upload upload = modelMapper.map(request, Upload.class);
 		upload.setUid(uidUtils.getCacheSerialUid());
-		upload.setClient(ClientEnum.fromValue(request.getClient()));
-		upload.setType(UploadTypeEnum.fromValue(request.getType()));
-		upload.setStatus(UploadStatusEnum.UPLOADED);
+		upload.setClient(ClientEnum.fromValue(request.getClient()).name());
+		upload.setType(UploadTypeEnum.fromValue(request.getType()).name());
+		upload.setStatus(UploadStatusEnum.UPLOADED.name());
 		//
 		Upload savedUpload = save(upload);
 		if (savedUpload == null) {

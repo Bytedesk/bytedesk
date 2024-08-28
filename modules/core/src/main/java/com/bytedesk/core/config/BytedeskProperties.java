@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-28 17:00:37
+ * @LastEditTime: 2024-08-25 11:25:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ public class BytedeskProperties {
     public static final String CONFIG_PREFIX = "bytedesk";
 
     private Boolean debug;
-
+    
     private String email;
 
     private String password;
@@ -61,11 +61,17 @@ public class BytedeskProperties {
     // cache
     private Integer cacheLevel;
     private String cachePrefix;
+    private String redisStreamKey;
+    // private String redisPubsubChannel;
 
     // upload
     private String uploadType;
     private String uploadDir;
     private String uploadUrl;
+    
+    // cluster
+    private Boolean cluster;
+    private List<String> clusterNodes = new ArrayList<>();
 
     // 
     public Boolean isInWhitelist(String mobile) {

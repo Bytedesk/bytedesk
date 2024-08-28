@@ -121,7 +121,7 @@ h2-console: http://127.0.0.1:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 
 ## [Mobile](https://github.com/Bytedesk/bytedesk-mobile)
 
-TODO:
+- [github](https://github.com/Bytedesk/bytedesk-mobile)
 
 ## [Web Chat](https://github.com/bytedesk/bytedesk-react)
 

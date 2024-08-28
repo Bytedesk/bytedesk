@@ -24,7 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.bytedesk.core.config.JedisProperties;
+import com.bytedesk.core.redis.JedisProperties;
 
 import redis.clients.jedis.JedisPooled;
 

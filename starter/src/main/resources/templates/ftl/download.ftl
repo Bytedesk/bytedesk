@@ -86,7 +86,7 @@ Listed course START -->
 						<img src="assets/images/element/data-science.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://pan.baidu.com/s/1lEoBGKh-iQJvfndnhn8r-A?pwd=jnk2" class="stretched-link" target="_blank">Windows客户端</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-windows.exe" class="stretched-link" target="_blank">Windows客户端</a></h5>
 					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
@@ -99,7 +99,7 @@ Listed course START -->
 						<img src="assets/images/element/online.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://pan.baidu.com/s/1lEoBGKh-iQJvfndnhn8r-A?pwd=jnk2" class="stretched-link" target="_blank">Mac客户端</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-mac-m1.dmg" class="stretched-link" target="_blank">Mac客户端</a></h5>
 					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
@@ -112,7 +112,7 @@ Listed course START -->
 						<img src="assets/images/element/profit.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://pan.baidu.com/s/1lEoBGKh-iQJvfndnhn8r-A?pwd=jnk2" class="stretched-link" target="_blank">Linux客户端</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-linux.AppImage" class="stretched-link" target="_blank">Linux客户端</a></h5>
 					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
@@ -125,33 +125,35 @@ Listed course START -->
 						<img src="assets/images/element/engineering.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">Android安卓</a></h5>
-					<span class="mb-0">即将开放下载.</span>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-android.apk" class="stretched-link" target="_blank">Android安卓</a></h5>
+					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
 
-			
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/profit.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">iPhone苹果</a></h5>
-					<span class="mb-0">即将开放下载</span>
+					<h5 class="mb-1"><a href="https://apps.apple.com/cn/app/%E5%BE%AE%E8%AF%AD/id6470106586" class="stretched-link" target="_blank">iPhone苹果</a></h5>
+					<#--  <span class="mb-0">即将开放下载</span>  -->
 				</div>
 			</div>
 
 			<!-- Item -->
-			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
+			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/medical.svg" alt="">
+						<img src="assets/images/element/profit.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">Github</a></h5>
-					<span class="mb-0"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank">Github</a></span>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download" class="stretched-link" target="_blank">所有下载</a></h5>
+					<#--  <h5 class="mb-1"><a href="https://pan.baidu.com/s/1lEoBGKh-iQJvfndnhn8r-A?pwd=jnk2" class="stretched-link" target="_blank">更多去网盘下载</a></h5>  -->
+					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
-			</div>  -->
+			</div>
 
 			<!-- Item -->
 			<#--  <div class="col-sm-6 col-md-4 col-xl-3">

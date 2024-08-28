@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-26 10:06:32
+ * @LastEditTime: 2024-08-18 09:35:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -79,7 +79,8 @@ public class UserRequest extends BaseRequest {
 	// @Builder.Default
 	// private String platform = BdConstants.PLATFORM_BYTEDESK;
 	@Builder.Default
-	private PlatformEnum platform = PlatformEnum.BYTEDESK;
+	// private PlatformEnum platform = PlatformEnum.BYTEDESK;
+	private String platform = PlatformEnum.BYTEDESK.name();
 	
 	// private String orgUid;
 	// 注册验证码

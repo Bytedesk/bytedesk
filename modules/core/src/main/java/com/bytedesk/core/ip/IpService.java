@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-10 08:35:08
+ * @LastEditTime: 2024-08-26 06:42:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -124,7 +124,7 @@ public class IpService {
             }
             ipOptional.get().setIpRangeStart(ipRequest.getIpRangeStart());
             ipOptional.get().setIpRangeEnd(ipRequest.getIpRangeEnd());
-            ipOptional.get().setType(IpTypeEnum.fromValue(ipRequest.getType()));
+            ipOptional.get().setType(IpTypeEnum.fromValue(ipRequest.getType()).name());
             ipOptional.get().setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
             ipOptional.get().setReason(ipRequest.getReason());
 

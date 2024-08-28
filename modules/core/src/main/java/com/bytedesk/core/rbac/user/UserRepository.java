@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 15:57:00
+ * @LastEditTime: 2024-08-18 09:36:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,8 +22,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 // import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
-
-import com.bytedesk.core.enums.PlatformEnum;
+// import com.bytedesk.core.enums.PlatformEnum;
 
 /**
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
@@ -37,16 +36,16 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     Optional<User> findByUid(String uid);
 
-    Optional<User> findByEmailAndPlatformAndDeleted(String email, PlatformEnum platform, Boolean deleted);
+    Optional<User> findByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
 
-    Optional<User> findByMobileAndPlatformAndDeleted(String mobile, PlatformEnum platform, Boolean deleted);
+    Optional<User> findByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
 
-    Optional<User> findByUsernameAndPlatformAndDeleted(String username, PlatformEnum platform, Boolean deleted);
+    Optional<User> findByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
 
-    Boolean existsByUsernameAndPlatformAndDeleted(String username, PlatformEnum platform, Boolean deleted);
+    Boolean existsByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
 
-    Boolean existsByMobileAndPlatformAndDeleted(String mobile, PlatformEnum platform, Boolean deleted);
+    Boolean existsByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
 
-    Boolean existsByEmailAndPlatformAndDeleted(String email, PlatformEnum platform, Boolean deleted);
+    Boolean existsByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
 
 }

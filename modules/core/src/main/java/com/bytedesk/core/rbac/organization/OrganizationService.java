@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 16:55:56
+ * @LastEditTime: 2024-08-27 13:03:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.config.BytedeskEventPublisher;
+// import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -61,7 +61,7 @@ public class OrganizationService {
 
     private final ModelMapper modelMapper;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
 
     public Page<OrganizationResponse> query(OrganizationRequest pageParam) {
 
@@ -112,10 +112,11 @@ public class OrganizationService {
             } else {
                 log.info("roleOptional fail");
             }
+            // 
             // 放到listener中会报错，所以放在此处
             // event listener order 1. member, 2. category, 3. faq, 4. quickbutton, 5.
             // robot, 6. agent, 7. workgroup,
-            bytedeskEventPublisher.publishOrganizationCreateEvent(organization);
+            // bytedeskEventPublisher.publishOrganizationCreateEvent(organization);
             //
             return convertToResponse(savedOrganization);
 

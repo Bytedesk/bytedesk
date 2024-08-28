@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-24 21:26:56
+ * @LastEditTime: 2024-08-27 18:10:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,8 +25,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -72,13 +70,15 @@ public class Category extends BaseEntity {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> children = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private LevelEnum level = LevelEnum.ORGNIZATION;
+    // @Enumerated(EnumType.STRING)
+    // private LevelEnum level = LevelEnum.ORGNIZATION;
+     private String level = LevelEnum.ORGNIZATION.name();
 
-    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    // @Enumerated(EnumType.STRING)
+    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    private String platform = PlatformEnum.BYTEDESK.name();
 
     // knowledge base uid
     private String kbUid;

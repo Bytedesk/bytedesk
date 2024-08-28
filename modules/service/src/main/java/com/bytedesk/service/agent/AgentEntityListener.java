@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 12:46:32
+ * @LastEditTime: 2024-08-27 15:42:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -48,6 +49,8 @@ public class AgentEntityListener {
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         // 默认订阅客服主题
         bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getOrgAgentTopic(cloneAgent.getUid()), user.getUid());
+        // 
+        bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<AgentCreateEvent>(this, new AgentCreateEvent(this, cloneAgent)));
     }
 
     // @PreUpdate

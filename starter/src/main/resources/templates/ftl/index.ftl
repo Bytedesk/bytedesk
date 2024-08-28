@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>微语 - 对话即服务 - 企业IM、在线客服、AI客服、知识库AI问答</title>
+	<title>微语 - 对话即服务 - 企业IM、在线客服、AI客服、知识库AI问答、帮助中心、工单系统</title>
 
 	<#--  Header  -->
 	<#include "./common/header_meta.ftl" />
@@ -34,7 +34,7 @@ Main Banner START -->
 			<div class="col-md-5">
 				<!-- Title -->
 				<h1 class="mb-3">基于AI全新打造</h1>
-				<h4 class="mb-3">企业IM、在线客服、AI客服、知识库AI问答</h4>
+				<h4 class="mb-3">企业IM、在线客服、AI助手、AI知识库问答、帮助中心、工单系统</h4>
 				<#--  社交IM、  -->
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->
@@ -72,7 +72,7 @@ Listed course START -->
 						<img src="assets/images/element/coding.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">即时通讯</a></h5>
+					<h5 class="mb-1"><a href="#" class="stretched-link">企业IM</a></h5>
 					<span class="mb-0">按照中大型团队架构使用规模设计，支持数万人同时在线</span>
 				</div>
 			</div>
@@ -113,8 +113,8 @@ Listed course START -->
 						<img src="assets/images/element/engineering.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">开源、开放</a></h5>
-					<span class="mb-0">服务器端源码开放，支持二次开发.</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">AI知识库问答</a></h5>
+					<span class="mb-0">AI知识库问答、知识管理</span>
 				</div>
 			</div>
 
@@ -125,21 +125,21 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/profit.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">国产化</a></h5>
-					<span class="mb-0">支持国产操作系统、国产数据库等</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">帮助中心</a></h5>
+					<span class="mb-0">帮助中心</span>
 				</div>
 			</div>
 
 			<!-- Item -->
-			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
+			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/medical.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">Multi LLMs</a></h5>
-					<span class="mb-0">We supply multi llms, you can choose the one you like</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">工单系统</a></h5>
+					<span class="mb-0">工单系统</span>
 				</div>
-			</div>  -->
+			</div>
 
 			<!-- Item -->
 			<#--  <div class="col-sm-6 col-md-4 col-xl-3">

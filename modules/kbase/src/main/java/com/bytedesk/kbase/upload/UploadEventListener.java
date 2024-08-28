@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 10:22:08
+ * @LastEditTime: 2024-08-24 08:00:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,7 @@ public class UploadEventListener {
         Upload upload = event.getObject().getUpload();
         log.info("UploadEventListener create: {}", upload.toString());
         // etl分块处理
-        if (upload.getType().equals(UploadTypeEnum.LLM)) {
+        if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
             uploadVectorStore.readSplitWriteToVectorStore(upload);
             return;
         }
@@ -74,50 +74,56 @@ public class UploadEventListener {
         if (resource.exists()) {
             String filePath = resource.getFile().getAbsolutePath();
             log.info("UploadEventListener loadAsResource: {}", filePath);
-            if (upload.getType().equals(UploadTypeEnum.KEYWORD)) {
+            if (upload.getType().equals(UploadTypeEnum.KEYWORD.name())) {
                 // 导入关键字
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                 EasyExcel.read(filePath, KeywordExcel.class,
-                        new KeywordExcelListener(keywordService, upload.getCategoryUid(), upload.getKbUid(),
+                        new KeywordExcelListener(keywordService,
+                                // upload.getCategoryUid(),
+                                upload.getKbUid(),
                                 upload.getOrgUid()))
                         .sheet().doRead();
-            } else if (upload.getType().equals(UploadTypeEnum.FAQ)) {
+            } else if (upload.getType().equals(UploadTypeEnum.FAQ.name())) {
                 // 导入FAQ
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqService, upload.getCategoryUid(),
+                EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqService,
+                        // upload.getCategoryUid(),
                         upload.getKbUid(),
                         upload.getOrgUid())).sheet().doRead();
-            } else if (upload.getType().equals(UploadTypeEnum.AUTOREPLY)) {
+            } else if (upload.getType().equals(UploadTypeEnum.AUTOREPLY.name())) {
                 // 导入自动回复
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                 EasyExcel.read(filePath, AutoReplyExcel.class, new AutoReplyExcelListener(
-                        autoReplyService, upload.getCategoryUid(),
+                        autoReplyService,
+                        // upload.getCategoryUid(),
                         upload.getKbUid(),
                         upload.getOrgUid())).sheet().doRead();
-            } else if (upload.getType().equals(UploadTypeEnum.QUICKREPLY)) {
+            } else if (upload.getType().equals(UploadTypeEnum.QUICKREPLY.name())) {
                 // 导入快捷回复
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                 EasyExcel.read(filePath, QuickReplyExcel.class, new QuickReplyExcelListener(quickReplyService,
-                        upload.getCategoryUid(),
+                        // upload.getCategoryUid(),
                         upload.getKbUid(),
                         upload.getOrgUid())).sheet()
                         .doRead();
-            } else if (upload.getType().equals(UploadTypeEnum.TABOO)) {
+            } else if (upload.getType().equals(UploadTypeEnum.TABOO.name())) {
                 // 导入敏感词
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                EasyExcel.read(filePath, TabooExcel.class, new TabooExcelListener(tabooService, upload.getCategoryUid(),
+                EasyExcel.read(filePath, TabooExcel.class, new TabooExcelListener(tabooService,
+                        // upload.getCategoryUid(),
                         upload.getKbUid(),
                         upload.getOrgUid())).sheet().doRead();
-            } else if (upload.getType().equals(UploadTypeEnum.MEMBER)) {
+            } else if (upload.getType().equals(UploadTypeEnum.MEMBER.name())) {
                 // TODO: 导入成员
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                // EasyExcel.read(filePath, MemberExcel.class, new MemberExcelListener(memberService)).sheet().doRead();
+                // EasyExcel.read(filePath, MemberExcel.class, new
+                // MemberExcelListener(memberService)).sheet().doRead();
             }
         }
 

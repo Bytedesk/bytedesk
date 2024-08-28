@@ -24,12 +24,16 @@ import lombok.Data;
 @Data
 public class AutoReplyExcel {
 
-    @ExcelProperty(index = 0, value = "内容")
+    @ExcelProperty(index = 0, value = "分类")
     @ColumnWidth(20)
-    private String content;
+    private String category;
 
     @ExcelProperty(index = 1, value = "类型")
     @ColumnWidth(20)
     private String type;
+
+    @ExcelProperty(index = 2, value = "内容")
+    @ColumnWidth(20)
+    private String content;
 
 }

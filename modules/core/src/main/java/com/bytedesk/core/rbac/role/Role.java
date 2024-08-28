@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:11:58
+ * @LastEditTime: 2024-08-26 06:19:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,10 +64,10 @@ public class Role extends BaseEntity {
 	private String description;
 
 	@Builder.Default
-	@Enumerated(EnumType.STRING)
+	// @Enumerated(EnumType.STRING)
 	@Column(name = "role_type", nullable = false)
-	// private String type;
-	private RoleTypeEnum type = RoleTypeEnum.SYSTEM;
+	private String type = RoleTypeEnum.SYSTEM.name();
+	// private RoleTypeEnum type = RoleTypeEnum.SYSTEM;
 
 	@JsonIgnore
 	@Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 15:46:04
+ * @LastEditTime: 2024-08-26 06:46:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.constant.BdConstants;
@@ -45,7 +50,7 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
 
     private final UidUtils uidUtils;
 
-    // private final CategoryService categoryService;
+    private final CategoryService categoryService;
 
     @Override
     public Page<FaqResponse> queryByOrg(FaqRequest request) {
@@ -78,7 +83,7 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getDefaultSerialUid());
         }
-        entity.setType(MessageTypeEnum.fromValue(request.getType()));
+        entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
         //
         // category
         // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
@@ -98,7 +103,7 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
             entity.setContent(request.getContent());
-            entity.setType(MessageTypeEnum.fromValue(request.getType()));
+            entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
 
             // category
             // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
@@ -178,16 +183,32 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         return modelMapper.map(faq, FaqExcel.class);
     }
 
-    public Faq convertExcelToFaq(FaqExcel excel, String categoryUid, String kbUid, String orgUid) {
-        // return modelMapper.map(excel, Faq.class);
+    public Faq convertExcelToFaq(FaqExcel excel,String kbUid, String orgUid) {
+        // return modelMapper.map(excel, Faq.class); // String categoryUid,
         Faq faq = Faq.builder().build();
         faq.setUid(uidUtils.getCacheSerialUid());
         faq.setTitle(excel.getTitle());
         faq.setContent(excel.getContent());
         // 
-        faq.setType(MessageTypeEnum.TEXT);
+        // faq.setType(MessageTypeEnum.TEXT);
+        faq.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         // 
-        faq.setCategoryUid(categoryUid);
+        // faq.setCategoryUid(categoryUid);
+        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        if (categoryOptional.isPresent()) {
+            faq.setCategoryUid(categoryOptional.get().getUid());
+        } else {
+            // create category
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(excel.getCategory())
+                    .kbUid(kbUid)
+                    .build();
+            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+            categoryRequest.setOrgUid(orgUid);
+            // 
+            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            faq.setCategoryUid(categoryResponse.getUid());
+        }
         faq.setKbUid(kbUid);
         faq.setOrgUid(orgUid);
         // 

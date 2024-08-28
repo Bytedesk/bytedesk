@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:30:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 18:10:39
+ * @LastEditTime: 2024-08-26 06:18:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,11 +16,10 @@ package com.bytedesk.core.push;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.enums.ClientEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,14 +57,18 @@ public class Push extends BaseEntity {
     // according to ip address
     private String ipLocation;
 
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Builder.Default
     // private String status = StatusConsts.CODE_STATUS_PENDING;
-    private PushStatus status = PushStatus.PENDING;
+    // private PushStatus status = PushStatus.PENDING;
+    @Column(name = "push_status")
+    private String status = PushStatusEnum.PENDING.name();
 
-    private String client;
-
-    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    private String client = ClientEnum.WEB.name();
+
+    // @Enumerated(EnumType.STRING)
+    @Builder.Default
+    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    private String platform = PlatformEnum.BYTEDESK.name();
 }

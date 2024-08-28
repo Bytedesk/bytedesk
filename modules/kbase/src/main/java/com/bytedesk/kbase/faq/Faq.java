@@ -19,8 +19,6 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,9 +48,10 @@ public class Faq extends BaseEntity {
     private String content;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "faq_type", nullable = false)
-    private MessageTypeEnum type = MessageTypeEnum.TEXT;
+    // private MessageTypeEnum type = MessageTypeEnum.TEXT;
+    private String type = MessageTypeEnum.TEXT.name();
 
     // 被点击查看次数
     @Builder.Default

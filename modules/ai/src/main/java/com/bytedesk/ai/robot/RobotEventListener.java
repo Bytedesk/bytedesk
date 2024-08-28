@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 10:46:16
+ * @LastEditTime: 2024-08-19 16:51:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,8 +28,10 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.ai.zhipuai.ZhipuaiService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageExtra;
@@ -42,8 +44,11 @@ import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
+import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.MessageConvertUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -63,6 +68,8 @@ public class RobotEventListener {
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final UidUtils uidUtils;
+
+    private final ThreadService threadService;
 
     @Order(5)
     @EventListener
@@ -182,9 +189,39 @@ public class RobotEventListener {
                 String json = JSON.toJSONString(clonedMessage);
                 bytedeskEventPublisher.publishMessageJsonEvent(json);
                 // 绑定知识库
-                zhipuaiService.sendWsAutoReply(query, robot.getKbUid(), message);
+                zhipuaiService.sendWsRobotMessage(query, robot.getKbUid(), robot, message);
             } else {
                 log.error("robot not found");
+            }
+        }
+
+    }
+
+    // 
+    @EventListener
+    public void onThreadCreateEvent(ThreadCreateEvent event) {
+        Thread thread = event.getThread();
+        log.info("robot ThreadCreateEvent: {}", thread.getUid());
+        //
+        if (thread.getType().equals(ThreadTypeEnum.ROBOT)
+            && thread.getAgent().equals(BdConstants.EMPTY_JSON_STRING)) {
+            // 机器人会话：org/robot/{robot_uid}/{visitor_uid}
+            String topic = thread.getTopic();
+            //
+            String[] splits = topic.split("/");
+            if (splits.length < 4) {
+                throw new RuntimeException("robot topic format error");
+            }
+            String robotUid = splits[2];
+            Optional<Robot> robotOptional = robotService.findByUid(robotUid);
+            if (robotOptional.isPresent()) {
+                Robot robot = robotOptional.get();
+                // 更新机器人配置+大模型相关信息
+                thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
+                        robot.getServiceSettings())));
+                thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
+                // 
+                threadService.save(thread);
             }
         }
 

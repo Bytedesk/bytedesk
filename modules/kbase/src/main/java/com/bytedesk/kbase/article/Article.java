@@ -33,8 +33,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -71,9 +69,10 @@ public class Article extends BaseEntity {
     private String contentHtml;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "article_type", nullable = false)
-    private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
+    // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
+    private String type = KnowledgebaseTypeEnum.HELPDOC.name();
 
     // @Builder.Default
     // @ManyToMany

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 15:50:25
+ * @LastEditTime: 2024-08-26 06:42:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,8 +25,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotMessage;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.robot.RobotTypeEnum;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.thread.Thread;
@@ -87,7 +89,6 @@ public class ZhipuaiService {
             {query}
             当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
             """;
-
     /**
      * sse调用
      */
@@ -105,9 +106,9 @@ public class ZhipuaiService {
         //
         String messageUid = uidUtils.getCacheSerialUid();
         Message message = Message.builder()
-                .type(MessageTypeEnum.ROBOT)
-                .status(MessageStatusEnum.SUCCESS)
-                .client(ClientEnum.SYSTEM)
+                .type(MessageTypeEnum.ROBOT.name())
+                .status(MessageStatusEnum.SUCCESS.name())
+                .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
                 .build();
         message.setUid(messageUid);
@@ -222,6 +223,85 @@ public class ZhipuaiService {
     /**
      * websocket 发送消息
      */
+    public void sendWsRobotMessage(String query, String kbUid, Robot robot, MessageProtobuf messageProtobuf) {
+        //
+        String prompt = robot.getLlm().getPrompt();
+        if (robot.getType().equals(RobotTypeEnum.SERVICE)
+            || robot.getType().equals(RobotTypeEnum.KNOWLEDGEBASE)) {
+            List<String> contentList = uploadVectorStore.searchText(query, kbUid);
+            String context = String.join("\n", contentList);
+            prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
+            log.info("sendWsRobotMessage prompt {}", prompt);
+        } else {
+            prompt = prompt + "\n" + query;
+        }
+        //
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
+        messages.add(chatMessage);
+        //
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                // 模型名称
+                .model(Constants.ModelChatGLM3TURBO)
+                // .model(robotSimple.getLlm().getModel())
+                // .temperature(robotSimple.getLlm().getTemperature())
+                // .topP(robotSimple.getLlm().getTopP())
+                .stream(Boolean.TRUE)
+                .messages(messages)
+                .requestId(messageProtobuf.getUid())
+                .build();
+        //
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        if (sseModelApiResp.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            List<Choice> choices = new ArrayList<>();
+            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                log.info("answer start: ");
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
+                                log.info("tool_calls: " + jsonString);
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
+                                String answerContent = accumulator.getDelta().getContent();
+                                log.info("answerContent {}", answerContent);
+                                if (StringUtils.hasText(answerContent)) {
+                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                    messageProtobuf.setContent(answerContent);
+                                    //
+                                    String json = JSON.toJSONString(messageProtobuf);
+                                    bytedeskEventPublisher.publishMessageJsonEvent(json);
+                                }
+                            }
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        log.info("answer end");
+                    })
+                    .lastElement()
+                    .blockingGet();
+
+            ModelData data = new ModelData();
+            data.setChoices(choices);
+            data.setUsage(chatMessageAccumulator.getUsage());
+            data.setId(chatMessageAccumulator.getId());
+            data.setCreated(chatMessageAccumulator.getCreated());
+            data.setRequestId(chatCompletionRequest.getRequestId());
+            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setData(data);
+            // 存储到数据库
+            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
+            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
+            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
+        }
+
+        String result = JSON.toJSONString(sseModelApiResp);
+        log.info("websocket output:" + result);
+    }
+
     public void sendWsAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
         //
         List<String> contentList = uploadVectorStore.searchText(query, kbUid);
@@ -295,11 +375,13 @@ public class ZhipuaiService {
         log.info("websocket output:" + result);
 
     }
-
+    
     public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
         return flowable.map(chunk -> {
             return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null, chunk.getChoices().get(0),
                     chunk.getUsage(), chunk.getCreated(), chunk.getId());
         });
     }
+
+    
 }

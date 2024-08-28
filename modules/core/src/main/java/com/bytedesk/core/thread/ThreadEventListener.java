@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 13:21:41
+ * @LastEditTime: 2024-08-27 14:39:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,9 +14,13 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.Optional;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
@@ -34,37 +38,31 @@ public class ThreadEventListener {
 
     private final TopicCacheService topicCacheService;
 
+    private final ThreadService threadService;
+
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         Thread thread = event.getThread();
         User user = thread.getOwner();
         log.info("thread ThreadCreateEvent: {}", thread.getUid());
-        //
-        if (thread.getType().equals(ThreadTypeEnum.MEMBER)) {
-            // 防止首次消息延迟，立即订阅
-            TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
-            topicService.create(request);
-        }
+        
         // // 机器人会话不需要订阅topic
         // if (event.getThread().getType().equals(ThreadTypeEnum.ROBOT)) {
         // return;
         // }
         // 创建客服会话之后，需要订阅topic
-        if (thread.getType().equals(ThreadTypeEnum.AGENT)
-                || thread.getType().equals(ThreadTypeEnum.WORKGROUP)) {
+        if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
+                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
             topicService.create(request);
-        }
-        // 文件助手、系统通知会话延迟订阅topic
-        if (thread.getType().equals(ThreadTypeEnum.ASISTANT)
-                || thread.getType().equals(ThreadTypeEnum.CHANNEL)) {
+        } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
+         || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
+                || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())) {
+                    // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
@@ -79,15 +77,45 @@ public class ThreadEventListener {
         User user = thread.getOwner();
         log.info("topic onThreadUpdateEvent: {}", thread.getUid());
         // TODO: 会话关闭之后，需要取消订阅
-        if (thread.getOwner() != null) {
+        // 
+        // 文件助手、系统通知会话延迟订阅topic
+        if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
+                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+            // 防止首次消息延迟，立即订阅
+            TopicRequest request = TopicRequest.builder()
+                    .topic(thread.getTopic())
+                    .userUid(user.getUid())
+                    .build();
+            topicService.create(request);
+        } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
+                || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
+                || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())) {
+            TopicRequest request = TopicRequest.builder()
+                    .topic(thread.getTopic())
+                    .userUid(user.getUid())
+                    .build();
+            topicCacheService.pushRequest(request);
+        } else if (thread.getOwner() != null) {
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
             // 防止首次消息延迟，立即订阅
             topicService.create(request);
-            // 首次消息会有延迟
-            // topicCacheService.push(JSON.toJSONString(request));
+        }
+    }
+
+
+    @EventListener
+    public void onMessageCreateEvent(MessageCreateEvent event) {
+        Message message = event.getMessage();
+        // log.info("robot message unread create event: " + event);
+        Optional<Thread> threadOptional = threadService.findByTopic(message.getThreadTopic());
+        if (threadOptional.isPresent()) {
+            Thread thread = threadOptional.get();
+            thread.setHide(false);
+            thread.setContent(message.getContent());
+            threadService.save(thread);
         }
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 06:46:12
+ * @LastEditTime: 2024-08-27 15:56:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,10 +21,10 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -90,8 +90,19 @@ public class KnowledgebaseRequest extends BaseRequest {
     private String embedding = KnowledgebaseConsts.KB_EMBEDING;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private LanguageEnum language = LanguageEnum.ZH_CN;
+    // @Enumerated(EnumType.STRING)
+    // private LanguageEnum language = LanguageEnum.ZH_CN;
+    private String language = LanguageEnum.ZH_CN.name();
+
+    @Builder.Default
+    // @Enumerated(EnumType.STRING)
+    // private LevelEnum level = LevelEnum.ORGNIZATION;
+    private String level = LevelEnum.ORGNIZATION.name();
+
+    @Builder.Default
+    // @Enumerated(EnumType.STRING)
+    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    private String platform = PlatformEnum.BYTEDESK.name();
 
     // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
     // private String categoryUid;
@@ -101,5 +112,7 @@ public class KnowledgebaseRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean published = true;
+
+    private String agentUid;
 
 }

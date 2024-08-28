@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 11:53:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 11:54:16
+ * @LastEditTime: 2024-08-20 12:52:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,6 @@ public class KbaseConst {
     private KbaseConst() {
     }
 
-    public static final String KBASE_FILE_UID = "fileUid";
-    public static final String KBASE_KB_UID = "kbUid";
+    public static final String KBASE_FILE_UID = "file_uid";
+    public static final String KBASE_KB_UID = "kb_uid";
 }

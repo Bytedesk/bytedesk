@@ -20,8 +20,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -85,8 +83,9 @@ public class User extends BaseEntityNoOrg {
 	private String description = I18Consts.I18N_USER_DESCRIPTION;
 
 	@Builder.Default
-	@Enumerated(EnumType.STRING)
-	private Sex sex = Sex.UNKNOWN;
+	// @Enumerated(EnumType.STRING)
+	// private Sex sex = Sex.UNKNOWN;
+	private String sex = Sex.UNKNOWN.name();
 
 	@Builder.Default
 	@Column(name = "is_enabled")
@@ -105,9 +104,10 @@ public class User extends BaseEntityNoOrg {
 	private boolean mobileVerified = false;
 
 	@Builder.Default
-	@Enumerated(EnumType.STRING)
-	private PlatformEnum platform = PlatformEnum.BYTEDESK;
-	//
+	// @Enumerated(EnumType.STRING)
+	// private PlatformEnum platform = PlatformEnum.BYTEDESK;
+	private String platform = PlatformEnum.BYTEDESK.name();
+	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Organization currentOrganization;

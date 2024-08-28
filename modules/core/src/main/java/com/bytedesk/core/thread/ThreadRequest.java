@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 09:55:07
+ * @LastEditTime: 2024-08-16 08:12:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,7 @@ public class ThreadRequest extends BaseRequest {
     private Boolean mute = false;
 
     @Builder.Default
-    private boolean hide = false;
+    private Boolean hide = false;
 
     @Builder.Default
     private Integer star = 0;

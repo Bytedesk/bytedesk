@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-23 09:00:08
+ * @LastEditTime: 2024-08-26 11:17:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,10 +24,14 @@ import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import com.zhipu.oapi.ClientV4;
 
 /**
+ * https://open.bigmodel.cn/dev/api#sdk_install
+ * https://github.com/MetaGLM/zhipuai-sdk-java-v4
+ * 
  * https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
  * https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
  */
@@ -42,11 +46,6 @@ public class ZhipuaiConfig {
         return new ZhiPuAiApi(zhiPuAiApiKey);
     }
 
-    @Bean
-    ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel() {
-        return new ZhiPuAiEmbeddingModel(zhipuaiApi());
-    }
-
     // https://open.bigmodel.cn/overview
     @Bean
     ZhiPuAiEmbeddingOptions ZhiPuAiEmbeddingOptions() {
@@ -57,6 +56,13 @@ public class ZhipuaiConfig {
     }
 
     @Bean
+    @Primary
+    ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel() {
+        return new ZhiPuAiEmbeddingModel(zhipuaiApi());
+    }
+
+    @Bean
+    @Primary
     ZhiPuAiChatModel zhipuaiChatModel() {
         return new ZhiPuAiChatModel(zhipuaiApi(), ZhiPuAiChatOptions.builder()
                 .withModel(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())

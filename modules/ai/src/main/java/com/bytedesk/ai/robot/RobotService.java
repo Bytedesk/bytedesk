@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 22:16:34
+ * @LastEditTime: 2024-08-26 06:42:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,6 +78,14 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    public RobotResponse queryByUid(String uid) {
+        Optional<Robot> robotOptional = robotRepository.findByUid(uid);
+        if (robotOptional.isPresent()) {
+            return modelMapper.map(robotOptional.get(), RobotResponse.class);
+        }
+        return null;
+    }
+
     @Override
     public RobotResponse create(RobotRequest request) {
 
@@ -96,7 +104,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             robot.setUid(uidUtils.getCacheSerialUid());
         }
         robot.setNickname(request.getNickname());
-        robot.setType(RobotTypeEnum.fromValue(request.getType()));
+        robot.setType(RobotTypeEnum.fromValue(request.getType()).name());
         robot.setOrgUid(request.getOrgUid());
         robot.setLlm(llm);
         //

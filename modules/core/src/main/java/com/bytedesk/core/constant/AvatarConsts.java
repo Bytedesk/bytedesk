@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-03 13:13:27
+ * @LastEditTime: 2024-08-10 12:52:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -133,7 +133,7 @@ public class AvatarConsts {
      * default group avatar
      * 默认群组头像
      */
-    public static final String DEFAULT_GROUP_AVATAR_URL = "https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/group_default_avatar.png";
+    public static final String DEFAULT_GROUP_AVATAR_URL = "https://cdn.weiyuai.cn/avatars/group_default_avatar.png";
     
     // 文件助手头像
     public static final String DEFAULT_FILE_ASISTANT_AVATAR_URL = "https://cdn.weiyuai.cn/avatars/file_asistant_avatar.png";
@@ -143,8 +143,8 @@ public class AvatarConsts {
 
     /**
      * 测试头像：
-     * https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/girl.png
-     * https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/boy.png
+     * https://cdn.weiyuai.cn/avatars/girl.png
+     * https://cdn.weiyuai.cn/avatars/boy.png
      */
     
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 11:03:27
+ * @LastEditTime: 2024-08-24 07:35:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,11 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -40,6 +45,8 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final CategoryService categoryService;
 
     @Override
     public Page<TabooResponse> queryByOrg(TabooRequest request) {
@@ -140,13 +147,29 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
         return modelMapper.map(response, TabooExcel.class);
     }
 
-    public Taboo convertExcelToTaboo(TabooExcel excel, String categoryUid, String kbUid, String orgUid) {
-        // return modelMapper.map(excel, Taboo.class);
+    public Taboo convertExcelToTaboo(TabooExcel excel, String kbUid, String orgUid) {
+        // return modelMapper.map(excel, Taboo.class); // String categoryUid,
         Taboo taboo = Taboo.builder().build();
         taboo.setUid(uidUtils.getCacheSerialUid());
         taboo.setContent(excel.getContent());
         // 
-        taboo.setCategoryUid(categoryUid);
+        // taboo.setCategoryUid(categoryUid);
+         Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        if (categoryOptional.isPresent()) {
+            taboo.setCategoryUid(categoryOptional.get().getUid());
+        } else {
+            // create category
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(excel.getCategory())
+                    .kbUid(kbUid)
+                    .build();
+            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_TABOO);
+            categoryRequest.setOrgUid(orgUid);
+            // 
+            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            taboo.setCategoryUid(categoryResponse.getUid());
+        }
+        // 
         taboo.setKbUid(kbUid);
         taboo.setOrgUid(orgUid);
 

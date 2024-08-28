@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 10:32:57
+ * @LastEditTime: 2024-08-24 08:01:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,15 +26,23 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class KeywordExcel {
 
-    @ExcelProperty(index = 0, value = "关键词")
+    @ExcelProperty(index = 0, value = "分类")
+    @ColumnWidth(20)
+    private String category;
+
+    // @ExcelProperty(index = 1, value = "类型")
+    // @ColumnWidth(20)
+    // private String type;
+    
+    @ExcelProperty(index = 1, value = "关键词")
     @ColumnWidth(20)
     private String keyword;
 
-    @ExcelProperty(index = 1, value = "回复内容")
+    @ExcelProperty(index = 2, value = "回复内容")
     @ColumnWidth(20)
     private String reply;
 
-    @ExcelProperty(index = 2, value = "匹配模式")
+    @ExcelProperty(index = 3, value = "匹配模式")
     @ColumnWidth(20)
     private String matchType;
 

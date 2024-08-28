@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 13:57:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 10:32:05
+ * @LastEditTime: 2024-08-27 13:03:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,8 +15,11 @@
 package com.bytedesk.core.rbac.organization;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.utils.ApplicationContextHolder;
 
 // import com.bytedesk.core.event.BytedeskEventPublisher;
 // import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -34,15 +37,23 @@ public class OrganizationEntityListener {
     @PostPersist
     public void onPostCreate(Organization organization) {
         log.info("onPostCreate: {}", organization);
+        Organization clonedOrg = SerializationUtils.clone(organization);
 
         if (BdConstants.DEFAULT_ORGANIZATION_UID.equals(organization.getUid())) {
             return;
         }
 
+        // event listener order 
+        // 1. member, 
+        // 2. category, 
+        // 3. faq, 
+        // 4. quickbutton, 
+        // 5. robot, 
+        // 6. agent, 
+        // 7. workgroup,
         // 放在此处会报错，直接放到service Create中
-        // BytedeskEventPublisher bytedeskEventPublisher =
-        // ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        // bytedeskEventPublisher.publishOrganizationCreateEvent(organization);
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishOrganizationCreateEvent(clonedOrg);
     }
 
 }

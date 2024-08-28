@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 14:08:12
+ * @LastEditTime: 2024-08-24 22:16:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,6 @@ import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.utils.ConvertUtils;
 
 // import com.bytedesk.core.uid.UidUtils;
-
 import lombok.AllArgsConstructor;
 
 @Service

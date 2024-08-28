@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 09:54:04
+ * @LastEditTime: 2024-08-27 14:21:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,6 +52,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class InitDataRunner implements ApplicationRunner {
 
+    @Value("${application.version}")
+    private String version;
+    
     @Value("${server.port}")
     private String port;
 
@@ -140,8 +143,6 @@ public class InitDataRunner implements ApplicationRunner {
 
         faqService.initData();
 
-        // quickButtonService.initData();
-
         robotService.initData();
 
         agentService.initData();
@@ -158,7 +159,7 @@ public class InitDataRunner implements ApplicationRunner {
 
         // logEventProducer.simulate();
 
-        log.debug("application started. you can now open: http://127.0.0.1:{}/dev", port);
+        log.debug("bytedesk.im v{} started at: http://127.0.0.1:{}/dev", version, port);
     }
 
 }

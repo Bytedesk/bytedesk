@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 06:24:32
+ * @LastEditTime: 2024-08-27 13:54:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,13 +21,14 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +47,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ KnowledgebaseEntityListener.class })
 @Table(name = "kb_base")
 public class Knowledgebase extends BaseEntity {
 
@@ -54,9 +56,10 @@ public class Knowledgebase extends BaseEntity {
     private String name;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "kb_type", nullable = false)
-    private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
+    // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
+    private String type = KnowledgebaseTypeEnum.HELPDOC.name();
 
     // headline标头
     @Builder.Default
@@ -108,8 +111,19 @@ public class Knowledgebase extends BaseEntity {
     private String embedding = KnowledgebaseConsts.KB_EMBEDING;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private LanguageEnum language = LanguageEnum.ZH_CN;
+    // @Enumerated(EnumType.STRING)
+    // private LanguageEnum language = LanguageEnum.ZH_CN;
+    private String language = LanguageEnum.ZH_CN.name();
+
+    @Builder.Default
+    // @Enumerated(EnumType.STRING)
+    // private LevelEnum level = LevelEnum.ORGNIZATION;
+    private String level = LevelEnum.ORGNIZATION.name();
+
+    @Builder.Default
+    // @Enumerated(EnumType.STRING)
+    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    private String platform = PlatformEnum.BYTEDESK.name();
 
     // @Builder.Default
     // @ManyToMany
@@ -123,6 +137,6 @@ public class Knowledgebase extends BaseEntity {
     @Builder.Default
     private boolean published = true;
 
-    // 创建者
-    private String userUid;
+    // 某人工客服快捷回复知识库
+    private String agentUid;
 }

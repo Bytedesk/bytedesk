@@ -19,8 +19,6 @@ import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,8 +53,9 @@ public class Tag extends BaseEntity {
     // private String color;
 
 
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Builder.Default
-    private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    private String platform = PlatformEnum.BYTEDESK.name();
 
 }

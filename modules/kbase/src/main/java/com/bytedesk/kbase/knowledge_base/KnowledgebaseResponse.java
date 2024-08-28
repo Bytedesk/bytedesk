@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 06:46:23
+ * @LastEditTime: 2024-08-27 16:26:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,10 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.enums.LanguageEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,7 +31,7 @@ public class KnowledgebaseResponse extends BaseResponse {
 
     private String name;
 
-    private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
+    private String type;
 
     // headline标头
     private String headline;
@@ -67,14 +64,19 @@ public class KnowledgebaseResponse extends BaseResponse {
 
     private String embedding;
 
-    private LanguageEnum language = LanguageEnum.ZH_CN;
+    private String language;
 
-    private List<String> tags = new ArrayList<>();
+    private String level;
 
-    private Boolean published = true;
+    private String platform;
+
+    private List<String> tags;
+
+    private Boolean published;
 
     private String orgUid;
 
     private Date updatedAt;
 
+    private String agentUid;
 }

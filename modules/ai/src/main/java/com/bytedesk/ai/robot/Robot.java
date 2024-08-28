@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 22:14:15
+ * @LastEditTime: 2024-08-26 06:10:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,8 +28,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -77,14 +75,16 @@ public class Robot extends BaseEntity {
 
     // service、ask、chat
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "robot_type", nullable = false)
-    private RobotTypeEnum type = RobotTypeEnum.SERVICE;
+    // private RobotTypeEnum type = RobotTypeEnum.SERVICE;
+    private String type = RobotTypeEnum.SERVICE.name();
 
     // private、team、public
-    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private LevelEnum level = LevelEnum.ORGNIZATION;
+    // @Enumerated(EnumType.STRING)
+    // private LevelEnum level = LevelEnum.ORGNIZATION;
+     private String level = LevelEnum.ORGNIZATION.name();
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
@@ -93,6 +93,10 @@ public class Robot extends BaseEntity {
 
     @Builder.Default
     private boolean published = false;
+
+    // @Builder.Default
+    // @Column(name = "is_private")
+    // private boolean isPrivate = false;
 
     private String kbUid; // 对应知识库
 
