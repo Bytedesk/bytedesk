@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 08:46:26
+ * @LastEditTime: 2024-08-24 06:18:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ public enum MessageTypeEnum {
     WELCOME,
     CONTINUE,
     SYSTEM,
+    NOTICE,
     TEXT,
     IMAGE,
     FILE,
@@ -28,7 +29,7 @@ public enum MessageTypeEnum {
     LOCATION,
     GOODS, // 商品
     CARD,
-    EVENT,
+    EVENT, // 事件：离线、上线等
     GUESS, // 猜你想问
     HOT, // 热门话题
     SHORTCUT, // 快捷路径
@@ -82,7 +83,8 @@ public enum MessageTypeEnum {
                 return type;
             }
         }
-        throw new IllegalArgumentException("No MessageTypeEnum constant with value: " + value);
+        // throw new IllegalArgumentException("No MessageTypeEnum constant with value: " + value);
+        return TEXT;
     }
 
     public static boolean isRecept(MessageTypeEnum type) {

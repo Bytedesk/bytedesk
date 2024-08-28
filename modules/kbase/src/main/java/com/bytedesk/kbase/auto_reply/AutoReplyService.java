@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 10:23:55
+ * @LastEditTime: 2024-08-26 06:46:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,11 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -40,6 +45,8 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
     private final UidUtils uidUtils;
 
     private final ModelMapper modelMapper;
+
+    private final CategoryService categoryService;
 
     @Override
     public Page<AutoReplyResponse> queryByOrg(AutoReplyRequest request) {
@@ -143,15 +150,33 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
         return modelMapper.map(autoReply, AutoReplyExcel.class);
     }
 
-    public AutoReply convertExcelToAutoReply(AutoReplyExcel excel, String categoryUid, String kbUid, String orgUid) {
+    // String categoryUid,
+    public AutoReply convertExcelToAutoReply(AutoReplyExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, AutoReply.class);
         AutoReply autoReply = AutoReply.builder().build();
         autoReply.setUid(uidUtils.getCacheSerialUid());
         autoReply.setContent(excel.getContent());
         // 
-        autoReply.setType(MessageTypeEnum.TEXT); // TODO: 根据实际类型设置
+        // autoReply.setType(MessageTypeEnum.TEXT); // TODO: 根据实际类型设置
+        autoReply.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         // 
-        autoReply.setCategoryUid(categoryUid);
+        // autoReply.setCategoryUid(categoryUid);
+        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        if (categoryOptional.isPresent()) {
+            autoReply.setCategoryUid(categoryOptional.get().getUid());
+        } else {
+            // create category
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(excel.getCategory())
+                    .kbUid(kbUid)
+                    .build();
+            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_AUTOREPLY);
+            categoryRequest.setOrgUid(orgUid);
+            // 
+            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            autoReply.setCategoryUid(categoryResponse.getUid());
+        }
+        // 
         autoReply.setKbUid(kbUid);
         autoReply.setOrgUid(orgUid);
 

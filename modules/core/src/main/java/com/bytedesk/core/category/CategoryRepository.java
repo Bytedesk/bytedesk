@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 17:09:40
+ * @LastEditTime: 2024-08-27 18:10:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,14 +20,26 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
-
 public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
     Optional<Category> findByUid(String uid);
-    List<Category> findByParentAndPlatformOrderByOrderNoAsc(Category parent, PlatformEnum platform);
-    Optional<Category> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid, 
-            PlatformEnum platform);
-    Optional<Category> findByNameAndTypeAndLevelAndPlatform(String name, String type, LevelEnum level,
-            PlatformEnum platform);
+    // 
+    List<Category> findByParentAndPlatformAndDeletedOrderByOrderNoAsc(Category parent, String platform,
+                    Boolean deleted);
+            
+    Optional<Category> findByNameAndTypeAndOrgUidAndPlatformAndDeleted(String name, String type, String orgUid, String platform,
+                    Boolean deleted);
+            
+    Optional<Category> findByNameAndTypeAndLevelAndPlatformAndDeleted(String name, String type, String level, String platform,
+            Boolean deleted);
+
+    Optional<Category> findByNameAndKbUidAndDeleted(String name, String kbUid, Boolean deleted);
+
+    List<Category> findByKbUidAndDeleted(String kbUid, Boolean deleted);
+
+//     List<Category> findByLevelAndDeleted(String level, Boolean deleted);
+
+//     List<Category> findByLevelAndOrgUidAndDeleted(String level, String orgUid, Boolean deleted);
+
+//     List<Category> findByLevelAndAgentUidAndDeleted(String level, String agentUid, Boolean deleted);
+    
 }

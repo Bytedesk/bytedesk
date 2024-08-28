@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 19:17:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-18 19:19:15
+ * @LastEditTime: 2024-08-12 16:53:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,8 +83,9 @@ public class KaptchaController {
         //
         String captchaUid = map.get("captchaUid");
         String captchaCode = map.get("captchaCode");
+        String client = map.get("client");
         log.info("checkKaptcha captchaUid {} captchaCode {}", captchaUid, captchaCode);
-        if (kaptchaCacheService.checkKaptcha(captchaUid, captchaCode)) {
+        if (kaptchaCacheService.checkKaptcha(captchaUid, captchaCode, client)) {
             return ResponseEntity.ok(JsonResult.success("kaptcha success"));
         } else {
             return ResponseEntity.ok(JsonResult.error("kaptcha failed", -1));

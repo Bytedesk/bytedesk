@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 17:53:24
+ * @LastEditTime: 2024-08-26 06:34:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,6 @@ import com.bytedesk.core.enums.ClientEnum;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,7 +64,10 @@ public class Visitor extends BaseEntity {
 
 	private String note;
 
+	@Builder.Default
 	// private String client;
-	@Enumerated(EnumType.STRING)
-	private ClientEnum client;
+	// @Enumerated(EnumType.STRING)
+	// private ClientEnum client;
+	private String client = ClientEnum.WEB.name();
+	
 }

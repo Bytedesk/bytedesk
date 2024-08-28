@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 17:58:32
+ * @LastEditTime: 2024-08-24 10:11:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
-// import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 
@@ -40,9 +39,10 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
     // private final BytedeskEventPublisher bytedeskEventPublisher;
     @Override
     public void onApplicationEvent(@NonNull SessionConnectedEvent sessionConnectedEvent) {
-        log.debug(sessionConnectedEvent.toString());
+        log.debug("sessionConnectedEvent {}", sessionConnectedEvent.toString());
         // 
         // bytedeskEventPublisher.publishStompConnectedEvent(null);
+        // TODO: 访客上线，通知客服端
     }
 
 }

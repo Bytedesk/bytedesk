@@ -20,8 +20,6 @@ import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,9 +43,11 @@ public class AutoReply extends BaseEntity {
 
     @Builder.Default
     // 如果使用int存储，enum中类型的顺序改变，会导致数据库中的数据类型改变，导致无法查询到数据
-    @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
+    // @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
     @Column(name = "message_type", nullable = false)
-    private MessageTypeEnum type = MessageTypeEnum.TEXT;
+    // private MessageTypeEnum type = MessageTypeEnum.TEXT;
+    private String type = MessageTypeEnum.TEXT.name();
+
     //
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;

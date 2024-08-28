@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 09:50:19
+ * @LastEditTime: 2024-08-26 06:43:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,8 +42,7 @@ public class MessagePersistService {
         //
         MessageTypeEnum type = messageProtobuf.getType();
         String threadTopic = messageProtobuf.getThread().getTopic();
-        MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
-        String orgUid = extraObject.getOrgUid();
+        
         // log.info("orgUid: {}", orgUid);
 
         // 返回true表示该消息是系统通知，不应该保存到数据库
@@ -73,11 +72,16 @@ public class MessagePersistService {
         Message message = modelMapper.map(messageProtobuf, Message.class);
         //
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
-            message.setStatus(MessageStatusEnum.SUCCESS);
+            message.setStatus(MessageStatusEnum.SUCCESS.name());
         }
         message.setThreadTopic(threadTopic);
         message.setUser(JSON.toJSONString(messageProtobuf.getUser()));
-        message.setOrgUid(orgUid);
+        // 
+        MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+        if (extraObject != null) {
+            String orgUid = extraObject.getOrgUid();
+            message.setOrgUid(orgUid);
+        }
         //
         messageService.save(message);
     }
@@ -174,12 +178,12 @@ public class MessagePersistService {
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止deliverd在后面更新read消息
         Optional<Message> messageOpt = messageService.findByUid(message.getContent());
-        if (messageOpt.isPresent() && messageOpt.get().getStatus() != MessageStatusEnum.READ) {
+        if (messageOpt.isPresent() && messageOpt.get().getStatus() != MessageStatusEnum.READ.name()) {
             Message messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.READ)) {
-                messageEntity.setStatus(MessageStatusEnum.READ);
+                messageEntity.setStatus(MessageStatusEnum.READ.name());
             } else if (type.equals(MessageTypeEnum.DELIVERED)) {
-                messageEntity.setStatus(MessageStatusEnum.DELIVERED);
+                messageEntity.setStatus(MessageStatusEnum.DELIVERED.name());
             }
             messageService.save(messageEntity);
         }
@@ -198,10 +202,10 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             Message messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.RATE_SUBMIT)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_SUBMIT);
+                messageEntity.setStatus(MessageStatusEnum.RATE_SUBMIT.name());
                 messageEntity.setContent(message.getExtra());
             } else if (type.equals(MessageTypeEnum.RATE_CANCEL)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_CANCEL);
+                messageEntity.setStatus(MessageStatusEnum.RATE_CANCEL.name());
             }
             messageService.save(messageEntity);
         }
@@ -213,7 +217,7 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             Message messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
-                messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT);
+                messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
                 messageEntity.setContent(message.getExtra());
                 messageService.save(messageEntity);
             }
@@ -227,9 +231,9 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             Message messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.FAQ_UP)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_UP);
+                messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
             } else if (type.equals(MessageTypeEnum.FAQ_DOWN)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_DOWN);
+                messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
             }
             messageService.save(messageEntity);
         }
@@ -242,9 +246,9 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             Message messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.ROBOT_UP)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_UP);
+                messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
             } else if (type.equals(MessageTypeEnum.ROBOT_DOWN)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_DOWN);
+                messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
             }
             messageService.save(messageEntity);
         }
@@ -259,9 +263,9 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             Message messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)) {
-                messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPT);
+                messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPT.name());
             } else if (type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
-                messageEntity.setStatus(MessageStatusEnum.TRANSFER_REJECT);
+                messageEntity.setStatus(MessageStatusEnum.TRANSFER_REJECT.name());
             }
             messageService.save(messageEntity);
         }

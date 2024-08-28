@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 22:55:52
+ * @LastEditTime: 2024-08-26 06:50:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,6 +83,7 @@ public class MemberService {
                 "id");
 
         Specification<Member> spec = MemberSpecification.search(memberRequest);
+        
         Page<Member> memberPage = memberRepository.findAll(spec, pageable);
 
         return memberPage.map(this::convertToResponse);
@@ -131,17 +132,17 @@ public class MemberService {
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = modelMapper.map(memberRequest, UserRequest.class);
         userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
-        userRequest.setPlatform(PlatformEnum.BYTEDESK);
+        userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
         userRequest.setOrgUid(depOptional.get().getOrgUid());
         //
         User user = null;
         if (StringUtils.hasText(memberRequest.getMobile())) {
             user = userService.findByMobileAndPlatform(memberRequest.getMobile(),
-                    PlatformEnum.BYTEDESK)
+                    PlatformEnum.BYTEDESK.name())
                     .orElseGet(() -> userService.createUser(userRequest));
         } else if (StringUtils.hasText(memberRequest.getEmail())) {
             user = userService.findByEmailAndPlatform(memberRequest.getEmail(),
-                    PlatformEnum.BYTEDESK)
+                    PlatformEnum.BYTEDESK.name())
                     .orElseGet(() -> userService.createUser(userRequest));
         } else {
             throw new RuntimeException("mobile and email should not be both null.");
@@ -315,7 +316,7 @@ public class MemberService {
         reverseThread.setType(thread.getType());
         // TODO: 同事私聊被动方默认不显示会话，直到收到一条消息
         // reverseThread.setHide(true);
-        reverseThread.setClient(ClientEnum.SYSTEM);
+        reverseThread.setClient(ClientEnum.SYSTEM.name());
         reverseThread.setOrgUid(thread.getOrgUid());
         reverseThread.setOwner(reverseMemberOptional.get().getUser());
         //

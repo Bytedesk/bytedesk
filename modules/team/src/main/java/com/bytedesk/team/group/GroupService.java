@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-01 18:36:47
+ * @LastEditTime: 2024-08-26 06:49:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,7 +93,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
         Group group = Group.builder().build();
         group.setName(request.getName());
         group.setUid(uidUtils.getCacheSerialUid());
-        group.setType(GroupTypeEnum.fromValue(request.getType()));
+        group.setType(GroupTypeEnum.fromValue(request.getType()).name());
         // 
         group.getAdmins().add(creator);
         // 
@@ -130,7 +130,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
         Optional<Group> groupOptional = findByUid(request.getUid());
         if (groupOptional.isPresent()) {
             Group group = groupOptional.get();
-            group.setStatus(GroupStatusEnum.DISMISSED);
+            group.setStatus(GroupStatusEnum.DISMISSED.name());
             //
             save(group);
             // 解散相关会话thread

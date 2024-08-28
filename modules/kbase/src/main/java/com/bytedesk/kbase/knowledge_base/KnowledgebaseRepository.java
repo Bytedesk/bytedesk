@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 18:33:20
+ * @LastEditTime: 2024-08-27 21:44:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +24,11 @@ public interface KnowledgebaseRepository
         extends JpaRepository<Knowledgebase, Long>, JpaSpecificationExecutor<Knowledgebase> {
 
     Optional<Knowledgebase> findByUid(String uid);
+
+    List<Knowledgebase> findByLevelAndTypeAndDeleted(String level, String type, Boolean deleted);
+
+    List<Knowledgebase> findByLevelAndTypeAndOrgUidAndDeleted(String level, String type, String orgUid, Boolean deleted);
+
+    List<Knowledgebase> findByLevelAndTypeAndAgentUidAndDeleted(String level, String type, String agentUid, Boolean deleted);
 
 }

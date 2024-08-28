@@ -34,11 +34,11 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PushRequest extends BaseRequest {
-    
+
     private static final long serialVersionUID = 1L;
-            
+
     private String sender;
-    
+
     private String receiver;
 
     private String ip;
@@ -47,8 +47,10 @@ public class PushRequest extends BaseRequest {
     private String ipLocation;
 
     @Builder.Default
-    private PushStatus status = PushStatus.PENDING;
+    // private PushStatusEnum status = PushStatusEnum.PENDING;
+    private String status = PushStatusEnum.PENDING.name();
 
     @Builder.Default
-    private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    private String platform = PlatformEnum.BYTEDESK.name();
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:31:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 11:56:40
+ * @LastEditTime: 2024-08-19 13:48:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,8 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -48,6 +47,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ ActionEntityListener.class })
 @Table(name = "core_action")
 public class Action extends BaseEntity {
 
@@ -65,10 +65,11 @@ public class Action extends BaseEntity {
     private String ipLocation;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "action_type", nullable = false)
     // private String type = TypeConsts.ACTION_TYPE_LOG;
-    private ActionTypeEnum type = ActionTypeEnum.LOG;
+    // private ActionTypeEnum type = ActionTypeEnum.LOG;
+    private String type = ActionTypeEnum.LOG.name();
 
     // action failed object
     @Builder.Default
@@ -81,8 +82,10 @@ public class Action extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @Enumerated(EnumType.STRING)
+
     @Builder.Default
-    private PlatformEnum platform = PlatformEnum.BYTEDESK;
+    // @Enumerated(EnumType.STRING)
+    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
+     private String platform = PlatformEnum.BYTEDESK.name();
 
 }

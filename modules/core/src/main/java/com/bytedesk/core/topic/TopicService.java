@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 18:40:59
+ * @LastEditTime: 2024-08-19 12:23:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,8 +32,8 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionRequest;
+import com.bytedesk.core.action.ActionService;
 import com.bytedesk.core.action.ActionTypeEnum;
-import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -50,7 +50,8 @@ public class TopicService {
 
     private final UidUtils uidUtils;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final ActionService actionService;
 
     private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
 
@@ -280,7 +281,8 @@ public class TopicService {
                 .extra(topicJSON)
                 .build();
         actionRequest.setType(ActionTypeEnum.FAILED.name());
-        bytedeskEventPublisher.publishActionEvent(actionRequest);
+        actionService.create(actionRequest);
+        // bytedeskEventPublisher.publishActionEvent(actionRequest);
         log.error("All retry attempts failed for optimistic locking of topic: {}", topic.getUserUid());
         // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
         // notifyUserOfFailure(topic);

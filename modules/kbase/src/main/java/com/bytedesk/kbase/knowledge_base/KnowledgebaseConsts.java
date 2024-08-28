@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-24 11:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 18:33:00
+ * @LastEditTime: 2024-08-27 15:08:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,22 @@ public class KnowledgebaseConsts {
     }
 
     public static final String KB_NAME = I18Consts.I18N_PREFIX + "kb.name";
+
+    public static final String KB_PLATFORM_NAME = I18Consts.I18N_PREFIX + "kb.platform.name";
+
+    public static final String KB_HELPDOC_NAME = I18Consts.I18N_PREFIX + "kb.helpdoc.name";
+
+    public static final String KB_LLM_NAME = I18Consts.I18N_PREFIX + "kb.llm.name";
+
+    public static final String KB_KEYWORD_NAME = I18Consts.I18N_PREFIX + "kb.keyword.name";
+
+    public static final String KB_FAQ_NAME = I18Consts.I18N_PREFIX + "kb.faq.name";
+
+    public static final String KB_AUTOREPLY_NAME = I18Consts.I18N_PREFIX + "kb.autoreply.name";
+
+    public static final String KB_QUICKREPLY_NAME = I18Consts.I18N_PREFIX + "kb.quickreply.name";
+
+    public static final String KB_TABOO_NAME = I18Consts.I18N_PREFIX + "kb.taboo.name";
 
     public static final String KB_DESCRIPTION = I18Consts.I18N_PREFIX + "kb.description";
 

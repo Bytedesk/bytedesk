@@ -24,16 +24,20 @@ import lombok.Data;
 @Data
 public class QuickReplyExcel {
 
-    @ExcelProperty(index = 0, value = "标题")
+    @ExcelProperty(index = 0, value = "分类")
     @ColumnWidth(20)
-    private String title;
+    private String category;
 
-    @ExcelProperty(index = 1, value = "内容")
-    @ColumnWidth(20)
-    private String content;
-
-    @ExcelProperty(index = 2, value = "类型")
+    @ExcelProperty(index = 1, value = "类型")
     @ColumnWidth(20)
     private String type;
 
+    @ExcelProperty(index = 2, value = "标题")
+    @ColumnWidth(20)
+    private String title;
+
+    @ExcelProperty(index = 3, value = "内容")
+    @ColumnWidth(20)
+    private String content;
+    
 }

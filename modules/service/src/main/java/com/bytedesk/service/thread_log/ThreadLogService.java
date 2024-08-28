@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:47:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-12 11:54:23
+ * @LastEditTime: 2024-08-26 06:47:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,14 +89,14 @@ public class ThreadLogService {
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            if (thread.getType() == ThreadTypeEnum.WORKGROUP || thread.getType() == ThreadTypeEnum.AGENT) {
+            if (thread.getType() == ThreadTypeEnum.WORKGROUP.name() || thread.getType() == ThreadTypeEnum.AGENT.name()) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();
                 if (diffInMinutes > autoCloseMinites) {
                     threadService.autoClose(thread);
                 }
-            } else if (thread.getType() == ThreadTypeEnum.ROBOT) {
+            } else if (thread.getType() == ThreadTypeEnum.ROBOT.name()) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();

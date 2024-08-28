@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 10:46:33
+ * @LastEditTime: 2024-08-27 16:28:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,8 +23,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-// import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
@@ -34,6 +36,9 @@ import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadUpdateEvent;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
 import com.bytedesk.service.worktime.WorktimeService;
 import com.bytedesk.team.member.Member;
 import com.bytedesk.team.member.MemberService;
@@ -51,11 +56,13 @@ public class AgentEventListener {
     private final MemberService memberService;
 
     private final WorktimeService worktimeService;
+
+    private final KnowledgebaseService knowledgebaseService;
     
     private final UidUtils uidUtils;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
-    @Order(6) // membereventlistener是1，robot是2，agent是3，wg是4
+    @Order(6)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         Organization organization = (Organization) event.getSource();
@@ -98,6 +105,27 @@ public class AgentEventListener {
         agentService.create(agent1Request);
     }
 
+
+    @EventListener
+    public void onAgentCreateEvent(GenericApplicationEvent<AgentCreateEvent> event) {
+        AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
+        Agent agent = agentCreateEvent.getAgent();
+        log.info("agent onAgentCreateEvent: {}", agent.getUid());
+        // 创建快捷回复知识库
+        KnowledgebaseRequest kownledgebaseRequeqstQuickReply = KnowledgebaseRequest.builder()
+                .name(agent.getNickname() +  "Kb")
+                .descriptionHtml(agent.getNickname() + "Kb")
+                .language(LanguageEnum.ZH_CN.name())
+                .level(LevelEnum.AGENT.name())
+                .build();
+        kownledgebaseRequeqstQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequeqstQuickReply.setOrgUid(agent.getOrgUid());
+        kownledgebaseRequeqstQuickReply.setAgentUid(agent.getUid());
+        knowledgebaseService.create(kownledgebaseRequeqstQuickReply);
+        // 
+    }
+
+    
     // TODO: 定时ping客服，检查在线状态
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {

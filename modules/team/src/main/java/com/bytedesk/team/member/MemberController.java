@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 06:47:27
+ * @LastEditTime: 2024-08-14 10:29:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@ import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
+// import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mem")
-@Tag(name = "member", description = "member apis")
+// @Tag(name = "member", description = "member apis")
 public class MemberController extends BaseController<MemberRequest> {
 
     private final MemberService memberService;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:42:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-28 07:28:29
+ * @LastEditTime: 2024-08-27 12:58:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,11 +16,10 @@ package com.bytedesk.core.config;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
-// import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.action.ActionEvent;
-import com.bytedesk.core.action.ActionRequest;
+import com.bytedesk.core.action.Action;
+import com.bytedesk.core.action.ActionCreateEvent;
 import com.bytedesk.core.event.GenericApplicationEvent;
 // import com.bytedesk.core.cache.CaffeineCacheGroupEvent;
 import com.bytedesk.core.message.MessageProtoEvent;
@@ -137,8 +136,8 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new ThreadUpdateEvent(this, thread));
     }
 
-    public void publishActionEvent(ActionRequest actionRequest) {
-        applicationEventPublisher.publishEvent(new ActionEvent(this, actionRequest));
+    public void publishActionCreateEvent(Action action) {
+        applicationEventPublisher.publishEvent(new ActionCreateEvent(this, action));
     }
 
     public void publishOrganizationCreateEvent(Organization organization) {
@@ -146,11 +145,14 @@ public class BytedeskEventPublisher {
     }
 
     // public void publishEmailAlreadyExistsEvent(String email) {
-    //     applicationEventPublisher.publishEvent(new EmailAlreadyExistsEvent(this, email));
+    // applicationEventPublisher.publishEvent(new EmailAlreadyExistsEvent(this,
+    // email));
     // }
 
-    // public void publishCaffeineCacheGroupEvent(String groupUid, String messageJson) {
-    //     applicationEventPublisher.publishEvent(new CaffeineCacheGroupEvent(this, groupUid, messageJson));
+    // public void publishCaffeineCacheGroupEvent(String groupUid, String
+    // messageJson) {
+    // applicationEventPublisher.publishEvent(new CaffeineCacheGroupEvent(this,
+    // groupUid, messageJson));
     // }
 
 }

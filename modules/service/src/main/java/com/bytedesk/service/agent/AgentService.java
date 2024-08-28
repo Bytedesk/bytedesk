@@ -42,12 +42,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.action.ActionRequest;
+import com.bytedesk.core.action.ActionService;
 import com.bytedesk.core.action.ActionTypeEnum;
-import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
-// import com.bytedesk.core.quick_button.QuickButton;
-// import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.constant.BdConstants;
@@ -90,7 +88,8 @@ public class AgentService {
 
     private final BytedeskProperties bytedeskProperties;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final ActionService actionService;
 
     public Page<AgentResponse> queryByOrg(AgentRequest agentRequest) {
 
@@ -526,7 +525,8 @@ public class AgentService {
                 .extra(agentJSON)
                 .build();
         actionRequest.setType(ActionTypeEnum.FAILED.name());
-        bytedeskEventPublisher.publishActionEvent(actionRequest);
+        actionService.create(actionRequest);
+        // bytedeskEventPublisher.publishActionCreateEvent(actionRequest);
         log.error("All retry attempts failed for optimistic locking of agent: {}", agent.getUid());
         // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
         // notifyUserOfFailure(agent);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 07:45:29
+ * @LastEditTime: 2024-08-26 06:49:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,6 @@ import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
@@ -44,6 +43,7 @@ import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -84,7 +84,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
 
     private final RobotService robotService;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final MessageService messageService;
 
     @Override
     public Page<VisitorResponse> queryByOrg(VisitorRequest request) {
@@ -139,7 +139,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         log.info("visitorRequest {}", visitorRequest);
         visitor = modelMapper.map(visitorRequest, Visitor.class);
         visitor.setUid(uidUtils.getCacheSerialUid());
-        visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
+        visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         visitor.setOrgUid(visitorRequest.getOrgUid());
         //
         VisitorDevice device = modelMapper.map(visitorRequest, VisitorDevice.class);
@@ -237,7 +237,8 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         //
         MessageProtobuf messageProtobuf = getAgentMessage(visitorRequest, thread, agent);
         // 广播消息，由消息通道统一处理
-        notifyAgent(messageProtobuf);
+        messageService.notifyUser(messageProtobuf);
+        // 
         // if (agent.isConnected() && agent.isAvailable()) {
         // // notify agent - 通知客服
         // notifyAgent(messageProtobuf);
@@ -263,8 +264,8 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         Thread thread = Thread.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
-        thread.setType(ThreadTypeEnum.AGENT);
-        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
+        thread.setType(ThreadTypeEnum.AGENT.name());
+        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         //
         VisitorProtobuf visitor = ConvertServiceUtils.convertToVisitorProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
@@ -298,7 +299,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             isReenter = false;
             // 客服离线 或 非接待状态
             thread.setContent(agent.getServiceSettings().getLeavemsgTip());
-            thread.setStatus(ThreadStatusEnum.OFFLINE);
+            thread.setStatus(ThreadStatusEnum.OFFLINE.name());
         } else {
             // 客服在线 且 接待状态
             thread.setUnreadCount(1);
@@ -310,9 +311,9 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             if (thread.isClosed()) {
                 // 访客会话关闭之后，重新进入
                 isReenter = false;
-                thread.setStatus(ThreadStatusEnum.REOPEN);
+                thread.setStatus(ThreadStatusEnum.REOPEN.name());
             } else {
-                thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
+                thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.NORMAL.name());
             }
         }
         threadService.save(thread);
@@ -370,7 +371,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         //
         MessageProtobuf messageProtobuf = getWorkgroupMessage(visitorRequest, thread, agent, workgroup);
         // 广播消息，由消息通道统一处理
-        notifyAgent(messageProtobuf);
+        messageService.notifyUser(messageProtobuf);
         // if (agent.isConnected() && agent.isAvailable()) {
         // log.info("agent is connected and available");
         // // notify agent - 通知客服
@@ -400,8 +401,8 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         Thread thread = Thread.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
-        thread.setType(ThreadTypeEnum.WORKGROUP);
-        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
+        thread.setType(ThreadTypeEnum.WORKGROUP.name());
+        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         //
         VisitorProtobuf visitor = ConvertServiceUtils.convertToVisitorProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
@@ -413,12 +414,6 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         thread.setAgent(JSON.toJSONString(ConvertServiceUtils.convertToWorkgroupResponseSimple(workgroup)));
         //
         return thread;
-
-        // Thread savedThread = threadService.save(thread);
-        // if (savedThread == null) {
-        // throw new RuntimeException("crate workgroup thread error, topic " + topic);
-        // }
-        // return savedThread;
     }
 
     private MessageProtobuf getWorkgroupMessage(VisitorRequest visitorRequest, Thread thread, Agent agent,
@@ -444,7 +439,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             isReenter = false;
             // 客服离线 或 非接待状态
             thread.setContent(workgroup.getServiceSettings().getLeavemsgTip());
-            thread.setStatus(ThreadStatusEnum.OFFLINE);
+            thread.setStatus(ThreadStatusEnum.OFFLINE.name());
         } else {
             // 客服在线 且 接待状态
             thread.setUnreadCount(1);
@@ -456,9 +451,9 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             if (thread.isClosed()) {
                 // 访客会话关闭之后，重新进入
                 isReenter = false;
-                thread.setStatus(ThreadStatusEnum.REOPEN);
+                thread.setStatus(ThreadStatusEnum.REOPEN.name());
             } else {
-                thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
+                thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.NORMAL.name());
             }
         }
         threadService.save(thread);
@@ -496,9 +491,9 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         Thread thread = Thread.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
-        thread.setType(ThreadTypeEnum.ROBOT);
+        thread.setType(ThreadTypeEnum.ROBOT.name());
         thread.setUnreadCount(0);
-        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()));
+        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         //
         VisitorProtobuf visitor = ConvertServiceUtils.convertToVisitorProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
@@ -532,9 +527,9 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         // if thread is closed, reopen it and then create a new message
         if (thread.isClosed()) {
             isReenter = false;
-            thread.setStatus(ThreadStatusEnum.REOPEN);
+            thread.setStatus(ThreadStatusEnum.REOPEN.name());
         } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE : ThreadStatusEnum.NORMAL);
+            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.NORMAL.name());
         }
         threadService.save(thread);
         //
@@ -555,9 +550,9 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         //
         Message message = Message.builder()
                 .content(isReenter ? I18Consts.I18N_REENTER_TIP : thread.getContent())
-                .type(isReenter ? MessageTypeEnum.CONTINUE : MessageTypeEnum.WELCOME)
-                .status(MessageStatusEnum.READ)
-                .client(ClientEnum.SYSTEM)
+                .type(isReenter ? MessageTypeEnum.CONTINUE.name() : MessageTypeEnum.WELCOME.name())
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
                 .build();
         message.setUid(uidUtils.getCacheSerialUid());
@@ -566,7 +561,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         message.setUpdatedAt(new Date());
         //
         if (thread.getStatus().equals(ThreadStatusEnum.OFFLINE)) {
-            message.setType(MessageTypeEnum.LEAVE_MSG);
+            message.setType(MessageTypeEnum.LEAVE_MSG.name());
         }
         // message.getThreads().add(thread);
         message.setThreadTopic(thread.getTopic());
@@ -596,11 +591,10 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         return null;
     }
 
-    public void notifyAgent(MessageProtobuf messageProtobuf) {
-        //
-        String json = JSON.toJSONString(messageProtobuf);
-        bytedeskEventPublisher.publishMessageJsonEvent(json);
-    }
+    // public void notifyAgent(MessageProtobuf messageProtobuf) {
+    // String json = JSON.toJSONString(messageProtobuf);
+    // bytedeskEventPublisher.publishMessageJsonEvent(json);
+    // }
 
     // TODO: 模拟压力测试：随机生成 10000 个访客，分配给1个技能组中10个客服账号，并随机分配给1个客服账号，每秒发送1条消息
     public void prepeareStressTest() {

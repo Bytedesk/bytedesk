@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 14:43:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 16:45:24
+ * @LastEditTime: 2024-08-24 08:03:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,13 +17,16 @@ package com.bytedesk.core.category;
 public class CategoryConsts {
     private CategoryConsts() {
     }
-    // 
-    public static final String CATEGORY_TYPE_QUICK_REPLY = "quick_reply";
-    public static final String CATEGORY_TYPE_FAQ = "faq";
-    // 
-    public static final String CATEGORY_TYPE_HELP_DOC = "help_doc";
-    public static final String CATEGORY_TYPE_ROBOT_KB = "robot_kb";
-    public static final String CATEGORY_TYPE_BLOG = "blog";
-    public static final String CATEGORY_TYPE_EMAIL = "email";
-    // 
+
+    //
+    public static final String CATEGORY_TYPE_AUTOREPLY = "AUTOREPLY";
+    public static final String CATEGORY_TYPE_QUICKREPLY = "QUICKREPLY";
+    public static final String CATEGORY_TYPE_FAQ = "FAQ";
+    public static final String CATEGORY_TYPE_HELPDOC = "HELPDOC";
+    public static final String CATEGORY_TYPE_LLM = "LLM";
+    public static final String CATEGORY_TYPE_KEYWORD = "KEYWORD";
+    public static final String CATEGORY_TYPE_BLOG = "BLOG";
+    public static final String CATEGORY_TYPE_EMAIL = "EMAIL";
+    public static final String CATEGORY_TYPE_TABOO = "TABOO";
+    //
 }

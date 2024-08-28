@@ -29,8 +29,6 @@ import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.faq.Faq;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MappedSuperclass;
@@ -44,8 +42,9 @@ import lombok.EqualsAndHashCode;
 public class BaseServiceSettings implements Serializable {
 
     @NotBlank
-    @Enumerated(EnumType.STRING)
-    private LanguageEnum language = LanguageEnum.ZH_CN;
+    // @Enumerated(EnumType.STRING)
+    // private LanguageEnum language = LanguageEnum.ZH_CN;
+    private String language = LanguageEnum.ZH_CN.name();
 
     @NotBlank
     private boolean autoPop = false;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-25 06:55:22
+ * @LastEditTime: 2024-08-26 06:10:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,6 +43,9 @@ public class RobotLlm {
 
     @Builder.Default
     private Double scoreThreshold = 0.5;
+
+    // @Builder.Default
+    // private String provider = "zhipuai";
     
     @Builder.Default
     // @Enumerated(EnumType.STRING)
@@ -50,7 +53,7 @@ public class RobotLlm {
     // private RobotModelEnum model = RobotModelEnum.ZHIPUAI_GLM_3_TURBO;
     
     // @Builder.Default
-    // // @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     // private String embeddings = "M3E_BASE";
     // // private RobotEmbedingEnum embeddings = RobotEmbedingEnum.M3E_BASE;
 
@@ -79,10 +82,10 @@ public class RobotLlm {
     @Column(name = "is_custom")
     private boolean custom = true;
 
+    private String apiUrl;
+
     private String apiKey;
 
     private String apiSecret;
-
-    private String apiUrl;
 
 }

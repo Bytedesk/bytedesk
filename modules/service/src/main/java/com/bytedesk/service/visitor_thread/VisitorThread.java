@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 21:59:00
+ * @LastEditTime: 2024-08-26 06:36:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,8 +28,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -71,19 +69,23 @@ public class VisitorThread extends BaseEntity {
      * @{ThreadTypeConsts}
      */
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "thread_type", nullable = false)
     // private String type = ThreadTypeConsts.WORKGROUP;
-    private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
+    // private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
+    private String typ = ThreadTypeEnum.WORKGROUP.name();
 
     // closed/open
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     // private String status = StatusConsts.THREAD_STATUS_OPEN;
-    private ThreadStatusEnum status = ThreadStatusEnum.NORMAL;
+    // private ThreadStatusEnum status = ThreadStatusEnum.NORMAL;
+    private String status = ThreadStatusEnum.NORMAL.name();
 
-    @Enumerated(EnumType.STRING)
-    private ClientEnum client;
+    @Builder.Default
+    // @Enumerated(EnumType.STRING)
+    // private ClientEnum client;
+    private String client = ClientEnum.WEB.name();
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)

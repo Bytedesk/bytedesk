@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 22:27:56
+ * @LastEditTime: 2024-08-26 08:46:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,8 @@ import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.filter.Filter.Expression;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -52,7 +54,7 @@ public class UploadVectorStore {
 	 * @param fileUrl
 	 */
 	public void readSplitWriteToVectorStore(@NonNull Upload upload) {
-		if (!upload.getType().equals(UploadTypeEnum.LLM)) {
+		if (!upload.getType().equals(UploadTypeEnum.LLM.name())) {
 			return;
 		}
 		String fileUrl = upload.getFileUrl();
@@ -196,7 +198,10 @@ public class UploadVectorStore {
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, upload.getKbUid());
 		}
 		upload.setDocIdList(docIdList);
-		upload.setStatus(UploadStatusEnum.EXTRATED);
+		upload.setStatus(UploadStatusEnum.EXTRATED.name());
+		// FIXME: ObjectOptimisticLockingFailureException: Row was updated or deleted by
+		// another transaction (or unsaved-value mapping was incorrect) :
+		// [com.bytedesk.kbase.upload.Upload#52]
 		uploadService.save(upload);
 		// log.info("Parsing document, this will take a while.");
 		vectorStore.write(docList);
@@ -220,16 +225,20 @@ public class UploadVectorStore {
 	// FIXME: kb_uid 没有起到过滤作用？
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	public List<String> searchText(String query, String kbUid) {
+		// log.info("searchText kbUid {}, query: {}", kbUid, query);
 		// Retrieve documents similar to a query
-		// FilterExpressionBuilder b = new FilterExpressionBuilder();
-		// Expression expression = b.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
+		FilterExpressionBuilder b = new FilterExpressionBuilder();
+		Expression expression = b.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
+		log.info("expression: {}", expression.toString());
 		//
 		SearchRequest searchRequest = SearchRequest.query(query)
-				.withTopK(2);
+				.withFilterExpression(expression);
+				// .withTopK(2);
 				// .withSimilarityThreshold(0.5)
 				// .withFilterExpression(expression);
 		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
 		List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
+		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		//
 		return contentList;
 	}

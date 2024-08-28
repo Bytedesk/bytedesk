@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 11:44:22
+ * @LastEditTime: 2024-08-24 08:00:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ public class KeywordExcelListener implements ReadListener<KeywordExcel> {
 
     private final KeywordService keywordService;
 
-    private final String categoryUid;
+    // private final String categoryUid;
 
     private final String kbUid;
 
@@ -52,7 +52,7 @@ public class KeywordExcelListener implements ReadListener<KeywordExcel> {
     @Override
     public void invoke(KeywordExcel data, AnalysisContext context) {
         // log.info("KeywordExcelListener invoke: {}", JSON.toJSONString(data));
-        Keyword keyword = keywordService.convertExcelToKeyword(data, categoryUid, kbUid, orgUid);
+        Keyword keyword = keywordService.convertExcelToKeyword(data, kbUid, orgUid);
         cachedDataList.add(keyword);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

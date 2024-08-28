@@ -3,7 +3,7 @@
  # @Author: jackning 270580156@qq.com
  # @Date: 2024-08-09 10:35:30
  # @LastEditors: jackning 270580156@qq.com
- # @LastEditTime: 2024-08-09 10:51:39
+ # @LastEditTime: 2024-08-28 09:24:56
  # @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  #   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  #  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,7 @@
  #  联系：270580156@qq.com
  # Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 ### 
-RUN_NAME="bytedesk-starter-0.3.5-SNAPSHOT.jar"
+RUN_NAME="bytedesk-starter-0.4.0.jar"
 export LANG="en_US.UTF-8"
 PRG=$0
 APPDIRFILE=`dirname "$PRG"`

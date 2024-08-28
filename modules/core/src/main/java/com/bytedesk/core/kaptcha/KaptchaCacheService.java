@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 17:48:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-19 15:00:38
+ * @LastEditTime: 2024-08-12 16:04:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,7 +45,12 @@ public class KaptchaCacheService {
         return kaptchaCache.getIfPresent(key);
     }
 
-    public Boolean checkKaptcha(String key, String value) {
+    public Boolean checkKaptcha(String key, String value, String client) {
+        // flutter手机端验证码暂时不做校验, TODO: 后续需要优化
+        if (client != null && client.contains("flutter")) {
+            return true;
+        }
+
         String cachedValue = kaptchaCache.getIfPresent(key);
         return cachedValue != null && cachedValue.equals(value);
     }

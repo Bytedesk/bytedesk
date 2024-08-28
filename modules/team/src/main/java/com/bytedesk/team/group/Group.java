@@ -62,13 +62,15 @@ public class Group extends BaseEntity {
     private String topTip = BdConstants.EMPTY_STRING;
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    // @Enumerated(EnumType.STRING)
     @Column(name = "group_type", nullable = false)
-    private GroupTypeEnum type = GroupTypeEnum.MEMBER;
+    // private GroupTypeEnum type = GroupTypeEnum.MEMBER;
+    private String type = GroupTypeEnum.MEMBER.name();
 
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private GroupStatusEnum status = GroupStatusEnum.NORMAL;
+    // @Enumerated(EnumType.STRING)
+    // private GroupStatusEnum status = GroupStatusEnum.NORMAL;
+    private String status = GroupStatusEnum.NORMAL.name();
 
     @JsonIgnore
     @Builder.Default

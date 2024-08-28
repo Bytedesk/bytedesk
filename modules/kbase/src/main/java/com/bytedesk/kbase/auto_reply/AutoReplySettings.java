@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:34:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 09:17:45
+ * @LastEditTime: 2024-08-19 16:15:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,6 @@ import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.message.MessageTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,16 +41,20 @@ public class AutoReplySettings implements Serializable {
 
     // 自动回复类型
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private AutoReplyTypeEnum autoReplyType = AutoReplyTypeEnum.FIXED;
+    // @Enumerated(EnumType.STRING)
+    // private AutoReplyTypeEnum autoReplyType = AutoReplyTypeEnum.FIXED;
+    private String autoReplyType = AutoReplyTypeEnum.FIXED.name();
 
     // 固定回复类型所需要字段
     @Builder.Default
     private String autoReplyUid = BdConstants.EMPTY_STRING;
+    
     // 自动回复内容类型
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private MessageTypeEnum autoReplyContentType = MessageTypeEnum.TEXT;
+    // @Enumerated(EnumType.STRING)
+    // private MessageTypeEnum autoReplyContentType = MessageTypeEnum.TEXT;
+    private String autoReplyContentType = MessageTypeEnum.TEXT.name();
+
     // 自动回复内容
     @Builder.Default
     private String autoReplyContent = BdConstants.EMPTY_STRING;
@@ -60,5 +62,7 @@ public class AutoReplySettings implements Serializable {
     // 关键词回复类型所需要字段
     // 大模型回复类型所需要字段
     private String kbUid;
+
+    // 
 
 }

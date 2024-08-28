@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-03 16:23:43
+ * @LastEditTime: 2024-08-24 10:10:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,8 @@
  */
 package com.bytedesk.core.socket.stomp.listener;
 
-// import com.bytedesk.core.model.entity.*;
-// import com.bytedesk.core.publisher.EventPublisher;
-// import com.bytedesk.core.service.*;
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -34,7 +31,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
  * 
  * @author bytedesk.com
  */
-// @Slf4j
+@Slf4j
 @Component
 @AllArgsConstructor
 public class StompDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
@@ -42,7 +39,9 @@ public class StompDisconnectListener implements ApplicationListener<SessionDisco
     // private final BytedeskEventPublisher bytedeskEventPublisher;
     @Override
     public void onApplicationEvent(@NonNull SessionDisconnectEvent evet) {
-        // log.debug(evet.toString());
+        log.debug("SessionDisconnectEvent {}", evet.toString());
+        // TODO: 访客离线，通知客服端
+        
     }
 
 }

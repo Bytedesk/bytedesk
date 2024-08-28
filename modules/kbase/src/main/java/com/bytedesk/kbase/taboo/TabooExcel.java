@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 13:51:14
+ * @LastEditTime: 2024-08-24 07:34:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,11 @@ import lombok.Data;
 @Data
 public class TabooExcel {
 
-    @ExcelProperty(index = 0, value = "敏感词")
+    @ExcelProperty(index = 0, value = "分类")
+    @ColumnWidth(20)
+    private String category;
+
+    @ExcelProperty(index = 1, value = "敏感词")
     @ColumnWidth(20)
     private String content;
 

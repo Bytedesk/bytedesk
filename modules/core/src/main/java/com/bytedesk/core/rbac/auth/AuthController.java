@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-26 10:10:28
+ * @LastEditTime: 2024-08-12 16:56:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.kaptcha.KaptchaCacheService;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.user.UserRequest;
@@ -66,7 +67,7 @@ public class AuthController {
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest) {
 
-        if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode())) {
+        if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(), userRequest.getClient())) {
             return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
         }
 
@@ -82,11 +83,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @ActionAnnotation(title = "auth", action = "loginWithUsernamePassword", description = "Login With Username & Password")
+    @ActionAnnotation(title = "auth", action = BdConstants.ACTION_LOGIN_USERNAME, description = "Login With Username & Password")
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode())) {
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
             return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
         }
 
@@ -104,8 +105,7 @@ public class AuthController {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getClient(),
                 authRequest.getType());
 
-        // TODO: 暂未考虑手机客服端登录，发送短信验证码 不需要填写CaptchaCode的情况
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode())) {
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
             return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
         }
 
@@ -120,13 +120,12 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success("send mobile code success"));
     }
 
-    @ActionAnnotation(title = "auth", action = "loginWithMobileCode", description = "Login With mobile & code")
+    @ActionAnnotation(title = "auth", action = BdConstants.ACTION_LOGIN_MOBILE, description = "Login With mobile & code")
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest) {
         log.debug("login mobile {}", authRequest.toString());
 
-        // TODO: 暂未考虑手机客服端登录，发送短信验证码 不需要填写CaptchaCode的情况
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode())) {
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
             return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
         }
         // validate mobile & code
@@ -170,7 +169,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success("send email code success"));
     }
 
-    @ActionAnnotation(title = "auth", action = "loginWithEmailCode", description = "Login With email & code")
+    @ActionAnnotation(title = "auth", action = BdConstants.ACTION_LOGIN_EMAIL, description = "Login With email & code")
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest) {
         log.debug("login email {}", authRequest.toString());

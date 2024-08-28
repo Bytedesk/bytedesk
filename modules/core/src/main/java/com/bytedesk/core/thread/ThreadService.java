@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 22:39:46
+ * @LastEditTime: 2024-08-26 06:57:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,15 +109,16 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         //
         Thread thread = modelMapper.map(request, Thread.class);
         thread.setUid(uidUtils.getCacheSerialUid());
-        thread.setStatus(ThreadStatusEnum.NORMAL);
+        thread.setStatus(ThreadStatusEnum.NORMAL.name());
         //
         String user = JSON.toJSONString(request.getUser());
         log.info("request {}, user {}", request.toString(), user);
         thread.setUser(user);
         //
-        thread.setClient(ClientEnum.fromValue(request.getClient()));
+        thread.setClient(ClientEnum.fromValue(request.getClient()).name());
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
+        
         //
         Thread savedThread = save(thread);
         if (savedThread == null) {
@@ -127,17 +128,21 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         return convertToResponse(savedThread);
     }
     
-   
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
     public ThreadResponse createGroupMemberThread(Thread thread, User owner) {
+        //
+        Optional<Thread> threadOptional = findByTopicAndOwner(thread.getTopic(), owner);
+        if (threadOptional.isPresent()) {
+            return convertToResponse(threadOptional.get());
+        }
 
         Thread groupThread = Thread.builder()
                 .type(thread.getType())
                 .topic(thread.getTopic())
                 .unreadCount(0)
                 .status(thread.getStatus())
-                .client(ClientEnum.SYSTEM)
+                .client(ClientEnum.SYSTEM.name())
                 .user(thread.getUser())
                 .owner(owner)
                 .build();
@@ -154,19 +159,26 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     /** 文件助手会话：file/{user_uid} */
     public ThreadResponse createFileAsistantThread(User user) {
+        // 
+        String topic = TopicUtils.TOPIC_FILE_PREFIX + user.getUid();
+        //
+        Optional<Thread> threadOptional = findByTopicAndOwner(topic, user);
+        if (threadOptional.isPresent()) {
+            return convertToResponse(threadOptional.get());
+        }
 
         UserProtobuf userSimple = UserProtobuf.builder()
-                // .uid(BdConstants.DEFAULT_FILE_ASISTANT_UID)
                 .nickname(I18Consts.I18N_FILE_ASISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
                 .build();
+        userSimple.setUid(BdConstants.DEFAULT_FILE_ASISTANT_UID);
         //
         Thread asistantThread = Thread.builder()
-                .type(ThreadTypeEnum.ASISTANT)
-                .topic(TopicUtils.TOPIC_FILE_PREFIX + user.getUid())
+                .type(ThreadTypeEnum.ASISTANT.name())
+                .topic(topic)
                 .unreadCount(0)
-                .status(ThreadStatusEnum.NORMAL)
-                .client(ClientEnum.SYSTEM)
+                .status(ThreadStatusEnum.NORMAL.name())
+                .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
@@ -187,6 +199,13 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     // 系统通知会话：system/{user_uid}
     public ThreadResponse createSystemChannelThread(User user) {
+        // 
+        String topic = TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid();
+        //
+        Optional<Thread> threadOptional = findByTopicAndOwner(topic, user);
+        if (threadOptional.isPresent()) {
+            return convertToResponse(threadOptional.get());
+        }
 
         UserProtobuf userSimple = UserProtobuf.builder()
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
@@ -195,11 +214,11 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         userSimple.setUid(BdConstants.DEFAULT_SYSTEM_UID);
         //
         Thread noticeThread = Thread.builder()
-                .type(ThreadTypeEnum.CHANNEL)
-                .topic(TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid())
+                .type(ThreadTypeEnum.CHANNEL.name())
+                .topic(topic)
                 .unreadCount(0)
-                .status(ThreadStatusEnum.NORMAL)
-                .client(ClientEnum.SYSTEM)
+                .status(ThreadStatusEnum.NORMAL.name())
+                .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
@@ -218,7 +237,6 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         return convertToResponse(updateThread);
     }
 
-   
     public ThreadResponse update(ThreadRequest threadRequest) {
         Optional<Thread> threadOptional = findByUid(threadRequest.getUid());
         if (!threadOptional.isPresent()) {
@@ -230,8 +248,10 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         thread.setUnread(threadRequest.getUnread());
         thread.setUnreadCount(threadRequest.getUnreadCount());
         thread.setMute(threadRequest.getMute());
+        thread.setHide(threadRequest.getHide());
         thread.setStar(threadRequest.getStar());
         thread.setFolded(threadRequest.getFolded());
+        thread.setContent(threadRequest.getContent());
         //
         Thread updateThread = save(thread);
         if (updateThread == null) {
@@ -253,7 +273,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
             // log.info("thread {} is already closed", uid);
             throw new RuntimeException("thread is already closed");
         }
-        thread.setStatus(ThreadStatusEnum.AGENT_CLOSED);
+        thread.setStatus(ThreadStatusEnum.AGENT_CLOSED.name());
         //
         Thread updateThread = save(thread);
         if (updateThread == null) {
@@ -272,7 +292,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         Iterator<Thread> iterator = threads.iterator();
         while (iterator.hasNext()) {
             Thread thread = iterator.next();
-            thread.setStatus(ThreadStatusEnum.DISMISSED);
+            thread.setStatus(ThreadStatusEnum.DISMISSED.name());
             //
             save(thread);
         }
@@ -307,8 +327,8 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     // TODO: 更新缓存
     // @Cacheable(value = "threadOpen")
     public List<Thread> findStatusOpen() {
-        List<ThreadStatusEnum> statuses = Arrays
-                .asList(new ThreadStatusEnum[] { ThreadStatusEnum.NORMAL, ThreadStatusEnum.CONTINUE });
+        List<String> statuses = Arrays
+                .asList(new String[] { ThreadStatusEnum.NORMAL.name(), ThreadStatusEnum.CONTINUE.name() });
         return threadRepository.findByStatusesAndDeleted(statuses, false);
     }
 
@@ -327,7 +347,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     // }
 
     public Thread autoClose(Thread thread) {
-        thread.setStatus(ThreadStatusEnum.AUTO_CLOSED);
+        thread.setStatus(ThreadStatusEnum.AUTO_CLOSED.name());
         return save(thread);
     }
 

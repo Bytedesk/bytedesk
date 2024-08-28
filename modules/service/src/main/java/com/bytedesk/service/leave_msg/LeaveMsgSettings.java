@@ -24,8 +24,6 @@ import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,8 +49,9 @@ public class LeaveMsgSettings implements Serializable {
 
     // 留言提醒类型
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private LeaveMsgNotifyTypeEnum leaveMsgNotifyType = LeaveMsgNotifyTypeEnum.EMAIL;
+    // @Enumerated(EnumType.STRING)
+    // private LeaveMsgNotifyTypeEnum leaveMsgNotifyType = LeaveMsgNotifyTypeEnum.EMAIL;
+    private String leaveMsgNotifyType = LeaveMsgNotifyTypeEnum.EMAIL.name();
 
     // 留言提醒邮箱
     @Builder.Default

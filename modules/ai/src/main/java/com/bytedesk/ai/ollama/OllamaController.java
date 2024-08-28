@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 09:41:26
+ * @LastEditTime: 2024-08-22 22:25:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,9 @@ package com.bytedesk.ai.ollama;
 
 import java.util.List;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +40,7 @@ public class OllamaController {
 
     private final ChatClient chatClient;
 
-    // private final ChatModel chatModel;
+    private final ChatModel chatModel;
 
     private final UploadVectorStore uploadVectorStore;
 
@@ -83,6 +85,19 @@ public class OllamaController {
         return ResponseEntity.ok(JsonResult.success(chatResponse));
     }
 
+    // FIXME: java.lang.NoClassDefFoundError: org/eclipse/jetty/reactive/client/ReactiveRequest
+    // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/stream
+    @GetMapping("/stream")
+    public ResponseEntity<?> getStreamCompletion(
+            @RequestParam(value = "message", defaultValue = "讲一个笑话") String message) {
+
+        chatModel.stream(new Prompt(message)).subscribe(chatResponse -> {
+            log.info("stream response: {}", chatResponse.getResult().getOutput().getContent());
+        });
+
+        return ResponseEntity.ok(JsonResult.success("stream success"));
+    }
+
     // 参考
     // https://github.com/habuma/spring-ai-rag-example/blob/main/src/main/java/com/example/springairag/AskController.java
     // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/chat?query=考试日期
@@ -103,6 +118,8 @@ public class OllamaController {
         // 
         return ResponseEntity.ok(JsonResult.success("chat success", answer));
     }
+
+    
 
     // http://127.0.0.1:9003/visitor/api/v1/ai/ollama/chat/stream?query=考试日期
     // @GetMapping("/chat/stream")

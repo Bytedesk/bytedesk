@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-26 18:46:56
+ * @LastEditTime: 2024-08-23 07:49:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -290,17 +290,17 @@ public class UserService {
     }
 
     @Cacheable(value = "user", key = "#email", unless = "#result == null")
-    public Optional<User> findByEmailAndPlatform(String email, PlatformEnum platform) {
+    public Optional<User> findByEmailAndPlatform(String email, String platform) {
         return userRepository.findByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
     @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
-    public Optional<User> findByMobileAndPlatform(String mobile, PlatformEnum platform) {
+    public Optional<User> findByMobileAndPlatform(String mobile, String platform) {
         return userRepository.findByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
-    public Optional<User> findByUsernameAndPlatform(String username, PlatformEnum platform) {
+    public Optional<User> findByUsernameAndPlatform(String username, String platform) {
         return userRepository.findByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
@@ -312,28 +312,28 @@ public class UserService {
     @Cacheable(value = "admin", unless = "#result == null")
     public Optional<User> getAdmin() {
         return userRepository.findByUsernameAndPlatformAndDeleted(bytedeskProperties.getEmail(),
-                PlatformEnum.BYTEDESK, false);
+                PlatformEnum.BYTEDESK.name(), false);
     }
 
     //
-    @Cacheable(value = "userExists", key = "#username", unless = "#result == null")
-    public Boolean existsByUsernameAndPlatform(@NonNull String username, @NonNull PlatformEnum platform) {
+    @Cacheable(value = "user:exists", key = "#username", unless = "#result == null")
+    public Boolean existsByUsernameAndPlatform(@NonNull String username, @NonNull String platform) {
         if (!StringUtils.hasText(username)) {
             return false;
         }
         return userRepository.existsByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
-    @Cacheable(value = "userExists", key = "#mobile", unless = "#result == null")
-    public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull PlatformEnum platform) {
+    @Cacheable(value = "user:exists", key = "#mobile", unless = "#result == null")
+    public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull String platform) {
         if (!StringUtils.hasText(mobile)) {
             return false;
         }
         return userRepository.existsByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
-    @Cacheable(value = "userExists", key = "#email", unless = "#result == null")
-    public Boolean existsByEmailAndPlatform(@NonNull String email, @NonNull PlatformEnum platform) {
+    @Cacheable(value = "user:exists", key = "#email", unless = "#result == null")
+    public Boolean existsByEmailAndPlatform(@NonNull String email, @NonNull String platform) {
         if (!StringUtils.hasText(email)) {
             return false;
         }
@@ -346,9 +346,9 @@ public class UserService {
             @CachePut(value = "user", key = "#user.email", unless = "#user.email == null"),
             @CachePut(value = "user", key = "#user.uid", unless = "#user.uid == null"),
             // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
-            // @CachePut(value = "userExists", key = "#user.username"),
-            // @CachePut(value = "userExists", key = "#user.mobile"),
-            // @CachePut(value = "userExists", key = "#user.email"),
+            // @CachePut(value = "user:exists", key = "#user.username"),
+            // @CachePut(value = "user:exists", key = "#user.mobile"),
+            // @CachePut(value = "user:exists", key = "#user.email"),
     })
     public User save(@NonNull User user) {
         try {
@@ -365,9 +365,9 @@ public class UserService {
             @CacheEvict(value = "user", key = "#user.mobile"),
             @CacheEvict(value = "user", key = "#user.email"),
             @CacheEvict(value = "user", key = "#user.uid"),
-            @CacheEvict(value = "userExists", key = "#user.username"),
-            @CacheEvict(value = "userExists", key = "#user.mobile"),
-            @CacheEvict(value = "userExists", key = "#user.email"),
+            @CacheEvict(value = "user:exists", key = "#user.username"),
+            @CacheEvict(value = "user:exists", key = "#user.mobile"),
+            @CacheEvict(value = "user:exists", key = "#user.email"),
     })
     public void delete(@NonNull User user) {
         // userRepository.delete(user);
@@ -383,7 +383,7 @@ public class UserService {
 
     public void initData() {
 
-        if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), PlatformEnum.BYTEDESK)) {
+        if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), PlatformEnum.BYTEDESK.name())) {
             return;
         }
 
@@ -410,7 +410,7 @@ public class UserService {
         Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
                 BdConstants.DEFAULT_ORGANIZATION_UID);
         Optional<User> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(),
-                PlatformEnum.BYTEDESK);
+                PlatformEnum.BYTEDESK.name());
         if (orgOptional.isPresent() && roleOptional.isPresent() && adminOptional.isPresent()) {
             Organization organization = orgOptional.get();
             Role role = roleOptional.get();

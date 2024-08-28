@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 17:00:48
+ * @LastEditTime: 2024-08-18 09:35:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -43,7 +42,8 @@ public class UserDetailsImpl implements UserDetails {
     private boolean superUser;
     private boolean emailVerified;
     private boolean mobileVerified;
-    private PlatformEnum platform;
+    // private PlatformEnum platform;
+    private String platform;
     // 
     @JsonIgnore
     private String password;
@@ -66,7 +66,8 @@ public class UserDetailsImpl implements UserDetails {
             boolean superUser,
             boolean emailVerified,
             boolean mobileVerified,
-            PlatformEnum platform,
+            // PlatformEnum platform,
+            String platform,
             boolean enabled) {
         this.id = id;
         this.uid = uid;

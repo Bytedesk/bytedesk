@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 11:57:42
+ * @LastEditTime: 2024-08-27 14:52:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,11 +25,10 @@ public class BdConstants {
     // Prevents instantiation
     private BdConstants() {
     }
-
+    
     // bytedesk
     public static final String PLATFORM_BYTEDESK = "BYTEDESK";
     // public static final boolean IS_DEBUG = false;
-
     // 空字符串
     public static final String EMPTY_STRING = "";
     public static final String EMPTY_JSON_STRING = "{}";
@@ -40,5 +39,12 @@ public class BdConstants {
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid";
     public static final String DEFAULT_FILE_ASISTANT_UID = "df_fa_uid";
     public static final String DEFAULT_SYSTEM_UID = "df_sys_uid";
+    public static final String DEFAULT_KB_UID = "df_kb_uid";
+    // 
+    public static final String ACTION_LOGIN_USERNAME = "loginWithUsernamePassword";
+    public static final String ACTION_LOGIN_MOBILE = "loginWithMobileCode";
+    public static final String ACTION_LOGIN_EMAIL = "loginWithEmailCode";
+    // 
+    
 
 }

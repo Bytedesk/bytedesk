@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 16:49:02
+ * @LastEditTime: 2024-08-26 06:44:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,7 +60,7 @@ public class RoleService {
 
                 Role role = modelMapper.map(rolerRequest, Role.class);
                 role.setUid(uidUtils.getCacheSerialUid());
-                role.setType(RoleTypeEnum.fromValue(rolerRequest.getType()));
+                role.setType(RoleTypeEnum.fromValue(rolerRequest.getType()).name());
                 //
                 Iterator<String> iterator = rolerRequest.getAuthorityUids().iterator();
                 while (iterator.hasNext()) {

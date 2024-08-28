@@ -27,7 +27,7 @@ public class TagService {
     private final TagRepository tagRepository;
     
     public Boolean existsByPlatform(PlatformEnum platform) {
-        return tagRepository.existsByPlatform(platform);
+        return tagRepository.existsByPlatform(platform.name());
     }
     
 }

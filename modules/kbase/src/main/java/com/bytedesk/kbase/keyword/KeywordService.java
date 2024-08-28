@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 19:36:47
+ * @LastEditTime: 2024-08-26 06:46:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,11 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -44,6 +49,8 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final CategoryService categoryService;
 
     @Override
     public Page<KeywordResponse> queryByOrg(KeywordRequest request) {
@@ -91,8 +98,8 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
         Keyword keyword = keywordOptional.get();
         keyword.setKeywordList(request.getKeywordList());
         keyword.setReplyList(request.getReplyList());
-        keyword.setMatchType(request.getMatchType());
-        keyword.setContentType(request.getContentType());
+        keyword.setMatchType(request.getMatchType().name());
+        keyword.setContentType(request.getContentType().name());
         keyword.setEnabled(request.getEnabled());
         //
         Keyword savedKeyword = save(keyword);
@@ -152,21 +159,37 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
         return keywordExcel;
     }
 
-    public Keyword convertExcelToKeyword(KeywordExcel entity, String categoryUid, String kbUid, String orgUid) {
-        List<String> keywordList = Arrays.asList(entity.getKeyword().split("\\|")); // 使用正则表达式匹配 "|"
-        List<String> replyList = Arrays.asList(entity.getReply().split("\\|")); // 使用正则表达式匹配 "|"
-        log.info("keyword {} keywordList: {}", entity.getKeyword(), keywordList);
-        log.info("reply {} replyList: {}", entity.getReply(), replyList);
+    public Keyword convertExcelToKeyword(KeywordExcel excel, String kbUid, String orgUid) {
+        List<String> keywordList = Arrays.asList(excel.getKeyword().split("\\|")); // 使用正则表达式匹配 "|"
+        List<String> replyList = Arrays.asList(excel.getReply().split("\\|")); // 使用正则表达式匹配 "|"
+        log.info("keyword {} keywordList: {}", excel.getKeyword(), keywordList);
+        log.info("reply {} replyList: {}", excel.getReply(), replyList);
         // 
         Keyword keyword = Keyword.builder().build();
         keyword.setUid(uidUtils.getCacheSerialUid());
         keyword.setKeywordList(keywordList);
         keyword.setReplyList(replyList);
         // 
-        keyword.setMatchType(KeywordMatchEnum.FUZZY); // TODO: 默认匹配类型
+        keyword.setMatchType(KeywordMatchEnum.FUZZY.name()); // TODO: 默认匹配类型
         keyword.setTransfer(false);
         // 
-        keyword.setCategoryUid(categoryUid);
+        // keyword.setCategoryUid(categoryUid);
+        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        if (categoryOptional.isPresent()) {
+            keyword.setCategoryUid(categoryOptional.get().getUid());
+        } else {
+            // create category
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(excel.getCategory())
+                    .kbUid(kbUid)
+                    .build();
+            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_KEYWORD);
+            categoryRequest.setOrgUid(orgUid);
+            //
+            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            keyword.setCategoryUid(categoryResponse.getUid());
+        }
+        // 
         keyword.setKbUid(kbUid);
         keyword.setOrgUid(orgUid);
         // 

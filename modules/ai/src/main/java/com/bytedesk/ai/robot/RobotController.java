@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 10:55:47
+ * @LastEditTime: 2024-08-19 17:13:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ package com.bytedesk.ai.robot;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +39,6 @@ public class RobotController extends BaseController<RobotRequest> {
 
     private final RobotService robotService;
 
-    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
@@ -49,15 +47,21 @@ public class RobotController extends BaseController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @GetMapping("/query/user")
     @Override
     public ResponseEntity<?> query(RobotRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
+    @GetMapping("/query/uid")
+    public ResponseEntity<?> queryByUid(RobotRequest request) {
+
+        RobotResponse robot = robotService.queryByUid(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(robot));
+    }
+
     @ActionAnnotation(title = "robot", action = "create", description = "create robot")
-    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
         
@@ -67,7 +71,6 @@ public class RobotController extends BaseController<RobotRequest> {
     }
 
     @ActionAnnotation(title = "robot", action = "update", description = "update robot")
-    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody RobotRequest request) {
 
@@ -77,7 +80,6 @@ public class RobotController extends BaseController<RobotRequest> {
     }
 
     @ActionAnnotation(title = "robot", action = "delete", description = "delete robot")
-    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody RobotRequest request) {
         

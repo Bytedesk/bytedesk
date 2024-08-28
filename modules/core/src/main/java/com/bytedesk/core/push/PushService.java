@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 22:11:29
+ * @LastEditTime: 2024-08-26 06:55:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.enums.PlatformEnum;
+// import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.ip.IpService;
@@ -68,22 +68,26 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     private final IpService ipService;
 
-    public Boolean sendEmailCode(String email, String client, String authType, PlatformEnum platform,
+    public Boolean sendEmailCode(String email, String client, String authType, String platform,
             HttpServletRequest request) {
 
         return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform, request);
     }
 
     public Boolean sendSmsCode(String mobile, String client, String authType,
-            PlatformEnum platform, HttpServletRequest request) {
+            String platform, HttpServletRequest request) {
 
         return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, request);
     }
 
-    // TODO: 验证限制同一个ip发送数量、频率
     public Boolean sendCode(String receiver, String type, String client, String authType,
-            PlatformEnum platform,
+            String platform,
             HttpServletRequest request) {
+
+        String ip = ipService.getIp(request);
+        String ipLocation = ipService.getIpLocation(ip);
+
+        // TODO: 验证限制同一个ip发送数量、频率
 
         // 注册验证码，如果账号已经存在，则直接抛出异常
         if (authType.equals(TypeConsts.SEND_MOBILE_CODE_TYPE_REGISTER)) {
@@ -98,12 +102,14 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         }
 
         // check if has already send validate code within 15min
-        if (existsByStatusAndTypeAndReceiver(PushStatus.PENDING, type, receiver)) {
+        if (existsByStatusAndTypeAndReceiver(PushStatusEnum.PENDING, type, receiver)) {
             return false;
         }
 
         String code = "";
-        if (Utils.isTestMobile(receiver) || Utils.isTestEmail(receiver) || bytedeskProperties.isInWhitelist(receiver)) {
+        if (Utils.isTestMobile(receiver)
+                || Utils.isTestEmail(receiver)
+                || bytedeskProperties.isInWhitelist(receiver)) {
             code = bytedeskProperties.getMobileCode();
             log.info("test code: {}", code);
         } else {
@@ -117,9 +123,6 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         } else {
             return false;
         }
-
-        String ip = ipService.getIp(request);
-        String ipLocation = ipService.getIpLocation(ip);
         //
         PushRequest pushRequest = new PushRequest();
         pushRequest.setType(type);
@@ -168,11 +171,11 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         // }
         // return result;
         //
-        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatus.PENDING, type, receiver,
+        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatusEnum.PENDING, type, receiver,
                 code);
         if (pushOptional.isPresent()) {
             // pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
-            pushOptional.get().setStatus(PushStatus.CONFIRMED);
+            pushOptional.get().setStatus(PushStatusEnum.CONFIRMED.name());
             save(pushOptional.get());
             return true;
         }
@@ -181,18 +184,18 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result
     // == null")
-    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(PushStatus status, String type, String receiver,
+    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(PushStatusEnum status, String type, String receiver,
             String content) {
-        return pushRepository.findByStatusAndTypeAndReceiverAndContent(status, type, receiver, content);
+        return pushRepository.findByStatusAndTypeAndReceiverAndContent(status.name(), type, receiver, content);
     }
 
-    public Boolean existsByStatusAndTypeAndReceiver(PushStatus status, String type, String receiver) {
-        return pushRepository.existsByStatusAndTypeAndReceiver(status, type, receiver);
+    public Boolean existsByStatusAndTypeAndReceiver(PushStatusEnum status, String type, String receiver) {
+        return pushRepository.existsByStatusAndTypeAndReceiver(status.name(), type, receiver);
     }
 
     @Caching(put = {
-        @CachePut(value = "push", key = "#push.receiver"),
-        // TODO: 根据status, 缓存或清空缓存，clear or cache according to status
+            @CachePut(value = "push", key = "#push.receiver"),
+            // TODO: 根据status, 缓存或清空缓存，clear or cache according to status
     })
     public Push save(Push push) {
         try {
@@ -207,7 +210,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
     @Cacheable(value = "pushPending")
     public List<Push> findStatusPending() {
         // return pushRepository.findByStatus(StatusConsts.CODE_STATUS_PENDING);
-        return pushRepository.findByStatus(PushStatus.PENDING);
+        return pushRepository.findByStatus(PushStatusEnum.PENDING.name());
     }
 
     // 自动过期
@@ -224,7 +227,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
             if (diffInMinutes > 15) {
                 // TODO: 过期，清空缓存
                 // push.setStatus(StatusConsts.CODE_STATUS_EXPIRED);
-                push.setStatus(PushStatus.EXPIRED);
+                push.setStatus(PushStatusEnum.EXPIRED.name());
                 save(push);
             }
         });
