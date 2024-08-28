@@ -48,3 +48,4 @@ h2db/
 modules/local/target/*
 .flattened-pom.xml
 effective-pom.xml
+
