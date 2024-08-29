@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-22 12:30:31
+ * @LastEditTime: 2024-08-29 08:06:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -166,11 +166,11 @@ h2-console: http://127.0.0.1:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 ## Dev Stack
 
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
-- springboot-3.x for im server
-- python for ai
-- react for web
-- flutter for ios&android
-- electron for windows&mac&linux
+- [springboot-3.x for im server](https://github.com/Bytedesk/bytedesk)
+- [python for ai](https://github.com/Bytedesk/bytedesk-ai)
+- [react for web](https://github.com/Bytedesk/bytedesk-react)
+- [flutter for ios&android](https://github.com/Bytedesk/bytedesk-mobile)
+- [electron for windows&mac&linux](https://github.com/Bytedesk/bytedesk-desktop)
 
 ## Contact
 
