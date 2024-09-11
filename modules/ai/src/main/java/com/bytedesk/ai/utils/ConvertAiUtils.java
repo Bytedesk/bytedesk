@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 18:16:49
+ * @LastEditTime: 2024-09-07 10:25:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,8 @@ import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.settings.RobotServiceSettings;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 
 public class ConvertAiUtils {
@@ -33,6 +35,12 @@ public class ConvertAiUtils {
 
     public static RobotProtobuf convertToRobotProtobuf(Robot entity) {
         return new ModelMapper().map(entity, RobotProtobuf.class);
+    }
+
+    public static UserProtobuf convertToUserProtobuf(Robot entity) {
+        UserProtobuf userProtobuf = new ModelMapper().map(entity, UserProtobuf.class);
+        userProtobuf.setType(UserTypeEnum.ROBOT.name());
+        return userProtobuf;
     }
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(

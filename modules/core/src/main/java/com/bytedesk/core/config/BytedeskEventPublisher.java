@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:42:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 12:58:18
+ * @LastEditTime: 2024-09-09 16:26:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,10 +24,12 @@ import com.bytedesk.core.event.GenericApplicationEvent;
 // import com.bytedesk.core.cache.CaffeineCacheGroupEvent;
 import com.bytedesk.core.message.MessageProtoEvent;
 import com.bytedesk.core.message.MessageUpdateEvent;
+import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
+import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageJsonEvent;
-import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
@@ -94,6 +96,14 @@ public class BytedeskEventPublisher {
 
     public void publishQuartzFiveSecondEvent() {
         applicationEventPublisher.publishEvent(new QuartzFiveSecondEvent(this));
+    }
+
+    public void publishQuartzFiveMinEvent() {
+        applicationEventPublisher.publishEvent(new QuartzFiveMinEvent(this));
+    }
+
+    public void publishQuartzOneMinEvent() {
+        applicationEventPublisher.publishEvent(new QuartzOneMinEvent(this));
     }
 
     public void publishMqttConnectedEvent(String clientId) {

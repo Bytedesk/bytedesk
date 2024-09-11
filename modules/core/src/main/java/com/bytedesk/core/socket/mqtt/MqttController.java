@@ -29,13 +29,13 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/visitor/api/v1/mqtt")
+@RequestMapping("/mqtt/api/v1")
 public class MqttController {
 
     private MqttSessionService mqttSessionService;
 
     /**
-     * http://127.0.0.1:9003/visitor/api/v1/mqtt/clientIds
+     * http://127.0.0.1:9003/mqtt/api/v1/clientIds
      * 
      * @return
      */

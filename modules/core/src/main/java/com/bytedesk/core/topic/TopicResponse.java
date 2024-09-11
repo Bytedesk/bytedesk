@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:15:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:42:57
+ * @LastEditTime: 2024-09-07 12:52:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,8 +40,10 @@ public class TopicResponse extends BaseResponse {
     // private String uid;
     
     @Builder.Default
-    // private String topic;
     private Set<String> topics = new HashSet<>();
+
+    @Builder.Default
+    private Set<String> monitorTopics = new HashSet<>();
     
     private String userUid;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:34:03
+ * @LastEditTime: 2024-09-07 13:03:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,6 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-// @DiscriminatorValue("Visitor")
 @Table(name = "service_visitor")
 public class Visitor extends BaseEntity {
 
@@ -69,5 +68,8 @@ public class Visitor extends BaseEntity {
 	// @Enumerated(EnumType.STRING)
 	// private ClientEnum client;
 	private String client = ClientEnum.WEB.name();
+
+	@Builder.Default
+	private String status = VisitorStatusEnum.OFFLINE.name();
 	
 }

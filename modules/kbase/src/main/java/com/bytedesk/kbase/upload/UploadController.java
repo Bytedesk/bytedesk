@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 15:21:10
+ * @LastEditTime: 2024-08-30 18:02:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -138,7 +138,7 @@ public class UploadController extends BaseController<UploadRequest> {
 		throw new UnsupportedOperationException("Unimplemented method 'update'");
 	}
 
-	@ActionAnnotation(title = "upload", action = "delete", description = "create upload")
+	@ActionAnnotation(title = "upload", action = "delete", description = "delete upload")
 	@Override
 	public ResponseEntity<?> delete(UploadRequest request) {
 		// 更新数据库

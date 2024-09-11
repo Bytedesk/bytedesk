@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-24 08:00:43
+ * @LastEditTime: 2024-09-07 16:56:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,13 +15,23 @@
 package com.bytedesk.kbase.upload;
 
 import java.io.IOException;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
+import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
+import com.bytedesk.core.redis.pubsub.RedisPubsubService;
+import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.AutoReplyExcel;
 import com.bytedesk.kbase.auto_reply.AutoReplyExcelListener;
 import com.bytedesk.kbase.auto_reply.AutoReplyService;
@@ -58,7 +68,11 @@ public class UploadEventListener {
 
     private final TabooService tabooService;
 
-    private final UploadVectorStore uploadVectorStore;
+    private final RedisPubsubService redisPubsubService;
+
+    // private final MessageService messageService;
+
+    private final UidUtils uidUtils;
 
     @EventListener
     public void onUploadCreateEvent(GenericApplicationEvent<UploadCreateEvent> event) throws IOException {
@@ -66,7 +80,12 @@ public class UploadEventListener {
         log.info("UploadEventListener create: {}", upload.toString());
         // etl分块处理
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
-            uploadVectorStore.readSplitWriteToVectorStore(upload);
+            // 通知python ai模块处理
+            // uploadVectorStore.readSplitWriteToVectorStore(upload);
+            redisPubsubService.sendParseFileMessage(
+                    upload.getUid(),
+                    upload.getFileUrl(),
+                    upload.getKbUid());
             return;
         }
         // 导入Excel文件
@@ -126,7 +145,6 @@ public class UploadEventListener {
                 // MemberExcelListener(memberService)).sheet().doRead();
             }
         }
-
     }
 
     @EventListener
@@ -135,9 +153,54 @@ public class UploadEventListener {
         log.info("UploadEventListener update: {}", upload.toString());
         // 后台删除文件记录
         if (upload.isDeleted()) {
+            // 通知python ai模块处理
+            redisPubsubService.sendDeleteFileMessage(upload.getUid(), upload.getDocIdList());
             // 删除redis中缓存的document
-            uploadVectorStore.deleteDoc(upload.getDocIdList());
+            // uploadVectorStore.deleteDoc(upload.getDocIdList());
         }
+    }
+
+    @EventListener
+    public void onRedisPubsubParseFileSuccessEvent(GenericApplicationEvent<RedisPubsubParseFileSuccessEvent> event) {
+        RedisPubsubMessageFile messageFile = event.getObject().getMessageFile();
+        log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
+        //
+        Upload upload = uploadService.findByUid(messageFile.getFileUid())
+                .orElseThrow(() -> new RuntimeException("upload not found by uid: " + messageFile.getFileUid()));
+        upload.setDocIdList(messageFile.getDocIds());
+        upload.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
+        uploadService.save(upload);
+        //
+        String user = upload.getUser();
+        UserProtobuf uploadUser = JSON.parseObject(user, UserProtobuf.class);
+
+        // 通知前端
+        JSONObject contentObject = new JSONObject();
+        contentObject.put(I18Consts.I18N_NOTICE_TITLE, I18Consts.I18N_NOTICE_PARSE_FILE_SUCCESS);
+        //
+        MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
+                JSON.toJSONString(contentObject));
+        MessageUtils.notifyUser(message);
+    }
+
+    @EventListener
+    public void onRedisPubsubParseFileErrorEvent(GenericApplicationEvent<RedisPubsubParseFileErrorEvent> event) {
+        RedisPubsubMessageFile messageFile = event.getObject().getMessageFile();
+        log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
+        Upload upload = uploadService.findByUid(messageFile.getFileUid())
+                .orElseThrow(() -> new RuntimeException("upload not found by uid: " + messageFile.getFileUid()));
+        upload.setStatus(UploadStatusEnum.PARSE_FILE_ERROR.name());
+        uploadService.save(upload);
+        //
+        String user = upload.getUser();
+        UserProtobuf uploadUser = JSON.parseObject(user, UserProtobuf.class);
+        // 通知前端
+        JSONObject contentObject = new JSONObject();
+        contentObject.put(I18Consts.I18N_NOTICE_TITLE, I18Consts.I18N_NOTICE_PARSE_FILE_ERROR);
+        //
+        MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
+                JSON.toJSONString(contentObject));
+        MessageUtils.notifyUser(message);
     }
 
 }

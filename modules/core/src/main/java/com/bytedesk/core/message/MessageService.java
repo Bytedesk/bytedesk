@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-24 09:18:11
+ * @LastEditTime: 2024-09-07 17:01:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,12 +14,10 @@
  */
 package com.bytedesk.core.message;
 
-import java.util.Date;
 import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CachePut;
-import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,16 +28,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
+// import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.ThreadProtobuf;
-import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.uid.UidUtils;
+// import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -51,13 +42,7 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
 
     private final MessageRepository messageRepository;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
-
-    private final ThreadService threadService;
-
-    private final UidUtils uidUtils;
-
-    private final ModelMapper modelMapper;
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
 
     public Page<MessageResponse> queryByOrg(MessageRequest request) {
 
@@ -101,16 +86,6 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
         return messageRepository.findByUid(uid);
     }
 
-    /**
-     * find the last message in the thread
-     * 找到当前会话中最新一条聊天记录
-     */
-    // @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
-    // public Optional<Message> findByThreadsUidInOrderByCreatedAtDesc(String
-    // threadUid) {
-    // return messageRepository.findFirstByThreadsUidInOrderByCreatedAtDesc(new
-    // String[] { threadUid });
-    // }
 
     @Caching(put = {
             @CachePut(value = "message", key = "#message.uid"),
@@ -147,12 +122,6 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
         return messageRepository.existsByUid(uid);
     }
 
-    // public int ping() {
-    // User user = authService.getCurrentUser();
-    // int count = messageCacheService.getUnreadCount(user.getUid());
-    // return count;
-    // }
-
     @Override
     public Page<MessageResponse> queryByUser(MessageRequest request) {
         // TODO Auto-generated method stub
@@ -184,58 +153,80 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
     }
 
     //
-    public void notifyUser(MessageProtobuf messageProtobuf) {
-        String json = JSON.toJSONString(messageProtobuf);
-        bytedeskEventPublisher.publishMessageJsonEvent(json);
-    }
+    // public void notifyUser(MessageProtobuf messageProtobuf) {
+    //     String json = JSON.toJSONString(messageProtobuf);
+    //     bytedeskEventPublisher.publishMessageJsonEvent(json);
+    // }
+
+    // public MessageProtobuf createNoticeMessage(String userUid, String orgUid, String content) {
+    //     // 
+    //     UserProtobuf sender = UserUtils.getSystemChannelUser();
+    //     // 
+    //     String topic = TopicUtils.getSystemTopic(userUid);
+    //     ThreadProtobuf thread = ThreadUtils.getThreadProtobuf(topic, ThreadTypeEnum.CHANNEL, sender);
+    //     // 
+    //     MessageExtra extra = MessageUtils.getMessageExtra(orgUid);
+    //     // 
+    //     MessageProtobuf message = MessageProtobuf.builder()
+    //             .uid(uidUtils.getCacheSerialUid())
+    //             .type(MessageTypeEnum.NOTICE)
+    //             .content(content)
+    //             .status(MessageStatusEnum.SUCCESS)
+    //             .createdAt(new Date())
+    //             .client(ClientEnum.SYSTEM)
+    //             .thread(thread)
+    //             .user(sender)
+    //             .extra(JSON.toJSONString(extra))
+    //             .build();
+    //     return message;
+    // }
 
     // 通知消息：登录
-    public MessageProtobuf createNoticeMessage(User user, String content) {
-        //
-        ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
-        ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
-        UserProtobuf sender = thread.getUser();
-        // 
-        MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
-        //
-        MessageProtobuf message = MessageProtobuf.builder()
-                .uid(uidUtils.getCacheSerialUid())
-                .type(MessageTypeEnum.NOTICE)
-                .content(content)
-                .status(MessageStatusEnum.SUCCESS)
-                .createdAt(new Date())
-                .client(ClientEnum.SYSTEM)
-                .thread(thread)
-                .user(sender)
-                .extra(JSON.toJSONString(extra))
-                .build();
-
-        return message;
-    }
+    // public MessageProtobuf createNoticeMessage(User user, String content) {
+    //     //
+    //     ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
+    //     ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
+    //     UserProtobuf sender = thread.getUser();
+    //     // 
+    //     MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
+    //     //
+    //     MessageProtobuf message = MessageProtobuf.builder()
+    //             .uid(uidUtils.getCacheSerialUid())
+    //             .type(MessageTypeEnum.NOTICE)
+    //             .content(content)
+    //             .status(MessageStatusEnum.SUCCESS)
+    //             .createdAt(new Date())
+    //             .client(ClientEnum.SYSTEM)
+    //             .thread(thread)
+    //             .user(sender)
+    //             .extra(JSON.toJSONString(extra))
+    //             .build();
+    //     return message;
+    // }
 
     // TODO: 事件消息：访客离线、访客上线
-    public MessageProtobuf createEventMessage(User user, String content) {
-        //
-        ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
-        ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
-        UserProtobuf sender = thread.getUser();
-        //
-        MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
-        //
-        MessageProtobuf message = MessageProtobuf.builder()
-                .uid(uidUtils.getCacheSerialUid())
-                .type(MessageTypeEnum.EVENT)
-                .content(content)
-                .status(MessageStatusEnum.SUCCESS)
-                .createdAt(new Date())
-                .client(ClientEnum.SYSTEM)
-                .thread(thread)
-                .user(sender)
-                .extra(JSON.toJSONString(extra))
-                .build();
+    // public MessageProtobuf createEventMessage(User user, String content) {
+    //     //
+    //     ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
+    //     ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
+    //     UserProtobuf sender = thread.getUser();
+    //     //
+    //     MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
+    //     //
+    //     MessageProtobuf message = MessageProtobuf.builder()
+    //             .uid(uidUtils.getCacheSerialUid())
+    //             .type(MessageTypeEnum.EVENT)
+    //             .content(content)
+    //             .status(MessageStatusEnum.SUCCESS)
+    //             .createdAt(new Date())
+    //             .client(ClientEnum.SYSTEM)
+    //             .thread(thread)
+    //             .user(sender)
+    //             .extra(JSON.toJSONString(extra))
+    //             .build();
 
-        return message;
-    }
+    //     return message;
+    // }
     
 
 }

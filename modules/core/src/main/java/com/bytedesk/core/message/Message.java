@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:14:34
+ * @LastEditTime: 2024-08-30 16:33:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,13 +47,13 @@ public class Message extends BaseEntity {
     // @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
     @Column(name = "message_type", nullable = false)
     // private MessageTypeEnum type = MessageTypeEnum.TEXT;
-     private String type = MessageTypeEnum.TEXT.name();
+    private String type = MessageTypeEnum.TEXT.name();
 
     // 仅对一对一/客服/技能组聊天有效，表示对方是否已读。群聊无效
     @Builder.Default
     // @Enumerated(EnumType.STRING)
     // private MessageStatusEnum status = MessageStatusEnum.SUCCESS;
-     private String status = MessageStatusEnum.SUCCESS.name();
+    private String status = MessageStatusEnum.SUCCESS.name();
 
     // 复杂类型可以使用json存储在此，通过type字段区分
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

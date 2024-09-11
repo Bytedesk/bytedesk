@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 11:45:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 21:30:50
+ * @LastEditTime: 2024-08-31 10:22:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,9 +35,9 @@ public class LeaveMsgEventListener {
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
         Message message = event.getMessage();
-        log.info("message leave_msg update event: {}", message);
+        // log.info("message leave_msg update event: {}", message);
         //
-        if (message.getStatus().equals(MessageStatusEnum.LEAVE_MSG_SUBMIT)) {
+        if (message.getStatus().equals(MessageStatusEnum.LEAVE_MSG_SUBMIT.name())) {
             LeaveMsgExtra extra = JSON.parseObject(message.getContent(), LeaveMsgExtra.class);
             //
             LeaveMsgRequest request = LeaveMsgRequest.builder()

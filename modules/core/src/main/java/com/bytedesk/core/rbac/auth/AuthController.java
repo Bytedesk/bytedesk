@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-12 16:56:29
+ * @LastEditTime: 2024-09-08 15:50:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,17 +52,12 @@ public class AuthController {
 
     private AuthService authService;
 
-    private AuthenticationManager authenticationManager;
-
     private PushService pushService;
 
     private KaptchaCacheService kaptchaCacheService;
 
-    /**
-     * 
-     * @param userRequest
-     * @return
-     */
+    private AuthenticationManager authenticationManager;
+
     @ActionAnnotation(title = "auth", action = "register", description = "register")
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest) {
@@ -198,19 +193,9 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
+    // TODO: 刷新token
     // @PostMapping("/refreshToken")
-    // public JwtResponse refreshToken(@RequestBody RefreshTokenRequest
-    // refreshTokenRequestDTO) {
-    // return refreshTokenService.findByToken(refreshTokenRequestDTO.getToken())
-    // .map(refreshTokenService::verifyExpiration)
-    // .map(RefreshToken::getUser)
-    // .map(userInfo -> {
-    // String accessToken = jwtService.generateToken(userInfo.getUsername());
-    // // String accessToken = jwtUtils.generateJwtToken(userInfo.getUsername());
-    // return JwtResponse.builder()
-    // .access_token(accessToken)
-    // .refresh_token(refreshTokenRequestDTO.getToken()).build();
-    // }).orElseThrow(() -> new RuntimeException("Refresh Token is not in DB..!!"));
+    // public JwtResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequestDTO) {
     // }
 
 }

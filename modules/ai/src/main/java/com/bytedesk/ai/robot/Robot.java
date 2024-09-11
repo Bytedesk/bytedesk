@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:10:25
+ * @LastEditTime: 2024-08-30 08:34:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,15 +14,10 @@
  */
 package com.bytedesk.ai.robot;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -53,7 +48,8 @@ public class Robot extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private String nickname;
+    @Builder.Default
+    private String nickname = I18Consts.I18N_ROBOT_NICKNAME;
 
     @Builder.Default
     private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
@@ -68,6 +64,10 @@ public class Robot extends BaseEntity {
     @Embedded
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
+
+    @Embedded
+    @Builder.Default
+    private RobotFlow flow = new RobotFlow();
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default
@@ -86,10 +86,10 @@ public class Robot extends BaseEntity {
     // private LevelEnum level = LevelEnum.ORGNIZATION;
      private String level = LevelEnum.ORGNIZATION.name();
 
-    @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
-    private String flow = BdConstants.EMPTY_JSON_STRING;
+    // @Builder.Default
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    // private String flow = BdConstants.EMPTY_JSON_STRING;
 
     @Builder.Default
     private boolean published = false;

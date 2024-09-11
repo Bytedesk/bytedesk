@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:30:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:18:13
+ * @LastEditTime: 2024-09-09 16:16:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,6 +56,8 @@ public class Push extends BaseEntity {
 
     // according to ip address
     private String ipLocation;
+
+    private String deviceUid; // 设备唯一标识
 
     // @Enumerated(EnumType.STRING)
     @Builder.Default

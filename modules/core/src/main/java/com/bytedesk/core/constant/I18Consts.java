@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-23 21:37:48
+ * @LastEditTime: 2024-08-31 21:57:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,7 +63,9 @@ public class I18Consts {
     //
     public static final String I18N_ROBOT_NICKNAME = I18N_PREFIX + "robot.nickname";
     public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description";
-    // public static final String I18N_ROBOT_LLM_PROMPT = I18N_PREFIX + "llm.prompt";
+    public static final String I18N_ROBOT_AGENT_ASISTANT_NICKNAME = I18N_PREFIX + "robot.agent.asistant.nickname";
+    // public static final String I18N_ROBOT_LLM_PROMPT = I18N_PREFIX +
+    // "llm.prompt";
     public static final String I18N_ROBOT_LLM_PROMPT = "角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度";
     public static final String I18N_ROBOT_REPLY = I18N_PREFIX + "robot.reply";
     public static final String I18N_ROBOT_NO_REPLY = I18N_PREFIX + "robot.noreply";
@@ -104,10 +106,10 @@ public class I18Consts {
     public static final String I18N_QUICK_BUTTON_DEMO_CONTENT_1 = I18N_PREFIX + "quick.button.demo.content.1";
     public static final String I18N_QUICK_BUTTON_DEMO_TITLE_2 = I18N_PREFIX + "quick.button.demo.title.2";
     public static final String I18N_QUICK_BUTTON_DEMO_CONTENT_2 = I18N_PREFIX + "quick.button.demo.content.2";
-    // 
+    //
     public static final String I18N_GROUP_NAME = I18N_PREFIX + "group.name";
     public static final String I18N_GROUP_DESCRIPTION = I18N_PREFIX + "group.description";
-    // 
+    //
     public static final String I18N_NOTICE_TITLE = I18N_PREFIX + "notice.title";
     public static final String I18N_NOTICE_TYPE = I18N_PREFIX + "notice.type";
     public static final String I18N_NOTICE_CONTENT = I18N_PREFIX + "notice.content";
@@ -115,6 +117,11 @@ public class I18Consts {
     public static final String I18N_NOTICE_IPLOCATION = I18N_PREFIX + "notice.ipLocation";
     public static final String I18N_NOTICE_URL = I18N_PREFIX + "notice.url";
     public static final String I18N_NOTICE_EXTRA = I18N_PREFIX + "notice.extra";
-    //
+    // 
+    public static final String I18N_NOTICE_PARSE_FILE_SUCCESS = I18N_PREFIX + "notice.parse.file.success";
+    public static final String I18N_NOTICE_PARSE_FILE_ERROR = I18N_PREFIX + "notice.parse.file.error";
+    // 
+    public static final String I18N_AUTO_CLOSED = I18N_PREFIX + "auto.closed";
+    public static final String I18N_AGENT_CLOSED = I18N_PREFIX + "agent.closed";
 
 }

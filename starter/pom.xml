@@ -254,7 +254,7 @@
 		<!-- flow - 流程引擎 -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-vip-flow</artifactId>
+			<artifactId>bytedesk-vip-flowbot</artifactId>
 			<version>${revision}</version>
 		</dependency>
 

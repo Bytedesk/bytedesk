@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class PushServiceImplSms extends Notifier {
+public class PushServiceImplSms extends PushNotifier {
 
     // @Value("${bytedesk.debug}")
     // private Boolean debug;
@@ -68,7 +68,7 @@ public class PushServiceImplSms extends Notifier {
         log.info("send sms to {}, content: {}", mobile, content);
 
         // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
-        
+
         // not test mobile, send sms
         if (Utils.isTestMobile(mobile)) {
             return;
@@ -82,12 +82,10 @@ public class PushServiceImplSms extends Notifier {
         sendValidateCode(mobile, content);
     }
 
-    
-
     public void sendValidateCode(String phone, String code) {
 
         // if (debug) {
-        //     return;
+        // return;
         // }
 
         DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 16:22:46
+ * @LastEditTime: 2024-09-07 10:15:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,11 +34,15 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class UserProtobuf extends BaseResponse {
 
-    private static final long serialVersionUID = 1L;    
+    private static final long serialVersionUID = 1L;
 
     private String nickname;
-    
+
     private String avatar;
+
+    // ROBOT/AGENT/SYSTEM/USER/VISITOR
+    @Builder.Default
+    private String type = UserTypeEnum.VISITOR.name();
 
     private String extra;
 }

@@ -44,12 +44,13 @@ public class BytedeskProperties {
     private List<String> mobileWhitelist = new ArrayList<>();
 
     private String mobileCode;
-
     private String organizationName;
-
     private String organizationCode;
-    
     // private String timezone;
+
+    // ai
+    private Boolean javaai;
+    private Boolean pythonai;
 
     // cors
     private String corsAllowedOrigins;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 18:12:10
+ * @LastEditTime: 2024-09-09 16:14:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,6 +45,10 @@ public class PushRequest extends BaseRequest {
 
     // according to ip address
     private String ipLocation;
+
+    // 用于扫码登录
+    private Boolean forceRefresh; // 强制刷新
+    private String deviceUid; // 设备唯一标识
 
     @Builder.Default
     // private PushStatusEnum status = PushStatusEnum.PENDING;

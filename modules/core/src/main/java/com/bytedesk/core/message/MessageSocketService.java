@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 18:54:05
+ * @LastEditTime: 2024-08-31 16:46:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -147,28 +147,5 @@ public class MessageSocketService {
         }
     }
 
-    // private void doSendToSenderClients(MessageProto.Message messageProto) {
-    // log.debug("doSendToSenderClients");
-    // // String uid, String topic, byte[] messageBytes
-    // // String uid = messageProto.getUser().getUid();
-    // String topic = messageProto.getThread().getTopic();
-    // byte[] messageBytes = messageProto.toByteArray();
-    // //
-    // // String sid = topic.split("/")[0];
-    // // List<Topic> topicList = topicService.findByTopic(sid);
-    // Set<Topic> topicSet = topicService.findByTopic(topic);
-    // topicSet.forEach(topicElement -> {
-    // Set<String> clientIdList = topicElement.getClientIds();
-    // clientIdList.forEach(clientId -> {
-    // doSendMessage(topic, messageBytes, clientId);
-    // });
-    // });
-    // //
-    // if (topicSet.size() == 0) {
-    // log.debug("doSendToSenderClients: no topic");
-    // // TODO: 数据库中为空，尝试匹配内存
-    // // doSendMessage(topic, messageBytes, topic);
-    // }
-    // }
 
 }

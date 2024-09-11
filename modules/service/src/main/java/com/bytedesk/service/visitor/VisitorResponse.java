@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-10 10:52:28
+ * @LastEditTime: 2024-09-07 13:02:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,5 +60,7 @@ public class VisitorResponse extends BaseResponse {
 	private ClientEnum client;
 
 	private Date updatedAt;
+
+	private String status;
 
 }

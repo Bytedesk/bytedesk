@@ -198,7 +198,7 @@ public class UploadVectorStore {
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, upload.getKbUid());
 		}
 		upload.setDocIdList(docIdList);
-		upload.setStatus(UploadStatusEnum.EXTRATED.name());
+		upload.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
 		// FIXME: ObjectOptimisticLockingFailureException: Row was updated or deleted by
 		// another transaction (or unsaved-value mapping was incorrect) :
 		// [com.bytedesk.kbase.upload.Upload#52]
@@ -233,9 +233,9 @@ public class UploadVectorStore {
 		//
 		SearchRequest searchRequest = SearchRequest.query(query)
 				.withFilterExpression(expression);
-				// .withTopK(2);
-				// .withSimilarityThreshold(0.5)
-				// .withFilterExpression(expression);
+		// .withTopK(2);
+		// .withSimilarityThreshold(0.5)
+		// .withFilterExpression(expression);
 		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
 		List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());

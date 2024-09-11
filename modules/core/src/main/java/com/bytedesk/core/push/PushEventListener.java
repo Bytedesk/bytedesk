@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:24:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-27 16:38:55
+ * @LastEditTime: 2024-09-10 10:22:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,12 +17,12 @@ package com.bytedesk.core.push;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @Component
 @AllArgsConstructor
 public class PushEventListener {
@@ -30,9 +30,8 @@ public class PushEventListener {
     private final PushService pushService;
 
     @EventListener
-    public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
-        // log.info("push quartz five second event: " + event);
-
+    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+        // log.info("push quartz one min event");
         // auto outdate code
         pushService.autoOutdateCode();
     }

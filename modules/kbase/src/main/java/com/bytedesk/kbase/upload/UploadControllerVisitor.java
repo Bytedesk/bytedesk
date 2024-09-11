@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 19:21:06
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 22:54:38
+ * @LastEditTime: 2024-08-28 11:09:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -46,17 +48,41 @@ public class UploadControllerVisitor {
     public ResponseEntity<?> upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam("file_name") String fileName,
-            @RequestParam("file_type") String type) {
-        log.info("fileName {}, type {}", fileName, type);
+            @RequestParam("file_type") String fileType,
+            @RequestParam(name = "kb_type", required = false) String kbType,
+            @RequestParam(name = "visitor_uid", required = false) String visitorUid,
+            @RequestParam(name = "nickname", required = false) String visitorNickname,
+            @RequestParam(name = "avatar", required = false) String visitorAvatar,
+            @RequestParam(name = "org_uid", required = false) String orgUid,
+			@RequestParam(name = "client", required = false) String client) {
+        log.info("fileName {}, fileType {}", fileName, fileType);
 
         // TODO: image/avatar/file/video/voice
 
         // http://localhost:9003/file/20240319162820_img-service2.png
         String uploadPath = uploadService.store(file, fileName);
         // http://localhost:9003
-        String url = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+        String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+        // 
+        UserProtobuf visitorProtobuf = UserProtobuf.builder()
+                .nickname(visitorNickname)
+                .avatar(visitorAvatar)
+            .build();
+        visitorProtobuf.setUid(visitorUid);
+		//
+		UploadRequest uploadRequest = UploadRequest.builder()
+				.fileName(fileName)
+				.fileSize(String.valueOf(file.getSize()))
+				.fileUrl(fileUrl)
+				.fileType(fileType)
+				.client(client)
+				.user(JSON.toJSONString(visitorProtobuf))
+                .build();
+        uploadRequest.setType(kbType);
+		uploadRequest.setOrgUid(orgUid);
+		uploadService.create(uploadRequest);
 
-        return ResponseEntity.ok(JsonResult.success("upload success", url));
+        return ResponseEntity.ok(JsonResult.success("upload success", fileUrl));
     }
     
 }

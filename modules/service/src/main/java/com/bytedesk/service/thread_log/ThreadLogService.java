@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 10:47:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:47:41
+ * @LastEditTime: 2024-09-06 16:42:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,9 +34,9 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ThreadLogService {
@@ -54,9 +54,8 @@ public class ThreadLogService {
                 "updatedAt");
 
         Specification<ThreadLog> spec = ThreadLogSpecification.search(threadLogRequest);
+        
         Page<ThreadLog> threadLogPage = threadLogRepository.findAll(spec, pageable);
-        // Page<ThreadLog> threadLogPage =
-        // threadLogRepository.findByOrgUid(threadLogRequest.getOrgUid(), pageable);
 
         return threadLogPage.map(this::convertThreadLogResponse);
     }
@@ -89,21 +88,30 @@ public class ThreadLogService {
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            if (thread.getType() == ThreadTypeEnum.WORKGROUP.name() || thread.getType() == ThreadTypeEnum.AGENT.name()) {
+            // log.info("1.autoCloseThread threadUid {} threadType {} threadId {} diffInMinutes {}", thread.getUid(), thread.getType(),
+            //         thread.getUid(), diffInMinutes);
+            // 
+            // log.info("{}, {}, {} ", ThreadTypeEnum.WORKGROUP.name(), ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.ROBOT.name());
+            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
+                    || thread.getType().equals(ThreadTypeEnum.AGENT.name())
+                    || thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();
-                if (diffInMinutes > autoCloseMinites) {
-                    threadService.autoClose(thread);
-                }
-            } else if (thread.getType() == ThreadTypeEnum.ROBOT.name()) {
-                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
-                        ServiceSettingsResponseVisitor.class);
-                Double autoCloseMinites = settings.getAutoCloseMin();
+                // log.info("2. autoCloseThread  threadUid {} threadType {} autoCloseMinites {}, diffInMinutes {}", 
+                //         thread.getUid(), thread.getType(), autoCloseMinites, diffInMinutes);
                 if (diffInMinutes > autoCloseMinites) {
                     threadService.autoClose(thread);
                 }
             }
+            //  else if (thread.getType() == ThreadTypeEnum.ROBOT.name()) {
+            //     ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
+            //             ServiceSettingsResponseVisitor.class);
+            //     Double autoCloseMinites = settings.getAutoCloseMin();
+            //     if (diffInMinutes > autoCloseMinites) {
+            //         threadService.autoClose(thread);
+            //     }
+            // }
         });
     }
 

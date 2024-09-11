@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 14:39:41
+ * @LastEditTime: 2024-09-11 11:19:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageCreateEvent;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
@@ -40,16 +43,19 @@ public class ThreadEventListener {
 
     private final ThreadService threadService;
 
+    private final ThreadPersistCache threadPersistCache;
+
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         Thread thread = event.getThread();
         User user = thread.getOwner();
         log.info("thread ThreadCreateEvent: {}", thread.getUid());
-        
+
         // // 机器人会话不需要订阅topic
         // if (event.getThread().getType().equals(ThreadTypeEnum.ROBOT)) {
         // return;
         // }
+
         // 创建客服会话之后，需要订阅topic
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
@@ -60,9 +66,9 @@ public class ThreadEventListener {
                     .build();
             topicService.create(request);
         } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-         || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
+                || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
                 || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())) {
-                    // 文件助手、系统通知会话延迟订阅topic
+            // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
@@ -77,8 +83,7 @@ public class ThreadEventListener {
         User user = thread.getOwner();
         log.info("topic onThreadUpdateEvent: {}", thread.getUid());
         // TODO: 会话关闭之后，需要取消订阅
-        // 
-        // 文件助手、系统通知会话延迟订阅topic
+        
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             // 防止首次消息延迟，立即订阅
@@ -90,6 +95,7 @@ public class ThreadEventListener {
         } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
                 || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
                 || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())) {
+            // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
@@ -105,18 +111,31 @@ public class ThreadEventListener {
         }
     }
 
-
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
         Message message = event.getMessage();
+        if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
+            return;
+        }
         // log.info("robot message unread create event: " + event);
         Optional<Thread> threadOptional = threadService.findByTopic(message.getThreadTopic());
         if (threadOptional.isPresent()) {
             Thread thread = threadOptional.get();
             thread.setHide(false);
             thread.setContent(message.getContent());
-            threadService.save(thread);
+            // threadService.save(thread);
+            threadPersistCache.pushForPersist(thread);
         }
     }
 
+    @EventListener
+    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+        List<Thread> threadList = threadPersistCache.getListForPersist();
+        if (threadList != null) {
+            threadList.forEach(thread -> {
+                threadService.save(thread);
+            });
+        }
+
+    }
 }

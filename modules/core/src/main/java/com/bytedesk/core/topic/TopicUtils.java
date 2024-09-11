@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 13:33:35
+ * @LastEditTime: 2024-09-06 23:07:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,6 +38,8 @@ public class TopicUtils {
     public static final String TOPIC_ORG_ROBOT_PREFIX = "org/robot/";
     public static final String TOPIC_ORG_AGENT_PREFIX = "org/agent/";
     public static final String TOPIC_ORG_WORKGROUP_PREFIX = "org/workgroup/";
+    public static final String TOPIC_ORG_KB_PREFIX = "org/kb/";
+    public static final String TOPIC_ORG_KBDOC_PREFIX = "org/kbdoc/";
 
     // topic格式定义：
     // 注意：开头没有 '/' ，防止stomp主题中将 '/' 替换为 '.'之后，在最前面多余一个 '.'
@@ -69,16 +71,20 @@ public class TopicUtils {
     private static final String TOPIC_ORG_DEPARTMENT_PATTERN = TOPIC_ORG_DEPARTMENT_PREFIX + "%s"; // "org/department/%s";
     private static final String TOPIC_ORG_GROUP_PATTERN = TOPIC_ORG_GROUP_PREFIX + "%s"; // "org/group/%s";
     private static final String TOPIC_ORG_ROBOT_THREAD_PATTERN = TOPIC_ORG_ROBOT_PREFIX + "%s/%s"; // "org/robot/%s/%s";
+    private static final String TOPIC_ORG_KB_THREAD_PATTERN = TOPIC_ORG_KB_PREFIX + "%s/%s"; // "org/kb/%s/%s";
+    private static final String TOPIC_ORG_KBDOC_THREAD_PATTERN = TOPIC_ORG_KBDOC_PREFIX + "%s/%s"; // "org/kbdoc/%s/%s";
 
     // 客服:
     // 用户默认订阅客服uid：org/agent/{agent_uid}
     // 一对一客服会话：org/agent/{agent_uid}/{visitor_uid}
     // 用户默认订阅技能组uid：org/workgroup/{workgroup_uid}
-    // 技能组客服会话：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
+    // 废弃：技能组客服会话：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
+    // 技能组客服会话：org/workgroup/{workgroup_uid}/{visitor_uid}
     private static final String TOPIC_ORG_AGENT_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s"; // "org/agent/%s";
     private static final String TOPIC_ORG_AGENT_THREAD_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s/%s"; // "org/agent/%s/%s";
     private static final String TOPIC_ORG_WORKGROUP_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s"; // "org/workgroup/%s";
-    private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s/%s"; // "org/workgroup/%s/%s/%s";
+    // private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s/%s"; // "org/workgroup/%s/%s/%s";
+    private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s"; // "org/workgroup/%s/%s";
 
     //
     public static String getUserTopic(String userUid) {
@@ -120,6 +126,7 @@ public class TopicUtils {
     public static Boolean isOrgMemberTopic(String topic) {
         return topic.startsWith(TOPIC_ORG_MEMBER_PATTERN);
     }
+
     public static String formatOrgMemberTopic(String memberUid) {
         return String.format(TOPIC_ORG_MEMBER_PATTERN, memberUid);
     }
@@ -145,10 +152,9 @@ public class TopicUtils {
     public static String getOrgGroupTopic(String groupUid) {
         return String.format(TOPIC_ORG_GROUP_PATTERN, groupUid);
     }
-    
+
     //////////////////////////////////////////////////////////////////////////
 
-    
     //////////////////////////////////////////////////////////////////////////
 
     public static Boolean isOrgRobotTopic(String topic) {
@@ -157,6 +163,26 @@ public class TopicUtils {
 
     public static String formatOrgRobotThreadTopic(String robotUid, String visitorUid) {
         return String.format(TOPIC_ORG_ROBOT_THREAD_PATTERN, robotUid, visitorUid);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgKbTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_KB_PREFIX);
+    }
+
+    public static String formatOrgKbThreadTopic(String kbUid, String visitorUid) {
+        return String.format(TOPIC_ORG_KB_THREAD_PATTERN, kbUid, visitorUid);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgKbdocTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_KBDOC_PREFIX);
+    }
+
+    public static String formatOrgKbdocThreadTopic(String kbdocUid, String visitorUid) {
+        return String.format(TOPIC_ORG_KBDOC_THREAD_PATTERN, kbdocUid, visitorUid);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -183,8 +209,10 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_WORKGROUP_PATTERN, workgroupUid);
     }
 
-    public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String agentUid, String visitorUid) {
-        return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, agentUid, visitorUid);
+    // public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String agentUid, String visitorUid) {
+    //     return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, agentUid, visitorUid);
+    // }
+    public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String visitorUid) {
+        return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, visitorUid);
     }
-
 }

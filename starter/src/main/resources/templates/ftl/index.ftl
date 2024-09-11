@@ -34,7 +34,7 @@ Main Banner START -->
 			<div class="col-md-5">
 				<!-- Title -->
 				<h1 class="mb-3">基于AI全新打造</h1>
-				<h4 class="mb-3">企业IM、在线客服、AI助手、AI知识库问答、帮助中心、工单系统</h4>
+				<h4 class="mb-3">企业IM + 在线客服、AI助手、AI知识库问答、帮助中心、工单系统</h4>
 				<#--  社交IM、  -->
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->
@@ -176,17 +176,20 @@ Download START -->
 			<div class="col-md-5 position-relative z-index-9">
 				<!-- Title -->
 				<h2>支持定制</h2>
-				<p>如果您有定制需求，请与我们<a href="https://www.weiyuai.cn/contact.html" target="_blank">联系</a>.</p>
+				<p>如果您有定制需求或其他合作事宜，请与我们联系.</p>
+				<p>添加微信请备注：微语</p>
 				<!-- Download button -->
 				<div class="row">
 					<!-- Google play store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
-						<#--  <a href="mailto:270580156@qq.com">contact us</a>  -->
-						<#--  <a href="#"><img src="assets/images/element/google-play.svg" class="btn-transition" alt="google-play"></a>  -->
+						<a href="mailto:270580156@qq.com">270580156@qq.com</a>
 					</div>
 					<!-- App store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
 						<#--  <a href="#"><img src="assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
+						<a href="https://www.kefux.com/assets/img/qrcode/qiye.png" target="_blank">
+							<img src="https://www.kefux.com/assets/img/qrcode/qiye.png"/>
+						</a>
 					</div>
 				</div>
 			</div>

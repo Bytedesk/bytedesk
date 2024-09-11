@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 10:46:45
+ * @LastEditTime: 2024-09-07 13:07:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,7 @@ import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadService;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.socket.MqService;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
@@ -85,7 +86,7 @@ public class VisitorController extends BaseController<VisitorRequest> {
     @GetMapping("/init")
     public ResponseEntity<?> init(VisitorRequest visitorRequest, HttpServletRequest request) {
         //
-        VisitorProtobuf visitor = visitorService.create(visitorRequest, request);
+        UserProtobuf visitor = visitorService.create(visitorRequest, request);
         if (visitor == null) {
             return ResponseEntity.ok(JsonResult.error("init visitor failed", -1));
         }
@@ -125,6 +126,8 @@ public class VisitorController extends BaseController<VisitorRequest> {
     @GetMapping("/ping")
     public ResponseEntity<?> ping(VisitorRequest request) {
 
+        visitorService.updateStatus(request.getUid(), VisitorStatusEnum.ONLINE.name());
+
         int count = messageUnreadService.getUnreadCount(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success("pong", count));
@@ -158,30 +161,34 @@ public class VisitorController extends BaseController<VisitorRequest> {
 
     // 机器人关键词问答
     // TODO: 写入聊天记录
-    // @VisitorAnnotation(title = "visitor", action = "sendKeywordMessage", description = "sendKeywordMessage")
+    // @VisitorAnnotation(title = "visitor", action = "sendKeywordMessage",
+    // description = "sendKeywordMessage")
     // @PostMapping("/message/keyword")
-    // public ResponseEntity<?> sendKeywordMessage(@RequestBody VisitorRequest request) {
-    //     //
-    //     String keyword = request.getContent();
-    //     String robotUid = request.getSid();
-    //     String orgUid = request.getOrgUid();
-    //     List<KeywordResponse> keywordList = keywordService.ask(keyword, robotUid, orgUid);
+    // public ResponseEntity<?> sendKeywordMessage(@RequestBody VisitorRequest
+    // request) {
+    // //
+    // String keyword = request.getContent();
+    // String robotUid = request.getSid();
+    // String orgUid = request.getOrgUid();
+    // List<KeywordResponse> keywordList = keywordService.ask(keyword, robotUid,
+    // orgUid);
 
-    //     // 随机从keywordList中选择一个元素
-    //     Random random = new Random();
-    //     KeywordResponse randomKeywordResponse = null;
-    //     if (!keywordList.isEmpty()) {
-    //         int randomIndex = random.nextInt(keywordList.size());
-    //         randomKeywordResponse = keywordList.get(randomIndex);
-    //     }
+    // // 随机从keywordList中选择一个元素
+    // Random random = new Random();
+    // KeywordResponse randomKeywordResponse = null;
+    // if (!keywordList.isEmpty()) {
+    // int randomIndex = random.nextInt(keywordList.size());
+    // randomKeywordResponse = keywordList.get(randomIndex);
+    // }
 
-    //     // 返回随机选择的元素或空列表（如果keywordList为空）
-    //     if (randomKeywordResponse != null) {
-    //         return ResponseEntity.ok(JsonResult.success(randomKeywordResponse.getReply()));
-    //     } else {
-    //         // 如果keywordList为空，你可以根据需要返回适当的信息，比如一个空对象或者错误信息
-    //         return ResponseEntity.ok(JsonResult.error());
-    //     }
+    // // 返回随机选择的元素或空列表（如果keywordList为空）
+    // if (randomKeywordResponse != null) {
+    // return
+    // ResponseEntity.ok(JsonResult.success(randomKeywordResponse.getReply()));
+    // } else {
+    // // 如果keywordList为空，你可以根据需要返回适当的信息，比如一个空对象或者错误信息
+    // return ResponseEntity.ok(JsonResult.error());
+    // }
     // }
 
     // TODO: 访客输入关联/联想

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 07:41:24
+ * @LastEditTime: 2024-09-03 10:37:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,5 +78,20 @@ public class ServiceSettings extends BaseServiceSettings {
             return true;
         }
         return this.worktimes.stream().anyMatch(w -> w.isWorkTime());
+    }
+
+    //
+    public Boolean shouldTransferToRobot(Boolean isOffline) {
+        if (this.defaultRobot) {
+            // 默认机器人优先接待
+            return true;
+        } else if (isOffline && this.offlineRobot) {
+            // 所有客服离线，且设置机器人离线优先接待
+            return true;
+        } else if (this.nonWorktimeRobot && !isWorkTime()) {
+            // 设置非工作时间机器人接待，且当前非工作时间，转机器人
+            return true;
+        }
+        return false;
     }
 }
