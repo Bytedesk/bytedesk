@@ -25,12 +25,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>integrations</module>
         <module>modules</module>
-        <module>projects</module>
         <module>starter</module>
-        <module>starter-ai</module>
-        <module>vip</module>
     </modules>
 
     <properties>
@@ -41,7 +37,7 @@
         <sofa.boot.version>4.2.0</sofa.boot.version>
         <querydsl.version>5.1.0</querydsl.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
-        <revision>0.4.0</revision>
+        <revision>0.4.1</revision>
     </properties>
 
     <dependencies>
