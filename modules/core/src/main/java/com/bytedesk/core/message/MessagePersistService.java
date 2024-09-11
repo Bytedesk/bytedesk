@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:43:05
+ * @LastEditTime: 2024-09-07 16:23:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,17 +37,16 @@ public class MessagePersistService {
     private final ModelMapper modelMapper;
 
     public void persist(String messageJSON) {
-        log.info("persist: {}", messageJSON);
+        // log.info("persist: {}", messageJSON);
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJSON, MessageProtobuf.class);
         //
         MessageTypeEnum type = messageProtobuf.getType();
         String threadTopic = messageProtobuf.getThread().getTopic();
-        
         // log.info("orgUid: {}", orgUid);
 
         // 返回true表示该消息是系统通知，不应该保存到数据库
         if (dealWithMessageNotification(type, messageProtobuf)) {
-            log.info("message should not be saved uid {}, type {}", messageProtobuf.getUid(), type);
+            // log.info("message should not be saved uid {}, type {}", messageProtobuf.getUid(), type);
             return;
         }
         //
@@ -191,12 +190,12 @@ public class MessagePersistService {
 
     // 消息撤回，从数据库中删除消息
     private void dealWithMessageRecall(MessageProtobuf message) {
-        log.info("dealWithMessageRecall");
+        // log.info("dealWithMessageRecall");
         messageService.deleteByUid(message.getUid());
     }
 
     private void dealWithRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-        log.info("dealWithMessageRateSubmit");
+        // log.info("dealWithMessageRateSubmit");
         // 如果是客服邀请评价，则content为邀请评价消息的uid，否则为空
         Optional<Message> messageOpt = messageService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
@@ -212,7 +211,7 @@ public class MessagePersistService {
     }
 
     private void dealWithLeaveMsg(MessageTypeEnum type, MessageProtobuf message) {
-        log.info("dealWithLeaveMsg");
+        // log.info("dealWithLeaveMsg");
         Optional<Message> messageOpt = messageService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             Message messageEntity = messageOpt.get();
@@ -225,8 +224,7 @@ public class MessagePersistService {
     }
 
     private void dealWithFaqRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-        log.info("dealWithFaqRateMessage");
-        //
+        // log.info("dealWithFaqRateMessage");
         Optional<Message> messageOpt = messageService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             Message messageEntity = messageOpt.get();
@@ -240,7 +238,7 @@ public class MessagePersistService {
     }
 
     private void dealWithRobotRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-        log.info("dealWithRobotRateMessage");
+        // log.info("dealWithRobotRateMessage");
         //
         Optional<Message> messageOpt = messageService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
@@ -255,7 +253,7 @@ public class MessagePersistService {
     }
 
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
-        log.info("dealWithTransferMessage");
+        // log.info("dealWithTransferMessage");
         MessageTransferContent transferContentObject = JSONObject.parseObject(message.getContent(),
                 MessageTransferContent.class);
         //

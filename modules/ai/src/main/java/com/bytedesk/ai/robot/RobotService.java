@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:42:14
+ * @LastEditTime: 2024-08-30 08:43:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -336,6 +336,35 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         return robotRepository.existsByNicknameAndOrgUidAndDeleted(name, orgUid, false);
     }
 
+    public RobotResponse createDefaultRobot(String orgUid, String uid) {
+        List<String> faqUids = Arrays.asList(
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+        //
+        RobotRequest robotRequest = RobotRequest.builder()
+                .nickname(I18Consts.I18N_ROBOT_NICKNAME)
+                .build();
+        robotRequest.setUid(uid);
+        robotRequest.setType(RobotTypeEnum.SERVICE.name());
+        robotRequest.setOrgUid(orgUid);
+        //
+        robotRequest.getServiceSettings().setFaqUids(faqUids);
+        robotRequest.getServiceSettings().setQuickFaqUids(faqUids);
+        //
+        return create(robotRequest);
+    }
+
+    public RobotResponse createDefaultAgentAsistantRobot(String orgUid) {
+        //
+        RobotRequest robotRequest = RobotRequest.builder()
+                .nickname(I18Consts.I18N_ROBOT_AGENT_ASISTANT_NICKNAME)
+                .build();
+        robotRequest.setType(RobotTypeEnum.AGENT_ASSISTANT.name());
+        robotRequest.setOrgUid(orgUid);
+        //
+        return create(robotRequest);
+    }
+
     public void initData() {
 
         if (robotRepository.count() > 0) {
@@ -343,29 +372,24 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         }
         //
         String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
-        List<String> faqUids = Arrays.asList(
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
-        //
-        // Kb kb = kbService.getKb(I18Consts.I18N_ROBOT_NICKNAME,
-        // BdConstants.DEFAULT_ORGANIZATION_UID);
-        // RobotLlm llm = RobotLlm.builder().build();
-        RobotRequest robotRequest = RobotRequest.builder()
-                .nickname(I18Consts.I18N_ROBOT_NICKNAME)
-                // .description(I18Consts.I18N_ROBOT_DESCRIPTION)
-                // .kb(kb)
-                // .llm(llm)
-                .build();
-        robotRequest.setUid(BdConstants.DEFAULT_ROBOT_UID);
-        robotRequest.setType(RobotTypeEnum.SERVICE.name());
-        robotRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
-        //
-        robotRequest.getServiceSettings().setFaqUids(faqUids);
-        robotRequest.getServiceSettings().setQuickFaqUids(faqUids);
-        //
-        create(robotRequest);
-        // save(robotRequest);
-
+        createDefaultRobot(orgUid, BdConstants.DEFAULT_ROBOT_UID);
+        createDefaultAgentAsistantRobot(orgUid);
+        // // 
+        // List<String> faqUids = Arrays.asList(
+        //         orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+        //         orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+        // //
+        // RobotRequest robotRequest = RobotRequest.builder()
+        //         .nickname(I18Consts.I18N_ROBOT_NICKNAME)
+        //         .build();
+        // robotRequest.setUid(BdConstants.DEFAULT_ROBOT_UID);
+        // robotRequest.setType(RobotTypeEnum.SERVICE.name());
+        // robotRequest.setOrgUid(orgUid);
+        // //
+        // robotRequest.getServiceSettings().setFaqUids(faqUids);
+        // robotRequest.getServiceSettings().setQuickFaqUids(faqUids);
+        // //
+        // create(robotRequest);
     }
 
 }

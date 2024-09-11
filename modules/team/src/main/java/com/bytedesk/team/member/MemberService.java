@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:50:05
+ * @LastEditTime: 2024-09-07 10:18:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -332,7 +332,7 @@ public class MemberService {
         String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
         Optional<Thread> reverseThreadOptional = threadService.findByUid(reverseUid);
         if (!reverseThreadOptional.isPresent()) {
-            throw new RuntimeException("reverseThread not found");
+            throw new RuntimeException("reverseThread " + reverseUid + " not found");
         }
         return reverseThreadOptional.get();
     }

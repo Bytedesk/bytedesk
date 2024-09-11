@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-09 16:34:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:32:59
+ * @LastEditTime: 2024-09-06 16:41:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,11 +56,6 @@ public class ThreadLog extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // @NotBlank
-    // private String title;
-    // @NotBlank
-    // private String avatar;
-
     /**
      * @{TopicConsts}
      */
@@ -102,7 +97,6 @@ public class ThreadLog extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
 
-    //
     // h2 db 不能使用 user, 所以重定义为 _user
     @Builder.Default
     @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)

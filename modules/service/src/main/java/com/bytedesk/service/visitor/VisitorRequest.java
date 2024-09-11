@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 18:26:13
+ * @LastEditTime: 2024-09-07 13:02:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,15 +58,12 @@ public class VisitorRequest extends BaseRequest {
 	private String note;
 
 	// for thread request
-	// private String type; // use super.type
 	private String sid;
-	// private String orgUid;
 
-	// public String formatTopic() {
-	// 	// 格式化topic，sid/uid, 其中：sid为agentUid或者workgroupUid, uid为访客visitorUid
-	// 	return this.sid + "/" + super.uid;
-	// 	// return formatType() + "/" + this.sid + "/" + uid;
-	// }
+	// 强制转人工服务，默认false
+	private Boolean forceAgent = false;
+
+	private String status;
 
 	public ThreadTypeEnum formatType() {
 		int typeInt;

@@ -47,6 +47,9 @@ public class GroupRequest extends BaseRequest {
     private String topTip;
 
     @Builder.Default
+    private Boolean isExternal = false;
+
+    @Builder.Default
     private GroupStatusEnum status = GroupStatusEnum.NORMAL;
 
     @Builder.Default

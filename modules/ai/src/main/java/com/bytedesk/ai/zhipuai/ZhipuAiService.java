@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:42:25
+ * @LastEditTime: 2024-08-30 14:41:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,6 @@ import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.ai.robot.RobotMessage;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotTypeEnum;
-import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.message.Message;
@@ -37,6 +36,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.uid.UidUtils;
@@ -44,7 +44,7 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JsonResultCodeEnum;
 import com.bytedesk.kbase.upload.UploadVectorStore;
 import com.zhipu.oapi.ClientV4;
-import com.zhipu.oapi.Constants;
+// import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
 import com.zhipu.oapi.service.v4.model.ChatMessage;
 import com.zhipu.oapi.service.v4.model.ChatMessageAccumulator;
@@ -68,6 +68,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ZhipuaiService {
 
+    private final ZhipuaiConfig zhipuaiConfig;
+
     private final ClientV4 client;
 
     private final UidUtils uidUtils;
@@ -80,7 +82,7 @@ public class ZhipuaiService {
 
     private final UploadVectorStore uploadVectorStore;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    // private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final String PROMPT_BLUEPRINT = """
             根据提供的文档信息回答问题，文档信息如下:
@@ -226,8 +228,8 @@ public class ZhipuaiService {
     public void sendWsRobotMessage(String query, String kbUid, Robot robot, MessageProtobuf messageProtobuf) {
         //
         String prompt = robot.getLlm().getPrompt();
-        if (robot.getType().equals(RobotTypeEnum.SERVICE)
-            || robot.getType().equals(RobotTypeEnum.KNOWLEDGEBASE)) {
+        if (robot.getType().equals(RobotTypeEnum.SERVICE.name())
+            || robot.getType().equals(RobotTypeEnum.KNOWLEDGEBASE.name())) {
             List<String> contentList = uploadVectorStore.searchText(query, kbUid);
             String context = String.join("\n", contentList);
             prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
@@ -242,7 +244,8 @@ public class ZhipuaiService {
         //
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 // 模型名称
-                .model(Constants.ModelChatGLM3TURBO)
+                .model(zhipuaiConfig.zhiPuAiApiModel)
+                // .model(Constants.ModelChatGLM3TURBO)
                 // .model(robotSimple.getLlm().getModel())
                 // .temperature(robotSimple.getLlm().getTemperature())
                 // .topP(robotSimple.getLlm().getTopP())
@@ -272,8 +275,9 @@ public class ZhipuaiService {
                                     messageProtobuf.setType(MessageTypeEnum.STREAM);
                                     messageProtobuf.setContent(answerContent);
                                     //
-                                    String json = JSON.toJSONString(messageProtobuf);
-                                    bytedeskEventPublisher.publishMessageJsonEvent(json);
+                                    MessageUtils.notifyUser(messageProtobuf);
+                                    // String json = JSON.toJSONString(messageProtobuf);
+                                    // bytedeskEventPublisher.publishMessageJsonEvent(json);
                                 }
                             }
                         }
@@ -315,7 +319,8 @@ public class ZhipuaiService {
         //
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 // 模型名称
-                .model(Constants.ModelChatGLM3TURBO)
+                .model(zhipuaiConfig.zhiPuAiApiModel)
+                // .model(Constants.ModelChatGLM3TURBO)
                 // .model(robotSimple.getLlm().getModel())
                 // .temperature(robotSimple.getLlm().getTemperature())
                 // .topP(robotSimple.getLlm().getTopP())
@@ -345,8 +350,9 @@ public class ZhipuaiService {
                                     messageProtobuf.setType(MessageTypeEnum.STREAM);
                                     messageProtobuf.setContent(answerContent);
                                     //
-                                    String json = JSON.toJSONString(messageProtobuf);
-                                    bytedeskEventPublisher.publishMessageJsonEvent(json);
+                                    MessageUtils.notifyUser(messageProtobuf);
+                                    // String json = JSON.toJSONString(messageProtobuf);
+                                    // bytedeskEventPublisher.publishMessageJsonEvent(json);
                                 }
                             }
                         }

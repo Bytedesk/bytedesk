@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-12 11:35:44
+ * @LastEditTime: 2024-09-07 09:45:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,9 +28,9 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.service.visitor.Visitor;
-import com.bytedesk.service.visitor.VisitorProtobuf;
 import com.bytedesk.service.visitor.VisitorService;
 
 import lombok.AllArgsConstructor;
@@ -81,7 +81,7 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
         VisitorThread visitorThread = modelMapper.map(thread, VisitorThread.class);
         //
         String visitorString = thread.getUser();
-        VisitorProtobuf visitor = JSON.parseObject(visitorString, VisitorProtobuf.class);
+        UserProtobuf visitor = JSON.parseObject(visitorString, UserProtobuf.class);
         //
         Optional<Visitor> visitorOpt = visitorService.findByUid(visitor.getUid());
         if (visitorOpt.isPresent()) {

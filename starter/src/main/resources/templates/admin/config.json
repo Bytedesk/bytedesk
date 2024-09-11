@@ -1,5 +1,5 @@
 {
     "enabled": false,
-    "restHost": "https://api.weiyuai.cn",
-    "htmlHost": "https://www.weiyuai.cn"
+    "apiHost": "api.weiyuai.cn",
+    "htmlHost": "www.weiyuai.cn"
 }

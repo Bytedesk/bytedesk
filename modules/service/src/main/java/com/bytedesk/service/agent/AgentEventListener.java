@@ -27,7 +27,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.event.GenericApplicationEvent;
-import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;

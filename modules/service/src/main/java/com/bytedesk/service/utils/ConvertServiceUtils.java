@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 20:28:24
+ * @LastEditTime: 2024-09-07 10:24:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,18 +24,16 @@ import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentResponse;
-import com.bytedesk.service.agent.AgentResponseSimple;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.visitor.Visitor;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
-import com.bytedesk.service.visitor.VisitorProtobuf;
 import com.bytedesk.service.workgroup.Workgroup;
 import com.bytedesk.service.workgroup.WorkgroupResponse;
-import com.bytedesk.service.workgroup.WorkgroupResponseSimple;
 
 public class ConvertServiceUtils {
     private ConvertServiceUtils() {
@@ -46,19 +44,22 @@ public class ConvertServiceUtils {
         return new ModelMapper().map(visitor, VisitorResponse.class);
     }
 
-    public static VisitorProtobuf convertToVisitorProtobuf(Visitor visitor) {
-        return new ModelMapper().map(visitor, VisitorProtobuf.class);
+    public static UserProtobuf convertToUserProtobuf(Visitor visitor) {
+        return new ModelMapper().map(visitor, UserProtobuf.class);
     }
 
-    public static VisitorProtobuf convertToVisitorProtobuf(VisitorRequest visitorRequest) {
-        return new ModelMapper().map(visitorRequest, VisitorProtobuf.class);
+    public static UserProtobuf convertToUserProtobuf(VisitorRequest visitorRequest) {
+        UserProtobuf userProtobuf = new ModelMapper().map(visitorRequest, UserProtobuf.class);
+        userProtobuf.setType(UserTypeEnum.VISITOR.name());
+        return userProtobuf;
     }
 
-    public static UserProtobuf convertToUserResponseSimple(AgentResponseSimple agentResponseSimple) {
-        return new ModelMapper().map(agentResponseSimple, UserProtobuf.class);
-    }
+    // public static UserProtobuf convertToUserResponseSimple(AgentResponseSimple
+    // agentResponseSimple) {
+    // return new ModelMapper().map(agentResponseSimple, UserProtobuf.class);
+    // }
 
-    public static UserProtobuf convertToUserResponseSimple(VisitorProtobuf visitorResponseSimple) {
+    public static UserProtobuf convertToUserResponseSimple(UserProtobuf visitorResponseSimple) {
         return new ModelMapper().map(visitorResponseSimple, UserProtobuf.class);
     }
 
@@ -95,8 +96,10 @@ public class ConvertServiceUtils {
         return new ModelMapper().map(agent, AgentResponse.class);
     }
 
-    public static AgentResponseSimple convertToAgentResponseSimple(Agent agent) {
-        return new ModelMapper().map(agent, AgentResponseSimple.class);
+    public static UserProtobuf convertToUserProtobuf(Agent agent) {
+        UserProtobuf userProtobuf = new ModelMapper().map(agent, UserProtobuf.class);
+        userProtobuf.setType(UserTypeEnum.AGENT.name());
+        return userProtobuf;
     }
 
     //
@@ -104,9 +107,10 @@ public class ConvertServiceUtils {
         return new ModelMapper().map(workgroup, WorkgroupResponse.class);
     }
 
-    public static WorkgroupResponseSimple convertToWorkgroupResponseSimple(Workgroup workgroup) {
-        return new ModelMapper().map(workgroup, WorkgroupResponseSimple.class);
-    }
+    // public static WorkgroupResponseSimple
+    // convertToWorkgroupResponseSimple(Workgroup workgroup) {
+    // return new ModelMapper().map(workgroup, WorkgroupResponseSimple.class);
+    // }
 
     //
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(

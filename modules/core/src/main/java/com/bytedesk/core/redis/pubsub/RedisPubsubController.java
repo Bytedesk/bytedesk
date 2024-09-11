@@ -15,7 +15,7 @@
 package com.bytedesk.core.redis.pubsub;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+// import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,8 +39,8 @@ public class RedisPubsubController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    // @Autowired
+    // private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * http://127.0.0.1:9003/redis/pubsub/send?message=hello
@@ -64,17 +64,17 @@ public class RedisPubsubController {
      * @param message
      * @return
      */
-    @GetMapping("/send/object")
-    public JsonResult<String> publishObject(@RequestParam String message) {
-        log.info("redisPubsub send: {}", message);
-        //
-        RedisPubsubMessage messageDto = RedisPubsubMessage.builder()
-                .type("text")
-                .content("pubsub")
-                .build();
-        redisTemplate.convertAndSend(RedisPubsubConst.BYTEDESK_PUBSUB_CHANNEL_OBJECT, messageDto);
+    // @GetMapping("/send/object")
+    // public JsonResult<String> publishObject(@RequestParam String message) {
+    //     log.info("redisPubsub send: {}", message);
+    //     //
+    //     RedisPubsubMessage messageDto = RedisPubsubMessage.builder()
+    //             .type("text")
+    //             .fileUrl("pubsub").fileUid("").kbUid("")
+    //             .build();
+    //     redisTemplate.convertAndSend(RedisPubsubConst.BYTEDESK_PUBSUB_CHANNEL_OBJECT, messageDto);
 
-        return new JsonResult<>("send object", 200, message);
-    }
+    //     return new JsonResult<>("send object", 200, message);
+    // }
 
 }

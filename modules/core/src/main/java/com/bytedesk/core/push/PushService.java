@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:55:08
+ * @LastEditTime: 2024-09-09 20:35:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -113,7 +112,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
             code = bytedeskProperties.getMobileCode();
             log.info("test code: {}", code);
         } else {
-            code = Utils.getRandomCode(receiver);
+            code = Utils.getRandomCode();
         }
 
         if (type.equals(TypeConsts.TYPE_EMAIL)) {
@@ -138,6 +137,67 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         return true;
     }
 
+    public PushResponse scanQuery(PushRequest pushRequest, HttpServletRequest request) {
+
+        Optional<Push> pushOptional = findByDeviceUid(pushRequest.getDeviceUid());
+        if (pushOptional.isPresent()) {
+            Push push = pushOptional.get();
+            // 
+            if (pushRequest.getForceRefresh().booleanValue()) {
+                push.setStatus(PushStatusEnum.PENDING.name());
+                save(push);
+            }
+            // 
+            return convertToResponse(push);
+        }
+
+        String ip = ipService.getIp(request);
+        String ipLocation = ipService.getIpLocation(ip);
+        //
+        Push push = modelMapper.map(pushRequest, Push.class);
+        push.setUid(uidUtils.getCacheSerialUid());
+        push.setType(TypeConsts.TYPE_SCAN);
+        push.setSender(TypeConsts.TYPE_SYSTEM);
+        push.setContent(Utils.getRandomCode());
+        push.setIp(ip);
+        push.setIpLocation(ipLocation);
+        //
+        Push savedPush = save(push);
+        if (savedPush == null) {
+            throw new RuntimeException("scan query failed");
+        }
+        return convertToResponse(savedPush);
+    }
+
+    public PushResponse scan(PushRequest pushRequest, HttpServletRequest request) {
+        
+        Push push = findByDeviceUid(pushRequest.getDeviceUid())
+                .orElseThrow(() -> new RuntimeException("scan deviceUid " + pushRequest.getDeviceUid() + " not found"));
+        
+        push.setStatus(PushStatusEnum.SCANED.name());
+        //
+        Push savedPush = save(push);
+        if (savedPush == null) {
+            throw new RuntimeException("scan save failed");
+        }
+        return convertToResponse(savedPush);
+    }
+
+    public PushResponse scanConfirm(PushRequest pushRequest, HttpServletRequest request) {
+
+        Push push = findByDeviceUid(pushRequest.getDeviceUid())
+                .orElseThrow(() -> new RuntimeException(
+                        "scanConfirm deviceUid " + pushRequest.getDeviceUid() + " not found"));
+        push.setReceiver(pushRequest.getReceiver());
+        push.setStatus(PushStatusEnum.CONFIRMED.name());
+        //
+        Push savedPush = save(push);
+        if (savedPush == null) {
+            throw new RuntimeException("scanConfirm save failed");
+        }
+        return convertToResponse(savedPush);
+    }
+
     public PushResponse create(PushRequest pushRequest) {
         log.info("pushRequest {}", pushRequest.toString());
 
@@ -149,6 +209,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         if (savedPush == null) {
             throw new RuntimeException("create push failed");
         }
+        // 
         return convertToResponse(savedPush);
     }
 
@@ -162,15 +223,6 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     public Boolean validateCode(String receiver, String type, String code) {
         // check if has already send validate code within 15min
-
-        // Boolean result =
-        // pushRepository.existsByStatusAndTypeAndReceiverAndContent(StatusConsts.CODE_STATUS_PENDING,
-        // type, receiver, code);
-        // if (result) {
-        // // TODO: 更新状态
-        // }
-        // return result;
-        //
         Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatusEnum.PENDING, type, receiver,
                 code);
         if (pushOptional.isPresent()) {
@@ -189,6 +241,10 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         return pushRepository.findByStatusAndTypeAndReceiverAndContent(status.name(), type, receiver, content);
     }
 
+    public Optional<Push> findByDeviceUid(String deviceUid) {
+        return pushRepository.findByDeviceUid(deviceUid);
+    }
+
     public Boolean existsByStatusAndTypeAndReceiver(PushStatusEnum status, String type, String receiver) {
         return pushRepository.existsByStatusAndTypeAndReceiver(status.name(), type, receiver);
     }
@@ -201,32 +257,38 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         try {
             return pushRepository.save(push);
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
         return null;
     }
 
     // TODO: 更新缓存
-    @Cacheable(value = "pushPending")
+    // @Cacheable(value = "pushPending")
     public List<Push> findStatusPending() {
-        // return pushRepository.findByStatus(StatusConsts.CODE_STATUS_PENDING);
         return pushRepository.findByStatus(PushStatusEnum.PENDING.name());
     }
 
     // 自动过期
-    // TODO: 频繁查库，待优化
     @Async
     public void autoOutdateCode() {
         List<Push> pendingPushes = findStatusPending();
+        // log.info("autoOutdateCode pendingPushes {}", pendingPushes.size());
         pendingPushes.forEach(push -> {
             // 计算两个日期之间的毫秒差
             long diffInMilliseconds = Math.abs(new Date().getTime() - push.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            // 验证码有效时间15分钟
-            if (diffInMinutes > 15) {
-                // TODO: 过期，清空缓存
-                // push.setStatus(StatusConsts.CODE_STATUS_EXPIRED);
+            // log.info("autoOutdateCode diffInMinutes {} {}", push.getContent(), diffInMinutes);
+            //
+            if (push.getType().equals(TypeConsts.TYPE_SCAN)) {
+                // log.info("autoOutdateCode scan TypeConsts.TYPE_SCAN");
+                // 扫码有效时间3分钟
+                if (diffInMinutes > 3) {
+                    push.setStatus(PushStatusEnum.EXPIRED.name());
+                    save(push);
+                }
+            } else if (diffInMinutes > 15) {
+                // 手机验证码有效时间15分钟
                 push.setStatus(PushStatusEnum.EXPIRED.name());
                 save(push);
             }

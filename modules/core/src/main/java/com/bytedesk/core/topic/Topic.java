@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:03:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-03 07:22:42
+ * @LastEditTime: 2024-09-07 12:51:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,6 +53,12 @@ public class Topic extends BaseEntityNoOrg {
     @Convert(converter = StringSetConverter.class)
     private Set<String> topics = new HashSet<>();
     // private String topic;
+
+    // 管理员监控的topic
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Convert(converter = StringSetConverter.class)
+    private Set<String> monitorTopics = new HashSet<>();
 
     // 每个用户仅存在一条记录
     // user, no need map, just uid

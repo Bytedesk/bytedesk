@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:30:23
+ * @LastEditTime: 2024-08-31 15:47:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,7 +83,7 @@ public class Upload extends BaseEntity {
 
     private String kbUid; // 所属知识库
 
-    // 存储用户信息：包括客服、访客、群聊、同事等
+    // 上传用户
     @Builder.Default
     @Column(name = "upload_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)

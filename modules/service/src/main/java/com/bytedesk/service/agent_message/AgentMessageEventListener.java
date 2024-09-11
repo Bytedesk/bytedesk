@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-05 11:07:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 11:09:53
+ * @LastEditTime: 2024-09-07 16:15:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,7 @@
  */
 package com.bytedesk.service.agent_message;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import com.bytedesk.core.message.MessageCreateEvent;
-import com.bytedesk.core.message.MessageUpdateEvent;
 
 // import lombok.extern.slf4j.Slf4j;
 
@@ -26,15 +22,15 @@ import com.bytedesk.core.message.MessageUpdateEvent;
 @Component
 public class AgentMessageEventListener {
 
-    @EventListener
-    public void onMessageCreateEvent(MessageCreateEvent event) {
-        // log.info("visitor message unread create event: " + event);
+    // @EventListener
+    // public void onMessageCreateEvent(MessageCreateEvent event) {
+    //     // log.info("visitor message unread create event: " + event);
 
-    }
+    // }
 
-    @EventListener
-    public void onMessageUpdateEvent(MessageUpdateEvent event) {
-        // log.info("visitor message unread update event: " + event);
-    }
+    // @EventListener
+    // public void onMessageUpdateEvent(MessageUpdateEvent event) {
+    //     // log.info("visitor message unread update event: " + event);
+    // }
 
 }

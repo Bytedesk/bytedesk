@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 15:37:39
+ * @LastEditTime: 2024-09-07 16:41:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -91,6 +91,8 @@ public class ThreadController extends BaseController<ThreadRequest> {
     @ActionAnnotation(title = "thread", action = "close", description = "close thread")
     @PostMapping("/close")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
+
+        request.setStatus(ThreadStatusEnum.AGENT_CLOSED);
 
         ThreadResponse threadResponse = threadService.close(request);
 

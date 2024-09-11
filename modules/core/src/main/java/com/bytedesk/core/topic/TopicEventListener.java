@@ -19,7 +19,8 @@ import java.util.List;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

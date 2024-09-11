@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 12:24:45
+ * @LastEditTime: 2024-09-10 17:06:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,9 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.message.Message;
 import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUpdateEvent;
+import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
 import com.bytedesk.core.socket.stomp.StompConnectedEvent;
@@ -42,7 +44,10 @@ public class MessageUnreadEventListener {
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
         Message message = event.getMessage();
-        log.info("message unread create event: {}", message.getContent());
+        if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
+            return;
+        }
+        // log.info("message unread create event: {}", message.getContent());
         // 缓存未读消息
         String threadTopic = message.getThreadTopic();
         String userString = message.getUser();
@@ -67,23 +72,23 @@ public class MessageUnreadEventListener {
             }
             //
         } else if (TopicUtils.isOrgWorkgroupTopic(threadTopic)) {
-            // 技能组客服 topic格式：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
+            // 技能组客服 topic格式：org/workgroup/{workgroup_uid}/{visitor_uid}
             String[] splits = threadTopic.split("/");
-            if (splits.length < 5) {
+            if (splits.length < 4) {
                 throw new RuntimeException("workgroup topic format error");
             }
             String workgroupUid = splits[2];
-            String agentUid = splits[3];
-            String visitorUid = splits[4];
-            log.info("workgroupUid {}, agentUid {}, visitorUid {}", workgroupUid, agentUid, visitorUid);
+            // String agentUid = splits[3];
+            String visitorUid = splits[3];
+            log.info("workgroupUid {}, visitorUid {}", workgroupUid, visitorUid);
             //
             // 仅缓存接受者未读消息
-            if (userUid.equals(agentUid)) {
-                messageUnreadService.create(message, visitorUid);
-            }
-            if (userUid.equals(visitorUid)) {
-                messageUnreadService.create(message, agentUid);
-            }
+            // if (userUid.equals(agentUid)) {
+            //     messageUnreadService.create(message, visitorUid);
+            // }
+            // if (userUid.equals(visitorUid)) {
+            //     messageUnreadService.create(message, agentUid);
+            // }
 
         } else if (TopicUtils.isOrgGroupTopic(threadTopic)) {
             // 群组消息 topic格式：org/group/{group_uid}
@@ -122,7 +127,10 @@ public class MessageUnreadEventListener {
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
         Message message = event.getMessage();
-        log.info("message unread update event: {}", message.getContent());
+        // log.info("message unread update event: {}", message.getContent());
+        if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
+            return;
+        }
         //
         String threadTopic = message.getThreadTopic();
         MessageStatusEnum messageStatus = MessageStatusEnum.fromValue(message.getStatus());
@@ -145,17 +153,17 @@ public class MessageUnreadEventListener {
             messageUnreadService.delete(visitorUid);
             //
         } else if (TopicUtils.isOrgWorkgroupTopic(threadTopic)) {
-            // 技能组客服 topic格式：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
+            // 技能组客服 topic格式：org/workgroup/{workgroup_uid}/{visitor_uid}
             String[] splits = threadTopic.split("/");
-            if (splits.length < 5) {
+            if (splits.length < 4) {
                 throw new RuntimeException("workgroup topic format error");
             }
             String workgroupUid = splits[2];
-            String agentUid = splits[3];
-            String visitorUid = splits[4];
-            log.info("workgroupUid {}, agentUid {}, visitorUid {}", workgroupUid, agentUid, visitorUid);
+            // String agentUid = splits[3];
+            String visitorUid = splits[3];
+            log.info("workgroupUid {}, visitorUid {}", workgroupUid, visitorUid);
             //
-            messageUnreadService.delete(agentUid);
+            // messageUnreadService.delete(agentUid);
             messageUnreadService.delete(visitorUid);
 
         } else if (TopicUtils.isOrgGroupTopic(threadTopic)) {
@@ -183,10 +191,11 @@ public class MessageUnreadEventListener {
         }
     }
 
-    // @EventListener
-    // public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
-    // // log.info("message quartz five second event: " + event);
-    // }
+    @EventListener
+    public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
+        // log.info("message quartz five second event: " + event);
+        
+    }
 
     @EventListener
     public void onMqttConnectEvent(MqttConnectedEvent event) {

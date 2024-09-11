@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 14:34:30
+ * @LastEditTime: 2024-09-11 08:50:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,11 +17,14 @@ package com.bytedesk.core.thread;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -153,10 +156,9 @@ public class Thread extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
-    public Boolean isInit() {
-        return this.status == ThreadStatusEnum.NORMAL.name();
-        // return !StringUtils.hasText(this.content);
-    }
+    // public Boolean isInit() {
+    //     return this.status == ThreadStatusEnum.NORMAL.name();
+    // }
 
     //
     public Boolean isClosed() {
@@ -165,6 +167,18 @@ public class Thread extends BaseEntity {
 
     public Boolean isCustomerService() {
         return this.type == ThreadTypeEnum.AGENT.name() || this.type == ThreadTypeEnum.WORKGROUP.name();
+    }
+
+    public ThreadProtobuf toProtobuf() {
+        return ConvertUtils.convertToThreadProtobuf(this);
+    }
+
+    public UserProtobuf getAgentProtobuf() {
+        return JSON.parseObject(this.agent, UserProtobuf.class);
+    }
+
+    public UserProtobuf getUserProtobuf() {
+        return JSON.parseObject(this.user, UserProtobuf.class);
     }
 
 }

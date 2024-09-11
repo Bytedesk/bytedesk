@@ -25,12 +25,22 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class TopicCacheService {
 
+    // 假设我们使用"myList"作为缓存中的键
+    String defaultCacheKey = "topicList";
+
     // 创建一个缓存实例，设置过期时间为5天
-    Cache<String, List<String>> topicCache = Caffeine.newBuilder()
-            .expireAfterWrite(5, TimeUnit.DAYS)
+    private Cache<String, List<String>> topicCache;
+
+    @PostConstruct
+    public void init() {
+        // 初始化caffeinecache，设置缓存的最大大小、过期时间等参数
+        topicCache = Caffeine.newBuilder()
+            .expireAfterWrite(1, TimeUnit.DAYS)
             .build(new CacheLoader<String, List<String>>() {
                 @Override
                 public List<String> load(String key) throws Exception {
@@ -38,9 +48,7 @@ public class TopicCacheService {
                     return new ArrayList<>();
                 }
             });
-
-    // 假设我们使用"myList"作为缓存中的键
-    String defaultCacheKey = "topicList";
+    }
 
     // 模拟 push 操作：向列表中添加元素
     public void push(String messageJSON) {

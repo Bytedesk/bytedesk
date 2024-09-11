@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 16:32:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-01 18:33:38
+ * @LastEditTime: 2024-08-30 11:13:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,11 @@ public enum ThreadTypeEnum {
     CHANNEL(8),
     LOCAL(9),
     FRIEND(10),
-    TICKET(11);
+    TICKET(11),
+    KB(12),
+    KBDOC(13),
+    AGENTASISTANT(14),
+            ;
 
     private final int value;
 

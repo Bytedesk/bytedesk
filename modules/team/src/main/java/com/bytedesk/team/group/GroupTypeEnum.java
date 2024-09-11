@@ -14,25 +14,14 @@
  */
 package com.bytedesk.team.group;
 
-
 public enum GroupTypeEnum {
-    MEMBER("member"), // 企业内部群组
-    USER("user"); // 社交群组
-
-    private final String value;
-
-    GroupTypeEnum(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
+    NORMAL, // 普通群组
+    TOPIC; // 话题群组
 
     // 根据字符串查找对应的枚举常量
     public static GroupTypeEnum fromValue(String value) {
         for (GroupTypeEnum type : GroupTypeEnum.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
+            if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }
         }

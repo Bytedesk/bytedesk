@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 09:55:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-28 14:23:18
+ * @LastEditTime: 2024-08-29 18:05:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,6 +50,8 @@ public class GroupResponse extends BaseResponse {
     private GroupTypeEnum type;
 
     private GroupStatusEnum status;
+
+    private Boolean isExternal;
 
     private List<MemberResponseSimple> members;
 

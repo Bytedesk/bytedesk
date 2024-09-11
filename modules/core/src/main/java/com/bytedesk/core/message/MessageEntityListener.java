@@ -30,7 +30,7 @@ public class MessageEntityListener {
 
     @PostPersist
     public void onPostPersist(Message message) {
-        log.info("message MessageEntityListener: onPostPersist");
+        // log.info("message MessageEntityListener: onPostPersist");
         Message clonedMessage = SerializationUtils.clone(message);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -39,7 +39,7 @@ public class MessageEntityListener {
 
     @PostUpdate
     public void onPostUpdate(Message message) {
-        log.info("message MessageEntityListener: onPostUpdate");
+        // log.info("message MessageEntityListener: onPostUpdate");
         Message clonedMessage = SerializationUtils.clone(message);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);

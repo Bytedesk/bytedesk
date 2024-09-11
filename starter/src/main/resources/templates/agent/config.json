@@ -1,12 +1,5 @@
 {
-    "BASE_HOST": "127.0.0.1",
-    "BASE_URL": "http://127.0.0.1:9003",
-    "MQTT_PORT": 9885,
-    "MQTT_HOST": "127.0.0.1",
-    "MQTT_WSS_HOST": "",
-    "IS_DEBUG": false,
-    "SERVER_MODE": "opensource",
-    "UPLOAD_FILE_URL": "http://127.0.0.1:9003/api/v1/upload/file",
-    "UPLOAD_AVATAR_URL": "http://127.0.0.1:9003/api/v1/upload/file",
-    "CLIENT": "electron"
+    "enabled": false,
+    "apiHost": "api.weiyuai.cn",
+    "htmlHost": "www.weiyuai.cn"
 }

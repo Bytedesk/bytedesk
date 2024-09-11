@@ -17,7 +17,7 @@ package com.bytedesk.service.agent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;

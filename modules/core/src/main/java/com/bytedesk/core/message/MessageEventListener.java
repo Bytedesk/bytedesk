@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 07:26:46
+ * @LastEditTime: 2024-08-31 10:02:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.quartz.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.utils.MessageConvertUtils;
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageEventListener {
 
-    private final MessageCacheService messageCacheService;
+    private final MessagePersistCache messagePersistCache;
 
     private final MessagePersistService messagePersistService;
 
@@ -108,7 +108,7 @@ public class MessageEventListener {
 
         String msgJson = JSON.toJSONString(messageProtobuf);
         // 缓存消息，用于定期持久化到数据库
-        messageCacheService.pushForPersist(msgJson);
+        messagePersistCache.pushForPersist(msgJson);
         //
         return msgJson;
     }
@@ -116,7 +116,7 @@ public class MessageEventListener {
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
         // log.info("message quartz five second event: " + event);
-        List<String> messageJsonList = messageCacheService.getListForPersist();
+        List<String> messageJsonList = messagePersistCache.getListForPersist();
         if (messageJsonList == null || messageJsonList.isEmpty()) {
             return;
         }

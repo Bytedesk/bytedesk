@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-18 17:56:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-09 00:30:30
+ * @LastEditTime: 2024-09-07 23:29:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,10 +19,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>微语-智能客服</title>
+    <style type="text/css">
+        /* 白天模式样式 */
+        body.day-mode {
+            background-color: #ffffff;
+            /* 白色背景 */
+            color: #000000;
+            /* 黑色文本 */
+        }
+
+        /* 黑夜模式样式 */
+        body.night-mode {
+            background-color: #333333;
+            /* 深色背景 */
+            color: #ffffff;
+            /* 白色文本 */
+        }
+
+        /* 切换按钮样式（可选） */
+        #toggleModeBtn {
+            /* 添加您喜欢的样式 */
+        }
+    </style>
 </head>
 
 <body>
-    <!--  -->
+    <!-- 切换白天/夜间模式按钮 -->
+    <button id="toggleModeBtn">切换模式</button>
+    <!-- TODO: 切换白天/夜间模式 -->
     <script src="/chat/assets/js/float/index.js"></script>
     <!-- <script src="./assets/js/float/index.min.js"></script> -->
     <script>
@@ -50,6 +74,20 @@
             //showButton: true, // show button or not
             //showIframe: true // show iframe or not
         });
+        //
+        // 切换白天/夜间模式功能
+        document.getElementById('toggleModeBtn').addEventListener('click', function () {
+            var body = document.body;
+            if (body.classList.contains('day-mode')) {
+                body.classList.remove('day-mode');
+                body.classList.add('night-mode');
+            } else {
+                body.classList.remove('night-mode');
+                body.classList.add('day-mode');
+            }
+        });
+        // 初始设置为白天模式（可选）
+        document.body.classList.add('day-mode');
     </script>
 </body>
 

@@ -22,8 +22,7 @@ import com.bytedesk.core.message.Message;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
-public class PushServiceImplAndroid extends Notifier {
-
+public class PushServiceImplAndroid extends PushNotifier {
 
     @Async
     @Override
@@ -37,9 +36,8 @@ public class PushServiceImplAndroid extends Notifier {
 
         // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
 
-        
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'send'");
     }
-    
+
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-07 15:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-09 17:49:09
+ * @LastEditTime: 2024-08-30 10:55:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.uid.impl.CachedUidGenerator;
 import com.bytedesk.core.uid.impl.DefaultUidGenerator;
 
+import jakarta.annotation.PostConstruct;
+
 // import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,6 +37,18 @@ public class UidUtils {
 
     @Autowired
     private CachedUidGenerator cachedUidGenerator;
+
+    private static UidUtils instance;
+
+    @PostConstruct
+    public void init() {
+        instance = this;
+    }
+
+    // 使用方法：String uid = UidUtils.getInstance().getDefaultSerialUid();
+    public static UidUtils getInstance() {
+        return instance;
+    }
 
     /**
      * 实时生成

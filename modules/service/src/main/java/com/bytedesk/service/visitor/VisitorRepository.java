@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-04 15:48:03
+ * @LastEditTime: 2024-09-07 13:06:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,17 +14,25 @@
  */
 package com.bytedesk.service.visitor;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- * 
- */
 @Repository
 public interface VisitorRepository extends JpaRepository<Visitor, Long>, JpaSpecificationExecutor<Visitor> {
 
     Optional<Visitor> findByUidAndDeleted(String uid, Boolean deleted);
+
+    List<Visitor> findByStatusAndDeleted(String status, Boolean deleted);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Visitor v SET v.status = :status WHERE v.uid = :uid")
+    int updateStatusByUid(String uid, String status);
 }

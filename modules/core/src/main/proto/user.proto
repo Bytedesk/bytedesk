@@ -26,6 +26,8 @@ message User {
     string nickname = 2;
     // 头像
     string avatar = 3;
+    // 类型
+    string type = 4;
     // 自定义扩展/附加信息
-    string extra = 4;
+    string extra = 5;
 }

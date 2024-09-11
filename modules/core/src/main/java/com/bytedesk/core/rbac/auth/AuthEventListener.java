@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-19 11:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-23 21:39:15
+ * @LastEditTime: 2024-09-07 16:56:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,8 +24,9 @@ import com.bytedesk.core.action.ActionCreateEvent;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageService;
+import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +36,13 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AuthEventListener {
     
-    private final MessageService messageService;
+    // private final MessageService messageService;
+
+    private final UidUtils uidUtils;
 
     @EventListener
     public void onActionCreateEvent(ActionCreateEvent event) {
-        log.info("onActionCreateEvent Received event: {}", event.getAction().getTitle());
+        log.info("onActionCreateEvent Received event: {}", event.toString());
         // do something
         Action action = event.getAction();
         // 监听登录action，发送登录系统消息，提醒相关用户
@@ -53,9 +56,11 @@ public class AuthEventListener {
             contentObject.put(I18Consts.I18N_NOTICE_CONTENT, action.getAction());
             contentObject.put(I18Consts.I18N_NOTICE_IP, action.getIp());
             contentObject.put(I18Consts.I18N_NOTICE_IPLOCATION, action.getIpLocation());
-            MessageProtobuf messsage = messageService.createNoticeMessage(user, JSON.toJSONString(contentObject));
-            //
-            messageService.notifyUser(messsage);
+            // 
+            // MessageProtobuf messsage = messageService.createNoticeMessage(user, JSON.toJSONString(contentObject));
+            MessageProtobuf messsage = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), user.getUid(), user.getOrgUid(),
+                    JSON.toJSONString(contentObject));
+            MessageUtils.notifyUser(messsage);
         }
     }
 

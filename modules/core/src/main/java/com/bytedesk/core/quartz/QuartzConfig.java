@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 13:05:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-17 11:39:54
+ * @LastEditTime: 2024-09-09 16:28:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,9 @@ import org.quartz.TriggerBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.bytedesk.core.quartz.job.FiveMinJob;
 import com.bytedesk.core.quartz.job.FiveSecondJob;
+import com.bytedesk.core.quartz.job.OneMinJob;
 
 /**
  * Cron使用方法：
@@ -77,6 +79,58 @@ public class QuartzConfig {
                 .withDescription("每隔5秒钟检查一次")
                 .withSchedule(scheduleBuilder)
                 .build();
+    }
+
+    /**
+     * 每5分钟运行一次
+     */
+    @Bean
+    public JobDetail fiveMinJobJobDetail() {
+        return JobBuilder.newJob(FiveMinJob.class)
+                .withIdentity("FiveMinJob", "bytedesk")
+                .withDescription("每5分钟运行一次")
+                .storeDurably()
+                .build();
+    }
+
+    @Bean
+    public Trigger fiveMinJobTrigger() {
+            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
+                            .simpleSchedule()
+                            .withIntervalInMinutes(5)
+                            .repeatForever();
+            return TriggerBuilder.newTrigger()
+                            .forJob(fiveMinJobJobDetail())
+                            .withIdentity("fiveMinJobTrigger", "bytedesk")
+                            .withDescription("每隔5分钟检查一次")
+                            .withSchedule(scheduleBuilder)
+                            .build();
+    }
+    
+    /**
+     * 每1分钟运行一次
+     */
+    @Bean
+    public JobDetail oneMinJobJobDetail() {
+            return JobBuilder.newJob(OneMinJob.class)
+                            .withIdentity("OneMinJob", "bytedesk")
+                            .withDescription("每1分钟运行一次")
+                            .storeDurably()
+                            .build();
+    }
+
+    @Bean
+    public Trigger oneMinJobTrigger() {
+            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
+                            .simpleSchedule()
+                            .withIntervalInMinutes(1)
+                            .repeatForever();
+            return TriggerBuilder.newTrigger()
+                            .forJob(oneMinJobJobDetail())
+                            .withIdentity("oneMinJobTrigger", "bytedesk")
+                            .withDescription("每隔1分钟检查一次")
+                            .withSchedule(scheduleBuilder)
+                            .build();
     }
     
 

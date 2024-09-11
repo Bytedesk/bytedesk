@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:57:09
+ * @LastEditTime: 2024-09-07 19:00:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,13 +35,16 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -118,7 +121,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         thread.setClient(ClientEnum.fromValue(request.getClient()).name());
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
-        
+
         //
         Thread savedThread = save(thread);
         if (savedThread == null) {
@@ -127,7 +130,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         //
         return convertToResponse(savedThread);
     }
-    
+
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
     public ThreadResponse createGroupMemberThread(Thread thread, User owner) {
@@ -159,7 +162,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     /** 文件助手会话：file/{user_uid} */
     public ThreadResponse createFileAsistantThread(User user) {
-        // 
+        //
         String topic = TopicUtils.TOPIC_FILE_PREFIX + user.getUid();
         //
         Optional<Thread> threadOptional = findByTopicAndOwner(topic, user);
@@ -167,11 +170,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
             return convertToResponse(threadOptional.get());
         }
 
-        UserProtobuf userSimple = UserProtobuf.builder()
-                .nickname(I18Consts.I18N_FILE_ASISTANT_NAME)
-                .avatar(AvatarConsts.DEFAULT_FILE_ASISTANT_AVATAR_URL)
-                .build();
-        userSimple.setUid(BdConstants.DEFAULT_FILE_ASISTANT_UID);
+        UserProtobuf userSimple = UserUtils.getFileAsistantUser();
         //
         Thread asistantThread = Thread.builder()
                 .type(ThreadTypeEnum.ASISTANT.name())
@@ -199,19 +198,16 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     // 系统通知会话：system/{user_uid}
     public ThreadResponse createSystemChannelThread(User user) {
-        // 
-        String topic = TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid();
+        //
+        // String topic = TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid();
+        String topic = TopicUtils.getSystemTopic(user.getUid());
         //
         Optional<Thread> threadOptional = findByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
 
-        UserProtobuf userSimple = UserProtobuf.builder()
-                .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
-                .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
-                .build();
-        userSimple.setUid(BdConstants.DEFAULT_SYSTEM_UID);
+        UserProtobuf userSimple = UserUtils.getSystemChannelUser();
         //
         Thread noticeThread = Thread.builder()
                 .type(ThreadTypeEnum.CHANNEL.name())
@@ -228,7 +224,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         } else {
             noticeThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
         }
-        // 
+        //
         Thread updateThread = save(noticeThread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
@@ -238,9 +234,10 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     }
 
     public ThreadResponse update(ThreadRequest threadRequest) {
-        Optional<Thread> threadOptional = findByUid(threadRequest.getUid());
+        // Optional<Thread> threadOptional = findByUid(threadRequest.getUid());
+        Optional<Thread> threadOptional = findByTopic(threadRequest.getTopic());
         if (!threadOptional.isPresent()) {
-            throw new RuntimeException("thread not found");
+            throw new RuntimeException("update thread " + threadRequest.getTopic() + " not found");
         }
         //
         Thread thread = threadOptional.get();
@@ -260,25 +257,44 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         return convertToResponse(updateThread);
     }
 
+    public ThreadResponse autoClose(Thread thread) {
+        // log.info(thread.getUid() + "自动关闭");
+        // thread.setStatus(ThreadStatusEnum.AUTO_CLOSED.name());
+        // return save(thread);
+        ThreadRequest threadRequest = ThreadRequest.builder()
+                .topic(thread.getTopic())
+                .status(ThreadStatusEnum.AUTO_CLOSED)
+                .build();
+        return close(threadRequest);
+    }
+
     public ThreadResponse close(ThreadRequest threadRequest) {
-        Optional<Thread> threadOptional = findByUid(threadRequest.getUid());
+        // Optional<Thread> threadOptional = findByUid(threadRequest.getUid());
+        Optional<Thread> threadOptional = findByTopic(threadRequest.getTopic());
         if (!threadOptional.isPresent()) {
-            throw new RuntimeException("thread not found");
+            throw new RuntimeException("close thread " + threadRequest.getTopic() + " not found");
         }
         //
         Thread thread = threadOptional.get();
         //
-        if (ThreadStatusEnum.AGENT_CLOSED.equals(thread.getStatus())
-                || ThreadStatusEnum.AUTO_CLOSED.equals(thread.getStatus())) {
+        if (ThreadStatusEnum.AGENT_CLOSED.name().equals(thread.getStatus())
+                || ThreadStatusEnum.AUTO_CLOSED.name().equals(thread.getStatus())) {
             // log.info("thread {} is already closed", uid);
             throw new RuntimeException("thread is already closed");
         }
-        thread.setStatus(ThreadStatusEnum.AGENT_CLOSED.name());
+        // thread.setStatus(ThreadStatusEnum.AGENT_CLOSED.name());
+        thread.setStatus(threadRequest.getStatus().name());
         //
         Thread updateThread = save(thread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
+        // 发布关闭消息, 通知用户
+        String content = threadRequest.getStatus().equals(ThreadStatusEnum.AUTO_CLOSED) ? I18Consts.I18N_AUTO_CLOSED : I18Consts.I18N_AGENT_CLOSED;
+        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getCacheSerialUid(), updateThread, 
+                MessageTypeEnum.fromValue(threadRequest.getStatus().name()),
+                content);
+        MessageUtils.notifyUser(messageProtobuf);
         //
         return convertToResponse(updateThread);
     }
@@ -318,6 +334,21 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         return threadRepository.findFirstByTopicAndDeleted(topic, false);
     }
 
+    // 找到某个访客对应某个一对一客服未关闭会话
+    @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
+    public Optional<Thread> findByTopicNotClosed(String topic, String status) {
+        return threadRepository.findFirstByTopicAndStatusNotContainingAndDeleted(topic, "CLOSED", false);
+    }
+
+    // 找到某个访客当前对应某技能组未关闭会话
+    @Cacheable(value = "thread", key = "#workgroupUid + '-' + #visitorUid", unless = "#result == null")
+    public Optional<Thread> findByWgTopicNotClosed(String topic) {
+        // String likeTopic = TopicUtils.TOPIC_ORG_WORKGROUP_PREFIX + workgroupUid + "/%/" + visitorUid;
+        List<String> statuses = Arrays
+                .asList(new String[] { ThreadStatusEnum.AGENT_CLOSED.name(), ThreadStatusEnum.AUTO_CLOSED.name() });
+        return threadRepository.findFirstTopicAndStatusesNotInAndDeleted(topic, statuses, false);
+    }
+
     // TODO: how to cacheput or cacheevict?
     @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
     public Page<Thread> findByOwner(User user, Pageable pageable) {
@@ -327,14 +358,15 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     // TODO: 更新缓存
     // @Cacheable(value = "threadOpen")
     public List<Thread> findStatusOpen() {
+        List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(), ThreadTypeEnum.ROBOT.name() });
         List<String> statuses = Arrays
-                .asList(new String[] { ThreadStatusEnum.NORMAL.name(), ThreadStatusEnum.CONTINUE.name() });
-        return threadRepository.findByStatusesAndDeleted(statuses, false);
+                .asList(new String[] { ThreadStatusEnum.AUTO_CLOSED.name(), ThreadStatusEnum.AGENT_CLOSED.name() });
+        return threadRepository.findByTypesInAndStatusesNotInAndDeleted(types, statuses, false);
     }
 
     public Boolean isClosed(Thread thread) {
-        return ThreadStatusEnum.AGENT_CLOSED.equals(thread.getStatus())
-                || ThreadStatusEnum.AUTO_CLOSED.equals(thread.getStatus());
+        return ThreadStatusEnum.AGENT_CLOSED.name().equals(thread.getStatus())
+                || ThreadStatusEnum.AUTO_CLOSED.name().equals(thread.getStatus());
     }
 
     // public Thread reenter(Thread thread) {
@@ -346,10 +378,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     // return save(thread);
     // }
 
-    public Thread autoClose(Thread thread) {
-        thread.setStatus(ThreadStatusEnum.AUTO_CLOSED.name());
-        return save(thread);
-    }
+    
 
     // public Thread agentClose(Thread thread) {
     // thread.setStatus(ThreadStatusEnum.AGENT_CLOSED);
@@ -376,7 +405,8 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     })
     public void delete(@NonNull Thread entity) {
         // threadRepository.delete(thread);
-        Optional<Thread> threadOptional = findByUid(entity.getUid());
+        // Optional<Thread> threadOptional = findByUid(entity.getUid());
+        Optional<Thread> threadOptional = findByTopic(entity.getTopic());
         threadOptional.ifPresent(thread -> {
             thread.setDeleted(true);
             save(thread);

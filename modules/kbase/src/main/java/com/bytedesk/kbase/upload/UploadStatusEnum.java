@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-26 14:40:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-28 06:36:46
+ * @LastEditTime: 2024-08-31 15:56:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,14 +18,10 @@ package com.bytedesk.kbase.upload;
 // https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
 public enum UploadStatusEnum {
     UPLOADED,
-    EXTRACTING,
-    EXTRATED,
-    TRANSFORMING,
-    TRANSFORMED,
-    LOADING,
-    LOADED,
-    FAILED,
-    ABORTED;
+    PARSING,
+    PARSE_FILE_SUCCESS,
+    PARSE_FILE_ERROR
+    ;
 
     // 根据字符串查找对应的枚举常量
     public static UploadStatusEnum fromValue(String value) {

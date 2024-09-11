@@ -4,7 +4,7 @@
 (function () {
     // 定义默认配置
     var defaults = {
-        chatUrl: 'https://www.weiyuai.cn/chat?t=1&sid=default_wg_uid&',
+        chatUrl: 'https://www.weiyuai.cn/chat?org=df_org_uid&t=1&sid=default_wg_uid&',
         buttonPosition: 'right',
         buttonBackgroundColor: 'blue',
         iframeWidth: 400,

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 11:10:06
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-24 14:11:39
+ * @LastEditTime: 2024-08-30 11:07:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,10 @@ public enum RobotTypeEnum {
     SERVICE, // 客服机器人
     MARKETING, // 营销机器人
     KNOWLEDGEBASE, // 知识库机器人
-    QA; // 问答机器人
+    QA, // 问答机器人
+    AGENT_ASSISTANT, // 客服助理机器人
+    TICKET_ASSISTANT, // 工单助手机器人
+            ;
 
     // 根据整型值查找对应的枚举常量
     public static RobotTypeEnum fromValue(String value) {
@@ -27,17 +30,7 @@ public enum RobotTypeEnum {
                 return type;
             }
         }
-        throw new IllegalArgumentException("No enum constant with value " + value);
-    }
-
-    public static RobotTypeEnum fromString(String typeStr) {
-        // 使用try-catch处理可能的异常
-        try {
-            return RobotTypeEnum.valueOf(typeStr);
-        } catch (IllegalArgumentException e) {
-            // 处理错误，例如记录日志或抛出更具体的异常
-            throw new IllegalArgumentException("Invalid robot type: " + typeStr, e);
-        }
+        throw new IllegalArgumentException("No RobotTypeEnum constant with value " + value);
     }
 
 }
