@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-29 08:06:14
+ * @LastEditTime: 2024-09-16 11:34:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -170,9 +170,9 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 - [Android](https://www.weiyuai.cn/download.html)
 - [IOS](https://www.weiyuai.cn/download.html)
 
-## 技术栈 - 基于金融级云原生架构
+## 技术栈
 
-<!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
+<!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->
 - [springboot-3.x for 后端](https://github.com/Bytedesk/bytedesk)
 - [python for ai](https://github.com/Bytedesk/bytedesk-ai)
 - [react for web前端](https://github.com/Bytedesk/bytedesk-react)
@@ -183,6 +183,7 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 
 - [Email](mailto:270580156@qq.com)
 - [微信](./images/wechat.png)
+- <img src="./images/wechat_group.jpg" width="200">
 
 ## [写在前面](https://www.weiyuai.cn/)
 
