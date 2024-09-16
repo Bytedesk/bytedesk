@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-16 11:34:06
+ * @LastEditTime: 2024-09-16 11:41:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -184,6 +184,8 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 - [Email](mailto:270580156@qq.com)
 - [微信](./images/wechat.png)
 - <img src="./images/wechat_group.jpg" width="200">
+- 如群二维码过期，请添加微信，备注: 微语
+- <img src="./images/wechat.png" width="200">
 
 ## [写在前面](https://www.weiyuai.cn/)
 
