@@ -150,7 +150,7 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 - [React-native](./visitor/react-native)
 - [UniApp](./visitor/uniapp)
 - [Web](./visitor/web) -->
-- [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
+<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc) -->
 - [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
 - [Android](https://github.com/bytedesk/bytedesk-android)
 - [Flutter](https://github.com/bytedesk/bytedesk-flutter)
