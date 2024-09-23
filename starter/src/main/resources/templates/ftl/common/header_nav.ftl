@@ -42,6 +42,7 @@
 					</li>  -->
 					<!-- Nav item 2 Course -->
 					<li class="nav-item dropdown"><a class="nav-link" href="./docs/zh-CN/" target="_blank">文档</a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank">下载</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./about.html" target="_blank">关于</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./contact.html" target="_blank">联系</a></li>

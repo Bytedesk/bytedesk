@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 14:21:47
+ * @LastEditTime: 2024-09-18 17:36:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,12 +25,10 @@ import com.bytedesk.core.asistant.AsistantService;
 import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.channel.ChannelService;
 import com.bytedesk.core.quartz.QuartzService;
-// import com.bytedesk.core.quick_button.QuickButtonService;
 import com.bytedesk.core.rbac.authority.AuthorityService;
 import com.bytedesk.core.rbac.organization.OrganizationService;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserService;
-import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.service.agent.AgentService;
 import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
@@ -103,8 +101,8 @@ public class InitDataRunner implements ApplicationRunner {
     @Autowired
     UploadService uploadService;
 
-    @Autowired
-    ThreadService threadService;
+    // @Autowired
+    // ThreadService threadService;
 
     @Autowired
     QuartzService quartzService;
@@ -150,8 +148,6 @@ public class InitDataRunner implements ApplicationRunner {
         workgroupService.initData();
 
         uploadService.initUploadDir();
-
-        threadService.initData();
 
         quartzService.initData();
 

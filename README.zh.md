@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-16 11:51:59
+ * @LastEditTime: 2024-09-23 23:21:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
 -->
 # 微语
 
-对话即服务，Chat as a Service
+开源企业协作管理系统，支持企业IM、在线客服、知识库、工单系统、AI助手等
 
 ## 语言
 
@@ -194,5 +194,5 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 <!-- - 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权。 -->
 <!-- - 代理合作：您负责销售，我方负责售后，维护等，五五分成。联系[微信](./images/wechat.png) -->
 <!-- - 此软件可能存在bug或不完善的地方，如造成损失，需自行负责 -->
-- 此为开源社区版，支持免费商用
+- 此为开源社区版，支持完全免费商用
 - 严禁用于含有木马、病毒、色情、赌博、诈骗等违法违规业务，否则我司将暂停或终止其服务，并协助有关行政机关等进行追索和查处

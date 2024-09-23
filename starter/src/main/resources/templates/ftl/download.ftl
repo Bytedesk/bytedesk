@@ -73,7 +73,7 @@ Listed course START -->
 						<img src="assets/images/element/coding.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://github.com/Bytedesk/bytedesk" class="stretched-link" target="_blank">服务器端</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-server.zip" class="stretched-link" target="_blank">服务器端</a></h5>
 					<#--  <span class="mb-0">即将开放下载</span>  -->
 				</div>
 			</div>
@@ -126,7 +126,9 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-android.apk" class="stretched-link" target="_blank">Android安卓</a></h5>
-					<#--  <span class="mb-0">即将开放下载.</span>  -->
+					<a href="assets/qr/qr_android.png" target="_blank">
+						<img src="assets/qr/qr_android.png" style="height: 100px "/>
+					</a>
 				</div>
 			</div>
 
@@ -138,6 +140,9 @@ Listed course START -->
 					</div>
 					<h5 class="mb-1"><a href="https://apps.apple.com/cn/app/%E5%BE%AE%E8%AF%AD/id6470106586" class="stretched-link" target="_blank">iPhone苹果</a></h5>
 					<#--  <span class="mb-0">即将开放下载</span>  -->
+					<a href="assets/qr/qr_ios.png" target="_blank">
+						<img src="assets/qr/qr_ios.png" style="height: 100px "/>
+					</a>
 				</div>
 			</div>
 
