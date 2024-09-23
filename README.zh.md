@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 23:28:54
+ * @LastEditTime: 2024-09-24 07:04:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,8 @@
 -->
 # 微语
 
-开源企业协作管理系统，支持企业IM、在线客服、知识库、工单系统、AI助手等。致力于实现企业管理软件一站式解决方案。
+开源企业协作管理系统，支持企业IM、在线客服、知识库、工单系统、AI助手等。
+<!-- 致力于实现企业管理软件一站式解决方案。 -->
 
 ## 语言
 
