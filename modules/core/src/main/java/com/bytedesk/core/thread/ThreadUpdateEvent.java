@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-23 08:51:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-23 09:54:54
+ * @LastEditTime: 2024-09-20 10:27:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,5 +29,4 @@ public class ThreadUpdateEvent extends ApplicationEvent {
         super(source);
         this.thread = thread;
     }
-
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-16 08:12:39
+ * @LastEditTime: 2024-09-20 09:50:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ package com.bytedesk.core.thread;
 import java.util.Date;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
@@ -44,9 +43,9 @@ public class ThreadResponse extends BaseResponse {
 
     private String content;
 
-    private ThreadTypeEnum type;
+    private String type;
 
-    private ThreadStatusEnum status;
+    private String status;
 
     //
     private Boolean top;
@@ -63,7 +62,7 @@ public class ThreadResponse extends BaseResponse {
 
     private Boolean folded;
 
-    private ClientEnum client;
+    private String client;
 
     private String extra;
 

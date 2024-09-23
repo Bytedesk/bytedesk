@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-08-29 23:00:00
+ * @Date: 2024-08-29 22:59:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 09:45:18
+ * @LastEditTime: 2024-09-07 09:45:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.visitor.strategy;
+package com.bytedesk.service.strategy;
 
 import java.util.Optional;
 
@@ -27,20 +27,20 @@ import com.bytedesk.core.thread.ThreadStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.upload.Upload;
-import com.bytedesk.kbase.upload.UploadService;
+import com.bytedesk.kbase.knowledge_base.Knowledgebase;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.core.thread.Thread;
 
 import lombok.AllArgsConstructor;
 
-// 知识库某一个文档对话
-@Component("kbdocCsThreadStrategy")
+// 知识库对话
+@Component("kbCsThreadStrategy")
 @AllArgsConstructor
-public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
+public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
-    private final UploadService uploadService;
+    private final KnowledgebaseService knowledgebaseService;
 
     private final ThreadService threadService;
 
@@ -48,26 +48,26 @@ public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
-        return createKbdocCsThread(visitorRequest);
+        return createKbCsThread(visitorRequest);
     }
 
-    public MessageProtobuf createKbdocCsThread(VisitorRequest visitorRequest) {
+    public MessageProtobuf createKbCsThread(VisitorRequest visitorRequest) {
 
-        String uploadUid = visitorRequest.getSid();
-        Upload upload = uploadService.findByUid(uploadUid)
-                .orElseThrow(() -> new RuntimeException("Upload " + uploadUid + " not found"));
+        String kbUid = visitorRequest.getSid();
+        Knowledgebase knowledgebase = knowledgebaseService.findByUid(kbUid)
+                .orElseThrow(() -> new RuntimeException("Knowledgebase " + kbUid + " not found"));
         //
-        Thread thread = getKbdocThread(visitorRequest, upload);
+        Thread thread = getKbThread(visitorRequest, knowledgebase);
         //
-        return getKbdocMessage(visitorRequest, thread, upload);
+        return getKbMessage(visitorRequest, thread, knowledgebase);
     }
 
-    private Thread getKbdocThread(VisitorRequest visitorRequest, Upload upload) {
-        if (upload == null) {
-            throw new RuntimeException("Upload cannot be null");
+    private Thread getKbThread(VisitorRequest visitorRequest, Knowledgebase kb) {
+        if (kb == null) {
+            throw new RuntimeException("Knowledgebase cannot be null");
         }
         //
-        String topic = TopicUtils.formatOrgKbdocThreadTopic(upload.getUid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgKbThreadTopic(kb.getUid(), visitorRequest.getUid());
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadOptional.get();
@@ -76,14 +76,14 @@ public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
         Thread thread = Thread.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
-        thread.setType(ThreadTypeEnum.KBDOC.name());
+        thread.setType(ThreadTypeEnum.KB.name());
         thread.setUnreadCount(0);
         thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         //
         UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
         //
-        thread.setOrgUid(upload.getOrgUid());
+        thread.setOrgUid(kb.getOrgUid());
         // thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
         // robot.getServiceSettings())));
         // thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
@@ -91,38 +91,38 @@ public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getKbdocMessage(VisitorRequest visitorRequest, Thread thread, Upload upload) {
+    private MessageProtobuf getKbMessage(VisitorRequest visitorRequest, Thread thread, Knowledgebase kb) {
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
         }
-        if (upload == null) {
-            throw new RuntimeException("Robot cannot be null");
+        if (kb == null) {
+            throw new RuntimeException("Knowledgebase cannot be null");
         }
-        // thread.setContent(robot.getServiceSettings().getWelcomeTip());
+        thread.setContent(kb.getName());
         //
         boolean isReenter = true;
-        if (thread.getStatus() == ThreadStatusEnum.NORMAL.name()) {
+        if (thread.getStatus() == ThreadStatusEnum.START.name()) {
             isReenter = false;
         }
         // 更新机器人配置+大模型相关信息
         // thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
         // robot.getServiceSettings())));
         // thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
-        // thread.setContent(robot.getServiceSettings().getWelcomeTip());
+        //
         // if thread is closed, reopen it and then create a new message
         if (thread.isClosed()) {
             isReenter = false;
-            thread.setStatus(ThreadStatusEnum.REOPEN.name());
+            thread.setStatus(ThreadStatusEnum.RESTART.name());
         } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.NORMAL.name());
+            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.START.name());
         }
         threadService.save(thread);
         //
         UserProtobuf user = UserProtobuf.builder()
-                // .nickname(upload.getName())
-                // .avatar(kb.getLogoUrl())
+                .nickname(kb.getName())
+                .avatar(kb.getLogoUrl())
                 .build();
-        user.setUid(upload.getUid());
+        user.setUid(kb.getUid());
         //
         // JSONObject userExtra = new JSONObject();
         // userExtra.put("llm", robot.getLlm().isEnabled());

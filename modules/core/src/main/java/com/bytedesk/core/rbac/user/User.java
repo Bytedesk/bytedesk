@@ -83,8 +83,6 @@ public class User extends BaseEntityNoOrg {
 	private String description = I18Consts.I18N_USER_DESCRIPTION;
 
 	@Builder.Default
-	// @Enumerated(EnumType.STRING)
-	// private Sex sex = Sex.UNKNOWN;
 	private String sex = Sex.UNKNOWN.name();
 
 	@Builder.Default
@@ -104,8 +102,6 @@ public class User extends BaseEntityNoOrg {
 	private boolean mobileVerified = false;
 
 	@Builder.Default
-	// @Enumerated(EnumType.STRING)
-	// private PlatformEnum platform = PlatformEnum.BYTEDESK;
 	private String platform = PlatformEnum.BYTEDESK.name();
 	
 	@JsonIgnore

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 17:52:52
+ * @LastEditTime: 2024-09-18 17:36:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,10 +15,10 @@
 package com.bytedesk.core.thread;
 
 public enum ThreadStatusEnum {
+    START, // 开始会话
     QUEUING, // 排队中
-    NORMAL, // 正常
     CONTINUE, // 会话进行中，访客关闭会话页面之后，重新进入
-    REOPEN, // 会话关闭之后，重新进入
+    RESTART, // 会话关闭之后，重新进入
     OFFLINE, // 客服不在线
     RATED, // rated, prevent repeated rate
     AUTO_CLOSED, // 自动关闭
@@ -29,6 +29,7 @@ public enum ThreadStatusEnum {
     MONITORED, // 会话监控
     TRANSFERED, // 会话转接
     INVITED, // 会话邀请
+    SOLVED, // 问题已解决
     ;
 
     // 根据字符串查找对应的枚举常量

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 16:28:02
+ * @LastEditTime: 2024-09-20 14:33:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,8 +33,8 @@ import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
-import com.bytedesk.core.thread.ThreadCreateEvent;
-import com.bytedesk.core.thread.ThreadUpdateEvent;
+// import com.bytedesk.core.thread.ThreadCreateEvent;
+// import com.bytedesk.core.thread.ThreadUpdateEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
@@ -106,6 +106,7 @@ public class AgentEventListener {
     }
 
 
+    // 因为依赖关系的原因，无法将该方法放到kbase事件监听中，所以放在此处
     @EventListener
     public void onAgentCreateEvent(GenericApplicationEvent<AgentCreateEvent> event) {
         AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
@@ -122,7 +123,6 @@ public class AgentEventListener {
         kownledgebaseRequeqstQuickReply.setOrgUid(agent.getOrgUid());
         kownledgebaseRequeqstQuickReply.setAgentUid(agent.getUid());
         knowledgebaseService.create(kownledgebaseRequeqstQuickReply);
-        // 
     }
 
     
@@ -132,24 +132,24 @@ public class AgentEventListener {
         // log.info("agent quartz five second event: " + event);
     }
 
-    // TODO: 新创建会话，更新客服当前接待数量
-    @EventListener
-    public void onThreadCreateEvent(ThreadCreateEvent event) {
-        // log.info("agent onThreadCreateEvent: " + event);
-    }
+    // // TODO: 新创建会话，更新客服当前接待数量
+    // @EventListener
+    // public void onThreadCreateEvent(ThreadCreateEvent event) {
+    //     // log.info("agent onThreadCreateEvent: " + event);
+    // }
 
-    // TODO: 会话关闭，更新客服当前接待数量
-    @EventListener
-    public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-        // log.info("agent onThreadUpdateEvent: " + event);
-    }
+    // // TODO: 会话关闭，更新客服当前接待数量
+    // @EventListener
+    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
+    //     // log.info("agent onThreadUpdateEvent: " + event);
+    // }
 
     @EventListener
     public void onMqttConnectedEvent(MqttConnectedEvent event) {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
-        log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
+        // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         //
         agentService.updateConnect(uid, true);
     }
@@ -159,7 +159,7 @@ public class AgentEventListener {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
-        log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
+        // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
         //
         agentService.updateConnect(uid, false);
     }

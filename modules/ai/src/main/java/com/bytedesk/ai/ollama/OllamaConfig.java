@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 11:18:10
+ * @LastEditTime: 2024-09-17 22:24:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -76,14 +76,14 @@ public class OllamaConfig {
     @Bean
     OllamaChatModel ollamaChatModel() {
         return new OllamaChatModel(ollamaApi(), OllamaOptions.create().withModel(
-                ollamaChatModel).withTemperature(0.9f));
+                ollamaChatModel).withTemperature(0.9));
     }
 
     // https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
     @Bean
     OllamaEmbeddingModel ollamaEmbeddingModel() {
         return new OllamaEmbeddingModel(ollamaApi(), OllamaOptions.create().withModel(
-                ollamaEmbeddingModel).withTemperature(0.9f));
+                ollamaEmbeddingModel).withTemperature(0.9));
     }
 
 }

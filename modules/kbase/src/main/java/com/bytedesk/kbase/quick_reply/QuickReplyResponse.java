@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 17:46:40
+ * @LastEditTime: 2024-09-21 11:26:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,8 @@ public class QuickReplyResponse extends BaseResponse {
     private String title;
 
     private String content;
+
+    private String shortCut;
 
     private String type;
 

@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
@@ -129,6 +130,12 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(WebSocketTimeoutException.class)
     public ResponseEntity<?> handleWebSocketTimeoutException(WebSocketTimeoutException ex) {
         return ResponseEntity.badRequest().body(JsonResult.error("TODO: jetty Websocket Timeout Exception"));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error("Http Request Method Not Supported Exception", 400));
     }
 
     @ExceptionHandler(Exception.class)

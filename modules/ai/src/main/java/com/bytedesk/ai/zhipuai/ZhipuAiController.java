@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 11:00:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 10:03:06
+ * @LastEditTime: 2024-09-17 22:24:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,7 +69,7 @@ public class ZhipuaiController {
                         "Generate the names of 5 famous pirates.",
                         ZhiPuAiChatOptions.builder()
                                 .withModel(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
-                                .withTemperature(0.5f)
+                                .withTemperature(0.5)
                                 .build()));
         return ResponseEntity.ok(JsonResult.success(response));
     }

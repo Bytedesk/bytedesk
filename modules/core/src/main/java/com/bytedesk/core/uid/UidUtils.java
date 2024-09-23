@@ -81,4 +81,8 @@ public class UidUtils {
         return String.valueOf(uid);
     }
 
+    public String getUid() {
+        return getDefaultSerialUid();
+    }
+
 }

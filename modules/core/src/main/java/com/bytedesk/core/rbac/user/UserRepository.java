@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-18 09:36:27
+ * @LastEditTime: 2024-09-19 10:05:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,10 +19,6 @@ import java.util.Optional;
 // import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-// import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-// import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Repository;
-// import com.bytedesk.core.enums.PlatformEnum;
 
 /**
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
@@ -31,7 +27,7 @@ import org.springframework.stereotype.Repository;
  */
 // @RepositoryRestResource(exported = false)
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
-@Repository
+// @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     Optional<User> findByUid(String uid);

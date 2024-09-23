@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 07:52:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 09:11:25
+ * @LastEditTime: 2024-09-19 12:50:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.core.config;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +63,7 @@ public class BytedeskConfig {
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory()); //
         restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        restTemplate.setInterceptors(Arrays.asList(new TraceIdInterceptor()));
         return restTemplate;
     }
 
@@ -71,16 +73,16 @@ public class BytedeskConfig {
     }
 
     @Bean
-	public OpenAPI apiInfo() {
-		return new OpenAPI().info(new Info().title("bytedesk apis").version(appVersion));
-	}
+    public OpenAPI apiInfo() {
+        return new OpenAPI().info(new Info().title("bytedesk apis").version(appVersion));
+    }
 
-	// @Bean
-	// public GroupedOpenApi httpApi() {
-	// 	return GroupedOpenApi.builder()
-	// 			.group("http")
-	// 			.pathsToMatch("/**")
-	// 			.build();
-	// }
+    // @Bean
+    // public GroupedOpenApi httpApi() {
+    // return GroupedOpenApi.builder()
+    // .group("http")
+    // .pathsToMatch("/**")
+    // .build();
+    // }
 
 }

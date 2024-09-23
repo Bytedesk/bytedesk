@@ -29,9 +29,10 @@ public class CorsConfig {
 
     /**
      * 经测试：仅有此处起作用，corsFilter()和WebMvcConfig.addCorsMappings()不起作用
+     * 
      * @return
      */
-    // https://docs.spring.io/spring-security/reference/reactive/integrations/cors.html
+    // https://docs.spring.io/spring-security/reference/reactive/channels/cors.html
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -40,31 +41,33 @@ public class CorsConfig {
         // configuration.setAllowedOriginPatterns(List.of("*")); // 不能启用
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
-        // configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE",
+        // "OPTIONS"));
         // configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        // 
+        //
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-    //     @Bean
-    //     public CorsFilter corsFilter() {
-    //         log.info("CorsConfig.corsFilter()");
-    //         CorsConfiguration corsConfiguration = new CorsConfiguration();
-    //         //1,允许任何来源
-    //         corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
-    //         //2,允许任何请求头
-    //         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
-    //         //3,允许任何方法
-    //         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
-    //         //4,允许凭证
-    //         corsConfiguration.setAllowCredentials(true);
-    //         // 
-    //         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    //         source.registerCorsConfiguration("/**", corsConfiguration);
-    //         // 
-    //         return new CorsFilter(source);
-    //     }
+    // @Bean
+    // public CorsFilter corsFilter() {
+    // log.info("CorsConfig.corsFilter()");
+    // CorsConfiguration corsConfiguration = new CorsConfiguration();
+    // //1,允许任何来源
+    // corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
+    // //2,允许任何请求头
+    // corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+    // //3,允许任何方法
+    // corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
+    // //4,允许凭证
+    // corsConfiguration.setAllowCredentials(true);
+    // //
+    // UrlBasedCorsConfigurationSource source = new
+    // UrlBasedCorsConfigurationSource();
+    // source.registerCorsConfiguration("/**", corsConfiguration);
+    // //
+    // return new CorsFilter(source);
+    // }
 
 }

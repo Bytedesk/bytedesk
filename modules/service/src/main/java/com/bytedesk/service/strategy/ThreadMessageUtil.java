@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 22:35:25
+ * @LastEditTime: 2024-09-21 09:38:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.visitor.strategy;
+package com.bytedesk.service.strategy;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.I18Consts;
@@ -49,7 +49,6 @@ public class ThreadMessageUtil {
                 .user(JSON.toJSONString(user))
                 .build();
         // message.setUid(uidUtils.getCacheSerialUid());
-        // message.setUid(Utils.getUid());
         message.setUid(UidUtils.getInstance().getDefaultSerialUid());
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(new Date());

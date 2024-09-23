@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 22:04:31
+ * @LastEditTime: 2024-09-20 14:56:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -168,6 +168,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
             return;
         }
         //
+        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
         KnowledgebaseRequest kownledgebaseRequeqstQuickReplyPlatform = KnowledgebaseRequest.builder()
                 .name(KnowledgebaseConsts.KB_PLATFORM_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
@@ -177,7 +178,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
         kownledgebaseRequeqstQuickReplyPlatform.setUid(BdConstants.DEFAULT_KB_UID);
         kownledgebaseRequeqstQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
         // 方便超级管理员加载，避免重新写一个接口拉取
-        kownledgebaseRequeqstQuickReplyPlatform.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequeqstQuickReplyPlatform.setOrgUid(orgUid);
         create(kownledgebaseRequeqstQuickReplyPlatform);
         
         ////////////////////////////////////////////////////////////
@@ -188,7 +189,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestHelpdoc.setType(KnowledgebaseTypeEnum.HELPDOC.name());
-        kownledgebaseRequestHelpdoc.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
         //
         KnowledgebaseRequest kownledgebaseRequestLlm = KnowledgebaseRequest.builder()
@@ -197,7 +198,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestLlm.setType(KnowledgebaseTypeEnum.LLM.name());
-        kownledgebaseRequestLlm.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequestLlm.setOrgUid(orgUid);
         create(kownledgebaseRequestLlm);
         //
         KnowledgebaseRequest kownledgebaseRequestKeyword = KnowledgebaseRequest.builder()
@@ -206,7 +207,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestKeyword.setType(KnowledgebaseTypeEnum.KEYWORD.name());
-        kownledgebaseRequestKeyword.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequestKeyword.setOrgUid(orgUid);
         create(kownledgebaseRequestKeyword);
         // 
         KnowledgebaseRequest kownledgebaseRequeqstFaq = KnowledgebaseRequest.builder()
@@ -215,7 +216,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequeqstFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
-        kownledgebaseRequeqstFaq.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequeqstFaq.setOrgUid(orgUid);
         create(kownledgebaseRequeqstFaq);
         //
         KnowledgebaseRequest kownledgebaseRequeqstAutoReply = KnowledgebaseRequest.builder()
@@ -224,7 +225,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequeqstAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
-        kownledgebaseRequeqstAutoReply.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequeqstAutoReply.setOrgUid(orgUid);
         create(kownledgebaseRequeqstAutoReply);
         //
         KnowledgebaseRequest kownledgebaseRequeqstQuickReply = KnowledgebaseRequest.builder()
@@ -233,7 +234,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequeqstQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
-        kownledgebaseRequeqstQuickReply.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequeqstQuickReply.setOrgUid(orgUid);
         create(kownledgebaseRequeqstQuickReply);
         //
         KnowledgebaseRequest kownledgebaseRequestTaboo = KnowledgebaseRequest.builder()
@@ -242,7 +243,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestTaboo.setType(KnowledgebaseTypeEnum.TABOO.name());
-        kownledgebaseRequestTaboo.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);
         // 
         

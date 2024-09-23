@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 10:24:56
+ * @LastEditTime: 2024-09-20 09:38:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -106,12 +106,7 @@ public class ConvertServiceUtils {
     public static WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
         return new ModelMapper().map(workgroup, WorkgroupResponse.class);
     }
-
-    // public static WorkgroupResponseSimple
-    // convertToWorkgroupResponseSimple(Workgroup workgroup) {
-    // return new ModelMapper().map(workgroup, WorkgroupResponseSimple.class);
-    // }
-
+    
     //
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             ServiceSettings serviceSettings) {

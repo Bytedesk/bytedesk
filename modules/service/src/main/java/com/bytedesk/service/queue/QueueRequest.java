@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 23:20:24
+ * @LastEditTime: 2024-09-19 17:44:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.service.queue;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -29,9 +32,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QueueRequest extends BaseRequest {
 
-    private Integer orderInQueue;
+    private String queueUid;
 
-    private QueueStatusEnum status;
+    @Builder.Default
+    private List<String> threadTopics = new LinkedList<>();
 
-    private String orgUid;
+    // private Integer orderInQueue;
+
+    // private QueueStatusEnum status;
+
+    // private String orgUid;
 }

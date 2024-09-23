@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:09:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 13:41:04
+ * @LastEditTime: 2024-09-19 09:49:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,4 +27,6 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class VisitorThreadRequest extends BaseRequest {
     
+
+    private String visitorUid;
 }

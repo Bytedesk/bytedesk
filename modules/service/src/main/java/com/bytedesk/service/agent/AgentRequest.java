@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 15:47:52
+ * @LastEditTime: 2024-09-18 13:59:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,7 +55,8 @@ public class AgentRequest extends BaseRequest {
     private String description = I18Consts.I18N_AGENT_DESCRIPTION;
 
     @Builder.Default
-    private AgentStatusEnum status = AgentStatusEnum.AVAILABLE;
+    // private AgentStatusEnum status = AgentStatusEnum.AVAILABLE;
+    private String status = AgentStatusEnum.AVAILABLE.name();
 
     @Builder.Default
     private Integer maxThreadCount = 10;

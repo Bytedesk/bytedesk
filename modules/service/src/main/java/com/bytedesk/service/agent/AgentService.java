@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 10:59:52
+ * @LastEditTime: 2024-09-18 15:13:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,8 +44,10 @@ import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.action.ActionRequest;
 import com.bytedesk.core.action.ActionService;
 import com.bytedesk.core.action.ActionTypeEnum;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.constant.BdConstants;
@@ -88,7 +90,8 @@ public class AgentService {
 
     private final BytedeskProperties bytedeskProperties;
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final BytedeskEventPublisher bytedeskEventPublisher;
+    
     private final ActionService actionService;
 
     public Page<AgentResponse> queryByOrg(AgentRequest agentRequest) {
@@ -379,6 +382,29 @@ public class AgentService {
             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
         }
         // 转换并返回AgentResponse
+        return ConvertServiceUtils.convertToAgentResponse(updatedAgent);
+    }
+
+    public AgentResponse updateStatus(AgentRequest request) {
+        Optional<Agent> agentOptional = findByUid(request.getUid());
+        if (!agentOptional.isPresent()) {
+            // 如果找不到对应的Agent，则返回null
+            throw new RuntimeException("null agent found with uid: " + request.getUid());
+        }
+        // 
+        Agent agent = agentOptional.get();
+        agent.setStatus(request.getStatus()); // 更新接待状态
+        // 保存Agent并检查返回值
+        Agent updatedAgent = save(agent);
+        if (updatedAgent == null) {
+            // 根据业务逻辑决定如何处理保存失败的情况
+            // 例如，可以抛出一个异常或返回一个错误响应
+            throw new RuntimeException("Failed to save agent.");
+        }
+        bytedeskEventPublisher.publishGenericApplicationEvent(
+                new GenericApplicationEvent<AgentUpdateEvent>(this, new AgentUpdateEvent(this, updatedAgent, 
+                         AgentUpdateTypeEnum.STATUS.name())));
+
         return ConvertServiceUtils.convertToAgentResponse(updatedAgent);
     }
 

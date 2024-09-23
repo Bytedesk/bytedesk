@@ -48,7 +48,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         stompEndpointRegistry.addEndpoint("/stomp")
                 .setAllowedOriginPatterns("*")
                 .setHandshakeHandler(handshakeHandler());
-        // https://docs.spring.io/spring-security/reference/servlet/integrations/websocket.html
+        // https://docs.spring.io/spring-security/reference/servlet/channels/websocket.html
         // FIXME: Access to XMLHttpRequest at
         // 'http://127.0.0.1:9003/sockjs/info?t=1718785780963' from origin
         // 'http://127.0.0.1:9006' has been blocked by CORS policy: The value of the

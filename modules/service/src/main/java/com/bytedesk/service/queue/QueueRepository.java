@@ -22,4 +22,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface QueueRepository extends JpaRepository<Queue, Long>, JpaSpecificationExecutor<Queue> {
 
     Optional<Queue> findByUid(String uid);
+
+    Optional<Queue> findByQueueUid(String queueUid);
 }

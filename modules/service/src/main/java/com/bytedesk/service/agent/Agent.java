@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-14 06:46:36
+ * @LastEditTime: 2024-09-23 20:50:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,6 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.team.member.Member;
-// import com.bytedesk.core.rbac.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -35,7 +34,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,9 +63,7 @@ public class Agent extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 展示给访客端
-     */
+    // show to the visitors
     private String nickname;
 
     @Builder.Default
@@ -81,11 +77,8 @@ public class Agent extends BaseEntity {
 
     private String email;
 
-    /**
-     * @{AgentConsts}
-     */
     @Builder.Default
-    private AgentStatusEnum status = AgentStatusEnum.AVAILABLE;
+    private String status = AgentStatusEnum.AVAILABLE.name();
 
     // TODO:是否需要跟内存中mqttsession同步
     @Builder.Default
@@ -103,16 +96,6 @@ public class Agent extends BaseEntity {
     // max concurrent chatting thread count
     @Builder.Default
     private int maxThreadCount = 10;
-
-    // current chatting thread count
-    @Transient
-    @Builder.Default
-    private int currentThreadCount = 0;
-
-    // today chatted & chatting thread count
-    @Transient
-    @Builder.Default
-    private int todayThreadCount = 0;
 
     /** 存储当前接待数量等 */
     @Builder.Default
@@ -132,19 +115,9 @@ public class Agent extends BaseEntity {
     // for quick query, space exchange for speed
     private String userUid;
 
-    public void incrementThreadCount() {
-        this.currentThreadCount++;
-    }
-
-    public void decrementThreadCount() {
-        this.currentThreadCount--;
-    }
-
     public Boolean isAvailable() {
-        return this.status == AgentStatusEnum.AVAILABLE;
+        return this.status.equals(AgentStatusEnum.AVAILABLE.name());
     }
 
-    public Boolean canAcceptMore() {
-        return this.currentThreadCount < this.maxThreadCount;
-    }
+    
 }

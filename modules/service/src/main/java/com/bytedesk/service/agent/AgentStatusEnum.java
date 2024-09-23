@@ -16,6 +16,7 @@ package com.bytedesk.service.agent;
 
 public enum AgentStatusEnum {
     AVAILABLE, // 接待状态
+    REST, // 休息状态
     BUSY, // 忙碌状态
     OFFLINE, // 离线状态
     DISABLED; // 禁用状态

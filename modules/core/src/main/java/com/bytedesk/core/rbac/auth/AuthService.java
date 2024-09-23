@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 13:18:42
+ * @LastEditTime: 2024-09-19 10:03:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
-// import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;

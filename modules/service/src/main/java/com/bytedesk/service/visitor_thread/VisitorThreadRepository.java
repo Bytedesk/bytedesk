@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:09:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 13:32:56
+ * @LastEditTime: 2024-09-19 23:06:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,4 +24,8 @@ public interface VisitorThreadRepository extends JpaRepository<VisitorThread, Lo
     Optional<VisitorThread> findByUid(String uid);
 
     Boolean existsByUid(String uid);
+
+    Optional<VisitorThread> findByTopic(String topic);
+
+    Boolean existsByTopic(String topic);
 }

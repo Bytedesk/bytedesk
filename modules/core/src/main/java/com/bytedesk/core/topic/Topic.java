@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:03:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 12:51:48
+ * @LastEditTime: 2024-09-20 09:30:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,14 +45,11 @@ public class Topic extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
 
-    // @Column(nullable = false)
-    // private String topic;
     /** 为防止后添加的记录，clientIds缺失，所以用数组代替，这样每个用户在topic中只有一条记录，cliendIds可共用 */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     @Convert(converter = StringSetConverter.class)
     private Set<String> topics = new HashSet<>();
-    // private String topic;
 
     // 管理员监控的topic
     @Builder.Default
@@ -62,6 +59,7 @@ public class Topic extends BaseEntityNoOrg {
 
     // 每个用户仅存在一条记录
     // user, no need map, just uid
+    // 用户uid或者robotUid
     @NotBlank
     @Column(unique = true, nullable = false)
     private String userUid;

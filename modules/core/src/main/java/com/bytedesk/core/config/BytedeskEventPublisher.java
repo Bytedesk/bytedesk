@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:42:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-09 16:26:19
+ * @LastEditTime: 2024-09-20 10:29:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,6 +46,7 @@ import com.bytedesk.core.socket.stomp.StompUnsubscribeEvent;
 import com.bytedesk.core.thread.Thread;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadUpdateEvent;
+import com.bytedesk.core.thread.ThreadUpdateStatusEvent;
 import com.bytedesk.core.topic.TopicCreateEvent;
 import com.bytedesk.core.topic.TopicUpdateEvent;
 
@@ -144,6 +145,10 @@ public class BytedeskEventPublisher {
 
     public void publishThreadUpdateEvent(Thread thread) {
         applicationEventPublisher.publishEvent(new ThreadUpdateEvent(this, thread));
+    }
+
+    public void publishThreadUpdateStatusEvent(Thread thread, String status) {
+        applicationEventPublisher.publishEvent(new ThreadUpdateStatusEvent(this, thread, status));
     }
 
     public void publishActionCreateEvent(Action action) {

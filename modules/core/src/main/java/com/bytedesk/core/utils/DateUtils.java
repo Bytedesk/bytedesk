@@ -21,11 +21,11 @@ public class DateUtils {
 
     private static final String datetimeUidFormat = "yyyyMMddHHmmss";
 
-    private static final String dtFormat = "yyyy-MM-dd";
+    private static final String dateFormat = "yyyy-MM-dd";
 
-    private static final String dtFormatSlash = "yyyy/MM/dd";
+    private static final String dateFormatSlash = "yyyy/MM/dd";
 
-    private static final String dtFormatSlashNoZero = "yyyy/M/d";
+    private static final String dateFormatSlashNoZero = "yyyy/M/d";
 
     private static final String timeFormat = "HH:mm:ss";
 
@@ -55,7 +55,7 @@ public class DateUtils {
     }
 
     public static String formatDateNow() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(dtFormat);
+        SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormat);
         return dateFormater.format(new Date());
     }
 
@@ -78,27 +78,27 @@ public class DateUtils {
     }
 
     public static String formatDateSlashNow() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(dtFormatSlash);
+        SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormatSlash);
         return dateFormater.format(new Date());
     }
 
     public static String formatDateSlashNowNoZero() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(dtFormatSlashNoZero);
+        SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormatSlashNoZero);
         return dateFormater.format(new Date());
     }
 
     public static String formatDateToString(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat(dtFormat);
-        return formatter.format(date);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        return simpleDateFormat.format(date);
     }
 
     public static Date formatStringToDate(String date) {
         if (!StringUtils.hasText(date)) {
             return null;
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat(dtFormat);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         try {
-            return dateFormat.parse(date);
+            return simpleDateFormat.parse(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -126,7 +126,7 @@ public class DateUtils {
             fromFormat = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
         }
         //
-        SimpleDateFormat cnFormat = new SimpleDateFormat(dtFormat);
+        SimpleDateFormat cnFormat = new SimpleDateFormat(dateFormat);
         Date parse = null;
         try {
             parse = fromFormat.parse(enDate);

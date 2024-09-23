@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.visitor.strategy;
+package com.bytedesk.service.strategy;
 
 import java.util.Optional;
 
@@ -85,7 +85,7 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
             UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
             thread.setUser(JSON.toJSONString(visitor));
         }
-        // 
+        //
         thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
                 robot.getServiceSettings())));
         //
@@ -96,19 +96,19 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
     }
 
     private MessageProtobuf getRobotMessage(VisitorRequest visitorRequest, Thread thread, Robot robot) {
-        // 
+        //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         //
         boolean isReenter = true;
-        if (thread.getStatus() == ThreadStatusEnum.NORMAL.name()) {
+        if (thread.getStatus() == ThreadStatusEnum.START.name()) {
             isReenter = false;
         }
         // if thread is closed, reopen it and then create a new message
         if (thread.isClosed()) {
             isReenter = false;
-            thread.setStatus(ThreadStatusEnum.REOPEN.name());
+            thread.setStatus(ThreadStatusEnum.RESTART.name());
         } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.NORMAL.name());
+            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.START.name());
         }
         threadService.save(thread);
         //

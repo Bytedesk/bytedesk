@@ -98,6 +98,15 @@ public class AgentController extends BaseController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
+    @ActionAnnotation(title = "agent", action = "updateStatus", description = "update agent status")
+    @PostMapping("/update/status")
+    public ResponseEntity<?> updateStatus(@RequestBody AgentRequest request) {
+
+        AgentResponse agent = agentService.updateStatus(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(agent));
+    }
+
     @ActionAnnotation(title = "agent", action = "updateAutoReply", description = "update agent autoreply")
     @PostMapping("/update/autoreply")
     public ResponseEntity<?> updateAutoReply(@RequestBody AgentRequest request) {

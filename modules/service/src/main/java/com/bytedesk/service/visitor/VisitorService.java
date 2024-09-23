@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 14:53:50
+ * @LastEditTime: 2024-09-13 17:02:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,8 +36,9 @@ import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.strategy.CsThreadCreationContext;
 import com.bytedesk.service.utils.ConvertServiceUtils;
-import com.bytedesk.service.visitor.strategy.CsThreadCreationContext;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,7 +98,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             visitorRequest.setNickname(ipService.createVisitorNickname(request));
         }
         if (!StringUtils.hasText(visitorRequest.getAvatar())) {
-            visitorRequest.setAvatar(AvatarConsts.DEFAULT_VISITOR_AVATAR_URL);
+            visitorRequest.setAvatar(getAvatar(visitorRequest.getClient()));
         }
         //
         String ip = ipService.getIp(request);
@@ -224,4 +225,19 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 
+    public String getAvatar(String client) {
+        if (client == null) {
+            return AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
+        }
+        if (client.startsWith(ClientEnum.WEB.name())) {
+            return AvatarConsts.DEFAULT_WEB_AVATAR_URL;
+        } else if (client.startsWith(ClientEnum.ANDROID.name())) {
+            return AvatarConsts.DEFAULT_ANDROID_AVATAR_URL;
+        } else if (client.startsWith(ClientEnum.IOS.name())) {
+           return AvatarConsts.DEFAULT_IOS_AVATAR_URL;
+        } else if (client.startsWith(ClientEnum.UNI.name())) {
+            return AvatarConsts.DEFAULT_UNIAPP_AVATAR_URL;
+        }
+        return AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
+    }
 }

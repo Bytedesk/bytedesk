@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 11:00:08
+ * @LastEditTime: 2024-09-18 14:03:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
-// import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
 import com.bytedesk.service.settings.ServiceSettingsResponse;
 import com.bytedesk.team.member.MemberResponseSimple;
@@ -48,8 +47,8 @@ public class AgentResponse extends BaseResponse {
     private String description;
 
     // private String acceptStatus;
-    private AgentStatusEnum status;
-    // private String status;
+    // private AgentStatusEnum status;
+    private String status;
     // private Boolean enabled;
 
     private Boolean connected;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-11 08:50:25
+ * @LastEditTime: 2024-09-23 16:07:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,16 +48,16 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ ThreadEntityListener.class })
+// 表继承（Table Per Class
+// Inheritance）：在这种策略中，每一个类（父类和每个子类）都映射到一个独立的数据库表中。子类表将只包含子类特有的属性，以及与父类表相关联的主键。
+// @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(name = "core_thread")
 public class Thread extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
+
     /**
-     * used to push message
-     * topic format:
-     * workgroup_wid + '/' + visitor_vid
-     * agent_aid + '/' + visitor_vid
-     * such as: wid/vid or aid/vid
+     * @{TopicUtils}
      */
     @NotBlank
     private String topic;
@@ -69,16 +69,14 @@ public class Thread extends BaseEntity {
      * @{ThreadTypeConsts}
      */
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
     @Column(name = "thread_type", nullable = false)
-    // private ThreadTypeEnum type = ThreadTypeEnum.WORKGROUP;
     private String type = ThreadTypeEnum.WORKGROUP.name();
 
+    // TODO: 标记问题是否解决
+    
     /** closed/open, agent closed/auto closed */
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private ThreadStatusEnum status = ThreadStatusEnum.NORMAL;
-    private String status = ThreadStatusEnum.NORMAL.name();
+    private String status = ThreadStatusEnum.START.name();
 
     // 置顶
     @Builder.Default
@@ -151,31 +149,50 @@ public class Thread extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String agent = BdConstants.EMPTY_JSON_STRING;
 
+
+    // 机器人和agent可以同时存在，人工接待的时候，机器人可以同时给出答案，客服可以选用
+    // 存储机器人信息
+    // @Builder.Default
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    // private String robot = BdConstants.EMPTY_JSON_STRING;
+
     // belongs to user
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
-    // public Boolean isInit() {
-    //     return this.status == ThreadStatusEnum.NORMAL.name();
-    // }
 
     //
     public Boolean isClosed() {
-        return this.status == ThreadStatusEnum.AGENT_CLOSED.name() || this.status == ThreadStatusEnum.AUTO_CLOSED.name();
+        return this.status.equals(ThreadStatusEnum.AGENT_CLOSED.name())
+                || this.status.equals(ThreadStatusEnum.AUTO_CLOSED.name());
     }
 
     public Boolean isCustomerService() {
-        return this.type == ThreadTypeEnum.AGENT.name() || this.type == ThreadTypeEnum.WORKGROUP.name();
+        return this.type.equals(ThreadTypeEnum.AGENT.name())
+                || this.type.equals(ThreadTypeEnum.WORKGROUP.name());
+    }
+
+    public Boolean isRobotType() {
+        return this.type.equals(ThreadTypeEnum.ROBOT.name());
+    }
+
+    public Boolean isWorkgroupType() {
+        return this.type.equals(ThreadTypeEnum.WORKGROUP.name());
+    }
+
+    public Boolean isAgentType() {
+        return this.type.equals(ThreadTypeEnum.AGENT.name());
     }
 
     public ThreadProtobuf toProtobuf() {
         return ConvertUtils.convertToThreadProtobuf(this);
     }
 
-    public UserProtobuf getAgentProtobuf() {
-        return JSON.parseObject(this.agent, UserProtobuf.class);
-    }
+    // public UserProtobuf getAgentProtobuf() {
+    //     return JSON.parseObject(this.agent, UserProtobuf.class);
+    // }
 
     public UserProtobuf getUserProtobuf() {
         return JSON.parseObject(this.user, UserProtobuf.class);

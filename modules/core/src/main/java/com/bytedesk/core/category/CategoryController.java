@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-08 16:47:17
+ * @LastEditTime: 2024-09-20 16:03:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,8 +16,6 @@ package com.bytedesk.core.category;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +32,6 @@ public class CategoryController extends BaseController<CategoryRequest> {
     
     private final CategoryService categoryService;
     
-    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(CategoryRequest request) {
         
@@ -49,7 +46,6 @@ public class CategoryController extends BaseController<CategoryRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
-    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody CategoryRequest request) {
         
@@ -58,7 +54,6 @@ public class CategoryController extends BaseController<CategoryRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody CategoryRequest request) {
         
@@ -67,7 +62,6 @@ public class CategoryController extends BaseController<CategoryRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody CategoryRequest request) {
         

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:15:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:37:19
+ * @LastEditTime: 2024-09-20 09:29:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,8 +35,6 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class TopicRequest extends BaseRequest {
     
-    // private String uid;
-
     private String topic;
     
     @NotBlank
@@ -55,7 +53,4 @@ public class TopicRequest extends BaseRequest {
      */
     @Builder.Default
     private List<String> clientIds = new ArrayList<>();
-
-    /** 描述 */
-    // private String description;
 }
