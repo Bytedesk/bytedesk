@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.bytedesk</groupId>
         <artifactId>im</artifactId>
-       <version>${revision}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>modules</artifactId>
@@ -256,7 +256,7 @@
             <groupId>com.github.houbb</groupId>
             <artifactId>pinyin</artifactId>
             <version>0.3.1</version>
-            <!-- <version>0.4.1</version> -->
+            <!-- <version>0.4.2</version> -->
             <scope>provided</scope>
         </dependency>
 
