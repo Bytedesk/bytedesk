@@ -180,6 +180,6 @@ h2-console: http://127.0.0.1:9003/h2-console, path: ./h2db/weiyuim, user/passwor
 ## License
 
 - support business usage
-- must not remove trademark && logo info
-- selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
-- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权，请勿用于非法用途。
+<!-- - must not remove trademark && logo info -->
+<!-- - selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. -->
+<!-- - 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权，请勿用于非法用途。 -->
