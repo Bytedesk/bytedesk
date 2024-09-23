@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 13:02:59
+ * @LastEditTime: 2024-09-13 17:03:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.service.visitor;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 
 import lombok.Data;
@@ -34,7 +33,7 @@ public class VisitorRequest extends BaseRequest {
 	 */
 	private String nickname;
 
-	private String avatar = AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
+	private String avatar;
 
 	// location info
 	private String ip;
@@ -78,5 +77,6 @@ public class VisitorRequest extends BaseRequest {
 		return ThreadTypeEnum.fromValue(typeInt);
 	}
 
+	
 	
 }

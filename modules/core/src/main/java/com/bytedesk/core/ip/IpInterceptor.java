@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-17 12:53:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-27 17:04:27
+ * @LastEditTime: 2024-09-12 11:58:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,7 +40,7 @@ public class IpInterceptor implements HandlerInterceptor {
     private static final List<String> BLACKLISTED_IPS = Arrays.asList(
             "175.27.32.31",
             "112.53.2.93"
-    // 可以根据需要动态配置这个列表，例如从数据库或配置文件中加载
+    // TODO: 可以根据需要动态配置这个列表，例如从数据库或配置文件中加载
     );
 
     @Override

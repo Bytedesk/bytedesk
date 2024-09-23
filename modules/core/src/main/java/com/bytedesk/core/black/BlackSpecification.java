@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-27 12:24:15
+ * @LastEditTime: 2024-09-23 21:28:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,24 @@
  */
 package com.bytedesk.core.black;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.jpa.domain.Specification;
+
 import com.bytedesk.core.base.BaseSpecification;
+
+import jakarta.persistence.criteria.Predicate;
 
 public class BlackSpecification extends BaseSpecification {
 
+     public static Specification<Black> search(BlackRequest request) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            //
+            //
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }

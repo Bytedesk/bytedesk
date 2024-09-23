@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-11 18:35:00
+ * @LastEditTime: 2024-09-18 15:34:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,7 +89,6 @@ public class Workgroup extends BaseEntity {
     @JsonIgnore
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
-    // private Set<Agent> agents = new HashSet<>();
     // 为方便路由分配客服，特修改成list
     private List<Agent> agents = new ArrayList<>();
 

@@ -14,9 +14,9 @@
  */
 package com.bytedesk.core.black;
 
-import org.springframework.stereotype.Component;
+// import org.springframework.stereotype.Component;
 
-@Component
+// @Component
 public class BlackEntityListener {
     
 }

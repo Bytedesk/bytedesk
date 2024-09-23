@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 13:07:30
+ * @LastEditTime: 2024-09-20 10:27:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.core.thread;
 
 import org.springframework.util.SerializationUtils;
+
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -22,29 +23,39 @@ import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
+// import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 // @Async
 @Slf4j
 @Component
 public class ThreadEntityListener {
+
+    // @Transient
+    // private transient Thread oldThread;
     
     @PostPersist
     public void postPersist(Thread thread) {
         log.info("thread postPersist {}", thread.getUid());
         // send notifications
         Thread clonedThread = SerializationUtils.clone(thread);
-        
+
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadCreateEvent(clonedThread);
     }
+    
+    // @PreUpdate
+    // public void preUpdate(Thread thread) {
+    //     log.info("preUpdate {}", thread.getUid());
+    //     this.oldThread = SerializationUtils.clone(thread);
+    // }
 
     @PostUpdate
     public void postUpdate(Thread thread) {
         log.info("postUpdate {}", thread.getUid());
         // send notifications
         Thread clonedThread = SerializationUtils.clone(thread);
-        // 
+        
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadUpdateEvent(clonedThread);
     }

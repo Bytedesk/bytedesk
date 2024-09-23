@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 16:23:29
+ * @LastEditTime: 2024-09-12 19:01:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -191,7 +191,8 @@ public class MessagePersistService {
     // 消息撤回，从数据库中删除消息
     private void dealWithMessageRecall(MessageProtobuf message) {
         // log.info("dealWithMessageRecall");
-        messageService.deleteByUid(message.getUid());
+        // content为撤回消息的uid
+        messageService.deleteByUid(message.getContent());
     }
 
     private void dealWithRateMessage(MessageTypeEnum type, MessageProtobuf message) {
@@ -252,6 +253,7 @@ public class MessagePersistService {
         }
     }
 
+    // 处理转接消息
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithTransferMessage");
         MessageTransferContent transferContentObject = JSONObject.parseObject(message.getContent(),
@@ -268,5 +270,6 @@ public class MessagePersistService {
             messageService.save(messageEntity);
         }
     }
+
 
 }

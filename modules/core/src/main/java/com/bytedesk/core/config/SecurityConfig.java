@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/**").authenticated()
                         // .requestMatchers("/actuator/**").authenticated() // monitor endpoints
                         .anyRequest().permitAll())
-                // https://docs.spring.io/spring-security/reference/servlet/integrations/websocket.html
+                // https://docs.spring.io/spring-security/reference/servlet/channels/websocket.html
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin().disable()))
                 .authenticationProvider(authenticationProvider())
                 // .oauth2ResourceServer((oauth2) -> oauth2.jwt(withDefaults()))

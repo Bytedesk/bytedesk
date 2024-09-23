@@ -1,4 +1,4 @@
-package com.bytedesk.service.visitor.strategy;
+package com.bytedesk.service.strategy;
 
 import java.util.Optional;
 
@@ -92,7 +92,7 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         //
         boolean isReenter = true;
-        if (thread.getStatus() == ThreadStatusEnum.NORMAL.name()) {
+        if (thread.getStatus() == ThreadStatusEnum.START.name()) {
             isReenter = false;
         }
         // 更新机器人配置+大模型相关信息
@@ -103,9 +103,9 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
         // if thread is closed, reopen it and then create a new message
         if (thread.isClosed()) {
             isReenter = false;
-            thread.setStatus(ThreadStatusEnum.REOPEN.name());
+            thread.setStatus(ThreadStatusEnum.RESTART.name());
         } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.NORMAL.name());
+            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.START.name());
         }
         threadService.save(thread);
         //

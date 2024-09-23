@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 11:12:41
+ * @LastEditTime: 2024-09-19 20:35:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,17 +14,17 @@
  */
 package com.bytedesk.service.queue;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.service.agent.Agent;
-import com.bytedesk.service.visitor.Visitor;
-import com.bytedesk.service.workgroup.Workgroup;
-
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.utils.StringListConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,35 +43,17 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ QueueListener.class })
-@Table(name = "service_queue")
+@Table(name = "service_queue", uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "queueUid", "orgUid" })
+})
 public class Queue extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "queue_type")
-    private String type;
+    private String queueUid;
 
-    private Integer orderInQueue;
-
-    private QueueStatusEnum status;
-
-    // 排队访客
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Visitor visitor;
-
-    // 1. 被排队一对一客服
-    // 2. 或技能组中待分配客服，通过type区分
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Agent agent;
-
-    // 1. 被排队技能组
-    // 2. 或待分配客服所属技能组 通过type区分
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Workgroup workgroup;
-
-    /** belong to org */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private Organization organization;
-    // private String orgUid;
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Convert(converter = StringListConverter.class)
+    private List<String> threadTopics = new ArrayList<>();
 }

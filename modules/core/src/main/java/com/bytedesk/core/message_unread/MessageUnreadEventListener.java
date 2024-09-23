@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-10 17:06:01
+ * @LastEditTime: 2024-09-12 22:23:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -194,14 +194,13 @@ public class MessageUnreadEventListener {
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
         // log.info("message quartz five second event: " + event);
-        
     }
 
     @EventListener
     public void onMqttConnectEvent(MqttConnectedEvent event) {
         // 用户clientId格式: uid/client/deviceUid
-        String clientId = event.getClientId();
-        log.info("message unread mqtt connect event: {}", clientId);
+        // String clientId = event.getClientId();
+        // log.info("message unread mqtt connect event: {}", clientId);
         // String[] clientIdArray = clientId.split("/");
         // if (clientIdArray.length != 3) {
         // return;
@@ -217,7 +216,7 @@ public class MessageUnreadEventListener {
     @EventListener
     public void onStompSessionConnectedEvent(StompConnectedEvent event) {
         // TODO: 将缓存消息推送给相应访客端
-        log.info("message unread stomp session connect event: {}", event.getClientId());
+        // log.info("message unread stomp session connect event: {}", event.getClientId());
     }
 
 }

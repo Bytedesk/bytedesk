@@ -54,10 +54,10 @@ public class BaseServiceSettings implements Serializable {
      */
     @NotBlank
     private boolean showTopTip = false;
-
     // 公告
     @NotBlank
     private String topTip = I18Consts.I18N_TOP_TIP;
+    // TODO: 公告显示日期范围
 
     // 满意度评价设置
     // show rate btn on chat toolbar

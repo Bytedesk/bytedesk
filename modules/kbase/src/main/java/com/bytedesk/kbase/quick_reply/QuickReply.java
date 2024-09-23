@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 17:46:30
+ * @LastEditTime: 2024-09-20 13:34:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,15 +48,14 @@ public class QuickReply extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
+    // 快捷键
+    private String shortCut;
+
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
     @Column(name = "reply_type", nullable = false)
-    // private MessageTypeEnum type = MessageTypeEnum.TEXT;
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private LevelEnum level = LevelEnum.ORGNIZATION;
     private String level = LevelEnum.ORGNIZATION.name();
 
     private String categoryUid; // 文章分类

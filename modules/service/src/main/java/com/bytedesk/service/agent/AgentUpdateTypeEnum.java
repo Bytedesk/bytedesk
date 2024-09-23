@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-04-18 10:48:16
+ * @Date: 2024-09-18 15:13:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 13:32:34
+ * @LastEditTime: 2024-09-18 15:13:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,14 +12,8 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.thread_log;
+package com.bytedesk.service.agent;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
-public interface ThreadLogRepository extends JpaRepository<ThreadLog, Long>, JpaSpecificationExecutor<ThreadLog> {
-    
-    // Page<ThreadLog> findByOrgUid(String orgUid, Pageable pageable);
-
-    Boolean existsByUid(String uid);
+public enum AgentUpdateTypeEnum {
+    STATUS
 }

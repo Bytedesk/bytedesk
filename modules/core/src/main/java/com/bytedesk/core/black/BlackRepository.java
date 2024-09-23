@@ -14,9 +14,12 @@
  */
 package com.bytedesk.core.black;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface BlackRepository extends JpaRepository<Black, String>, JpaSpecificationExecutor<Black> {
 
+    Optional<Black> findByUid(String uid);
 }

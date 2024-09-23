@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 19:43:10
+ * @LastEditTime: 2024-09-23 21:47:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,20 +14,29 @@
  */
 package com.bytedesk.core.black;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.utils.JsonResult;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/black")
+@AllArgsConstructor
 public class BlackController extends BaseController<BlackRequest> {
+
+    private final BlackService blackService;
 
     @Override
     public ResponseEntity<?> queryByOrg(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        
+        Page<BlackResponse> page = blackService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
@@ -38,20 +47,22 @@ public class BlackController extends BaseController<BlackRequest> {
 
     @Override
     public ResponseEntity<?> create(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        
+        return ResponseEntity.ok(JsonResult.success(blackService.create(request)));
     }
 
     @Override
     public ResponseEntity<?> update(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
+        return ResponseEntity.ok(JsonResult.success(blackService.update(request)));
     }
 
     @Override
     public ResponseEntity<?> delete(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+
+        blackService.deleteByUid(request.getUid());
+        
+        return ResponseEntity.ok(JsonResult.success());
     }
 
 }

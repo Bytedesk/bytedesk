@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-06 23:07:16
+ * @LastEditTime: 2024-09-20 11:09:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -152,8 +152,6 @@ public class TopicUtils {
     public static String getOrgGroupTopic(String groupUid) {
         return String.format(TOPIC_ORG_GROUP_PATTERN, groupUid);
     }
-
-    //////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////
 

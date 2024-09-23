@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-04-08 13:03:35
+ * @Date: 2024-09-19 18:56:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-09 13:08:44
+ * @LastEditTime: 2024-09-20 10:11:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,20 @@
  */
 package com.bytedesk.service.route;
 
+import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.service.agent.Agent;
+import com.bytedesk.core.thread.Thread;
+import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.workgroup.Workgroup;
+
+import jakarta.annotation.Nonnull;
+
 public interface IRouteService {
-    
+
+    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull Thread thread, @Nonnull Robot robot);
+
+    public MessageProtobuf routeAgent(VisitorRequest request, @Nonnull Thread thread, @Nonnull Agent agent);
+
+    public MessageProtobuf routeWorkgroup(VisitorRequest request, @Nonnull Thread thread, @Nonnull Workgroup workgroup);
 }

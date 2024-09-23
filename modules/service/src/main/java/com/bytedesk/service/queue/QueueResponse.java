@@ -14,6 +14,9 @@
  */
 package com.bytedesk.service.queue;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +32,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QueueResponse extends BaseResponse {
 
-    private Integer orderInQueue;
+    private String queueUid;
 
-    private QueueStatusEnum status;
+    @Builder.Default
+    private List<String> threadTopics = new LinkedList<>();
+
+    // private Integer orderInQueue;
+
+    // private QueueStatusEnum status;
 }

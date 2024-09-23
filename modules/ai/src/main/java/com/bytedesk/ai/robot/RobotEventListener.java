@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 18:49:09
+ * @LastEditTime: 2024-09-18 06:56:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,8 +65,6 @@ public class RobotEventListener {
     private final RobotService robotService;
 
     private final ZhipuaiService zhipuaiService;
-
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final UidUtils uidUtils;
 
@@ -194,6 +192,7 @@ public class RobotEventListener {
         } else if (threadProtobuf.getType().equals(ThreadTypeEnum.AGENT)
                 || threadProtobuf.getType().equals(ThreadTypeEnum.WORKGROUP)) {
             log.info("robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+            // TODO: 取消查库
             Thread thread = threadService.findByTopic(threadTopic)
                     .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic + " not found"));
             UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);

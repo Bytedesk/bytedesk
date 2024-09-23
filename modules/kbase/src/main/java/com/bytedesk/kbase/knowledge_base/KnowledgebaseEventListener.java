@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 17:11:09
+ * @LastEditTime: 2024-09-20 14:55:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -138,9 +138,6 @@ public class KnowledgebaseEventListener {
                 kownledgebaseRequestTaboo.setType(KnowledgebaseTypeEnum.TABOO.name());
                 kownledgebaseRequestTaboo.setOrgUid(orgUid);
                 knowledgebaseService.create(kownledgebaseRequestTaboo);
-                //
-                //
-
         }
 
         @EventListener
@@ -178,7 +175,7 @@ public class KnowledgebaseEventListener {
                         return;
                 }
                 String query = messageProtobuf.getContent();
-                log.info("kb processMessage {}", query);
+                // log.info("kb processMessage {}", query);
                 //
                 ThreadProtobuf thread = messageProtobuf.getThread();
                 if (thread == null) {

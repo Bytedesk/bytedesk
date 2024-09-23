@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 19:42:05
+ * @LastEditTime: 2024-09-23 21:52:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,11 +16,20 @@ package com.bytedesk.core.black;
 
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -28,10 +37,25 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BlackService extends BaseService<Black, BlackRequest, BlackResponse> {
 
+    private final BlackRepository repository;
+
+    private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
+
+    private final AuthService authService;
+
     @Override
     public Page<BlackResponse> queryByOrg(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "createdAt");
+
+        Specification<Black> specification = BlackSpecification.search(request);
+
+        Page<Black> blacks = repository.findAll(specification, pageable);
+
+        return blacks.map(this::convertToResponse);
     }
 
     @Override
@@ -40,16 +64,25 @@ public class BlackService extends BaseService<Black, BlackRequest, BlackResponse
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(value = "black", key = "#uid", unless = "#result == null")
     @Override
     public Optional<Black> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return repository.findByUid(uid);
     }
 
     @Override
     public BlackResponse create(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        User user = authService.getCurrentUser();
+        // 
+        Black entity = modelMapper.map(request, Black.class);
+        entity.setUid(uidUtils.getUid());
+        entity.setUserUid(user.getUid());
+        // 
+        Black savedBlack = save(entity);
+        if (savedBlack == null) {
+            throw new RuntimeException("Create black failed");
+        }
+        return convertToResponse(savedBlack);
     }
 
     @Override
@@ -60,8 +93,12 @@ public class BlackService extends BaseService<Black, BlackRequest, BlackResponse
 
     @Override
     public Black save(Black entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return repository.save(entity);
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -84,8 +121,7 @@ public class BlackService extends BaseService<Black, BlackRequest, BlackResponse
 
     @Override
     public BlackResponse convertToResponse(Black entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        return modelMapper.map(entity, BlackResponse.class);
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:34:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-19 16:15:01
+ * @LastEditTime: 2024-09-19 17:12:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,8 +41,6 @@ public class AutoReplySettings implements Serializable {
 
     // 自动回复类型
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private AutoReplyTypeEnum autoReplyType = AutoReplyTypeEnum.FIXED;
     private String autoReplyType = AutoReplyTypeEnum.FIXED.name();
 
     // 固定回复类型所需要字段
@@ -51,8 +49,6 @@ public class AutoReplySettings implements Serializable {
     
     // 自动回复内容类型
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private MessageTypeEnum autoReplyContentType = MessageTypeEnum.TEXT;
     private String autoReplyContentType = MessageTypeEnum.TEXT.name();
 
     // 自动回复内容

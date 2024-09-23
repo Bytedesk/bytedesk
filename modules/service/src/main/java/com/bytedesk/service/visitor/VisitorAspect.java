@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 11:41:47
+ * @LastEditTime: 2024-09-18 17:12:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,7 +45,7 @@ public class VisitorAspect {
      */
     @Before(value = "@annotation(visitorAnnotation)")
     public void doBefore(JoinPoint joinPoint, VisitorAnnotation visitorAnnotation) {
-        log.debug("VisitorFilterAspect before: model {}, ", visitorAnnotation.title());
+        log.debug("VisitorAspect before: model {}, ", visitorAnnotation.title());
         // 
         // 获取方法签名
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
