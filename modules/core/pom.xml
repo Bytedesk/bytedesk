@@ -13,7 +13,7 @@
 	<artifactId>bytedesk-module-core</artifactId>
 
 	<name>bytedesk-module-core</name>
-	<description>Demo project for Spring Boot</description>
+	<description>https://www.weiyuai.cn</description>
 
 	<properties>
 		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>
@@ -63,7 +63,8 @@
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java-util</artifactId>
-			<version>3.25.2</version>
+			<!-- <version>3.25.2</version> -->
+			<version>4.28.2</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -83,6 +84,42 @@
 			<artifactId>redisson</artifactId>
 			<version>3.27.0</version>
 		</dependency> -->
+
+		<!-- ////////////////////// 推送 /////////////////////////////////// -->
+
+		<!-- apple push -->
+		<!-- https://github.com/jchambers/pushy -->
+		<dependency>
+			<groupId>com.eatthepath</groupId>
+			<artifactId>pushy</artifactId>
+			<version>0.15.4</version>
+		</dependency>
+
+		<!-- https://codelabs.developers.google.com/codelabs/push-notifications#0 -->
+		<!-- https://github.com/web-push-libs/webpush-java -->
+		<!-- web push -->
+		<dependency>
+			<groupId>nl.martijndwars</groupId>
+			<artifactId>web-push</artifactId>
+			<version>5.1.1</version>
+		</dependency>
+
+		<!-- web push 依赖 bouncycastle-->
+		<!-- https://search.maven.org/artifact/org.bouncycastle/bcprov-jdk15on/1.70/jar -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.70</version>
+		</dependency>
+
+		<!--小米推送,FIXME: 找不到，只能将jar放到本地.m2相应目录中-->
+		<!-- <dependency>
+			<groupId>com.xiaomi</groupId>
+			<artifactId>xpush</artifactId>
+			<version>1.0.2</version>
+		</dependency> -->
+
+		<!-- ////////////////////// 推送 /////////////////////////////////// -->
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents.core5/httpcore5 -->
 		<dependency>

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 17:25:48
+ * @LastEditTime: 2024-09-28 14:13:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
 
 /**
- * http://127.0.0.1:8011/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html
  * 
  * @author
  */

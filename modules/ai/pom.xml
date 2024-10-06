@@ -15,10 +15,12 @@
 	<version>${revision}</version>
 
 	<name>bytedesk-module-ai</name>
-	<description>ai module for https://www.weiyuai.cn</description>
+	<description>https://www.weiyuai.cn</description>
 
 	<properties>
-		  <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
+		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
+		<langchain4j.version>0.35.0</langchain4j.version>
+		<agentsflex.version>1.0.0-beta.11</agentsflex.version>
 	</properties>
 
 	<dependencies>
@@ -29,6 +31,7 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- https://docs.spring.io/spring-ai/reference/index.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-ollama-spring-boot-starter -->
 		<dependency>
@@ -79,6 +82,113 @@
 			<version>release-V4-2.3.0</version>
 		</dependency>
 
+		<!-- https://ollama4j.github.io/ollama4j/intro -->
+		<!-- https://central.sonatype.com/artifact/io.github.ollama4j/ollama4j/overview -->
+		<!-- <dependency>
+			<groupId>io.github.ollama4j</groupId>
+			<artifactId>ollama4j</artifactId>
+			<version>1.0.84</version>
+		</dependency> -->
+
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- https://agentsflex.com/intro/getting-started.html -->
+		<!-- https://central.sonatype.com/artifact/com.agentsflex/agents-flex-bom -->
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-spring-boot-starter</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-chatglm</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-coze</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-gitee</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-moonshot</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-ollama</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+		<!-- <dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-openai</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency> -->
+
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-qwen</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.agentsflex</groupId>
+			<artifactId>agents-flex-llm-spark</artifactId>
+			<version>${agentsflex.version}</version>
+		</dependency>
+
+
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- https://docs.langchain4j.dev/tutorials/spring-boot-integration -->
+		<!-- https://github.com/langchain4j/langchain4j-examples -->
+		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-spring-boot-starter -->
+		<!-- https://github.com/langchain4j/langchain4j?tab=readme-ov-file -->
+		<!-- <dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-spring-boot-starter</artifactId>
+			<version>0.35.0</version>
+		</dependency> -->
+
+		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-ollama-spring-boot-starter -->
+		<!-- <dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-ollama-spring-boot-starter</artifactId>
+			<version>${langchain4j.version}</version>
+		</dependency> -->
+
+		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-open-ai-spring-boot-starter -->
+		<!-- <dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-open-ai-spring-boot-starter</artifactId>
+			<version>${langchain4j.version}</version>
+		</dependency> -->
+
+		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-qianfan-spring-boot-starter -->
+		<!-- <dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-qianfan-spring-boot-starter</artifactId>
+			 <version>${langchain4j.version}</version>
+		</dependency> -->
+
+		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-dashscope-spring-boot-starter -->
+		<!-- <dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-dashscope-spring-boot-starter</artifactId>
+			 <version>${langchain4j.version}</version>
+		</dependency> -->
+
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -99,7 +209,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<build>
 		<plugins>
 			<!-- <plugin>

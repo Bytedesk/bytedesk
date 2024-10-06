@@ -13,7 +13,7 @@
 	<artifactId>bytedesk-module-kbase</artifactId>
 
 	<name>bytedesk-module-kbase</name>
-	<description>Demo project for Spring Boot</description>
+	<description>https://www.weiyuai.cn</description>
 
 	<properties>
 		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
@@ -69,7 +69,6 @@
 		</dependency>
 
 		<!-- //////////////////////////////////////////////////////////////// -->
-
 
 
 	</dependencies>

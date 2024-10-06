@@ -95,7 +95,9 @@ public class ThreadController extends BaseController<ThreadRequest> {
         request.setStatus(ThreadStatusEnum.AGENT_CLOSED.name());
 
         ThreadResponse threadResponse = threadService.close(request);
-
+        if (threadResponse == null) {
+            return ResponseEntity.ok(JsonResult.error("thread already closed"));
+        }
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 

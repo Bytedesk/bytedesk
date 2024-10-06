@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-28 11:12:16
+ * @LastEditTime: 2024-09-29 14:32:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,10 +32,10 @@ public enum ClientEnum {
     FLUTTER_WEB,
     FLUTTER_ANDROID,
     FLUTTER_IOS,
-    UNI,
-    UNI_WEB,
-    UNI_ANDROID,
-    UNI_IOS,
+    UNIAPP,
+    UNIAPP_WEB,
+    UNIAPP_ANDROID,
+    UNIAPP_IOS,
     WECHAT_MINI,
     WECHAT_MP,
     WECHAT_WORK,

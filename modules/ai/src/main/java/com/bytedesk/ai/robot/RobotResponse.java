@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-18 13:17:40
+ * @LastEditTime: 2024-09-24 16:05:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.ai.robot;
 
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.enums.LevelEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,9 +36,7 @@ public class RobotResponse extends BaseResponse {
 
     private String description;
 
-    private RobotTypeEnum type;
-
-    private LevelEnum level;
+    private String type;
 
     private RobotServiceSettings serviceSettings;
 
@@ -47,9 +44,11 @@ public class RobotResponse extends BaseResponse {
 
     private String defaultReply;
 
-    private Boolean published;
+    private String category;
 
-    // private Boolean isPrivate;
+    private String level;
+
+    private Boolean published;
 
     private String kbUid; // 对应知识库
 }

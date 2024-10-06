@@ -73,7 +73,7 @@ public class Thread extends BaseEntity {
     private String type = ThreadTypeEnum.WORKGROUP.name();
 
     // TODO: 标记问题是否解决
-    
+
     /** closed/open, agent closed/auto closed */
     @Builder.Default
     private String status = ThreadStatusEnum.START.name();
@@ -149,7 +149,6 @@ public class Thread extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String agent = BdConstants.EMPTY_JSON_STRING;
 
-
     // 机器人和agent可以同时存在，人工接待的时候，机器人可以同时给出答案，客服可以选用
     // 存储机器人信息
     // @Builder.Default
@@ -161,7 +160,6 @@ public class Thread extends BaseEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
-
 
     //
     public Boolean isClosed() {
@@ -175,7 +173,7 @@ public class Thread extends BaseEntity {
     }
 
     public Boolean isRobotType() {
-        return this.type.equals(ThreadTypeEnum.ROBOT.name());
+        return this.type.equals(ThreadTypeEnum.KB.name());
     }
 
     public Boolean isWorkgroupType() {
@@ -191,7 +189,7 @@ public class Thread extends BaseEntity {
     }
 
     // public UserProtobuf getAgentProtobuf() {
-    //     return JSON.parseObject(this.agent, UserProtobuf.class);
+    // return JSON.parseObject(this.agent, UserProtobuf.class);
     // }
 
     public UserProtobuf getUserProtobuf() {

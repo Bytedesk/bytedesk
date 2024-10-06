@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 12:16:49
+ * @LastEditTime: 2024-09-26 10:33:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,7 +56,7 @@ public class AsistantService {
 
         Asistant asistant = modelMapper.map(asistantRequest, Asistant.class);
         if (!StringUtils.hasText(asistant.getUid())) {
-            asistant.setUid(uidUtils.getCacheSerialUid());
+            asistant.setUid(uidUtils.getUid());
         }
 
         return save(asistant);

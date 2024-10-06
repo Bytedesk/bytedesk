@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 09:07:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-30 09:25:30
+ * @LastEditTime: 2024-09-24 16:50:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,15 +32,21 @@ public class RobotSpecification extends BaseSpecification {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             // 
+            if (StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
+            }
+            if (StringUtils.hasText(request.getCategory())) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), request.getCategory()));
+            }
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
-            //
-            // if (request.getPublished()) {
-            //     predicates.add(criteriaBuilder.equal(root.get("published"), request.getPublished()));
-            // }
             // 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

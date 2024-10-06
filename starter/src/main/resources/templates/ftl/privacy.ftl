@@ -2,9 +2,6 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="utf-8">
-    <title>微语 · 隐私策略 - 对话即服务 - 企业IM、在线客服、AI客服、知识库AI问答</title>
-    
     <#include "./common/header_meta.ftl" />
 
 </head>
