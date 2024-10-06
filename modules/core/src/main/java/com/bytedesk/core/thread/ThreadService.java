@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 10:27:49
+ * @LastEditTime: 2024-09-30 23:00:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,6 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
-// import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -97,7 +96,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     /**
      * create thread
-     * 同事会话、机器人会话、群聊会话
+     * 同事会话、群聊会话
      * 
      * @{TopicUtils}
      * 
@@ -124,7 +123,6 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         thread.setClient(ClientEnum.fromValue(request.getClient()).name());
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
-
         //
         Thread savedThread = save(thread);
         if (savedThread == null) {
@@ -279,7 +277,8 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         if (ThreadStatusEnum.AGENT_CLOSED.name().equals(thread.getStatus())
                 || ThreadStatusEnum.AUTO_CLOSED.name().equals(thread.getStatus())) {
             // log.info("thread {} is already closed", uid);
-            throw new RuntimeException("thread is already closed");
+            // throw new RuntimeException("thread is already closed");
+            return null;
         }
         thread.setStatus(threadRequest.getStatus());
         //
@@ -289,7 +288,8 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         }
         // bytedeskEventPublisher.publishThreadUpdateEvent(updateThread);
         // 发布关闭消息, 通知用户
-        String content = threadRequest.getStatus().equals(ThreadStatusEnum.AUTO_CLOSED.name()) ? I18Consts.I18N_AUTO_CLOSED
+        String content = threadRequest.getStatus().equals(ThreadStatusEnum.AUTO_CLOSED.name())
+                ? I18Consts.I18N_AUTO_CLOSED
                 : I18Consts.I18N_AGENT_CLOSED;
         MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getCacheSerialUid(), updateThread,
                 MessageTypeEnum.fromValue(threadRequest.getStatus()),
@@ -323,8 +323,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         return threadRepository.existsByUid(uid);
     }
 
-    // TODO: how to cacheput or cacheevict?
-    @Cacheable(value = "thread", key = "#topic-#user.uid", unless = "#result == null")
+    @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
     public Optional<Thread> findByTopicAndOwner(String topic, User user) {
         return threadRepository.findFirstByTopicAndOwnerAndDeleted(topic, user, false);
     }
@@ -337,10 +336,14 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     // 找到某个访客对应某个一对一客服未关闭会话
     // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     // public Optional<Thread> findByTopicNotClosed(String topic, String status) {
-    //     return threadRepository.findFirstByTopicAndStatusNotContainingAndDeleted(topic, "CLOSED", false);
+    // return
+    // threadRepository.findFirstByTopicAndStatusNotContainingAndDeleted(topic,
+    // "CLOSED", false);
     // }
+    
     // 找到某个访客当前对应某技能组未关闭会话
-    // @Cacheable(value = "thread", key = "#workgroupUid + '-' + #visitorUid", unless = "#result == null")
+    // @Cacheable(value = "thread", key = "#workgroupUid + '-' + #visitorUid",
+    // unless = "#result == null")
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<Thread> findByTopicNotClosed(String topic) {
         List<String> statuses = Arrays
@@ -358,7 +361,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     // @Cacheable(value = "threadOpen")
     public List<Thread> findStatusOpen() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
-                ThreadTypeEnum.ROBOT.name() });
+                ThreadTypeEnum.KB.name() });
         List<String> statuses = Arrays
                 .asList(new String[] { ThreadStatusEnum.AUTO_CLOSED.name(), ThreadStatusEnum.AGENT_CLOSED.name() });
         return threadRepository.findByTypesInAndStatusesNotInAndDeleted(types, statuses, false);

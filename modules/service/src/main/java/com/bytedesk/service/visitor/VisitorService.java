@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-13 17:02:54
+ * @LastEditTime: 2024-09-29 15:03:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -88,12 +88,13 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         //
         String uid = visitorRequest.getUid();
         log.info("visitor init, uid: {}", uid);
-        //
         Visitor visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
             return ConvertServiceUtils.convertToUserProtobuf(visitor);
         }
-        //
+        if (!StringUtils.hasText(uid)) {
+            visitorRequest.setUid(uidUtils.getCacheSerialUid());
+        }
         if (!StringUtils.hasText(visitorRequest.getNickname())) {
             visitorRequest.setNickname(ipService.createVisitorNickname(request));
         }
@@ -109,7 +110,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         //
         log.info("visitorRequest {}", visitorRequest);
         visitor = modelMapper.map(visitorRequest, Visitor.class);
-        visitor.setUid(uidUtils.getCacheSerialUid());
+        // visitor.setUid(uidUtils.getCacheSerialUid());
         visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         visitor.setOrgUid(visitorRequest.getOrgUid());
         //
@@ -235,7 +236,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             return AvatarConsts.DEFAULT_ANDROID_AVATAR_URL;
         } else if (client.startsWith(ClientEnum.IOS.name())) {
            return AvatarConsts.DEFAULT_IOS_AVATAR_URL;
-        } else if (client.startsWith(ClientEnum.UNI.name())) {
+        } else if (client.startsWith(ClientEnum.UNIAPP.name())) {
             return AvatarConsts.DEFAULT_UNIAPP_AVATAR_URL;
         }
         return AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;

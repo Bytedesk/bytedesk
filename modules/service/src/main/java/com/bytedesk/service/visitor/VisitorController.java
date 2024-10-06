@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 13:07:00
+ * @LastEditTime: 2024-09-28 11:15:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.apilimit.ApiRateLimiter;
 import com.bytedesk.core.base.BaseController;
@@ -157,56 +156,6 @@ public class VisitorController extends BaseController<VisitorRequest> {
         stompMqService.sendJsonMessageToMq(json);
         //
         return ResponseEntity.ok(JsonResult.success(json));
-    }
-
-    // 机器人关键词问答
-    // TODO: 写入聊天记录
-    // @VisitorAnnotation(title = "visitor", action = "sendKeywordMessage",
-    // description = "sendKeywordMessage")
-    // @PostMapping("/message/keyword")
-    // public ResponseEntity<?> sendKeywordMessage(@RequestBody VisitorRequest
-    // request) {
-    // //
-    // String keyword = request.getContent();
-    // String robotUid = request.getSid();
-    // String orgUid = request.getOrgUid();
-    // List<KeywordResponse> keywordList = keywordService.ask(keyword, robotUid,
-    // orgUid);
-
-    // // 随机从keywordList中选择一个元素
-    // Random random = new Random();
-    // KeywordResponse randomKeywordResponse = null;
-    // if (!keywordList.isEmpty()) {
-    // int randomIndex = random.nextInt(keywordList.size());
-    // randomKeywordResponse = keywordList.get(randomIndex);
-    // }
-
-    // // 返回随机选择的元素或空列表（如果keywordList为空）
-    // if (randomKeywordResponse != null) {
-    // return
-    // ResponseEntity.ok(JsonResult.success(randomKeywordResponse.getReply()));
-    // } else {
-    // // 如果keywordList为空，你可以根据需要返回适当的信息，比如一个空对象或者错误信息
-    // return ResponseEntity.ok(JsonResult.error());
-    // }
-    // }
-
-    // TODO: 访客输入关联/联想
-    // https://github.com/redis/redis-om-springURL_ADDRESS
-    // https://redis.io/docs/latest/integrate/redisom-for-java/
-    @VisitorAnnotation(title = "visitor", action = "inputAssociation", description = "inputAssociation")
-    @GetMapping("/input/association")
-    public ResponseEntity<?> inputAssociation() {
-        //
-        return ResponseEntity.ok(JsonResult.success());
-    }
-
-    // 热门问题-换一换
-    @VisitorAnnotation(title = "visitor", action = "faqChange", description = "faqChange")
-    @PostMapping("/faq/change")
-    public ResponseEntity<?> faqChange(@RequestParam("orgUid") String orgUid) {
-
-        return ResponseEntity.ok(JsonResult.success("test success"));
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 09:45:18
+ * @LastEditTime: 2024-09-26 13:53:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import com.bytedesk.core.thread.Thread;
 
 import lombok.AllArgsConstructor;
 
-// 知识库某一个文档对话
+// 机器人-知识库某一个文档对话
 @Component("kbdocCsThreadStrategy")
 @AllArgsConstructor
 public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {

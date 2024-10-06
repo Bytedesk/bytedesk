@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-20 10:31:08
+ * @LastEditTime: 2024-09-25 10:33:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,7 +80,9 @@ public class UserController {
     @ActionAnnotation(title = "user", action = "logout", description = "logout")
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-        // TODO: 清理token，使其过期
+
+        userService.logout();
+        
         return ResponseEntity.ok().body(JsonResult.success());
     }
 

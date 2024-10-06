@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 14:07:41
+ * @LastEditTime: 2024-09-29 15:16:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,7 +61,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
     public MessageProtobuf createWorkgroupCsThread(VisitorRequest visitorRequest) {
         //
         String workgroupUid = visitorRequest.getSid();
-        //
         String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroupUid, visitorRequest.getUid());
         // 是否已经存在进行中会话
         Thread thread = getProcessingThread(topic);
@@ -108,7 +107,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         if (threadOptional.isPresent()) {
             thread = threadOptional.get();
         } else {
-            // thread.setUid(uidUtils.getCacheSerialUid());
             thread.setTopic(topic);
             thread.setType(ThreadTypeEnum.WORKGROUP.name());
             thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());

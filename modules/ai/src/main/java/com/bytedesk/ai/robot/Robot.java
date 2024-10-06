@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-30 08:34:31
+ * @LastEditTime: 2024-09-25 13:43:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,6 +73,10 @@ public class Robot extends BaseEntity {
     @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_REPLY;
 
+    @Builder.Default
+    @Column(name = "robot_category")
+    private String category = RobotCategoryEnum.DEFAULT.name();
+
     // service、ask、chat
     @Builder.Default
     // @Enumerated(EnumType.STRING)
@@ -84,7 +88,7 @@ public class Robot extends BaseEntity {
     @Builder.Default
     // @Enumerated(EnumType.STRING)
     // private LevelEnum level = LevelEnum.ORGNIZATION;
-     private String level = LevelEnum.ORGNIZATION.name();
+    private String level = LevelEnum.ORGNIZATION.name();
 
     // @Builder.Default
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)

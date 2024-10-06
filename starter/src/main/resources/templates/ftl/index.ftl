@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>微语 - 对话即服务 - 企业IM、在线客服、AI客服、知识库AI问答、帮助中心、工单系统</title>
-
 	<#--  Header  -->
 	<#include "./common/header_meta.ftl" />
 	<#include "./common/header_js.ftl" />

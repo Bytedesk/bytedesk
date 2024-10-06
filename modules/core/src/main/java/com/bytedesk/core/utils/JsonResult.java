@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-10 20:22:56
+ * @LastEditTime: 2024-09-29 16:49:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,7 @@ public class JsonResult<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    // 建议使用message而不是msg，因为它更清晰地表达了字段的用途，并且与类中其他字段（如code和data）的命名风格保持一致
     private String message;
 
     private int code;

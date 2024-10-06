@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:59:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 09:45:09
+ * @LastEditTime: 2024-09-26 14:06:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import com.bytedesk.core.thread.Thread;
 
 import lombok.AllArgsConstructor;
 
-// 知识库对话
+// 机器人-知识库对话
 @Component("kbCsThreadStrategy")
 @AllArgsConstructor
 public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
@@ -63,9 +63,6 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
     }
 
     private Thread getKbThread(VisitorRequest visitorRequest, Knowledgebase kb) {
-        if (kb == null) {
-            throw new RuntimeException("Knowledgebase cannot be null");
-        }
         //
         String topic = TopicUtils.formatOrgKbThreadTopic(kb.getUid(), visitorRequest.getUid());
         Optional<Thread> threadOptional = threadService.findByTopic(topic);
@@ -132,4 +129,5 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return ThreadMessageUtil.getThreadMessage(user, thread, isReenter);
     }
 
+    
 }

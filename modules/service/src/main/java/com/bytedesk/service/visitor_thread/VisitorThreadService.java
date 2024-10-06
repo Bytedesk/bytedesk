@@ -142,7 +142,7 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
             // thread.getUid(), diffInMinutes);
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
                     || thread.getType().equals(ThreadTypeEnum.AGENT.name())
-                    || thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
+                    || thread.getType().equals(ThreadTypeEnum.KB.name())) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinites = settings.getAutoCloseMin();

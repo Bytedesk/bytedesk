@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 10:25:24
+ * @LastEditTime: 2024-09-26 14:47:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,27 +25,28 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 
 public class ConvertAiUtils {
-    private ConvertAiUtils() {
 
-    }
+    public static final ModelMapper modelMapper = new ModelMapper();
+
+    private ConvertAiUtils() {}
 
     public static RobotResponse convertToRobotResponse(Robot entity) {
-        return new ModelMapper().map(entity, RobotResponse.class);
+        return modelMapper.map(entity, RobotResponse.class);
     }
 
     public static RobotProtobuf convertToRobotProtobuf(Robot entity) {
-        return new ModelMapper().map(entity, RobotProtobuf.class);
+        return modelMapper.map(entity, RobotProtobuf.class);
     }
 
     public static UserProtobuf convertToUserProtobuf(Robot entity) {
-        UserProtobuf userProtobuf = new ModelMapper().map(entity, UserProtobuf.class);
+        UserProtobuf userProtobuf = modelMapper.map(entity, UserProtobuf.class);
         userProtobuf.setType(UserTypeEnum.ROBOT.name());
         return userProtobuf;
     }
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             RobotServiceSettings serviceSettings) {
-        return new ModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
+        return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 
 }

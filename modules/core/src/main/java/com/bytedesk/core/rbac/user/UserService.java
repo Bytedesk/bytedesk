@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-23 07:49:03
+ * @LastEditTime: 2024-09-25 10:36:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,11 +25,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.UsernameExistsException;
@@ -67,6 +70,8 @@ public class UserService {
     private final UidUtils uidUtils;
 
     private final OrganizationRepository organizationRepository;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Transactional
     public UserResponse register(UserRequest request) {
@@ -215,7 +220,7 @@ public class UserService {
                 return ConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
             } else {
                 // 旧密码验证失败，抛出异常或返回错误信息
-                throw new RuntimeException("old password wrong, please try again..!!");
+                throw new RuntimeException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG);
             }
         } else {
             throw new RuntimeException("User not found..!!");
@@ -287,6 +292,12 @@ public class UserService {
         user.setEmail(email);
 
         return save(user);
+    }
+
+    public void logout() {
+        // TODO: 清理token，使其过期
+        User user = AuthUser.getCurrentUser();
+        bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<UserLogoutEvent>(this, new UserLogoutEvent(this, user)));
     }
 
     @Cacheable(value = "user", key = "#email", unless = "#result == null")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-31 16:46:01
+ * @LastEditTime: 2024-09-25 11:29:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -97,7 +97,6 @@ public class MessageSocketService {
                     .build();
             //
             MessageProto.Message reverseMessage = messageProto.toBuilder().setThread(thread).build();
-            //
             doSendToSubscribers(reverseThreadTopic, reverseMessage);
             //
         } else if (threadType.equals(ThreadTypeEnum.GROUP)) {
@@ -105,14 +104,14 @@ public class MessageSocketService {
             log.info("send group message");
         }
         //
-        String topic = messageProto.getThread().getTopic();
-        log.debug("mqtt send topic {}", topic);
+        String topic = messageProto.getThread().getTopic();        
         doSendToSubscribers(topic, messageProto);
     }
 
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
-        log.debug("doSendToSubscribers {}", topic);
-        //
+        log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={}, clientId={}",
+                messageProto.getUser().getNickname(), messageProto.getContent(), topic, messageProto.getType(),
+                messageProto.getClient());
         Set<Topic> topicSet = topicService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
         topicSet.forEach(topicElement -> {
@@ -124,7 +123,8 @@ public class MessageSocketService {
     }
 
     private void doSendMessage(String topic, @NonNull MessageProto.Message messageProto, String clientId) {
-        log.debug("doSendMessage: {}, {}", topic, clientId);
+        log.debug("doSendMessage: user={}, content={}, topic={}, type={}, clientId={}",
+                         messageProto.getUser().getNickname(), messageProto.getContent(), topic, messageProto.getType(), clientId);
         //
         MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
         boolean dup = false;
@@ -132,7 +132,7 @@ public class MessageSocketService {
         byte[] messageBytes = messageProto.toByteArray();
         // 当前活跃长连接信息
         if (mqttSessionService.containsKey(clientId)) {
-            log.debug("hasSession: topic {} clientId {}", topic, clientId);
+            // log.debug("hasSession: topic {} clientId {}", topic, clientId);
             // 订阅者收到MQTT消息的QoS级别, 最终取决于发布消息的QoS和主题订阅的QoS
             int messageId = mqttMessageIdService.getNextMessageId();
             //
