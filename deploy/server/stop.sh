@@ -13,7 +13,7 @@
  #  联系：270580156@qq.com
  # Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 ### 
-RUN_NAME="bytedesk-starter-0.4.2.jar"
+RUN_NAME="bytedesk-starter-0.4.3.jar"
 export LANG="en_US.UTF-8"
 PRG=$0
 APPDIRFILE=`dirname "$PRG"`
