@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-29 15:03:51
+ * @LastEditTime: 2024-10-10 15:48:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -230,13 +230,13 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         if (client == null) {
             return AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
         }
-        if (client.startsWith(ClientEnum.WEB.name())) {
+        if (client.toUpperCase().contains(ClientEnum.WEB.name())) {
             return AvatarConsts.DEFAULT_WEB_AVATAR_URL;
-        } else if (client.startsWith(ClientEnum.ANDROID.name())) {
+        } else if (client.toUpperCase().contains(ClientEnum.ANDROID.name())) {
             return AvatarConsts.DEFAULT_ANDROID_AVATAR_URL;
-        } else if (client.startsWith(ClientEnum.IOS.name())) {
+        } else if (client.toUpperCase().contains(ClientEnum.IOS.name())) {
            return AvatarConsts.DEFAULT_IOS_AVATAR_URL;
-        } else if (client.startsWith(ClientEnum.UNIAPP.name())) {
+        } else if (client.toUpperCase().contains(ClientEnum.UNIAPP.name())) {
             return AvatarConsts.DEFAULT_UNIAPP_AVATAR_URL;
         }
         return AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;

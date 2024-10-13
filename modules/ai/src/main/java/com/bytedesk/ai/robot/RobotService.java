@@ -194,11 +194,12 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         String user = JSON.toJSONString(request.getUser());
         log.info("request {}, user {}", request.toString(), user);
         thread.setUser(user);
-        // 
+        //
         String[] splits = topic.split("/");
         if (splits.length < 4) {
             throw new RuntimeException("robot topic format error");
         }
+        // org/robot/robotUid/userUid
         String robotUid = splits[2];
         Optional<Robot> robotOptional = findByUid(robotUid);
         if (robotOptional.isPresent()) {

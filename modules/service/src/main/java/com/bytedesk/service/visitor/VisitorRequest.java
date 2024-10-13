@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-13 17:03:09
+ * @LastEditTime: 2024-10-10 10:23:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,13 +15,16 @@
 package com.bytedesk.service.visitor;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class VisitorRequest extends BaseRequest {
@@ -34,6 +37,9 @@ public class VisitorRequest extends BaseRequest {
 	private String nickname;
 
 	private String avatar;
+
+	@Builder.Default
+	private String lang = LanguageEnum.ZH_CN.name();
 
 	// location info
 	private String ip;
@@ -60,6 +66,7 @@ public class VisitorRequest extends BaseRequest {
 	private String sid;
 
 	// 强制转人工服务，默认false
+	@Builder.Default
 	private Boolean forceAgent = false;
 
 	private String status;

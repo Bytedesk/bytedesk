@@ -227,6 +227,127 @@
 			<version>${revision}</version>
 		</dependency>
 
+		<!--
+		//////////////////////////////////付费模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
+
+		<!-- core - admin -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-core</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- kbase - 知识库 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-kbase</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- service - 客服付费模块 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-service</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- flow - 流程引擎 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-flowbot</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- team - 团队付费模块 -->
+		<!-- <dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-team</artifactId>
+			<version>${revision}</version>
+		</dependency> -->
+
+		<!-- ticket - 工单 -->
+		<!-- <dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-vip-ticket</artifactId>
+			<version>${revision}</version>
+		</dependency> -->
+
+		<!--
+		//////////////////////////////////渠道模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
+
+		<!-- 抖音 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-channel-douyin</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- 微信 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-channel-wechat</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- uniapp -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-channel-uniapp</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- flutter -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-channel-flutter</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- android -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-channel-android</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- ios -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-channel-ios</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!--
+		//////////////////////////////////Side项目模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
+
+		<!-- 良师宝 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-liangshibao</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- 今日美语 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-meiyu</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- 微语题库 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-tiku</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- 微语招标 -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-project-zhaobiao</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 
 		<!-- https://www.sofastack.tech/projects/sofa-boot/quick-start/ -->
@@ -369,12 +490,19 @@
 			<version>3.3.1</version>
 		</dependency>
 
-		<!-- export excel -->
+		<!-- export/import excel -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba/easyexcel -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>easyexcel</artifactId>
 			<version>4.0.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-3-starter -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-3-starter</artifactId>
+			<version>1.2.23</version>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->

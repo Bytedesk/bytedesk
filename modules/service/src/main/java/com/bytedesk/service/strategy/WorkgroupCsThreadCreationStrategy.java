@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-29 15:16:03
+ * @LastEditTime: 2024-10-12 15:51:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -100,6 +100,26 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         return null;
     }
 
+    // FIXME: 如果访客重复打开、关闭页面，会重复发送continue消息
+    private MessageProtobuf getWorkgroupProcessingMessage(VisitorRequest visitorRequest, Thread thread) {
+        if (thread == null) {
+            throw new RuntimeException("Thread cannot be null");
+        }
+        //
+        thread.setUnreadCount(1);
+        thread.setStatus(ThreadStatusEnum.CONTINUE.name());
+        threadService.save(thread);
+        //
+        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        log.info("getWorkgroupProcessingMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        //
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadMessage(user, thread, true);
+        // 广播消息，由消息通道统一处理
+        MessageUtils.notifyUser(messageProtobuf);
+
+        return messageProtobuf;
+    }
+
     private Thread getWorkgroupThread(VisitorRequest visitorRequest, Workgroup workgroup, String topic) {
         //
         Thread thread = Thread.builder().build();
@@ -123,23 +143,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         return thread;
     }
 
-    private MessageProtobuf getWorkgroupProcessingMessage(VisitorRequest visitorRequest, Thread thread) {
-        if (thread == null) {
-            throw new RuntimeException("Thread cannot be null");
-        }
-        //
-        thread.setUnreadCount(1);
-        thread.setStatus(ThreadStatusEnum.CONTINUE.name());
-        threadService.save(thread);
-        //
-        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("getWorkgroupProcessingMessage user: {}, agent {}", user.toString(), thread.getAgent());
-        //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadMessage(user, thread, true);
-        // 广播消息，由消息通道统一处理
-        MessageUtils.notifyUser(messageProtobuf);
-
-        return messageProtobuf;
-    }
+    
 
 }

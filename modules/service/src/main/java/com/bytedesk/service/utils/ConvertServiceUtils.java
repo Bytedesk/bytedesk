@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 09:38:17
+ * @LastEditTime: 2024-10-10 11:42:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,36 +36,39 @@ import com.bytedesk.service.workgroup.Workgroup;
 import com.bytedesk.service.workgroup.WorkgroupResponse;
 
 public class ConvertServiceUtils {
+
+    private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
+    
     private ConvertServiceUtils() {
     }
 
     //
     public static VisitorResponse convertToVisitorResponse(Visitor visitor) {
-        return new ModelMapper().map(visitor, VisitorResponse.class);
+        return modelMapper.map(visitor, VisitorResponse.class);
     }
 
     public static UserProtobuf convertToUserProtobuf(Visitor visitor) {
-        return new ModelMapper().map(visitor, UserProtobuf.class);
+        return modelMapper.map(visitor, UserProtobuf.class);
     }
 
     public static UserProtobuf convertToUserProtobuf(VisitorRequest visitorRequest) {
-        UserProtobuf userProtobuf = new ModelMapper().map(visitorRequest, UserProtobuf.class);
+        UserProtobuf userProtobuf = modelMapper.map(visitorRequest, UserProtobuf.class);
         userProtobuf.setType(UserTypeEnum.VISITOR.name());
         return userProtobuf;
     }
 
     // public static UserProtobuf convertToUserResponseSimple(AgentResponseSimple
     // agentResponseSimple) {
-    // return new ModelMapper().map(agentResponseSimple, UserProtobuf.class);
+    // return modelMapper.map(agentResponseSimple, UserProtobuf.class);
     // }
 
     public static UserProtobuf convertToUserResponseSimple(UserProtobuf visitorResponseSimple) {
-        return new ModelMapper().map(visitorResponseSimple, UserProtobuf.class);
+        return modelMapper.map(visitorResponseSimple, UserProtobuf.class);
     }
 
     public static MessageProtobuf convertToMessageProtobuf(Message lastMessage, Thread thread) {
         //
-        MessageProtobuf messageProtobuf = new ModelMapper().map(lastMessage, MessageProtobuf.class);
+        MessageProtobuf messageProtobuf = modelMapper.map(lastMessage, MessageProtobuf.class);
         messageProtobuf.setThread(ConvertUtils.convertToThreadProtobuf(thread));
         //
         UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
@@ -79,7 +82,7 @@ public class ConvertServiceUtils {
 
     public static MessageResponse convertToMessageResponse(Message lastMessage, Thread thread) {
         //
-        MessageResponse messageResponse = new ModelMapper().map(lastMessage, MessageResponse.class);
+        MessageResponse messageResponse = modelMapper.map(lastMessage, MessageResponse.class);
         // messageResponse.setThread(ConvertUtils.convertToThreadProtobuf(thread));
         //
         UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
@@ -93,24 +96,24 @@ public class ConvertServiceUtils {
 
     //
     public static AgentResponse convertToAgentResponse(Agent agent) {
-        return new ModelMapper().map(agent, AgentResponse.class);
+        return modelMapper.map(agent, AgentResponse.class);
     }
 
     public static UserProtobuf convertToUserProtobuf(Agent agent) {
-        UserProtobuf userProtobuf = new ModelMapper().map(agent, UserProtobuf.class);
+        UserProtobuf userProtobuf = modelMapper.map(agent, UserProtobuf.class);
         userProtobuf.setType(UserTypeEnum.AGENT.name());
         return userProtobuf;
     }
 
     //
     public static WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
-        return new ModelMapper().map(workgroup, WorkgroupResponse.class);
+        return modelMapper.map(workgroup, WorkgroupResponse.class);
     }
     
     //
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             ServiceSettings serviceSettings) {
-        return new ModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
+        return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 
 }

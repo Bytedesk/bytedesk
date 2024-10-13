@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-18 17:56:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 23:29:36
+ * @LastEditTime: 2024-10-10 22:15:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,7 +61,24 @@
         var org = getUrlParam('org')
         var t = getUrlParam('t')
         var sid = getUrlParam('sid')
+        var lang = getUrlParam('lang')
+        var theme = getUrlParam('theme')
+        var navbar = getUrlParam('navbar')
+        //
         var src = '/chat/?org=' + org + '&t=' + t + '&sid=' + sid + '&'
+
+        if (lang) {
+            src += 'lang=' + lang
+        }
+
+        if (theme) {
+            src += '&theme=' + theme
+        }
+
+        if (navbar) {
+            src += '&navbar=' + navbar
+        }
+
         // init chatfloat, and init params
         window.ChatFloat({
             chatUrl: src, // custom chat url
