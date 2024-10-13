@@ -11,11 +11,11 @@ FROM eclipse-temurin:17-jdk
 WORKDIR /app
 # 
 # Copy the JAR file into the container at /app
-# COPY target/*.jar bytedesk-starter-0.4.3.jar
+# COPY target/*.jar bytedesk-starter-0.4.4.jar
 COPY target/*.jar app.jar
 # 
 # Specify the command to run your application
-# ENTRYPOINT ["java","-jar","/bytedesk-starter-0.4.3.jar"]
+# ENTRYPOINT ["java","-jar","/bytedesk-starter-0.4.4.jar"]
 # CMD ["java", "-jar", "app.jar"]
 ENTRYPOINT ["java","-jar","/app.jar"]
 

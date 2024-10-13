@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 14:19:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-25 12:19:51
+ * @LastEditTime: 2024-10-10 11:38:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,12 @@
  */
 package com.bytedesk.core.enums;
 
-// TODO: 增加更多语言支持
+// TODO: add more language support
 public enum LanguageEnum {
     EN,
     ZH_CN,
     ZH_TW;
 
-    // 根据字符串查找对应的枚举常量
     public static LanguageEnum fromValue(String value) {
         for (LanguageEnum type : LanguageEnum.values()) {
             if (type.name().equalsIgnoreCase(value)) {

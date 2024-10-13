@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-29 16:24:24
+ * @LastEditTime: 2024-10-10 10:24:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.service.visitor;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.LanguageEnum;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -52,6 +53,10 @@ public class Visitor extends BaseEntity {
 	private String avatar = AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
 
     // private String description;
+
+	// language
+	@Builder.Default
+	private String lang = LanguageEnum.ZH_CN.name();
 
 	@Embedded
 	private VisitorDevice device;

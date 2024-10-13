@@ -73,11 +73,27 @@
         var org = getUrlParam('org')
         var t = getUrlParam('t')
         var sid = getUrlParam('sid')
+        var lang = getUrlParam('lang')
+        var theme = getUrlParam('theme')
+        var navbar = getUrlParam('navbar')
         //
         //var websiteUrl = window.location.href
         //var websiteTitle = document.title
         //var refererUrl = document.referrer
         var src = '/chat/?org=' + org + '&t=' + t + '&sid=' + sid + '&'
+
+        if (lang) {
+            src += 'lang=' + lang
+        }
+
+        if (theme) {
+            src += '&theme=' + theme
+        }
+
+        if (navbar) {
+            src += '&navbar=' + navbar
+        }
+
         // console.log('urll:', src)
         document.getElementById('iframePanel').setAttribute('src', src)
         //

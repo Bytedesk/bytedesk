@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-28 19:49:29
+ * @LastEditTime: 2024-10-11 18:30:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.core.thread;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -55,7 +54,6 @@ public class ThreadEventListener {
         if (user == null) {
             return;
         }
-        
         // 创建客服会话之后，需要订阅topic
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
@@ -65,9 +63,7 @@ public class ThreadEventListener {
                     .userUid(user.getUid())
                     .build();
             topicService.create(request);
-        } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-                || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
-                || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())) {
+        } else {
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
@@ -97,23 +93,26 @@ public class ThreadEventListener {
                     .userUid(user.getUid())
                     .build();
             topicService.create(request);
-        } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-                || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
-                || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())) {
+        } else {
+            // if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
+            //     || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
+            //     || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())
+            //     || thread.getType().equals(ThreadTypeEnum.LLM.name())) 
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
             topicCacheService.pushRequest(request);
-        } else if (user != null) {
-            TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
-            // 防止首次消息延迟，立即订阅
-            topicService.create(request);
         }
+        //  else if (user != null) {
+        //     TopicRequest request = TopicRequest.builder()
+        //             .topic(thread.getTopic())
+        //             .userUid(user.getUid())
+        //             .build();
+        //     // 防止首次消息延迟，立即订阅
+        //     topicService.create(request);
+        // }
     }
 
     @EventListener
@@ -122,15 +121,14 @@ public class ThreadEventListener {
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
-        // log.info("robot message unread create event: " + event);
-        Optional<Thread> threadOptional = threadService.findByTopic(message.getThreadTopic());
-        if (threadOptional.isPresent()) {
-            Thread thread = threadOptional.get();
-            thread.setHide(false);
-            thread.setContent(message.getContent());
-            // threadService.save(thread);
-            threadPersistCache.pushForPersist(thread);
-        }
+        // Optional<Thread> threadOptional = threadService.findByTopic(message.getThreadTopic());
+        // if (threadOptional.isPresent()) {
+        //     Thread thread = threadOptional.get();
+        //     thread.setHide(false);
+        //     thread.setContent(message.getContent());
+        //     // threadService.save(thread);
+        //     threadPersistCache.pushForPersist(thread);
+        // }
     }
 
     @EventListener
@@ -141,6 +139,5 @@ public class ThreadEventListener {
                 threadService.save(thread);
             });
         }
-
     }
 }

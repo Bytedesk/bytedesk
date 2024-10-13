@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-26 11:45:31
+ * @LastEditTime: 2024-10-10 11:42:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,17 +37,19 @@ import com.bytedesk.core.thread.ThreadProtobuf;
 
 public class ConvertUtils {
 
+    private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
+
     private ConvertUtils() {
     }
 
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
-        UserResponse userResponse = new ModelMapper().map(userDetails, UserResponse.class);
+        UserResponse userResponse = modelMapper.map(userDetails, UserResponse.class);
 
         return userResponse;
     }
 
     public static UserResponse convertToUserResponse(User user) {
-        UserResponse userResponse = new ModelMapper().map(user, UserResponse.class);
+        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
                 .flatMap(uor -> uor.getRole().getAuthorities().stream()
                         .map(authority -> new SimpleGrantedAuthority(authority.getValue())))
@@ -57,11 +59,11 @@ public class ConvertUtils {
     }
 
     public static UserProtobuf convertToUserProtobuf(User user) {
-        return new ModelMapper().map(user, UserProtobuf.class);
+        return modelMapper.map(user, UserProtobuf.class);
     }
 
     public static ThreadProtobuf convertToThreadProtobuf(Thread thread) {
-        ThreadProtobuf threadProtobuf = new ModelMapper().map(thread, ThreadProtobuf.class);
+        ThreadProtobuf threadProtobuf = modelMapper.map(thread, ThreadProtobuf.class);
         //
         UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
@@ -73,12 +75,12 @@ public class ConvertUtils {
     }
 
     public static RoleResponse convertToRoleResponse(Role role) {
-        return new ModelMapper().map(role, RoleResponse.class);
+        return modelMapper.map(role, RoleResponse.class);
     }
 
     public static MessageResponse convertToMessageResponse(Message message) {
 
-        MessageResponse messageResponse = new ModelMapper().map(message, MessageResponse.class);
+        MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
 
         UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
@@ -91,7 +93,7 @@ public class ConvertUtils {
 
     public static MessageResponse convertToMessageResponse(MessageUnread message) {
 
-        MessageResponse messageResponse = new ModelMapper().map(message, MessageResponse.class);
+        MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
 
         UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {

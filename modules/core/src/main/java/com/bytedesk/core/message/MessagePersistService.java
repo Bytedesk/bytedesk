@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-26 16:43:03
+ * @LastEditTime: 2024-10-11 13:08:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,7 +86,8 @@ public class MessagePersistService {
 
     // 处理消息通知，已处理的消息返回true，未处理的消息返回false
     private boolean dealWithMessageNotification(MessageTypeEnum type, MessageProtobuf messageProtobuf) {
-        log.info("dealWithMessageNotification: {}", type);
+        String content = messageProtobuf.getContent();
+        log.info("dealWithMessageNotification: {}, {}", type, content);
 
         // 正在输入/消息预知 - 不保存
         if (type.equals(MessageTypeEnum.TYPING)

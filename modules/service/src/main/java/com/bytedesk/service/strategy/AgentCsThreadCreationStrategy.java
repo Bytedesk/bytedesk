@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 17:47:31
+ * @LastEditTime: 2024-10-12 15:52:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -103,6 +103,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return null;
     }
 
+    // FIXME: 如果访客重复打开、关闭页面，会重复发送continue消息
     private MessageProtobuf getAgentProcessingMessage(VisitorRequest visitorRequest, Thread thread) {
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
