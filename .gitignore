@@ -49,3 +49,4 @@ modules/local/target/*
 .flattened-pom.xml
 effective-pom.xml
 cicd/
+deploy/server/bytedesk-starter-0.4.4.jar
