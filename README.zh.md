@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-07 07:23:27
+ * @LastEditTime: 2024-10-19 11:36:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,15 +25,21 @@
 
 ## 介绍
 
-### 智能客服
+### 企业/团队IM
 
-- 基于大模型 LLM && RAG 的智能客服
-- 支持Ollama
-- 智谱AI
+- 多层组织架构
+- 角色管理
+- 权限管理
+- 聊天记录管理
+- 同事对话
+- 群组
 
 ### AI助手
 
-- 更适合团队使用，一人配置，多人使用。完美权限控制，即可私用，也可公用
+- 大模型对话LLM
+- 知识库对话RAG
+- 更适合团队使用，一人配置，多人使用。
+- 完美权限控制
 
 ### 在线客服：跟客户聊
 
@@ -57,24 +63,11 @@
 - 报表功能，
 - 为客户提供一体化客服工作台服务
 
-### 社交IM：跟好友聊
-
-- 好友
-- 群组
-
-### 企业IM：跟同事聊
-
-- 多层组织架构、
-- 角色管理
-- 权限管理
-- 聊天记录管理
-- 同事对话、同事群组
-
 ## 快速开始
 
 ```bash
 # 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
-git clone https://github.com/Bytedesk/bytedesk.git
+git clone https://github.com/bytedesk/bytedesk.git
 # 配置文件: bytedesk/starter/src/main/resources/application-dev.properties
 # 推荐开发环境：vscode + maven
 #
@@ -96,14 +89,14 @@ cd starter
 mvn spring-boot:run
 # 
 # 本地预览
-开发者入口: http://127.0.0.1:9003/dev
 web: http://127.0.0.1:9003/
+开发者入口: http://127.0.0.1:9003/dev
 管理后台: http://127.0.0.1:9003/admin, 用户名: admin@email.com, 密码: admin
-客服端: http://127.0.0.1:9003/agent, 用户名: admin@email.com, 密码: admin
+客服端: http://127.0.0.1:9003/agent/chat, 用户名: admin@email.com, 密码: admin
 访客: http://127.0.0.1:9003/chat?org=df_org_uid&t=0&sid=df_ag_uid&
 api文档: http://127.0.0.1:9003/swagger-ui/index.html
 actuator: http://127.0.0.1:9003/actuator
-h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
+# h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
 ```
 
 ## 文档
@@ -128,41 +121,45 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 | :----------: | :----------: | :----------: |
 | <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> |
 
-## [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
+<!-- ## [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
 
-- [github](https://github.com/Bytedesk/bytedesk-mobile)
+- [gitee](https://gitee.com/270580156/bytedesk-mobile)
+- [github](https://github.com/Bytedesk/bytedesk-mobile) -->
 
-## [网页版](https://github.com/bytedesk/bytedesk-react)
+<!-- ## [网页版](https://github.com/bytedesk/bytedesk-react)
 
-| 自定义按钮颜色 |  按钮放在窗口左下角 | 自定义按钮边距 | 自定义聊天窗口边距 |
+ [gitee](https://gitee.com/270580156/bytedesk-react)
+- [github](https://github.com/Bytedesk/bytedesk-react) -->
+
+<!-- | 自定义按钮颜色 |  按钮放在窗口左下角 | 自定义按钮边距 | 自定义聊天窗口边距 |
 | :----------: | :----------: | :----------:  | :----------: |
 | <img src="./images/visitor-web/button-color.png" width="250"> | <img src="./images/visitor-web/button-left.png" width="250"> | <img src="./images/visitor-web/button-margin.png" width="250"> | <img src="./images/visitor-web/iframe-margin.png" width="250"> |
 
 | 自定义聊天窗口宽度 |  全屏聊天窗口 | iframe聊天窗口 | 嵌入式聊天窗口 |
 | :----------: | :----------: | :----------:  | :----------: |
-| <img src="./images/visitor-web/iframe-width.png" width="250"> | <img src="./images/visitor-web/chat-full.png" width="250"> | <img src="./images/visitor-web/chat-iframe.png" width="250"> | <img src="./images/visitor-web/chat-embed.png" width="250"> |
+| <img src="./images/visitor-web/iframe-width.png" width="250"> | <img src="./images/visitor-web/chat-full.png" width="250"> | <img src="./images/visitor-web/chat-iframe.png" width="250"> | <img src="./images/visitor-web/chat-embed.png" width="250"> | -->
 
 ## 对话SDK
 
-<!-- - [iOS-oc](./visitor/oc)
-- [iOS-swift](./visitor/swift)
-- [Android](./visitor/android)
-- [Flutter](./visitor/flutter)
-- [React](./visitor/react)
-- [React-native](./visitor/react-native)
-- [UniApp](./visitor/uniapp)
-- [Web](./visitor/web) -->
 <!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc) -->
 <!-- - [React-native](https://github.com/bytedesk/bytedesk-react-native) -->
 <!-- - [Vue](https://github.com/bytedesk/bytedesk-vue) -->
 <!-- - [Browser-Extension](https://github.com/Bytedesk/bytedesk-browser-extention) -->
 <!-- - [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
-- [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
+<!-- - [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
 - [Android](https://github.com/bytedesk/bytedesk-android)
 - [Flutter](https://github.com/bytedesk/bytedesk-flutter)
 - [React](https://github.com/bytedesk/bytedesk-react)
 - [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
-- [Web](https://github.com/bytedesk/bytedesk-web)
+- [Web](https://github.com/bytedesk/bytedesk-web) -->
+| Project     | Description           | Forks          | Stars             |
+|-------------|-----------------------|----------------|-------------------|
+| [iOS-swift](https://github.com/bytedesk/bytedesk-swift) | iOS swift  | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-swift) | ![GitHub Repo stars](https://img.shields.io/github/stars/Bytedesk/bytedesk-swift)                 |
+| [Android](https://github.com/bytedesk/bytedesk-android) | Android | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-android) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-android)  |
+| [Flutter](https://github.com/bytedesk/bytedesk-flutter) | Flutter | ![GitHub forks](https://img.shields.io/github/bytedesk/bytedesk-flutter)| ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-flutter) |
+| [React](https://github.com/bytedesk/bytedesk-react) | React | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-react) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-react) |
+| [UniApp](https://github.com/bytedesk/bytedesk-uniapp) | Uniapp | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp) |
+| [Web](https://github.com/bytedesk/bytedesk-web) | Web | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web) |
 
 ## 客户端
 
@@ -197,4 +194,5 @@ h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名
 <!-- - 代理合作：您负责销售，我方负责售后，维护等，五五分成。联系[微信](./images/wechat.png) -->
 <!-- - 此软件可能存在bug或不完善的地方，如造成损失，需自行负责 -->
 - 此为开源社区版，支持完全免费商用，无任何限制
-- 严禁用于含有木马、病毒、色情、赌博、诈骗等违法违规业务，否则我司将暂停或终止其服务，并协助有关行政机关等进行追索和查处
+- 严禁用于含有木马、病毒、色情、赌博、诈骗等违法违规业务
+- 根据[《生成式人工智能服务管理暂行办法》](https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm)的要求，请勿对中国地区公众提供一切未经备案的生成式人工智能服务
