@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-10 15:48:59
+ * @LastEditTime: 2024-10-15 16:21:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -157,13 +157,8 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         return null;
     }
 
-    // public void notifyAgent(MessageProtobuf messageProtobuf) {
-    // String json = JSON.toJSONString(messageProtobuf);
-    // bytedeskEventPublisher.publishMessageJsonEvent(json);
-    // }
-
     // TODO: 模拟压力测试：随机生成 10000 个访客，分配给1个技能组中10个客服账号，并随机分配给1个客服账号，每秒发送1条消息
-    public void prepeareStressTest() {
+    public void prepareStressTest() {
         // String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
         // // 随机生成10000个访客
         // List<Visitor> visitors = new ArrayList<>();

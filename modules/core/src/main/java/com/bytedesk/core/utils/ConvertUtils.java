@@ -23,7 +23,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnread;
 import com.bytedesk.core.rbac.role.Role;
@@ -32,7 +32,7 @@ import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 
 public class ConvertUtils {
@@ -62,7 +62,7 @@ public class ConvertUtils {
         return modelMapper.map(user, UserProtobuf.class);
     }
 
-    public static ThreadProtobuf convertToThreadProtobuf(Thread thread) {
+    public static ThreadProtobuf convertToThreadProtobuf(ThreadEntity thread) {
         ThreadProtobuf threadProtobuf = modelMapper.map(thread, ThreadProtobuf.class);
         //
         UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
@@ -78,7 +78,7 @@ public class ConvertUtils {
         return modelMapper.map(role, RoleResponse.class);
     }
 
-    public static MessageResponse convertToMessageResponse(Message message) {
+    public static MessageResponse convertToMessageResponse(MessageEntity message) {
 
         MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
 

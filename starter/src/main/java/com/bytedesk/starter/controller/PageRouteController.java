@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-04 20:59:23
+ * @LastEditTime: 2024-10-16 10:26:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,12 +16,16 @@ package com.bytedesk.starter.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller for "/".
  *
  * @author jackning
  */
+@Slf4j
 @Controller
 public class PageRouteController {
 
@@ -47,6 +51,16 @@ public class PageRouteController {
 	public String admin() {
 		return "admin/index.html";
 	}
+	@GetMapping(value = "/admin/{path:[^\\.]*}")
+    public String adminRedirect(@PathVariable String path) {
+		log.info("admin path: {}", path);
+		return "forward:/admin/index.html"; // 默认路径
+    }
+	@GetMapping(value = "/admin/{path:[^\\.]*}/{path2:[^\\\\.]*}")
+    public String adminRedirect2(@PathVariable String path, @PathVariable String path2) {
+		log.info("admin path: {}, {}", path, path2);
+		return "forward:/admin/index.html"; // 默认路径
+    }
 
 	/**
 	 * agent
@@ -57,6 +71,19 @@ public class PageRouteController {
 	public String agent() {
 		return "agent/index.html";
 	}
+	@GetMapping(value = "/agent/{path:[^\\.]*}")
+    public String agentRedirect(@PathVariable String path) {
+		log.info("agent path: {}", path);
+		return "forward:/agent/index.html"; // 默认路径
+    }
+	@GetMapping(value = "/agent/{path:[^\\.]*}/{path2:[^\\\\.]*}")
+    public String agentRedirect2(@PathVariable String path, @PathVariable String path2) {
+		log.info("agent path: {}, {}", path, path2);
+        // if ("index.html".equals(path)) {
+		// 	return "forward:/agent/index.html";
+		// }
+		return "forward:/agent/index.html"; // 默认路径
+    }
 
 	/**
 	 * visitor

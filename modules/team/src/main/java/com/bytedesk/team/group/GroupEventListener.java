@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -40,7 +40,7 @@ public class GroupEventListener {
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
-        Thread thread = event.getThread();
+        ThreadEntity thread = event.getThread();
         // ThreadRequest request = event.getRequest();
         log.info("group ThreadCreateEvent: {}", thread.getUid());
         //

@@ -23,9 +23,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class ThreadCreateEvent extends ApplicationEvent {
 
-    private Thread thread;
+    private ThreadEntity thread;
 
-    public ThreadCreateEvent(Object source, Thread thread) {
+    public ThreadCreateEvent(Object source, ThreadEntity thread) {
         super(source);
         this.thread = thread;
     }

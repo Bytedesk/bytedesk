@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 14:33:27
+ * @LastEditTime: 2024-10-18 16:11:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.event.GenericApplicationEvent;
-import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
@@ -125,24 +124,6 @@ public class AgentEventListener {
         knowledgebaseService.create(kownledgebaseRequeqstQuickReply);
     }
 
-    
-    // TODO: 定时ping客服，检查在线状态
-    @EventListener
-    public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
-        // log.info("agent quartz five second event: " + event);
-    }
-
-    // // TODO: 新创建会话，更新客服当前接待数量
-    // @EventListener
-    // public void onThreadCreateEvent(ThreadCreateEvent event) {
-    //     // log.info("agent onThreadCreateEvent: " + event);
-    // }
-
-    // // TODO: 会话关闭，更新客服当前接待数量
-    // @EventListener
-    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-    //     // log.info("agent onThreadUpdateEvent: " + event);
-    // }
 
     @EventListener
     public void onMqttConnectedEvent(MqttConnectedEvent event) {
@@ -163,6 +144,25 @@ public class AgentEventListener {
         //
         agentService.updateConnect(uid, false);
     }
+
+        
+    // TODO: 定时ping客服，检查在线状态
+    // @EventListener
+    // public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
+    //     // log.info("agent quartz five second event: " + event);
+    // }
+
+    // // TODO: 新创建会话，更新客服当前接待数量
+    // @EventListener
+    // public void onThreadCreateEvent(ThreadCreateEvent event) {
+    //     // log.info("agent onThreadCreateEvent: " + event);
+    // }
+
+    // // TODO: 会话关闭，更新客服当前接待数量
+    // @EventListener
+    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
+    //     // log.info("agent onThreadUpdateEvent: " + event);
+    // }
 
     
 }

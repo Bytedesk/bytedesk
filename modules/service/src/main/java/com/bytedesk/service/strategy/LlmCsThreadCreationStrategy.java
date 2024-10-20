@@ -27,13 +27,12 @@ import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 
@@ -59,22 +58,22 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
         Robot robot = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
-        Thread thread = getLlmThread(visitorRequest, robot);
+        ThreadEntity thread = getLlmThread(visitorRequest, robot);
         //
         return getLlmMessage(visitorRequest, thread, robot);
     }
 
-    private Thread getLlmThread(VisitorRequest visitorRequest, Robot robot) {
+    private ThreadEntity getLlmThread(VisitorRequest visitorRequest, Robot robot) {
         //
         String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
         // TODO: 到visitor thread表中拉取
-        Thread thread = Thread.builder().build();
-        Optional<Thread> threadOptional = threadService.findByTopic(topic);
+        ThreadEntity thread = ThreadEntity.builder().build();
+        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
             thread = threadOptional.get();
         } else {
             //
-            thread = Thread.builder().build();
+            thread = ThreadEntity.builder().build();
             thread.setUid(uidUtils.getCacheSerialUid());
             thread.setTopic(topic);
             thread.setType(ThreadTypeEnum.KB.name());
@@ -95,21 +94,21 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getLlmMessage(VisitorRequest visitorRequest, Thread thread, Robot robot) {
+    private MessageProtobuf getLlmMessage(VisitorRequest visitorRequest, ThreadEntity thread, Robot robot) {
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         //
-        boolean isReenter = true;
-        if (thread.getStatus() == ThreadStatusEnum.START.name()) {
-            isReenter = false;
-        }
+        // boolean isReenter = true;
+        // if (thread.getState() == ThreadStateEnum.STARTED.name()) {
+        //     isReenter = false;
+        // }
         // if thread is closed, reopen it and then create a new message
-        if (thread.isClosed()) {
-            isReenter = false;
-            thread.setStatus(ThreadStatusEnum.RESTART.name());
-        } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.START.name());
-        }
+        // if (thread.isClosed()) {
+        //     isReenter = false;
+        //     thread.setStatus(ThreadStateEnum.RESTART.name());
+        // } else {
+        //     thread.setStatus(isReenter ? ThreadStateEnum.CONTINUE.name() : ThreadStateEnum.STARTED.name());
+        // }
         threadService.save(thread);
         //
         // UserProtobuf user = modelMapper.map(robot, UserProtobuf.class);
@@ -120,7 +119,7 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
         userExtra.put("defaultReply", robot.getDefaultReply());
         user.setExtra(JSON.toJSONString(userExtra));
         //
-        return ThreadMessageUtil.getThreadMessage(user, thread, isReenter);
+        return ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
     }
 
 }

@@ -136,7 +136,7 @@ public class AvatarConsts {
     public static final String DEFAULT_GROUP_AVATAR_URL = "https://cdn.weiyuai.cn/avatars/group_default_avatar.png";
     
     // 文件助手头像
-    public static final String DEFAULT_FILE_ASISTANT_AVATAR_URL = "https://cdn.weiyuai.cn/avatars/file_asistant_avatar.png";
+    public static final String DEFAULT_FILE_ASSISTANT_AVATAR_URL = "https://cdn.weiyuai.cn/avatars/file_assistant_avatar.png";
     
     // 系统通知-公众号头像
     public static final String DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL = "https://cdn.weiyuai.cn/avatars/notification.png";

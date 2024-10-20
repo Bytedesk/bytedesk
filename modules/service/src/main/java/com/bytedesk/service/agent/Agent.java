@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 20:50:16
+ * @LastEditTime: 2024-10-18 17:13:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,9 +78,8 @@ public class Agent extends BaseEntity {
     private String email;
 
     @Builder.Default
-    private String status = AgentStatusEnum.AVAILABLE.name();
+    private String status = AgentStateEnum.AVAILABLE.name();
 
-    // TODO:是否需要跟内存中mqttsession同步
     @Builder.Default
     @Column(name = "is_connected")
     private boolean connected = false;
@@ -92,6 +91,10 @@ public class Agent extends BaseEntity {
     @Embedded
     @Builder.Default
     private AutoReplySettings autoReplySettings = new AutoReplySettings();
+
+    // current thread count
+    @Builder.Default
+    private int currentThreadCount = 0;
 
     // max concurrent chatting thread count
     @Builder.Default
@@ -105,9 +108,7 @@ public class Agent extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
 
-    /**
-     * login user info
-     */
+    // org member
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
@@ -116,7 +117,24 @@ public class Agent extends BaseEntity {
     private String userUid;
 
     public Boolean isAvailable() {
-        return this.status.equals(AgentStatusEnum.AVAILABLE.name());
+        return this.status.equals(AgentStateEnum.AVAILABLE.name());
+    }
+
+    public Boolean isOffline() {
+        return this.status.equals(AgentStateEnum.OFFLINE.name());
+    }
+
+    public Boolean isBusy() {
+        return this.status.equals(AgentStateEnum.BUSY.name());
+    }
+
+    public Boolean isAway() {
+        return this.status.equals(AgentStateEnum.AWAY.name());
+    }
+
+    // 是否可以接待
+    public Boolean isConnectedAndAvailable() {
+        return this.isConnected() && this.isAvailable();
     }
 
     

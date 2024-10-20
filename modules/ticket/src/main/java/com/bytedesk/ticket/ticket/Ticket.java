@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:13:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 12:34:17
+ * @LastEditTime: 2024-10-16 19:04:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,10 @@
 package com.bytedesk.ticket.ticket;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -47,11 +48,14 @@ public class Ticket extends BaseEntity {
 
     private String content;
 
-    // private String status;
+    @Builder.Default
+    @Column(name = "ticket_state")
+    private String state = TicketStateEnum.INIT.name();
+    
     // private String priority;
 
     @JsonIgnore
     @ManyToOne
-    private Thread thread;
+    private ThreadEntity thread;
 
 }

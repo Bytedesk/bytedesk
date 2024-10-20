@@ -45,7 +45,7 @@ public class ThreadResponse extends BaseResponse {
 
     private String type;
 
-    private String status;
+    private String state;
 
     //
     private Boolean top;

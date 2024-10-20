@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 14:55:49
+ * @LastEditTime: 2024-10-16 15:21:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -26,12 +25,13 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageCache;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageJsonEvent;
-import com.bytedesk.core.message.MessageProtoEvent;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -40,13 +40,9 @@ import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.redis.pubsub.RedisPubsubService;
-import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.MessageConvertUtils;
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,6 +64,8 @@ public class KnowledgebaseEventListener {
         private final BytedeskProperties bytedeskProperties;
 
         private final MessageCache messageCache;
+
+        private final IMessageSendService messageSendService;
 
         // BdConstants.DEFAULT_ORGANIZATION_UID
         @EventListener
@@ -148,30 +146,34 @@ public class KnowledgebaseEventListener {
                 processMessage(messageJson);
         }
 
-        @EventListener
-        public void onMessageProtoEvent(MessageProtoEvent event) {
-                // log.info("MessageProtoEvent");
-                try {
-                        MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
-                        //
-                        try {
-                                String messageJson = MessageConvertUtils.toJson(messageProto);
-                                //
-                                processMessage(messageJson);
+        // @EventListener
+        // public void onMessageProtoEvent(MessageProtoEvent event) {
+        //         // log.info("MessageProtoEvent");
+        //         try {
+        //                 MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
+        //                 //
+        //                 try {
+        //                         String messageJson = MessageConvertUtils.toJson(messageProto);
+        //                         //
+        //                         processMessage(messageJson);
 
-                        } catch (IOException e) {
-                                e.printStackTrace();
-                        }
-                } catch (InvalidProtocolBufferException e) {
-                        e.printStackTrace();
-                }
-        }
+        //                 } catch (IOException e) {
+        //                         e.printStackTrace();
+        //                 }
+        //         } catch (InvalidProtocolBufferException e) {
+        //                 e.printStackTrace();
+        //         }
+        // }
 
         private void processMessage(String messageJson) {
                 MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
                 MessageTypeEnum messageType = messageProtobuf.getType();
                 if (messageType.equals(MessageTypeEnum.STREAM)) {
                         // ai回答暂不处理
+                        return;
+                }
+                if (messageProtobuf.getUser().getUid().equals(BdConstants.DEFAULT_SYSTEM_UID)) {
+                        // 系统消息不处理
                         return;
                 }
                 String query = messageProtobuf.getContent();
@@ -189,8 +191,6 @@ public class KnowledgebaseEventListener {
                 String threadTopic = thread.getTopic();
                 if (thread.getType().equals(ThreadTypeEnum.KB)) {
                         log.info("knowledge_base threadTopic {}, thread.type {}", threadTopic, thread.getType());
-                        // 机器人回复
-                        log.info("knowledge_base thread reply");
                         // 机器人客服消息 org/kb/default_kb_uid/1420995827073219
                         String[] splits = threadTopic.split("/");
                         if (splits.length < 4) {
@@ -199,6 +199,9 @@ public class KnowledgebaseEventListener {
                         String kbUid = splits[2];
                         if (!StringUtils.hasText(kbUid)) {
                                 throw new RuntimeException("kbUid is null");
+                        }
+                        if (messageProtobuf.getUser().getUid().equals(kbUid)) {
+                                return;
                         }
                         Optional<Knowledgebase> kbOptional = knowledgebaseService.findByUid(kbUid);
                         if (kbOptional.isPresent()) {
@@ -211,7 +214,7 @@ public class KnowledgebaseEventListener {
                                 //
                                 MessageExtra extra = MessageUtils.getMessageExtra(kb.getOrgUid());
                                 //
-                                String messageUid = uidUtils.getCacheSerialUid();
+                                String messageUid = uidUtils.getUid();
                                 MessageProtobuf message = MessageProtobuf.builder()
                                                 .uid(messageUid)
                                                 .status(MessageStatusEnum.SUCCESS)
@@ -224,12 +227,10 @@ public class KnowledgebaseEventListener {
 
                                 // 返回一个输入中消息，让访客端显示输入中
                                 MessageProtobuf clonedMessage = SerializationUtils.clone(message);
-                                clonedMessage.setUid(uidUtils.getCacheSerialUid());
+                                clonedMessage.setUid(uidUtils.getUid());
                                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
-                                // 
-                                MessageUtils.notifyUser(clonedMessage);
-                                // String json = JSON.toJSONString(clonedMessage);
-                                // bytedeskEventPublisher.publishMessageJsonEvent(json);
+                                // MessageUtils.notifyUser(clonedMessage);
+                                messageSendService.sendMessage(messageProtobuf);
                                 // 知识库
                                 // if (bytedeskProperties.getJavaai()) {
                                 //         zhipuaiService.sendWsRobotMessage(query, kb.getKbUid(), kb, message);

@@ -107,6 +107,8 @@
             <artifactId>spring-boot-starter-mail</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+        
 
         <!--
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor -->
@@ -257,7 +259,7 @@
             <groupId>com.github.houbb</groupId>
             <artifactId>pinyin</artifactId>
             <version>0.3.1</version>
-            <!-- <version>0.4.4</version> -->
+            <!-- <version>0.4.5</version> -->
             <scope>provided</scope>
         </dependency>
 

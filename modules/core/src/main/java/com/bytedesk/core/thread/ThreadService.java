@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-11 10:05:44
+ * @LastEditTime: 2024-10-17 16:55:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.core.thread;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +35,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResponse> {
+public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, ThreadResponse> {
 
     private final AuthService authService;
 
@@ -65,6 +65,8 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     private final UidUtils uidUtils;
 
+    private final IMessageSendService messageSendService;
+
     // private final BytedeskEventPublisher bytedeskEventPublisher;
 
     public Page<ThreadResponse> queryByOrg(ThreadRequest request) {
@@ -73,9 +75,9 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Specification<Thread> specs = ThreadSpecification.search(request);
+        Specification<ThreadEntity> specs = ThreadSpecification.search(request);
 
-        Page<Thread> threadPage = threadRepository.findAll(specs, pageable);
+        Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
 
         return threadPage.map(this::convertToResponse);
     }
@@ -89,7 +91,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Page<Thread> threadPage = findByOwner(user, pageable);
+        Page<ThreadEntity> threadPage = findByOwner(user, pageable);
 
         return threadPage.map(this::convertToResponse);
     }
@@ -107,14 +109,14 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
         User owner = authService.getCurrentUser();
         //
-        Optional<Thread> threadOptional = findByTopicAndOwner(request.getTopic(), owner);
+        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
         //
-        Thread thread = modelMapper.map(request, Thread.class);
+        ThreadEntity thread = modelMapper.map(request, ThreadEntity.class);
         thread.setUid(uidUtils.getCacheSerialUid());
-        thread.setStatus(ThreadStatusEnum.START.name());
+        thread.setState(ThreadStateEnum.STARTED.name());
         //
         String user = JSON.toJSONString(request.getUser());
         log.info("request {}, user {}", request.toString(), user);
@@ -124,7 +126,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
         //
-        Thread savedThread = save(thread);
+        ThreadEntity savedThread = save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
         }
@@ -132,20 +134,22 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         return convertToResponse(savedThread);
     }
 
+
+    
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
-    public ThreadResponse createGroupMemberThread(Thread thread, User owner) {
+    public ThreadResponse createGroupMemberThread(ThreadEntity thread, User owner) {
         //
-        Optional<Thread> threadOptional = findByTopicAndOwner(thread.getTopic(), owner);
+        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(thread.getTopic(), owner);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
 
-        Thread groupThread = Thread.builder()
+        ThreadEntity groupThread = ThreadEntity.builder()
                 .type(thread.getType())
                 .topic(thread.getTopic())
                 .unreadCount(0)
-                .status(thread.getStatus())
+                .state(thread.getState())
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getUser())
                 .owner(owner)
@@ -153,7 +157,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         groupThread.setUid(uidUtils.getCacheSerialUid());
         groupThread.setOrgUid(thread.getOrgUid());
 
-        Thread updateThread = save(groupThread);
+        ThreadEntity updateThread = save(groupThread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
@@ -162,34 +166,34 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     }
 
     /** 文件助手会话：file/{user_uid} */
-    public ThreadResponse createFileAsistantThread(User user) {
+    public ThreadResponse createFileAssistantThread(User user) {
         //
         String topic = TopicUtils.TOPIC_FILE_PREFIX + user.getUid();
         //
-        Optional<Thread> threadOptional = findByTopicAndOwner(topic, user);
+        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
 
-        UserProtobuf userSimple = UserUtils.getFileAsistantUser();
+        UserProtobuf userSimple = UserUtils.getFileAssistantUser();
         //
-        Thread asistantThread = Thread.builder()
-                .type(ThreadTypeEnum.ASISTANT.name())
+        ThreadEntity assistantThread = ThreadEntity.builder()
+                .type(ThreadTypeEnum.ASSISTANT.name())
                 .topic(topic)
                 .unreadCount(0)
-                .status(ThreadStatusEnum.START.name())
+                .state(ThreadStateEnum.STARTED.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
-        asistantThread.setUid(uidUtils.getCacheSerialUid());
+        assistantThread.setUid(uidUtils.getCacheSerialUid());
         if (StringUtils.hasText(user.getOrgUid())) {
-            asistantThread.setOrgUid(user.getOrgUid());
+            assistantThread.setOrgUid(user.getOrgUid());
         } else {
-            asistantThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            assistantThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
         }
 
-        Thread updateThread = save(asistantThread);
+        ThreadEntity updateThread = save(assistantThread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
@@ -203,18 +207,18 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         // String topic = TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid();
         String topic = TopicUtils.getSystemTopic(user.getUid());
         //
-        Optional<Thread> threadOptional = findByTopicAndOwner(topic, user);
+        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
 
         UserProtobuf userSimple = UserUtils.getSystemChannelUser();
         //
-        Thread noticeThread = Thread.builder()
+        ThreadEntity noticeThread = ThreadEntity.builder()
                 .type(ThreadTypeEnum.CHANNEL.name())
                 .topic(topic)
                 .unreadCount(0)
-                .status(ThreadStatusEnum.START.name())
+                .state(ThreadStateEnum.STARTED.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
@@ -226,7 +230,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
             noticeThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
         }
         //
-        Thread updateThread = save(noticeThread);
+        ThreadEntity updateThread = save(noticeThread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
@@ -236,12 +240,12 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
 
     public ThreadResponse update(ThreadRequest threadRequest) {
         // Optional<Thread> threadOptional = findByUid(threadRequest.getUid());
-        Optional<Thread> threadOptional = findByTopic(threadRequest.getTopic());
+        Optional<ThreadEntity> threadOptional = findByTopic(threadRequest.getTopic());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("update thread " + threadRequest.getTopic() + " not found");
         }
         //
-        Thread thread = threadOptional.get();
+        ThreadEntity thread = threadOptional.get();
         thread.setTop(threadRequest.getTop());
         thread.setUnread(threadRequest.getUnread());
         thread.setUnreadCount(threadRequest.getUnreadCount());
@@ -251,71 +255,56 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
         thread.setFolded(threadRequest.getFolded());
         thread.setContent(threadRequest.getContent());
         //
-        Thread updateThread = save(thread);
+        ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
         return convertToResponse(updateThread);
     }
 
-    public ThreadResponse autoClose(Thread thread) {
+    public ThreadResponse autoClose(ThreadEntity thread) {
         // log.info(thread.getUid() + "自动关闭");
         ThreadRequest threadRequest = ThreadRequest.builder()
                 .topic(thread.getTopic())
-                .status(ThreadStatusEnum.AUTO_CLOSED.name())
+                .autoClose(true)
+                .state(ThreadStateEnum.CLOSED.name())
                 .build();
         return close(threadRequest);
     }
 
     public ThreadResponse close(ThreadRequest threadRequest) {
-        Optional<Thread> threadOptional = findByTopic(threadRequest.getTopic());
+        Optional<ThreadEntity> threadOptional = findByTopic(threadRequest.getTopic());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("close thread " + threadRequest.getTopic() + " not found");
         }
         //
-        Thread thread = threadOptional.get();
-        if (ThreadStatusEnum.AGENT_CLOSED.name().equals(thread.getStatus())
-                || ThreadStatusEnum.AUTO_CLOSED.name().equals(thread.getStatus())) {
-            // log.info("thread {} is already closed", uid);
-            // throw new RuntimeException("thread is already closed");
+        ThreadEntity thread = threadOptional.get();
+        if (ThreadStateEnum.CLOSED.name().equals(thread.getState())) {
+            log.info("thread {} is already closed", thread.getTopic());
             return null;
         }
-        thread.setStatus(threadRequest.getStatus());
+        thread.setAutoClose(threadRequest.getAutoClose());
+        thread.setState(threadRequest.getState());
         //
-        Thread updateThread = save(thread);
+        ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-        // bytedeskEventPublisher.publishThreadUpdateEvent(updateThread);
         // 发布关闭消息, 通知用户
-        String content = threadRequest.getStatus().equals(ThreadStatusEnum.AUTO_CLOSED.name())
+        String content = threadRequest.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED
                 : I18Consts.I18N_AGENT_CLOSED;
         MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getCacheSerialUid(), updateThread,
-                MessageTypeEnum.fromValue(threadRequest.getStatus()),
+                MessageTypeEnum.fromValue(threadRequest.getState()),
                 content);
-        MessageUtils.notifyUser(messageProtobuf);
+        // MessageUtils.notifyUser(messageProtobuf);
+        messageSendService.sendMessage(messageProtobuf);
         //
         return convertToResponse(updateThread);
     }
 
-    // 群组解散之后，将所有会话设置为已解散状态
-    public void dismissByTopic(String topic) {
-        List<Thread> threads = threadRepository.findByTopic(topic);
-        if (threads == null || threads.isEmpty()) {
-            return;
-        }
-        Iterator<Thread> iterator = threads.iterator();
-        while (iterator.hasNext()) {
-            Thread thread = iterator.next();
-            thread.setStatus(ThreadStatusEnum.DISMISSED.name());
-            //
-            save(thread);
-        }
-    }
-
     @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
-    public Optional<Thread> findByUid(String uid) {
+    public Optional<ThreadEntity> findByUid(String uid) {
         return threadRepository.findByUid(uid);
     }
 
@@ -324,54 +313,42 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     }
 
     @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
-    public Optional<Thread> findByTopicAndOwner(String topic, User user) {
-        return threadRepository.findFirstByTopicAndOwnerAndDeleted(topic, user, false);
+    public Optional<ThreadEntity> findByTopicAndOwner(String topic, User user) {
+        return threadRepository.findByTopicAndOwnerAndDeleted(topic, user, false);
     }
 
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    public Optional<Thread> findByTopic(String topic) {
-        return threadRepository.findFirstByTopicAndDeleted(topic, false);
+    public Optional<ThreadEntity> findByTopic(String topic) {
+        return threadRepository.findByTopicAndDeleted(topic, false);
     }
 
-    // 找到某个访客对应某个一对一客服未关闭会话
-    // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    // public Optional<Thread> findByTopicNotClosed(String topic, String status) {
-    // return
-    // threadRepository.findFirstByTopicAndStatusNotContainingAndDeleted(topic,
-    // "CLOSED", false);
-    // }
-    
     // 找到某个访客当前对应某技能组未关闭会话
-    // @Cacheable(value = "thread", key = "#workgroupUid + '-' + #visitorUid",
-    // unless = "#result == null")
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    public Optional<Thread> findByTopicNotClosed(String topic) {
-        List<String> statuses = Arrays
-                .asList(new String[] { ThreadStatusEnum.AGENT_CLOSED.name(), ThreadStatusEnum.AUTO_CLOSED.name() });
-        return threadRepository.findFirstTopicAndStatusesNotInAndDeleted(topic, statuses, false);
+    public Optional<ThreadEntity> findByTopicNotClosed(String topic) {
+        List<String> states = Arrays.asList(new String[] { ThreadStateEnum.CLOSED.name()});
+        return threadRepository.findTopicAndStatesNotInAndDeleted(topic, states, false);
     }
 
     // TODO: how to cacheput or cacheevict?
     @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
-    public Page<Thread> findByOwner(User user, Pageable pageable) {
+    public Page<ThreadEntity> findByOwner(User user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }
 
     // TODO: 更新缓存
     // @Cacheable(value = "threadOpen")
-    public List<Thread> findStatusOpen() {
+    public List<ThreadEntity> findStateOpen() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.KB.name() });
-        List<String> statuses = Arrays
-                .asList(new String[] { ThreadStatusEnum.AUTO_CLOSED.name(), ThreadStatusEnum.AGENT_CLOSED.name() });
-        return threadRepository.findByTypesInAndStatusesNotInAndDeleted(types, statuses, false);
+        List<String> states = Arrays .asList(new String[] { ThreadStateEnum.CLOSED.name()});
+        return threadRepository.findByTypesInAndStatesNotInAndDeleted(types, states, false);
     }
 
     @Caching(put = {
             @CachePut(value = "thread", key = "#thread.uid"),
             @CachePut(value = "thread", key = "#thread.topic")
     })
-    public Thread save(@NonNull Thread thread) {
+    public ThreadEntity save(@NonNull ThreadEntity thread) {
         try {
             return threadRepository.save(thread);
         } catch (Exception e) {
@@ -384,17 +361,17 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
             @CacheEvict(value = "thread", key = "#thread.uid"),
             @CacheEvict(value = "thread", key = "#thread.topic")
     })
-    public void delete(@NonNull Thread entity) {
+    public void delete(@NonNull ThreadEntity entity) {
         // threadRepository.delete(thread);
         // Optional<Thread> threadOptional = findByUid(entity.getUid());
-        Optional<Thread> threadOptional = findByTopic(entity.getTopic());
+        Optional<ThreadEntity> threadOptional = findByTopic(entity.getTopic());
         threadOptional.ifPresent(thread -> {
             thread.setDeleted(true);
             save(thread);
         });
     }
 
-    public ThreadResponse convertToResponse(Thread thread) {
+    public ThreadResponse convertToResponse(ThreadEntity thread) {
         ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
         //
         UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
@@ -416,7 +393,7 @@ public class ThreadService extends BaseService<Thread, ThreadRequest, ThreadResp
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Thread entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ThreadEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }

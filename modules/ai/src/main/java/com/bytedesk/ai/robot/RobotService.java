@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-28 10:25:02
+ * @LastEditTime: 2024-10-14 09:28:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,11 +44,11 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.constant.AvatarConsts;
 // import com.bytedesk.core.quick_button.QuickButton;
 // import com.bytedesk.core.quick_button.QuickButtonService;
@@ -178,18 +178,18 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     }
 
     public ThreadResponse createThread(ThreadRequest request) {
-        // 
+        //
         User owner = authService.getCurrentUser();
         String topic = request.getTopic();
         //
-        Optional<Thread> threadOptional = threadService.findByTopicAndOwner(topic, owner);
+        Optional<ThreadEntity> threadOptional = threadService.findByTopicAndOwner(topic, owner);
         if (threadOptional.isPresent()) {
             return threadService.convertToResponse(threadOptional.get());
         }
         //
-        Thread thread = modelMapper.map(request, Thread.class);
+        ThreadEntity thread = modelMapper.map(request, ThreadEntity.class);
         thread.setUid(uidUtils.getUid());
-        thread.setStatus(ThreadStatusEnum.START.name());
+        thread.setState(ThreadStateEnum.STARTED.name());
         //
         String user = JSON.toJSONString(request.getUser());
         log.info("request {}, user {}", request.toString(), user);
@@ -213,7 +213,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
         //
-        Thread savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
         }
@@ -222,17 +222,17 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     }
 
     public ThreadResponse updateThread(ThreadRequest request) {
-        // 
+        //
         String topic = request.getTopic();
-        Optional<Thread> threadOptional = threadService.findByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("thread not found");
         }
-        Thread thread = threadOptional.get();
+        ThreadEntity thread = threadOptional.get();
         thread.setUser(JSON.toJSONString(request.getUser()));
         thread.setAgent(request.getAgent());
         //
-        Thread savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
         }
@@ -275,7 +275,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
                 }
             }
         }
-        // 
+        //
         if (request.getServiceSettings() != null
                 && request.getServiceSettings().getQuickFaqUids() != null
                 && request.getServiceSettings().getQuickFaqUids().size() > 0) {
@@ -362,7 +362,8 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     }
 
     // public Boolean existsByNicknameAndPlatform(String name) {
-    //     return robotRepository.existsByNicknameAndLevel(name, LevelEnum.PLATFORM.name());
+    // return robotRepository.existsByNicknameAndLevel(name,
+    // LevelEnum.PLATFORM.name());
     // }
 
     public Boolean existsByUid(String uid) {
@@ -426,10 +427,10 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         return create(robotRequest);
     }
 
-    public RobotResponse createDefaultAgentAsistantRobot(String orgUid) {
+    public RobotResponse createDefaultAgentAssistantRobot(String orgUid) {
         //
         RobotRequest robotRequest = RobotRequest.builder()
-                .nickname(I18Consts.I18N_ROBOT_AGENT_ASISTANT_NICKNAME)
+                .nickname(I18Consts.I18N_ROBOT_AGENT_ASSISTANT_NICKNAME)
                 .build();
         // robotRequest.setType(RobotTypeEnum.AGENT_ASSISTANT.name());
         robotRequest.setType(RobotTypeEnum.KB.name());
@@ -440,10 +441,10 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
 
     // 从json创建平台机器人
     public RobotResponse createRobotFromJson(RobotJson robotJson) {
-        
+
         log.info("robotJson {}", robotJson.getNickname());
         RobotLlm llm = RobotLlm.builder().prompt(robotJson.getPrompt()).build();
-        // 
+        //
         Robot robot = Robot.builder()
                 .nickname(robotJson.getNickname())
                 .avatar(robotJson.getAvatar())
@@ -464,6 +465,14 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     }
 
     public void initData() {
+
+        if (robotRepository.count() > 0) {
+            return;
+        }
+        //
+        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        createDefaultRobot(orgUid, BdConstants.DEFAULT_ROBOT_UID);
+        createDefaultAgentAssistantRobot(orgUid);
         //
         Map<String, ProviderJson> providerJsonMap = robotJsonService.loadProviders();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
@@ -473,7 +482,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
                 llmProviderService.createFromProviderJson(providerName, providerJson);
             }
         }
-        // 
+        //
         Map<String, List<ModelJson>> modelJsonMap = robotJsonService.loadModels();
         for (Map.Entry<String, List<ModelJson>> entry : modelJsonMap.entrySet()) {
             String providerName = entry.getKey();
@@ -484,21 +493,13 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
                 }
             }
         }
-        // 
+        //
         List<RobotJson> robotJsons = robotJsonService.loadRobots();
         for (RobotJson robotJson : robotJsons) {
             if (!existsByUid(robotJson.getUid())) {
                 createRobotFromJson(robotJson);
             }
         }
-        if (robotRepository.count() > 0) {
-            return;
-        }
-        //
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
-        createDefaultRobot(orgUid, BdConstants.DEFAULT_ROBOT_UID);
-        createDefaultAgentAsistantRobot(orgUid);
-        // 
     }
 
 }

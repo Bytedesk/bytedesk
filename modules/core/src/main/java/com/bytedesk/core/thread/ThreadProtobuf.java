@@ -42,7 +42,7 @@ public class ThreadProtobuf extends BaseResponse {
 
     private ThreadTypeEnum type;
 
-    private ThreadStatusEnum status;
+    private ThreadStateEnum status;
 
     private UserProtobuf user;
 

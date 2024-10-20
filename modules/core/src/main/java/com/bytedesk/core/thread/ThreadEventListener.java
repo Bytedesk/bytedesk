@@ -19,7 +19,7 @@ import java.util.List;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
@@ -46,7 +46,7 @@ public class ThreadEventListener {
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
-        Thread thread = event.getThread();
+        ThreadEntity thread = event.getThread();
         User user = thread.getOwner();
         log.info("thread ThreadCreateEvent: {}", thread.getUid());
 
@@ -75,7 +75,7 @@ public class ThreadEventListener {
 
     @EventListener
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-        Thread thread = event.getThread();
+        ThreadEntity thread = event.getThread();
         User user = thread.getOwner();
         log.info("topic onThreadUpdateEvent: {}", thread.getUid());
         // TODO: 会话关闭之后，需要取消订阅
@@ -95,7 +95,7 @@ public class ThreadEventListener {
             topicService.create(request);
         } else {
             // if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-            //     || thread.getType().equals(ThreadTypeEnum.ASISTANT.name())
+            //     || thread.getType().equals(ThreadTypeEnum.ASSISTANT.name())
             //     || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())
             //     || thread.getType().equals(ThreadTypeEnum.LLM.name())) 
             // 文件助手、系统通知会话延迟订阅topic
@@ -117,7 +117,7 @@ public class ThreadEventListener {
 
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
-        Message message = event.getMessage();
+        MessageEntity message = event.getMessage();
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
@@ -133,7 +133,7 @@ public class ThreadEventListener {
 
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        List<Thread> threadList = threadPersistCache.getListForPersist();
+        List<ThreadEntity> threadList = threadPersistCache.getListForPersist();
         if (threadList != null) {
             threadList.forEach(thread -> {
                 threadService.save(thread);

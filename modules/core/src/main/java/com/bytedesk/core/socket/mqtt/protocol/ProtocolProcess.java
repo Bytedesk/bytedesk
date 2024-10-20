@@ -1,6 +1,7 @@
 package com.bytedesk.core.socket.mqtt.protocol;
 
-import com.bytedesk.core.socket.MqService;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.socket.mqtt.MqService;
 import com.bytedesk.core.socket.mqtt.MqttAuthService;
 import com.bytedesk.core.socket.mqtt.MqttMessageIdService;
 import com.bytedesk.core.socket.mqtt.MqttSessionService;
@@ -30,6 +31,9 @@ public class ProtocolProcess {
 
     @Autowired
     private MqService mqService;
+
+    @Autowired
+    private IMessageSendService messageSendService;
 
     private Connect connect;
 
@@ -78,7 +82,7 @@ public class ProtocolProcess {
 
     public Publish publish() {
         if (publish == null) {
-            publish = new Publish(mqService);
+            publish = new Publish(messageSendService);
         }
         return publish;
     }

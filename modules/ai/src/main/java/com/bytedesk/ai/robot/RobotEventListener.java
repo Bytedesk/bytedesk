@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-28 10:37:37
+ * @LastEditTime: 2024-10-15 18:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.ai.robot;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -30,10 +29,10 @@ import com.bytedesk.ai.provider.ollama.OllamaService;
 import com.bytedesk.ai.provider.zhipuai.ZhipuaiService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageCache;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageJsonEvent;
-import com.bytedesk.core.message.MessageProtoEvent;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -43,15 +42,11 @@ import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.redis.pubsub.RedisPubsubService;
-import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.MessageConvertUtils;
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,6 +71,8 @@ public class RobotEventListener {
 
     private final MessageCache messageCache;
 
+    private final IMessageSendService messageSendService;
+
     @Order(5)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -84,35 +81,8 @@ public class RobotEventListener {
         log.info("robot - organization created: {}", organization.getName());
         //
         robotService.createDefaultRobot(orgUid, uidUtils.getCacheSerialUid());
-        robotService.createDefaultAgentAsistantRobot(orgUid);
+        robotService.createDefaultAgentAssistantRobot(orgUid);
     }
-
-    // 直接迁移到robotService.createThread方法
-    // @EventListener
-    // public void onThreadCreateEvent(ThreadCreateEvent event) {
-    // Thread thread = event.getThread();
-    // log.info("robot ThreadCreateEvent: {}", thread.getUid());
-    // //
-    // if (thread.getType().equals(ThreadTypeEnum.LLM.name())
-    // && thread.getAgent().equals(BdConstants.EMPTY_JSON_STRING)) {
-    // // 机器人会话：org/robot/{robot_uid}/{visitor_uid}
-    // String topic = thread.getTopic();
-    // //
-    // String[] splits = topic.split("/");
-    // if (splits.length < 4) {
-    // throw new RuntimeException("robot topic format error");
-    // }
-    // String robotUid = splits[2];
-    // Optional<Robot> robotOptional = robotService.findByUid(robotUid);
-    // if (robotOptional.isPresent()) {
-    // Robot robot = robotOptional.get();
-    // // 更新机器人配置+大模型相关信息
-    // thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
-    // //
-    // threadService.save(thread);
-    // }
-    // }
-    // }
 
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
@@ -122,24 +92,24 @@ public class RobotEventListener {
         processMessage(messageJson);
     }
 
-    @EventListener
-    public void onMessageProtoEvent(MessageProtoEvent event) {
-        // log.info("MessageProtoEvent");
-        try {
-            MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
-            //
-            try {
-                String messageJson = MessageConvertUtils.toJson(messageProto);
-                //
-                processMessage(messageJson);
+    // @EventListener
+    // public void onMessageProtoEvent(MessageProtoEvent event) {
+    //     // log.info("MessageProtoEvent");
+    //     try {
+    //         MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
+    //         //
+    //         try {
+    //             String messageJson = MessageConvertUtils.toJson(messageProto);
+    //             //
+    //             processMessage(messageJson);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-    }
+    //         } catch (IOException e) {
+    //             e.printStackTrace();
+    //         }
+    //     } catch (InvalidProtocolBufferException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     private void processMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
@@ -189,11 +159,11 @@ public class RobotEventListener {
         } else if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
             log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // 大模型对话，无知识库
-            Optional<Thread> threadOptional = threadService.findByTopic(threadTopic);
+            Optional<ThreadEntity> threadOptional = threadService.findByTopic(threadTopic);
             if (!threadOptional.isPresent()) {
                 throw new RuntimeException("thread with topic " + threadTopic + " not found");
             }
-            Thread thread = threadOptional.get();
+            ThreadEntity thread = threadOptional.get();
             MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
             // 
             String agent = thread.getAgent();
@@ -217,7 +187,8 @@ public class RobotEventListener {
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
             clonedMessage.setUid(uidUtils.getCacheSerialUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
-            MessageUtils.notifyUser(clonedMessage);
+            // MessageUtils.notifyUser(clonedMessage);
+            messageSendService.sendMessage(clonedMessage);
             //
             // TODO: 获取大模型配置
             // robotProtobuf.getLlm().getProvider()
@@ -236,7 +207,7 @@ public class RobotEventListener {
                 || threadProtobuf.getType().equals(ThreadTypeEnum.KBDOC)) {
             log.info("robot agent/workgroup threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // TODO: 取消查库
-            Thread thread = threadService.findByTopic(threadTopic)
+            ThreadEntity thread = threadService.findByTopic(threadTopic)
                     .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic + " not found"));
             UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
             // 当前会话为机器人接待，而且是访客发送的消息
@@ -272,8 +243,8 @@ public class RobotEventListener {
         MessageProtobuf clonedMessage = SerializationUtils.clone(message);
         clonedMessage.setUid(uidUtils.getCacheSerialUid());
         clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        //
-        MessageUtils.notifyUser(clonedMessage);
+        // MessageUtils.notifyUser(clonedMessage);
+        messageSendService.sendMessage(clonedMessage);
         // 知识库
         if (bytedeskProperties.getJavaai()) {
             zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);

@@ -15,7 +15,7 @@
 	<version>${revision}</version>
 
 	<name>bytedesk-module-ai</name>
-	<description>https://www.weiyuai.cn</description>
+	<description>https://ai.bytedesk.com</description>
 
 	<properties>
 		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>

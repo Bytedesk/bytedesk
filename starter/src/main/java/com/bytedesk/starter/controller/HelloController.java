@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-16 13:13:29
+ * @LastEditTime: 2024-10-17 10:32:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,6 +70,7 @@ public class HelloController {
 	// http://127.0.0.1:9003/hello/visits
 	@GetMapping("/visits")
 	public ResponseEntity<?> visitCount() {
+		visitCounter.increment();
 		return ResponseEntity.ok(JsonResult.success("visitor counts", visitCounter.count()));
 	}
 

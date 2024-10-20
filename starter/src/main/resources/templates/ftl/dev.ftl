@@ -11,7 +11,7 @@
     <a href="/" target="_blank">网站</a><br/>
     <h3>管理</h3>
     <a href="/admin" target="_blank">管理后台</a><br/>
-    <a href="/agent" target="_blank">客户端</a><br/>
+    <a href="/agent/chat" target="_blank">客户端</a><br/>
     <h3>访客</h3>
     <a href="/chat?org=df_org_uid&t=0&sid=df_ag_uid&" target="_blank">访客端</a><br/>
     <a href="/chat/frame?org=df_org_uid&t=0&sid=df_ag_uid&" target="_blank">访客端-iframe</a><br/>

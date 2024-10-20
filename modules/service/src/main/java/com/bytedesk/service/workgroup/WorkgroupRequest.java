@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-23 10:09:29
+ * @LastEditTime: 2024-10-17 16:27:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,8 @@ public class WorkgroupRequest extends BaseRequest {
 
     @Builder.Default
     // private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
-    private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
+    // private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
+    private String routeType = WorkgroupRouteEnum.ROBIN.name();
 
     @Builder.Default
     private Boolean recent = false;

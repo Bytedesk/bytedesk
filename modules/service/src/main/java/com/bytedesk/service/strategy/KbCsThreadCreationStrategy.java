@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:59:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-26 14:06:29
+ * @LastEditTime: 2024-10-18 17:09:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -31,7 +30,7 @@ import com.bytedesk.kbase.knowledge_base.Knowledgebase;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 
@@ -57,20 +56,20 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         Knowledgebase knowledgebase = knowledgebaseService.findByUid(kbUid)
                 .orElseThrow(() -> new RuntimeException("Knowledgebase " + kbUid + " not found"));
         //
-        Thread thread = getKbThread(visitorRequest, knowledgebase);
+        ThreadEntity thread = getKbThread(visitorRequest, knowledgebase);
         //
         return getKbMessage(visitorRequest, thread, knowledgebase);
     }
 
-    private Thread getKbThread(VisitorRequest visitorRequest, Knowledgebase kb) {
+    private ThreadEntity getKbThread(VisitorRequest visitorRequest, Knowledgebase kb) {
         //
         String topic = TopicUtils.formatOrgKbThreadTopic(kb.getUid(), visitorRequest.getUid());
-        Optional<Thread> threadOptional = threadService.findByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadOptional.get();
         }
         //
-        Thread thread = Thread.builder().build();
+        ThreadEntity thread = ThreadEntity.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
         thread.setType(ThreadTypeEnum.KB.name());
@@ -88,31 +87,25 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getKbMessage(VisitorRequest visitorRequest, Thread thread, Knowledgebase kb) {
-        if (thread == null) {
-            throw new RuntimeException("Thread cannot be null");
-        }
-        if (kb == null) {
-            throw new RuntimeException("Knowledgebase cannot be null");
-        }
+    private MessageProtobuf getKbMessage(VisitorRequest visitorRequest, ThreadEntity thread, Knowledgebase kb) {
         thread.setContent(kb.getName());
         //
-        boolean isReenter = true;
-        if (thread.getStatus() == ThreadStatusEnum.START.name()) {
-            isReenter = false;
-        }
+        // boolean isReenter = true;
+        // if (thread.getState() == ThreadStateEnum.STARTED.name()) {
+        //     isReenter = false;
+        // }
         // 更新机器人配置+大模型相关信息
         // thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
         // robot.getServiceSettings())));
         // thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
         //
         // if thread is closed, reopen it and then create a new message
-        if (thread.isClosed()) {
-            isReenter = false;
-            thread.setStatus(ThreadStatusEnum.RESTART.name());
-        } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.START.name());
-        }
+        // if (thread.isClosed()) {
+        //     isReenter = false;
+        //     thread.setStatus(ThreadStateEnum.RESTART.name());
+        // } else {
+        //     thread.setStatus(isReenter ? ThreadStateEnum.CONTINUE.name() : ThreadStateEnum.STARTED.name());
+        // }
         threadService.save(thread);
         //
         UserProtobuf user = UserProtobuf.builder()
@@ -126,7 +119,7 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // userExtra.put("defaultReply", robot.getDefaultReply());
         // user.setExtra(JSON.toJSONString(userExtra));
         //
-        return ThreadMessageUtil.getThreadMessage(user, thread, isReenter);
+        return ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
     }
 
     

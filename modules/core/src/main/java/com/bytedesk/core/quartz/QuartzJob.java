@@ -43,7 +43,7 @@ public class QuartzJob extends QuartzJobBean implements Serializable {
         /**
          * 获取任务中保存的方法名字，动态调用方法
          */
-        String methodName = dataMap.getString(QuartzConsts.JOB_METHORD_NAME);
+        String methodName = dataMap.getString(QuartzConsts.JOB_METHOD_NAME);
         try {
             QuartzJob job = new QuartzJob();
             Method method = job.getClass().getMethod(methodName);

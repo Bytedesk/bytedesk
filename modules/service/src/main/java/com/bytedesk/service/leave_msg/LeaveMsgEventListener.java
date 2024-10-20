@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 11:45:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-31 10:22:20
+ * @LastEditTime: 2024-10-17 16:32:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageUpdateEvent;
 
@@ -34,7 +34,7 @@ public class LeaveMsgEventListener {
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
-        Message message = event.getMessage();
+        MessageEntity message = event.getMessage();
         // log.info("message leave_msg update event: {}", message);
         //
         if (message.getStatus().equals(MessageStatusEnum.LEAVE_MSG_SUBMIT.name())) {

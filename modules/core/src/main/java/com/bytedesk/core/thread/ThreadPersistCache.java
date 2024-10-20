@@ -33,16 +33,16 @@ public class ThreadPersistCache {
     String defaultPersistKey = "threadList";
 
     // 创建一个缓存实例，设置过期时间为5天
-    private Cache<String, List<Thread>> threadCache;
+    private Cache<String, List<ThreadEntity>> threadCache;
 
     @PostConstruct
     public void init() {
         // 初始化caffeinecache，设置缓存的最大大小、过期时间等参数
         threadCache = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.DAYS)
-            .build(new CacheLoader<String, List<Thread>>() {
+            .build(new CacheLoader<String, List<ThreadEntity>>() {
                 @Override
-                public List<Thread> load(String key) throws Exception {
+                public List<ThreadEntity> load(String key) throws Exception {
                     // 当缓存中没有找到对应的键时，使用load方法初始化
                     return new ArrayList<>();
                 }
@@ -50,10 +50,10 @@ public class ThreadPersistCache {
     }
 
     // 模拟 push 操作：向列表中添加元素
-    public void pushForPersist(Thread thread) {
+    public void pushForPersist(ThreadEntity thread) {
         // 通过thread.uid判断defaultPersistKey中是否已经存在 则替换掉，不存在，则插入
         String uid = thread.getUid();
-        List<Thread> cachedList = threadCache.getIfPresent(defaultPersistKey);
+        List<ThreadEntity> cachedList = threadCache.getIfPresent(defaultPersistKey);
         if (cachedList == null) {
             cachedList = new ArrayList<>();
         }
@@ -75,13 +75,13 @@ public class ThreadPersistCache {
     }
 
     // 模拟 pop 操作：从列表中移除元素
-    public List<Thread> getListForPersist() {
+    public List<ThreadEntity> getListForPersist() {
         return getList(defaultPersistKey);
     }
 
     // 模拟 push 操作：向列表中添加元素
-    public void push(String listKey, Thread thread) {
-        List<Thread> cachedList = threadCache.getIfPresent(listKey);
+    public void push(String listKey, ThreadEntity thread) {
+        List<ThreadEntity> cachedList = threadCache.getIfPresent(listKey);
         if (cachedList == null) {
             // 如果缓存中没有找到对应的键，则使用load方法初始化
             cachedList = new ArrayList<>();
@@ -90,8 +90,8 @@ public class ThreadPersistCache {
         threadCache.put(listKey, cachedList);
     }
 
-    public List<Thread> getList(String listKey) {
-        List<Thread> cachedList = threadCache.getIfPresent(listKey);
+    public List<ThreadEntity> getList(String listKey) {
+        List<ThreadEntity> cachedList = threadCache.getIfPresent(listKey);
         if (cachedList != null && !cachedList.isEmpty()) {
             // 只需要返回一次即可
             remove(listKey);

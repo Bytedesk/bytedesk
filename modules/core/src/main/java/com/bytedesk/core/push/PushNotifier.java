@@ -14,13 +14,13 @@
  */
 package com.bytedesk.core.push;
 
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class PushNotifier {
     
-    abstract void notify(Message e);
+    abstract void notify(MessageEntity e);
 
     abstract void send(String to, String content, HttpServletRequest request);
 }

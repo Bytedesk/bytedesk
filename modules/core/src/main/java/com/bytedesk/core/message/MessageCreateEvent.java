@@ -25,9 +25,9 @@ public class MessageCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final Message message;
+    private final MessageEntity message;
 
-    public MessageCreateEvent(Object source, Message message) {
+    public MessageCreateEvent(Object source, MessageEntity message) {
         super(source);
         this.message = message;
     }

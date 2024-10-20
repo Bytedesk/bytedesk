@@ -29,7 +29,7 @@ import com.bytedesk.core.rbac.organization.Organization;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.User;
 import com.bytedesk.core.thread.ThreadCreateEvent;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
@@ -86,7 +86,7 @@ public class MemberEventListener {
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
-        Thread thread = event.getThread();
+        ThreadEntity thread = event.getThread();
         // User user = thread.getOwner();
         log.info("member ThreadCreateEvent: {}", thread.getUid());
         //

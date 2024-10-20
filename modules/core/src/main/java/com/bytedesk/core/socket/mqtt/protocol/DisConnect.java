@@ -6,7 +6,7 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessage;
 
-import com.bytedesk.core.socket.MqService;
+import com.bytedesk.core.socket.mqtt.MqService;
 import com.bytedesk.core.socket.mqtt.MqttSessionService;
 import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
 

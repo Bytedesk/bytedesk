@@ -29,11 +29,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Repository
 @Tag(name = "message")
-public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpecificationExecutor<Message> {
+public interface MessageRepository extends JpaRepository<MessageEntity, Long>, JpaSpecificationExecutor<MessageEntity> {
 
-    Optional<Message> findByUid(String uid);
+    Optional<MessageEntity> findByUid(String uid);
 
-    Page<Message> findByThreadTopic(String topic, Pageable pageable);
+    Page<MessageEntity> findByThreadTopic(String topic, Pageable pageable);
     // Page<Message> findByThreadsUidIn(String[] threadTids, Pageable pageable);
 
     // Optional<Message> findFirstByThreadsUidInOrderByCreatedAtDesc(String[]

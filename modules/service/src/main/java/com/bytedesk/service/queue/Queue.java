@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-19 20:35:37
+ * @LastEditTime: 2024-10-15 10:15:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,17 +14,17 @@
  */
 package com.bytedesk.service.queue;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.utils.StringListConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+// import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,16 +44,23 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ QueueListener.class })
 @Table(name = "service_queue", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "queueUid", "orgUid" })
+    // @UniqueConstraint(columnNames = { "orgUid" }) // "queueUid", 
 })
 public class Queue extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private String queueUid;
+    // @Builder.Default
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // @Convert(converter = StringListConverter.class)
+    // private List<String> threadTopics = new ArrayList<>();
 
+    // 排队用户
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    @Convert(converter = StringListConverter.class)
-    private List<String> threadTopics = new ArrayList<>();
+    @Column(name = "queue_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String user = BdConstants.EMPTY_JSON_STRING;
+
+    // 对应技能组uid/客服uid
+    private String agentUid;
 }

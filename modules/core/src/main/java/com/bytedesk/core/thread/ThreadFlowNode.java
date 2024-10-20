@@ -29,7 +29,7 @@ public class ThreadFlowNode implements Serializable {
 
     private final static long serialVersionUID = 1L;
 
-    private ThreadStatusEnum status;
+    private ThreadStateEnum status;
 
     private String content;
 

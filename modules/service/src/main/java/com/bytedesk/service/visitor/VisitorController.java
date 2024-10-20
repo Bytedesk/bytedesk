@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-28 11:15:31
+ * @LastEditTime: 2024-10-15 17:59:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,11 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.apilimit.ApiRateLimiter;
 import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.socket.MqService;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -46,9 +46,11 @@ public class VisitorController extends BaseController<VisitorRequest> {
 
     private final VisitorService visitorService;
 
-    private final MqService stompMqService;
+    // private final MqService stompMqService;
 
     private final MessageUnreadService messageUnreadService;
+
+    private final IMessageSendService messageSendService;
 
     @Override
     public ResponseEntity<?> queryByOrg(VisitorRequest request) {
@@ -153,7 +155,8 @@ public class VisitorController extends BaseController<VisitorRequest> {
         //
         String json = (String) map.get("json");
         log.debug("json {}", json);
-        stompMqService.sendJsonMessageToMq(json);
+        // stompMqService.sendJsonMessageToMq(json);
+        messageSendService.sendMessage(json);
         //
         return ResponseEntity.ok(JsonResult.success(json));
     }

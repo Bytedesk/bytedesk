@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-18 15:34:34
+ * @LastEditTime: 2024-10-17 17:50:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.service.workgroup;
 
-// import java.util.Set;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -70,7 +69,11 @@ public class Workgroup extends BaseEntity {
      */
     @Builder.Default
     // private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
-    private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
+    // private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
+    private String routeType = WorkgroupRouteEnum.ROBIN.name();
+
+    @Builder.Default
+    private String status = WorkgroupStateEnum.AVAILABLE.name();
 
     /**
      * recent chat agent should be routed first
@@ -110,21 +113,6 @@ public class Workgroup extends BaseEntity {
     // of type character varying
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BdConstants.EMPTY_JSON_STRING;
-
-    /**
-     * belong to org
-     */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private Organization organization;
-    // private String orgUid;
-
-    /**
-     * belongs to user
-     */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private User owner;
 
     // TODO: 根据算法选择一个agent
     // TODO: 增加agent-currentThreadCount数量

@@ -56,7 +56,7 @@ public class AgentRequest extends BaseRequest {
 
     @Builder.Default
     // private AgentStatusEnum status = AgentStatusEnum.AVAILABLE;
-    private String status = AgentStatusEnum.AVAILABLE.name();
+    private String status = AgentStateEnum.AVAILABLE.name();
 
     @Builder.Default
     private Integer maxThreadCount = 10;

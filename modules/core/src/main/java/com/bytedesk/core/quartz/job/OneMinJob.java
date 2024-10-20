@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 13:07:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-09 20:28:34
+ * @LastEditTime: 2024-10-18 13:33:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,8 +30,6 @@ import lombok.AllArgsConstructor;
 
 /**
  * 1 min job
- * 1分钟定时任务
- * 
  */
 // @Slf4j
 @AllArgsConstructor
@@ -45,6 +43,7 @@ public class OneMinJob extends QuartzJobBean implements Serializable {
     @Override
     protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException {
         // log.info("OneMinJob");
+        // 
         bytedeskEventPublisher.publishQuartzOneMinEvent();
     }
 

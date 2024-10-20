@@ -17,7 +17,7 @@ package com.bytedesk.service.route;
 import com.bytedesk.ai.robot.Robot;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.service.agent.Agent;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.Workgroup;
 
@@ -25,9 +25,9 @@ import jakarta.annotation.Nonnull;
 
 public interface IRouteService {
 
-    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull Thread thread, @Nonnull Robot robot);
+    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull Robot robot);
 
-    public MessageProtobuf routeAgent(VisitorRequest request, @Nonnull Thread thread, @Nonnull Agent agent);
+    public MessageProtobuf routeAgent(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull Agent agent);
 
-    public MessageProtobuf routeWorkgroup(VisitorRequest request, @Nonnull Thread thread, @Nonnull Workgroup workgroup);
+    public MessageProtobuf routeWorkgroup(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull Workgroup workgroup);
 }

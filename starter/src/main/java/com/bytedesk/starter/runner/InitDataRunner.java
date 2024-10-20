@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-18 17:36:58
+ * @LastEditTime: 2024-10-21 07:08:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.robot.RobotService;
-import com.bytedesk.core.asistant.AsistantService;
+import com.bytedesk.core.assistant.AssistantService;
 import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.channel.ChannelService;
 import com.bytedesk.core.quartz.QuartzService;
@@ -57,7 +57,7 @@ public class InitDataRunner implements ApplicationRunner {
     private String port;
 
     @Autowired
-    AsistantService asistantService;
+    AssistantService assistantService;
 
     @Autowired
     ChannelService channelService;
@@ -117,7 +117,7 @@ public class InitDataRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         // log.debug("application started, initiating data...");
 
-        asistantService.initData();
+        assistantService.initData();
 
         channelService.initData();
 

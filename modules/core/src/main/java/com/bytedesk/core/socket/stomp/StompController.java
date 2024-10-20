@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-29 22:04:07
+ * @LastEditTime: 2024-10-15 16:23:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,8 @@ import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import com.bytedesk.core.socket.MqService;
+import com.bytedesk.core.message.IMessageSendService;
+// import com.bytedesk.core.socket.MqService;
 
 import java.security.Principal;
 
@@ -36,9 +37,11 @@ import java.security.Principal;
 @Controller
 public class StompController {
 
-    private final MqService mqService;
+    // private final MqService mqService;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
+
+    private final IMessageSendService messageSendService;
 
     /**
      * stompClient.publish('/app/sid.uid', message)
@@ -55,16 +58,9 @@ public class StompController {
             @DestinationVariable(value = "uid") String uid,
             String message) {
         log.debug("principal: {}, sid: {}, uid: {}, message: {}", principal, sid, uid, message);
-        // MessageResponse messageResponse = JSON.parseObject(message,
-        // MessageResponse.class);
-        // // 发送回执
-        // JSONObject ackObject = new JSONObject();
-        // ackObject.put("type", MessageTypeConsts.NOTIFICATION_ACK_SUCCESS);
-        // ackObject.put("mid", messageResponse.getMid());
-        // simpMessagingTemplate.convertAndSend(MqConsts.TOPIC_PREFIX + sid + '.' + uid,
-        // ackObject);
         // 转发给mq
-        mqService.sendJsonMessageToMq(message);
+        // mqService.sendJsonMessageToMq(message);
+        messageSendService.sendMessage(message);
     }
 
     /**

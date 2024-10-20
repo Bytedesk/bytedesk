@@ -29,7 +29,7 @@ message Thread {
     // 会话类型
     string type = 3;
     // 会话状态
-    string status = 4;
+    string state = 4;
     // 头像昵称等信息
     User user = 5;
     // 自定义扩展/附加信息

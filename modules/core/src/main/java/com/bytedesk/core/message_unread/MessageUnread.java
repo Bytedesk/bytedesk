@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:15:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-05 11:55:54
+ * @LastEditTime: 2024-10-17 17:06:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,8 +80,6 @@ public class MessageUnread implements Serializable  {
 
     // 仅对一对一/客服/技能组聊天有效，表示对方是否已读。群聊无效
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private MessageStatusEnum status = MessageStatusEnum.SUCCESS;
     private String status = MessageStatusEnum.SUCCESS.name();
 
     // 复杂类型可以使用json存储在此，通过type字段区分

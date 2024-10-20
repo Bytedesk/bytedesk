@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-30 10:08:33
+ * @LastEditTime: 2024-10-15 17:41:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,8 +17,11 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
-import com.bytedesk.core.socket.MqService;
+import com.bytedesk.core.message.IMessageSendService;
+// import com.bytedesk.core.socket.MqService;
 import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.protobuf.model.MessageProto;
+import com.bytedesk.core.utils.MessageConvertUtils;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -27,7 +30,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class Publish {
 
-    private final MqService mqService;
+    // private final MqService mqService;
+    private final IMessageSendService messageSendService;
 
     //
     public void processPublish(Channel channel, MqttPublishMessage mqttPublishMessage) {
@@ -60,8 +64,16 @@ public class Publish {
     private void sendMqMessage(MqttPublishMessage publishMessage, byte[] messageBytes) {
         // 注意：不能去掉，否则无法解析protobuf
         publishMessage.payload().getBytes(publishMessage.payload().readerIndex(), messageBytes);
-        // publish messsage event, developers can listener to new message
-        mqService.sendProtoMessageToMq(messageBytes);
+        // publish message event, developers can listener to new message
+        // mqService.sendProtoMessageToMq(messageBytes);
+        try {
+            MessageProto.Message messageProto = MessageProto.Message.parseFrom(messageBytes);
+            String messageJson = MessageConvertUtils.toJson(messageProto);
+            // mqService.sendJsonMessageToMq(messageJson);
+            messageSendService.sendMessage(messageJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
