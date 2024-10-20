@@ -24,6 +24,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -71,6 +72,8 @@ public class UploadEventListener {
     private final RedisPubsubService redisPubsubService;
 
     private final UidUtils uidUtils;
+
+    private final IMessageSendService messageSendService;
 
     @EventListener
     public void onUploadCreateEvent(GenericApplicationEvent<UploadCreateEvent> event) throws IOException {
@@ -178,7 +181,8 @@ public class UploadEventListener {
         //
         MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
                 JSON.toJSONString(contentObject));
-        MessageUtils.notifyUser(message);
+        // MessageUtils.notifyUser(message);
+        messageSendService.sendMessage(message);
     }
 
     @EventListener
@@ -198,7 +202,8 @@ public class UploadEventListener {
         //
         MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
                 JSON.toJSONString(contentObject));
-        MessageUtils.notifyUser(message);
+        // MessageUtils.notifyUser(message);
+        messageSendService.sendMessage(message);
     }
 
 }

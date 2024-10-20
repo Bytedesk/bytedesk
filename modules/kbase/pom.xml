@@ -13,7 +13,7 @@
 	<artifactId>bytedesk-module-kbase</artifactId>
 
 	<name>bytedesk-module-kbase</name>
-	<description>https://www.weiyuai.cn</description>
+	<description>https://ai.bytedesk.com</description>
 
 	<properties>
 		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>

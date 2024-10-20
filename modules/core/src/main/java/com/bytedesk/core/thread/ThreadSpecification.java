@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ThreadSpecification extends BaseSpecification {
 
-    public static Specification<Thread> search(ThreadRequest request) {
+    public static Specification<ThreadEntity> search(ThreadRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

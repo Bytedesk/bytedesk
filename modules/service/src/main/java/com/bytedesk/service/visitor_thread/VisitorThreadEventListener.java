@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadUpdateEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class VisitorThreadEventListener {
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
-        Thread thread = event.getThread();
+        ThreadEntity thread = event.getThread();
         log.info("visitor ThreadCreateEvent: {}, type {}", thread.getUid(), thread.getType());
         // 仅同步客服会话
         if (thread.isCustomerService()) {
@@ -46,7 +46,7 @@ public class VisitorThreadEventListener {
 
     @EventListener
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-        Thread thread = event.getThread();
+        ThreadEntity thread = event.getThread();
         log.info("visitor onThreadUpdateEvent: {}", thread.getUid());
         // 更新visitor_thread表
         if (thread.isCustomerService()) {

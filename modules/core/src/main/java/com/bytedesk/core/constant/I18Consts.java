@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-24 09:12:22
+ * @LastEditTime: 2024-10-14 09:33:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,9 +29,9 @@ public class I18Consts {
 
     public static final String I18N_PREFIX = "i18n.";
     // "文件助手"
-    public static final String I18N_FILE_ASISTANT_NAME = I18N_PREFIX + "file.asistant";
+    public static final String I18N_FILE_ASSISTANT_NAME = I18N_PREFIX + "file.assistant";
     // "手机、电脑文件互传"
-    public static final String I18N_FILE_ASISTANT_DESCRIPTION = I18N_PREFIX + "file.asistant.description";
+    public static final String I18N_FILE_ASSISTANT_DESCRIPTION = I18N_PREFIX + "file.assistant.description";
     // 系统通知
     public static final String I18N_SYSTEM_NOTIFICATION_NAME = I18N_PREFIX + "system.notification";
     public static final String I18N_SYSTEM_NOTIFICATION_DESCRIPTION = I18N_PREFIX + "system.notification.description";
@@ -65,7 +65,7 @@ public class I18Consts {
     //
     public static final String I18N_ROBOT_NICKNAME = I18N_PREFIX + "robot.nickname";
     public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description";
-    public static final String I18N_ROBOT_AGENT_ASISTANT_NICKNAME = I18N_PREFIX + "robot.agent.asistant.nickname";
+    public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = I18N_PREFIX + "robot.agent.assistant.nickname";
     // public static final String I18N_ROBOT_LLM_PROMPT = I18N_PREFIX +
     // "llm.prompt";
     public static final String I18N_ROBOT_LLM_PROMPT = "角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度";

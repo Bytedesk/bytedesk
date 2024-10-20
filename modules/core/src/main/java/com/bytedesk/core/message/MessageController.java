@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 16:57:33
+ * @LastEditTime: 2024-10-15 17:42:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.message_unread.MessageUnreadService;
-import com.bytedesk.core.socket.MqService;
+// import com.bytedesk.core.socket.MqService;
 import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -52,7 +52,9 @@ public class MessageController extends BaseController<MessageRequest> {
 
     private final MessageService messageService;
 
-    private final MqService stompMqService;
+    // private final MqService stompMqService;
+
+    private final IMessageSendService messageSendService;
 
     private final MessageUnreadService messageUnreadService;
 
@@ -129,7 +131,8 @@ public class MessageController extends BaseController<MessageRequest> {
 
         String json = (String) map.get("json");
         log.debug("json {}", json);
-        stompMqService.sendJsonMessageToMq(json);
+        // stompMqService.sendJsonMessageToMq(json);
+        messageSendService.sendMessage(json);
         //
         return ResponseEntity.ok(JsonResult.success(json));
     }

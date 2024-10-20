@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 17:13:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 17:11:46
+ * @LastEditTime: 2024-10-15 17:54:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,10 +24,10 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageQa;
 import lombok.AllArgsConstructor;
@@ -43,6 +43,8 @@ public class RedisPubsubStringListener implements MessageListener {
     private final MessageCache messageCache;
 
     // private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final IMessageSendService messageSendService;
 
     private final Queue<RedisPubsubMessage> messageQueue = new LinkedList<>();
 
@@ -128,7 +130,7 @@ public class RedisPubsubStringListener implements MessageListener {
         //
         messageProtobuf.setType(MessageTypeEnum.STREAM);
         messageProtobuf.setContent(messageQa.getAnswer());
-        // 
-        MessageUtils.notifyUser(messageProtobuf);
+        // MessageUtils.notifyUser(messageProtobuf);
+        messageSendService.sendMessage(messageProtobuf);
     }
 }

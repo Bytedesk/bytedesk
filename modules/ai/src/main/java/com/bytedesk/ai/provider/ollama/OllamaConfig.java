@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-17 22:24:02
+ * @LastEditTime: 2024-10-19 09:58:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,7 @@
  */
 package com.bytedesk.ai.provider.ollama;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -71,22 +67,22 @@ public class OllamaConfig {
     // // FUNCTION CALLING
     // .build();
     // }
-    @Bean
-    ChatClient ollamaChatClient() {
-        return ChatClient.create(ollamaChatModel());
-    }
+    // @Bean
+    // ChatClient ollamaChatClient() {
+    //     return ChatClient.create(ollamaChatModel());
+    // }
 
-    @Bean
-    OllamaChatModel ollamaChatModel() {
-        return new OllamaChatModel(ollamaApi(), OllamaOptions.create().withModel(
-                ollamaChatModel).withTemperature(0.9));
-    }
+    // @Bean
+    // OllamaChatModel ollamaChatModel() {
+    //     return new OllamaChatModel(ollamaApi(), OllamaOptions.create().withModel(
+    //             ollamaChatModel).withTemperature(0.9));
+    // }
 
     // https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
-    @Bean
-    OllamaEmbeddingModel ollamaEmbeddingModel() {
-        return new OllamaEmbeddingModel(ollamaApi(), OllamaOptions.create().withModel(
-                ollamaEmbeddingModel).withTemperature(0.9));
-    }
+    // @Bean
+    // OllamaEmbeddingModel ollamaEmbeddingModel() {
+    //     return new OllamaEmbeddingModel(ollamaApi(), OllamaOptions.create().withModel(
+    //             ollamaEmbeddingModel).withTemperature(0.9));
+    // }
 
 }

@@ -20,7 +20,7 @@ public enum UserTypeEnum {
     VISITOR,
     ROBOT,
     MEMBER,
-    ASISTANT,
+    ASSISTANT,
     CHANNEL,
     USER
 }

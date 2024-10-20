@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 17:01:20
+ * @LastEditTime: 2024-10-15 16:21:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageService extends BaseService<Message, MessageRequest, MessageResponse> {
+public class MessageService extends BaseService<MessageEntity, MessageRequest, MessageResponse> {
 
     private final MessageRepository messageRepository;
 
@@ -50,9 +50,9 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
-        Specification<Message> specs = MessageSpecification.search(request);
+        Specification<MessageEntity> specs = MessageSpecification.search(request);
 
-        Page<Message> messagePage = messageRepository.findAll(specs, pageable);
+        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
 
         return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
@@ -64,7 +64,7 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
-        Page<Message> messagePage = messageRepository.findByThreadTopic(request.getThreadTopic(), pageable);
+        Page<MessageEntity> messagePage = messageRepository.findByThreadTopic(request.getThreadTopic(), pageable);
 
         return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
@@ -82,7 +82,7 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
     }
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
-    public Optional<Message> findByUid(String uid) {
+    public Optional<MessageEntity> findByUid(String uid) {
         return messageRepository.findByUid(uid);
     }
 
@@ -90,7 +90,7 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
     @Caching(put = {
             @CachePut(value = "message", key = "#message.uid"),
     })
-    public Message save(@NonNull Message message) {
+    public MessageEntity save(@NonNull MessageEntity message) {
         try {
             return messageRepository.save(message);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -102,7 +102,7 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
     @Caching(evict = {
             @CacheEvict(value = "message", key = "#message.uid"),
     })
-    public void delete(@NonNull Message message) {
+    public void delete(@NonNull MessageEntity message) {
         deleteByUid(message.getUid());
     }
 
@@ -111,7 +111,7 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
     })
     public void deleteByUid(String uid) {
         // messageRepository.deleteByUid(uid);
-        Optional<Message> messageOptional = findByUid(uid);
+        Optional<MessageEntity> messageOptional = findByUid(uid);
         messageOptional.ifPresent(message -> {
             message.setDeleted(true);
             save(message);
@@ -141,92 +141,17 @@ public class MessageService extends BaseService<Message, MessageRequest, Message
     }
 
     @Override
-    public MessageResponse convertToResponse(Message entity) {
+    public MessageResponse convertToResponse(MessageEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Message message) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, MessageEntity message) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
-    //
-    // public void notifyUser(MessageProtobuf messageProtobuf) {
-    //     String json = JSON.toJSONString(messageProtobuf);
-    //     bytedeskEventPublisher.publishMessageJsonEvent(json);
-    // }
-
-    // public MessageProtobuf createNoticeMessage(String userUid, String orgUid, String content) {
-    //     // 
-    //     UserProtobuf sender = UserUtils.getSystemChannelUser();
-    //     // 
-    //     String topic = TopicUtils.getSystemTopic(userUid);
-    //     ThreadProtobuf thread = ThreadUtils.getThreadProtobuf(topic, ThreadTypeEnum.CHANNEL, sender);
-    //     // 
-    //     MessageExtra extra = MessageUtils.getMessageExtra(orgUid);
-    //     // 
-    //     MessageProtobuf message = MessageProtobuf.builder()
-    //             .uid(uidUtils.getCacheSerialUid())
-    //             .type(MessageTypeEnum.NOTICE)
-    //             .content(content)
-    //             .status(MessageStatusEnum.SUCCESS)
-    //             .createdAt(new Date())
-    //             .client(ClientEnum.SYSTEM)
-    //             .thread(thread)
-    //             .user(sender)
-    //             .extra(JSON.toJSONString(extra))
-    //             .build();
-    //     return message;
-    // }
-
-    // 通知消息：登录
-    // public MessageProtobuf createNoticeMessage(User user, String content) {
-    //     //
-    //     ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
-    //     ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
-    //     UserProtobuf sender = thread.getUser();
-    //     // 
-    //     MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
-    //     //
-    //     MessageProtobuf message = MessageProtobuf.builder()
-    //             .uid(uidUtils.getCacheSerialUid())
-    //             .type(MessageTypeEnum.NOTICE)
-    //             .content(content)
-    //             .status(MessageStatusEnum.SUCCESS)
-    //             .createdAt(new Date())
-    //             .client(ClientEnum.SYSTEM)
-    //             .thread(thread)
-    //             .user(sender)
-    //             .extra(JSON.toJSONString(extra))
-    //             .build();
-    //     return message;
-    // }
-
-    // TODO: 事件消息：访客离线、访客上线
-    // public MessageProtobuf createEventMessage(User user, String content) {
-    //     //
-    //     ThreadResponse noticeThread = threadService.createSystemChannelThread(user);
-    //     ThreadProtobuf thread = modelMapper.map(noticeThread, ThreadProtobuf.class);
-    //     UserProtobuf sender = thread.getUser();
-    //     //
-    //     MessageExtra extra = MessageExtra.builder().orgUid(user.getOrgUid()).build();
-    //     //
-    //     MessageProtobuf message = MessageProtobuf.builder()
-    //             .uid(uidUtils.getCacheSerialUid())
-    //             .type(MessageTypeEnum.EVENT)
-    //             .content(content)
-    //             .status(MessageStatusEnum.SUCCESS)
-    //             .createdAt(new Date())
-    //             .client(ClientEnum.SYSTEM)
-    //             .thread(thread)
-    //             .user(sender)
-    //             .extra(JSON.toJSONString(extra))
-    //             .build();
-
-    //     return message;
-    // }
     
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-26 15:57:21
+ * @LastEditTime: 2024-10-17 16:54:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,7 +43,7 @@ public class ThreadRequest extends BaseRequest {
     // 
     private String topic;
 
-    private String status;
+    private String state;
 
     private UserProtobuf user;
     
@@ -72,6 +72,9 @@ public class ThreadRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean folded = false;
+
+    @Builder.Default
+    private Boolean autoClose = false;
 
     // 用于更新robot-agent-llm配置
     private String agent;

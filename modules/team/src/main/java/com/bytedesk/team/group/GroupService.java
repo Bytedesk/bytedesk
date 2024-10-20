@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:49:47
+ * @LastEditTime: 2024-10-16 13:53:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,8 +29,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.member.Member;
 import com.bytedesk.team.member.MemberService;
@@ -52,7 +50,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
 
     private MemberService memberService;
 
-    private ThreadService threadService;
+    // private ThreadService threadService;
 
     @Override
     public Page<GroupResponse> queryByOrg(GroupRequest request) {
@@ -134,7 +132,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
             //
             save(group);
             // 解散相关会话thread
-            threadService.dismissByTopic(TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid());
+            // threadService.dismissByTopic(TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid());
         }
         // 
         throw new RuntimeException("Failed to dismiss group by uid: " + request.getUid());

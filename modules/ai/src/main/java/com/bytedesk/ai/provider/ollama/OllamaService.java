@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-27 14:58:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-27 16:22:18
+ * @LastEditTime: 2024-10-15 17:46:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.ai.provider.ollama;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.agentsflex.core.llm.Llm;
@@ -23,9 +24,10 @@ import com.agentsflex.llm.ollama.OllamaLlm;
 import com.agentsflex.llm.ollama.OllamaLlmConfig;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageUtils;
+// import com.bytedesk.core.message.MessageUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class OllamaService {
 
+    @Autowired
+    private IMessageSendService messageSendService;
 
     public void sendSseMessage(String query, RobotLlm robotllm, MessageProtobuf messageProtobuf) {
         //
@@ -69,7 +73,8 @@ public class OllamaService {
             AiMessage aiMessage = response.getMessage();
             messageProtobuf.setType(MessageTypeEnum.STREAM);
             messageProtobuf.setContent(aiMessage.getContent());
-            MessageUtils.notifyUser(messageProtobuf);
+            // MessageUtils.notifyUser(messageProtobuf);
+            messageSendService.sendMessage(messageProtobuf);
             // 
             if (aiMessage.getStatus().equals(MessageStatus.END)) {
                 log.info("aiMessage.getStatus() == END");

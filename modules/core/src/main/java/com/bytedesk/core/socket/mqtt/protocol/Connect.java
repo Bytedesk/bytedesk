@@ -8,7 +8,7 @@ import io.netty.util.CharsetUtil;
 
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.socket.MqService;
+import com.bytedesk.core.socket.mqtt.MqService;
 import com.bytedesk.core.socket.mqtt.MqttAuthService;
 import com.bytedesk.core.socket.mqtt.MqttSession;
 import com.bytedesk.core.socket.mqtt.MqttSessionService;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-19 20:34:45
+ * @LastEditTime: 2024-10-15 07:54:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,10 +81,10 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
         return queueRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue", key = "#queueUid", unless = "#result==null")
-    public Optional<Queue> findByQueueUid(String queueUid) {
-        return queueRepository.findByQueueUid(queueUid);
-    }
+    // @Cacheable(value = "queue", key = "#queueUid", unless = "#result==null")
+    // public Optional<Queue> findByQueueUid(String queueUid) {
+    //     return queueRepository.findByQueueUid(queueUid);
+    // }
 
     @Override
     public QueueResponse create(QueueRequest request) {
@@ -101,12 +101,12 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
     @Override
     public QueueResponse update(QueueRequest request) {
 
-        Optional<Queue> queueOptional = findByQueueUid(request.getQueueUid());
+        Optional<Queue> queueOptional = findByUid(request.getUid());
         if (queueOptional.isPresent()) {
             Queue entity = queueOptional.get();
             // modelMapper.map(request, entity);
-            entity.setQueueUid(request.getQueueUid());
-            entity.setThreadTopics(request.getThreadTopics());
+            entity.setUid(request.getUid());
+            // entity.setThreadTopics(request.getThreadTopics());
             //
             return convertToResponse(save(entity));
         }

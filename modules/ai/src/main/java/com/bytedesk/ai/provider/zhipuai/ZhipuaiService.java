@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-27 16:15:28
+ * @LastEditTime: 2024-10-17 17:20:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,13 +31,14 @@ import com.bytedesk.ai.robot.RobotMessage;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotTypeEnum;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.thread.Thread;
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageUtils;
+// import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.uid.UidUtils;
@@ -83,6 +84,8 @@ public class ZhipuaiService {
 
     private final UploadVectorStore uploadVectorStore;
 
+    private final IMessageSendService messageSendService;
+
     // private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final String PROMPT_BLUEPRINT = """
@@ -98,7 +101,7 @@ public class ZhipuaiService {
      */
     public void getSseAnswer(String uid, String sid, String question, SseEmitter emitter) {
         String topic = sid + "/" + uid;
-        Thread thread = threadService.findByTopic(topic)
+        ThreadEntity thread = threadService.findByTopic(topic)
                 .orElseThrow(() -> new RuntimeException("thread with topic: " + topic + " not found"));
 
         RobotMessage robotMessage = RobotMessage.builder().question(question).build();
@@ -109,7 +112,7 @@ public class ZhipuaiService {
         UserProtobuf user = modelMapper.map(thread.getAgent(), UserProtobuf.class);
         //
         String messageUid = uidUtils.getCacheSerialUid();
-        Message message = Message.builder()
+        MessageEntity message = MessageEntity.builder()
                 .type(MessageTypeEnum.ROBOT.name())
                 .status(MessageStatusEnum.SUCCESS.name())
                 .client(ClientEnum.SYSTEM.name())
@@ -264,7 +267,8 @@ public class ZhipuaiService {
                                     messageProtobuf.setType(MessageTypeEnum.STREAM);
                                     messageProtobuf.setContent(answerContent);
                                     //
-                                    MessageUtils.notifyUser(messageProtobuf);
+                                    // MessageUtils.notifyUser(messageProtobuf);
+                                    messageSendService.sendMessage(messageProtobuf);
                                 }
                             }
                         }
@@ -344,9 +348,8 @@ public class ZhipuaiService {
                                     messageProtobuf.setType(MessageTypeEnum.STREAM);
                                     messageProtobuf.setContent(answerContent);
                                     //
-                                    MessageUtils.notifyUser(messageProtobuf);
-                                    // String json = JSON.toJSONString(messageProtobuf);
-                                    // bytedeskEventPublisher.publishMessageJsonEvent(json);
+                                    // MessageUtils.notifyUser(messageProtobuf);
+                                    messageSendService.sendMessage(messageProtobuf);
                                 }
                             }
                         }
@@ -419,9 +422,8 @@ public class ZhipuaiService {
                                     messageProtobuf.setType(MessageTypeEnum.STREAM);
                                     messageProtobuf.setContent(answerContent);
                                     //
-                                    MessageUtils.notifyUser(messageProtobuf);
-                                    // String json = JSON.toJSONString(messageProtobuf);
-                                    // bytedeskEventPublisher.publishMessageJsonEvent(json);
+                                    // MessageUtils.notifyUser(messageProtobuf);
+                                    messageSendService.sendMessage(messageProtobuf);
                                 }
                             }
                         }

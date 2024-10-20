@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-19 10:49:02
+ * @LastEditTime: 2024-10-17 17:51:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.thread.ThreadStatusEnum;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 
 /**
@@ -72,7 +72,7 @@ public class VisitorThread extends BaseEntity {
 
     /** closed/open, agent closed/auto closed */
     @Builder.Default
-    private String status = ThreadStatusEnum.START.name();
+    private String state = ThreadStateEnum.INITIAL.name();
 
     // 置顶
     @Builder.Default

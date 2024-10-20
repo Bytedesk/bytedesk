@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:42:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 10:29:14
+ * @LastEditTime: 2024-10-18 13:39:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,12 +22,16 @@ import com.bytedesk.core.action.Action;
 import com.bytedesk.core.action.ActionCreateEvent;
 import com.bytedesk.core.event.GenericApplicationEvent;
 // import com.bytedesk.core.cache.CaffeineCacheGroupEvent;
-import com.bytedesk.core.message.MessageProtoEvent;
+// import com.bytedesk.core.message.MessageProtoEvent;
 import com.bytedesk.core.message.MessageUpdateEvent;
+import com.bytedesk.core.quartz.event.QuartzDay0Event;
+import com.bytedesk.core.quartz.event.QuartzDay8Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzHalfHourEvent;
+import com.bytedesk.core.quartz.event.QuartzHourlyEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageJsonEvent;
 import com.bytedesk.core.rbac.organization.Organization;
@@ -43,10 +47,9 @@ import com.bytedesk.core.socket.stomp.StompConnectedEvent;
 import com.bytedesk.core.socket.stomp.StompDisconnectedEvent;
 import com.bytedesk.core.socket.stomp.StompSubscribeEvent;
 import com.bytedesk.core.socket.stomp.StompUnsubscribeEvent;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadUpdateEvent;
-import com.bytedesk.core.thread.ThreadUpdateStatusEvent;
 import com.bytedesk.core.topic.TopicCreateEvent;
 import com.bytedesk.core.topic.TopicUpdateEvent;
 
@@ -79,20 +82,36 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new UserUpdateEvent(user));
     }
 
-    public void publishMessageProtoEvent(byte[] messageBytes) {
-        applicationEventPublisher.publishEvent(new MessageProtoEvent(this, messageBytes));
-    }
+    // public void publishMessageProtoEvent(byte[] messageBytes) {
+    //     applicationEventPublisher.publishEvent(new MessageProtoEvent(this, messageBytes));
+    // }
 
     public void publishMessageJsonEvent(String json) {
         applicationEventPublisher.publishEvent(new MessageJsonEvent(this, json));
     }
 
-    public void publishMessageCreateEvent(Message message) {
+    public void publishMessageCreateEvent(MessageEntity message) {
         applicationEventPublisher.publishEvent(new MessageCreateEvent(this, message));
     }
 
-    public void publishMessageUpdateEvent(Message message) {
+    public void publishMessageUpdateEvent(MessageEntity message) {
         applicationEventPublisher.publishEvent(new MessageUpdateEvent(this, message));
+    }
+
+    public void publishQuartzDay8Event() {
+        applicationEventPublisher.publishEvent(new QuartzDay8Event(this));
+    }
+
+    public void publishQuartzDay0Event() {
+        applicationEventPublisher.publishEvent(new QuartzDay0Event(this));
+    }
+
+    public void publishQuartzHourlyEvent() {
+        applicationEventPublisher.publishEvent(new QuartzHourlyEvent(this));
+    }
+
+    public void publishQuartzHalfHourEvent() {
+        applicationEventPublisher.publishEvent(new QuartzHalfHourEvent(this));
     }
 
     public void publishQuartzFiveSecondEvent() {
@@ -139,17 +158,17 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new StompUnsubscribeEvent(this, topic, clientId));
     }
 
-    public void publishThreadCreateEvent(Thread thread) {
+    public void publishThreadCreateEvent(ThreadEntity thread) {
         applicationEventPublisher.publishEvent(new ThreadCreateEvent(this, thread));
     }
 
-    public void publishThreadUpdateEvent(Thread thread) {
+    public void publishThreadUpdateEvent(ThreadEntity thread) {
         applicationEventPublisher.publishEvent(new ThreadUpdateEvent(this, thread));
     }
 
-    public void publishThreadUpdateStatusEvent(Thread thread, String status) {
-        applicationEventPublisher.publishEvent(new ThreadUpdateStatusEvent(this, thread, status));
-    }
+    // public void publishThreadUpdateStatusEvent(Thread thread, String status) {
+    //     applicationEventPublisher.publishEvent(new ThreadUpdateStatusEvent(this, thread, status));
+    // }
 
     public void publishActionCreateEvent(Action action) {
         applicationEventPublisher.publishEvent(new ActionCreateEvent(this, action));

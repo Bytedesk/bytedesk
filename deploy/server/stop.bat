@@ -1,5 +1,5 @@
 @echo off
-set RUN_NAME=bytedesk-starter-0.4.4.jar
+set RUN_NAME=bytedesk-starter.jar
 set LANG=en_US.UTF-8
 set PRG=%0
 set APPDIRFILE=%~dp0

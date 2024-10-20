@@ -103,6 +103,17 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-artemis</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>artemis-jakarta-server</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- support docker -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-docker-compose -->
 		<!-- https://hub.docker.com/r/jackning/bytedesk -->
@@ -110,6 +121,8 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-docker-compose</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -147,8 +160,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- /////////////////////////////////////Spring AI
-		模块//////////////////////////////////////// -->
+		<!-- //////////////Spring AI 模块////////////// -->
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -226,7 +238,7 @@
 			<artifactId>bytedesk-module-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
-
+		
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 
 		<!-- https://www.sofastack.tech/projects/sofa-boot/quick-start/ -->
@@ -457,8 +469,8 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
-			<scope>provided</scope>
 		</dependency>
+		
 		<!-- devtools-热加载容易导致fastjson2类型转换失败，暂时禁用吧 -->
 		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -502,6 +514,8 @@
 
 
 	<build>
+		<!-- custom jar name, no version: bytedesk-starter.jar, default: ${project.artifactId}-${project.version} -->  
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -526,12 +540,26 @@
 					</nonFilteredFileExtensions>
 				</configuration>
 			</plugin>
-			<!-- jasypt配置文件加密 -->
-			<!-- <plugin>
-				<groupId>com.github.ulisesbocchio</groupId>
-				<artifactId>jasypt-maven-plugin</artifactId>
-				<version>3.0.5</version>
-			</plugin> -->
+			<!-- tag::asciidoc[] -->
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>2.2.6</version>
+				<executions>
+					<execution>
+						<id>generate-docs</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<backend>html</backend>
+							<doctype>book</doctype>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- end::asciidoc[] -->
 		</plugins>
 	</build>
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-12 22:23:34
+ * @LastEditTime: 2024-10-17 16:31:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -43,7 +43,7 @@ public class MessageUnreadEventListener {
 
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
-        Message message = event.getMessage();
+        MessageEntity message = event.getMessage();
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
@@ -126,16 +126,16 @@ public class MessageUnreadEventListener {
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
-        Message message = event.getMessage();
+        MessageEntity message = event.getMessage();
         // log.info("message unread update event: {}", message.getContent());
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
         //
         String threadTopic = message.getThreadTopic();
-        MessageStatusEnum messageStatus = MessageStatusEnum.fromValue(message.getStatus());
+        MessageStatusEnum messageState = MessageStatusEnum.fromValue(message.getStatus());
         //
-        if (messageStatus.ordinal() < MessageStatusEnum.DELIVERED.ordinal()) {
+        if (messageState.ordinal() < MessageStatusEnum.DELIVERED.ordinal()) {
             return;
         }
         // 删除已读消息

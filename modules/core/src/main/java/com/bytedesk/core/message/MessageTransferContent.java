@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.message;
 
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +29,7 @@ public class MessageTransferContent {
     private String note;
 
     // 被转接会话
-    private Thread thread;
+    private ThreadEntity thread;
 
     // 转接消息uid，用于transfer_accept/transfer_reject
     private String uid;

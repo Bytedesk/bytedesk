@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 23:19:33
+ * @LastEditTime: 2024-10-14 17:32:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QueueResponse extends BaseResponse {
 
+    // 对应技能组uid/客服uid
     private String queueUid;
 
     @Builder.Default

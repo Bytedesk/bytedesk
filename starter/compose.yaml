@@ -1,0 +1,59 @@
+services:
+  database:
+    image: mysql:8.0
+    container_name: mysql-standalone
+    restart: always
+    environment:
+      MYSQL_DATABASE: "bytedesk_im"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "r8FqfdbWUaN3"
+      MYSQL_ROOT_PASSWORD: "r8FqfdbWUaN3"
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    volumes:
+      - database:/var/lib/mysql/data
+  # database: 
+  #     image: postgres
+  #     container_name: postgres-standalone
+  #     restart: always
+  #     environment:
+  #       POSTGRES_USERNAME: postgres
+  #       POSTGRES_PASSWORD: r8FqfdbWUaN3
+  #       POSTGRES_DB: bytedesk_im
+  #     ports:
+  #       - "5432:5432"
+  #     volumes:
+  #       - database:/var/lib/postgres/data
+  # database:
+  #   image: oracle
+  #   container_name: oracle-standalone
+  #   restart: always
+  #   environment:
+  #     ORACLE_ROOT_PASSWORD: root
+  #     ORACLE_DATABASE: mydatabase
+  #   ports:
+  #     - "1521:1521"
+  #   expose:
+  #     - "1521"
+  #   volumes:
+  #     - database:/var/lib/oracle/data
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis-standalone
+    restart: always
+    environment:
+      REDIS_PASSWORD: "qfRxz3tVT8Nh"
+      REDIS_DATABASE: 0
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    volumes:
+      - redis:/var/lib/redis/data
+volumes:
+  database:
+    driver: local
+  redis:
+    driver: local

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-31 10:02:59
+ * @LastEditTime: 2024-10-15 18:07:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,8 +26,6 @@ import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.utils.MessageConvertUtils;
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,29 +59,29 @@ public class MessageEventListener {
         }
     }
 
-    @EventListener
-    public void onMessageProtoEvent(MessageProtoEvent event) {
-        log.info("MessageProtoEvent");
-        //
-        try {
-            MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
-            // JSON
-            try {
-                String messageJson = MessageConvertUtils.toJson(messageProto);
-                //
-                messageJson = processMessage(messageJson);
-                messageSocketService.sendJsonMessage(messageJson);
-                // process处理完毕之后，重新发送proto消息
-                messageProto = MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(), messageJson);
-                messageSocketService.sendProtoMessage(messageProto);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-    }
+    // @EventListener
+    // public void onMessageProtoEvent(MessageProtoEvent event) {
+    //     log.info("MessageProtoEvent");
+    //     //
+    //     try {
+    //         MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
+    //         // JSON
+    //         try {
+    //             String messageJson = MessageConvertUtils.toJson(messageProto);
+    //             //
+    //             messageJson = processMessage(messageJson);
+    //             messageSocketService.sendJsonMessage(messageJson);
+    //             // process处理完毕之后，重新发送proto消息
+    //             messageProto = MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(), messageJson);
+    //             messageSocketService.sendProtoMessage(messageProto);
+    //         } catch (IOException e) {
+    //             e.printStackTrace();
+    //         }
+    //         //
+    //     } catch (InvalidProtocolBufferException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     private String processMessage(String messageJson) {
         // log.info("processMessage {}", messageJson);

@@ -13,7 +13,7 @@
 	<artifactId>bytedesk-module-service</artifactId>
 
 	<name>bytedesk-module-service</name>
-	<description>https://www.weiyuai.cn</description>
+	<description>https://ai.bytedesk.com</description>
 
 	<properties>
 		<proguard.version>7.4.2</proguard.version>

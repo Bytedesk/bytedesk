@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 14:52:42
+ * @LastEditTime: 2024-10-14 17:44:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,5 +23,5 @@ public interface QueueRepository extends JpaRepository<Queue, Long>, JpaSpecific
 
     Optional<Queue> findByUid(String uid);
 
-    Optional<Queue> findByQueueUid(String queueUid);
+    // Optional<Queue> findByQueueUid(String queueUid);
 }

@@ -13,13 +13,20 @@
 	<artifactId>bytedesk-modules-ticket</artifactId>
 
 	<name>bytedesk-modules-ticket</name>
-	<description>https://www.weiyuai.cn</description>
+	<description>https://ai.bytedesk.com</description>
 
 	<properties>
 
 	</properties>
 
 	<dependencies>
+
+
+		<dependency>
+            <groupId>org.springframework.statemachine</groupId>
+            <artifactId>spring-statemachine-starter</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 

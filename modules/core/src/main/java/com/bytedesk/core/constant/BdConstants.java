@@ -37,7 +37,7 @@ public class BdConstants {
     public static final String DEFAULT_AGENT_UID = "df_ag_uid";
     public static final String DEFAULT_WORKGROUP_UID = "df_wg_uid";
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid";
-    public static final String DEFAULT_FILE_ASISTANT_UID = "df_fa_uid";
+    public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid";
     public static final String DEFAULT_SYSTEM_UID = "df_sys_uid";
     public static final String DEFAULT_KB_UID = "df_kb_uid";
     public static final String DEFAULT_DY_UID = "df_dy_uid";

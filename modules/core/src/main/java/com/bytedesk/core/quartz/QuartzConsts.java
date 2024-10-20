@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:35:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-14 11:46:34
+ * @LastEditTime: 2024-10-18 12:52:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ public class QuartzConsts {
     /** 不触发立即执行 */
     public static final String MISFIRE_DO_NOTHING = "3";
 
-    public static final String JOB_METHORD_NAME = "jobMethodName";
+    public static final String JOB_METHOD_NAME = "jobMethodName";
 
     public enum Status
     {

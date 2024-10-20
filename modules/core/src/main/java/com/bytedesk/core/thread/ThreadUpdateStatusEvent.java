@@ -14,22 +14,22 @@
  */
 package com.bytedesk.core.thread;
 
-import org.springframework.context.ApplicationEvent;
+// import org.springframework.context.ApplicationEvent;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+// import lombok.Data;
+// import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ThreadUpdateStatusEvent extends ApplicationEvent {
+// @Data
+// @EqualsAndHashCode(callSuper = false)
+// public class ThreadUpdateStatusEvent extends ApplicationEvent {
 
-    private Thread thread;
+//     private Thread thread;
 
-    private String status;
+//     private String status;
 
-    public ThreadUpdateStatusEvent(Object source, Thread thread, String status) {
-        super(source);
-        this.thread = thread;
-        this.status = status;
-    }
-}
+//     public ThreadUpdateStatusEvent(Object source, Thread thread, String status) {
+//         super(source);
+//         this.thread = thread;
+//         this.status = status;
+//     }
+// }

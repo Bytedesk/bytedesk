@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-10 11:42:25
+ * @LastEditTime: 2024-10-18 12:38:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,10 +17,10 @@ package com.bytedesk.service.utils;
 import org.modelmapper.ModelMapper;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.constant.BdConstants;
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -57,6 +57,10 @@ public class ConvertServiceUtils {
         return userProtobuf;
     }
 
+    public static String convertToUserProtobufJSONString(VisitorRequest visitorRequest) {
+        return JSON.toJSONString(convertToUserProtobuf(visitorRequest));
+    }
+
     // public static UserProtobuf convertToUserResponseSimple(AgentResponseSimple
     // agentResponseSimple) {
     // return modelMapper.map(agentResponseSimple, UserProtobuf.class);
@@ -66,7 +70,7 @@ public class ConvertServiceUtils {
         return modelMapper.map(visitorResponseSimple, UserProtobuf.class);
     }
 
-    public static MessageProtobuf convertToMessageProtobuf(Message lastMessage, Thread thread) {
+    public static MessageProtobuf convertToMessageProtobuf(MessageEntity lastMessage, ThreadEntity thread) {
         //
         MessageProtobuf messageProtobuf = modelMapper.map(lastMessage, MessageProtobuf.class);
         messageProtobuf.setThread(ConvertUtils.convertToThreadProtobuf(thread));
@@ -80,7 +84,7 @@ public class ConvertServiceUtils {
         return messageProtobuf;
     }
 
-    public static MessageResponse convertToMessageResponse(Message lastMessage, Thread thread) {
+    public static MessageResponse convertToMessageResponse(MessageEntity lastMessage, ThreadEntity thread) {
         //
         MessageResponse messageResponse = modelMapper.map(lastMessage, MessageResponse.class);
         // messageResponse.setThread(ConvertUtils.convertToThreadProtobuf(thread));
@@ -105,6 +109,10 @@ public class ConvertServiceUtils {
         return userProtobuf;
     }
 
+    public static String convertToUserProtobufJSONString(Agent agent) {
+        return JSON.toJSONString(convertToUserProtobuf(agent));
+    }
+
     //
     public static WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
         return modelMapper.map(workgroup, WorkgroupResponse.class);
@@ -115,5 +123,11 @@ public class ConvertServiceUtils {
             ServiceSettings serviceSettings) {
         return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
+
+    public static String convertToServiceSettingsResponseVisitorJSONString(
+            ServiceSettings serviceSettings) {
+        return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
+    }
+
 
 }

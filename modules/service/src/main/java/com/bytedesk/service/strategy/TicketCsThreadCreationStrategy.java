@@ -14,13 +14,12 @@ import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 
@@ -48,23 +47,23 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
                 .orElseThrow(
                         () -> new RuntimeException("agentAsistantRobotUid " + agentAsistantRobotUid + " not found"));
         //
-        Thread thread = getAgentasistantThread(visitorRequest, robot);
+        ThreadEntity thread = getAgentassistantThread(visitorRequest, robot);
         //
-        return getAgentasistantMessage(visitorRequest, thread, robot);
+        return getAgentassistantMessage(visitorRequest, thread, robot);
     }
 
-    private Thread getAgentasistantThread(VisitorRequest visitorRequest, Robot robot) {
+    private ThreadEntity getAgentassistantThread(VisitorRequest visitorRequest, Robot robot) {
         if (robot == null) {
             throw new RuntimeException("Robot cannot be null");
         }
         //
         String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
-        Optional<Thread> threadOptional = threadService.findByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadOptional.get();
         }
         //
-        Thread thread = Thread.builder().build();
+        ThreadEntity thread = ThreadEntity.builder().build();
         thread.setUid(uidUtils.getCacheSerialUid());
         thread.setTopic(topic);
         thread.setType(ThreadTypeEnum.TICKET.name());
@@ -82,7 +81,7 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
         return thread;
     }
 
-    private MessageProtobuf getAgentasistantMessage(VisitorRequest visitorRequest, Thread thread, Robot robot) {
+    private MessageProtobuf getAgentassistantMessage(VisitorRequest visitorRequest, ThreadEntity thread, Robot robot) {
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
         }
@@ -91,22 +90,22 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
         }
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         //
-        boolean isReenter = true;
-        if (thread.getStatus() == ThreadStatusEnum.START.name()) {
-            isReenter = false;
-        }
+        // boolean isReenter = true;
+        // if (thread.getState() == ThreadStateEnum.STARTED.name()) {
+        //     isReenter = false;
+        // }
         // 更新机器人配置+大模型相关信息
         thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
                 robot.getServiceSettings())));
         thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         // if thread is closed, reopen it and then create a new message
-        if (thread.isClosed()) {
-            isReenter = false;
-            thread.setStatus(ThreadStatusEnum.RESTART.name());
-        } else {
-            thread.setStatus(isReenter ? ThreadStatusEnum.CONTINUE.name() : ThreadStatusEnum.START.name());
-        }
+        // if (thread.isClosed()) {
+        //     isReenter = false;
+        //     thread.setStatus(ThreadStateEnum.RESTART.name());
+        // } else {
+        //     thread.setStatus(isReenter ? ThreadStateEnum.CONTINUE.name() : ThreadStateEnum.STARTED.name());
+        // }
         threadService.save(thread);
         //
         UserProtobuf user = modelMapper.map(robot, UserProtobuf.class);
@@ -116,7 +115,7 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
         userExtra.put("defaultReply", robot.getDefaultReply());
         user.setExtra(JSON.toJSONString(userExtra));
         //
-        return ThreadMessageUtil.getThreadMessage(user, thread, isReenter);
+        return ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
     }
 
 }

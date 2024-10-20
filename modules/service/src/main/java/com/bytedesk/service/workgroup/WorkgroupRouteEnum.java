@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-30 22:48:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-17 14:03:53
+ * @LastEditTime: 2024-10-17 16:19:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,7 @@ public enum WorkgroupRouteEnum {
     // 当前正在进行中对话数量，少者优先
     LESS,
     // 广播给所有客服，客服抢单
-    BOARDCAST,
+    BROADCAST,
     // 熟客优先，最近会话优先分配
     RECENT,
     // TODO: 智能分配，还没有想清楚，待后续完善

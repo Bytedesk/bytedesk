@@ -21,7 +21,7 @@ public class TopicUtils {
 
     public static final String TOPIC_PREFIX = "/topic/";
     //
-    public static final String TOPIC_FILE_ASISTANT = "file";
+    public static final String TOPIC_FILE_ASSISTANT = "file";
     public static final String TOPIC_SYSTEM_NOTIFICATION = "system";
     //
     // public static final String TOPIC_PRIVATE_PREFIX = "private/";

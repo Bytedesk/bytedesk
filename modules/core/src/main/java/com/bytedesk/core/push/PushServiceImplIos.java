@@ -17,7 +17,7 @@ package com.bytedesk.core.push;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -26,7 +26,7 @@ public class PushServiceImplIos extends PushNotifier {
 
     @Async
     @Override
-    void notify(Message e) {
+    void notify(MessageEntity e) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'notify'");
     }

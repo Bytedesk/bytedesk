@@ -35,10 +35,10 @@ public class ThreadEntityListener {
     // private transient Thread oldThread;
     
     @PostPersist
-    public void postPersist(Thread thread) {
+    public void postPersist(ThreadEntity thread) {
         log.info("thread postPersist {}", thread.getUid());
         // send notifications
-        Thread clonedThread = SerializationUtils.clone(thread);
+        ThreadEntity clonedThread = SerializationUtils.clone(thread);
 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadCreateEvent(clonedThread);
@@ -51,10 +51,10 @@ public class ThreadEntityListener {
     // }
 
     @PostUpdate
-    public void postUpdate(Thread thread) {
+    public void postUpdate(ThreadEntity thread) {
         log.info("postUpdate {}", thread.getUid());
         // send notifications
-        Thread clonedThread = SerializationUtils.clone(thread);
+        ThreadEntity clonedThread = SerializationUtils.clone(thread);
         
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadUpdateEvent(clonedThread);

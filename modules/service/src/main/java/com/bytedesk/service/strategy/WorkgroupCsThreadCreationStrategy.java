@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-12 15:51:51
+ * @LastEditTime: 2024-10-18 14:45:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,21 +20,26 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.Robot;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+// import com.bytedesk.core.thread.ThreadStateService;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.counter.CounterResponse;
+import com.bytedesk.service.counter.CounterService;
+import com.bytedesk.service.counter_visitor.CounterVisitorService;
 import com.bytedesk.service.route.IRouteService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.workgroup.Workgroup;
+
 import com.bytedesk.service.workgroup.WorkgroupService;
-import com.bytedesk.core.thread.Thread;
+
+import jakarta.annotation.Nonnull;
+
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +54,17 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
 
     private final ThreadService threadService;
 
+    private final VisitorThreadService visitorThreadService;
+
     private final IRouteService routeService;
 
-    private final UidUtils uidUtils;
+    // private final ThreadStateService threadStateService;
+
+    private final IMessageSendService messageSendService;
+
+    private final CounterService counterService;
+
+    private final CounterVisitorService counterVisitorService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -62,18 +75,34 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         //
         String workgroupUid = visitorRequest.getSid();
         String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroupUid, visitorRequest.getUid());
-        // 是否已经存在进行中会话
-        Thread thread = getProcessingThread(topic);
-        if (thread != null && !visitorRequest.getForceAgent()) {
-            log.info("Already have a processing thread " + JSON.toJSONString(thread));
-            return getWorkgroupProcessingMessage(visitorRequest, thread);
+        // 是否已经存在会话
+        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
+        // 存在会话，且未关闭
+        if (threadOptional.isPresent() && !threadOptional.get().isClosed() && !visitorRequest.getForceAgent()) {
+            log.info("Already have a processing thread {}", topic);
+            return getWorkgroupProcessingMessage(visitorRequest, threadOptional.get());
         }
         //
         Workgroup workgroup = workgroupService.findByUid(workgroupUid)
                 .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
+        // 
+        String orgUid = visitorRequest.getOrgUid();
+        String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
+        CounterResponse counter = counterService.getNumber(orgUid, topic, visitor);
+        counterVisitorService.saveNumber(orgUid, topic, counter.getCurrentNumber(), visitor);
+        log.info("counter topic: {}, count {}", topic, counter.getCurrentNumber());
         //
-        thread = getWorkgroupThread(visitorRequest, workgroup, topic);
-
+        ThreadEntity thread = null;
+        if (threadOptional.isPresent()) {
+            // 存在会话，且已经关闭
+            thread = threadOptional.get();
+            thread.reInit();
+            // threadStateService.reInit(threadOptional.get());
+        } else {
+            // 不存在会话，创建会话
+            thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
+        }
+        thread.setSerialNumber(counter.getCurrentNumber());
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             Boolean isOffline = !workgroup.isConnected();
@@ -82,66 +111,31 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 // 转机器人
                 // 将robot设置为agent
                 Robot robot = workgroup.getServiceSettings().getRobot();
-
-                return routeService.routeRobot(visitorRequest, thread, robot);
+                MessageProtobuf messageProtobuf = routeService.routeRobot(visitorRequest, thread, robot);
+                // threadStateService.autoAccept(thread);
+                return messageProtobuf;
             }
         }
         // 
-        return routeService.routeWorkgroup(visitorRequest, thread, workgroup);
+        MessageProtobuf messageProtobuf = routeService.routeWorkgroup(visitorRequest, thread, workgroup);
+        // threadStateService.autoAccept(thread);
+        return messageProtobuf;
     }
 
-    // 是否存在未关闭的会话
-    private Thread getProcessingThread(String topic) {
-        // 拉取未关闭会话
-        Optional<Thread> threadOptional = threadService.findByTopicNotClosed(topic);
-        if (threadOptional.isPresent()) {
-            return threadOptional.get();
-        }
-        return null;
-    }
-
-    // FIXME: 如果访客重复打开、关闭页面，会重复发送continue消息
-    private MessageProtobuf getWorkgroupProcessingMessage(VisitorRequest visitorRequest, Thread thread) {
-        if (thread == null) {
-            throw new RuntimeException("Thread cannot be null");
-        }
-        //
-        thread.setUnreadCount(1);
-        thread.setStatus(ThreadStatusEnum.CONTINUE.name());
-        threadService.save(thread);
+    // Q-原样返回会话
+    private MessageProtobuf getWorkgroupProcessingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("getWorkgroupProcessingMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadMessage(user, thread, true);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 广播消息，由消息通道统一处理
-        MessageUtils.notifyUser(messageProtobuf);
+        messageSendService.sendMessage(messageProtobuf);
 
         return messageProtobuf;
     }
 
-    private Thread getWorkgroupThread(VisitorRequest visitorRequest, Workgroup workgroup, String topic) {
-        //
-        Thread thread = Thread.builder().build();
-        Optional<Thread> threadOptional = threadService.findByTopic(topic);
-        if (threadOptional.isPresent()) {
-            thread = threadOptional.get();
-        } else {
-            thread.setTopic(topic);
-            thread.setType(ThreadTypeEnum.WORKGROUP.name());
-            thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
-            thread.setOrgUid(workgroup.getOrgUid());
-        }
-        // 强制生成新会话uid，代表新会话。便于会话跟踪计数统计
-        thread.setUid(uidUtils.getUid());
-        //
-        UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
-        thread.setUser(JSON.toJSONString(visitor));
-        thread.setExtra(JSON.toJSONString(
-                ConvertServiceUtils.convertToServiceSettingsResponseVisitor(workgroup.getServiceSettings())));
-        //
-        return thread;
-    }
+    
 
     
 

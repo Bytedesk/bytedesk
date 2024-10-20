@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-19 11:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-26 14:33:59
+ * @LastEditTime: 2024-10-15 17:45:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import com.bytedesk.core.action.Action;
 import com.bytedesk.core.action.ActionCreateEvent;
 import com.bytedesk.core.constant.BdConstants;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.User;
@@ -37,6 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthEventListener {
     
     // private final MessageService messageService;
+
+    private final IMessageSendService messageSendService;
 
     private final UidUtils uidUtils;
 
@@ -60,9 +63,10 @@ public class AuthEventListener {
             contentObject.put(I18Consts.I18N_NOTICE_IP, action.getIp());
             contentObject.put(I18Consts.I18N_NOTICE_IPLOCATION, action.getIpLocation());
             // 
-            MessageProtobuf messsage = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), user.getUid(), user.getOrgUid(),
+            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), user.getUid(), user.getOrgUid(),
                     JSON.toJSONString(contentObject));
-            MessageUtils.notifyUser(messsage);
+            // MessageUtils.notifyUser(message);
+            messageSendService.sendMessage(message);
         }
     }
 

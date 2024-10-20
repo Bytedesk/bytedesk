@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-12 15:52:52
+ * @LastEditTime: 2024-10-18 15:12:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,22 +20,25 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.Robot;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+// import com.bytedesk.core.thread.ThreadStateService;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.Agent;
 import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.service.counter.CounterResponse;
+import com.bytedesk.service.counter.CounterService;
+import com.bytedesk.service.counter_visitor.CounterVisitorService;
 import com.bytedesk.service.route.IRouteService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.visitor_thread.VisitorThreadService;
 
-import com.bytedesk.core.thread.Thread;
+import jakarta.annotation.Nonnull;
+
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +53,17 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final ThreadService threadService;
 
-    private final IRouteService routeService;
+    private final VisitorThreadService visitorThreadService;
 
-    private final UidUtils uidUtils;
+    private final IRouteService routeService;
+    
+    // private final ThreadStateService threadStateService;
+
+    private final IMessageSendService messageSendService;
+
+    private final CounterService counterService;
+
+    private final CounterVisitorService counterVisitorService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -62,24 +73,39 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
     public MessageProtobuf createAgentCsThread(VisitorRequest visitorRequest) {
         //
         String agentUid = visitorRequest.getSid();
-        //
         String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
-        // 是否已经存在进行中会话
-        Thread thread = getProcessingThread(topic);
-        if (thread != null && !visitorRequest.getForceAgent()) {
-            log.info("Already have a processing thread " + JSON.toJSONString(thread));
-            return getAgentProcessingMessage(visitorRequest, thread);
+        // 是否已经存在会话
+        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
+        if (threadOptional.isPresent() && !threadOptional.get().isClosed() && !visitorRequest.getForceAgent()) {
+            log.info("Already have a processing thread {}", topic);
+            return getAgentProcessingMessage(visitorRequest, threadOptional.get());
         }
         //
         Agent agent = agentService.findByUid(agentUid)
                 .orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
+        // 
+        String orgUid = visitorRequest.getOrgUid();
+        String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
+        CounterResponse counter = counterService.getNumber(orgUid, topic, visitor);
+        counterVisitorService.saveNumber(orgUid, topic, counter.getCurrentNumber(), visitor);
+        log.info("counter topic: {}, count {}", topic, counter.getCurrentNumber());
         //
-        thread = getAgentThread(visitorRequest, agent, topic);
-
+        ThreadEntity thread = null;
+        if (threadOptional.isPresent()) {
+            // 存在会话，且已经关闭
+            thread = threadOptional.get();
+            thread.reInit();
+            // threadStateService.reInit(threadOptional.get());
+        } else {
+            // 不存在会话，创建会话
+            thread = visitorThreadService.getAgentThread(visitorRequest, agent, topic);
+        }
+        thread.setSerialNumber(counter.getCurrentNumber());
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             // 判断是否需要转机器人
-            Boolean isOffline = !agent.isConnected() || !agent.isAvailable();
+            // Boolean isOffline = !agent.isConnected() || !agent.isAvailable();
+            Boolean isOffline = !agent.isConnectedAndAvailable();
             Boolean transferToRobot = agent.getServiceSettings().shouldTransferToRobot(isOffline);
             if (transferToRobot) {
                 // 转机器人
@@ -92,65 +118,20 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return routeService.routeAgent(visitorRequest, thread, agent);
     }
 
-    // 是否存在未关闭的会话
-    private Thread getProcessingThread(String topic) {
-        // TODO: 到visitor thread表中拉取
-        // 拉取未关闭会话
-        Optional<Thread> threadOptional = threadService.findByTopicNotClosed(topic);
-        if (threadOptional.isPresent()) {
-            return threadOptional.get();
-        }
-        return null;
-    }
-
     // FIXME: 如果访客重复打开、关闭页面，会重复发送continue消息
-    private MessageProtobuf getAgentProcessingMessage(VisitorRequest visitorRequest, Thread thread) {
-        if (thread == null) {
-            throw new RuntimeException("Thread cannot be null");
-        }
-        // 客服在线 且 接待状态
-        thread.setUnreadCount(1);
-        thread.setStatus(ThreadStatusEnum.CONTINUE.name());
-        threadService.save(thread);
+    private MessageProtobuf getAgentProcessingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        log.info("getAgentProcessingMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadMessage(user, thread, true);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 广播消息，由消息通道统一处理
-        MessageUtils.notifyUser(messageProtobuf);
+        // MessageUtils.notifyUser(messageProtobuf);
+        messageSendService.sendMessage(messageProtobuf);
 
         return messageProtobuf;
     }
 
-    private Thread getAgentThread(VisitorRequest visitorRequest, Agent agent, String topic) {
-        // TODO: 到visitor thread表中拉取
-        Thread thread = Thread.builder().build();
-        Optional<Thread> threadOptional = threadService.findByTopic(topic);
-        if (threadOptional.isPresent()) {
-            thread = threadOptional.get();
-        } else {
-            // thread.setUid(uidUtils.getCacheSerialUid());
-            thread.setTopic(topic);
-            thread.setType(ThreadTypeEnum.AGENT.name());
-            thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
-            //
-            UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
-            thread.setUser(JSON.toJSONString(visitor));
-            //
-            thread.setOwner(agent.getMember().getUser());
-            thread.setOrgUid(agent.getOrgUid());
-        }
-        // 强制生成新会话uid，代表新会话。便于会话跟踪计数统计
-        thread.setUid(uidUtils.getUid());
-        // 考虑到配置可能变化，更新配置
-        thread.setExtra(JSON
-                .toJSONString(
-                        ConvertServiceUtils.convertToServiceSettingsResponseVisitor(agent.getServiceSettings())));
-        // 考虑到客服信息发生变化，更新客服信息
-        UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
-        thread.setAgent(JSON.toJSONString(agentProtobuf));
-        //
-        return thread;
-    }
+    
 
 }

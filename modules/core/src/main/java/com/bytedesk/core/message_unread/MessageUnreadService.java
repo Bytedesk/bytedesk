@@ -20,7 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.message.Message;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -47,7 +47,7 @@ public class MessageUnreadService {
     // @Caching(put = {
     //         @CachePut(value = "message_unread", key = "#userUid"),
     // })
-    public void create(Message message, String userUid) {
+    public void create(MessageEntity message, String userUid) {
         MessageUnread messageUnread = modelMapper.map(message, MessageUnread.class);
         messageUnread.setUserUid(userUid);
         messageUnreadRepository.save(messageUnread);

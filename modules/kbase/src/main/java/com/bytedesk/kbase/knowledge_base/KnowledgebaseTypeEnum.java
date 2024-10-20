@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-23 10:36:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 18:34:31
+ * @LastEditTime: 2024-10-14 09:43:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@
 package com.bytedesk.kbase.knowledge_base;
 
 public enum KnowledgebaseTypeEnum {
-    ASISTANT, // 文档助手，内部文档知识库问答
+    ASSISTANT, // 文档助手，内部文档知识库问答
     HELPDOC, // 帮助文档
     LLM, // 大模型
     KEYWORD, // 关键词
@@ -33,6 +33,6 @@ public enum KnowledgebaseTypeEnum {
                 return type;
             }
         }
-        throw new IllegalArgumentException("No KownledgebaseTypeEnum constant with value: " + value);
+        throw new IllegalArgumentException("No KnowledgebaseTypeEnum constant with value: " + value);
     }
 }

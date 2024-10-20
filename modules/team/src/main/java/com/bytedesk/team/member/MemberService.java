@@ -49,7 +49,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.department.Department;
 import com.bytedesk.team.department.DepartmentService;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadService;
 
 import lombok.AllArgsConstructor;
@@ -278,7 +278,7 @@ public class MemberService {
     }
 
      /** 同事私聊会话：org/member/{self_member_uid}/{other_member_uid} */
-    public Thread createMemberReverseThread(Thread thread) {
+    public ThreadEntity createMemberReverseThread(ThreadEntity thread) {
         // 
         String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
         if (threadService.existsByUid(reverseUid)) {
@@ -296,7 +296,7 @@ public class MemberService {
         if (!reverseMemberOptional.isPresent()) {
             throw new RuntimeException("getMemberReverseThread member not found");
         }
-        Thread reverseThread = Thread.builder().build();
+        ThreadEntity reverseThread = ThreadEntity.builder().build();
         reverseThread.setUid(reverseUid);
         reverseThread.setTopic(reverseTopic);
         reverseThread.setUnreadCount(0);
@@ -320,7 +320,7 @@ public class MemberService {
         reverseThread.setOrgUid(thread.getOrgUid());
         reverseThread.setOwner(reverseMemberOptional.get().getUser());
         //
-        Thread savedTherad = threadService.save(reverseThread);
+        ThreadEntity savedTherad = threadService.save(reverseThread);
         if (savedTherad == null) {
             throw new RuntimeException("reverseThread save error");
         }
@@ -328,9 +328,9 @@ public class MemberService {
     }
 
     /** 同事私聊会话：org/member/{self_member_uid}/{other_member_uid} */
-    public Thread getMemberReverseThread(Thread thread) {
+    public ThreadEntity getMemberReverseThread(ThreadEntity thread) {
         String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
-        Optional<Thread> reverseThreadOptional = threadService.findByUid(reverseUid);
+        Optional<ThreadEntity> reverseThreadOptional = threadService.findByUid(reverseUid);
         if (!reverseThreadOptional.isPresent()) {
             throw new RuntimeException("reverseThread " + reverseUid + " not found");
         }

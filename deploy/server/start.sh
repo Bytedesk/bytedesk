@@ -1,5 +1,5 @@
 #!/bin/sh
-RUN_NAME="bytedesk-starter-0.4.4.jar"
+RUN_NAME="bytedesk-starter.jar"
 export LANG="en_US.UTF-8"
 PRG=$0
 APPDIRFILE=`dirname "$PRG"`

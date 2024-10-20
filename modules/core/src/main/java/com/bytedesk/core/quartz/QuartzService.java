@@ -170,7 +170,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
             // cls.getDeclaredConstructor().newInstance();
             //
             JobDataMap jobDataMap = new JobDataMap();
-            jobDataMap.put(QuartzConsts.JOB_METHORD_NAME, quartzRequest.getJobMethodName());
+            jobDataMap.put(QuartzConsts.JOB_METHOD_NAME, quartzRequest.getJobMethodName());
             JobDetail jobDetail = JobBuilder
                     // .newJob(QuartzJob.class)
                     .newJob(cls)

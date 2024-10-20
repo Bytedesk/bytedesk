@@ -13,7 +13,7 @@
 	<artifactId>bytedesk-module-core</artifactId>
 
 	<name>bytedesk-module-core</name>
-	<description>https://www.weiyuai.cn</description>
+	<description>https://ai.bytedesk.com</description>
 
 	<properties>
 		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>
@@ -42,6 +42,38 @@
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-artemis</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- spring statemachine - 迁移到 cola statemachine -->
+		 <!-- https://github.com/spring-projects/spring-statemachine -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-starter -->
+		<dependency>
+            <groupId>org.springframework.statemachine</groupId>
+            <artifactId>spring-statemachine-starter</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-jpa -->
+		<!-- <dependency>
+			<groupId>org.springframework.statemachine</groupId>
+			<artifactId>spring-statemachine-data-jpa</artifactId>
+			<version>4.0.0</version>
+		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-redis -->
+		<!-- <dependency>
+			<groupId>org.springframework.statemachine</groupId>
+			<artifactId>spring-statemachine-data-redis</artifactId>
+			<version>4.0.0</version>
+		</dependency> -->
+		<!-- 替换上面的 spring-statemachine https://mvnrepository.com/artifact/com.alibaba.cola/cola-component-statemachine -->
+		<dependency>
+			<groupId>com.alibaba.cola</groupId>
+			<artifactId>cola-component-statemachine</artifactId>
+			<version>5.0.0</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
 		<dependency>

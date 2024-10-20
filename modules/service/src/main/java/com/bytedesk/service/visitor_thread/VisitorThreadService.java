@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 06:32:18
+ * @LastEditTime: 2024-10-18 12:40:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,14 +32,24 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.Thread;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+// import com.bytedesk.core.thread.back.ThreadStateService;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.workgroup.Workgroup;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class VisitorThreadService extends BaseService<VisitorThread, VisitorThreadRequest, VisitorThreadResponse> {
@@ -48,7 +58,11 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
 
     private final ThreadService threadService;
 
+    // private final ThreadStateService threadStateService;
+
     private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
 
     @Override
     public Page<VisitorThreadResponse> queryByOrg(VisitorThreadRequest request) {
@@ -82,7 +96,7 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
         return visitorThreadRepository.findByTopic(topic);
     }
 
-    public VisitorThread create(Thread thread) {
+    public VisitorThread create(ThreadEntity thread) {
         //
         VisitorThread visitorThread = modelMapper.map(thread, VisitorThread.class);
         //
@@ -97,11 +111,54 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
         return savedThread;
     }
 
-    public VisitorThread update(Thread thread) {
+    public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, Workgroup workgroup, String topic) {
+        // TODO: 到visitor thread表中拉取
+        ThreadEntity thread = ThreadEntity.builder().build();
+        thread.setUid(uidUtils.getUid());
+        thread.setTopic(topic);
+        thread.setState(ThreadStateEnum.INITIAL.name());
+        // thread.setType(ThreadTypeEnum.WORKGROUP.name());
+        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
+        thread.setOrgUid(workgroup.getOrgUid());
+        //
+        String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
+        thread.setUser(visitor);
+        // 
+        String extra = ConvertServiceUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+        thread.setExtra(extra);
+        //
+        return thread;
+    }
+
+    public ThreadEntity getAgentThread(VisitorRequest visitorRequest, Agent agent, String topic) {
+        // TODO: 到visitor thread表中拉取
+        ThreadEntity thread = ThreadEntity.builder().build();
+        thread.setUid(uidUtils.getUid());
+        thread.setTopic(topic);
+        thread.setState(ThreadStateEnum.INITIAL.name());
+        thread.setType(ThreadTypeEnum.AGENT.name());
+        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
+        //
+        String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
+        thread.setUser(visitor);
+        //
+        thread.setOwner(agent.getMember().getUser());
+        thread.setOrgUid(agent.getOrgUid());
+        // 考虑到配置可能变化，更新配置
+        String extra = ConvertServiceUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        thread.setExtra(extra);
+        // 考虑到客服信息发生变化，更新客服信息
+        String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
+        thread.setAgent(agentString);
+        //
+        return thread;
+    }
+
+    public VisitorThread update(ThreadEntity thread) {
         Optional<VisitorThread> visitorThreadOpt = findByUid(thread.getUid());
         if (visitorThreadOpt.isPresent()) {
             VisitorThread visitorThread = visitorThreadOpt.get();
-            visitorThread.setStatus(thread.getStatus());
+            visitorThread.setState(thread.getState());
             //
             return save(visitorThread);
         }
@@ -121,36 +178,32 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
     }
 
     /**
-     * 
      * TODO: 座席端25分钟不回复则自动断开，推送满意度
      * TODO: 客户端2分钟没有回复坐席则自动推送1分钟计时提醒：
+     * TODO: 频繁查库，待优化
      * 温馨提示：您已经有2分钟未有操作了，如再有1分钟未有操作，系统将自动结束本次对话，感谢您的支持与谅解
      * 如果1分钟之内无回复，则推送满意度：
      */
-    // TODO: 频繁查库，待优化
     @Async
     public void autoCloseThread() {
-        List<Thread> threads = threadService.findStatusOpen();
-        // log.info("autoCloseThread size {}", threads.size());
+        List<ThreadEntity> threads = threadService.findStateOpen();
+        log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
             // 计算两个日期之间的毫秒差
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            // log.info("1.autoCloseThread threadUid {} threadType {} threadId {}
-            // diffInMinutes {}", thread.getUid(), thread.getType(),
-            // thread.getUid(), diffInMinutes);
+            log.info("before autoCloseThread threadUid {} threadType {} threadId {} diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(), diffInMinutes);
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
                     || thread.getType().equals(ThreadTypeEnum.AGENT.name())
                     || thread.getType().equals(ThreadTypeEnum.KB.name())) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
-                Double autoCloseMinites = settings.getAutoCloseMin();
-                // log.info("2. autoCloseThread threadUid {} threadType {} autoCloseMinites {},
-                // diffInMinutes {}",
-                // thread.getUid(), thread.getType(), autoCloseMinites, diffInMinutes);
-                if (diffInMinutes > autoCloseMinites) {
+                Double autoCloseMinutes = settings.getAutoCloseMin();
+                log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {}, diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes, diffInMinutes);
+                if (diffInMinutes > autoCloseMinutes) {
                     threadService.autoClose(thread);
+                    // threadStateService.autoClose(thread);
                 }
             }
         });
