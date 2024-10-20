@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 16:52:37
+ * @LastEditTime: 2024-10-21 07:28:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,10 +64,10 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         // JSON_EXTRACT(extra,'$.closed') = false", nativeQuery = true)
         List<ThreadEntity> findByStateAndDeleted(String state, Boolean deleted);
 
-        @Query("SELECT t FROM Thread t WHERE t.state IN :states AND t.deleted = :deleted")
+        @Query("SELECT t FROM ThreadEntity t WHERE t.state IN :states AND t.deleted = :deleted")
         List<ThreadEntity> findByStatesAndDeleted(@Param("states") List<String> states, Boolean deleted);
 
-        @Query("SELECT t FROM Thread t WHERE t.type IN :types AND t.state not IN :states AND t.deleted = :deleted")
+        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.state not IN :states AND t.deleted = :deleted")
         List<ThreadEntity> findByTypesInAndStatesNotInAndDeleted(@Param("types") List<String> types, @Param("states") List<String> states, Boolean deleted);
 
 }
