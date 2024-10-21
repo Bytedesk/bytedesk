@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-19 11:36:14
+ * @LastEditTime: 2024-10-21 22:35:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,7 +39,6 @@
 - 大模型对话LLM
 - 知识库对话RAG
 - 更适合团队使用，一人配置，多人使用。
-- 完美权限控制
 
 ### 在线客服：跟客户聊
 
@@ -60,8 +59,7 @@
 - 公告、
 - 敏感词、
 - CRM、
-- 报表功能，
-- 为客户提供一体化客服工作台服务
+- 报表功能
 
 ## 快速开始
 
