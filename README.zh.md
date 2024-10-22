@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-21 22:35:25
+ * @LastEditTime: 2024-10-22 11:23:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,39 +63,10 @@
 
 ## 快速开始
 
-```bash
-# 注意: 此开源版本处于早期阶段，许多功能尚未完善或测试未完成，文档尚待完善，请勿在生产环境使用
-git clone https://github.com/bytedesk/bytedesk.git
-# 配置文件: bytedesk/starter/src/main/resources/application-dev.properties
-# 推荐开发环境：vscode + maven
-#
-# java --version
-# java 17.0.4 2022-07-19 LTS
-# 
-# mvn --version
-# Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
-# OS name: "mac os x", version: "14.2.1", arch: "aarch64", family: "mac"
-# 
-# 项目使用了protobuf，可能需要安装 protobuf 编译工具
-# protoc --version
-# libprotoc 25.3
-# 
-cd bytedesk
-mvn install -Dmaven.test.skip=true
-# 
-cd starter
-mvn spring-boot:run
-# 
-# 本地预览
-web: http://127.0.0.1:9003/
-开发者入口: http://127.0.0.1:9003/dev
-管理后台: http://127.0.0.1:9003/admin, 用户名: admin@email.com, 密码: admin
-客服端: http://127.0.0.1:9003/agent/chat, 用户名: admin@email.com, 密码: admin
-访客: http://127.0.0.1:9003/chat?org=df_org_uid&t=0&sid=df_ag_uid&
-api文档: http://127.0.0.1:9003/swagger-ui/index.html
-actuator: http://127.0.0.1:9003/actuator
-# h2数据库: http://127.0.0.1:9003/h2-console, 路径: ./h2db/weiyuim, 用户名: sa, 密码: sa
-```
+- [注册体验](https://www.weiyuai.cn/admin/)
+- [源码部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
+- [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
+- [Jar包部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/jar)
 
 ## 文档
 

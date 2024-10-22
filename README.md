@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-19 11:25:05
+ * @LastEditTime: 2024-10-22 11:23:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,40 +55,10 @@ Chat as a Service
 
 ## Getting Started
 
-```bash
-# Notice: this repo is still under active development, 
-# many features are not completed or not stable，the docs are not completed
-git clone https://github.com/Bytedesk/bytedesk.git
-# config file: bytedesk/starter/src/main/resources/application-dev.properties
-# use maven && vscode
-#
-# java --version
-# java 17.0.4 2022-07-19 LTS
-# 
-# mvn --version
-# Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
-# OS name: "mac os x", version: "14.2.1", arch: "aarch64", family: "mac"
-# 
-# protobuf is used to generate java code, you may need to install protobuf on your machine
-# protoc --version
-# libprotoc 25.3
-# 
-cd bytedesk
-mvn install -Dmaven.test.skip=true
-# 
-cd starter
-mvn spring-boot:run
-# 
-# local preview:
-web: http://127.0.0.1:9003/
-developer: http://127.0.0.1:9003/dev
-admin: http://127.0.0.1:9003/admin, user/password: admin@email.com/admin
-agent: http://127.0.0.1:9003/agent/chat, user/password: admin@email.com/admin
-chat: http://127.0.0.1:9003/chat?org=df_org_uid&t=0&sid=df_ag_uid&
-api docs: http://127.0.0.1:9003/swagger-ui/index.html
-actuator: http://127.0.0.1:9003/actuator
-# h2-console: http://127.0.0.1:9003/h2-console, path: ./h2db/weiyuim, user/password: sa/sa
-```
+- [Register](https://www.weiyuai.cn/admin/)
+- [Source Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
+- [Docker Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
+- [Jar Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/jar)
 
 ## Docs
 
@@ -129,18 +99,6 @@ actuator: http://127.0.0.1:9003/actuator
 | <img src="./images/visitor-web/iframe-width.png" width="250"> | <img src="./images/visitor-web/chat-full.png" width="250"> | <img src="./images/visitor-web/chat-iframe.png" width="250"> | <img src="./images/visitor-web/chat-embed.png" width="250"> | -->
 
 ## Chat SDK
-
-<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc) -->
-<!-- - [React-native](https://github.com/bytedesk/bytedesk-react-native) -->
-<!-- - [Vue](https://github.com/bytedesk/bytedesk-vue) -->
-<!-- - [Browser-Extension](https://github.com/Bytedesk/bytedesk-browser-extention) -->
-<!-- - [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
-<!-- - [iOS-swift](https://github.com/bytedesk/bytedesk-swift)
-- [Android](https://github.com/bytedesk/bytedesk-android)
-- [Flutter](https://github.com/bytedesk/bytedesk-flutter)
-- [React](https://github.com/bytedesk/bytedesk-react)
-- [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
-- [Web](https://github.com/bytedesk/bytedesk-web) -->
 
 | Project     | Description           | Forks          | Stars             |
 |-------------|-----------------------|----------------|-------------------|
