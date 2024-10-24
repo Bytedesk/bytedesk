@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-09 10:08:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-10 05:45:29
+ * @LastEditTime: 2024-10-23 15:07:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ spring.data.redis.host=127.0.0.1
 spring.data.redis.port=6379
 spring.data.redis.password=password
 
-# change permisson
+# change permission
 chmod +x start.sh
 chmod +x stop.sh
 # start
