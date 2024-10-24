@@ -14,12 +14,12 @@
  */
 package com.bytedesk.starter.test;
 
-import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.bytedesk.core.config.BytedeskProperties;
+// import com.bytedesk.core.config.BytedeskProperties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,16 +27,16 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class AirportConfig {
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
+    // @Autowired
+    // private BytedeskProperties bytedeskProperties;
 
     @Bean
     public CommandLineRunner loadData(AirportsRepository repository) {
         return args -> {
             // log.info("Loading airports...");
-            if (!bytedeskProperties.getDebug()) {
-                return;
-            }
+            // if (!bytedeskProperties.getDebug()) {
+            //     return;
+            // }
             // 仅用于测试
             // repository.deleteAll();
             // try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("data/airport_codes.csv");
