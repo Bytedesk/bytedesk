@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface BlackRepository extends JpaRepository<Black, String>, JpaSpecificationExecutor<Black> {
+public interface BlackRepository extends JpaRepository<BlackEntity, String>, JpaSpecificationExecutor<BlackEntity> {
 
-    Optional<Black> findByUid(String uid);
+    Optional<BlackEntity> findByUid(String uid);
 }

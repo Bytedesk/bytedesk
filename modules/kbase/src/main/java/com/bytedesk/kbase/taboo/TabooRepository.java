@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface TabooRepository extends JpaRepository<Taboo, Long>, JpaSpecificationExecutor<Taboo> {
+public interface TabooRepository extends JpaRepository<TabooEntity, Long>, JpaSpecificationExecutor<TabooEntity> {
     
-    Optional<Taboo> findByUid(String uid);
+    Optional<TabooEntity> findByUid(String uid);
 }

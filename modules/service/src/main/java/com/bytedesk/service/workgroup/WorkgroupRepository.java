@@ -30,9 +30,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Repository
 @Tag(name = "workgroup info - 客服技能组")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
-public interface WorkgroupRepository extends JpaRepository<Workgroup, Long>, JpaSpecificationExecutor<Workgroup> {
+public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long>, JpaSpecificationExecutor<WorkgroupEntity> {
 
-    Optional<Workgroup> findByUid(@NonNull String uid);
+    Optional<WorkgroupEntity> findByUid(@NonNull String uid);
 
     // Optional<Workgroup> findByNicknameAndOrgUidAndDeleted(String nickname, String orgUid, Boolean deleted);
 

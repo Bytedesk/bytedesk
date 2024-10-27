@@ -33,7 +33,7 @@ public class CounterVisitorController extends BaseController<CounterVisitorReque
     }
 
     @Override
-    public ResponseEntity<?> query(CounterVisitorRequest request) {
+    public ResponseEntity<?> queryByUser(CounterVisitorRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

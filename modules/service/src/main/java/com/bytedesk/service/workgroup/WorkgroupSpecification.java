@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WorkgroupSpecification extends BaseSpecification {
 
-    public static Specification<Workgroup> search(WorkgroupRequest request) {
+    public static Specification<WorkgroupEntity> search(WorkgroupRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

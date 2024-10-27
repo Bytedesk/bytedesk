@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-21 07:28:07
+ * @LastEditTime: 2024-10-21 07:28:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,7 @@ import org.springframework.data.repository.query.Param;
 // import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -42,7 +42,7 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         Boolean existsByUid(String uid);
 
         /** used for member thread type */
-        Optional<ThreadEntity> findByTopicAndOwnerAndDeleted(String topic, User owner, Boolean deleted);
+        Optional<ThreadEntity> findByTopicAndOwnerAndDeleted(String topic, UserEntity owner, Boolean deleted);
 
         Optional<ThreadEntity> findByTopicAndDeleted(String topic, Boolean deleted);
 
@@ -54,7 +54,7 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
                         List<String> states,
                         Boolean deleted);
 
-        Page<ThreadEntity> findByOwnerAndHideAndDeleted(User owner, Boolean hide, Boolean deleted, Pageable pageable);
+        Page<ThreadEntity> findByOwnerAndHideAndDeleted(UserEntity owner, Boolean hide, Boolean deleted, Pageable pageable);
 
         List<ThreadEntity> findByTopic(String topic);
 
@@ -69,5 +69,6 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.state not IN :states AND t.deleted = :deleted")
         List<ThreadEntity> findByTypesInAndStatesNotInAndDeleted(@Param("types") List<String> types, @Param("states") List<String> states, Boolean deleted);
+
 
 }

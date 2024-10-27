@@ -40,7 +40,7 @@ public class OAuthController extends BaseController<OAuthRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(OAuthRequest request) {
+    public ResponseEntity<?> queryByUser(OAuthRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

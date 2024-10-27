@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PushSpecification extends BaseSpecification {
     
-    public static Specification<Push> search(PushRequest request) {
+    public static Specification<PushEntity> search(PushRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

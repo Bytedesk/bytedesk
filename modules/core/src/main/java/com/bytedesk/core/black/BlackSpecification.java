@@ -25,11 +25,10 @@ import jakarta.persistence.criteria.Predicate;
 
 public class BlackSpecification extends BaseSpecification {
 
-     public static Specification<Black> search(BlackRequest request) {
+     public static Specification<BlackEntity> search(BlackRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            //
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

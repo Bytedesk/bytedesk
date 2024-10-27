@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 21:31:44
+ * @LastEditTime: 2024-10-23 18:20:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class LeaveMsgService extends BaseService<LeaveMsg, LeaveMsgRequest, LeaveMsgResponse> {
+public class LeaveMsgService extends BaseService<LeaveMsgEntity, LeaveMsgRequest, LeaveMsgResponse> {
 
     private final LeaveMsgRepository LeaveMsgRepository;
 
@@ -50,9 +50,9 @@ public class LeaveMsgService extends BaseService<LeaveMsg, LeaveMsgRequest, Leav
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Specification<LeaveMsg> spec = LeaveMsgSpecification.search(request);
+        Specification<LeaveMsgEntity> spec = LeaveMsgSpecification.search(request);
 
-        Page<LeaveMsg> page = LeaveMsgRepository.findAll(spec, pageable);
+        Page<LeaveMsgEntity> page = LeaveMsgRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -64,7 +64,7 @@ public class LeaveMsgService extends BaseService<LeaveMsg, LeaveMsgRequest, Leav
     }
 
     @Override
-    public Optional<LeaveMsg> findByUid(String uid) {
+    public Optional<LeaveMsgEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
@@ -73,7 +73,7 @@ public class LeaveMsgService extends BaseService<LeaveMsg, LeaveMsgRequest, Leav
     public LeaveMsgResponse create(LeaveMsgRequest request) {
         log.info("request {}", request);
 
-        LeaveMsg LeaveMsg = modelMapper.map(request, LeaveMsg.class);
+        LeaveMsgEntity LeaveMsg = modelMapper.map(request, LeaveMsgEntity.class);
         LeaveMsg.setUid(uidUtils.getCacheSerialUid());
         //
         // Optional<Thread> thread = threadService.findByUid(request.getThreadUid());
@@ -85,7 +85,7 @@ public class LeaveMsgService extends BaseService<LeaveMsg, LeaveMsgRequest, Leav
         // throw new RuntimeException("Thread not found");
         // }
         // 保存留言
-        LeaveMsg savedLeaveMsg = save(LeaveMsg);
+        LeaveMsgEntity savedLeaveMsg = save(LeaveMsg);
         if (savedLeaveMsg == null) {
             throw new RuntimeException("LeaveMsg not saved");
         }
@@ -100,7 +100,7 @@ public class LeaveMsgService extends BaseService<LeaveMsg, LeaveMsgRequest, Leav
     }
 
     @Override
-    public LeaveMsg save(LeaveMsg entity) {
+    public LeaveMsgEntity save(LeaveMsgEntity entity) {
         try {
             return LeaveMsgRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -116,20 +116,20 @@ public class LeaveMsgService extends BaseService<LeaveMsg, LeaveMsgRequest, Leav
     }
 
     @Override
-    public void delete(LeaveMsg entity) {
+    public void delete(LeaveMsgRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            LeaveMsg entity) {
+            LeaveMsgEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public LeaveMsgResponse convertToResponse(LeaveMsg entity) {
+    public LeaveMsgResponse convertToResponse(LeaveMsgEntity entity) {
         return modelMapper.map(entity, LeaveMsgResponse.class);
     }
 

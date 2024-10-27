@@ -17,10 +17,10 @@ package com.bytedesk.service.settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.kbase.service_settings.BaseServiceSettings;
 import com.bytedesk.service.leave_msg.LeaveMsgSettings;
-import com.bytedesk.service.worktime.Worktime;
+import com.bytedesk.service.worktime.WorktimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Embeddable;
@@ -61,7 +61,7 @@ public class ServiceSettings extends BaseServiceSettings {
     /** work time */
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER)
-    private List<Worktime> worktimes = new ArrayList<>();
+    private List<WorktimeEntity> worktimes = new ArrayList<>();
 
     // 留言设置
     @Embedded
@@ -70,7 +70,7 @@ public class ServiceSettings extends BaseServiceSettings {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    private Robot robot;
+    private RobotEntity robot;
 
     //
     public boolean isWorkTime() {

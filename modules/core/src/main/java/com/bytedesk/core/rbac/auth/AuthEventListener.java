@@ -19,14 +19,14 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.action.Action;
+import com.bytedesk.core.action.ActionEntity;
 import com.bytedesk.core.action.ActionCreateEvent;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -47,13 +47,13 @@ public class AuthEventListener {
     public void onActionCreateEvent(ActionCreateEvent event) {
         log.info("onActionCreateEvent Received event: {}", event.toString());
         // do something
-        Action action = event.getAction();
+        ActionEntity action = event.getAction();
         // 监听登录action，发送登录系统消息，提醒相关用户
-        if (action.getAction().equals(BdConstants.ACTION_LOGIN_USERNAME)
-                || action.getAction().equals(BdConstants.ACTION_LOGIN_MOBILE)
-                || action.getAction().equals(BdConstants.ACTION_LOGIN_EMAIL)) {
+        if (action.getAction().equals(BytedeskConsts.ACTION_LOGIN_USERNAME)
+                || action.getAction().equals(BytedeskConsts.ACTION_LOGIN_MOBILE)
+                || action.getAction().equals(BytedeskConsts.ACTION_LOGIN_EMAIL)) {
             //
-            User user = action.getUser();
+            UserEntity user = action.getUser();
             if (user == null) {
                 return;
             }
@@ -66,7 +66,7 @@ public class AuthEventListener {
             MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), user.getUid(), user.getOrgUid(),
                     JSON.toJSONString(contentObject));
             // MessageUtils.notifyUser(message);
-            messageSendService.sendMessage(message);
+            messageSendService.sendProtobufMessage(message);
         }
     }
 

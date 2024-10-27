@@ -17,12 +17,12 @@ package com.bytedesk.core.rbac.auth;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 
 public class AuthUser {
 
-    public static User getCurrentUser() {
+    public static UserEntity getCurrentUser() {
         // not logged in
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             return null;
@@ -31,7 +31,7 @@ public class AuthUser {
         try {
             UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                     .getPrincipal();
-            return new ModelMapper().map(userDetails, User.class);
+            return new ModelMapper().map(userDetails, UserEntity.class);
         } catch (Exception e) {
             // TODO: handle exception
             // FIXME: 验证码错误时会报错：java.lang.ClassCastException: class java.lang.String cannot be cast to

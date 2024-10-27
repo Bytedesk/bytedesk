@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface WorktimeRepository extends JpaRepository<Worktime, Long> {
+public interface WorktimeRepository extends JpaRepository<WorktimeEntity, Long> {
     
-    Optional<Worktime> findByUid(String uid);
+    Optional<WorktimeEntity> findByUid(String uid);
 }

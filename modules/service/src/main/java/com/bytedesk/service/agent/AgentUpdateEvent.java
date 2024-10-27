@@ -24,11 +24,11 @@ public class AgentUpdateEvent extends ApplicationEvent {
 
     private final static long serialVersionUID = 1L;
 
-    private Agent agent;
+    private AgentEntity agent;
 
     private String updateType;
 
-    public AgentUpdateEvent(Object source, Agent agent, String updateType) {
+    public AgentUpdateEvent(Object source, AgentEntity agent, String updateType) {
         super(source);
         this.agent = agent;
         this.updateType = updateType;

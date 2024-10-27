@@ -25,12 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueListener {
 
     @PrePersist
-    public void prePersist(Queue queue) {
+    public void prePersist(QueueEntity queue) {
         log.info("prePersist: {}", queue);
     }
 
     @PostPersist
-    public void postPersist(Queue queue) {
+    public void postPersist(QueueEntity queue) {
         log.info("postPersist: {}", queue);
     }
     

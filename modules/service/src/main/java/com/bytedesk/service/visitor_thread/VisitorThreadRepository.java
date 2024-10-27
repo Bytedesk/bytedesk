@@ -19,13 +19,13 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface VisitorThreadRepository extends JpaRepository<VisitorThread, Long>, JpaSpecificationExecutor<VisitorThread> {
+public interface VisitorThreadRepository extends JpaRepository<VisitorThreadEntity, Long>, JpaSpecificationExecutor<VisitorThreadEntity> {
     
-    Optional<VisitorThread> findByUid(String uid);
+    Optional<VisitorThreadEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 
-    Optional<VisitorThread> findByTopic(String topic);
+    Optional<VisitorThreadEntity> findByTopic(String topic);
 
     Boolean existsByTopic(String topic);
 }

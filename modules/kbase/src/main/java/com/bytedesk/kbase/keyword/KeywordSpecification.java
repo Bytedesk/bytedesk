@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class KeywordSpecification extends BaseSpecification {
     
-    public static Specification<Keyword> search(KeywordRequest request) {
+    public static Specification<KeywordEntity> search(KeywordRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

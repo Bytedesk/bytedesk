@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class VisitorSpecification extends BaseSpecification {
     
-    public static Specification<Visitor> search(VisitorRequest request) {
+    public static Specification<VisitorEntity> search(VisitorRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

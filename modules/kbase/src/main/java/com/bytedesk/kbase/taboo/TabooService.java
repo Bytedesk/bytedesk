@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-24 07:35:15
+ * @LastEditTime: 2024-10-23 18:18:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse> {
+public class TabooService extends BaseService<TabooEntity, TabooRequest, TabooResponse> {
 
     private final TabooRepository tabooRepository;
 
@@ -54,9 +54,9 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
 
-        Specification<Taboo> specification = TabooSpecification.search(request);
+        Specification<TabooEntity> specification = TabooSpecification.search(request);
         
-        Page<Taboo> page = tabooRepository.findAll(specification, pageable);
+        Page<TabooEntity> page = tabooRepository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -68,17 +68,17 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
     }
 
     @Override
-    public Optional<Taboo> findByUid(String uid) {
+    public Optional<TabooEntity> findByUid(String uid) {
         return tabooRepository.findByUid(uid);
     }
 
     @Override
     public TabooResponse create(TabooRequest request) {
         
-        Taboo taboo = modelMapper.map(request, Taboo.class);
+        TabooEntity taboo = modelMapper.map(request, TabooEntity.class);
         taboo.setUid(uidUtils.getCacheSerialUid());
 
-        Taboo savedTaboo = save(taboo);
+        TabooEntity savedTaboo = save(taboo);
         if (savedTaboo == null) {
             throw new RuntimeException("create taboo failed");
         }
@@ -88,12 +88,12 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
     @Override
     public TabooResponse update(TabooRequest request) {
         
-        Optional<Taboo> optional = findByUid(request.getUid());
+        Optional<TabooEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            Taboo taboo = optional.get();
+            TabooEntity taboo = optional.get();
             taboo.setContent(request.getContent());
             // 
-            Taboo savedTaboo = save(taboo);
+            TabooEntity savedTaboo = save(taboo);
             if (savedTaboo == null) {
                 throw new RuntimeException("create taboo failed");
             }
@@ -104,7 +104,7 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
     }
 
     @Override
-    public Taboo save(Taboo entity) {
+    public TabooEntity save(TabooEntity entity) {
         try {
             return tabooRepository.save(entity);
         } catch (Exception e) {
@@ -113,33 +113,33 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
         return null;
     }
 
-    public void save(List<Taboo> entities) {
+    public void save(List<TabooEntity> entities) {
         tabooRepository.saveAll(entities);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Taboo> optional = findByUid(uid);
+        Optional<TabooEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
-            Taboo taboo = optional.get();
+            TabooEntity taboo = optional.get();
             taboo.setDeleted(true);
             save(taboo);
         }
     }
 
     @Override
-    public void delete(Taboo entity) {
+    public void delete(TabooRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Taboo entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TabooEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public TabooResponse convertToResponse(Taboo entity) {
+    public TabooResponse convertToResponse(TabooEntity entity) {
         return modelMapper.map(entity, TabooResponse.class);
     }
 
@@ -147,14 +147,14 @@ public class TabooService extends BaseService<Taboo, TabooRequest, TabooResponse
         return modelMapper.map(response, TabooExcel.class);
     }
 
-    public Taboo convertExcelToTaboo(TabooExcel excel, String kbUid, String orgUid) {
+    public TabooEntity convertExcelToTaboo(TabooExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Taboo.class); // String categoryUid,
-        Taboo taboo = Taboo.builder().build();
+        TabooEntity taboo = TabooEntity.builder().build();
         taboo.setUid(uidUtils.getCacheSerialUid());
         taboo.setContent(excel.getContent());
         // 
         // taboo.setCategoryUid(categoryUid);
-         Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+         Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             taboo.setCategoryUid(categoryOptional.get().getUid());
         } else {

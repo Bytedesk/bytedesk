@@ -45,24 +45,24 @@ public class ChannelService {
                 Sort.Direction.ASC,
                 "id");
 
-        Page<Channel> channelPage = channelRepository.findAll(pageable);
+        Page<ChannelEntity> channelPage = channelRepository.findAll(pageable);
 
         return channelPage.map(channel -> convertToResponse(channel));
     }
 
-    public Channel create(ChannelRequest channelRequest) {
+    public ChannelEntity create(ChannelRequest channelRequest) {
 
-        Channel channel = modelMapper.map(channelRequest, Channel.class);
+        ChannelEntity channel = modelMapper.map(channelRequest, ChannelEntity.class);
         channel.setUid(uidUtils.getCacheSerialUid());
 
         return save(channel);
     }
 
-    private Channel save(Channel channel) {
+    private ChannelEntity save(ChannelEntity channel) {
         return channelRepository.save(channel);
     }
 
-    public ChannelResponse convertToResponse(Channel channel) {
+    public ChannelResponse convertToResponse(ChannelEntity channel) {
         return modelMapper.map(channel, ChannelResponse.class);
     }
 
@@ -79,7 +79,7 @@ public class ChannelService {
                 .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
                 .build();
         channelRequest.setType(TypeConsts.TYPE_SYSTEM);
-        // channelRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        // channelRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         create(channelRequest);
     }
 

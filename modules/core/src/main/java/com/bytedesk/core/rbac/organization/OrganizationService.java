@@ -32,10 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.role.Role;
+import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleService;
-import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -65,12 +65,12 @@ public class OrganizationService {
 
     public Page<OrganizationResponse> query(OrganizationRequest pageParam) {
 
-        User user = authService.getCurrentUser();
+        UserEntity user = authService.getCurrentUser();
 
         Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Page<Organization> orgPage = organizationRepository.findByUser(user, pageable);
+        Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
 
         return orgPage.map(organization -> convertToResponse(organization));
     }
@@ -85,17 +85,17 @@ public class OrganizationService {
             throw new RuntimeException("Organization with code: " + organizationRequest.getCode() + " already exists.");
         }
         //
-        User user = authService.getCurrentUser();
+        UserEntity user = authService.getCurrentUser();
         String orgUid = uidUtils.getCacheSerialUid();
         //
-        Organization organization = modelMapper.map(organizationRequest, Organization.class);
+        OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
         organization.setUid(orgUid);
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
         //
         try {
             //
-            Organization savedOrganization = save(organization);
+            OrganizationEntity savedOrganization = save(organization);
             if (savedOrganization == null) {
                 throw new RuntimeException("Failed to create organization.");
             }
@@ -104,7 +104,7 @@ public class OrganizationService {
             // 初始化组织的角色
             roleService.initOrgRoles(orgUid);
             //
-            Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_ADMIN, orgUid);
+            Optional<RoleEntity> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_ADMIN, orgUid);
             if (roleOptional.isPresent()) {
                 log.info("roleOptional success");
                 user.addOrganizationRole(savedOrganization, roleOptional.get());
@@ -130,14 +130,14 @@ public class OrganizationService {
     public OrganizationResponse update(OrganizationRequest organizationRequest) {
 
         // 查找要更新的组织
-        Optional<Organization> organizationOptional = findByUid(organizationRequest.getUid());
+        Optional<OrganizationEntity> organizationOptional = findByUid(organizationRequest.getUid());
         if (!organizationOptional.isPresent()) {
             // 如果组织不存在，可以抛出一个自定义异常，例如OrganizationNotFoundException
             throw new RuntimeException("Organization with UID: " + organizationRequest.getUid() + " not found.");
         }
 
         // 获取要更新的组织实体
-        Organization organization = organizationOptional.get();
+        OrganizationEntity organization = organizationOptional.get();
         // 使用ModelMapper进行属性拷贝，避免逐一设置字段
         // modelMapper.map(organizationRequest, organization); // 一些默认值会被清空，待前端支持完善之后再启用
         organization.setName(organizationRequest.getName());
@@ -146,7 +146,7 @@ public class OrganizationService {
         organization.setDescription(organizationRequest.getDescription());
 
         // 保存更新后的组织
-        Organization updatedOrganization = save(organization);
+        OrganizationEntity updatedOrganization = save(organization);
 
         if (updatedOrganization == null) {
             throw new RuntimeException("Failed to update organization.");
@@ -157,17 +157,17 @@ public class OrganizationService {
     }
 
     @Cacheable(value = "organization", key = "#uid", unless = "#result == null")
-    public Optional<Organization> findByUid(String uid) {
+    public Optional<OrganizationEntity> findByUid(String uid) {
         return organizationRepository.findByUid(uid);
     }
 
     @Cacheable(value = "organization", key = "#name", unless = "#result == null")
-    public Optional<Organization> findByName(String name) {
+    public Optional<OrganizationEntity> findByName(String name) {
         return organizationRepository.findByNameAndDeleted(name, false);
     }
 
     @Cacheable(value = "organization", key = "#code", unless = "#result == null")
-    public Optional<Organization> findByCode(String code) {
+    public Optional<OrganizationEntity> findByCode(String code) {
         return organizationRepository.findByCodeAndDeleted(code, false);
     }
 
@@ -183,7 +183,7 @@ public class OrganizationService {
             @CachePut(value = "organization", key = "#organization.uid"),
             @CachePut(value = "organization", key = "#organization.name")
     })
-    public Organization save(Organization organization) {
+    public OrganizationEntity save(OrganizationEntity organization) {
         try {
             return organizationRepository.save(organization);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -193,11 +193,11 @@ public class OrganizationService {
     }
 
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            Organization organization) {
+            OrganizationEntity organization) {
         log.info("handleOptimisticLockingFailureException: " + e.getMessage());
     }
 
-    public OrganizationResponse convertToResponse(Organization organization) {
+    public OrganizationResponse convertToResponse(OrganizationEntity organization) {
         return modelMapper.map(organization, OrganizationResponse.class);
     }
 
@@ -207,16 +207,16 @@ public class OrganizationService {
             return;
         }
         //
-        Optional<User> adminOptional = userService.getAdmin();
+        Optional<UserEntity> adminOptional = userService.getAdmin();
         if (adminOptional.isPresent()) {
             //
-            Organization organization = Organization.builder()
+            OrganizationEntity organization = OrganizationEntity.builder()
                     .name(bytedeskProperties.getOrganizationName())
                     .code(bytedeskProperties.getOrganizationCode())
                     .description(bytedeskProperties.getOrganizationName() + " Description")
                     .user(adminOptional.get())
                     .build();
-            organization.setUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            organization.setUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
             //
             save(organization);
         }

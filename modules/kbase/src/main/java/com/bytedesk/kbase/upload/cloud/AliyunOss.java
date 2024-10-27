@@ -29,25 +29,7 @@ import java.net.URL;
  */
 @Component
 public class AliyunOss {
-
-    // @Value("${aliyun.access.key.id}")
-    // private String accessKeyId;
-
-    // @Value("${aliyun.access.key.secret}")
-    // private String accessKeySecret;
-
-    // @Value("${aliyun.oss.endpoint}")
-    // private String endPoint;
-
-    // @Value("${aliyun.oss.bucket.name}")
-    // private String aliyunProperties.getOssBucketName();
-
-    // @Value("${aliyun.oss.base.url}")
-    // private String aliyunProperties.getOssBaseUrl();
-
-    // @Value("${upload.dir.prefix}")
-    // private String uploadDirPrefix;
-
+    
     // @Autowired
     // AttachmentService attachmentService;
 

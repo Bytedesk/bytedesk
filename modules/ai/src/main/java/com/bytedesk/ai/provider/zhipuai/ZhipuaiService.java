@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 17:20:36
+ * @LastEditTime: 2024-10-23 23:56:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotMessage;
 import com.bytedesk.ai.robot.RobotProtobuf;
@@ -95,7 +95,6 @@ public class ZhipuaiService {
             {query}
             当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
             """;
-
     /**
      * sse调用
      */
@@ -229,18 +228,18 @@ public class ZhipuaiService {
 
     /**
      * websocket 发送消息
+     * LLM 聊天
      */
-    // LLM 聊天
-    public void sendWsMessage(String query, RobotLlm robotllm, MessageProtobuf messageProtobuf) {
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
         //
-        String prompt = robotllm.getPrompt() + "\n" + query;
+        String prompt = robotLlm.getPrompt() + "\n" + query;
         //
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
         messages.add(chatMessage);
         //
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(robotllm.getModel())
+                .model(robotLlm.getModel())
                 .stream(Boolean.TRUE)
                 .messages(messages)
                 .requestId(messageProtobuf.getUid())
@@ -268,7 +267,7 @@ public class ZhipuaiService {
                                     messageProtobuf.setContent(answerContent);
                                     //
                                     // MessageUtils.notifyUser(messageProtobuf);
-                                    messageSendService.sendMessage(messageProtobuf);
+                                    messageSendService.sendProtobufMessage(messageProtobuf);
                                 }
                             }
                         }
@@ -292,13 +291,12 @@ public class ZhipuaiService {
             // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
             // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
         }
-
         String result = JSON.toJSONString(sseModelApiResp);
         log.info("websocket output:" + result);
     }
 
     // 知识库问答
-    public void sendWsKbMessage(String query, String kbUid, Robot robot, MessageProtobuf messageProtobuf) {
+    public void sendWsKbMessage(String query, String kbUid, RobotEntity robot, MessageProtobuf messageProtobuf) {
         //
         String prompt = robot.getLlm().getPrompt();
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())
@@ -349,7 +347,7 @@ public class ZhipuaiService {
                                     messageProtobuf.setContent(answerContent);
                                     //
                                     // MessageUtils.notifyUser(messageProtobuf);
-                                    messageSendService.sendMessage(messageProtobuf);
+                                    messageSendService.sendProtobufMessage(messageProtobuf);
                                 }
                             }
                         }
@@ -423,7 +421,7 @@ public class ZhipuaiService {
                                     messageProtobuf.setContent(answerContent);
                                     //
                                     // MessageUtils.notifyUser(messageProtobuf);
-                                    messageSendService.sendMessage(messageProtobuf);
+                                    messageSendService.sendProtobufMessage(messageProtobuf);
                                 }
                             }
                         }

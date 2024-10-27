@@ -24,9 +24,9 @@ public class CounterCreateEvent extends ApplicationEvent {
     
     private final static long serialVersionUID = 1L;
 
-    private Counter counter;
+    private CounterEntity counter;
 
-    public CounterCreateEvent(Object source, Counter counter) {
+    public CounterCreateEvent(Object source, CounterEntity counter) {
         super(source);
         this.counter = counter;
     }

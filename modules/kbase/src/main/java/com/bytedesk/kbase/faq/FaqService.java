@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:46:10
+ * @LastEditTime: 2024-10-23 18:16:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,21 +28,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
+public class FaqService extends BaseService<FaqEntity, FaqRequest, FaqResponse> {
 
     private final FaqRepository faqRepository;
 
@@ -58,9 +58,9 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
 
-        Specification<Faq> spec = FaqSpecification.search(request);
+        Specification<FaqEntity> spec = FaqSpecification.search(request);
 
-        Page<Faq> page = faqRepository.findAll(spec, pageable);
+        Page<FaqEntity> page = faqRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -72,14 +72,14 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     }
 
     @Override
-    public Optional<Faq> findByUid(String uid) {
+    public Optional<FaqEntity> findByUid(String uid) {
         return faqRepository.findByUid(uid);
     }
 
     @Override
     public FaqResponse create(FaqRequest request) {
 
-        Faq entity = modelMapper.map(request, Faq.class);
+        FaqEntity entity = modelMapper.map(request, FaqEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getDefaultSerialUid());
         }
@@ -97,9 +97,9 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     @Override
     public FaqResponse update(FaqRequest request) {
 
-        Optional<Faq> optional = findByUid(request.getUid());
+        Optional<FaqEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            Faq entity = optional.get();
+            FaqEntity entity = optional.get();
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
             entity.setContent(request.getContent());
@@ -118,9 +118,9 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     }
 
     public FaqResponse upVote(String uid) {
-        Optional<Faq> optional = findByUid(uid);
+        Optional<FaqEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
-            Faq entity = optional.get();
+            FaqEntity entity = optional.get();
             entity.up();
             return convertToResponse(save(entity));
         } else {
@@ -129,9 +129,9 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     }
 
     public FaqResponse downVote(String uid) {
-        Optional<Faq> optional = findByUid(uid);
+        Optional<FaqEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
-            Faq entity = optional.get();
+            FaqEntity entity = optional.get();
             entity.down();
             return convertToResponse(save(entity));
         } else {
@@ -140,7 +140,7 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     }
 
     @Override
-    public Faq save(Faq entity) {
+    public FaqEntity save(FaqEntity entity) {
         try {
             return faqRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -149,13 +149,13 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         return null;
     }
 
-    public void save(List<Faq> entities) {
+    public void save(List<FaqEntity> entities) {
         faqRepository.saveAll(entities);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Faq> optional = findByUid(uid);
+        Optional<FaqEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -163,19 +163,19 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
     }
 
     @Override
-    public void delete(Faq entity) {
+    public void delete(FaqRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Faq entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public FaqResponse convertToResponse(Faq entity) {
+    public FaqResponse convertToResponse(FaqEntity entity) {
         return modelMapper.map(entity, FaqResponse.class);
     }
 
@@ -183,9 +183,9 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         return modelMapper.map(faq, FaqExcel.class);
     }
 
-    public Faq convertExcelToFaq(FaqExcel excel,String kbUid, String orgUid) {
+    public FaqEntity convertExcelToFaq(FaqExcel excel,String kbUid, String orgUid) {
         // return modelMapper.map(excel, Faq.class); // String categoryUid,
-        Faq faq = Faq.builder().build();
+        FaqEntity faq = FaqEntity.builder().build();
         faq.setUid(uidUtils.getCacheSerialUid());
         faq.setTitle(excel.getTitle());
         faq.setContent(excel.getContent());
@@ -194,7 +194,7 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         faq.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         // 
         // faq.setCategoryUid(categoryUid);
-        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             faq.setCategoryUid(categoryOptional.get().getUid());
         } else {
@@ -222,7 +222,7 @@ public class FaqService extends BaseService<Faq, FaqRequest, FaqResponse> {
         }
 
         //
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         FaqRequest faqDemo1 = FaqRequest.builder()
                 .title(I18Consts.I18N_FAQ_DEMO_TITLE_1)
                 .content(I18Consts.I18N_FAQ_DEMO_CONTENT_1)

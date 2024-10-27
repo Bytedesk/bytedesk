@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface AutoReplyRepository extends JpaRepository<AutoReply, Long>, JpaSpecificationExecutor<AutoReply> {
+public interface AutoReplyRepository extends JpaRepository<AutoReplyEntity, Long>, JpaSpecificationExecutor<AutoReplyEntity> {
     
-    Optional<AutoReply> findByUid(String uid);
+    Optional<AutoReplyEntity> findByUid(String uid);
 }

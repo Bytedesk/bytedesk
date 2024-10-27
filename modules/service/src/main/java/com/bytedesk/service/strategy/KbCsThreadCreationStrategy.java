@@ -26,7 +26,7 @@ import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.knowledge_base.Knowledgebase;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseEntity;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -53,7 +53,7 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
     public MessageProtobuf createKbCsThread(VisitorRequest visitorRequest) {
 
         String kbUid = visitorRequest.getSid();
-        Knowledgebase knowledgebase = knowledgebaseService.findByUid(kbUid)
+        KnowledgebaseEntity knowledgebase = knowledgebaseService.findByUid(kbUid)
                 .orElseThrow(() -> new RuntimeException("Knowledgebase " + kbUid + " not found"));
         //
         ThreadEntity thread = getKbThread(visitorRequest, knowledgebase);
@@ -61,7 +61,7 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return getKbMessage(visitorRequest, thread, knowledgebase);
     }
 
-    private ThreadEntity getKbThread(VisitorRequest visitorRequest, Knowledgebase kb) {
+    private ThreadEntity getKbThread(VisitorRequest visitorRequest, KnowledgebaseEntity kb) {
         //
         String topic = TopicUtils.formatOrgKbThreadTopic(kb.getUid(), visitorRequest.getUid());
         Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
@@ -87,7 +87,7 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getKbMessage(VisitorRequest visitorRequest, ThreadEntity thread, Knowledgebase kb) {
+    private MessageProtobuf getKbMessage(VisitorRequest visitorRequest, ThreadEntity thread, KnowledgebaseEntity kb) {
         thread.setContent(kb.getName());
         //
         // boolean isReenter = true;

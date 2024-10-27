@@ -1,0 +1,35 @@
+services:
+  bytedesk-db:
+    image: mysql:latest
+    container_name: mysql-bytedesk
+    environment:
+      MYSQL_DATABASE: "bytedesk_im"
+      MYSQL_ROOT_PASSWORD: "r8FqfdbWUaN3"
+    ports:
+      - "3306:3306"
+  bytedesk-redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis-bytedesk
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_HOST_PASSWORD"
+    env_file:
+      - docker.env
+    ports:
+      - "6379:6379"
+  bytedesk:
+    # image: bytedesk/bytedesk:latest
+    image: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:0.4.7
+    container_name: bytedesk
+    depends_on:
+      - bytedesk-db
+      - bytedesk-redis
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-bytedesk:3306/bytedesk_im
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=r8FqfdbWUaN3
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATA_REDIS_HOST=redis-bytedesk
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=qfRxz3tVT8Nh
+      - SPRING_DATA_REDIS_DATABASE=0
+    ports:
+      - 9003:9003

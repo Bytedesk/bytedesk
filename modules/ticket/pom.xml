@@ -26,6 +26,7 @@
             <groupId>org.springframework.statemachine</groupId>
             <artifactId>spring-statemachine-starter</artifactId>
             <version>4.0.0</version>
+			<scope>provided</scope>
         </dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->

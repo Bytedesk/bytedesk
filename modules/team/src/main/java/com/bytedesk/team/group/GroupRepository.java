@@ -21,7 +21,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "group")
-public interface GroupRepository extends JpaRepository<Group, Long>, JpaSpecificationExecutor<Group> {
+public interface GroupRepository extends JpaRepository<GroupEntity, Long>, JpaSpecificationExecutor<GroupEntity> {
 
-    Optional<Group> findByUid(String uid);
+    Optional<GroupEntity> findByUid(String uid);
 }

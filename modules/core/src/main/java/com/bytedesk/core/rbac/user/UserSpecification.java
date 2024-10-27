@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserSpecification {
 
-    public static Specification<User> search(UserRequest request) {
+    public static Specification<UserEntity> search(UserRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

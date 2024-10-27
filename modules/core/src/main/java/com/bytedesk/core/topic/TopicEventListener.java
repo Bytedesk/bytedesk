@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserLogoutEvent;
 
 import lombok.AllArgsConstructor;
@@ -75,7 +75,7 @@ public class TopicEventListener {
     @EventListener
     public void onUserLogoutEvent(GenericApplicationEvent<UserLogoutEvent> event) {
         UserLogoutEvent userLogoutEvent = event.getObject();
-        User user = userLogoutEvent.getUser();
+        UserEntity user = userLogoutEvent.getUser();
         log.info("topic onUserLogoutEvent: {}", user.getUsername());
         // TODO: 用户登录之后，删除相关clientId
     }

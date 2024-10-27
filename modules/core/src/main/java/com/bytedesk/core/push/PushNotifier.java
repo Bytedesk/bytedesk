@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class PushNotifier {
     
-    abstract void notify(MessageEntity e);
+    public abstract void notify(MessageEntity e);
 
-    abstract void send(String to, String content, HttpServletRequest request);
+    public abstract void send(String to, String content, HttpServletRequest request);
 }

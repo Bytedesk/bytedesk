@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 16:23:06
+ * @LastEditTime: 2024-10-23 22:58:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,8 +37,6 @@ import java.security.Principal;
 @Controller
 public class StompController {
 
-    // private final MqService mqService;
-
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     private final IMessageSendService messageSendService;
@@ -58,9 +56,9 @@ public class StompController {
             @DestinationVariable(value = "uid") String uid,
             String message) {
         log.debug("principal: {}, sid: {}, uid: {}, message: {}", principal, sid, uid, message);
+        // TODO: 发送回执
         // 转发给mq
-        // mqService.sendJsonMessageToMq(message);
-        messageSendService.sendMessage(message);
+        messageSendService.sendJsonMessage(message);
     }
 
     /**

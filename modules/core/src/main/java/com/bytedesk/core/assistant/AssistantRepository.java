@@ -16,6 +16,6 @@ package com.bytedesk.core.assistant;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AssistantRepository extends JpaRepository<Assistant, Long> {
+public interface AssistantRepository extends JpaRepository<AssistantEntity, Long> {
     
 }

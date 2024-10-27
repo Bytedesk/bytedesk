@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.enums.ClientEnum;
@@ -55,7 +55,7 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
     public MessageProtobuf createLlmCsThread(VisitorRequest visitorRequest) {
         //
         String robotUid = visitorRequest.getSid();
-        Robot robot = robotService.findByUid(robotUid)
+        RobotEntity robot = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
         ThreadEntity thread = getLlmThread(visitorRequest, robot);
@@ -63,7 +63,7 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return getLlmMessage(visitorRequest, thread, robot);
     }
 
-    private ThreadEntity getLlmThread(VisitorRequest visitorRequest, Robot robot) {
+    private ThreadEntity getLlmThread(VisitorRequest visitorRequest, RobotEntity robot) {
         //
         String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
         // TODO: 到visitor thread表中拉取
@@ -94,7 +94,7 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getLlmMessage(VisitorRequest visitorRequest, ThreadEntity thread, Robot robot) {
+    private MessageProtobuf getLlmMessage(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         //

@@ -23,9 +23,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class UserUpdateEvent extends ApplicationEvent {
 
-    private User user;
+    private UserEntity user;
 
-    public UserUpdateEvent(User user) {
+    public UserUpdateEvent(UserEntity user) {
         super(user);
         this.user = user;
     }

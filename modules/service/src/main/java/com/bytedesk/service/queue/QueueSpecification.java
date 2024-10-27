@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class QueueSpecification extends BaseSpecification {
 
-    public static Specification<Queue> search(QueueRequest request) {
+    public static Specification<QueueEntity> search(QueueRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

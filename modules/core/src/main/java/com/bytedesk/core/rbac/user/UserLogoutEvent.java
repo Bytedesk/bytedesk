@@ -25,9 +25,9 @@ public class UserLogoutEvent extends ApplicationEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private User user;
+    private UserEntity user;
 
-    public UserLogoutEvent(Object source, User user) {
+    public UserLogoutEvent(Object source, UserEntity user) {
         super(source);
         this.user = user;
     }

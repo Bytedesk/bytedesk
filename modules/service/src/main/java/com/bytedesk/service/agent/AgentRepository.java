@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 10:59:46
+ * @LastEditTime: 2024-10-22 12:28:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,16 +33,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Repository
 @Tag(name = "agent account info")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
-public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecificationExecutor<Agent> {
+public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSpecificationExecutor<AgentEntity> {
 
-    Optional<Agent> findByUid(String uid);
+    Optional<AgentEntity> findByUid(String uid);
 
-    Optional<Agent> findByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
+    Optional<AgentEntity> findByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
 
-    Optional<Agent> findByMobileAndOrgUidAndDeleted(String mobile, String orgUid, Boolean deleted);
+    Optional<AgentEntity> findByMobileAndOrgUidAndDeleted(String mobile, String orgUid, Boolean deleted);
 
     // Optional<Agent> findByUser_Uid(String uid);
-    Optional<Agent> findByUserUidAndOrgUidAndDeleted(String userUid, String orgUid, Boolean deleted);
+    Optional<AgentEntity> findByUserUidAndOrgUidAndDeleted(String userUid, String orgUid, Boolean deleted);
 
     // Page<Agent> findByOrgUidAndDeleted(String orgUid, Boolean deleted, Pageable pageable);
 
@@ -54,12 +54,12 @@ public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecific
 
     @Transactional
     @Modifying
-	@Query(value = "update service_agent set is_connected = :connected where user_uid = :uid", nativeQuery = true)
-    void updateConnectedByUid(@Param("connected") Boolean conncted, @Param("uid") String uid);
+	@Query(value = "update bytedesk_service_agent set is_connected = :connected where user_uid = :uid", nativeQuery = true)
+    void updateConnectedByUid(@Param("connected") Boolean connected, @Param("uid") String uid);
     
     @Transactional
     @Modifying
-    @Query(value = "update Agent set deleted = :deleted where uid = :uid")
+    @Query(value = "update AgentEntity set deleted = :deleted where uid = :uid")
     void updateDeletedByUid(@Param("deleted") Boolean deleted, @Param("uid") String uid);
     
 }

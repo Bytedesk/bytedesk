@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 16:55:27
+ * @LastEditTime: 2024-10-24 22:20:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,8 +40,8 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
@@ -85,7 +85,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
     /**  */
     public Page<ThreadResponse> query(ThreadRequest pageParam) {
 
-        User user = authService.getCurrentUser();
+        UserEntity user = authService.getCurrentUser();
 
         // 优先加载最近更新的会话记录，updatedAt越大越新
         Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
@@ -107,7 +107,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
      */
     public ThreadResponse create(ThreadRequest request) {
 
-        User owner = authService.getCurrentUser();
+        UserEntity owner = authService.getCurrentUser();
         //
         Optional<ThreadEntity> threadOptional = findByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
@@ -138,7 +138,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
     
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
-    public ThreadResponse createGroupMemberThread(ThreadEntity thread, User owner) {
+    public ThreadResponse createGroupMemberThread(ThreadEntity thread, UserEntity owner) {
         //
         Optional<ThreadEntity> threadOptional = findByTopicAndOwner(thread.getTopic(), owner);
         if (threadOptional.isPresent()) {
@@ -166,7 +166,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
     }
 
     /** 文件助手会话：file/{user_uid} */
-    public ThreadResponse createFileAssistantThread(User user) {
+    public ThreadResponse createFileAssistantThread(UserEntity user) {
         //
         String topic = TopicUtils.TOPIC_FILE_PREFIX + user.getUid();
         //
@@ -190,7 +190,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
         if (StringUtils.hasText(user.getOrgUid())) {
             assistantThread.setOrgUid(user.getOrgUid());
         } else {
-            assistantThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
 
         ThreadEntity updateThread = save(assistantThread);
@@ -202,7 +202,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
     }
 
     // 系统通知会话：system/{user_uid}
-    public ThreadResponse createSystemChannelThread(User user) {
+    public ThreadResponse createSystemChannelThread(UserEntity user) {
         //
         // String topic = TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid();
         String topic = TopicUtils.getSystemTopic(user.getUid());
@@ -227,7 +227,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
         if (StringUtils.hasText(user.getOrgUid())) {
             noticeThread.setOrgUid(user.getOrgUid());
         } else {
-            noticeThread.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            noticeThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
         //
         ThreadEntity updateThread = save(noticeThread);
@@ -294,11 +294,13 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
         String content = threadRequest.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED
                 : I18Consts.I18N_AGENT_CLOSED;
-        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getCacheSerialUid(), updateThread,
-                MessageTypeEnum.fromValue(threadRequest.getState()),
+        MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED : MessageTypeEnum.AGENT_CLOSED;
+        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getCacheSerialUid(), 
+                updateThread,
+                messageTypeEnum,
                 content);
         // MessageUtils.notifyUser(messageProtobuf);
-        messageSendService.sendMessage(messageProtobuf);
+        messageSendService.sendProtobufMessage(messageProtobuf);
         //
         return convertToResponse(updateThread);
     }
@@ -313,7 +315,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
     }
 
     @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
-    public Optional<ThreadEntity> findByTopicAndOwner(String topic, User user) {
+    public Optional<ThreadEntity> findByTopicAndOwner(String topic, UserEntity user) {
         return threadRepository.findByTopicAndOwnerAndDeleted(topic, user, false);
     }
 
@@ -331,7 +333,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
 
     // TODO: how to cacheput or cacheevict?
     @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
-    public Page<ThreadEntity> findByOwner(User user, Pageable pageable) {
+    public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }
 
@@ -361,7 +363,7 @@ public class ThreadService extends BaseService<ThreadEntity, ThreadRequest, Thre
             @CacheEvict(value = "thread", key = "#thread.uid"),
             @CacheEvict(value = "thread", key = "#thread.topic")
     })
-    public void delete(@NonNull ThreadEntity entity) {
+    public void delete(@NonNull ThreadRequest entity) {
         // threadRepository.delete(thread);
         // Optional<Thread> threadOptional = findByUid(entity.getUid());
         Optional<ThreadEntity> threadOptional = findByTopic(entity.getTopic());

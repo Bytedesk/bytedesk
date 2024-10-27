@@ -15,7 +15,7 @@
 package com.bytedesk.core.rbac.user;
 
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 
 public class UserUtils {
@@ -25,7 +25,7 @@ public class UserUtils {
                 .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASSISTANT_AVATAR_URL)
                 .build();
-        user.setUid(BdConstants.DEFAULT_FILE_ASSISTANT_UID);
+        user.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
         return user;
     }
 
@@ -34,7 +34,7 @@ public class UserUtils {
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
                 .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
                 .build();
-        user.setUid(BdConstants.DEFAULT_SYSTEM_UID);
+        user.setUid(BytedeskConsts.DEFAULT_SYSTEM_UID);
         return user;
     }
 

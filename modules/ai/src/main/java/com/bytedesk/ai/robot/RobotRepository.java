@@ -28,9 +28,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Repository
 @Tag(name = "robot info")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
-public interface RobotRepository extends JpaRepository<Robot, Long>, JpaSpecificationExecutor<Robot> {
+public interface RobotRepository extends JpaRepository<RobotEntity, Long>, JpaSpecificationExecutor<RobotEntity> {
 
-    Optional<Robot> findByUid(String uid);
+    Optional<RobotEntity> findByUid(String uid);
     // Boolean existsByNicknameAndLevel(String nickname, String level);
     Boolean existsByUidAndDeleted(String uid, Boolean deleted);
 

@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TicketSpecification extends BaseSpecification {
 
-    public static Specification<Ticket> search(TicketRequest request) {
+    public static Specification<TicketEntity> search(TicketRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

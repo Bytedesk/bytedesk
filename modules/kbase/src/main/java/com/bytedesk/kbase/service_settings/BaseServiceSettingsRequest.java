@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
 import jakarta.persistence.MappedSuperclass;
@@ -46,7 +46,7 @@ public class BaseServiceSettingsRequest {
 
     private Boolean showPreForm = false;
 
-    private String preForm = BdConstants.EMPTY_JSON_STRING;
+    private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     private Boolean showHistory = false;
 

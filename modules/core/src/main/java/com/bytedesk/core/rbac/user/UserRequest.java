@@ -18,7 +18,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.rbac.user.User.Sex;
+import com.bytedesk.core.rbac.user.UserEntity.Sex;
 
 // import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
@@ -77,7 +77,7 @@ public class UserRequest extends BaseRequest {
 	// 需要前端传递字符串的情况下，使用string类型
 	@NotBlank(message = "platform required")
 	// @Builder.Default
-	// private String platform = BdConstants.PLATFORM_BYTEDESK;
+	// private String platform = BytedeskConsts.PLATFORM_BYTEDESK;
 	@Builder.Default
 	// private PlatformEnum platform = PlatformEnum.BYTEDESK;
 	private String platform = PlatformEnum.BYTEDESK.name();

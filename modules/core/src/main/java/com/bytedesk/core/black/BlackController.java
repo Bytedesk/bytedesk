@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 21:47:16
+ * @LastEditTime: 2024-10-23 18:12:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,7 +40,7 @@ public class BlackController extends BaseController<BlackRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(BlackRequest request) {
+    public ResponseEntity<?> queryByUser(BlackRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
@@ -60,7 +60,7 @@ public class BlackController extends BaseController<BlackRequest> {
     @Override
     public ResponseEntity<?> delete(BlackRequest request) {
 
-        blackService.deleteByUid(request.getUid());
+        blackService.delete(request);
         
         return ResponseEntity.ok(JsonResult.success());
     }

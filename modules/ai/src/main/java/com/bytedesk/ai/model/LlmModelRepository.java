@@ -20,9 +20,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface LlmModelRepository extends JpaRepository<LlmModel, Long>, JpaSpecificationExecutor<LlmModel> {
+public interface LlmModelRepository extends JpaRepository<LlmModelEntity, Long>, JpaSpecificationExecutor<LlmModelEntity> {
 
-    Optional<LlmModel> findByUid(String uid);
+    Optional<LlmModelEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 
@@ -30,5 +30,5 @@ public interface LlmModelRepository extends JpaRepository<LlmModel, Long>, JpaSp
 
     // Boolean existsByNickname(String nickname);
 
-    List<LlmModel> findByProvider(String provider);
+    List<LlmModelEntity> findByProvider(String provider);
 }

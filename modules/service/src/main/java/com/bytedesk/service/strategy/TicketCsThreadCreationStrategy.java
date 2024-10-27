@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.enums.ClientEnum;
@@ -43,7 +43,7 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
 
     public MessageProtobuf createTicketCsThread(VisitorRequest visitorRequest) {
         String agentAsistantRobotUid = visitorRequest.getSid();
-        Robot robot = robotService.findByUid(agentAsistantRobotUid)
+        RobotEntity robot = robotService.findByUid(agentAsistantRobotUid)
                 .orElseThrow(
                         () -> new RuntimeException("agentAsistantRobotUid " + agentAsistantRobotUid + " not found"));
         //
@@ -52,7 +52,7 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
         return getAgentassistantMessage(visitorRequest, thread, robot);
     }
 
-    private ThreadEntity getAgentassistantThread(VisitorRequest visitorRequest, Robot robot) {
+    private ThreadEntity getAgentassistantThread(VisitorRequest visitorRequest, RobotEntity robot) {
         if (robot == null) {
             throw new RuntimeException("Robot cannot be null");
         }
@@ -81,7 +81,7 @@ public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy 
         return thread;
     }
 
-    private MessageProtobuf getAgentassistantMessage(VisitorRequest visitorRequest, ThreadEntity thread, Robot robot) {
+    private MessageProtobuf getAgentassistantMessage(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
         if (thread == null) {
             throw new RuntimeException("Thread cannot be null");
         }

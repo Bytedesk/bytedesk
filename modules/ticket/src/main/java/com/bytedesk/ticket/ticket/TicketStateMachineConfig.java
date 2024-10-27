@@ -64,19 +64,19 @@ public class TicketStateMachineConfig extends EnumStateMachineConfigurerAdapter<
 	// }
 	
 	@Bean
-	public DefaultStateMachinePersister<TicketStateEnum, TicketStateEventEnum, Ticket> ticketStatePersister() {
+	public DefaultStateMachinePersister<TicketStateEnum, TicketStateEventEnum, TicketEntity> ticketStatePersister() {
 		
-		return new DefaultStateMachinePersister<>(new StateMachinePersist<TicketStateEnum, TicketStateEventEnum, Ticket>() {
+		return new DefaultStateMachinePersister<>(new StateMachinePersist<TicketStateEnum, TicketStateEventEnum, TicketEntity>() {
 
 			@Override
-			public void write(StateMachineContext<TicketStateEnum, TicketStateEventEnum> context, Ticket contextObj)
+			public void write(StateMachineContext<TicketStateEnum, TicketStateEventEnum> context, TicketEntity contextObj)
 					throws Exception {
 				// TODO Auto-generated method stub
 				throw new UnsupportedOperationException("Unimplemented method 'write'");
 			}
 
 			@Override
-			public StateMachineContext<TicketStateEnum, TicketStateEventEnum> read(Ticket contextObj) throws Exception {
+			public StateMachineContext<TicketStateEnum, TicketStateEventEnum> read(TicketEntity contextObj) throws Exception {
 				// TODO Auto-generated method stub
 				throw new UnsupportedOperationException("Unimplemented method 'read'");
 			}

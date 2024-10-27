@@ -20,9 +20,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
-public interface KeywordRepository extends JpaRepository<Keyword, Long>, JpaSpecificationExecutor<Keyword> {
+public interface KeywordRepository extends JpaRepository<KeywordEntity, Long>, JpaSpecificationExecutor<KeywordEntity> {
     
-    Optional<Keyword> findByUid(String uid);
+    Optional<KeywordEntity> findByUid(String uid);
 
     // List<Keyword> findByKeywordListContaining(String keyword);
 

@@ -39,7 +39,7 @@ public class KnowledgebaseRouteController {
     public String index(Model model, @PathVariable("kbUid") String kbUid) {
         log.info("kbUid: {}", kbUid);
         //
-        Optional<Knowledgebase> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
+        Optional<KnowledgebaseEntity> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
         if (knowledgebaseOptional.isPresent()) {
             model.addAttribute("knowledgebase", knowledgebaseOptional.get());
         } else {

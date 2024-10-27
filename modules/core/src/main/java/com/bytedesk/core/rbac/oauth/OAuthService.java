@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 23:50:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-10 23:50:32
+ * @LastEditTime: 2024-10-23 18:14:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseService;
 
 @Service
-public class OAuthService extends BaseService<OAuth, OAuthRequest, OAuthResponse> {
+public class OAuthService extends BaseService<OAuthEntity, OAuthRequest, OAuthResponse> {
 
     @Override
     public Page<OAuthResponse> queryByOrg(OAuthRequest request) {
@@ -38,7 +38,7 @@ public class OAuthService extends BaseService<OAuth, OAuthRequest, OAuthResponse
     }
 
     @Override
-    public Optional<OAuth> findByUid(String uid) {
+    public Optional<OAuthEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
@@ -56,7 +56,7 @@ public class OAuthService extends BaseService<OAuth, OAuthRequest, OAuthResponse
     }
 
     @Override
-    public OAuth save(OAuth entity) {
+    public OAuthEntity save(OAuthEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
@@ -68,19 +68,19 @@ public class OAuthService extends BaseService<OAuth, OAuthRequest, OAuthResponse
     }
 
     @Override
-    public void delete(OAuth entity) {
+    public void delete(OAuthRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, OAuth entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, OAuthEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public OAuthResponse convertToResponse(OAuth entity) {
+    public OAuthResponse convertToResponse(OAuthEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }

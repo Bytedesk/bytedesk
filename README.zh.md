@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 17:31:34
+ * @LastEditTime: 2024-10-25 17:29:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@
 - 权限管理
 - 聊天记录管理
 - 同事对话
-- 群组
+- 群组/讨论组
 
 ### AI助手
 
@@ -59,7 +59,7 @@
 - 公告、
 - 敏感词、
 - CRM、
-- 报表功能
+- 报表功能，
 
 ## 快速开始
 
@@ -67,9 +67,6 @@
 - [源码部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [Jar包部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/jar)
-
-## 文档
-
 - [文档](https://www.weiyuai.cn/docs/zh-CN/)
 
 ## 预览

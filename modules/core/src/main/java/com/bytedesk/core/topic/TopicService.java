@@ -64,9 +64,9 @@ public class TopicService {
     }
 
     public void create(TopicRequest topicRequest) {
-        Optional<Topic> topicOptional = findByUserUid(topicRequest.getUserUid());
+        Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
-            Topic topicElement = topicOptional.get();
+            TopicEntity topicElement = topicOptional.get();
             if (topicElement.getTopics().contains(topicRequest.getTopic())) {
                 return;
             }
@@ -78,16 +78,16 @@ public class TopicService {
         }
         topicRequest.setUid(uidUtils.getCacheSerialUid());
         // 
-        Topic topic = modelMapper.map(topicRequest, Topic.class);
+        TopicEntity topic = modelMapper.map(topicRequest, TopicEntity.class);
         topic.getTopics().add(topicRequest.getTopic());
         // 
         save(topic);
     }
 
     public void remove(String topic, String userUid) {
-        Optional<Topic> topicOptional = findByUserUid(userUid);
+        Optional<TopicEntity> topicOptional = findByUserUid(userUid);
         if (topicOptional.isPresent()) {
-            Topic topicElement = topicOptional.get();
+            TopicEntity topicElement = topicOptional.get();
             if (!topicElement.getTopics().contains(topic)) {
                 return;
             }
@@ -99,9 +99,9 @@ public class TopicService {
     
     public void subscribe(String topic, String clientId) {
         // 用户clientId格式: uid/client/deviceUid
-        Optional<Topic> topicOptional = findByClientId(clientId);
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
-            Topic topicElement = topicOptional.get();
+            TopicEntity topicElement = topicOptional.get();
             if (topicElement.getTopics().contains(topic)) {
                 log.info("create: {}", topic);
                 return;
@@ -124,9 +124,9 @@ public class TopicService {
 
     public void unsubscribe(String topic, String clientId) {
         // 用户clientId格式: uid/client/deviceUid
-        Optional<Topic> topicOptional = findByClientId(clientId);
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
-            Topic topicElement = topicOptional.get();
+            TopicEntity topicElement = topicOptional.get();
             if (topicElement.getTopics().contains(topic)) {
                 log.info("create: {}", topic);
                 return;
@@ -144,9 +144,9 @@ public class TopicService {
         concurrentMap.remove(clientId);
 
         // 用户clientId格式: uid/client/deviceUid
-        Optional<Topic> topicOptional = findByClientId(clientId);
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
-            Topic topic = topicOptional.get();
+            TopicEntity topic = topicOptional.get();
             if (!topic.getClientIds().contains(clientId)) {
                 log.info("addClientId: {}", clientId);
                 topic.getClientIds().add(clientId);
@@ -164,9 +164,9 @@ public class TopicService {
 
     private void doRemoveClientId(String clientId) {
         // 用户clientId格式: uid/client/deviceUid
-        Optional<Topic> topicOptional = findByClientId(clientId);
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
-            Topic topic = topicOptional.get();
+            TopicEntity topic = topicOptional.get();
             if (topic.getClientIds().contains(clientId)) {
                 log.info("removeClientId: {}", clientId);
                 topic.getClientIds().remove(clientId);
@@ -185,24 +185,24 @@ public class TopicService {
     }
 
     @Cacheable(value = "topic", key = "#uid")
-    public Optional<Topic> findByUid(String uid) {
+    public Optional<TopicEntity> findByUid(String uid) {
         return topicRepository.findByUid(uid);
     }
 
     @Cacheable(value = "topic", key = "#clientId", unless = "#result == null")
-    public Optional<Topic> findByClientId(String clientId) {
+    public Optional<TopicEntity> findByClientId(String clientId) {
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
         return findByUserUid(uid);
     }
 
     @Cacheable(value = "topic", key = "#uid", unless = "#result == null")
-    public Optional<Topic> findByUserUid(String uid) {
+    public Optional<TopicEntity> findByUserUid(String uid) {
         return topicRepository.findFirstByUserUid(uid);
     }
 
     @Cacheable(value = "topic", key = "#topic", unless="#result == null")
-    public Set<Topic> findByTopic(String topic) {
+    public Set<TopicEntity> findByTopic(String topic) {
         return topicRepository.findByTopicsContains(topic);
         // return topics;
         // return topics.stream().map(this::convertToTopicResponse).toList();
@@ -211,7 +211,7 @@ public class TopicService {
     @Caching(put = {
         @CachePut(value = "topic", key = "#topic.userUid")
     })
-    public Topic save(Topic topic) {
+    public TopicEntity save(TopicEntity topic) {
         try {
             return topicRepository.save(topic);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -223,16 +223,16 @@ public class TopicService {
 
     private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
     private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
-    private final Queue<Topic> retryQueue = new LinkedList<>();
+    private final Queue<TopicEntity> retryQueue = new LinkedList<>();
 
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Topic topic) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TopicEntity topic) {
         retryQueue.add(topic);
         processRetryQueue();
     }
 
     private void processRetryQueue() {
         while (!retryQueue.isEmpty()) {
-            Topic topic = retryQueue.poll(); // 从队列中取出一个元素
+            TopicEntity topic = retryQueue.poll(); // 从队列中取出一个元素
             if (topic == null) {
                 break; // 队列为空，跳出循环
             }
@@ -272,7 +272,7 @@ public class TopicService {
         }
     }
 
-    private void handleFailedRetries(Topic topic) {
+    private void handleFailedRetries(TopicEntity topic) {
         String topicJSON = JSONObject.toJSONString(topic);
         ActionRequest actionRequest = ActionRequest.builder()
                 .title("topic")
@@ -291,7 +291,7 @@ public class TopicService {
     // TODO: 需要从原先uid的缓存列表中删除，然后添加到新的uid的换成列表中
     // @CachePut(value = "topic", key = "#uid")
     public void update(String uid, String userUid) {
-        Optional<Topic> optionalTopic = findByUid(uid);
+        Optional<TopicEntity> optionalTopic = findByUid(uid);
         optionalTopic.ifPresent(topic -> {
             topic.setUserUid(userUid);
             topicRepository.save(topic);
@@ -299,11 +299,11 @@ public class TopicService {
     }
 
     @CacheEvict(value = "topic", key = "#topic.userUid")
-    public void delete(Topic topic) {
+    public void delete(TopicEntity topic) {
         topicRepository.delete(topic);
     }
 
-    public TopicResponse convertToTopicResponse(Topic topic) {
+    public TopicResponse convertToTopicResponse(TopicEntity topic) {
         return modelMapper.map(topic, TopicResponse.class);
     }
 

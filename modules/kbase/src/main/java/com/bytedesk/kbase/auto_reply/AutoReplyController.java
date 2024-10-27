@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:39:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 11:33:00
+ * @LastEditTime: 2024-10-23 18:16:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ public class AutoReplyController extends BaseController<AutoReplyRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(AutoReplyRequest request) {
+    public ResponseEntity<?> queryByUser(AutoReplyRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
@@ -73,7 +73,7 @@ public class AutoReplyController extends BaseController<AutoReplyRequest> {
     @Override
     public ResponseEntity<?> delete(AutoReplyRequest request) {
         
-        autoReplyService.deleteByUid(request.getUid());
+        autoReplyService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

@@ -21,7 +21,7 @@ import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.event.GenericApplicationEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -38,9 +38,9 @@ public class MemberEntityListener {
     // }
 
     @PostPersist
-    public void postPersist(Member member) {
-        Member clonedMember = SerializationUtils.clone(member);
-        User user = clonedMember.getUser();
+    public void postPersist(MemberEntity member) {
+        MemberEntity clonedMember = SerializationUtils.clone(member);
+        UserEntity user = clonedMember.getUser();
         log.info("postPersist member {}, user {}", clonedMember.getUid(), user.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -64,10 +64,10 @@ public class MemberEntityListener {
     // }
 
     @PostUpdate
-    public void postUpdate(Member member) {
+    public void postUpdate(MemberEntity member) {
         // log.info("postUpdate member {}", member.getUid());
-        Member clonedMember = SerializationUtils.clone(member);
-        User user = clonedMember.getUser();
+        MemberEntity clonedMember = SerializationUtils.clone(member);
+        UserEntity user = clonedMember.getUser();
         log.info("postUpdate member {}, user {}", clonedMember.getUid(), user.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);

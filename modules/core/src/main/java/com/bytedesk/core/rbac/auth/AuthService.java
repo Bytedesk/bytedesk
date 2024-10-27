@@ -23,7 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
@@ -48,7 +48,7 @@ public class AuthService {
 
     private ModelMapper modelMapper;
 
-    public User getCurrentUser() {
+    public UserEntity getCurrentUser() {
         // not logged in
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             return null;
@@ -58,7 +58,7 @@ public class AuthService {
             UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                     .getPrincipal();
 
-            return modelMapper.map(userDetails, User.class);
+            return modelMapper.map(userDetails, UserEntity.class);
         } catch (Exception e) {
             // TODO: handle exception
             // FIXME: 验证码错误时会报错：java.lang.ClassCastException: class java.lang.String cannot be cast to

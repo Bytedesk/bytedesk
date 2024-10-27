@@ -30,18 +30,18 @@ import lombok.extern.slf4j.Slf4j;
 public class UploadEntityListener {
 
     @PostPersist
-    public void postPersist(Upload upload) {
+    public void postPersist(UploadEntity upload) {
         log.info("UploadEntityListener: postPersist");
-        Upload clonedUpload = SerializationUtils.clone(upload);
+        UploadEntity clonedUpload = SerializationUtils.clone(upload);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         publisher.publishGenericApplicationEvent(new GenericApplicationEvent<UploadCreateEvent>(this, new UploadCreateEvent(this, clonedUpload)));
     }
 
     @PostUpdate
-    public void postUpdate(Upload upload) {
+    public void postUpdate(UploadEntity upload) {
         log.info("UploadEntityListener: postUpdate");
-        Upload clonedUpload = SerializationUtils.clone(upload);
+        UploadEntity clonedUpload = SerializationUtils.clone(upload);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         publisher.publishGenericApplicationEvent(new GenericApplicationEvent<UploadUpdateEvent>(this, new UploadUpdateEvent(this, clonedUpload)));

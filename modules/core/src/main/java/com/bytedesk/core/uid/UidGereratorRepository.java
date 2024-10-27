@@ -40,15 +40,15 @@ import org.springframework.stereotype.Repository;
  * @author wujun
  */
 @Repository
-public interface UidGereratorRepository extends JpaRepository<UidGenerator, Long>, JpaSpecificationExecutor<UidGenerator>  {
+public interface UidGereratorRepository extends JpaRepository<UidGeneratorEntity, Long>, JpaSpecificationExecutor<UidGeneratorEntity>  {
 
     /**
-     * Get {@link UidGenerator} by node host
+     * Get {@link UidGeneratorEntity} by node host
      * 
      * @param host
      * @param port
      * @return
      */
-    UidGenerator findByHostAndPort(String host, String port);
+    UidGeneratorEntity findByHostAndPort(String host, String port);
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 15:06:48
+ * @LastEditTime: 2024-10-23 18:19:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class CounterService extends BaseService<Counter, CounterRequest, CounterResponse> {
+public class CounterService extends BaseService<CounterEntity, CounterRequest, CounterResponse> {
 
     private final CounterRepository counterRepository;
 
@@ -39,9 +39,9 @@ public class CounterService extends BaseService<Counter, CounterRequest, Counter
 
     // agentUid 代表 技能组uid/客服uid
     public CounterResponse getNumber(String orgUid, String topic, String visitor) {
-        Optional<Counter> counterOptional = findByTopic(topic);
+        Optional<CounterEntity> counterOptional = findByTopic(topic);
         if (counterOptional.isPresent()) {
-            Counter counter = counterOptional.get();
+            CounterEntity counter = counterOptional.get();
             counter.increaseSerialNumber();
             try {
                 return convertToResponse(counterRepository.save(counter));
@@ -71,7 +71,7 @@ public class CounterService extends BaseService<Counter, CounterRequest, Counter
 
     @Cacheable(value = "counter", key = "#uid")
     @Override
-    public Optional<Counter> findByUid(String uid) {
+    public Optional<CounterEntity> findByUid(String uid) {
         return counterRepository.findByUid(uid);
     }
 
@@ -81,16 +81,16 @@ public class CounterService extends BaseService<Counter, CounterRequest, Counter
     // }
 
     @Cacheable(value = "counter", key = "#topic")
-    public Optional<Counter> findByTopic(String topic) {
+    public Optional<CounterEntity> findByTopic(String topic) {
         return counterRepository.findByTopic(topic);
     }
 
     @Override
     public CounterResponse create(CounterRequest request) {
-        Counter counter = modelMapper.map(request, Counter.class);
+        CounterEntity counter = modelMapper.map(request, CounterEntity.class);
         counter.setUid(uidUtils.getUid());
         // 
-        Counter savedCounter = save(counter);
+        CounterEntity savedCounter = save(counter);
         if (savedCounter == null) {
             throw new RuntimeException("save counter failed");
         }
@@ -104,7 +104,7 @@ public class CounterService extends BaseService<Counter, CounterRequest, Counter
     }
 
     @Override
-    public Counter save(Counter entity) {
+    public CounterEntity save(CounterEntity entity) {
         try {
             return counterRepository.save(entity);
         } catch (Exception e) {
@@ -120,7 +120,7 @@ public class CounterService extends BaseService<Counter, CounterRequest, Counter
     }
 
     @Override
-    public void delete(Counter entity) {
+    public void delete(CounterRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
@@ -130,13 +130,13 @@ public class CounterService extends BaseService<Counter, CounterRequest, Counter
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Counter entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CounterEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public CounterResponse convertToResponse(Counter entity) {
+    public CounterResponse convertToResponse(CounterEntity entity) {
         return modelMapper.map(entity, CounterResponse.class);
     }
     

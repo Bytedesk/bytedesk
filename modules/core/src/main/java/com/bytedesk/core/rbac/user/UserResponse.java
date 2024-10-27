@@ -28,7 +28,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.organization.OrganizationResponse;
-import com.bytedesk.core.rbac.user.User.Sex;
+import com.bytedesk.core.rbac.user.UserEntity.Sex;
 
 @Data
 @Builder

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 13:06:07
+ * @LastEditTime: 2024-10-22 12:29:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,14 +25,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public interface VisitorRepository extends JpaRepository<Visitor, Long>, JpaSpecificationExecutor<Visitor> {
+public interface VisitorRepository extends JpaRepository<VisitorEntity, Long>, JpaSpecificationExecutor<VisitorEntity> {
 
-    Optional<Visitor> findByUidAndDeleted(String uid, Boolean deleted);
+    Optional<VisitorEntity> findByUidAndDeleted(String uid, Boolean deleted);
 
-    List<Visitor> findByStatusAndDeleted(String status, Boolean deleted);
+    List<VisitorEntity> findByStatusAndDeleted(String status, Boolean deleted);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Visitor v SET v.status = :status WHERE v.uid = :uid")
+    @Query("UPDATE VisitorEntity v SET v.status = :status WHERE v.uid = :uid")
     int updateStatusByUid(String uid, String status);
 }

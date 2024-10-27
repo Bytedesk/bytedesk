@@ -40,7 +40,7 @@ public class QueueController extends BaseController<QueueRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(QueueRequest request) {
+    public ResponseEntity<?> queryByUser(QueueRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

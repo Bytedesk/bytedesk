@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-29 12:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-23 20:35:26
+ * @LastEditTime: 2024-10-23 17:18:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 // https://docs.spring.io/spring-data/redis/reference/redis/getting-started.html
@@ -44,6 +45,10 @@ public class RedisConfig {
         poolConfig.setMaxTotal(jedisPoolProperties.getMaxTotal());
         poolConfig.setMinIdle(jedisPoolProperties.getMaxIdle());
         return poolConfig;
+    }
+
+    public JedisPool getJedisPool() {
+        return new JedisPool(jedisPoolConfig(), jedisProperties.getHost(), jedisProperties.getPort());
     }
 
     // https://github.com/redis/jedis

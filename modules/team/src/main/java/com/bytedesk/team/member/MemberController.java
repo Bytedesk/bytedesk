@@ -64,7 +64,7 @@ public class MemberController extends BaseController<MemberRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(MemberRequest memberRequest) {
+    public ResponseEntity<?> queryByUser(MemberRequest memberRequest) {
         //
         MemberResponse memberResponse = memberService.query(memberRequest);
         //

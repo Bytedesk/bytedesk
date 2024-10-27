@@ -15,7 +15,7 @@
 package com.bytedesk.ai.provider;
 
 import com.bytedesk.core.base.BaseRequestNoOrg;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +40,7 @@ public class LlmProviderRequest extends BaseRequestNoOrg {
     private String avatar;
     //
     @Builder.Default
-    private String description = BdConstants.EMPTY_STRING;
+    private String description = BytedeskConsts.EMPTY_STRING;
 
     //
     private String apiUrl;

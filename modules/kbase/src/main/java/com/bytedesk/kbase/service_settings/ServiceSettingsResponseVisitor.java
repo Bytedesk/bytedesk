@@ -17,7 +17,7 @@ package com.bytedesk.kbase.service_settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
 
@@ -58,7 +58,7 @@ public class ServiceSettingsResponseVisitor {
     private Boolean showPreForm = false;
 
     @Builder.Default
-    private String preForm = BdConstants.EMPTY_JSON_STRING;
+    private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     private Boolean showHistory = false;

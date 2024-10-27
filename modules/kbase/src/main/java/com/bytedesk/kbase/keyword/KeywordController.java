@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 15:17:34
+ * @LastEditTime: 2024-10-23 18:17:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class KeywordController extends BaseController<KeywordRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(KeywordRequest request) {
+    public ResponseEntity<?> queryByUser(KeywordRequest request) {
         
         Page<KeywordResponse> page = keywordService.queryByUser(request);
 
@@ -80,7 +80,7 @@ public class KeywordController extends BaseController<KeywordRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody KeywordRequest request) {
 
-        keywordService.deleteByUid(request.getUid());
+        keywordService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }

@@ -19,9 +19,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface IpRepository extends JpaRepository<Ip, Long>, JpaSpecificationExecutor<Ip> {
+public interface IpRepository extends JpaRepository<IpEntity, Long>, JpaSpecificationExecutor<IpEntity> {
 
-    Optional<Ip> findByUid(String uid);
+    Optional<IpEntity> findByUid(String uid);
 
-    Optional<Ip> findFirstByOrgUid(String orgUid);
+    Optional<IpEntity> findFirstByOrgUid(String orgUid);
 }

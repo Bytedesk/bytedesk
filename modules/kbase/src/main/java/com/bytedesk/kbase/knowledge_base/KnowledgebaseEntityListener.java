@@ -29,9 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 public class KnowledgebaseEntityListener {
 
     @PostPersist
-    void postPersist(Knowledgebase knowledgebase) {
+    void postPersist(KnowledgebaseEntity knowledgebase) {
         log.info("knowledgebase postPersist: {}", knowledgebase);
-        Knowledgebase clonedKnowledgebase = SerializationUtils.clone(knowledgebase);
+        KnowledgebaseEntity clonedKnowledgebase = SerializationUtils.clone(knowledgebase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         publisher.publishGenericApplicationEvent(new GenericApplicationEvent<KnowledgebaseCreateEvent>(this, new KnowledgebaseCreateEvent(this, clonedKnowledgebase)));

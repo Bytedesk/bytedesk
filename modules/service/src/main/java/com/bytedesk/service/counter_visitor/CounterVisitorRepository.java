@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface CounterVisitorRepository extends JpaRepository<CounterVisitor, Long>, JpaSpecificationExecutor<CounterVisitor> {
+public interface CounterVisitorRepository extends JpaRepository<CounterVisitorEntity, Long>, JpaSpecificationExecutor<CounterVisitorEntity> {
     
-    Optional<CounterVisitor> findByTopic(String topic);
+    Optional<CounterVisitorEntity> findByTopic(String topic);
 }

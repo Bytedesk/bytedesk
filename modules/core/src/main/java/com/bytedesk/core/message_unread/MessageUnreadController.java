@@ -43,7 +43,7 @@ public class MessageUnreadController extends BaseController<MessageUnreadRequest
     // 登录用户拉取未读消息
     @GetMapping("/query")
     @Override
-    public ResponseEntity<?> query(MessageUnreadRequest request) {
+    public ResponseEntity<?> queryByUser(MessageUnreadRequest request) {
 
         List<MessageResponse> messageList = messageUnreadService.getMessages(request.getUserUid());
 

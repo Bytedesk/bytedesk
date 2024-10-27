@@ -19,10 +19,10 @@ import org.hibernate.type.SqlTypes;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -48,7 +48,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ ThreadEntityListener.class })
-@Table(name = "core_thread", uniqueConstraints = {
+@Table(name = "bytedesk_core_thread", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"topic", "owner_id"})
 })
 public class ThreadEntity extends BaseEntity {
@@ -62,7 +62,7 @@ public class ThreadEntity extends BaseEntity {
     private String topic;
 
     @Builder.Default
-    private String content = BdConstants.EMPTY_STRING;
+    private String content = BytedeskConsts.EMPTY_STRING;
 
     /**
      * @{ThreadTypeConsts}
@@ -139,7 +139,7 @@ public class ThreadEntity extends BaseEntity {
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
     // of type character varying
     @JdbcTypeCode(SqlTypes.JSON)
-    private String extra = BdConstants.EMPTY_JSON_STRING;
+    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 在客服会话中，存储访客信息
@@ -153,7 +153,7 @@ public class ThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String user = BdConstants.EMPTY_JSON_STRING;
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 一对一客服对话中，存储客服信息
@@ -165,19 +165,19 @@ public class ThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String agent = BdConstants.EMPTY_JSON_STRING;
+    private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 机器人和agent可以同时存在，人工接待的时候，机器人可以同时给出答案，客服可以选用
     // 存储机器人信息
     // @Builder.Default
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
-    // private String robot = BdConstants.EMPTY_JSON_STRING;
+    // private String robot = BytedeskConsts.EMPTY_JSON_STRING;
 
     // belongs to user
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    private User owner;
+    private UserEntity owner;
 
     public void reInit() {
         this.state = ThreadStateEnum.INITIAL.name();

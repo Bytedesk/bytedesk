@@ -45,7 +45,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		log.debug("loadUserByUsername {}", username);
 		//
-		Optional<User> userOptional = userService.findByUsernameAndPlatform(username, PlatformEnum.BYTEDESK.name());
+		Optional<UserEntity> userOptional = userService.findByUsernameAndPlatform(username, PlatformEnum.BYTEDESK.name());
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -60,7 +60,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();
 		log.debug("loadUserByUsername {}, username {}, platform {}", subject, username, platform);
 		//
-		Optional<User> userOptional = userService.findByUsernameAndPlatform(username, PlatformEnum.fromValue(platform).name());
+		Optional<UserEntity> userOptional = userService.findByUsernameAndPlatform(username, PlatformEnum.fromValue(platform).name());
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -73,7 +73,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetailsImpl loadUserByEmailAndPlatform(String email, String platform) {
 		log.debug("loadUserByEmail {}", email);
 		//
-		Optional<User> userOptional = userService.findByEmailAndPlatform(email, platform);
+		Optional<UserEntity> userOptional = userService.findByEmailAndPlatform(email, platform);
 		if (!userOptional.isPresent()) {
 			throw new EmailNotFoundException("email " + email + " is not found");
 		}
@@ -86,7 +86,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetailsImpl loadUserByMobileAndPlatform(String mobile, String platform) {
 		log.debug("loadUserByMobile {}", mobile);
 		//
-		Optional<User> userOptional = userService.findByMobileAndPlatform(mobile, platform);
+		Optional<UserEntity> userOptional = userService.findByMobileAndPlatform(mobile, platform);
 		if (!userOptional.isPresent()) {
 			throw new MobileNotFoundException("mobile " + mobile + " is not found");
 		}

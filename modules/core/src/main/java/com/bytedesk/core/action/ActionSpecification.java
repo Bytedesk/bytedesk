@@ -26,7 +26,7 @@ import jakarta.persistence.criteria.Predicate;
 
 public class ActionSpecification extends BaseSpecification {
 
-    public static Specification<Action> search(ActionRequest request) {
+    public static Specification<ActionEntity> search(ActionRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

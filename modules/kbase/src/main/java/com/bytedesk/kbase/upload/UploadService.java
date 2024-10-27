@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UploadService extends BaseService<Upload, UploadRequest, UploadResponse> {
+public class UploadService extends BaseService<UploadEntity, UploadRequest, UploadResponse> {
 
 	private final Path uploadDir;
 
@@ -58,11 +58,11 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 
 	private final ModelMapper modelMapper;
 
-	private final UploadReposistory uploadReposistory;
+	private final UploadRepository uploadRepository;
 
 	public UploadResponse create(UploadRequest request) {
 
-		Upload upload = modelMapper.map(request, Upload.class);
+		UploadEntity upload = modelMapper.map(request, UploadEntity.class);
 		upload.setUid(uidUtils.getCacheSerialUid());
 		upload.setClient(ClientEnum.fromValue(request.getClient()).name());
 		upload.setType(UploadTypeEnum.fromValue(request.getType()).name());
@@ -72,7 +72,7 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 			upload.setStatus(UploadStatusEnum.UPLOADED.name());
 		}
 		//
-		Upload savedUpload = save(upload);
+		UploadEntity savedUpload = save(upload);
 		if (savedUpload == null) {
 			throw new RuntimeException("Failed to store file " + upload.getFileName());
 		}
@@ -80,9 +80,9 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 		return convertToResponse(savedUpload);
 	}
 
-	public Upload save(Upload upload) {
+	public UploadEntity save(UploadEntity upload) {
 		try {
-			return uploadReposistory.save(upload);
+			return uploadRepository.save(upload);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -244,8 +244,8 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 
 		Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
 				"updatedAt");
-		Specification<Upload> specification = UploadSpecification.search(request);
-		Page<Upload> page = uploadReposistory.findAll(specification, pageable);
+		Specification<UploadEntity> specification = UploadSpecification.search(request);
+		Page<UploadEntity> page = uploadRepository.findAll(specification, pageable);
 
 		return page.map(this::convertToResponse);
 	}
@@ -257,8 +257,8 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 	}
 
 	@Override
-	public Optional<Upload> findByUid(String uid) {
-		return uploadReposistory.findByUid(uid);
+	public Optional<UploadEntity> findByUid(String uid) {
+		return uploadRepository.findByUid(uid);
 	}
 
 	@Override
@@ -269,7 +269,7 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 
 	@Override
 	public void deleteByUid(String uid) {
-		Optional<Upload> uploadOptional = findByUid(uid);
+		Optional<UploadEntity> uploadOptional = findByUid(uid);
 		if (uploadOptional.isPresent()) {
 			uploadOptional.get().setDeleted(true);
 			save(uploadOptional.get());
@@ -279,18 +279,18 @@ public class UploadService extends BaseService<Upload, UploadRequest, UploadResp
 	}
 
 	@Override
-	public void delete(Upload entity) {
+	public void delete(UploadRequest entity) {
 		deleteByUid(entity.getUid());
 	}
 
 	@Override
-	public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Upload entity) {
+	public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UploadEntity entity) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
 	}
 
 	@Override
-	public UploadResponse convertToResponse(Upload entity) {
+	public UploadResponse convertToResponse(UploadEntity entity) {
 		UploadResponse uploadResponse = this.modelMapper.map(entity, UploadResponse.class);
 		// 上一行没有自动初始化isLlm字段，所以这里需要手动设置
 		// uploadResponse.setIsLlm(entity.isLlm());

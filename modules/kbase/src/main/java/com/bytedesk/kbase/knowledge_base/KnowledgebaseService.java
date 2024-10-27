@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 14:56:31
+ * @LastEditTime: 2024-10-23 18:17:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -37,7 +37,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class KnowledgebaseService extends BaseService<Knowledgebase, KnowledgebaseRequest, KnowledgebaseResponse> {
+public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, KnowledgebaseRequest, KnowledgebaseResponse> {
 
     private final KnowledgebaseRepository knowledgebaseRepository;
 
@@ -51,9 +51,9 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
 
-        Specification<Knowledgebase> spec = KnowledgebaseSpecification.search(request);
+        Specification<KnowledgebaseEntity> spec = KnowledgebaseSpecification.search(request);
 
-        Page<Knowledgebase> page = knowledgebaseRepository.findAll(spec, pageable);
+        Page<KnowledgebaseEntity> page = knowledgebaseRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -65,14 +65,14 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
     }
 
     @Override
-    public Optional<Knowledgebase> findByUid(String uid) {
+    public Optional<KnowledgebaseEntity> findByUid(String uid) {
         return knowledgebaseRepository.findByUid(uid);
     }
 
     @Override
     public KnowledgebaseResponse create(KnowledgebaseRequest request) {
 
-        Knowledgebase entity = Knowledgebase.builder().build();
+        KnowledgebaseEntity entity = KnowledgebaseEntity.builder().build();
         if (StringUtils.hasText(request.getUid())) {
             entity.setUid(request.getUid());
         } else {
@@ -87,7 +87,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
         entity.setOrgUid(request.getOrgUid());
         entity.setAgentUid(request.getAgentUid());
         //
-        Knowledgebase savedKb = save(entity);
+        KnowledgebaseEntity savedKb = save(entity);
         if (savedKb == null) {
             throw new RuntimeException("knowledge_base not saved");
         }
@@ -98,9 +98,9 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
     @Override
     public KnowledgebaseResponse update(KnowledgebaseRequest request) {
 
-        Optional<Knowledgebase> optional = findByUid(request.getUid());
+        Optional<KnowledgebaseEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            Knowledgebase entity = optional.get();
+            KnowledgebaseEntity entity = optional.get();
             entity.setName(request.getName());
             // entity.setType(KownledgebaseTypeEnum.fromValue(request.getType()));
             entity.setDescriptionHtml(request.getDescriptionHtml());
@@ -114,20 +114,20 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
     }
 
 
-    public List<Knowledgebase> findByLevelAndType(LevelEnum level, KnowledgebaseTypeEnum type) {
+    public List<KnowledgebaseEntity> findByLevelAndType(LevelEnum level, KnowledgebaseTypeEnum type) {
         return knowledgebaseRepository.findByLevelAndTypeAndDeleted(level.name(), type.name(), false);
     }
 
-    public List<Knowledgebase> findByLevelAndTypeAndOrgUid(LevelEnum level, KnowledgebaseTypeEnum type, String orgUid) {
+    public List<KnowledgebaseEntity> findByLevelAndTypeAndOrgUid(LevelEnum level, KnowledgebaseTypeEnum type, String orgUid) {
         return knowledgebaseRepository.findByLevelAndTypeAndOrgUidAndDeleted(level.name(), type.name(), orgUid, false);
     }
 
-    public List<Knowledgebase> findByLevelAndTypeAndAgentUid(LevelEnum level, KnowledgebaseTypeEnum type, String agentUid) {
+    public List<KnowledgebaseEntity> findByLevelAndTypeAndAgentUid(LevelEnum level, KnowledgebaseTypeEnum type, String agentUid) {
         return knowledgebaseRepository.findByLevelAndTypeAndAgentUidAndDeleted(level.name(), type.name(), agentUid, false);
     }
 
     @Override
-    public Knowledgebase save(Knowledgebase entity) {
+    public KnowledgebaseEntity save(KnowledgebaseEntity entity) {
         try {
             return knowledgebaseRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -138,7 +138,7 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Knowledgebase> optional = findByUid(uid);
+        Optional<KnowledgebaseEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -146,19 +146,19 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
     }
 
     @Override
-    public void delete(Knowledgebase entity) {
+    public void delete(KnowledgebaseRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            Knowledgebase entity) {
+            KnowledgebaseEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public KnowledgebaseResponse convertToResponse(Knowledgebase entity) {
+    public KnowledgebaseResponse convertToResponse(KnowledgebaseEntity entity) {
         return modelMapper.map(entity, KnowledgebaseResponse.class);
     }
 
@@ -168,14 +168,14 @@ public class KnowledgebaseService extends BaseService<Knowledgebase, Knowledgeba
             return;
         }
         //
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         KnowledgebaseRequest kownledgebaseRequeqstQuickReplyPlatform = KnowledgebaseRequest.builder()
                 .name(KnowledgebaseConsts.KB_PLATFORM_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .level(LevelEnum.PLATFORM.name())
                 .build();
-        kownledgebaseRequeqstQuickReplyPlatform.setUid(BdConstants.DEFAULT_KB_UID);
+        kownledgebaseRequeqstQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_UID);
         kownledgebaseRequeqstQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
         // 方便超级管理员加载，避免重新写一个接口拉取
         kownledgebaseRequeqstQuickReplyPlatform.setOrgUid(orgUid);

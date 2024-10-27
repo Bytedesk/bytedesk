@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AgentSpecification extends BaseSpecification {
 
-    public static Specification<Agent> search(AgentRequest request) {
+    public static Specification<AgentEntity> search(AgentRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-26 10:36:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-26 13:51:35
+ * @LastEditTime: 2024-10-23 18:29:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class LlmProviderKeyService extends BaseService<LlmProviderKey, LlmProviderKeyRequest, LlmProviderKeyResponse> {
+public class LlmProviderKeyService extends BaseService<LlmProviderKeyEntity, LlmProviderKeyRequest, LlmProviderKeyResponse> {
 
     private final LlmProviderKeyRepository repository;
 
@@ -47,9 +47,9 @@ public class LlmProviderKeyService extends BaseService<LlmProviderKey, LlmProvid
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
                 "updatedAt");
 
-        Specification<LlmProviderKey> specification = LlmProviderKeySpecification.search(request);
+        Specification<LlmProviderKeyEntity> specification = LlmProviderKeySpecification.search(request);
 
-        Page<LlmProviderKey> page = repository.findAll(specification, pageable);
+        Page<LlmProviderKeyEntity> page = repository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -62,22 +62,22 @@ public class LlmProviderKeyService extends BaseService<LlmProviderKey, LlmProvid
 
     @Cacheable(value = "LlmProviderKey", key = "#uid", unless = "#result==null")
     @Override
-    public Optional<LlmProviderKey> findByUid(String uid) {
+    public Optional<LlmProviderKeyEntity> findByUid(String uid) {
         return repository.findByUid(uid);
     }
 
     @Cacheable(value = "LlmProviderKey", key = "#provider+'-'+#orgUid", unless = "#result==null")
-    public Optional<LlmProviderKey> findByProviderAndOrgUid(String provider, String orgUid) {
+    public Optional<LlmProviderKeyEntity> findByProviderAndOrgUid(String provider, String orgUid) {
         return repository.findByProviderAndOrgUid(provider, orgUid);
     }
 
     @Override
     public LlmProviderKeyResponse create(LlmProviderKeyRequest request) {
         
-        LlmProviderKey entity = modelMapper.map(request, LlmProviderKey.class);
+        LlmProviderKeyEntity entity = modelMapper.map(request, LlmProviderKeyEntity.class);
         entity.setUid(uidUtils.getUid());
 
-        LlmProviderKey savedEntity = save(entity);
+        LlmProviderKeyEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create entity failed");
         }
@@ -91,7 +91,7 @@ public class LlmProviderKeyService extends BaseService<LlmProviderKey, LlmProvid
     }
 
     @Override
-    public LlmProviderKey save(LlmProviderKey entity) {
+    public LlmProviderKeyEntity save(LlmProviderKeyEntity entity) {
         try {
             return repository.save(entity);
         } catch (Exception e) {
@@ -107,20 +107,20 @@ public class LlmProviderKeyService extends BaseService<LlmProviderKey, LlmProvid
     }
 
     @Override
-    public void delete(LlmProviderKey entity) {
+    public void delete(LlmProviderKeyRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            LlmProviderKey entity) {
+            LlmProviderKeyEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public LlmProviderKeyResponse convertToResponse(LlmProviderKey entity) {
+    public LlmProviderKeyResponse convertToResponse(LlmProviderKeyEntity entity) {
         return modelMapper.map(entity, LlmProviderKeyResponse.class);
     }
     

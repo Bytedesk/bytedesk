@@ -25,9 +25,9 @@ public class ArticleCreateEvent extends ApplicationEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private Article article;
+    private ArticleEntity article;
 
-    public ArticleCreateEvent(Object source, Article article) {
+    public ArticleCreateEvent(Object source, ArticleEntity article) {
         super(source);
         this.article = article;
     }

@@ -40,7 +40,7 @@ public class VisitorThreadController extends BaseController<VisitorThreadRequest
     }
 
     @Override
-    public ResponseEntity<?> query(VisitorThreadRequest request) {
+    public ResponseEntity<?> queryByUser(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

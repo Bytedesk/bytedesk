@@ -24,7 +24,7 @@ import jakarta.persistence.PostPersist;
 public class ChannelEntityListener {
 
     @PostPersist
-    public void onPostPersist(Channel channel) {
+    public void onPostPersist(ChannelEntity channel) {
         // log.info("onPostPersist: {}", channel.getNickname());
     }
 

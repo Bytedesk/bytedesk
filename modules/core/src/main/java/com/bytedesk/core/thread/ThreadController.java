@@ -63,7 +63,7 @@ public class ThreadController extends BaseController<ThreadRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(ThreadRequest request) {
+    public ResponseEntity<?> queryByUser(ThreadRequest request) {
 
         Page<ThreadResponse> threadPage = threadService.query(request);
         //

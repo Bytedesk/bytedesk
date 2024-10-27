@@ -33,16 +33,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "department - 部门/分公司")
 // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER')")
 @RepositoryRestResource(path = "dep")
-public interface DepartmentRepository extends JpaRepository<Department, Long>, JpaSpecificationExecutor<Department> {
+public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long>, JpaSpecificationExecutor<DepartmentEntity> {
 
     // @SuppressWarnings("unchecked")
     // @CacheEvict(cacheNames = "userOrgs", key =
     // "#department.getUser().getUsername()")
     // @NonNull Department save(@NonNull Department department);
 
-    Optional<Department> findByNameAndOrgUidAndDeleted(String name, String orgUid, boolean deleted);
+    Optional<DepartmentEntity> findByNameAndOrgUidAndDeleted(String name, String orgUid, boolean deleted);
 
-    Optional<Department> findByUid(String uid);
+    Optional<DepartmentEntity> findByUid(String uid);
 
     // Page<Department> findByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted, Pageable pageable);
 

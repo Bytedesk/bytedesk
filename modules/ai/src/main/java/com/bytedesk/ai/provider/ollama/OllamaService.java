@@ -74,7 +74,7 @@ public class OllamaService {
             messageProtobuf.setType(MessageTypeEnum.STREAM);
             messageProtobuf.setContent(aiMessage.getContent());
             // MessageUtils.notifyUser(messageProtobuf);
-            messageSendService.sendMessage(messageProtobuf);
+            messageSendService.sendProtobufMessage(messageProtobuf);
             // 
             if (aiMessage.getStatus().equals(MessageStatus.END)) {
                 log.info("aiMessage.getStatus() == END");

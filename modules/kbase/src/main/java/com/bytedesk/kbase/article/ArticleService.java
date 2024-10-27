@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-27 08:50:25
+ * @LastEditTime: 2024-10-23 18:15:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -37,7 +37,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class ArticleService extends BaseService<Article, ArticleRequest, ArticleResponse> {
+public class ArticleService extends BaseService<ArticleEntity, ArticleRequest, ArticleResponse> {
 
     private final ArticleRepository FaqRepository;
 
@@ -55,9 +55,9 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Specification<Article> spec = ArticleSpecification.search(request);
+        Specification<ArticleEntity> spec = ArticleSpecification.search(request);
 
-        Page<Article> page = FaqRepository.findAll(spec, pageable);
+        Page<ArticleEntity> page = FaqRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -69,17 +69,17 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
     }
 
     @Override
-    public Optional<Article> findByUid(String uid) {
+    public Optional<ArticleEntity> findByUid(String uid) {
         return FaqRepository.findByUid(uid);
     }
 
     @Override
     public ArticleResponse create(ArticleRequest request) {
 
-        Article entity = modelMapper.map(request, Article.class);
+        ArticleEntity entity = modelMapper.map(request, ArticleEntity.class);
         entity.setUid(uidUtils.getCacheSerialUid());
         // 
-        User user = authService.getCurrentUser();
+        UserEntity user = authService.getCurrentUser();
         UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
         entity.setUser(JSON.toJSONString(userProtobuf));
         // 
@@ -91,7 +91,7 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
         //     entity.setCategory(categoryOptional.get());
         // }
         //
-        Article savedArticle = save(entity);
+        ArticleEntity savedArticle = save(entity);
         if (savedArticle == null) {
             throw new RuntimeException("article save failed");
         }
@@ -102,9 +102,9 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
     @Override
     public ArticleResponse update(ArticleRequest request) {
 
-        Optional<Article> optional = findByUid(request.getUid());
+        Optional<ArticleEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            Article entity = optional.get();
+            ArticleEntity entity = optional.get();
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
             entity.setContentHtml(request.getContentHtml());
@@ -117,7 +117,7 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
             //     entity.setCategory(categoryOptional.get());
             // }
             //
-            Article savedArticle = save(entity);
+            ArticleEntity savedArticle = save(entity);
             if (savedArticle == null) {
                 throw new RuntimeException("article save failed");
             }
@@ -130,7 +130,7 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
     }
 
     @Override
-    public Article save(Article entity) {
+    public ArticleEntity save(ArticleEntity entity) {
         try {
             return FaqRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -141,7 +141,7 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Article> optional = findByUid(uid);
+        Optional<ArticleEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -149,18 +149,18 @@ public class ArticleService extends BaseService<Article, ArticleRequest, Article
     }
 
     @Override
-    public void delete(Article entity) {
+    public void delete(ArticleRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Article entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ArticleEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public ArticleResponse convertToResponse(Article entity) {
+    public ArticleResponse convertToResponse(ArticleEntity entity) {
         return modelMapper.map(entity, ArticleResponse.class);
     }
 

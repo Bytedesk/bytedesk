@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-14 09:28:31
+ * @LastEditTime: 2024-10-23 22:11:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,7 +43,7 @@ import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -52,9 +52,9 @@ import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.constant.AvatarConsts;
 // import com.bytedesk.core.quick_button.QuickButton;
 // import com.bytedesk.core.quick_button.QuickButtonService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.faq.Faq;
+import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +62,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse> {
+public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotResponse> {
 
     private final RobotRepository robotRepository;
 
@@ -88,9 +88,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
                 "updatedAt");
 
-        Specification<Robot> specification = RobotSpecification.search(request);
+        Specification<RobotEntity> specification = RobotSpecification.search(request);
 
-        Page<Robot> page = robotRepository.findAll(specification, pageable);
+        Page<RobotEntity> page = robotRepository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -102,7 +102,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     }
 
     public RobotResponse queryByUid(String uid) {
-        Optional<Robot> robotOptional = robotRepository.findByUid(uid);
+        Optional<RobotEntity> robotOptional = robotRepository.findByUid(uid);
         if (robotOptional.isPresent()) {
             return modelMapper.map(robotOptional.get(), RobotResponse.class);
         }
@@ -120,7 +120,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         RobotLlm llm = RobotLlm.builder().build();
         //
         // Robot robot = modelMapper.map(request, Robot.class);
-        Robot robot = Robot.builder().build();
+        RobotEntity robot = RobotEntity.builder().build();
         if (StringUtils.hasText(request.getUid())) {
             robot.setUid(request.getUid());
         } else {
@@ -138,9 +138,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
+                    FaqEntity faqEntity = faqOptional.get();
                     log.info("faqUid added {}", faqUid);
 
                     robot.getServiceSettings().getFaqs().add(faqEntity);
@@ -158,9 +158,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
-                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
-                    Faq quickFaqEntity = quickFaqOptional.get();
+                    FaqEntity quickFaqEntity = quickFaqOptional.get();
                     log.info("quickFaqUid added {}", quickFaqUid);
                     robot.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
                 } else {
@@ -169,7 +169,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             }
         }
 
-        Robot updatedRobot = save(robot);
+        RobotEntity updatedRobot = save(robot);
         if (updatedRobot == null) {
             throw new RuntimeException("save robot failed");
         }
@@ -179,7 +179,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
 
     public ThreadResponse createThread(ThreadRequest request) {
         //
-        User owner = authService.getCurrentUser();
+        UserEntity owner = authService.getCurrentUser();
         String topic = request.getTopic();
         //
         Optional<ThreadEntity> threadOptional = threadService.findByTopicAndOwner(topic, owner);
@@ -201,15 +201,13 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         }
         // org/robot/robotUid/userUid
         String robotUid = splits[2];
-        Optional<Robot> robotOptional = findByUid(robotUid);
+        Optional<RobotEntity> robotOptional = findByUid(robotUid);
         if (robotOptional.isPresent()) {
-            Robot robot = robotOptional.get();
+            RobotEntity robot = robotOptional.get();
             robot.setAvatar(AvatarConsts.LLM_THREAD_DEFAULT_AVATAR);
             // 更新机器人配置+大模型相关信息
             thread.setAgent(JSON.toJSONString(ConvertAiUtils.convertToRobotProtobuf(robot)));
         }
-        //
-        // thread.setClient(ClientEnum.fromValue(request.getClient()).name());
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
         //
@@ -243,12 +241,12 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     @Override
     public RobotResponse update(RobotRequest request) {
 
-        Optional<Robot> robotOptional = findByUid(request.getUid());
+        Optional<RobotEntity> robotOptional = findByUid(request.getUid());
         if (!robotOptional.isPresent()) {
             throw new RuntimeException("robot " + request.getUid() + " not found");
         }
         //
-        Robot robot = robotOptional.get();
+        RobotEntity robot = robotOptional.get();
         robot.setNickname(request.getNickname());
         robot.setAvatar(request.getAvatar());
         robot.setDescription(request.getDescription());
@@ -264,9 +262,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
+                    FaqEntity faqEntity = faqOptional.get();
                     log.info("faqUid added {}", faqUid);
 
                     serviceSettings.getFaqs().add(faqEntity);
@@ -282,9 +280,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
-                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
-                    Faq quickFaqEntity = quickFaqOptional.get();
+                    FaqEntity quickFaqEntity = quickFaqOptional.get();
                     log.info("quickFaqUid added {}", quickFaqUid);
                     serviceSettings.getQuickFaqs().add(quickFaqEntity);
                 } else {
@@ -298,9 +296,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             Iterator<String> iterator = request.getServiceSettings().getGuessFaqUids().iterator();
             while (iterator.hasNext()) {
                 String guessFaqUid = iterator.next();
-                Optional<Faq> guessFaqOptional = faqService.findByUid(guessFaqUid);
+                Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
                 if (guessFaqOptional.isPresent()) {
-                    Faq guessFaq = guessFaqOptional.get();
+                    FaqEntity guessFaq = guessFaqOptional.get();
                     log.info("guessFaqUid added {}", guessFaqUid);
                     serviceSettings.getGuessFaqs().add(guessFaq);
                 } else {
@@ -314,9 +312,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             Iterator<String> iterator = request.getServiceSettings().getHotFaqUids().iterator();
             while (iterator.hasNext()) {
                 String hotFaqUid = iterator.next();
-                Optional<Faq> hotFaqOptional = faqService.findByUid(hotFaqUid);
+                Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
                 if (hotFaqOptional.isPresent()) {
-                    Faq hotFaq = hotFaqOptional.get();
+                    FaqEntity hotFaq = hotFaqOptional.get();
                     log.info("hotFaqUid added {}", hotFaqUid);
                     serviceSettings.getHotFaqs().add(hotFaq);
                 } else {
@@ -330,9 +328,9 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             Iterator<String> iterator = request.getServiceSettings().getShortcutFaqUids().iterator();
             while (iterator.hasNext()) {
                 String shortcutFaqUid = iterator.next();
-                Optional<Faq> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
+                Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
                 if (shortcutFaqOptional.isPresent()) {
-                    Faq shortcutFaq = shortcutFaqOptional.get();
+                    FaqEntity shortcutFaq = shortcutFaqOptional.get();
                     log.info("shortcutFaqUid added {}", shortcutFaqUid);
                     serviceSettings.getShortcutFaqs().add(shortcutFaq);
                 } else {
@@ -345,7 +343,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         //
         robot.setLlm(request.getLlm());
         //
-        Robot updateRobot = save(robot);
+        RobotEntity updateRobot = save(robot);
         if (updateRobot == null) {
             throw new RuntimeException("update robot failed");
         }
@@ -357,7 +355,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
 
     @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
     @Override
-    public Optional<Robot> findByUid(String uid) {
+    public Optional<RobotEntity> findByUid(String uid) {
         return robotRepository.findByUid(uid);
     }
 
@@ -371,7 +369,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     }
 
     @Override
-    public Robot save(Robot entity) {
+    public RobotEntity save(RobotEntity entity) {
         try {
             return robotRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -382,7 +380,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Robot> robotOptional = findByUid(uid);
+        Optional<RobotEntity> robotOptional = findByUid(uid);
         robotOptional.ifPresent(robot -> {
             robot.setDeleted(true);
             save(robot);
@@ -390,18 +388,18 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
     }
 
     @Override
-    public void delete(Robot entity) {
+    public void delete(RobotRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Robot entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, RobotEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public RobotResponse convertToResponse(Robot entity) {
+    public RobotResponse convertToResponse(RobotEntity entity) {
         return modelMapper.map(entity, RobotResponse.class);
     }
 
@@ -445,7 +443,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
         log.info("robotJson {}", robotJson.getNickname());
         RobotLlm llm = RobotLlm.builder().prompt(robotJson.getPrompt()).build();
         //
-        Robot robot = Robot.builder()
+        RobotEntity robot = RobotEntity.builder()
                 .nickname(robotJson.getNickname())
                 .avatar(robotJson.getAvatar())
                 .description(robotJson.getDescription())
@@ -457,7 +455,7 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
                 .build();
         robot.setUid(robotJson.getUid());
 
-        Robot savedRobot = save(robot);
+        RobotEntity savedRobot = save(robot);
         if (savedRobot == null) {
             throw new RuntimeException("create robot failed");
         }
@@ -470,8 +468,8 @@ public class RobotService extends BaseService<Robot, RobotRequest, RobotResponse
             return;
         }
         //
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
-        createDefaultRobot(orgUid, BdConstants.DEFAULT_ROBOT_UID);
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        createDefaultRobot(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
         createDefaultAgentAssistantRobot(orgUid);
         //
         Map<String, ProviderJson> providerJsonMap = robotJsonService.loadProviders();

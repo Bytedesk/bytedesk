@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-18 15:13:28
+ * @LastEditTime: 2024-10-23 11:17:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.action.ActionRequest;
 import com.bytedesk.core.action.ActionService;
@@ -49,18 +49,18 @@ import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
-import com.bytedesk.kbase.faq.Faq;
+import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.settings.ServiceSettingsRequest;
 import com.bytedesk.service.utils.ConvertServiceUtils;
-import com.bytedesk.service.worktime.Worktime;
+import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.worktime.WorktimeService;
-import com.bytedesk.team.member.Member;
+import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberService;
 
 // import jakarta.transaction.Transactional;
@@ -94,21 +94,21 @@ public class AgentService {
     
     private final ActionService actionService;
 
-    public Page<AgentResponse> queryByOrg(AgentRequest agentRequest) {
+    public Page<AgentResponse> queryByOrg(AgentRequest request) {
 
-        Pageable pageable = PageRequest.of(agentRequest.getPageNumber(), agentRequest.getPageSize(), Sort.Direction.ASC,
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "id");
 
-        Specification<Agent> spec = AgentSpecification.search(agentRequest);
-        Page<Agent> agentPage = agentRepository.findAll(spec, pageable);
+        Specification<AgentEntity> spec = AgentSpecification.search(request);
+        Page<AgentEntity> agentPage = agentRepository.findAll(spec, pageable);
 
         return agentPage.map(ConvertServiceUtils::convertToAgentResponse);
     }
 
     public AgentResponse query(AgentRequest agentRequest) {
         //
-        User user = authService.getCurrentUser();
-        Optional<Agent> agentOptional = findByUserUidAndOrgUid(user.getUid(), agentRequest.getOrgUid());
+        UserEntity user = authService.getCurrentUser();
+        Optional<AgentEntity> agentOptional = findByUserUidAndOrgUid(user.getUid(), agentRequest.getOrgUid());
         if (!agentOptional.isPresent()) {
             throw new RuntimeException("agent not found");
         }
@@ -118,7 +118,7 @@ public class AgentService {
     @Transactional
     public AgentResponse create(AgentRequest agentRequest) {
 
-        Optional<Member> memberOptional = memberService.findByUid(agentRequest.getMemberUid());
+        Optional<MemberEntity> memberOptional = memberService.findByUid(agentRequest.getMemberUid());
         if (!memberOptional.isPresent() || memberOptional.get().getUser() == null) {
             throw new RuntimeException("member uid: " + agentRequest.getMemberUid() + " not found");
         }
@@ -128,7 +128,7 @@ public class AgentService {
         }
         //
         // Agent agent = modelMapper.map(agentRequest, Agent.class);
-        Agent agent = Agent.builder()
+        AgentEntity agent = AgentEntity.builder()
                 .nickname(agentRequest.getNickname())
                 .email(agentRequest.getEmail())
                 .mobile(agentRequest.getMobile())
@@ -158,9 +158,9 @@ public class AgentService {
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();
             // log.info("worktimeUid {}", worktimeUid);
-            Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
+            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
-                Worktime worktimeEntity = worktimeOptional.get();
+                WorktimeEntity worktimeEntity = worktimeOptional.get();
 
                 agent.getServiceSettings().getWorktimes().add(worktimeEntity);
             } else {
@@ -197,9 +197,9 @@ public class AgentService {
             Iterator<String> iterator = agentRequest.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
+                    FaqEntity faqEntity = faqOptional.get();
                     log.info("agent faqUid added {}", faqUid);
 
                     agent.getServiceSettings().getFaqs().add(faqEntity);
@@ -217,9 +217,9 @@ public class AgentService {
             Iterator<String> iterator = agentRequest.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
-                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
-                    Faq quickFaqEntity = quickFaqOptional.get();
+                    FaqEntity quickFaqEntity = quickFaqOptional.get();
                     log.info("quickFaqUid added {}", quickFaqUid);
                     agent.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
                 } else {
@@ -229,7 +229,7 @@ public class AgentService {
         }
 
         // 保存Agent并检查返回值
-        Agent savedAgent = save(agent);
+        AgentEntity savedAgent = save(agent);
         if (savedAgent == null) {
             // 根据业务逻辑决定如何处理保存失败的情况
             // 例如，可以抛出一个异常或返回一个错误响应
@@ -242,13 +242,13 @@ public class AgentService {
     @Transactional
     public AgentResponse update(AgentRequest request) {
         // 
-        Optional<Agent> agentOptional = findByUid(request.getUid());
+        Optional<AgentEntity> agentOptional = findByUid(request.getUid());
         if (!agentOptional.isPresent()) {
             // 如果找不到对应的Agent，则返回null
             throw new RuntimeException("null agent found with uid: " + request.getUid());
         }
         //
-        Agent agent = agentOptional.get();
+        AgentEntity agent = agentOptional.get();
         // 更新Agent的信息
         // modelMapper.map(agentRequest, agent); // 需要排除 connected 字段，否则会改变真实连接状态
         agent.setNickname(request.getNickname());
@@ -265,9 +265,9 @@ public class AgentService {
         ServiceSettings serviceSettings = modelMapper.map(request.getServiceSettings(), ServiceSettings.class);
         //
         if (StringUtils.hasText(request.getServiceSettings().getRobotUid())) {
-            Optional<Robot> robotOptional = robotService.findByUid(request.getServiceSettings().getRobotUid());
+            Optional<RobotEntity> robotOptional = robotService.findByUid(request.getServiceSettings().getRobotUid());
             if (robotOptional.isPresent()) {
-                Robot robot = robotOptional.get();
+                RobotEntity robot = robotOptional.get();
                 serviceSettings.setRobot(robot);
             } else {
                 throw new RuntimeException(request.getServiceSettings().getRobotUid() + " is not found.");
@@ -277,9 +277,9 @@ public class AgentService {
         Iterator<String> worktimeTterator = request.getServiceSettings().getWorktimeUids().iterator();
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();
-            Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
+            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
-                Worktime worktimeEntity = worktimeOptional.get();
+                WorktimeEntity worktimeEntity = worktimeOptional.get();
                 serviceSettings.getWorktimes().add(worktimeEntity);
             } else {
                 throw new RuntimeException(worktimeUid + " is not found.");
@@ -293,9 +293,9 @@ public class AgentService {
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
                 log.info("update faq {}", faqUid);
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
+                    FaqEntity faqEntity = faqOptional.get();
 
                     log.info("save update faq {}", faqEntity.getUid());
                     serviceSettings.getFaqs().add(faqEntity);
@@ -311,9 +311,9 @@ public class AgentService {
             Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
-                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
-                    Faq quickFaqEntity = quickFaqOptional.get();
+                    FaqEntity quickFaqEntity = quickFaqOptional.get();
                     log.info("quickFaqUid added {}", quickFaqUid);
                     serviceSettings.getQuickFaqs().add(quickFaqEntity);
                 } else {
@@ -327,9 +327,9 @@ public class AgentService {
             Iterator<String> iterator = request.getServiceSettings().getGuessFaqUids().iterator();
             while (iterator.hasNext()) {
                 String guessFaqUid = iterator.next();
-                Optional<Faq> guessFaqOptional = faqService.findByUid(guessFaqUid);
+                Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
                 if (guessFaqOptional.isPresent()) {
-                    Faq guessFaq = guessFaqOptional.get();
+                    FaqEntity guessFaq = guessFaqOptional.get();
                     log.info("guessFaqUid added {}", guessFaqUid);
                     serviceSettings.getGuessFaqs().add(guessFaq);
                 } else {
@@ -343,9 +343,9 @@ public class AgentService {
             Iterator<String> iterator = request.getServiceSettings().getHotFaqUids().iterator();
             while (iterator.hasNext()) {
                 String hotFaqUid = iterator.next();
-                Optional<Faq> hotFaqOptional = faqService.findByUid(hotFaqUid);
+                Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
                 if (hotFaqOptional.isPresent()) {
-                    Faq hotFaq = hotFaqOptional.get();
+                    FaqEntity hotFaq = hotFaqOptional.get();
                     log.info("hotFaqUid added {}", hotFaqUid);
                     serviceSettings.getHotFaqs().add(hotFaq);
                 } else {
@@ -359,9 +359,9 @@ public class AgentService {
             Iterator<String> iterator = request.getServiceSettings().getShortcutFaqUids().iterator();
             while (iterator.hasNext()) {
                 String shortcutFaqUid = iterator.next();
-                Optional<Faq> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
+                Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
                 if (shortcutFaqOptional.isPresent()) {
-                    Faq shortcutFaq = shortcutFaqOptional.get();
+                    FaqEntity shortcutFaq = shortcutFaqOptional.get();
                     log.info("shortcutFaqUid added {}", shortcutFaqUid);
                     serviceSettings.getShortcutFaqs().add(shortcutFaq);
                 } else {
@@ -376,7 +376,7 @@ public class AgentService {
                 AutoReplySettings.class);
         agent.setAutoReplySettings(autoReplySettings);
         // 保存Agent，并检查返回值
-        Agent updatedAgent = save(agent);
+        AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             // 如果保存失败，可以选择抛出异常或记录日志，这里以抛出异常为例
             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
@@ -386,16 +386,16 @@ public class AgentService {
     }
 
     public AgentResponse updateStatus(AgentRequest request) {
-        Optional<Agent> agentOptional = findByUid(request.getUid());
+        Optional<AgentEntity> agentOptional = findByUid(request.getUid());
         if (!agentOptional.isPresent()) {
             // 如果找不到对应的Agent，则返回null
             throw new RuntimeException("null agent found with uid: " + request.getUid());
         }
         // 
-        Agent agent = agentOptional.get();
+        AgentEntity agent = agentOptional.get();
         agent.setStatus(request.getStatus()); // 更新接待状态
         // 保存Agent并检查返回值
-        Agent updatedAgent = save(agent);
+        AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             // 根据业务逻辑决定如何处理保存失败的情况
             // 例如，可以抛出一个异常或返回一个错误响应
@@ -411,20 +411,20 @@ public class AgentService {
     @Transactional
     public AgentResponse updateAutoReply(AgentRequest request) {
         // User user = authService.getCurrentUser();
-        Optional<Agent> agentOptional = findByUid(request.getUid());
+        Optional<AgentEntity> agentOptional = findByUid(request.getUid());
         if (!agentOptional.isPresent()) {
             // 如果找不到对应的Agent，则返回null
             throw new RuntimeException("null agent found with uid: " + request.getUid());
         }
         //
-        Agent agent = agentOptional.get();
+        AgentEntity agent = agentOptional.get();
         // 自动回复
         AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
                 AutoReplySettings.class);
         agent.setAutoReplySettings(autoReplySettings);
         //
         // 保存Agent，并检查返回值
-        Agent updatedAgent = save(agent);
+        AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             // 如果保存失败，可以选择抛出异常或记录日志，这里以抛出异常为例
             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
@@ -443,22 +443,22 @@ public class AgentService {
     }
 
     @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
-    public Optional<Agent> findByUid(String uid) {
+    public Optional<AgentEntity> findByUid(String uid) {
         return agentRepository.findByUid(uid);
     }
 
     @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")
-    public Optional<Agent> findByMobileAndOrgUid(String mobile, String orgUid) {
+    public Optional<AgentEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
         return agentRepository.findByMobileAndOrgUidAndDeleted(mobile, orgUid, false);
     }
 
     @Cacheable(value = "agent", key = "#email", unless = "#result == null")
-    public Optional<Agent> findByEmailAndOrgUid(String email, String orgUid) {
+    public Optional<AgentEntity> findByEmailAndOrgUid(String email, String orgUid) {
         return agentRepository.findByEmailAndOrgUidAndDeleted(email, orgUid, false);
     }
 
     @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
-    public Optional<Agent> findByUserUidAndOrgUid(String userUid, String orgUid) {
+    public Optional<AgentEntity> findByUserUidAndOrgUid(String userUid, String orgUid) {
         return agentRepository.findByUserUidAndOrgUidAndDeleted(userUid, orgUid, false);
     }
 
@@ -471,7 +471,7 @@ public class AgentService {
             @CachePut(value = "agent", key = "#agent.mobile", unless = "#agent.mobile == null"),
             @CachePut(value = "agent", key = "#agent.email", unless = "#agent.email == null"),
     })
-    public Agent save(Agent agent) {
+    public AgentEntity save(AgentEntity agent) {
         try {
             return agentRepository.save(agent);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -484,25 +484,20 @@ public class AgentService {
     @CacheEvict(value = "agent", key = "#uid")
     public void deleteByUid(String uid) {
         agentRepository.updateDeletedByUid(true, uid);
-        // Optional<Agent> agentOptional = findByUid(uid);
-        // agentOptional.ifPresent(agent -> {
-        // agent.setDeleted(true);
-        // save(agent);
-        // });
     }
 
     private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
     private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
-    private final Queue<Agent> retryQueue = new LinkedList<>();
+    private final Queue<AgentEntity> retryQueue = new LinkedList<>();
 
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Agent agent) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AgentEntity agent) {
         retryQueue.add(agent);
         processRetryQueue();
     }
 
     private void processRetryQueue() {
         while (!retryQueue.isEmpty()) {
-            Agent agent = retryQueue.poll(); // 从队列中取出一个元素
+            AgentEntity agent = retryQueue.poll(); // 从队列中取出一个元素
             if (agent == null) {
                 break; // 队列为空，跳出循环
             }
@@ -542,7 +537,7 @@ public class AgentService {
         }
     }
 
-    private void handleFailedRetries(Agent agent) {
+    private void handleFailedRetries(AgentEntity agent) {
         String agentJSON = JSONObject.toJSONString(agent);
         ActionRequest actionRequest = ActionRequest.builder()
                 .title("agent")
@@ -564,9 +559,9 @@ public class AgentService {
             return;
         }
 
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         //
-        Optional<Member> memberOptional = memberService.findByMobileAndOrgUid(bytedeskProperties.getMobile(), orgUid);
+        Optional<MemberEntity> memberOptional = memberService.findByMobileAndOrgUid(bytedeskProperties.getMobile(), orgUid);
         if (!memberOptional.isPresent()) {
             return;
         }
@@ -583,7 +578,7 @@ public class AgentService {
         String worktimeUid = worktimeService.createDefault();
         worktimeUids.add(worktimeUid);
         //
-        Member member = memberOptional.get();
+        MemberEntity member = memberOptional.get();
         // add agent
         AgentRequest agentRequest = AgentRequest.builder()
                 .nickname(I18Consts.I18N_AGENT_NICKNAME)
@@ -591,7 +586,7 @@ public class AgentService {
                 .mobile(member.getMobile())
                 .memberUid(member.getUid())
                 .build();
-        agentRequest.setUid(BdConstants.DEFAULT_AGENT_UID);
+        agentRequest.setUid(BytedeskConsts.DEFAULT_AGENT_UID);
         agentRequest.setOrgUid(orgUid);
         //
         agentRequest.getServiceSettings().setFaqUids(faqUids);

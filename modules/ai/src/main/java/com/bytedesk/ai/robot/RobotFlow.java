@@ -17,7 +17,7 @@ package com.bytedesk.ai.robot;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
@@ -37,31 +37,31 @@ public class RobotFlow {
     @Builder.Default
     @Column(name = "flow_groups", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String groups = BdConstants.EMPTY_JSON_STRING;
+    private String groups = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     @Column(name = "flow_events", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String events = BdConstants.EMPTY_JSON_STRING;
+    private String events = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     @Column(name = "flow_variables", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String variables = BdConstants.EMPTY_JSON_STRING;
+    private String variables = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     @Column(name = "flow_edges", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String edges = BdConstants.EMPTY_JSON_STRING;
+    private String edges = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     @Column(name = "flow_themes", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String themes = BdConstants.EMPTY_JSON_STRING;
+    private String themes = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     @Column(name = "flow_settings", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String settings = BdConstants.EMPTY_JSON_STRING;
+    private String settings = BytedeskConsts.EMPTY_JSON_STRING;
 
 }

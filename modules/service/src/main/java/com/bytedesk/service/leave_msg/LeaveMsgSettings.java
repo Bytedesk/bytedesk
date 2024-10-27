@@ -19,7 +19,7 @@ import java.io.Serializable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
@@ -55,22 +55,22 @@ public class LeaveMsgSettings implements Serializable {
 
     // 留言提醒邮箱
     @Builder.Default
-    private String leaveMsgNotifyEmail = BdConstants.EMPTY_STRING;
+    private String leaveMsgNotifyEmail = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
-    private String leaveMsgNotifyMobile = BdConstants.EMPTY_STRING;
+    private String leaveMsgNotifyMobile = BytedeskConsts.EMPTY_STRING;
 
     // @Builder.Default
-    // private String leaveMsgNotifyWechat = BdConstants.EMPTY_STRING;
+    // private String leaveMsgNotifyWechat = BytedeskConsts.EMPTY_STRING;
 
     // 留言提醒时间
     // @Builder.Default
-    // private String leaveMsgNotifyTime = BdConstants.EMPTY_STRING;
+    // private String leaveMsgNotifyTime = BytedeskConsts.EMPTY_STRING;
 
     // 留言表单
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String leaveMsgForm = BdConstants.EMPTY_JSON_STRING;
+    private String leaveMsgForm = BytedeskConsts.EMPTY_JSON_STRING;
 
 }

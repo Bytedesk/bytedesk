@@ -55,7 +55,7 @@ public class PageTemplateController {
         pageService.about();
         pageService.contact();
         pageService.privacy();
-        pageService.protocal();
+        pageService.protocol();
 
         return JsonResult.success("generate html success", 200, true);
     }

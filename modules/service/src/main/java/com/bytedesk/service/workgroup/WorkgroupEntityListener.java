@@ -23,7 +23,7 @@ public class WorkgroupEntityListener {
 
     
     @PostPersist
-    public void onPostPersist(Workgroup workgroup) {
+    public void onPostPersist(WorkgroupEntity workgroup) {
         System.out.println("WorkgroupListener: onPostPersist");
     }
 

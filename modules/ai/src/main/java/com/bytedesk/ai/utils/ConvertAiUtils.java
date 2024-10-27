@@ -16,7 +16,7 @@ package com.bytedesk.ai.utils;
 
 import org.modelmapper.ModelMapper;
 
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.settings.RobotServiceSettings;
@@ -30,15 +30,15 @@ public class ConvertAiUtils {
 
     private ConvertAiUtils() {}
 
-    public static RobotResponse convertToRobotResponse(Robot entity) {
+    public static RobotResponse convertToRobotResponse(RobotEntity entity) {
         return modelMapper.map(entity, RobotResponse.class);
     }
 
-    public static RobotProtobuf convertToRobotProtobuf(Robot entity) {
+    public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
         return modelMapper.map(entity, RobotProtobuf.class);
     }
 
-    public static UserProtobuf convertToUserProtobuf(Robot entity) {
+    public static UserProtobuf convertToUserProtobuf(RobotEntity entity) {
         UserProtobuf userProtobuf = modelMapper.map(entity, UserProtobuf.class);
         userProtobuf.setType(UserTypeEnum.ROBOT.name());
         return userProtobuf;

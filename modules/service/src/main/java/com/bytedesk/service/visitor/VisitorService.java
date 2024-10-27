@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 16:21:48
+ * @LastEditTime: 2024-10-23 18:20:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class VisitorService extends BaseService<Visitor, VisitorRequest, VisitorResponse> {
+public class VisitorService extends BaseService<VisitorEntity, VisitorRequest, VisitorResponse> {
 
     private final VisitorRepository visitorRepository;
 
@@ -63,15 +63,15 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
-        Specification<Visitor> spec = VisitorSpecification.search(request);
-        Page<Visitor> page = visitorRepository.findAll(spec, pageable);
+        Specification<VisitorEntity> spec = VisitorSpecification.search(request);
+        Page<VisitorEntity> page = visitorRepository.findAll(spec, pageable);
 
         return page.map(ConvertServiceUtils::convertToVisitorResponse);
     }
 
     public VisitorResponse query(VisitorRequest visitorRequest) {
 
-        Optional<Visitor> visitorOptional = findByUid(visitorRequest.getUid());
+        Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
         if (!visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
         }
@@ -88,7 +88,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         //
         String uid = visitorRequest.getUid();
         log.info("visitor init, uid: {}", uid);
-        Visitor visitor = findByUid(uid).orElse(null);
+        VisitorEntity visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
             return ConvertServiceUtils.convertToUserProtobuf(visitor);
         }
@@ -109,7 +109,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         }
         //
         log.info("visitorRequest {}", visitorRequest);
-        visitor = modelMapper.map(visitorRequest, Visitor.class);
+        visitor = modelMapper.map(visitorRequest, VisitorEntity.class);
         // visitor.setUid(uidUtils.getCacheSerialUid());
         visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         visitor.setOrgUid(visitorRequest.getOrgUid());
@@ -117,7 +117,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
         VisitorDevice device = modelMapper.map(visitorRequest, VisitorDevice.class);
         visitor.setDevice(device);
         //
-        Visitor savedVisitor = save(visitor);
+        VisitorEntity savedVisitor = save(visitor);
         if (savedVisitor == null) {
             throw new RuntimeException("visitor not saved");
         }
@@ -131,11 +131,11 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
     }
 
     @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
-    public Optional<Visitor> findByUid(String uid) {
+    public Optional<VisitorEntity> findByUid(String uid) {
         return visitorRepository.findByUidAndDeleted(uid, false);
     }
 
-    public List<Visitor> findByStatus(String status) {
+    public List<VisitorEntity> findByStatus(String status) {
         return visitorRepository.findByStatusAndDeleted(status, false);
     }
 
@@ -147,7 +147,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
             @CachePut(value = "visitor", key = "#visitor.uid"),
     })
     @Override
-    public Visitor save(Visitor visitor) {
+    public VisitorEntity save(VisitorEntity visitor) {
         try {
             return visitorRepository.save(visitor);
         } catch (Exception e) {
@@ -159,7 +159,7 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
 
     // TODO: 模拟压力测试：随机生成 10000 个访客，分配给1个技能组中10个客服账号，并随机分配给1个客服账号，每秒发送1条消息
     public void prepareStressTest() {
-        // String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // // 随机生成10000个访客
         // List<Visitor> visitors = new ArrayList<>();
         // for (int i = 0; i < 10000; i++) {
@@ -204,19 +204,19 @@ public class VisitorService extends BaseService<Visitor, VisitorRequest, Visitor
     }
 
     @Override
-    public void delete(Visitor entity) {
+    public void delete(VisitorRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Visitor entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, VisitorEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public VisitorResponse convertToResponse(Visitor entity) {
+    public VisitorResponse convertToResponse(VisitorEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }

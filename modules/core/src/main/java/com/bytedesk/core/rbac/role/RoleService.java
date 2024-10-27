@@ -30,9 +30,9 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.authority.Authority;
+import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -52,20 +52,20 @@ public class RoleService {
 
         private final AuthorityService authorityService;
 
-        public Role create(RoleRequest rolerRequest) {
+        public RoleEntity create(RoleRequest rolerRequest) {
 
                 if (existsByNameAndOrgUid(rolerRequest.getName(), rolerRequest.getOrgUid())) {
                         throw new RuntimeException("role " + rolerRequest.getName() + " already exists");
                 }
 
-                Role role = modelMapper.map(rolerRequest, Role.class);
+                RoleEntity role = modelMapper.map(rolerRequest, RoleEntity.class);
                 role.setUid(uidUtils.getCacheSerialUid());
                 role.setType(RoleTypeEnum.fromValue(rolerRequest.getType()).name());
                 //
                 Iterator<String> iterator = rolerRequest.getAuthorityUids().iterator();
                 while (iterator.hasNext()) {
                         String authorityUid = iterator.next();
-                        Optional<Authority> authorityOptional = authorityService.findByUid(authorityUid);
+                        Optional<AuthorityEntity> authorityOptional = authorityService.findByUid(authorityUid);
                         if (authorityOptional.isPresent()) {
                                 role.addAuthority(authorityOptional.get());
                         }
@@ -80,8 +80,8 @@ public class RoleService {
                                 Sort.Direction.ASC,
                                 "id");
 
-                Specification<Role> specification = RoleSpecification.search(roleRequest);
-                Page<Role> rolePage = roleRepository.findAll(specification, pageable);
+                Specification<RoleEntity> specification = RoleSpecification.search(roleRequest);
+                Page<RoleEntity> rolePage = roleRepository.findAll(specification, pageable);
 
                 return rolePage.map(ConvertUtils::convertToRoleResponse);
         }
@@ -92,14 +92,14 @@ public class RoleService {
         }
 
         @Cacheable(value = "role", key = "#name + '-' + #orgUid", unless = "#result == null")
-        public Optional<Role> findByNameAndOrgUid(String name, String orgUid) {
+        public Optional<RoleEntity> findByNameAndOrgUid(String name, String orgUid) {
                 return roleRepository.findByNameAndOrgUidAndDeleted(name, orgUid, false);
         }
 
         @Caching(put = {
                         @CachePut(value = "role", key = "#role.name+ '-' + #role.orgUid"),
         })
-        public Role save(Role role) {
+        public RoleEntity save(RoleEntity role) {
                 return roleRepository.save(role);
         }
 
@@ -129,7 +129,7 @@ public class RoleService {
                         roleRequest.setType(TypeConsts.TYPE_SYSTEM);
                         roleRequest.setOrgUid(orgUid);
                         //
-                        Optional<Authority> authorityOptional = authorityService.findByValue(authority);
+                        Optional<AuthorityEntity> authorityOptional = authorityService.findByValue(authority);
                         if (authorityOptional.isPresent()) {
                                 roleRequest.getAuthorityUids().add(authorityOptional.get().getUid());
                         }
@@ -144,7 +144,7 @@ public class RoleService {
                         return;
                 }
                 //
-                initOrgRoles(BdConstants.DEFAULT_ORGANIZATION_UID);
+                initOrgRoles(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
 
 }

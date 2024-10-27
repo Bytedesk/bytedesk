@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-30 18:02:23
+ * @LastEditTime: 2024-10-23 18:31:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseController;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
@@ -76,7 +76,7 @@ public class UploadController extends BaseController<UploadRequest> {
 		// http://localhost:9003
 		String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
 		//
-		User user = authService.getCurrentUser();
+		UserEntity user = authService.getCurrentUser();
 		UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
 		//
 		UploadRequest uploadRequest = UploadRequest.builder()
@@ -100,9 +100,9 @@ public class UploadController extends BaseController<UploadRequest> {
 	@PostMapping("/process")
 	public ResponseEntity<?> process(@RequestBody UploadRequest request) {
 
-		Optional<Upload> uploadOptional = uploadService.findByUid(request.getUid());
+		Optional<UploadEntity> uploadOptional = uploadService.findByUid(request.getUid());
 		if (uploadOptional.isPresent()) {
-			Upload upload = uploadOptional.get();
+			UploadEntity upload = uploadOptional.get();
 			uploadVectorStore.readSplitWriteToVectorStore(upload);
 			//
 			return ResponseEntity.ok(JsonResult.success("process success"));
@@ -121,7 +121,7 @@ public class UploadController extends BaseController<UploadRequest> {
 	}
 
 	@Override
-	public ResponseEntity<?> query(UploadRequest request) {
+	public ResponseEntity<?> queryByUser(UploadRequest request) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'query'");
 	}
@@ -142,7 +142,7 @@ public class UploadController extends BaseController<UploadRequest> {
 	@Override
 	public ResponseEntity<?> delete(UploadRequest request) {
 		// 更新数据库
-		uploadService.deleteByUid(request.getUid());
+		uploadService.delete(request);
 		// 删除文件
 		uploadService.deleteFile(request.getFileName());
 		

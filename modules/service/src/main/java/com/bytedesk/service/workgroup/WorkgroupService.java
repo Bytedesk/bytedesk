@@ -31,21 +31,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.constant.I18Consts;
 // import com.bytedesk.core.quick_button.QuickButton;
 // import com.bytedesk.core.quick_button.QuickButtonService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentService;
-import com.bytedesk.kbase.faq.Faq;
+import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.service.settings.ServiceSettings;
 import com.bytedesk.service.settings.ServiceSettingsRequest;
 import com.bytedesk.service.utils.ConvertServiceUtils;
-import com.bytedesk.service.worktime.Worktime;
+import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.worktime.WorktimeService;
 
 import lombok.AllArgsConstructor;
@@ -80,9 +80,9 @@ public class WorkgroupService {
                 workgroupRequest.getPageSize(), Sort.Direction.DESC,
                 "id");
 
-        Specification<Workgroup> specs = WorkgroupSpecification.search(workgroupRequest);
+        Specification<WorkgroupEntity> specs = WorkgroupSpecification.search(workgroupRequest);
         
-        Page<Workgroup> workgroupPage = workgroupRepository.findAll(specs, pageable);
+        Page<WorkgroupEntity> workgroupPage = workgroupRepository.findAll(specs, pageable);
 
         return workgroupPage.map(ConvertServiceUtils::convertToWorkgroupResponse);
     }
@@ -92,7 +92,7 @@ public class WorkgroupService {
         //
         // // 使用映射会把默认值给清空为null
         // Workgroup workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
-        Workgroup workgroup = Workgroup.builder()
+        WorkgroupEntity workgroup = WorkgroupEntity.builder()
                 .nickname(workgroupRequest.getNickname())
                 // .orgUid(workgroupRequest.getOrgUid())
                 .build();
@@ -117,9 +117,9 @@ public class WorkgroupService {
         Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();
-            Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
+            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
-                Worktime worktimeEntity = worktimeOptional.get();
+                WorktimeEntity worktimeEntity = worktimeOptional.get();
 
                 workgroup.getServiceSettings().getWorktimes().add(worktimeEntity);
             } else {
@@ -153,9 +153,9 @@ public class WorkgroupService {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
+                    FaqEntity faqEntity = faqOptional.get();
 
                     workgroup.getServiceSettings().getFaqs().add(faqEntity);
                 } else {
@@ -169,9 +169,9 @@ public class WorkgroupService {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
-                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
-                    Faq quickFaqEntity = quickFaqOptional.get();
+                    FaqEntity quickFaqEntity = quickFaqOptional.get();
                     log.info("quickFaqUid added {}", quickFaqUid);
                     workgroup.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
                 } else {
@@ -183,16 +183,16 @@ public class WorkgroupService {
         Iterator<String> agentIterator = workgroupRequest.getAgentUids().iterator();
         while (agentIterator.hasNext()) {
             String agentUid = agentIterator.next();
-            Optional<Agent> agentOptional = agentService.findByUid(agentUid);
+            Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
             if (agentOptional.isPresent()) {
-                Agent agentEntity = agentOptional.get();
+                AgentEntity agentEntity = agentOptional.get();
                 workgroup.getAgents().add(agentEntity);
             } else {
                 throw new RuntimeException(agentUid + " is not found.");
             }
         }
         //
-        Workgroup updatedWorkgroup = save(workgroup);
+        WorkgroupEntity updatedWorkgroup = save(workgroup);
         if (updatedWorkgroup == null) {
             throw new RuntimeException("save workgroup failed.");
         }
@@ -202,12 +202,12 @@ public class WorkgroupService {
 
     public WorkgroupResponse update(WorkgroupRequest workgroupRequest) {
 
-        Optional<Workgroup> workgroupOptional = findByUid(workgroupRequest.getUid());
+        Optional<WorkgroupEntity> workgroupOptional = findByUid(workgroupRequest.getUid());
         if (!workgroupOptional.isPresent()) {
             throw new RuntimeException(workgroupRequest.getUid() + " is not found.");
         }
         //
-        Workgroup workgroup = workgroupOptional.get();
+        WorkgroupEntity workgroup = workgroupOptional.get();
         //
         // modelMapper.map(workgroupRequest, workgroup); // 会把orgUid给清空为null
         workgroup.setNickname(workgroupRequest.getNickname());
@@ -218,9 +218,9 @@ public class WorkgroupService {
         //
         ServiceSettings serviceSettings = modelMapper.map(workgroupRequest.getServiceSettings(), ServiceSettings.class);
         if (StringUtils.hasText(workgroupRequest.getServiceSettings().getRobotUid())) {
-            Optional<Robot> robotOptional = robotService.findByUid(workgroupRequest.getServiceSettings().getRobotUid());
+            Optional<RobotEntity> robotOptional = robotService.findByUid(workgroupRequest.getServiceSettings().getRobotUid());
             if (robotOptional.isPresent()) {
-                Robot robot = robotOptional.get();
+                RobotEntity robot = robotOptional.get();
                 serviceSettings.setRobot(robot);
             } else {
                 throw new RuntimeException(workgroupRequest.getServiceSettings().getRobotUid() + " is not found.");
@@ -253,9 +253,9 @@ public class WorkgroupService {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
-                Optional<Faq> faqOptional = faqService.findByUid(faqUid);
+                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
-                    Faq faqEntity = faqOptional.get();
+                    FaqEntity faqEntity = faqOptional.get();
 
                     serviceSettings.getFaqs().add(faqEntity);
                 } else {
@@ -269,9 +269,9 @@ public class WorkgroupService {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
-                Optional<Faq> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
-                    Faq quickFaqEntity = quickFaqOptional.get();
+                    FaqEntity quickFaqEntity = quickFaqOptional.get();
                     log.info("quickFaqUid added {}", quickFaqUid);
                     serviceSettings.getQuickFaqs().add(quickFaqEntity);
                 } else {
@@ -283,9 +283,9 @@ public class WorkgroupService {
         Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
         while (worktimeTterator.hasNext()) {
             String worktimeUid = worktimeTterator.next();
-            Optional<Worktime> worktimeOptional = worktimeService.findByUid(worktimeUid);
+            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
-                Worktime worktimeEntity = worktimeOptional.get();
+                WorktimeEntity worktimeEntity = worktimeOptional.get();
                 serviceSettings.getWorktimes().add(worktimeEntity);
             } else {
                 throw new RuntimeException(worktimeUid + " is not found.");
@@ -297,9 +297,9 @@ public class WorkgroupService {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getGuessFaqUids().iterator();
             while (iterator.hasNext()) {
                 String guessFaqUid = iterator.next();
-                Optional<Faq> guessFaqOptional = faqService.findByUid(guessFaqUid);
+                Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
                 if (guessFaqOptional.isPresent()) {
-                    Faq guessFaq = guessFaqOptional.get();
+                    FaqEntity guessFaq = guessFaqOptional.get();
                     log.info("guessFaqUid added {}", guessFaqUid);
                     serviceSettings.getGuessFaqs().add(guessFaq);
                 } else {
@@ -313,9 +313,9 @@ public class WorkgroupService {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getHotFaqUids().iterator();
             while (iterator.hasNext()) {
                 String hotFaqUid = iterator.next();
-                Optional<Faq> hotFaqOptional = faqService.findByUid(hotFaqUid);
+                Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
                 if (hotFaqOptional.isPresent()) {
-                    Faq hotFaq = hotFaqOptional.get();
+                    FaqEntity hotFaq = hotFaqOptional.get();
                     log.info("hotFaqUid added {}", hotFaqUid);
                     serviceSettings.getHotFaqs().add(hotFaq);
                 } else {
@@ -329,9 +329,9 @@ public class WorkgroupService {
             Iterator<String> iterator = workgroupRequest.getServiceSettings().getShortcutFaqUids().iterator();
             while (iterator.hasNext()) {
                 String shortcutFaqUid = iterator.next();
-                Optional<Faq> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
+                Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
                 if (shortcutFaqOptional.isPresent()) {
-                    Faq shortcutFaq = shortcutFaqOptional.get();
+                    FaqEntity shortcutFaq = shortcutFaqOptional.get();
                     log.info("shortcutFaqUid added {}", shortcutFaqUid);
                     serviceSettings.getShortcutFaqs().add(shortcutFaq);
                 } else {
@@ -346,16 +346,16 @@ public class WorkgroupService {
         Iterator<String> iterator = workgroupRequest.getAgentUids().iterator();
         while (iterator.hasNext()) {
             String agentUid = iterator.next();
-            Optional<Agent> agentOptional = agentService.findByUid(agentUid);
+            Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
             if (agentOptional.isPresent()) {
-                Agent agentEntity = agentOptional.get();
+                AgentEntity agentEntity = agentOptional.get();
                 workgroup.getAgents().add(agentEntity);
             } else {
                 throw new RuntimeException(agentUid + " is not found.");
             }
         }
         //
-        Workgroup updatedWorkgroup = save(workgroup);
+        WorkgroupEntity updatedWorkgroup = save(workgroup);
         if (updatedWorkgroup == null) {
             throw new RuntimeException("save workgroup failed.");
         }
@@ -364,7 +364,7 @@ public class WorkgroupService {
     }
 
     @Cacheable(value = "workgroup", key = "#uid", unless = "#result == null")
-    public Optional<Workgroup> findByUid(String uid) {
+    public Optional<WorkgroupEntity> findByUid(String uid) {
         return workgroupRepository.findByUid(uid);
     }
 
@@ -376,7 +376,7 @@ public class WorkgroupService {
     // orgUid, false);
     // }
 
-    private Workgroup save(Workgroup workgroup) {
+    private WorkgroupEntity save(WorkgroupEntity workgroup) {
         try {
             return workgroupRepository.save(workgroup);
         } catch (Exception e) {
@@ -386,7 +386,7 @@ public class WorkgroupService {
     }
 
     public void deleteByUid(String uid) {
-        Optional<Workgroup> workgroupOptional = findByUid(uid);
+        Optional<WorkgroupEntity> workgroupOptional = findByUid(uid);
         workgroupOptional.ifPresent(workgroup -> {
             workgroup.setDeleted(true);
             save(workgroup);
@@ -399,10 +399,10 @@ public class WorkgroupService {
             return;
         }
 
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         //
         List<String> agentUids = Arrays.asList(
-                BdConstants.DEFAULT_AGENT_UID);
+                BytedeskConsts.DEFAULT_AGENT_UID);
         //
         List<String> faqUids = Arrays.asList(
                 orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
@@ -421,7 +421,7 @@ public class WorkgroupService {
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
                 .agentUids(agentUids)
                 .build();
-        workgroupRequest.setUid(BdConstants.DEFAULT_WORKGROUP_UID);
+        workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
         workgroupRequest.setOrgUid(orgUid);
         //
         workgroupRequest.getServiceSettings().setFaqUids(faqUids);

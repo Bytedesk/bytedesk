@@ -24,34 +24,25 @@ import java.io.File;
 @Component
 public class TencentCos {
 
-    /**
-     * 存储桶所属地域
-     */
-    @Value("${tencent.bucket.location}")
+    @Value("${tencent.bucket.location:}")
     private String bucketLocation;
 
-    /**
-     * 存储桶名称
-     */
-    @Value("${tencent.bucket.name}")
+    @Value("${tencent.bucket.name:}")
     private String bucketName;
 
-    /**
-     * 访问域名
-     */
-    @Value("${tencent.bucket.domain}")
+    @Value("${tencent.bucket.domain:}")
     private String bucketDomain;
 
-    @Value("${tencent.appid}")
+    @Value("${tencent.appid:}")
     private String appId;
 
-    @Value("${tencent.secretid}")
+    @Value("${tencent.secretid:}")
     private String secretId;
 
-    @Value("${tencent.secretkey}")
+    @Value("${tencent.secretkey:}")
     private String secretKey;
 
-    @Value("${upload.dir.prefix}")
+    @Value("${upload.dir.prefix:}")
     private String uploadDirPrefix;
 
     // @Autowired

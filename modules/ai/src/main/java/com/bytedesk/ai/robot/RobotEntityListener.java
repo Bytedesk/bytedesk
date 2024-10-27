@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RobotEntityListener {
 
     @PostPersist
-    public void onPostPersist(Robot robot) {
+    public void onPostPersist(RobotEntity robot) {
         log.info("RobotListener: onPostPersist");
     }
 

@@ -17,18 +17,18 @@ package com.bytedesk.service.route;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.strategy.ThreadMessageUtil;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.service.visitor.VisitorRequest;
-import com.bytedesk.service.workgroup.Workgroup;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ public class RouteServiceImpl implements IRouteService {
     private final IMessageSendService messageSendService;
 
     @Override
-    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull Robot robot) {
+    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull RobotEntity robot) {
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         // 使用agent的serviceSettings配置
         UserProtobuf agentProtobuf = ConvertAiUtils.convertToUserProtobuf(robot);
@@ -62,7 +62,7 @@ public class RouteServiceImpl implements IRouteService {
     }
 
     @Override
-    public MessageProtobuf routeAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread, @Nonnull Agent agent) {
+    public MessageProtobuf routeAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread, @Nonnull AgentEntity agent) {
         log.info("RouteServiceImpl routeAgent: " + agent.getUid());
         // 排队在vip模块中处理
         // boolean isReenter = true;
@@ -101,13 +101,13 @@ public class RouteServiceImpl implements IRouteService {
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
         // 广播消息，由消息通道统一处理
         // MessageUtils.notifyUser(messageProtobuf);
-        messageSendService.sendMessage(messageProtobuf);
+        messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
     }
 
     @Override
-    public MessageProtobuf routeWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread, Workgroup workgroup) {
+    public MessageProtobuf routeWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
         log.info("RouteServiceImpl routeWorkgroup: " + workgroup.getUid());
         // 排队在vip模块中处理
         // 高级路由逻辑在vip模块中处理
@@ -115,7 +115,7 @@ public class RouteServiceImpl implements IRouteService {
             throw new RuntimeException("No agents found in workgroup with uid " + workgroup.getUid());
         }
         // 下面人工接待
-        Agent agent = workgroup.nextAgent();
+        AgentEntity agent = workgroup.nextAgent();
         if (agent == null) {
             throw new RuntimeException("No available agent found in workgroup with uid " + workgroup.getUid());
         }
@@ -158,7 +158,7 @@ public class RouteServiceImpl implements IRouteService {
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
         // 广播消息，由消息通道统一处理
         // MessageUtils.notifyUser(messageProtobuf);
-        messageSendService.sendMessage(messageProtobuf);
+        messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
     }

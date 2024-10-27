@@ -40,13 +40,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-@RepositoryEventHandler(Member.class)
+@RepositoryEventHandler(MemberEntity.class)
 public class MemberRestEventHandler {
 
 	// private AuthService authService;
 
 	@HandleBeforeCreate
-	public void beforeCreate(Member member) {
+	public void beforeCreate(MemberEntity member) {
 		log.debug("beforeCreate");
 		// User user = authService.getCurrentUser();
 		// member.setOid(Utils.getUid());
@@ -54,43 +54,43 @@ public class MemberRestEventHandler {
 	}
 
 	@HandleAfterCreate
-	public void afterCreate(Member member) {
+	public void afterCreate(MemberEntity member) {
 		log.debug("afterCreate");
 
 	}
 
 	@HandleBeforeSave
-	public void beforeSave(Member member) {
+	public void beforeSave(MemberEntity member) {
 		log.debug("beforeSave");
 
 	}
 
 	@HandleAfterSave
-	public void afterSave(Member member) {
+	public void afterSave(MemberEntity member) {
 		log.debug("afterSave");
 
 	}
 
 	@HandleBeforeLinkSave
-	public void beforeLinkSave(Member member) {
+	public void beforeLinkSave(MemberEntity member) {
 		log.debug("beforeLinkSave");
 
 	}
 
 	@HandleAfterLinkSave
-	public void afterLinkSave(Member member) {
+	public void afterLinkSave(MemberEntity member) {
 		log.debug("afterLinkSave");
 
 	}
 
 	@HandleBeforeDelete
-	public void beforeDelete(Member member) {
+	public void beforeDelete(MemberEntity member) {
 		log.debug("beforeDelete");
 
 	}
 
 	@HandleAfterDelete
-	public void afterDelete(Member member) {
+	public void afterDelete(MemberEntity member) {
 		log.debug("afterDelete");
 
 	}

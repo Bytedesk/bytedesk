@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-30 16:02:31
+ * @LastEditTime: 2024-10-23 18:11:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,16 +26,16 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class ActionService extends BaseService<Action, ActionRequest, ActionResponse> {
+public class ActionService extends BaseService<ActionEntity, ActionRequest, ActionResponse> {
 
     private final ActionRepository actionRepository;
 
@@ -47,17 +47,17 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
 
     public ActionResponse create(ActionRequest actionRequest) {
 
-        Action action = modelMapper.map(actionRequest, Action.class);
+        ActionEntity action = modelMapper.map(actionRequest, ActionEntity.class);
         action.setUid(uidUtils.getCacheSerialUid());
         //
-        User user = authService.getCurrentUser();
+        UserEntity user = authService.getCurrentUser();
         if (user != null) {
             action.setUser(user);
             action.setOrgUid(user.getOrgUid());
         } else {
-            action.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            action.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
-        Action savedAction = save(action);
+        ActionEntity savedAction = save(action);
         if (savedAction == null) {
             // TODO: handle exception
         }
@@ -65,7 +65,7 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
         return convertToResponse(savedAction);
     }
 
-    public Action save(Action action) {
+    public ActionEntity save(ActionEntity action) {
         try {
             return actionRepository.save(action);
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
         return null;
     }
 
-    public ActionResponse convertToResponse(Action action) {
+    public ActionResponse convertToResponse(ActionEntity action) {
         return modelMapper.map(action, ActionResponse.class);
     }
 
@@ -83,8 +83,8 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
         //
-        Specification<Action> spec = ActionSpecification.search(request);
-        Page<Action> page = actionRepository.findAll(spec, pageable);
+        Specification<ActionEntity> spec = ActionSpecification.search(request);
+        Page<ActionEntity> page = actionRepository.findAll(spec, pageable);
 
         return page.map(action -> convertToResponse(action));
     }
@@ -96,7 +96,7 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
     }
 
     @Override
-    public Optional<Action> findByUid(String uid) {
+    public Optional<ActionEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
@@ -114,13 +114,13 @@ public class ActionService extends BaseService<Action, ActionRequest, ActionResp
     }
 
     @Override
-    public void delete(Action entity) {
+    public void delete(ActionRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Action entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ActionEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }

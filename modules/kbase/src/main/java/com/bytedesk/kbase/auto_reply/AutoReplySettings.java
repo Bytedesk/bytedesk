@@ -16,7 +16,7 @@ package com.bytedesk.kbase.auto_reply;
 
 import java.io.Serializable;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -45,7 +45,7 @@ public class AutoReplySettings implements Serializable {
 
     // 固定回复类型所需要字段
     @Builder.Default
-    private String autoReplyUid = BdConstants.EMPTY_STRING;
+    private String autoReplyUid = BytedeskConsts.EMPTY_STRING;
     
     // 自动回复内容类型
     @Builder.Default
@@ -53,7 +53,7 @@ public class AutoReplySettings implements Serializable {
 
     // 自动回复内容
     @Builder.Default
-    private String autoReplyContent = BdConstants.EMPTY_STRING;
+    private String autoReplyContent = BytedeskConsts.EMPTY_STRING;
 
     // 关键词回复类型所需要字段
     // 大模型回复类型所需要字段

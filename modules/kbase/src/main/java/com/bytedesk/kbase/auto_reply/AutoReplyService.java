@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:46:01
+ * @LastEditTime: 2024-10-23 18:16:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, AutoReplyResponse> {
+public class AutoReplyService extends BaseService<AutoReplyEntity, AutoReplyRequest, AutoReplyResponse> {
 
     private final AutoReplyRepository autoReplyRepository;
 
@@ -54,9 +54,9 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
 
-        Specification<AutoReply> specification = AutoReplySpecification.search(request);
+        Specification<AutoReplyEntity> specification = AutoReplySpecification.search(request);
 
-        Page<AutoReply> page = autoReplyRepository.findAll(specification, pageable);
+        Page<AutoReplyEntity> page = autoReplyRepository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -68,17 +68,17 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
     }
 
     @Override
-    public Optional<AutoReply> findByUid(String uid) {
+    public Optional<AutoReplyEntity> findByUid(String uid) {
         return autoReplyRepository.findByUid(uid);
     }
 
     @Override
     public AutoReplyResponse create(AutoReplyRequest request) {
         
-        AutoReply autoReply = modelMapper.map(request, AutoReply.class);
+        AutoReplyEntity autoReply = modelMapper.map(request, AutoReplyEntity.class);
         autoReply.setUid(uidUtils.getCacheSerialUid());
 
-        AutoReply savedAutoReply = save(autoReply);
+        AutoReplyEntity savedAutoReply = save(autoReply);
         if (savedAutoReply == null) {
             throw new RuntimeException("AutoReply create failed");
         }
@@ -89,14 +89,14 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
     @Override
     public AutoReplyResponse update(AutoReplyRequest request) {
         
-        Optional<AutoReply> optional = findByUid(request.getUid());
+        Optional<AutoReplyEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            AutoReply autoReply = optional.get();
+            AutoReplyEntity autoReply = optional.get();
             autoReply.setContent(request.getContent());
             autoReply.setCategoryUid(request.getCategoryUid());
             autoReply.setKbUid(request.getKbUid());
             // 
-            AutoReply savedAutoReply = save(autoReply);
+            AutoReplyEntity savedAutoReply = save(autoReply);
             if (savedAutoReply == null) {
                 throw new RuntimeException("AutoReply create failed");
             }
@@ -108,7 +108,7 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
     }
 
     @Override
-    public AutoReply save(AutoReply entity) {
+    public AutoReplyEntity save(AutoReplyEntity entity) {
         try {
             return autoReplyRepository.save(entity);
         } catch (Exception e) {
@@ -117,13 +117,13 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
         return null;
     }
 
-    public void save(List<AutoReply> entities) {
+    public void save(List<AutoReplyEntity> entities) {
         autoReplyRepository.saveAll(entities);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<AutoReply> autoReplyOptional = findByUid(uid);
+        Optional<AutoReplyEntity> autoReplyOptional = findByUid(uid);
         if (autoReplyOptional.isPresent()) {
             autoReplyOptional.get().setDeleted(true);
             save(autoReplyOptional.get());
@@ -131,18 +131,18 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
     }
 
     @Override
-    public void delete(AutoReply entity) {
+    public void delete(AutoReplyRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReply entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReplyEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public AutoReplyResponse convertToResponse(AutoReply entity) {
+    public AutoReplyResponse convertToResponse(AutoReplyEntity entity) {
         return modelMapper.map(entity, AutoReplyResponse.class);
     }
 
@@ -151,9 +151,9 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
     }
 
     // String categoryUid,
-    public AutoReply convertExcelToAutoReply(AutoReplyExcel excel, String kbUid, String orgUid) {
+    public AutoReplyEntity convertExcelToAutoReply(AutoReplyExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, AutoReply.class);
-        AutoReply autoReply = AutoReply.builder().build();
+        AutoReplyEntity autoReply = AutoReplyEntity.builder().build();
         autoReply.setUid(uidUtils.getCacheSerialUid());
         autoReply.setContent(excel.getContent());
         // 
@@ -161,7 +161,7 @@ public class AutoReplyService extends BaseService<AutoReply, AutoReplyRequest, A
         autoReply.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         // 
         // autoReply.setCategoryUid(categoryUid);
-        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             autoReply.setCategoryUid(categoryOptional.get().getUid());
         } else {

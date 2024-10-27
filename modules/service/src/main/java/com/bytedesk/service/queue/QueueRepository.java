@@ -19,9 +19,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface QueueRepository extends JpaRepository<Queue, Long>, JpaSpecificationExecutor<Queue> {
+public interface QueueRepository extends JpaRepository<QueueEntity, Long>, JpaSpecificationExecutor<QueueEntity> {
 
-    Optional<Queue> findByUid(String uid);
+    Optional<QueueEntity> findByUid(String uid);
 
     // Optional<Queue> findByQueueUid(String queueUid);
 }
