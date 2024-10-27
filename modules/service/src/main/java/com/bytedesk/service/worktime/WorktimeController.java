@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-12 14:52:35
+ * @LastEditTime: 2024-10-23 18:21:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ public class WorktimeController extends BaseController<WorktimeRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(WorktimeRequest request) {
+    public ResponseEntity<?> queryByUser(WorktimeRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
@@ -65,7 +65,7 @@ public class WorktimeController extends BaseController<WorktimeRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody WorktimeRequest request) {
         
-        worktimeService.deleteByUid(request.getUid());
+        worktimeService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }

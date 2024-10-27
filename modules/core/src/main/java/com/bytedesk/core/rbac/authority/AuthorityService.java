@@ -35,25 +35,25 @@ public class AuthorityService {
 
     private final UidUtils uidUtils;
 
-    public Authority create(AuthorityRequest authorityRequest) {
+    public AuthorityEntity create(AuthorityRequest authorityRequest) {
         //
-        Authority authority = modelMapper.map(authorityRequest, Authority.class);
+        AuthorityEntity authority = modelMapper.map(authorityRequest, AuthorityEntity.class);
         authority.setUid(uidUtils.getCacheSerialUid());
 
         return save(authority);
     }
 
     @Cacheable(value = "authority", key = "#uid", unless = "#result == null")
-    public Optional<Authority> findByUid(String uid) {
+    public Optional<AuthorityEntity> findByUid(String uid) {
         return authorityRepository.findByUid(uid);
     }
 
     @Cacheable(value = "authority", key = "#value", unless = "#result == null")
-    public Optional<Authority> findByValue(String value) {
+    public Optional<AuthorityEntity> findByValue(String value) {
         return authorityRepository.findByValue(value);
     }
 
-    public Authority save(Authority authority) {
+    public AuthorityEntity save(AuthorityEntity authority) {
         return authorityRepository.save(authority);
     }
 

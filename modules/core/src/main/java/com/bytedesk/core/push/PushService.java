@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-07 10:50:38
+ * @LastEditTime: 2024-10-26 12:03:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,9 @@ package com.bytedesk.core.push;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CachePut;
@@ -37,6 +39,9 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.push.email.PushServiceImplEmail;
+import com.bytedesk.core.push.sms.PushServiceImplSms;
+import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
@@ -48,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class PushService extends BaseService<Push, PushRequest, PushResponse> {
+public class PushService extends BaseService<PushEntity, PushRequest, PushResponse> {
 
     private final PushRepository pushRepository;
 
@@ -66,6 +71,12 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     private final IpService ipService;
 
+    // 用于存储每个IP最后发送验证码的时间的缓存
+    private final ConcurrentHashMap<String, AtomicLong> ipLastSentTimeCache = new ConcurrentHashMap<>();
+
+    // 验证码发送间隔阈值（单位：毫秒）
+    private static final long VALIDATE_CODE_SEND_INTERVAL = 10 * 60 * 1000; // 10分钟
+
     public Boolean sendEmailCode(String email, String client, String authType, String platform,
             HttpServletRequest request) {
 
@@ -78,17 +89,21 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, request);
     }
 
-    public Boolean sendCode(String receiver, String type, String client, String authType,
+    private Boolean sendCode(String receiver, String type, String client, String authType,
             String platform,
             HttpServletRequest request) {
 
         String ip = ipService.getIp(request);
-        String ipLocation = ipService.getIpLocation(ip);
 
-        // TODO: 验证限制同一个ip发送数量、频率
+         // 验证限制同一个ip发送数量、频率
+        // 检查是否短时间内已发送过验证码
+        if (!canSendValidateCode(ip)) {
+            log.info("验证码发送过于频繁，IP: {}", ip);
+            return false;
+        }
 
         // 注册验证码，如果账号已经存在，则直接抛出异常
-        if (authType.equals(TypeConsts.SEND_MOBILE_CODE_TYPE_REGISTER)) {
+        if (authType.equals(AuthTypeEnum.MOBILE_REGISTER.name())) {
 
             if (type.equals(TypeConsts.TYPE_MOBILE) && userService.existsByMobileAndPlatform(receiver, platform)) {
                 throw new MobileExistsException("mobile already exists");
@@ -121,6 +136,8 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         } else {
             return false;
         }
+
+        String ipLocation = ipService.getIpLocation(ip);
         //
         PushRequest pushRequest = new PushRequest();
         pushRequest.setType(type);
@@ -133,14 +150,30 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         pushRequest.setIpLocation(ipLocation);
         create(pushRequest);
 
+        // 更新IP最后发送验证码的时间
+        updateIpLastSentTime(ip);
+
         return true;
     }
 
+    // 检查是否可以发送验证码
+    private boolean canSendValidateCode(String ip) {
+        AtomicLong lastSentTime = ipLastSentTimeCache.getOrDefault(ip, new AtomicLong(0));
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - lastSentTime.get()) >= VALIDATE_CODE_SEND_INTERVAL;
+    }
+
+    // 更新IP最后发送验证码的时间
+    private void updateIpLastSentTime(String ip) {
+        ipLastSentTimeCache.put(ip, new AtomicLong(System.currentTimeMillis()));
+    }
+
+
     public PushResponse scanQuery(PushRequest pushRequest, HttpServletRequest request) {
 
-        Optional<Push> pushOptional = findByDeviceUid(pushRequest.getDeviceUid());
+        Optional<PushEntity> pushOptional = findByDeviceUid(pushRequest.getDeviceUid());
         if (pushOptional.isPresent()) {
-            Push push = pushOptional.get();
+            PushEntity push = pushOptional.get();
             // 
             if (pushRequest.getForceRefresh().booleanValue()) {
                 push.setStatus(PushStatusEnum.PENDING.name());
@@ -153,7 +186,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         String ip = ipService.getIp(request);
         String ipLocation = ipService.getIpLocation(ip);
         //
-        Push push = modelMapper.map(pushRequest, Push.class);
+        PushEntity push = modelMapper.map(pushRequest, PushEntity.class);
         push.setUid(uidUtils.getCacheSerialUid());
         push.setType(TypeConsts.TYPE_SCAN);
         push.setSender(TypeConsts.TYPE_SYSTEM);
@@ -161,7 +194,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
         push.setIp(ip);
         push.setIpLocation(ipLocation);
         //
-        Push savedPush = save(push);
+        PushEntity savedPush = save(push);
         if (savedPush == null) {
             throw new RuntimeException("scan query failed");
         }
@@ -170,12 +203,12 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     public PushResponse scan(PushRequest pushRequest, HttpServletRequest request) {
         
-        Push push = findByDeviceUid(pushRequest.getDeviceUid())
+        PushEntity push = findByDeviceUid(pushRequest.getDeviceUid())
                 .orElseThrow(() -> new RuntimeException("scan deviceUid " + pushRequest.getDeviceUid() + " not found"));
         
-        push.setStatus(PushStatusEnum.SCANED.name());
+        push.setStatus(PushStatusEnum.SCANNED.name());
         //
-        Push savedPush = save(push);
+        PushEntity savedPush = save(push);
         if (savedPush == null) {
             throw new RuntimeException("scan save failed");
         }
@@ -184,13 +217,13 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     public PushResponse scanConfirm(PushRequest pushRequest, HttpServletRequest request) {
 
-        Push push = findByDeviceUid(pushRequest.getDeviceUid())
+        PushEntity push = findByDeviceUid(pushRequest.getDeviceUid())
                 .orElseThrow(() -> new RuntimeException(
                         "scanConfirm deviceUid " + pushRequest.getDeviceUid() + " not found"));
         push.setReceiver(pushRequest.getReceiver());
         push.setStatus(PushStatusEnum.CONFIRMED.name());
         //
-        Push savedPush = save(push);
+        PushEntity savedPush = save(push);
         if (savedPush == null) {
             throw new RuntimeException("scanConfirm save failed");
         }
@@ -200,11 +233,11 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
     public PushResponse create(PushRequest pushRequest) {
         log.info("pushRequest {}", pushRequest.toString());
 
-        Push push = modelMapper.map(pushRequest, Push.class);
+        PushEntity push = modelMapper.map(pushRequest, PushEntity.class);
         push.setUid(uidUtils.getCacheSerialUid());
         push.setClient(pushRequest.getClient());
 
-        Push savedPush = save(push);
+        PushEntity savedPush = save(push);
         if (savedPush == null) {
             throw new RuntimeException("create push failed");
         }
@@ -222,7 +255,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     public Boolean validateCode(String receiver, String type, String code) {
         // check if has already send validate code within 15min
-        Optional<Push> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatusEnum.PENDING, type, receiver,
+        Optional<PushEntity> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatusEnum.PENDING, type, receiver,
                 code);
         if (pushOptional.isPresent()) {
             // pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
@@ -235,12 +268,12 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result
     // == null")
-    public Optional<Push> findByStatusAndTypeAndReceiverAndContent(PushStatusEnum status, String type, String receiver,
+    public Optional<PushEntity> findByStatusAndTypeAndReceiverAndContent(PushStatusEnum status, String type, String receiver,
             String content) {
         return pushRepository.findByStatusAndTypeAndReceiverAndContent(status.name(), type, receiver, content);
     }
 
-    public Optional<Push> findByDeviceUid(String deviceUid) {
+    public Optional<PushEntity> findByDeviceUid(String deviceUid) {
         return pushRepository.findByDeviceUid(deviceUid);
     }
 
@@ -252,7 +285,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
             @CachePut(value = "push", key = "#push.receiver"),
             // TODO: 根据status, 缓存或清空缓存，clear or cache according to status
     })
-    public Push save(Push push) {
+    public PushEntity save(PushEntity push) {
         try {
             return pushRepository.save(push);
         } catch (Exception e) {
@@ -263,14 +296,14 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
     // TODO: 更新缓存
     // @Cacheable(value = "pushPending")
-    public List<Push> findStatusPending() {
+    public List<PushEntity> findStatusPending() {
         return pushRepository.findByStatus(PushStatusEnum.PENDING.name());
     }
 
     // 自动过期
     @Async
     public void autoOutdateCode() {
-        List<Push> pendingPushes = findStatusPending();
+        List<PushEntity> pendingPushes = findStatusPending();
         // log.info("autoOutdateCode pendingPushes {}", pendingPushes.size());
         pendingPushes.forEach(push -> {
             // 计算两个日期之间的毫秒差
@@ -299,8 +332,8 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
-        Specification<Push> specification = PushSpecification.search(request);
-        Page<Push> page = pushRepository.findAll(specification, pageable);
+        Specification<PushEntity> specification = PushSpecification.search(request);
+        Page<PushEntity> page = pushRepository.findAll(specification, pageable);
 
         return page.map(push -> convertToResponse(push));
     }
@@ -312,7 +345,7 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
     }
 
     @Override
-    public Optional<Push> findByUid(String uid) {
+    public Optional<PushEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
@@ -330,19 +363,19 @@ public class PushService extends BaseService<Push, PushRequest, PushResponse> {
     }
 
     @Override
-    public void delete(Push entity) {
+    public void delete(PushRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Push entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, PushEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public PushResponse convertToResponse(Push entity) {
+    public PushResponse convertToResponse(PushEntity entity) {
         return modelMapper.map(entity, PushResponse.class);
     }
 

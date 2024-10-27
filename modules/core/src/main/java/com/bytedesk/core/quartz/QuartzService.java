@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-24 15:47:29
+ * @LastEditTime: 2024-10-23 18:14:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 // import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -100,7 +100,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
     }
 
     @Override
-    public void delete(QuartzEntity object) {
+    public void delete(QuartzRequest object) {
         // quartzRepository.delete(object);
         deleteByUid(object.getUid());
     }
@@ -275,7 +275,7 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
                 .triggerGroup(group)
                 .triggerType("cron")
                 .triggerState("started")
-                .orgUid(BdConstants.DEFAULT_ORGANIZATION_UID)
+                .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
         create(quartzRequest);
         //

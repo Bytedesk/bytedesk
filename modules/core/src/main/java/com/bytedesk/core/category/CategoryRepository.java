@@ -20,21 +20,21 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
-    Optional<Category> findByUid(String uid);
+public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>, JpaSpecificationExecutor<CategoryEntity> {
+    Optional<CategoryEntity> findByUid(String uid);
     // 
-    List<Category> findByParentAndPlatformAndDeletedOrderByOrderNoAsc(Category parent, String platform,
+    List<CategoryEntity> findByParentAndPlatformAndDeletedOrderByOrderNoAsc(CategoryEntity parent, String platform,
                     Boolean deleted);
             
-    Optional<Category> findByNameAndTypeAndOrgUidAndPlatformAndDeleted(String name, String type, String orgUid, String platform,
+    Optional<CategoryEntity> findByNameAndTypeAndOrgUidAndPlatformAndDeleted(String name, String type, String orgUid, String platform,
                     Boolean deleted);
             
-    Optional<Category> findByNameAndTypeAndLevelAndPlatformAndDeleted(String name, String type, String level, String platform,
+    Optional<CategoryEntity> findByNameAndTypeAndLevelAndPlatformAndDeleted(String name, String type, String level, String platform,
             Boolean deleted);
 
-    Optional<Category> findByNameAndKbUidAndDeleted(String name, String kbUid, Boolean deleted);
+    Optional<CategoryEntity> findByNameAndKbUidAndDeleted(String name, String kbUid, Boolean deleted);
 
-    List<Category> findByKbUidAndDeleted(String kbUid, Boolean deleted);
+    List<CategoryEntity> findByKbUidAndDeleted(String kbUid, Boolean deleted);
 
 //     List<Category> findByLevelAndDeleted(String level, Boolean deleted);
 

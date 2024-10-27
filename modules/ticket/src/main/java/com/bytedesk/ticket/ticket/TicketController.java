@@ -31,7 +31,7 @@ public class TicketController extends BaseController<TicketRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(TicketRequest request) {
+    public ResponseEntity<?> queryByUser(TicketRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

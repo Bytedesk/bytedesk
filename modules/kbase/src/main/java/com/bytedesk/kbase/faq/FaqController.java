@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 15:47:39
+ * @LastEditTime: 2024-10-23 18:17:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,7 @@ public class FaqController extends BaseController<FaqRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(FaqRequest request) {
+    public ResponseEntity<?> queryByUser(FaqRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
@@ -77,7 +77,7 @@ public class FaqController extends BaseController<FaqRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
 
-        faqService.deleteByUid(request.getUid());
+        faqService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }

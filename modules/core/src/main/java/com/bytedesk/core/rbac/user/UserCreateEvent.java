@@ -23,11 +23,11 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class UserCreateEvent extends ApplicationEvent {
 
-    private User user;
+    private UserEntity user;
 
-    public UserCreateEvent(User source) {
+    public UserCreateEvent(UserEntity source) {
         super(source);
-        this.user = (User) source;
+        this.user = (UserEntity) source;
     }
 
 }

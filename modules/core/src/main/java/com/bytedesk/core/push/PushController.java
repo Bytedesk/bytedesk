@@ -42,7 +42,7 @@ public class PushController extends BaseController<PushRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(PushRequest request) {
+    public ResponseEntity<?> queryByUser(PushRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

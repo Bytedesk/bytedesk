@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:40:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 10:50:11
+ * @LastEditTime: 2024-10-23 18:14:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,7 +54,7 @@ public class QuartzController extends BaseController<QuartzRequest> {
      */
     @GetMapping("/query")
     @Override
-    public ResponseEntity<?> query(QuartzRequest request) {
+    public ResponseEntity<?> queryByUser(QuartzRequest request) {
 
         Page<QuartzResponse> pageResult = quartzService.queryByUser(request);
 
@@ -89,7 +89,7 @@ public class QuartzController extends BaseController<QuartzRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody QuartzRequest request) {
 
-        quartzService.deleteByUid(request.getUid());
+        quartzService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

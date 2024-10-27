@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-11 23:15:16
+ * @LastEditTime: 2024-10-26 11:58:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,8 +72,8 @@ public class PageTemplateService {
         toHtml("privacy");
     }
 
-    public void protocal() {
-        toHtml("protocal");
+    public void protocol() {
+        toHtml("protocol");
     }
 
     private void toHtml(String tempName) {

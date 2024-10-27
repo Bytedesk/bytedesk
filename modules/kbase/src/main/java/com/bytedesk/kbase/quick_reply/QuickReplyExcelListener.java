@@ -45,7 +45,7 @@ public class QuickReplyExcelListener implements ReadListener<QuickReplyExcel> {
     /**
      * 缓存的数据
      */
-    private List<QuickReply> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<QuickReplyEntity> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
     
     /**
      * 这个每一条数据解析都会来调用
@@ -54,7 +54,7 @@ public class QuickReplyExcelListener implements ReadListener<QuickReplyExcel> {
     public void invoke(QuickReplyExcel data, AnalysisContext context) {
         log.info("QuickReplyExcelListener invoke: {}", JSON.toJSONString(data));
         // categoryUid,
-        QuickReply quickReply = quickreplyService.convertExcelToQuickReply(data, kbUid, orgUid);
+        QuickReplyEntity quickReply = quickreplyService.convertExcelToQuickReply(data, kbUid, orgUid);
         cachedDataList.add(quickReply);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

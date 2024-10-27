@@ -25,12 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 public class CounterVisitorEntityListener {
     
     @PostPersist
-    public void onPostPersist(CounterVisitor counterVisitor) {
+    public void onPostPersist(CounterVisitorEntity counterVisitor) {
         log.info("counterVisitor onPostPersist: {}", counterVisitor);
     }
 
     @PostUpdate
-    public void onPostUpdate(CounterVisitor counterVisitor) {
+    public void onPostUpdate(CounterVisitorEntity counterVisitor) {
         log.info("counterVisitor onPostUpdate: {}", counterVisitor);
     }
 }

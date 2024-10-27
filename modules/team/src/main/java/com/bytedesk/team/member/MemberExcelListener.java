@@ -41,7 +41,7 @@ public class MemberExcelListener implements ReadListener<MemberExcel> {
     /**
      * 缓存的数据
      */
-    private List<Member> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<MemberEntity> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
     
     /**
      * 这个每一条数据解析都会来调用
@@ -49,7 +49,7 @@ public class MemberExcelListener implements ReadListener<MemberExcel> {
     @Override
     public void invoke(MemberExcel data, AnalysisContext context) {
         log.info("FaqExcelListener invoke: {}", JSON.toJSONString(data));
-        Member faq = memberService.convertExcelToMember(data, orgUid);
+        MemberEntity faq = memberService.convertExcelToMember(data, orgUid);
         cachedDataList.add(faq);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

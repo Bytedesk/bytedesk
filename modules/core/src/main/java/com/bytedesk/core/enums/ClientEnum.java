@@ -19,6 +19,8 @@ public enum ClientEnum {
     SYSTEM_AUTO, // auto reply
     SYSTEM_BOT, // robot reply
     WEB,
+    WEB_PC, // pc端
+    WEB_H5, // h5端
     WEB_VISITOR, // 访客端
     WEB_ADMIN, // 管理端
     H5,

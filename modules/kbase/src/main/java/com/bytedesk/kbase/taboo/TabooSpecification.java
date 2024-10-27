@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TabooSpecification extends BaseSpecification {
     
-    public static Specification<Taboo> search(TabooRequest request) {
+    public static Specification<TabooEntity> search(TabooRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

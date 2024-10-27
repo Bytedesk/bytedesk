@@ -77,7 +77,7 @@ public class UploadEventListener {
 
     @EventListener
     public void onUploadCreateEvent(GenericApplicationEvent<UploadCreateEvent> event) throws IOException {
-        Upload upload = event.getObject().getUpload();
+        UploadEntity upload = event.getObject().getUpload();
         log.info("UploadEventListener create: {}", upload.toString());
         // etl分块处理
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
@@ -150,7 +150,7 @@ public class UploadEventListener {
 
     @EventListener
     public void onUploadUpdateEvent(GenericApplicationEvent<UploadUpdateEvent> event) {
-        Upload upload = event.getObject().getUpload();
+        UploadEntity upload = event.getObject().getUpload();
         log.info("UploadEventListener update: {}", upload.toString());
         // 后台删除文件记录
         if (upload.isDeleted()) {
@@ -166,7 +166,7 @@ public class UploadEventListener {
         RedisPubsubMessageFile messageFile = event.getObject().getMessageFile();
         log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
         //
-        Upload upload = uploadService.findByUid(messageFile.getFileUid())
+        UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
                 .orElseThrow(() -> new RuntimeException("upload not found by uid: " + messageFile.getFileUid()));
         upload.setDocIdList(messageFile.getDocIds());
         upload.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
@@ -182,14 +182,14 @@ public class UploadEventListener {
         MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
                 JSON.toJSONString(contentObject));
         // MessageUtils.notifyUser(message);
-        messageSendService.sendMessage(message);
+        messageSendService.sendProtobufMessage(message);
     }
 
     @EventListener
     public void onRedisPubsubParseFileErrorEvent(GenericApplicationEvent<RedisPubsubParseFileErrorEvent> event) {
         RedisPubsubMessageFile messageFile = event.getObject().getMessageFile();
         log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
-        Upload upload = uploadService.findByUid(messageFile.getFileUid())
+        UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
                 .orElseThrow(() -> new RuntimeException("upload not found by uid: " + messageFile.getFileUid()));
         upload.setStatus(UploadStatusEnum.PARSE_FILE_ERROR.name());
         uploadService.save(upload);
@@ -203,7 +203,7 @@ public class UploadEventListener {
         MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
                 JSON.toJSONString(contentObject));
         // MessageUtils.notifyUser(message);
-        messageSendService.sendMessage(message);
+        messageSendService.sendProtobufMessage(message);
     }
 
 }

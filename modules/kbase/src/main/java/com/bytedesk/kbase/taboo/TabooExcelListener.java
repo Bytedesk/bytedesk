@@ -45,7 +45,7 @@ public class TabooExcelListener implements ReadListener<TabooExcel> {
     /**
      * 缓存的数据
      */
-    private List<Taboo> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<TabooEntity> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
     
     /**
      * 这个每一条数据解析都会来调用
@@ -53,7 +53,7 @@ public class TabooExcelListener implements ReadListener<TabooExcel> {
     @Override
     public void invoke(TabooExcel data, AnalysisContext context) {
         log.info("TabooExcelListener invoke: {}", JSON.toJSONString(data));
-        Taboo taboo = tabooService.convertExcelToTaboo(data, kbUid, orgUid); // categoryUid,
+        TabooEntity taboo = tabooService.convertExcelToTaboo(data, kbUid, orgUid); // categoryUid,
                 cachedDataList.add(taboo);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

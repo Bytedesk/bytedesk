@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RobotSpecification extends BaseSpecification {
     
-    public static Specification<Robot> search(RobotRequest request) {
+    public static Specification<RobotEntity> search(RobotRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

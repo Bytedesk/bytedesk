@@ -24,7 +24,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.team.member.Member;
+import com.bytedesk.team.member.MemberEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +49,13 @@ public class GroupEventListener {
             // 同事群组会话：org/group/{group_uid}
             String groupUid = topic.split("/")[2];
             log.info("groupUid {}", groupUid);
-            Optional<Group> groupOptional = groupService.findByUid(groupUid);
+            Optional<GroupEntity> groupOptional = groupService.findByUid(groupUid);
             if (groupOptional.isPresent()
                     && groupOptional.get().getCreator().getUid().equals(thread.getOwner().getUid())) {
                 // 仅允许群组创建者首次创建thread时，创建群组成员的thread
-                Iterator<Member> iterator = groupOptional.get().getMembers().iterator();
+                Iterator<MemberEntity> iterator = groupOptional.get().getMembers().iterator();
                 while (iterator.hasNext()) {
-                    Member member = iterator.next();
+                    MemberEntity member = iterator.next();
                     //
                     threadService.createGroupMemberThread(thread, member.getUser());
                 }

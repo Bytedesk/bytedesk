@@ -25,9 +25,9 @@ public class ArticleUpdateEvent extends ApplicationEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private Article article;
+    private ArticleEntity article;
 
-    public ArticleUpdateEvent(Object source, Article article) {
+    public ArticleUpdateEvent(Object source, ArticleEntity article) {
         super(source);
         this.article = article;
     }

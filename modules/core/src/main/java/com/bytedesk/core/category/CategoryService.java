@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 18:11:20
+ * @LastEditTime: 2024-10-24 18:33:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -42,7 +42,7 @@ import lombok.AllArgsConstructor;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class CategoryService extends BaseService<Category, CategoryRequest, CategoryResponse> {
+public class CategoryService extends BaseService<CategoryEntity, CategoryRequest, CategoryResponse> {
 
     private final CategoryRepository categoryRepository;
 
@@ -52,14 +52,14 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
 
     public List<CategoryResponse> findByNullParent(String platform) {
         // 一级分类
-        List<Category> firstCategoriesList = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderNoAsc(null,
+        List<CategoryEntity> firstCategoriesList = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderNoAsc(null,
                 platform, false);
 
-        Iterator<Category> iterator = firstCategoriesList.iterator();
+        Iterator<CategoryEntity> iterator = firstCategoriesList.iterator();
         while (iterator.hasNext()) {
-            Category category = iterator.next();
+            CategoryEntity category = iterator.next();
             // 二级分类
-            List<Category> secondCategoriesSet = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderNoAsc(category,
+            List<CategoryEntity> secondCategoriesSet = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderNoAsc(category,
                     platform, false);
             if (secondCategoriesSet != null && !secondCategoriesSet.isEmpty()) {
                 category.setChildren(secondCategoriesSet);
@@ -74,9 +74,9 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
 
-        Specification<Category> specs = CategorySpecification.search(request);
+        Specification<CategoryEntity> specs = CategorySpecification.search(request);
 
-        Page<Category> page = categoryRepository.findAll(specs, pageable);
+        Page<CategoryEntity> page = categoryRepository.findAll(specs, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -88,14 +88,14 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     }
 
     @Override
-    public Optional<Category> findByUid(String uid) {
+    public Optional<CategoryEntity> findByUid(String uid) {
         return categoryRepository.findByUid(uid);
     }
 
     @Override
     public CategoryResponse create(CategoryRequest request) {
 
-        Category category = modelMapper.map(request, Category.class);
+        CategoryEntity category = modelMapper.map(request, CategoryEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             category.setUid(uidUtils.getDefaultSerialUid());
         }
@@ -103,7 +103,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
             category.setPlatform(request.getPlatform());
         }
         //
-        Category newCategory = save(category);
+        CategoryEntity newCategory = save(category);
         if (newCategory == null) {
             throw new RuntimeException("category save error");
         }
@@ -111,38 +111,38 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         return convertToResponse(newCategory);
     }
 
-    public Optional<Category> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid,
+    public Optional<CategoryEntity> findByNameAndTypeAndOrgUidAndPlatform(String name, String type, String orgUid,
             String platform) {
         return categoryRepository.findByNameAndTypeAndOrgUidAndPlatformAndDeleted(name, type, orgUid, platform, false);
     }
 
-    public Optional<Category> findByNameAndTypeAndLevelAndPlatform(String name, String type, LevelEnum level,
+    public Optional<CategoryEntity> findByNameAndTypeAndLevelAndPlatform(String name, String type, LevelEnum level,
             PlatformEnum platform) {
         return categoryRepository.findByNameAndTypeAndLevelAndPlatformAndDeleted(name, type, level.name(), platform.name(), false);
     }
 
-    public Optional<Category> findByNameAndKbUid(String name, String kbUid) {
+    public Optional<CategoryEntity> findByNameAndKbUid(String name, String kbUid) {
         return categoryRepository.findByNameAndKbUidAndDeleted(name, kbUid, false);
     }
 
-    public List<Category> findByKbUid(String kbUid) {
+    public List<CategoryEntity> findByKbUid(String kbUid) {
         return categoryRepository.findByKbUidAndDeleted(kbUid, false);
     }
 
     @Override
     public CategoryResponse update(CategoryRequest request) {
-        Optional<Category> category = findByUid(request.getUid());
+        Optional<CategoryEntity> category = findByUid(request.getUid());
         if (!category.isPresent()) {
             throw new RuntimeException("category not found");
         }
-        Category entity = category.get();
+        CategoryEntity entity = category.get();
         // modelMapper.map(request, entity);
         entity.setName(request.getName());
         // entity.setIcon(request.getIcon());
         entity.setType(request.getType());
         // entity.setPlatform(request.getPlatform());
         // TODO: children
-        Category newCategory = save(entity);
+        CategoryEntity newCategory = save(entity);
         if (newCategory == null) {
             throw new RuntimeException("category save error");
         }
@@ -151,7 +151,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     }
 
     @Override
-    public Category save(Category entity) {
+    public CategoryEntity save(CategoryEntity entity) {
         try {
             return categoryRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -162,7 +162,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Category> category = findByUid(uid);
+        Optional<CategoryEntity> category = findByUid(uid);
         if (category.isPresent()) {
             category.get().setDeleted(true);
             save(category.get());
@@ -170,18 +170,18 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
     }
 
     @Override
-    public void delete(Category entity) {
+    public void delete(CategoryRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Category entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CategoryEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public CategoryResponse convertToResponse(Category entity) {
+    public CategoryResponse convertToResponse(CategoryEntity entity) {
         CategoryResponse response = modelMapper.map(entity, CategoryResponse.class);
         // log.info("{} children length {}", entity.getName(),
         // entity.getChildren().size());
@@ -189,7 +189,7 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         return response;
     }
 
-    public List<CategoryResponse> convertToResponseList(List<Category> list) {
+    public List<CategoryResponse> convertToResponseList(List<CategoryEntity> list) {
         return list.stream().map(city -> convertToResponse(city)).collect(Collectors.toList());
     }
 
@@ -206,59 +206,59 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         CategoryRequest categoryContact = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
                 .orderNo(0)
-                .level(LevelEnum.PLATFORM)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
-                .kbUid(BdConstants.DEFAULT_KB_UID)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                 .build();
         categoryContact.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载
-        categoryContact.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        categoryContact.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         create(categoryContact);
 
         CategoryRequest categoryThanks = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
                 .orderNo(1)
-                .level(LevelEnum.PLATFORM)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
-                .kbUid(BdConstants.DEFAULT_KB_UID)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                 .build();
         categoryThanks.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载
-        categoryThanks.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        categoryThanks.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         create(categoryThanks);
 
         CategoryRequest categoryWelcome = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
                 .orderNo(2)
-                .level(LevelEnum.PLATFORM)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
-                .kbUid(BdConstants.DEFAULT_KB_UID)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                 .build();
         categoryWelcome.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载
-        categoryWelcome.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        categoryWelcome.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         create(categoryWelcome);
 
         CategoryRequest categoryBye = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
                 .orderNo(3)
-                .level(LevelEnum.PLATFORM)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
-                .kbUid(BdConstants.DEFAULT_KB_UID)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                 .build();
         categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载
-        categoryBye.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        categoryBye.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         create(categoryBye);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         //
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         CategoryRequest categoryFaqDemoRequest1 = CategoryRequest.builder()
                 .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
                 .orderNo(0)
-                .level(LevelEnum.ORGNIZATION)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
+                .level(LevelEnum.ORGANIZATION.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 .build();
         categoryFaqDemoRequest1.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
         categoryFaqDemoRequest1.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1);
@@ -268,8 +268,8 @@ public class CategoryService extends BaseService<Category, CategoryRequest, Cate
         CategoryRequest categoryFaqDemoRequest2 = CategoryRequest.builder()
                 .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
                 .orderNo(0)
-                .level(LevelEnum.ORGNIZATION)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
+                .level(LevelEnum.ORGANIZATION.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 .build();
         categoryFaqDemoRequest2.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
         categoryFaqDemoRequest2.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2);

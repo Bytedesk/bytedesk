@@ -19,14 +19,14 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadService;
 // import com.bytedesk.core.thread.ThreadStateService;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentService;
 import com.bytedesk.service.counter.CounterResponse;
 import com.bytedesk.service.counter.CounterService;
@@ -81,7 +81,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
             return getAgentProcessingMessage(visitorRequest, threadOptional.get());
         }
         //
-        Agent agent = agentService.findByUid(agentUid)
+        AgentEntity agent = agentService.findByUid(agentUid)
                 .orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
         // 
         String orgUid = visitorRequest.getOrgUid();
@@ -109,7 +109,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
             Boolean transferToRobot = agent.getServiceSettings().shouldTransferToRobot(isOffline);
             if (transferToRobot) {
                 // 转机器人
-                Robot robot = agent.getServiceSettings().getRobot();
+                RobotEntity robot = agent.getServiceSettings().getRobot();
                 // 
                 return routeService.routeRobot(visitorRequest, thread, robot);
             }
@@ -127,7 +127,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 广播消息，由消息通道统一处理
         // MessageUtils.notifyUser(messageProtobuf);
-        messageSendService.sendMessage(messageProtobuf);
+        messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
     }

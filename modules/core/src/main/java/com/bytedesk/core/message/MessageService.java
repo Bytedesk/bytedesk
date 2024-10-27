@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 16:21:03
+ * @LastEditTime: 2024-10-23 18:13:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -102,7 +102,7 @@ public class MessageService extends BaseService<MessageEntity, MessageRequest, M
     @Caching(evict = {
             @CacheEvict(value = "message", key = "#message.uid"),
     })
-    public void delete(@NonNull MessageEntity message) {
+    public void delete(@NonNull MessageRequest message) {
         deleteByUid(message.getUid());
     }
 

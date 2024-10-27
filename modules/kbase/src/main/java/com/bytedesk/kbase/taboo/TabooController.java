@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:34:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 10:59:57
+ * @LastEditTime: 2024-10-23 18:18:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ public class TabooController extends BaseController<TabooRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(TabooRequest request) {
+    public ResponseEntity<?> queryByUser(TabooRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
@@ -76,7 +76,7 @@ public class TabooController extends BaseController<TabooRequest> {
     @Override
     public ResponseEntity<?> delete(TabooRequest request) {
         
-        tabooService.deleteByUid(request.getUid());
+        tabooService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

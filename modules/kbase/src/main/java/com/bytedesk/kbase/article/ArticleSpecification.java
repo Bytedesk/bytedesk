@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ArticleSpecification extends BaseSpecification {
 
-    public static Specification<Article> search(ArticleRequest request) {
+    public static Specification<ArticleEntity> search(ArticleRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

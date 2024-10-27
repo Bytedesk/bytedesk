@@ -4,10 +4,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 
 import lombok.AllArgsConstructor;
@@ -23,15 +23,15 @@ public class CategoryEventListener {
     @Order(2)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        Organization organization = (Organization) event.getSource();
+        OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("faq - organization created: {}", organization.getName());
         //
         CategoryRequest categoryFaqDemoRequest1 = CategoryRequest.builder()
                 .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
                 .orderNo(0)
-                .level(LevelEnum.ORGNIZATION)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
+                .level(LevelEnum.ORGANIZATION.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 // .orgUid(orgUid)
                 .build();
         categoryFaqDemoRequest1.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
@@ -42,8 +42,8 @@ public class CategoryEventListener {
         CategoryRequest categoryFaqDemoRequest2 = CategoryRequest.builder()
                 .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
                 .orderNo(0)
-                .level(LevelEnum.ORGNIZATION)
-                .platform(BdConstants.PLATFORM_BYTEDESK)
+                .level(LevelEnum.ORGANIZATION.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 // .orgUid(orgUid)
                 .build();
         categoryFaqDemoRequest2.setType(CategoryConsts.CATEGORY_TYPE_FAQ);

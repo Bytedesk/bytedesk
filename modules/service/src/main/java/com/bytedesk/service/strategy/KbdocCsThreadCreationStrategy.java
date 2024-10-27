@@ -26,7 +26,7 @@ import com.bytedesk.core.thread.ThreadService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.upload.Upload;
+import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -53,7 +53,7 @@ public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
     public MessageProtobuf createKbdocCsThread(VisitorRequest visitorRequest) {
 
         String uploadUid = visitorRequest.getSid();
-        Upload upload = uploadService.findByUid(uploadUid)
+        UploadEntity upload = uploadService.findByUid(uploadUid)
                 .orElseThrow(() -> new RuntimeException("Upload " + uploadUid + " not found"));
         //
         ThreadEntity thread = getKbdocThread(visitorRequest, upload);
@@ -61,7 +61,7 @@ public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return getKbdocMessage(visitorRequest, thread, upload);
     }
 
-    private ThreadEntity getKbdocThread(VisitorRequest visitorRequest, Upload upload) {
+    private ThreadEntity getKbdocThread(VisitorRequest visitorRequest, UploadEntity upload) {
         if (upload == null) {
             throw new RuntimeException("Upload cannot be null");
         }
@@ -90,7 +90,7 @@ public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getKbdocMessage(VisitorRequest visitorRequest, ThreadEntity thread, Upload upload) {
+    private MessageProtobuf getKbdocMessage(VisitorRequest visitorRequest, ThreadEntity thread, UploadEntity upload) {
         // thread.setContent(robot.getServiceSettings().getWelcomeTip());
         //
         // boolean isReenter = true;

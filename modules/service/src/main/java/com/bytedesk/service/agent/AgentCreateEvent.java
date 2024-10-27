@@ -24,9 +24,9 @@ public class AgentCreateEvent extends ApplicationEvent {
 
     private final static long serialVersionUID = 1L;
 
-    private Agent agent;
+    private AgentEntity agent;
 
-    public AgentCreateEvent(Object source, Agent agent) {
+    public AgentCreateEvent(Object source, AgentEntity agent) {
         super(source);
         this.agent = agent;
     }

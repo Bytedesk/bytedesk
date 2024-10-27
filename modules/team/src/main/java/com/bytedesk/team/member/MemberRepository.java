@@ -25,7 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "member - 成员")
 @RepositoryRestResource(path = "mem", itemResourceRel = "mems", collectionResourceRel = "mems")
 // @PreAuthorize("hasRole('ROLE_USER')")
-public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecificationExecutor<Member> {
+public interface MemberRepository extends JpaRepository<MemberEntity, Long>, JpaSpecificationExecutor<MemberEntity> {
 
     // @Override
     // @PreAuthorize("#member?.user == null or #member?.user?.username ==
@@ -53,17 +53,17 @@ public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecif
     // // @PreAuthorize("#member?.user?.username == authentication?.username")
     // void delete(@Param("member") Member member);
 
-    Optional<Member> findByUidAndDeleted(String uid, Boolean deleted);
+    Optional<MemberEntity> findByUidAndDeleted(String uid, Boolean deleted);
 
-    Optional<Member> findByUser_UidAndDeleted(String uid, Boolean deleted);
+    Optional<MemberEntity> findByUser_UidAndDeleted(String uid, Boolean deleted);
 
-    Optional<Member> findByMobileAndOrgUidAndDeleted(String mobile, String orgUid, Boolean deleted);
+    Optional<MemberEntity> findByMobileAndOrgUidAndDeleted(String mobile, String orgUid, Boolean deleted);
 
-    Optional<Member> findByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
+    Optional<MemberEntity> findByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
 
-    Optional<Member> findByUserAndOrgUidAndDeleted(User user, String orgUid, Boolean deleted);
+    Optional<MemberEntity> findByUserAndOrgUidAndDeleted(UserEntity user, String orgUid, Boolean deleted);
 
-    Page<Member> findByDepartmentsUidInAndOrgUidAndDeleted(String dids[],
+    Page<MemberEntity> findByDepartmentsUidInAndOrgUidAndDeleted(String dids[],
             String orgUid, Boolean deleted, Pageable pageable);
 
     // Page<Member> findByOrgUidAndDeleted(String orgUid, boolean deleted, Pageable

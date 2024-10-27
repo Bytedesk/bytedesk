@@ -21,7 +21,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.core.topic.Topic;
+import com.bytedesk.core.topic.TopicEntity;
 import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.alibaba.fastjson2.JSON;
@@ -112,7 +112,7 @@ public class MessageSocketService {
         // log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={}, clientId={}",
         //         messageProto.getUser().getNickname(), messageProto.getContent(), topic, messageProto.getType(),
         //         messageProto.getClient());
-        Set<Topic> topicSet = topicService.findByTopic(topic);
+        Set<TopicEntity> topicSet = topicService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
         topicSet.forEach(topicElement -> {
             Set<String> clientIdSet = topicElement.getClientIds();

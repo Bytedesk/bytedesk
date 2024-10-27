@@ -37,7 +37,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -76,7 +76,7 @@ public class RobotEventListener {
     @Order(5)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        Organization organization = (Organization) event.getSource();
+        OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("robot - organization created: {}", organization.getName());
         //
@@ -143,9 +143,9 @@ public class RobotEventListener {
             if (!StringUtils.hasText(robotUid)) {
                 throw new RuntimeException("robotUid is null");
             }
-            Optional<Robot> robotOptional = robotService.findByUid(robotUid);
+            Optional<RobotEntity> robotOptional = robotService.findByUid(robotUid);
             if (robotOptional.isPresent()) {
-                Robot robot = robotOptional.get();
+                RobotEntity robot = robotOptional.get();
                 //
                 UserProtobuf user = UserProtobuf.builder().build();
                 user.setUid(robotUid);
@@ -188,7 +188,7 @@ public class RobotEventListener {
             clonedMessage.setUid(uidUtils.getCacheSerialUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
             // MessageUtils.notifyUser(clonedMessage);
-            messageSendService.sendMessage(clonedMessage);
+            messageSendService.sendProtobufMessage(clonedMessage);
             //
             // TODO: 获取大模型配置
             // robotProtobuf.getLlm().getProvider()
@@ -215,7 +215,7 @@ public class RobotEventListener {
                     && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())) {
                 // 机器人回复
                 log.info("robot thread reply");
-                Robot robot = robotService.findByUid(agent.getUid())
+                RobotEntity robot = robotService.findByUid(agent.getUid())
                         .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
                 //
                 sendRobotReply(threadProtobuf, agent, query, robot);
@@ -223,7 +223,7 @@ public class RobotEventListener {
         }
     }
 
-    private void sendRobotReply(ThreadProtobuf threadProtobuf, UserProtobuf user, String query, Robot robot) {
+    private void sendRobotReply(ThreadProtobuf threadProtobuf, UserProtobuf user, String query, RobotEntity robot) {
         //
         String threadTopic = threadProtobuf.getTopic();
         MessageExtra extra = MessageUtils.getMessageExtra(robot.getOrgUid());
@@ -244,7 +244,7 @@ public class RobotEventListener {
         clonedMessage.setUid(uidUtils.getCacheSerialUid());
         clonedMessage.setType(MessageTypeEnum.PROCESSING);
         // MessageUtils.notifyUser(clonedMessage);
-        messageSendService.sendMessage(clonedMessage);
+        messageSendService.sendProtobufMessage(clonedMessage);
         // 知识库
         if (bytedeskProperties.getJavaai()) {
             zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);

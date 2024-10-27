@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CategorySpecification extends BaseSpecification {
 
-    public static Specification<Category> search(CategoryRequest request) {
+    public static Specification<CategoryEntity> search(CategoryRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

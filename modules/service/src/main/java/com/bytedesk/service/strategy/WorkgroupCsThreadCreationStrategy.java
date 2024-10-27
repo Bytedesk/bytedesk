@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -33,7 +33,7 @@ import com.bytedesk.service.route.IRouteService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
-import com.bytedesk.service.workgroup.Workgroup;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import com.bytedesk.service.workgroup.WorkgroupService;
 
@@ -83,7 +83,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             return getWorkgroupProcessingMessage(visitorRequest, threadOptional.get());
         }
         //
-        Workgroup workgroup = workgroupService.findByUid(workgroupUid)
+        WorkgroupEntity workgroup = workgroupService.findByUid(workgroupUid)
                 .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
         // 
         String orgUid = visitorRequest.getOrgUid();
@@ -110,7 +110,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             if (transferToRobot) {
                 // 转机器人
                 // 将robot设置为agent
-                Robot robot = workgroup.getServiceSettings().getRobot();
+                RobotEntity robot = workgroup.getServiceSettings().getRobot();
                 MessageProtobuf messageProtobuf = routeService.routeRobot(visitorRequest, thread, robot);
                 // threadStateService.autoAccept(thread);
                 return messageProtobuf;
@@ -130,7 +130,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 广播消息，由消息通道统一处理
-        messageSendService.sendMessage(messageProtobuf);
+        messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
     }

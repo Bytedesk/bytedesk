@@ -19,12 +19,12 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface CounterRepository extends JpaRepository<Counter, Long>, JpaSpecificationExecutor<Counter> {
+public interface CounterRepository extends JpaRepository<CounterEntity, Long>, JpaSpecificationExecutor<CounterEntity> {
     
-    Optional<Counter> findByUid(String uid);
+    Optional<CounterEntity> findByUid(String uid);
 
     // Optional<Counter> findBySid(String sid);
-    Optional<Counter> findByTopic(String topic);
+    Optional<CounterEntity> findByTopic(String topic);
 
     // TODO: 设置所有数据currentNumber = 0
     // void updateAll();

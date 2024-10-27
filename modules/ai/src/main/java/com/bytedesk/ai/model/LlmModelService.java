@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-25 23:48:54
+ * @LastEditTime: 2024-10-23 18:29:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class LlmModelService extends BaseService<LlmModel, LlmModelRequest, LlmModelResponse> {
+public class LlmModelService extends BaseService<LlmModelEntity, LlmModelRequest, LlmModelResponse> {
 
     private final LlmModelRepository repository;
 
@@ -48,9 +48,9 @@ public class LlmModelService extends BaseService<LlmModel, LlmModelRequest, LlmM
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
                 "updatedAt");
 
-        Specification<LlmModel> specification = LlmModelSpecification.search(request);
+        Specification<LlmModelEntity> specification = LlmModelSpecification.search(request);
 
-        Page<LlmModel> page = repository.findAll(specification, pageable);
+        Page<LlmModelEntity> page = repository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -62,7 +62,7 @@ public class LlmModelService extends BaseService<LlmModel, LlmModelRequest, LlmM
     }
 
     @Override
-    public Optional<LlmModel> findByUid(String uid) {
+    public Optional<LlmModelEntity> findByUid(String uid) {
         return repository.findByUid(uid);
     }
 
@@ -85,14 +85,14 @@ public class LlmModelService extends BaseService<LlmModel, LlmModelRequest, LlmM
         //     throw new RuntimeException("LlmModel name already exists");
         // }
 
-        LlmModel entity = modelMapper.map(request, LlmModel.class);
+        LlmModelEntity entity = modelMapper.map(request, LlmModelEntity.class);
         if (StringUtils.hasText(request.getUid())) {
             entity.setUid(request.getUid());
         } else {
             entity.setUid(uidUtils.getUid());
         }
         //
-        LlmModel savedModel = save(entity);
+        LlmModelEntity savedModel = save(entity);
         if (savedModel == null) {
             throw new RuntimeException("Create LlmModel failed");
         }
@@ -119,7 +119,7 @@ public class LlmModelService extends BaseService<LlmModel, LlmModelRequest, LlmM
     }
 
     @Override
-    public LlmModel save(LlmModel entity) {
+    public LlmModelEntity save(LlmModelEntity entity) {
         try {
             return repository.save(entity);
         } catch (Exception e) {
@@ -136,19 +136,19 @@ public class LlmModelService extends BaseService<LlmModel, LlmModelRequest, LlmM
     }
 
     @Override
-    public void delete(LlmModel entity) {
+    public void delete(LlmModelRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, LlmModel entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, LlmModelEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public LlmModelResponse convertToResponse(LlmModel entity) {
+    public LlmModelResponse convertToResponse(LlmModelEntity entity) {
         return modelMapper.map(entity, LlmModelResponse.class);
     }
 

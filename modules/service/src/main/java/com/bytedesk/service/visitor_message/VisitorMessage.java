@@ -25,7 +25,7 @@ package com.bytedesk.service.visitor_message;
 // @EqualsAndHashCode(callSuper = false)
 // @AllArgsConstructor
 // @NoArgsConstructor
-// @Table(name = "service_visitor_message")
+// @Table(name = "bytedesk_service_visitor_message")
 // public class VisitorMessage extends BaseEntity {
     
 //     private static final long serialVersionUID = 1L;
@@ -44,7 +44,7 @@ package com.bytedesk.service.visitor_message;
 //     @Builder.Default
 //     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
 //     @JdbcTypeCode(SqlTypes.JSON)
-//     private String extra = BdConstants.EMPTY_JSON_STRING;
+//     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
 //     // 仅对一对一/客服/技能组聊天有效，表示对方是否已读。群聊无效
 //     @Builder.Default
@@ -71,7 +71,7 @@ package com.bytedesk.service.visitor_message;
 //     @Builder.Default
 //     @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
 //     @JdbcTypeCode(SqlTypes.JSON)
-//     private String user = BdConstants.EMPTY_JSON_STRING;
+//     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     
 // }

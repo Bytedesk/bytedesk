@@ -24,7 +24,7 @@ import jakarta.persistence.PostPersist;
 public class AssistantEntityListener {
 
     @PostPersist
-    public void onPostPersist(Assistant assistant) {
+    public void onPostPersist(AssistantEntity assistant) {
         // log.debug("AssistantListener: onPostPersist {}", assistant.getNickname());
     }
 

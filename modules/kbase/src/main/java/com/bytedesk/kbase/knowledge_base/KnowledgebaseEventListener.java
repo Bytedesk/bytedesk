@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.config.BytedeskProperties;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -36,7 +36,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.redis.pubsub.RedisPubsubService;
@@ -67,10 +67,10 @@ public class KnowledgebaseEventListener {
 
         private final IMessageSendService messageSendService;
 
-        // BdConstants.DEFAULT_ORGANIZATION_UID
+        // BytedeskConsts.DEFAULT_ORGANIZATION_UID
         @EventListener
         public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-                Organization organization = (Organization) event.getSource();
+                OrganizationEntity organization = (OrganizationEntity) event.getSource();
                 String orgUid = organization.getUid();
                 log.info("onOrganizationCreateEvent: orgUid {}", orgUid);
                 //
@@ -172,7 +172,7 @@ public class KnowledgebaseEventListener {
                         // ai回答暂不处理
                         return;
                 }
-                if (messageProtobuf.getUser().getUid().equals(BdConstants.DEFAULT_SYSTEM_UID)) {
+                if (messageProtobuf.getUser().getUid().equals(BytedeskConsts.DEFAULT_SYSTEM_UID)) {
                         // 系统消息不处理
                         return;
                 }
@@ -203,9 +203,9 @@ public class KnowledgebaseEventListener {
                         if (messageProtobuf.getUser().getUid().equals(kbUid)) {
                                 return;
                         }
-                        Optional<Knowledgebase> kbOptional = knowledgebaseService.findByUid(kbUid);
+                        Optional<KnowledgebaseEntity> kbOptional = knowledgebaseService.findByUid(kbUid);
                         if (kbOptional.isPresent()) {
-                                Knowledgebase kb = kbOptional.get();
+                                KnowledgebaseEntity kb = kbOptional.get();
                                 //
                                 UserProtobuf user = UserProtobuf.builder().build();
                                 user.setUid(kbUid);
@@ -230,7 +230,7 @@ public class KnowledgebaseEventListener {
                                 clonedMessage.setUid(uidUtils.getUid());
                                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                                 // MessageUtils.notifyUser(clonedMessage);
-                                messageSendService.sendMessage(messageProtobuf);
+                                messageSendService.sendProtobufMessage(messageProtobuf);
                                 // 知识库
                                 // if (bytedeskProperties.getJavaai()) {
                                 //         zhipuaiService.sendWsRobotMessage(query, kb.getKbUid(), kb, message);

@@ -34,14 +34,14 @@ import java.util.Optional;
 @Repository
 // @Transactional(readOnly = true)
 @Tag(name = "roles - 角色")
-public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
+public interface RoleRepository extends JpaRepository<RoleEntity, Long>, JpaSpecificationExecutor<RoleEntity> {
 
-    Optional<Role> findByNameAndOrgUidAndDeleted(String name, String orgUid, Boolean deleted);
+    Optional<RoleEntity> findByNameAndOrgUidAndDeleted(String name, String orgUid, Boolean deleted);
 
-    List<Role> findByTypeAndOrgUidAndDeleted(String type, String orgUid, Boolean deleted);
+    List<RoleEntity> findByTypeAndOrgUidAndDeleted(String type, String orgUid, Boolean deleted);
 
     // Page<Role> findByUser(User user, Pageable pageable);
-    Page<Role> findByOrgUidAndDeleted(String orgUid, boolean deleted, Pageable pageable);
+    Page<RoleEntity> findByOrgUidAndDeleted(String orgUid, boolean deleted, Pageable pageable);
 
     Boolean existsByNameAndOrgUidAndDeleted(String name, String orgUid, boolean deleted);
 

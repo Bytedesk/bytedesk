@@ -30,18 +30,18 @@ import lombok.extern.slf4j.Slf4j;
 public class ArticleEntityListener {
 
     @PostPersist
-    public void onPostPersist(Article article) {
+    public void onPostPersist(ArticleEntity article) {
         log.info("ArticleEntityListener: onPostPersist");
-        Article clonedArticle = SerializationUtils.clone(article);
+        ArticleEntity clonedArticle = SerializationUtils.clone(article);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         publisher.publishGenericApplicationEvent(new GenericApplicationEvent<ArticleCreateEvent>(this, new ArticleCreateEvent(this, clonedArticle)));
     }
 
     @PostUpdate
-    public void onPostUpdate(Article article) {
+    public void onPostUpdate(ArticleEntity article) {
         log.info("ArticleEntityListener: onPostUpdate");
-        Article clonedArticle = SerializationUtils.clone(article);
+        ArticleEntity clonedArticle = SerializationUtils.clone(article);
         //
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         publisher.publishGenericApplicationEvent(new GenericApplicationEvent<ArticleUpdateEvent>(this, new ArticleUpdateEvent(this, clonedArticle)));

@@ -21,7 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.bytedesk.kbase.knowledge_base.Knowledgebase;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseEntity;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 
 import lombok.RequiredArgsConstructor;
@@ -45,14 +45,14 @@ public class ArticleRouteController {
     public String index(Model model, @PathVariable("kbUid") String kbUid, @PathVariable("articleUid") String articleUid) {
         log.info("kbUid {}, articleUid: {}", kbUid, articleUid);
         // 
-        Optional<Article> articleOptional = articleService.findByUid(articleUid);
+        Optional<ArticleEntity> articleOptional = articleService.findByUid(articleUid);
         if (articleOptional.isPresent()) {
             model.addAttribute("article", articleOptional.get());
         } else {
             return "redirect:/404";
         }
         // 
-        Optional<Knowledgebase> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
+        Optional<KnowledgebaseEntity> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
         if (knowledgebaseOptional.isPresent()) {
             model.addAttribute("knowledgebase", knowledgebaseOptional.get());
         } else {

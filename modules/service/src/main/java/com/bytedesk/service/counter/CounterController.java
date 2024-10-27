@@ -31,7 +31,7 @@ public class CounterController extends BaseController<CounterRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(CounterRequest request) {
+    public ResponseEntity<?> queryByUser(CounterRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

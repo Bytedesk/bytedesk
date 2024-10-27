@@ -33,7 +33,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "core_quartz")
+@Table(name = "bytedesk_core_quartz")
 public class QuartzEntity extends BaseEntity {
 
     // job details

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 // import com.bytedesk.core.event.BytedeskEventPublisher;
@@ -35,11 +35,11 @@ public class OrganizationEntityListener {
 
     // 这允许你执行一些后续操作，比如发布事件、更新缓存、触发其他业务逻辑等
     @PostPersist
-    public void onPostCreate(Organization organization) {
+    public void onPostCreate(OrganizationEntity organization) {
         log.info("onPostCreate: {}", organization);
-        Organization clonedOrg = SerializationUtils.clone(organization);
+        OrganizationEntity clonedOrg = SerializationUtils.clone(organization);
 
-        if (BdConstants.DEFAULT_ORGANIZATION_UID.equals(organization.getUid())) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid())) {
             return;
         }
 

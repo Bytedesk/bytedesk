@@ -25,7 +25,7 @@ public class OrganizationCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
     
-    public OrganizationCreateEvent(Organization organization) {
+    public OrganizationCreateEvent(OrganizationEntity organization) {
         super(organization);
     }
 

@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoleSpecification extends BaseSpecification {
 
-    public static Specification<Role> search(RoleRequest request) {
+    public static Specification<RoleEntity> search(RoleRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

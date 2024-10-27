@@ -30,7 +30,7 @@
 
 package com.bytedesk.core.uid.worker;
 
-import com.bytedesk.core.uid.UidGenerator;
+import com.bytedesk.core.uid.UidGeneratorEntity;
 import com.bytedesk.core.uid.UidGereratorRepository;
 // import com.bytedesk.core.uid.utils.DockerUtils;
 import com.bytedesk.core.uid.utils.NetUtils;
@@ -72,9 +72,9 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
     @Override
     public long assignWorkerId() {
         // build worker node entity
-        UidGenerator workerNodeEntity = buildWorkerNode();
+        UidGeneratorEntity workerNodeEntity = buildWorkerNode();
 
-        UidGenerator oldWorkerNode = workerNodeDAO
+        UidGeneratorEntity oldWorkerNode = workerNodeDAO
                 .findByHostAndPort(workerNodeEntity.getHost(), workerNodeEntity.getPort());
         if (null != oldWorkerNode) {
             return oldWorkerNode.getId();
@@ -96,8 +96,8 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
     /**
      * Build worker node entity by IP and PORT
      */
-    private UidGenerator buildWorkerNode() {
-        UidGenerator workerNodeEntity = new UidGenerator();
+    private UidGeneratorEntity buildWorkerNode() {
+        UidGeneratorEntity workerNodeEntity = new UidGeneratorEntity();
         workerNodeEntity.setUid(Utils.getUid());
     
         workerNodeEntity.setType(WorkerNodeType.ACTUAL.value());
@@ -109,8 +109,8 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
         return workerNodeEntity;
     }
 
-    private UidGenerator buildFakeWorkerNode() {
-        UidGenerator workerNodeEntity = new UidGenerator();
+    private UidGeneratorEntity buildFakeWorkerNode() {
+        UidGeneratorEntity workerNodeEntity = new UidGeneratorEntity();
         workerNodeEntity.setUid(Utils.getUid());
 
         workerNodeEntity.setType(WorkerNodeType.FAKE.value());

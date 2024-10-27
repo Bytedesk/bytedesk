@@ -28,9 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ActionEntityListener {
 
     @PostPersist
-    private void onPostPersist(Action action) {
+    private void onPostPersist(ActionEntity action) {
         log.info("actionLog after: model {}, action {}", action.getTitle(), action.getAction());
-        Action clonedAction = SerializationUtils.clone(action);
+        ActionEntity clonedAction = SerializationUtils.clone(action);
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishActionCreateEvent(clonedAction);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-04 10:20:26
+ * @LastEditTime: 2024-10-22 16:23:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TopicRepository extends JpaRepository<Topic, Long> {
+public interface TopicRepository extends JpaRepository<TopicEntity, Long> {
 
-    Optional<Topic> findByUid(String uid);
+    Optional<TopicEntity> findByUid(String uid);
     
-    Optional<Topic> findFirstByUserUid(String userUid);
+    Optional<TopicEntity> findFirstByUserUid(String userUid);
 
     // boolean existsByTopicAndUid(String topic, String uid);
 
@@ -43,8 +43,8 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     // List<Topic> findByTopicStartsWith(String topic);
     // List<Topic> findByTopic(String topic);
     // 
-    @Query(value="select * from core_topic where topics like %:topic% ", nativeQuery = true)
-    Set<Topic> findByTopicsContains(@Param("topic") String topic);
+    @Query(value="select * from bytedesk_core_topic where topics like %:topic% ", nativeQuery = true)
+    Set<TopicEntity> findByTopicsContains(@Param("topic") String topic);
 
     // void deleteByTopicAndUid(String topic, String uid);
 }

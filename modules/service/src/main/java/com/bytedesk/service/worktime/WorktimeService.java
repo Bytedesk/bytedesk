@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:46:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 16:12:12
+ * @LastEditTime: 2024-10-23 18:21:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class WorktimeService extends BaseService<Worktime, WorktimeRequest, WorktimeResponse> {
+public class WorktimeService extends BaseService<WorktimeEntity, WorktimeRequest, WorktimeResponse> {
 
     private final WorktimeRepository worktimeRepository;
 
@@ -49,7 +49,7 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
     }
 
     @Override
-    public Optional<Worktime> findByUid(String uid) {
+    public Optional<WorktimeEntity> findByUid(String uid) {
         return worktimeRepository.findByUid(uid);
     }
 
@@ -57,7 +57,7 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
     public WorktimeResponse create(WorktimeRequest request) {
 
         // Worktime worktime = modelMapper.map(request, Worktime.class);
-        Worktime worktime = Worktime.builder()
+        WorktimeEntity worktime = WorktimeEntity.builder()
         .startTime(DateUtils.formatStringToTime(request.getStartTime()))
         .endTime(DateUtils.formatStringToTime(request.getEndTime()))
         .build();
@@ -69,9 +69,9 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
     @Override
     public WorktimeResponse update(WorktimeRequest request) {
 
-        Optional<Worktime> optional = findByUid(request.getUid());
+        Optional<WorktimeEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            Worktime worktime = optional.get();
+            WorktimeEntity worktime = optional.get();
             // modelMapper.map(request, worktime);
             worktime.setStartTime(DateUtils.formatStringToTime(request.getStartTime()));
             worktime.setEndTime(DateUtils.formatStringToTime(request.getEndTime()));
@@ -83,15 +83,15 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
     }
 
     @Override
-    public Worktime save(Worktime entity) {
+    public WorktimeEntity save(WorktimeEntity entity) {
         return worktimeRepository.save(entity);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Worktime> optional = findByUid(uid);
+        Optional<WorktimeEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
-            Worktime worktime = optional.get();
+            WorktimeEntity worktime = optional.get();
             worktime.setDeleted(true);
             // worktimeRepository.delete(worktime);
             save(worktime);
@@ -99,18 +99,18 @@ public class WorktimeService extends BaseService<Worktime, WorktimeRequest, Work
     }
 
     @Override
-    public void delete(Worktime entity) {
-        worktimeRepository.delete(entity);
+    public void delete(WorktimeRequest entity) {
+        // worktimeRepository.delete(entity);
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Worktime entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, WorktimeEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public WorktimeResponse convertToResponse(Worktime entity) {
+    public WorktimeResponse convertToResponse(WorktimeEntity entity) {
         // return modelMapper.map(entity, WorktimeResponse.class);
         WorktimeResponse worktimeResponse = WorktimeResponse.builder()
                 // .uid(entity.getUid())

@@ -17,7 +17,7 @@ package com.bytedesk.core.channel;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserCreateEvent;
 import com.bytedesk.core.thread.ThreadService;
 
@@ -33,7 +33,7 @@ public class ChannelEventListener {
 
     @EventListener
     public void onUserCreateEvent(UserCreateEvent event) {
-        User user = event.getUser();
+        UserEntity user = event.getUser();
         log.info("channel onUserCreateEvent: {}", user.getUid());
         //
         // 每创建一个用户，自动给此用户生成一条系统通知的会话

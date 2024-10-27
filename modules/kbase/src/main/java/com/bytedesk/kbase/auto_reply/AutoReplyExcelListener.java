@@ -45,7 +45,7 @@ public class AutoReplyExcelListener implements ReadListener<AutoReplyExcel> {
     /**
      * 缓存的数据
      */
-    private List<AutoReply> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<AutoReplyEntity> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
     
     /**
      * 这个每一条数据解析都会来调用
@@ -53,7 +53,7 @@ public class AutoReplyExcelListener implements ReadListener<AutoReplyExcel> {
     @Override
     public void invoke(AutoReplyExcel data, AnalysisContext context) {
         log.info("AutoReplyExcelListener invoke: {}", JSON.toJSONString(data));
-        AutoReply autoReply = autoreplyService.convertExcelToAutoReply(data, kbUid, orgUid); // categoryUid, 
+        AutoReplyEntity autoReply = autoreplyService.convertExcelToAutoReply(data, kbUid, orgUid); // categoryUid, 
                 cachedDataList.add(autoReply);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

@@ -16,6 +16,6 @@ package com.bytedesk.core.channel;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ChannelRepository extends JpaRepository<Channel, Long> {
+public interface ChannelRepository extends JpaRepository<ChannelEntity, Long> {
     
 }

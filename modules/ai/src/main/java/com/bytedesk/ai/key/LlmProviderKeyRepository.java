@@ -19,9 +19,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface LlmProviderKeyRepository extends JpaRepository<LlmProviderKey, Long>, JpaSpecificationExecutor<LlmProviderKey> {
+public interface LlmProviderKeyRepository extends JpaRepository<LlmProviderKeyEntity, Long>, JpaSpecificationExecutor<LlmProviderKeyEntity> {
     
-    Optional<LlmProviderKey> findByUid(String uid);
+    Optional<LlmProviderKeyEntity> findByUid(String uid);
 
-    Optional<LlmProviderKey> findByProviderAndOrgUid(String provider, String orgUid);
+    Optional<LlmProviderKeyEntity> findByProviderAndOrgUid(String provider, String orgUid);
 }

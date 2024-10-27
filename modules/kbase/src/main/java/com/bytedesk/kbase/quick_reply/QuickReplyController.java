@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 22:01:17
+ * @LastEditTime: 2024-10-23 18:18:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ public class QuickReplyController extends BaseController<QuickReplyRequest> {
 
     // 客服端加载
     @Override
-    public ResponseEntity<?> query(QuickReplyRequest request) {
+    public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
         
         return ResponseEntity.ok(JsonResult.success(false));
     }
@@ -80,7 +80,7 @@ public class QuickReplyController extends BaseController<QuickReplyRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody QuickReplyRequest request) {
 
-        quickReplyService.deleteByUid(request.getUid());
+        quickReplyService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }

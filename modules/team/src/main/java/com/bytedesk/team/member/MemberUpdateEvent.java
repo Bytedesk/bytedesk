@@ -23,9 +23,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class MemberUpdateEvent extends ApplicationEvent {
 
-    private Member member;
+    private MemberEntity member;
 
-    public MemberUpdateEvent(Object source, Member member) {
+    public MemberUpdateEvent(Object source, MemberEntity member) {
         super(source);
         this.member = member;
     }

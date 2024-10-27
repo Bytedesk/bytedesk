@@ -53,7 +53,7 @@ public class UploadVectorStore {
 	 * 
 	 * @param fileUrl
 	 */
-	public void readSplitWriteToVectorStore(@NonNull Upload upload) {
+	public void readSplitWriteToVectorStore(@NonNull UploadEntity upload) {
 		if (!upload.getType().equals(UploadTypeEnum.LLM.name())) {
 			return;
 		}
@@ -80,7 +80,7 @@ public class UploadVectorStore {
 		}
 	}
 
-	public void readPdfPage(String fileName, Upload upload) {
+	public void readPdfPage(String fileName, UploadEntity upload) {
 		log.info("Loading document from pdfPage: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -105,7 +105,7 @@ public class UploadVectorStore {
 		storeDocuments(docList, upload);
 	}
 
-	public void readPdfParagraph(String fileName, Upload upload) {
+	public void readPdfParagraph(String fileName, UploadEntity upload) {
 		log.info("Loading document from pdfParagraph: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -130,7 +130,7 @@ public class UploadVectorStore {
 		storeDocuments(docList, upload);
 	}
 
-	public void readJson(String fileName, Upload upload) {
+	public void readJson(String fileName, UploadEntity upload) {
 		log.info("Loading document from json: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -148,7 +148,7 @@ public class UploadVectorStore {
 		storeDocuments(docList, upload);
 	}
 
-	public void readTxt(String fileName, Upload upload) {
+	public void readTxt(String fileName, UploadEntity upload) {
 		log.info("Loading document from txt: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -169,7 +169,7 @@ public class UploadVectorStore {
 
 	// https://tika.apache.org/2.9.0/formats.html
 	// PDF, DOC/DOCX, PPT/PPTX, and HTML
-	public void readByTika(String fileName, Upload upload) {
+	public void readByTika(String fileName, UploadEntity upload) {
 		log.info("Loading document from tika: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -185,7 +185,7 @@ public class UploadVectorStore {
 	}
 
 	// 存储到vectore store
-	private void storeDocuments(List<Document> docList, Upload upload) {
+	private void storeDocuments(List<Document> docList, UploadEntity upload) {
 		// log.info("Parsing document, this will take a while.");
 		List<String> docIdList = new ArrayList<>();
 		Iterator<Document> iterator = docList.iterator();

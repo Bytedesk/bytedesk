@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:46:32
+ * @LastEditTime: 2024-10-23 18:17:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class KeywordService extends BaseService<Keyword, KeywordRequest, KeywordResponse> {
+public class KeywordService extends BaseService<KeywordEntity, KeywordRequest, KeywordResponse> {
 
     private final KeywordRepository keywordRepository;
 
@@ -57,8 +57,8 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
-        Specification<Keyword> spec = KeywordSpecification.search(request);
-        Page<Keyword> page = keywordRepository.findAll(spec, pageable);
+        Specification<KeywordEntity> spec = KeywordSpecification.search(request);
+        Page<KeywordEntity> page = keywordRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -71,17 +71,17 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
 
     @Cacheable(value = "keyword", key = "#uid")
     @Override
-    public Optional<Keyword> findByUid(String uid) {
+    public Optional<KeywordEntity> findByUid(String uid) {
         return keywordRepository.findByUid(uid);
     }
 
     @Override
     public KeywordResponse create(KeywordRequest request) {
 
-        Keyword keyword = modelMapper.map(request, Keyword.class);
+        KeywordEntity keyword = modelMapper.map(request, KeywordEntity.class);
         keyword.setUid(uidUtils.getCacheSerialUid());
         //
-        Keyword savedKeyword = save(keyword);
+        KeywordEntity savedKeyword = save(keyword);
         if (savedKeyword == null) {
             throw new RuntimeException("Failed to create keyword");
         }
@@ -91,18 +91,18 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
 
     @Override
     public KeywordResponse update(KeywordRequest request) {
-        Optional<Keyword> keywordOptional = findByUid(request.getUid());
+        Optional<KeywordEntity> keywordOptional = findByUid(request.getUid());
         if (!keywordOptional.isPresent()) {
             throw new RuntimeException("Keyword not found");
         }
-        Keyword keyword = keywordOptional.get();
+        KeywordEntity keyword = keywordOptional.get();
         keyword.setKeywordList(request.getKeywordList());
         keyword.setReplyList(request.getReplyList());
         keyword.setMatchType(request.getMatchType().name());
         keyword.setContentType(request.getContentType().name());
         keyword.setEnabled(request.getEnabled());
         //
-        Keyword savedKeyword = save(keyword);
+        KeywordEntity savedKeyword = save(keyword);
         if (savedKeyword == null) {
             throw new RuntimeException("Failed to create keyword");
         }
@@ -111,7 +111,7 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
     }
 
     @Override
-    public Keyword save(Keyword entity) {
+    public KeywordEntity save(KeywordEntity entity) {
         try {
             return keywordRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -120,13 +120,13 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
         return null;
     }
 
-    public void save(List<Keyword> keywords) {
+    public void save(List<KeywordEntity> keywords) {
         keywordRepository.saveAll(keywords);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Keyword> keywordOptional = findByUid(uid);
+        Optional<KeywordEntity> keywordOptional = findByUid(uid);
         if (keywordOptional.isPresent()) {
             keywordOptional.get().setDeleted(true);
             save(keywordOptional.get());
@@ -134,18 +134,18 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
     }
 
     @Override
-    public void delete(Keyword entity) {
+    public void delete(KeywordRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Keyword entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, KeywordEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public KeywordResponse convertToResponse(Keyword entity) {
+    public KeywordResponse convertToResponse(KeywordEntity entity) {
         KeywordResponse keywordResponse = modelMapper.map(entity, KeywordResponse.class);
         // 没有自动转换？手动转换
         keywordResponse.setIsTransfer(entity.isTransfer());
@@ -159,13 +159,13 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
         return keywordExcel;
     }
 
-    public Keyword convertExcelToKeyword(KeywordExcel excel, String kbUid, String orgUid) {
+    public KeywordEntity convertExcelToKeyword(KeywordExcel excel, String kbUid, String orgUid) {
         List<String> keywordList = Arrays.asList(excel.getKeyword().split("\\|")); // 使用正则表达式匹配 "|"
         List<String> replyList = Arrays.asList(excel.getReply().split("\\|")); // 使用正则表达式匹配 "|"
         log.info("keyword {} keywordList: {}", excel.getKeyword(), keywordList);
         log.info("reply {} replyList: {}", excel.getReply(), replyList);
         // 
-        Keyword keyword = Keyword.builder().build();
+        KeywordEntity keyword = KeywordEntity.builder().build();
         keyword.setUid(uidUtils.getCacheSerialUid());
         keyword.setKeywordList(keywordList);
         keyword.setReplyList(replyList);
@@ -174,7 +174,7 @@ public class KeywordService extends BaseService<Keyword, KeywordRequest, Keyword
         keyword.setTransfer(false);
         // 
         // keyword.setCategoryUid(categoryUid);
-        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             keyword.setCategoryUid(categoryOptional.get().getUid());
         } else {

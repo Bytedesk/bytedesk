@@ -19,20 +19,20 @@ import org.modelmapper.ModelMapper;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.utils.ConvertUtils;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.settings.ServiceSettings;
-import com.bytedesk.service.visitor.Visitor;
+import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
-import com.bytedesk.service.workgroup.Workgroup;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupResponse;
 
 public class ConvertServiceUtils {
@@ -43,11 +43,11 @@ public class ConvertServiceUtils {
     }
 
     //
-    public static VisitorResponse convertToVisitorResponse(Visitor visitor) {
+    public static VisitorResponse convertToVisitorResponse(VisitorEntity visitor) {
         return modelMapper.map(visitor, VisitorResponse.class);
     }
 
-    public static UserProtobuf convertToUserProtobuf(Visitor visitor) {
+    public static UserProtobuf convertToUserProtobuf(VisitorEntity visitor) {
         return modelMapper.map(visitor, UserProtobuf.class);
     }
 
@@ -77,7 +77,7 @@ public class ConvertServiceUtils {
         //
         UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
-            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
         }
         messageProtobuf.setUser(user);
 
@@ -91,7 +91,7 @@ public class ConvertServiceUtils {
         //
         UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
-            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
         }
         messageResponse.setUser(user);
 
@@ -99,22 +99,22 @@ public class ConvertServiceUtils {
     }
 
     //
-    public static AgentResponse convertToAgentResponse(Agent agent) {
+    public static AgentResponse convertToAgentResponse(AgentEntity agent) {
         return modelMapper.map(agent, AgentResponse.class);
     }
 
-    public static UserProtobuf convertToUserProtobuf(Agent agent) {
+    public static UserProtobuf convertToUserProtobuf(AgentEntity agent) {
         UserProtobuf userProtobuf = modelMapper.map(agent, UserProtobuf.class);
         userProtobuf.setType(UserTypeEnum.AGENT.name());
         return userProtobuf;
     }
 
-    public static String convertToUserProtobufJSONString(Agent agent) {
+    public static String convertToUserProtobufJSONString(AgentEntity agent) {
         return JSON.toJSONString(convertToUserProtobuf(agent));
     }
 
     //
-    public static WorkgroupResponse convertToWorkgroupResponse(Workgroup workgroup) {
+    public static WorkgroupResponse convertToWorkgroupResponse(WorkgroupEntity workgroup) {
         return modelMapper.map(workgroup, WorkgroupResponse.class);
     }
     

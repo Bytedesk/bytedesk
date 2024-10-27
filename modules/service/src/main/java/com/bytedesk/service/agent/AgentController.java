@@ -58,7 +58,7 @@ public class AgentController extends BaseController<AgentRequest> {
      * @return
      */
     @Override
-    public ResponseEntity<?> query(AgentRequest request) {
+    public ResponseEntity<?> queryByUser(AgentRequest request) {
 
         AgentResponse agentResponse = agentService.query(request);
         

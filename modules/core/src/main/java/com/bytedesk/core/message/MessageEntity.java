@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-19 11:02:50
+ * @LastEditTime: 2024-10-23 15:22:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import jakarta.persistence.*;
@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ MessageEntityListener.class })
-@Table(name = "core_message")
+@Table(name = "bytedesk_core_message")
 public class MessageEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -59,7 +59,7 @@ public class MessageEntity extends BaseEntity {
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String extra = BdConstants.EMPTY_JSON_STRING;
+    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
@@ -80,6 +80,6 @@ public class MessageEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String user = BdConstants.EMPTY_JSON_STRING;
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
 }

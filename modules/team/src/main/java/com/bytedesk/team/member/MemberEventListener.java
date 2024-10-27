@@ -25,9 +25,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.event.GenericApplicationEvent;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -35,7 +35,7 @@ import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.department.Department;
+import com.bytedesk.team.department.DepartmentEntity;
 import com.bytedesk.team.department.DepartmentService;
 
 @Slf4j
@@ -56,12 +56,12 @@ public class MemberEventListener {
     @Order(1)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        Organization organization = (Organization) event.getSource();
-        User user = organization.getUser();
+        OrganizationEntity organization = (OrganizationEntity) event.getSource();
+        UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
         log.info("organization created: {}", organization.getName());
         //
-        Department department = Department.builder()
+        DepartmentEntity department = DepartmentEntity.builder()
                 .name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)
                 .description(TypeConsts.DEPT_ADMIN)
                 // .orgUid(organization.getUid())
@@ -98,8 +98,8 @@ public class MemberEventListener {
     @EventListener
     public void onMemberCreateEvent(GenericApplicationEvent<MemberCreateEvent> event) {
         MemberCreateEvent memberCreateEvent = (MemberCreateEvent) event.getObject();
-        Member member = memberCreateEvent.getMember();
-        User user = member.getUser();
+        MemberEntity member = memberCreateEvent.getMember();
+        UserEntity user = member.getUser();
         log.info("member created: {}", memberCreateEvent);
         // 默认订阅成员主题
         TopicRequest request = TopicRequest.builder()

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 21:52:07
+ * @LastEditTime: 2024-10-23 18:12:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,14 +28,14 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class BlackService extends BaseService<Black, BlackRequest, BlackResponse> {
+public class BlackService extends BaseService<BlackEntity, BlackRequest, BlackResponse> {
 
     private final BlackRepository repository;
 
@@ -51,9 +51,9 @@ public class BlackService extends BaseService<Black, BlackRequest, BlackResponse
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
-        Specification<Black> specification = BlackSpecification.search(request);
+        Specification<BlackEntity> specification = BlackSpecification.search(request);
 
-        Page<Black> blacks = repository.findAll(specification, pageable);
+        Page<BlackEntity> blacks = repository.findAll(specification, pageable);
 
         return blacks.map(this::convertToResponse);
     }
@@ -66,19 +66,19 @@ public class BlackService extends BaseService<Black, BlackRequest, BlackResponse
 
     @Cacheable(value = "black", key = "#uid", unless = "#result == null")
     @Override
-    public Optional<Black> findByUid(String uid) {
+    public Optional<BlackEntity> findByUid(String uid) {
         return repository.findByUid(uid);
     }
 
     @Override
     public BlackResponse create(BlackRequest request) {
-        User user = authService.getCurrentUser();
+        UserEntity user = authService.getCurrentUser();
         // 
-        Black entity = modelMapper.map(request, Black.class);
+        BlackEntity entity = modelMapper.map(request, BlackEntity.class);
         entity.setUid(uidUtils.getUid());
         entity.setUserUid(user.getUid());
         // 
-        Black savedBlack = save(entity);
+        BlackEntity savedBlack = save(entity);
         if (savedBlack == null) {
             throw new RuntimeException("Create black failed");
         }
@@ -92,7 +92,7 @@ public class BlackService extends BaseService<Black, BlackRequest, BlackResponse
     }
 
     @Override
-    public Black save(Black entity) {
+    public BlackEntity save(BlackEntity entity) {
         try {
             return repository.save(entity);
         } catch (Exception e) {
@@ -108,19 +108,19 @@ public class BlackService extends BaseService<Black, BlackRequest, BlackResponse
     }
 
     @Override
-    public void delete(Black entity) {
+    public void delete(BlackRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Black entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, BlackEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public BlackResponse convertToResponse(Black entity) {
+    public BlackResponse convertToResponse(BlackEntity entity) {
         return modelMapper.map(entity, BlackResponse.class);
     }
 

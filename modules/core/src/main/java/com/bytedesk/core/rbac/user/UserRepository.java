@@ -28,15 +28,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 // @RepositoryRestResource(exported = false)
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 // @Repository
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
 
-    Optional<User> findByUid(String uid);
+    Optional<UserEntity> findByUid(String uid);
 
-    Optional<User> findByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
+    Optional<UserEntity> findByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
 
-    Optional<User> findByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
+    Optional<UserEntity> findByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
 
-    Optional<User> findByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
+    Optional<UserEntity> findByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
 
     Boolean existsByUsernameAndPlatformAndDeleted(String username, String platform, Boolean deleted);
 

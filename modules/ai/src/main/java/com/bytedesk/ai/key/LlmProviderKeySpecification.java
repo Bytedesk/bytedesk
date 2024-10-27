@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LlmProviderKeySpecification extends BaseSpecification {
     
-    public static Specification<LlmProviderKey> search(LlmProviderKeyRequest request) {
+    public static Specification<LlmProviderKeyEntity> search(LlmProviderKeyRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

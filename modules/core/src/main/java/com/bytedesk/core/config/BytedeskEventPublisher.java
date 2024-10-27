@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.action.Action;
+import com.bytedesk.core.action.ActionEntity;
 import com.bytedesk.core.action.ActionCreateEvent;
 import com.bytedesk.core.event.GenericApplicationEvent;
 // import com.bytedesk.core.cache.CaffeineCacheGroupEvent;
@@ -34,9 +34,9 @@ import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageJsonEvent;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserCreateEvent;
 import com.bytedesk.core.rbac.user.UserUpdateEvent;
 import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
@@ -74,11 +74,11 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new TopicUpdateEvent(this, topic, userUid));
     }
 
-    public void publishUserCreateEvent(User user) {
+    public void publishUserCreateEvent(UserEntity user) {
         applicationEventPublisher.publishEvent(new UserCreateEvent(user));
     }
 
-    public void publishUserUpdateEvent(User user) {
+    public void publishUserUpdateEvent(UserEntity user) {
         applicationEventPublisher.publishEvent(new UserUpdateEvent(user));
     }
 
@@ -170,11 +170,11 @@ public class BytedeskEventPublisher {
     //     applicationEventPublisher.publishEvent(new ThreadUpdateStatusEvent(this, thread, status));
     // }
 
-    public void publishActionCreateEvent(Action action) {
+    public void publishActionCreateEvent(ActionEntity action) {
         applicationEventPublisher.publishEvent(new ActionCreateEvent(this, action));
     }
 
-    public void publishOrganizationCreateEvent(Organization organization) {
+    public void publishOrganizationCreateEvent(OrganizationEntity organization) {
         applicationEventPublisher.publishEvent(new OrganizationCreateEvent(organization));
     }
 

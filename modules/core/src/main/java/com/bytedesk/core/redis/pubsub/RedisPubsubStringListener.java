@@ -131,6 +131,6 @@ public class RedisPubsubStringListener implements MessageListener {
         messageProtobuf.setType(MessageTypeEnum.STREAM);
         messageProtobuf.setContent(messageQa.getAnswer());
         // MessageUtils.notifyUser(messageProtobuf);
-        messageSendService.sendMessage(messageProtobuf);
+        messageSendService.sendProtobufMessage(messageProtobuf);
     }
 }

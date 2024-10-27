@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 07:54:57
+ * @LastEditTime: 2024-10-23 18:20:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse> {
+public class QueueService extends BaseService<QueueEntity, QueueRequest, QueueResponse> {
 
     private final QueueRepository queueRepository;
 
@@ -63,8 +63,8 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
-        Specification<Queue> specification = QueueSpecification.search(request);
-        Page<Queue> page = queueRepository.findAll(specification, pageable);
+        Specification<QueueEntity> specification = QueueSpecification.search(request);
+        Page<QueueEntity> page = queueRepository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -77,7 +77,7 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
 
     @Cacheable(value = "queue", key = "#uid", unless = "#result==null")
     @Override
-    public Optional<Queue> findByUid(String uid) {
+    public Optional<QueueEntity> findByUid(String uid) {
         return queueRepository.findByUid(uid);
     }
 
@@ -88,10 +88,10 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
 
     @Override
     public QueueResponse create(QueueRequest request) {
-        Queue entity = modelMapper.map(request, Queue.class);
+        QueueEntity entity = modelMapper.map(request, QueueEntity.class);
         entity.setUid(uidUtils.getUid());
         //
-        Queue savedQueue = save(entity);
+        QueueEntity savedQueue = save(entity);
         if (savedQueue == null) {
             throw new RuntimeException("Create queue failed");
         }
@@ -101,9 +101,9 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
     @Override
     public QueueResponse update(QueueRequest request) {
 
-        Optional<Queue> queueOptional = findByUid(request.getUid());
+        Optional<QueueEntity> queueOptional = findByUid(request.getUid());
         if (queueOptional.isPresent()) {
-            Queue entity = queueOptional.get();
+            QueueEntity entity = queueOptional.get();
             // modelMapper.map(request, entity);
             entity.setUid(request.getUid());
             // entity.setThreadTopics(request.getThreadTopics());
@@ -115,7 +115,7 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
     }
 
     @Override
-    public Queue save(Queue entity) {
+    public QueueEntity save(QueueEntity entity) {
         try {
             return queueRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -126,26 +126,26 @@ public class QueueService extends BaseService<Queue, QueueRequest, QueueResponse
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<Queue> optional = findByUid(uid);
+        Optional<QueueEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
-            delete(optional.get());
+            // delete(optional.get());
         }
     }
 
     @Override
-    public void delete(Queue entity) {
-        entity.setDeleted(false);
-        save(entity);
+    public void delete(QueueRequest entity) {
+        // entity.setDeleted(false);
+        // save(entity);
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Queue entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QueueEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public QueueResponse convertToResponse(Queue entity) {
+    public QueueResponse convertToResponse(QueueEntity entity) {
         return modelMapper.map(entity, QueueResponse.class);
     }
 

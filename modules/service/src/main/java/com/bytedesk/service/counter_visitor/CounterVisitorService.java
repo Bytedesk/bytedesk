@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:10:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 14:54:23
+ * @LastEditTime: 2024-10-23 18:19:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class CounterVisitorService extends BaseService<CounterVisitor, CounterVisitorRequest, CounterVisitorResponse> {
+public class CounterVisitorService extends BaseService<CounterVisitorEntity, CounterVisitorRequest, CounterVisitorResponse> {
     
     private final CounterVisitorRepository counterVisitorRepository;
 
@@ -58,17 +58,17 @@ public class CounterVisitorService extends BaseService<CounterVisitor, CounterVi
     }
 
     @Override
-    public Optional<CounterVisitor> findByUid(String uid) {
+    public Optional<CounterVisitorEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
 
     @Override
     public CounterVisitorResponse create(CounterVisitorRequest request) {
-        CounterVisitor entity = modelMapper.map(request, CounterVisitor.class);
+        CounterVisitorEntity entity = modelMapper.map(request, CounterVisitorEntity.class);
         entity.setUid(uidUtils.getUid());
 
-        CounterVisitor savedCounterVisitor = save(entity);
+        CounterVisitorEntity savedCounterVisitor = save(entity);
         if (savedCounterVisitor == null) {
             throw new RuntimeException("Create counter_visitor failed");
         }
@@ -82,7 +82,7 @@ public class CounterVisitorService extends BaseService<CounterVisitor, CounterVi
     }
 
     @Override
-    public CounterVisitor save(CounterVisitor entity) {
+    public CounterVisitorEntity save(CounterVisitorEntity entity) {
         try {
             return counterVisitorRepository.save(entity);
         } catch (Exception e) {
@@ -98,20 +98,20 @@ public class CounterVisitorService extends BaseService<CounterVisitor, CounterVi
     }
 
     @Override
-    public void delete(CounterVisitor entity) {
+    public void delete(CounterVisitorRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            CounterVisitor entity) {
+            CounterVisitorEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public CounterVisitorResponse convertToResponse(CounterVisitor entity) {
+    public CounterVisitorResponse convertToResponse(CounterVisitorEntity entity) {
         return modelMapper.map(entity, CounterVisitorResponse.class);
     }
     

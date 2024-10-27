@@ -15,7 +15,7 @@
 package com.bytedesk.ai.model;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +38,7 @@ public class LlmModelRequest extends BaseRequest {
     // private String avatar;
 
     @Builder.Default
-    private String description = BdConstants.EMPTY_STRING;
+    private String description = BytedeskConsts.EMPTY_STRING;
 
     private String provider;
 

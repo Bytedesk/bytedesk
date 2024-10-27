@@ -22,11 +22,11 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.kbase.faq.Faq;
+import com.bytedesk.kbase.faq.FaqEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
@@ -75,7 +75,7 @@ public class BaseServiceSettings implements Serializable {
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String preForm = BdConstants.EMPTY_JSON_STRING;
+    private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     // show history message or not
     @NotBlank
@@ -107,23 +107,23 @@ public class BaseServiceSettings implements Serializable {
     // 常见问题
     private boolean showFaqs = false;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Faq> faqs = new ArrayList<>();
+    private List<FaqEntity> faqs = new ArrayList<>();
     // 快捷按钮
     private boolean showQuickFaqs = false;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Faq> quickFaqs = new ArrayList<>();
+    private List<FaqEntity> quickFaqs = new ArrayList<>();
     // 猜你想问
     private boolean showGuessFaqs = false;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Faq> guessFaqs = new ArrayList<>();
+    private List<FaqEntity> guessFaqs = new ArrayList<>();
     // 热门问题
     private boolean showHotFaqs = false;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Faq> hotFaqs = new ArrayList<>();
+    private List<FaqEntity> hotFaqs = new ArrayList<>();
     // 快捷功能
     private boolean showShortcutFaqs = false;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Faq> shortcutFaqs = new ArrayList<>();
+    private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
     /**
      * 是否显示logo

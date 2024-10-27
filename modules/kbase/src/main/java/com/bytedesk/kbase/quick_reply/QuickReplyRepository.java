@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface QuickReplyRepository extends JpaRepository<QuickReply, Long>, JpaSpecificationExecutor<QuickReply> {
-    Optional<QuickReply> findByUid(String uid);
-    List<QuickReply> findByCategoryUid(String categoryUid);
+public interface QuickReplyRepository extends JpaRepository<QuickReplyEntity, Long>, JpaSpecificationExecutor<QuickReplyEntity> {
+    Optional<QuickReplyEntity> findByUid(String uid);
+    List<QuickReplyEntity> findByCategoryUid(String categoryUid);
 }

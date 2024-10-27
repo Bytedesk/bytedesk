@@ -36,7 +36,7 @@ public class VisitorEventListener {
     public void onQuartzFiveMinEvent(QuartzFiveMinEvent event) {
         // log.info("visitor quartz five min event");
         // 
-        List<Visitor> visitorList = visitorService.findByStatus(VisitorStatusEnum.ONLINE.name());
+        List<VisitorEntity> visitorList = visitorService.findByStatus(VisitorStatusEnum.ONLINE.name());
         visitorList.forEach(visitor -> {
             log.info("visitor: {}", visitor.getUid());
             if (System.currentTimeMillis() - visitor.getUpdatedAt().getTime() > 5 * 60 * 1000) {

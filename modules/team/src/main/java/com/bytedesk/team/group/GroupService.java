@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-16 13:53:11
+ * @LastEditTime: 2024-10-23 18:21:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,9 +28,9 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.member.Member;
+import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberService;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class GroupService extends BaseService<Group, GroupRequest, GroupResponse> {
+public class GroupService extends BaseService<GroupEntity, GroupRequest, GroupResponse> {
 
     private GroupRepository groupRepository;
 
@@ -57,8 +57,8 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
         
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
 
-        Specification<Group> specification = GroupSpecification.search(request);
-        Page<Group> page = groupRepository.findAll(specification, pageable);
+        Specification<GroupEntity> specification = GroupSpecification.search(request);
+        Page<GroupEntity> page = groupRepository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -70,7 +70,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
     }
 
     public GroupResponse queryByUid(GroupRequest request) {
-        Optional<Group> optional = findByUid(request.getUid());
+        Optional<GroupEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             return convertToResponse(optional.get());
         } else {
@@ -79,16 +79,16 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
     }
 
     @Override
-    public Optional<Group> findByUid(String uid) {
+    public Optional<GroupEntity> findByUid(String uid) {
         return groupRepository.findByUid(uid);
     }
 
     @Override
     public GroupResponse create(GroupRequest request) {
 
-        User creator = authService.getCurrentUser();
+        UserEntity creator = authService.getCurrentUser();
         // 
-        Group group = Group.builder().build();
+        GroupEntity group = GroupEntity.builder().build();
         group.setName(request.getName());
         group.setUid(uidUtils.getCacheSerialUid());
         group.setType(GroupTypeEnum.fromValue(request.getType()).name());
@@ -99,7 +99,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
             Iterator<String> it = request.getMemberUids().iterator();
             while (it.hasNext()) {
                 String memberUid = it.next();
-                Optional<Member> optionalMember = memberService.findByUid(memberUid);
+                Optional<MemberEntity> optionalMember = memberService.findByUid(memberUid);
                 if (optionalMember.isPresent()) {
                     group.getMembers().add(optionalMember.get());
                 } else {
@@ -110,7 +110,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
         group.setCreator(creator);
         group.setOrgUid(creator.getOrgUid());
         // 
-        Group saved = save(group);
+        GroupEntity saved = save(group);
         if (saved == null) {
             throw new RuntimeException("Failed to create group");
         }
@@ -125,9 +125,9 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
 
     public void dismiss(GroupRequest request) {
         // 
-        Optional<Group> groupOptional = findByUid(request.getUid());
+        Optional<GroupEntity> groupOptional = findByUid(request.getUid());
         if (groupOptional.isPresent()) {
-            Group group = groupOptional.get();
+            GroupEntity group = groupOptional.get();
             group.setStatus(GroupStatusEnum.DISMISSED.name());
             //
             save(group);
@@ -139,7 +139,7 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
     }
 
     @Override
-    public Group save(Group entity) {
+    public GroupEntity save(GroupEntity entity) {
         try {
             return groupRepository.save(entity);
         } catch (Exception e) {
@@ -150,24 +150,29 @@ public class GroupService extends BaseService<Group, GroupRequest, GroupResponse
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<GroupEntity> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            optional.get().setDeleted(true);
+            save(optional.get());
+            // groupRepository.delete(optional.get());
+        } else {
+            throw new RuntimeException("Failed to delete group by uid: " + uid);
+        }
     }
 
     @Override
-    public void delete(Group entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    public void delete(GroupRequest entity) {
+        // delete(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Group entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, GroupEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public GroupResponse convertToResponse(Group entity) {
+    public GroupResponse convertToResponse(GroupEntity entity) {
         return modelMapper.map(entity, GroupResponse.class);
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 21:27:59
+ * @LastEditTime: 2024-10-24 18:24:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,26 @@
  */
 package com.bytedesk.core.tag;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.jpa.domain.Specification;
+
 import com.bytedesk.core.base.BaseSpecification;
 
+import jakarta.persistence.criteria.Predicate;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class TagSpecification extends BaseSpecification {
     
+    public static Specification<TagEntity> search(TagRequest request) {
+        log.info("request: {}", request);
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            //
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }

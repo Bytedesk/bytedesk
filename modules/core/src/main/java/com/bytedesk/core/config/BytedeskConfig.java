@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 07:52:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-19 12:50:10
+ * @LastEditTime: 2024-10-22 11:58:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,8 +30,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
+// import io.swagger.v3.oas.models.OpenAPI;
+// import io.swagger.v3.oas.models.info.Info;
 import lombok.Getter;
 
 /**
@@ -72,10 +72,10 @@ public class BytedeskConfig {
         return new ApplicationContextHolder();
     }
 
-    @Bean
-    public OpenAPI apiInfo() {
-        return new OpenAPI().info(new Info().title("bytedesk apis").version(appVersion));
-    }
+    // @Bean
+    // public OpenAPI apiInfo() {
+    //     return new OpenAPI().info(new Info().title("bytedesk apis").version(appVersion));
+    // }
 
     // @Bean
     // public GroupedOpenApi httpApi() {

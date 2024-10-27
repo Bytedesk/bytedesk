@@ -29,11 +29,11 @@ import java.util.Optional;
  */
 @Repository
 @Tag(name = "authoritys - 权限")
-public interface AuthorityRepository extends JpaRepository<Authority, Long>, JpaSpecificationExecutor<Authority> {
+public interface AuthorityRepository extends JpaRepository<AuthorityEntity, Long>, JpaSpecificationExecutor<AuthorityEntity> {
 
-    Optional<Authority> findByUid(String uid);
+    Optional<AuthorityEntity> findByUid(String uid);
 
-    Optional<Authority> findByValue(String value);
+    Optional<AuthorityEntity> findByValue(String value);
 
     boolean existsById(@NonNull Long id);
 

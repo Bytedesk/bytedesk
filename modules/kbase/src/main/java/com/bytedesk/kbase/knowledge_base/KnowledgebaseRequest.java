@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
@@ -60,7 +60,7 @@ public class KnowledgebaseRequest extends BaseRequest {
 
     // 主题色
     @Builder.Default
-    private String primaryColor = BdConstants.EMPTY_STRING;
+    private String primaryColor = BytedeskConsts.EMPTY_STRING;
 
     /**
      * 知识库描述
@@ -74,17 +74,17 @@ public class KnowledgebaseRequest extends BaseRequest {
     // 自定义页眉, 添加显示于页面顶部、位于默认页眉上方的 HTML 代码。
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String headerHtml = BdConstants.EMPTY_STRING;
+    private String headerHtml = BytedeskConsts.EMPTY_STRING;
 
     // 自定义页脚, 添加显示于页面底部的 HTML 代码。
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String footerHtml = BdConstants.EMPTY_STRING;
+    private String footerHtml = BytedeskConsts.EMPTY_STRING;
 
     // 自定义 CSS, 添加 Less/CSS 代码以自定义论坛外观，此设置将覆盖默认样式
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String css = BdConstants.EMPTY_STRING;
+    private String css = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
     private String embedding = KnowledgebaseConsts.KB_EMBEDING;
@@ -96,8 +96,8 @@ public class KnowledgebaseRequest extends BaseRequest {
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
-    // private LevelEnum level = LevelEnum.ORGNIZATION;
-    private String level = LevelEnum.ORGNIZATION.name();
+    // private LevelEnum level = LevelEnum.ORGANIZATION;
+    private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)

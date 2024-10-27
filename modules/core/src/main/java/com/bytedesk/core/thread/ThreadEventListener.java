@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-11 18:30:11
+ * @LastEditTime: 2024-10-23 22:50:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicService;
@@ -47,7 +47,7 @@ public class ThreadEventListener {
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         ThreadEntity thread = event.getThread();
-        User user = thread.getOwner();
+        UserEntity user = thread.getOwner();
         log.info("thread ThreadCreateEvent: {}", thread.getUid());
 
         // 机器人接待的会话存在user == null的情况，不需要订阅topic
@@ -56,7 +56,8 @@ public class ThreadEventListener {
         }
         // 创建客服会话之后，需要订阅topic
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
-                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
+                || thread.getType().equals(ThreadTypeEnum.LLM.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
@@ -76,7 +77,7 @@ public class ThreadEventListener {
     @EventListener
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
         ThreadEntity thread = event.getThread();
-        User user = thread.getOwner();
+        UserEntity user = thread.getOwner();
         log.info("topic onThreadUpdateEvent: {}", thread.getUid());
         // TODO: 会话关闭之后，需要取消订阅
         
@@ -86,7 +87,8 @@ public class ThreadEventListener {
         }
         
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
-                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
+                || thread.getType().equals(ThreadTypeEnum.LLM.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
@@ -94,10 +96,6 @@ public class ThreadEventListener {
                     .build();
             topicService.create(request);
         } else {
-            // if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-            //     || thread.getType().equals(ThreadTypeEnum.ASSISTANT.name())
-            //     || thread.getType().equals(ThreadTypeEnum.CHANNEL.name())
-            //     || thread.getType().equals(ThreadTypeEnum.LLM.name())) 
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
@@ -105,14 +103,6 @@ public class ThreadEventListener {
                     .build();
             topicCacheService.pushRequest(request);
         }
-        //  else if (user != null) {
-        //     TopicRequest request = TopicRequest.builder()
-        //             .topic(thread.getTopic())
-        //             .userUid(user.getUid())
-        //             .build();
-        //     // 防止首次消息延迟，立即订阅
-        //     topicService.create(request);
-        // }
     }
 
     @EventListener

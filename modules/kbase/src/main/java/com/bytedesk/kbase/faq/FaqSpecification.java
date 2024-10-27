@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FaqSpecification extends BaseSpecification {
 
-    public static Specification<Faq> search(FaqRequest request) {
+    public static Specification<FaqEntity> search(FaqRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

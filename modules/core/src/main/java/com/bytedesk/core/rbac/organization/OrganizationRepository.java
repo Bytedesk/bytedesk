@@ -28,7 +28,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 // import org.springframework.web.bind.annotation.CrossOrigin;
 
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -45,14 +45,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 // use excerptProjection to self define response format:
 // @RepositoryRestResource(path = "org", excerptProjection = OrganizationResponse.class)
 public interface OrganizationRepository
-                extends JpaRepository<Organization, Long>, JpaSpecificationExecutor<Organization> {
+                extends JpaRepository<OrganizationEntity, Long>, JpaSpecificationExecutor<OrganizationEntity> {
 
-        Optional<Organization> findByUid(String uid);
+        Optional<OrganizationEntity> findByUid(String uid);
 
         // @RestResource(path = "name", rel = "name")
-        Optional<Organization> findByNameAndDeleted(String name, Boolean deleted);
+        Optional<OrganizationEntity> findByNameAndDeleted(String name, Boolean deleted);
 
-        Optional<Organization> findByCodeAndDeleted(String code, Boolean deleted);
+        Optional<OrganizationEntity> findByCodeAndDeleted(String code, Boolean deleted);
 
         //
         // @NonNull
@@ -60,7 +60,7 @@ public interface OrganizationRepository
         // List<Organization> findAll();
 
         //
-        Page<Organization> findByUser(User user, Pageable pageable);
+        Page<OrganizationEntity> findByUser(UserEntity user, Pageable pageable);
 
         Boolean existsByNameAndDeleted(String name, Boolean deleted);
 

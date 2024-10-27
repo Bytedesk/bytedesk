@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-09 14:39:12
+ * @LastEditTime: 2024-10-25 17:58:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ public class TypeConsts {
     public static final String TYPE_SCAN = "scan";
 
     // 
+    public static final String CUSTOMER_SERVICE = "CS";
     public static final String SUPER = "SUPER";
     public static final String ADMIN = "ADMIN";
     public static final String HR = "HR";
@@ -33,7 +34,6 @@ public class TypeConsts {
     public static final String MONEY = "MONEY";
     public static final String MARKETING = "MARKETING";
     public static final String SALES = "SALES";
-    public static final String CUSTOMER_SERVICE = "CS";
 
     // ROLES - 角色
     public static final String ROLE_PREFIX = "ROLE_";
@@ -77,10 +77,10 @@ public class TypeConsts {
     public static final String DEPT_CUSTOMER_SERVICE = DEPT_PREFIX + CUSTOMER_SERVICE;
 
     //
-    public static final String SEND_MOBILE_CODE_TYPE_LOGIN = "login";
-    public static final String SEND_MOBILE_CODE_TYPE_REGISTER = "register";
-    public static final String SEND_MOBILE_CODE_TYPE_FORGET = "forget";
-    public static final String SEND_MOBILE_CODE_TYPE_VERIFY = "verify";
+    // public static final String SEND_MOBILE_CODE_TYPE_LOGIN = "login";
+    // public static final String SEND_MOBILE_CODE_TYPE_REGISTER = "register";
+    // public static final String SEND_MOBILE_CODE_TYPE_FORGET = "forget";
+    // public static final String SEND_MOBILE_CODE_TYPE_VERIFY = "verify";
 
     /**
      * region类型, 代码长度分别为：省 2、市 4、区/县 6、镇 9

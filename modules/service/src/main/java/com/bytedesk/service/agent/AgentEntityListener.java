@@ -21,7 +21,7 @@ import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.event.GenericApplicationEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
@@ -44,10 +44,10 @@ public class AgentEntityListener {
     // private transient Agent oldAgent;
     
     @PostPersist
-    public void postPersist(Agent agent) {
+    public void postPersist(AgentEntity agent) {
         // topicService.create(agent.getUid(), agent.getUser().getUid());
-        Agent cloneAgent = SerializationUtils.clone(agent);
-        User user = cloneAgent.getMember().getUser();
+        AgentEntity cloneAgent = SerializationUtils.clone(agent);
+        UserEntity user = cloneAgent.getMember().getUser();
         log.info("agent postPersist {} user {}", cloneAgent.getUid(), user.getUid());
         // 这里可以记录日志、发送通知等
         //
@@ -66,7 +66,7 @@ public class AgentEntityListener {
     // }
 
     @PostUpdate
-    public void postUpdate(Agent agent) {
+    public void postUpdate(AgentEntity agent) {
         log.info("postUpdate {}", agent.getUid());
         // if (oldAgent != null) {
         //     // 现在你可以比较oldAgent和agent来识别哪些字段发生了变化

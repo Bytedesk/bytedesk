@@ -17,6 +17,6 @@ package com.bytedesk.service.leave_msg;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface LeaveMsgRepository extends JpaRepository<LeaveMsg, Long>, JpaSpecificationExecutor<LeaveMsg> {
+public interface LeaveMsgRepository extends JpaRepository<LeaveMsgEntity, Long>, JpaSpecificationExecutor<LeaveMsgEntity> {
 
 }

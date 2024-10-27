@@ -17,6 +17,6 @@ package com.bytedesk.core.rbac.oauth;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface OAuthRepository extends JpaRepository<OAuth, Long>, JpaSpecificationExecutor<OAuth> {
+public interface OAuthRepository extends JpaRepository<OAuthEntity, Long>, JpaSpecificationExecutor<OAuthEntity> {
     
 }

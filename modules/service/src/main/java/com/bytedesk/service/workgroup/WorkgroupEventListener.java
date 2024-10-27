@@ -24,11 +24,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentService;
 import com.bytedesk.service.worktime.WorktimeService;
 
@@ -51,14 +51,14 @@ public class WorkgroupEventListener {
     @Order(7)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        Organization organization = (Organization) event.getSource();
-        User user = organization.getUser();
+        OrganizationEntity organization = (OrganizationEntity) event.getSource();
+        UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
         // 创建默认workgroup
         log.info("workgroup - organization created: {}", organization.getName());
 
         List<String> agentUids = new ArrayList<>();
-        Optional<Agent> agentOptional = agentService.findByMobileAndOrgUid(user.getMobile(), organization.getUid());
+        Optional<AgentEntity> agentOptional = agentService.findByMobileAndOrgUid(user.getMobile(), organization.getUid());
         agentOptional.ifPresent(agent -> {
             agentUids.add(agent.getUid());
         });

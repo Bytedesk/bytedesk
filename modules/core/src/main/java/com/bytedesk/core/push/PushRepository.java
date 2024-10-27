@@ -20,16 +20,16 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface PushRepository extends JpaRepository<Push, Long>, JpaSpecificationExecutor<Push> {
+public interface PushRepository extends JpaRepository<PushEntity, Long>, JpaSpecificationExecutor<PushEntity> {
 
-    List<Push> findByStatus(String status);
+    List<PushEntity> findByStatus(String status);
 
-    Optional<Push> findByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver,
+    Optional<PushEntity> findByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver,
                     String content);
 
-    Optional<Push> findByDeviceUid(String deviceUid);
+    Optional<PushEntity> findByDeviceUid(String deviceUid);
 
-    Optional<Push> findByDeviceUidAndContent(String deviceUid, String code);
+    Optional<PushEntity> findByDeviceUidAndContent(String deviceUid, String code);
 
     Boolean existsByStatusAndTypeAndReceiver(String status, String type, String receiver);
 

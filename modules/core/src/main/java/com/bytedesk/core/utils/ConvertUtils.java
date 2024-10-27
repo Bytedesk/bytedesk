@@ -22,13 +22,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnread;
-import com.bytedesk.core.rbac.role.Role;
+import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleResponse;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -48,7 +48,7 @@ public class ConvertUtils {
         return userResponse;
     }
 
-    public static UserResponse convertToUserResponse(User user) {
+    public static UserResponse convertToUserResponse(UserEntity user) {
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
                 .flatMap(uor -> uor.getRole().getAuthorities().stream()
@@ -58,7 +58,7 @@ public class ConvertUtils {
         return userResponse;
     }
 
-    public static UserProtobuf convertToUserProtobuf(User user) {
+    public static UserProtobuf convertToUserProtobuf(UserEntity user) {
         return modelMapper.map(user, UserProtobuf.class);
     }
 
@@ -67,14 +67,14 @@ public class ConvertUtils {
         //
         UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
-            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
         }
         threadProtobuf.setUser(user);
         //
         return threadProtobuf;
     }
 
-    public static RoleResponse convertToRoleResponse(Role role) {
+    public static RoleResponse convertToRoleResponse(RoleEntity role) {
         return modelMapper.map(role, RoleResponse.class);
     }
 
@@ -84,7 +84,7 @@ public class ConvertUtils {
 
         UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
-            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
         }
         messageResponse.setUser(user);
 
@@ -97,7 +97,7 @@ public class ConvertUtils {
 
         UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
-            user.setExtra(BdConstants.EMPTY_JSON_STRING);
+            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
         }
         messageResponse.setUser(user);
 

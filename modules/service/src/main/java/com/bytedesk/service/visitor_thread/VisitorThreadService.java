@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 12:40:46
+ * @LastEditTime: 2024-10-23 18:20:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,10 +41,10 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 // import com.bytedesk.core.thread.back.ThreadStateService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
-import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
-import com.bytedesk.service.workgroup.Workgroup;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class VisitorThreadService extends BaseService<VisitorThread, VisitorThreadRequest, VisitorThreadResponse> {
+public class VisitorThreadService extends BaseService<VisitorThreadEntity, VisitorThreadRequest, VisitorThreadResponse> {
 
     private final VisitorThreadRepository visitorThreadRepository;
 
@@ -69,8 +69,8 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
-        Specification<VisitorThread> spec = VisitorThreadSpecification.search(request);
-        Page<VisitorThread> threads = visitorThreadRepository.findAll(spec, pageable);
+        Specification<VisitorThreadEntity> spec = VisitorThreadSpecification.search(request);
+        Page<VisitorThreadEntity> threads = visitorThreadRepository.findAll(spec, pageable);
 
         return threads.map(this::convertToResponse);
     }
@@ -83,7 +83,7 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
 
     @Cacheable(value = "visitor_thread", key = "#uid", unless = "#result == null")
     @Override
-    public Optional<VisitorThread> findByUid(String uid) {
+    public Optional<VisitorThreadEntity> findByUid(String uid) {
         return visitorThreadRepository.findByUid(uid);
     }
 
@@ -92,26 +92,26 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
     }
 
     @Cacheable(value = "visitor_thread", key = "#topic", unless = "#result == null")
-    public Optional<VisitorThread> findByTopic(String topic) {
+    public Optional<VisitorThreadEntity> findByTopic(String topic) {
         return visitorThreadRepository.findByTopic(topic);
     }
 
-    public VisitorThread create(ThreadEntity thread) {
+    public VisitorThreadEntity create(ThreadEntity thread) {
         //
-        VisitorThread visitorThread = modelMapper.map(thread, VisitorThread.class);
+        VisitorThreadEntity visitorThread = modelMapper.map(thread, VisitorThreadEntity.class);
         //
         String visitorString = thread.getUser();
         UserProtobuf visitor = JSON.parseObject(visitorString, UserProtobuf.class);
         visitorThread.setVisitorUid(visitor.getUid());
         //
-        VisitorThread savedThread = save(visitorThread);
+        VisitorThreadEntity savedThread = save(visitorThread);
         if (savedThread == null) {
             throw new RuntimeException("Could not save visitor thread");
         }
         return savedThread;
     }
 
-    public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, Workgroup workgroup, String topic) {
+    public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         // TODO: 到visitor thread表中拉取
         ThreadEntity thread = ThreadEntity.builder().build();
         thread.setUid(uidUtils.getUid());
@@ -130,7 +130,7 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
         return thread;
     }
 
-    public ThreadEntity getAgentThread(VisitorRequest visitorRequest, Agent agent, String topic) {
+    public ThreadEntity getAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         // TODO: 到visitor thread表中拉取
         ThreadEntity thread = ThreadEntity.builder().build();
         thread.setUid(uidUtils.getUid());
@@ -154,10 +154,10 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
         return thread;
     }
 
-    public VisitorThread update(ThreadEntity thread) {
-        Optional<VisitorThread> visitorThreadOpt = findByUid(thread.getUid());
+    public VisitorThreadEntity update(ThreadEntity thread) {
+        Optional<VisitorThreadEntity> visitorThreadOpt = findByUid(thread.getUid());
         if (visitorThreadOpt.isPresent()) {
-            VisitorThread visitorThread = visitorThreadOpt.get();
+            VisitorThreadEntity visitorThread = visitorThreadOpt.get();
             visitorThread.setState(thread.getState());
             //
             return save(visitorThread);
@@ -187,7 +187,7 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
     @Async
     public void autoCloseThread() {
         List<ThreadEntity> threads = threadService.findStateOpen();
-        log.info("autoCloseThread size {}", threads.size());
+        // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
             // 计算两个日期之间的毫秒差
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
@@ -210,7 +210,7 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
     }
 
     @Override
-    public VisitorThread save(VisitorThread entity) {
+    public VisitorThreadEntity save(VisitorThreadEntity entity) {
         try {
             return visitorThreadRepository.save(entity);
         } catch (Exception e) {
@@ -227,20 +227,20 @@ public class VisitorThreadService extends BaseService<VisitorThread, VisitorThre
     }
 
     @Override
-    public void delete(VisitorThread entity) {
+    public void delete(VisitorThreadRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            VisitorThread entity) {
+            VisitorThreadEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public VisitorThreadResponse convertToResponse(VisitorThread entity) {
+    public VisitorThreadResponse convertToResponse(VisitorThreadEntity entity) {
         return modelMapper.map(entity, VisitorThreadResponse.class);
     }
 

@@ -44,7 +44,7 @@ public class LeaveMsgController extends BaseController<LeaveMsgRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(LeaveMsgRequest request) {
+    public ResponseEntity<?> queryByUser(LeaveMsgRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

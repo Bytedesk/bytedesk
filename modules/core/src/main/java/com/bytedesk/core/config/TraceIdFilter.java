@@ -20,7 +20,7 @@ import java.util.UUID;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -44,17 +44,17 @@ public class TraceIdFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String traceId = httpRequest.getHeader(BdConstants.TRACE_ID);
+        String traceId = httpRequest.getHeader(BytedeskConsts.TRACE_ID);
         if (traceId == null) {
             traceId = UUID.randomUUID().toString();
         }
 
         // 设置到ThreadLocal，方便后续在业务代码中获取
-        MDC.put(BdConstants.TRACE_ID, traceId);
+        MDC.put(BytedeskConsts.TRACE_ID, traceId);
 
         // 添加到响应头，便于下游服务获取
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpResponse.setHeader(BdConstants.TRACE_ID, traceId);
+        httpResponse.setHeader(BytedeskConsts.TRACE_ID, traceId);
 
         chain.doFilter(request, response);
     }
@@ -64,7 +64,7 @@ public class TraceIdFilter implements Filter {
         log.info("TraceIdFilter destroy");
         // 请求处理完成后，清理ThreadLocal中存储的traceId
         // MDC.clear();
-        MDC.remove(BdConstants.TRACE_ID);
+        MDC.remove(BytedeskConsts.TRACE_ID);
     }
     
 }

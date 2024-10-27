@@ -27,9 +27,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.event.GenericApplicationEvent;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
 // import com.bytedesk.core.thread.ThreadCreateEvent;
@@ -39,7 +39,7 @@ import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
 import com.bytedesk.service.worktime.WorktimeService;
-import com.bytedesk.team.member.Member;
+import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberService;
 
 import lombok.AllArgsConstructor;
@@ -64,16 +64,16 @@ public class AgentEventListener {
     @Order(6)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        Organization organization = (Organization) event.getSource();
-        User user = organization.getUser();
+        OrganizationEntity organization = (OrganizationEntity) event.getSource();
+        UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
         log.info("agent - organization created: {}", organization.getName());
         //
-        Optional<Member> memberOptional = memberService.findByMobileAndOrgUid(user.getMobile(), organization.getUid());
+        Optional<MemberEntity> memberOptional = memberService.findByMobileAndOrgUid(user.getMobile(), organization.getUid());
         if (!memberOptional.isPresent()) {
             return;
         }
-        Member member = memberOptional.get();
+        MemberEntity member = memberOptional.get();
         // 创建默认客服
         AgentRequest agent1Request = AgentRequest.builder()
                 .nickname(I18Consts.I18N_AGENT_NICKNAME)
@@ -109,7 +109,7 @@ public class AgentEventListener {
     @EventListener
     public void onAgentCreateEvent(GenericApplicationEvent<AgentCreateEvent> event) {
         AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
-        Agent agent = agentCreateEvent.getAgent();
+        AgentEntity agent = agentCreateEvent.getAgent();
         log.info("agent onAgentCreateEvent: {}", agent.getUid());
         // 创建快捷回复知识库
         KnowledgebaseRequest kownledgebaseRequeqstQuickReply = KnowledgebaseRequest.builder()

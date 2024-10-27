@@ -19,11 +19,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface LlmProviderRepository extends JpaRepository<LlmProvider, Long>, JpaSpecificationExecutor<LlmProvider> {
+public interface LlmProviderRepository extends JpaRepository<LlmProviderEntity, Long>, JpaSpecificationExecutor<LlmProviderEntity> {
     
-    Optional<LlmProvider> findByUid(String uid);
+    Optional<LlmProviderEntity> findByUid(String uid);
 
-    Optional<LlmProvider> findByName(String name);
+    Optional<LlmProviderEntity> findByName(String name);
     
     Boolean existsByName(String name);
 }

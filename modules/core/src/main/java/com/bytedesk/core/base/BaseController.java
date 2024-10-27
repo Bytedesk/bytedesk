@@ -38,7 +38,7 @@ public abstract class BaseController<T> {
      * @return json
      */
     @GetMapping("/query")
-    abstract public ResponseEntity<?> query(T request);
+    abstract public ResponseEntity<?> queryByUser(T request);
 
     /**
      * create

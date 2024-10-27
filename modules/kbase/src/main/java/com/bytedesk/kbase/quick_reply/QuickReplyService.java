@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 22:02:08
+ * @LastEditTime: 2024-10-23 18:17:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,12 +28,12 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.category.Category;
+import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryService;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -43,7 +43,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest, QuickReplyResponse> {
+public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyRequest, QuickReplyResponse> {
 
     private final QuickReplyRepository quickReplyRepository;
 
@@ -59,9 +59,9 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
 
-        Specification<QuickReply> spec = QuickReplySpecification.search(request);
+        Specification<QuickReplyEntity> spec = QuickReplySpecification.search(request);
 
-        Page<QuickReply> page = quickReplyRepository.findAll(spec, pageable);
+        Page<QuickReplyEntity> page = quickReplyRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -75,14 +75,14 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
     
     @Cacheable(value = "quickreply", key = "#uid", unless = "#result == null")
     @Override
-    public Optional<QuickReply> findByUid(String uid) {
+    public Optional<QuickReplyEntity> findByUid(String uid) {
         return quickReplyRepository.findByUid(uid);
     }
 
     @Override
     public QuickReplyResponse create(QuickReplyRequest request) {
 
-        QuickReply entity = modelMapper.map(request, QuickReply.class);
+        QuickReplyEntity entity = modelMapper.map(request, QuickReplyEntity.class);
         entity.setUid(uidUtils.getCacheSerialUid());
         entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
 
@@ -92,9 +92,9 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
     @Override
     public QuickReplyResponse update(QuickReplyRequest request) {
 
-        Optional<QuickReply> optional = findByUid(request.getUid());
+        Optional<QuickReplyEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            QuickReply entity = optional.get();
+            QuickReplyEntity entity = optional.get();
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
             entity.setContent(request.getContent());
@@ -107,7 +107,7 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
     }
 
     @Override
-    public QuickReply save(QuickReply entity) {
+    public QuickReplyEntity save(QuickReplyEntity entity) {
         try {
             return quickReplyRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -116,13 +116,13 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
         return null;
     }
 
-    public void save(List<QuickReply> entities) {
+    public void save(List<QuickReplyEntity> entities) {
         quickReplyRepository.saveAll(entities);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<QuickReply> optional = findByUid(uid);
+        Optional<QuickReplyEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -130,18 +130,18 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
     }
 
     @Override
-    public void delete(QuickReply entity) {
+    public void delete(QuickReplyRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QuickReply entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QuickReplyEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public QuickReplyResponse convertToResponse(QuickReply entity) {
+    public QuickReplyResponse convertToResponse(QuickReplyEntity entity) {
         return modelMapper.map(entity, QuickReplyResponse.class);
     }
 
@@ -150,9 +150,9 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
     }
 
     // String categoryUid,
-    public QuickReply convertExcelToQuickReply(QuickReplyExcel excel, String kbUid, String orgUid) {
+    public QuickReplyEntity convertExcelToQuickReply(QuickReplyExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, QuickReply.class);
-        QuickReply quickReply = QuickReply.builder().build();
+        QuickReplyEntity quickReply = QuickReplyEntity.builder().build();
         quickReply.setUid(uidUtils.getCacheSerialUid());
         quickReply.setTitle(excel.getTitle());
         quickReply.setContent(excel.getContent());
@@ -160,7 +160,7 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
         quickReply.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         //
         // quickReply.setCategoryUid(categoryUid);
-        Optional<Category> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             quickReply.setCategoryUid(categoryOptional.get().getUid());
         } else {
@@ -190,7 +190,7 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
         }
 
         // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
-        Optional<Category> categoryContact = categoryService.findByNameAndTypeAndLevelAndPlatform(
+        Optional<CategoryEntity> categoryContact = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT,
                 CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
@@ -201,16 +201,16 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
                     .title(I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
                     .categoryUid(categoryContact.get().getUid())
-                    .kbUid(BdConstants.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                     .level(LevelEnum.PLATFORM)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
         //
-        Optional<Category> categoryThanks = categoryService.findByNameAndTypeAndLevelAndPlatform(
+        Optional<CategoryEntity> categoryThanks = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS,
                 CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
@@ -222,15 +222,15 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
                     .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
                     .categoryUid(categoryThanks.get().getUid())
                     .level(LevelEnum.PLATFORM)
-                    .kbUid(BdConstants.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
         //
-        Optional<Category> categoryWelcome = categoryService.findByNameAndTypeAndLevelAndPlatform(
+        Optional<CategoryEntity> categoryWelcome = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME,
                 CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
@@ -242,15 +242,15 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
                     .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
                     .categoryUid(categoryWelcome.get().getUid())
                     .level(LevelEnum.PLATFORM)
-                    .kbUid(BdConstants.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
 
-        Optional<Category> categoryBye = categoryService.findByNameAndTypeAndLevelAndPlatform(
+        Optional<CategoryEntity> categoryBye = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE,
                 CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
                 LevelEnum.PLATFORM,
@@ -262,11 +262,11 @@ public class QuickReplyService extends BaseService<QuickReply, QuickReplyRequest
                     .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
                     .categoryUid(categoryBye.get().getUid())
                     .level(LevelEnum.PLATFORM)
-                    .kbUid(BdConstants.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
             create(quickReplyRequest);
         }
 

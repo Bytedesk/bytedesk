@@ -44,7 +44,7 @@ public class KeywordExcelListener implements ReadListener<KeywordExcel> {
     /**
      * 缓存的数据
      */
-    private List<Keyword> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<KeywordEntity> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
 
     /**
      * 这个每一条数据解析都会来调用
@@ -52,7 +52,7 @@ public class KeywordExcelListener implements ReadListener<KeywordExcel> {
     @Override
     public void invoke(KeywordExcel data, AnalysisContext context) {
         // log.info("KeywordExcelListener invoke: {}", JSON.toJSONString(data));
-        Keyword keyword = keywordService.convertExcelToKeyword(data, kbUid, orgUid);
+        KeywordEntity keyword = keywordService.convertExcelToKeyword(data, kbUid, orgUid);
         cachedDataList.add(keyword);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

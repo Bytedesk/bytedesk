@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UploadSpecification extends BaseSpecification {
     
-    public static Specification<Upload> search(UploadRequest request) {
+    public static Specification<UploadEntity> search(UploadRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

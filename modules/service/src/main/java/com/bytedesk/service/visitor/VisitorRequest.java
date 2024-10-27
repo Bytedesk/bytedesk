@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-10 10:23:35
+ * @LastEditTime: 2024-10-24 17:07:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,7 +69,8 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Boolean forceAgent = false;
 
-	private String status;
+	@Builder.Default
+	private String status = VisitorStatusEnum.ONLINE.name();
 
 	public ThreadTypeEnum formatType() {
 		int typeInt;

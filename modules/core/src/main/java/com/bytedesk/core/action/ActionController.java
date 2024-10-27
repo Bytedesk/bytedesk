@@ -42,7 +42,7 @@ public class ActionController extends BaseController<ActionRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(ActionRequest request) {
+    public ResponseEntity<?> queryByUser(ActionRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }

@@ -33,9 +33,9 @@ public class UserEntityListener {
     // private static TopicService topicService;
 
     @PostPersist
-    public void postPersist(User user) {
+    public void postPersist(UserEntity user) {
         // 这里可以记录日志、发送通知等
-        User clonedUser = SerializationUtils.clone(user);
+        UserEntity clonedUser = SerializationUtils.clone(user);
         // log.info("user postPersist {}", user.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -48,9 +48,9 @@ public class UserEntityListener {
     // }
 
     @PostUpdate
-    public void postUpdate(User user) {
+    public void postUpdate(UserEntity user) {
         // create user topic
-        User clonedUser = SerializationUtils.clone(user);
+        UserEntity clonedUser = SerializationUtils.clone(user);
         // log.info("postUpdate {}", user.getUid());
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);

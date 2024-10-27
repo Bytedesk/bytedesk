@@ -18,7 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -47,8 +47,8 @@ public class UserDetailsImpl implements UserDetails {
     // 
     @JsonIgnore
     private String password;
-    private Organization currentOrganization;
-    private Set<UserOrganizationRole> userOrganizationRoles;
+    private OrganizationEntity currentOrganization;
+    private Set<UserOrganizationRoleEntity> userOrganizationRoles;
     // private Set<Role> roles;
     // private Set<String> organizations;
     //
@@ -58,8 +58,8 @@ public class UserDetailsImpl implements UserDetails {
     private UserDetailsImpl(Long id, String uid, String username, String nickname, String avatar, String mobile,
             String email, String password,
             Collection<? extends GrantedAuthority> authorities,
-            Organization currentOrganization,
-            Set<UserOrganizationRole> userOrganizationRoles,
+            OrganizationEntity currentOrganization,
+            Set<UserOrganizationRoleEntity> userOrganizationRoles,
             // Set<Role> roles,
             // Set<String> organizations,
             String description,
@@ -93,7 +93,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     //
-    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl build(UserEntity user) {
         //
         // Set<GrantedAuthority> authorities = user.getRoles().stream()
         // .map(role -> new SimpleGrantedAuthority(role.getValue()))

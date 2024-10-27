@@ -25,9 +25,9 @@ public class ActionCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final Action action;
+    private final ActionEntity action;
 
-    public ActionCreateEvent(Object source, Action action) {
+    public ActionCreateEvent(Object source, ActionEntity action) {
         super(source);
         this.action = action;
     }

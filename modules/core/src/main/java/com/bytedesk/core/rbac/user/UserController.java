@@ -45,7 +45,7 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
         //
-        User user = authService.getCurrentUser();
+        UserEntity user = authService.getCurrentUser();
 
         UserResponse userResponse = ConvertUtils.convertToUserResponse(user);
 

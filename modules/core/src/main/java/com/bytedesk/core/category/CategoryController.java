@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 16:03:46
+ * @LastEditTime: 2024-10-23 18:12:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ public class CategoryController extends BaseController<CategoryRequest> {
     }
 
     @Override
-    public ResponseEntity<?> query(CategoryRequest request) {
+    public ResponseEntity<?> queryByUser(CategoryRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
@@ -65,7 +65,7 @@ public class CategoryController extends BaseController<CategoryRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody CategoryRequest request) {
         
-        categoryService.deleteByUid(request.getUid());
+        categoryService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }

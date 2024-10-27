@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-23 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-23 09:59:32
+ * @LastEditTime: 2024-10-23 15:26:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,9 +14,14 @@
  */
 package com.bytedesk.core.redis.cache;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import com.bytedesk.core.redis.RedisConsts;
 
 @Service
 public class RedisCacheService {
@@ -26,5 +31,24 @@ public class RedisCacheService {
 
     // 
     
-    
+    /**
+     * wechat同一时间仅允许一个账号绑定, 有效期2分钟
+     */
+    public void cacheBindWeChatOpen(String uid, String url) {
+        stringRedisTemplate.opsForValue().set(RedisConsts.BIND_WECHAT_OPEN_UID, uid, 60 * 2, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(RedisConsts.BIND_WECHAT_OPEN_URL, url, 60 * 2, TimeUnit.SECONDS);
+    }
+
+    public String getBindWeChatOpenUid() {
+        return stringRedisTemplate.opsForValue().get(RedisConsts.BIND_WECHAT_OPEN_UID);
+    }
+
+    public String getBindWeChatOpenUrl() {
+        return stringRedisTemplate.opsForValue().get(RedisConsts.BIND_WECHAT_OPEN_URL);
+    }
+
+    public boolean isBindWeChatOpenAvailable() {
+        String uuid = stringRedisTemplate.opsForValue().get(RedisConsts.BIND_WECHAT_OPEN_UID);
+        return !StringUtils.hasText(uuid);
+    }
 }

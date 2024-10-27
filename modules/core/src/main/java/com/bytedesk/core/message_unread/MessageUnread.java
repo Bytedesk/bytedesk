@@ -22,7 +22,7 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageStatusEnum;
@@ -56,7 +56,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "core_message_unread")
+@Table(name = "bytedesk_core_message_unread")
 public class MessageUnread implements Serializable  {
 
     private static final long serialVersionUID = 1L;
@@ -89,7 +89,7 @@ public class MessageUnread implements Serializable  {
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String extra = BdConstants.EMPTY_JSON_STRING;
+    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
@@ -102,7 +102,7 @@ public class MessageUnread implements Serializable  {
     @Builder.Default
     @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
-    private String user = BdConstants.EMPTY_JSON_STRING;
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 乐观锁版本字段，每次更新时版本号加1
     @Version

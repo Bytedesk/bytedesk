@@ -22,16 +22,16 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 
 public class TraceIdInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
             throws IOException {
-        String traceId = MDC.get(BdConstants.TRACE_ID);
+        String traceId = MDC.get(BytedeskConsts.TRACE_ID);
         if (traceId != null) {
-            request.getHeaders().add(BdConstants.TRACE_ID, traceId);
+            request.getHeaders().add(BytedeskConsts.TRACE_ID, traceId);
         }
         return execution.execute(request, body);
     }

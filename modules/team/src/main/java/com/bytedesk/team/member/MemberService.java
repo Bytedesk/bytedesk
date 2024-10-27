@@ -40,14 +40,14 @@ import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.User;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.department.Department;
+import com.bytedesk.team.department.DepartmentEntity;
 import com.bytedesk.team.department.DepartmentService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadService;
@@ -82,16 +82,16 @@ public class MemberService {
                 Sort.Direction.ASC,
                 "id");
 
-        Specification<Member> spec = MemberSpecification.search(memberRequest);
+        Specification<MemberEntity> spec = MemberSpecification.search(memberRequest);
         
-        Page<Member> memberPage = memberRepository.findAll(spec, pageable);
+        Page<MemberEntity> memberPage = memberRepository.findAll(spec, pageable);
 
         return memberPage.map(this::convertToResponse);
     }
 
     public MemberResponse query(MemberRequest memberRequest) {
-        User user = authService.getCurrentUser();
-        Optional<Member> memberOptional = findByUserAndOrgUid(user, memberRequest.getOrgUid());
+        UserEntity user = authService.getCurrentUser();
+        Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, memberRequest.getOrgUid());
         if (!memberOptional.isPresent()) {
             throw new RuntimeException("Member does not exist."); // 抛出具体的异常
         }
@@ -99,7 +99,7 @@ public class MemberService {
     }
 
     public MemberResponse queryByUserUid(MemberRequest memberRequest) {
-        Optional<Member> memberOptional = findByUserUid(memberRequest.getUid());
+        Optional<MemberEntity> memberOptional = findByUserUid(memberRequest.getUid());
         if (!memberOptional.isPresent()) {
             throw new RuntimeException("Member does not exist."); // 抛出具体的异常
         }
@@ -118,12 +118,12 @@ public class MemberService {
             throw new MobileExistsException("Mobile " + memberRequest.getMobile() + " already exists..!!");
         }
         // 查找部门信息
-        Optional<Department> depOptional = departmentService.findByUid(memberRequest.getDepUid());
+        Optional<DepartmentEntity> depOptional = departmentService.findByUid(memberRequest.getDepUid());
         if (!depOptional.isPresent()) {
             throw new RuntimeException("Department does not exist."); // 抛出具体的异常
         }
         //
-        Member member = modelMapper.map(memberRequest, Member.class);
+        MemberEntity member = modelMapper.map(memberRequest, MemberEntity.class);
         member.setUid(uidUtils.getCacheSerialUid());
         //
         member.addDepartment(depOptional.get());
@@ -135,7 +135,7 @@ public class MemberService {
         userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
         userRequest.setOrgUid(depOptional.get().getOrgUid());
         //
-        User user = null;
+        UserEntity user = null;
         if (StringUtils.hasText(memberRequest.getMobile())) {
             user = userService.findByMobileAndPlatform(memberRequest.getMobile(),
                     PlatformEnum.BYTEDESK.name())
@@ -151,7 +151,7 @@ public class MemberService {
         // 设置用户到成员对象中
         member.setUser(user);
         //
-        Member saveMember = save(member);
+        MemberEntity saveMember = save(member);
         if (saveMember == null) {
             // 根据业务逻辑决定如何处理保存失败的情况
             // 例如，可以抛出一个异常或返回一个错误响应
@@ -163,16 +163,16 @@ public class MemberService {
 
     public MemberResponse update(MemberRequest memberRequest) {
         //
-        Optional<Member> memberOptional = findByUid(memberRequest.getUid());
+        Optional<MemberEntity> memberOptional = findByUid(memberRequest.getUid());
         if (!memberOptional.isPresent()) {
             throw new RuntimeException("Failed to find member.");
         }
-        Optional<Department> depOptional = departmentService.findByUid(memberRequest.getDepUid());
+        Optional<DepartmentEntity> depOptional = departmentService.findByUid(memberRequest.getDepUid());
         if (!depOptional.isPresent()) {
             throw new RuntimeException("Failed to find department.");
         }
         //
-        Member member = memberOptional.get();
+        MemberEntity member = memberOptional.get();
         //
         modelMapper.map(memberRequest, member);
         // member.setJobNo(memberRequest.getJobNo());
@@ -185,33 +185,33 @@ public class MemberService {
         member.addDepartment(depOptional.get());
         member.setOrgUid(depOptional.get().getOrgUid());
         //
-        Member result = save(member);
+        MemberEntity result = save(member);
 
         return convertToResponse(result);
     }
 
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
-    public Optional<Member> findByUid(String uid) {
+    public Optional<MemberEntity> findByUid(String uid) {
         return memberRepository.findByUidAndDeleted(uid, false);
     }
 
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
-    public Optional<Member> findByUserUid(String uid) {
+    public Optional<MemberEntity> findByUserUid(String uid) {
         return memberRepository.findByUser_UidAndDeleted(uid, false);
     }
 
     @Cacheable(value = "member", key = "#mobile", unless = "#result == null")
-    public Optional<Member> findByMobileAndOrgUid(String mobile, String orgUid) {
+    public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
         return memberRepository.findByMobileAndOrgUidAndDeleted(mobile, orgUid, false);
     }
 
     @Cacheable(value = "member", key = "#email", unless = "#result == null")
-    public Optional<Member> findByEmailAndOrgUid(String email, String orgUid) {
+    public Optional<MemberEntity> findByEmailAndOrgUid(String email, String orgUid) {
         return memberRepository.findByEmailAndOrgUidAndDeleted(email, orgUid, false);
     }
 
     @Cacheable(value = "member", key = "#user.uid", unless = "#result == null")
-    public Optional<Member> findByUserAndOrgUid(User user, String orgUid) {
+    public Optional<MemberEntity> findByUserAndOrgUid(UserEntity user, String orgUid) {
         return memberRepository.findByUserAndOrgUidAndDeleted(user, orgUid, false);
     }
 
@@ -228,7 +228,7 @@ public class MemberService {
             @CachePut(value = "member", key = "#member.mobile", unless = "#member.mobile == null"),
             @CachePut(value = "member", key = "#member.email", unless = "#member.email == null")
     })
-    private Member save(Member member) {
+    private MemberEntity save(MemberEntity member) {
         try {
             return memberRepository.save(member);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -238,25 +238,25 @@ public class MemberService {
         return null;
     }
 
-    public void save(List<Member> members) {
+    public void save(List<MemberEntity> members) {
         memberRepository.saveAll(members);
     }
 
     public void deleteByUid(String uid) {
-        Optional<Member> memberOptional = findByUid(uid);
+        Optional<MemberEntity> memberOptional = findByUid(uid);
         memberOptional.ifPresent(member -> {
             member.setDeleted(true);
             save(member);
         });
     }
 
-    private MemberResponse convertToResponse(Member member) {
+    private MemberResponse convertToResponse(MemberEntity member) {
         return modelMapper.map(member, MemberResponse.class);
     }
 
-    public Member convertExcelToMember(MemberExcel memberExcel, String orgUid) {
+    public MemberEntity convertExcelToMember(MemberExcel memberExcel, String orgUid) {
         // Member member = Member.builder().build();
-        Member member = modelMapper.map(memberExcel, Member.class);
+        MemberEntity member = modelMapper.map(memberExcel, MemberEntity.class);
         member.setUid(uidUtils.getCacheSerialUid());
         member.setOrgUid(orgUid);
         // TODO: 生成user
@@ -269,7 +269,7 @@ public class MemberService {
     }
 
     // TODO: 待处理
-    private void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Member member) {
+    private void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, MemberEntity member) {
         // 可以在这里实现重试逻辑，例如使用递归调用或定时任务
         // 也可以记录日志、发送通知或执行其他业务逻辑
         log.error("Optimistic locking failure for member: {}", member.getUid());
@@ -292,7 +292,7 @@ public class MemberService {
         String originalMemberUid = splits[2];
         String reverseMemberUid = splits[3];
         String reverseTopic = TopicUtils.TOPIC_ORG_MEMBER_PREFIX + reverseMemberUid + "/" + originalMemberUid;
-        Optional<Member> reverseMemberOptional = findByUid(reverseMemberUid);
+        Optional<MemberEntity> reverseMemberOptional = findByUid(reverseMemberUid);
         if (!reverseMemberOptional.isPresent()) {
             throw new RuntimeException("getMemberReverseThread member not found");
         }
@@ -301,7 +301,7 @@ public class MemberService {
         reverseThread.setTopic(reverseTopic);
         reverseThread.setUnreadCount(0);
         //
-        Optional<Member> originalMemberOptional = findByUid(originalMemberUid);
+        Optional<MemberEntity> originalMemberOptional = findByUid(originalMemberUid);
         if (originalMemberOptional.isPresent()) {
             UserProtobuf user = UserProtobuf.builder()
                     .nickname(originalMemberOptional.get().getNickname())
@@ -355,10 +355,10 @@ public class MemberService {
             return;
         }
         //
-        String orgUid = BdConstants.DEFAULT_ORGANIZATION_UID;
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         for (int i = 0; i < departments.length; i++) {
             String department = departments[i];
-            Optional<Department> depOptional = departmentService.findByNameAndOrgUid(department, orgUid);
+            Optional<DepartmentEntity> depOptional = departmentService.findByNameAndOrgUid(department, orgUid);
             if (depOptional.isPresent()) {
                 if (i == 0) {
                     MemberRequest memberRequest = MemberRequest.builder()

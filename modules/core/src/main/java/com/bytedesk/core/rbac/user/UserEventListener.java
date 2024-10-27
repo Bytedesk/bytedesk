@@ -35,7 +35,7 @@ public class UserEventListener {
 
     @EventListener
     public void onUserCreateEvent(UserCreateEvent event) {
-        User user = event.getUser();
+        UserEntity user = event.getUser();
         log.info("topic onUserCreateEvent: {}", user.getUid());
         // 默认订阅用户主题
         // topicService.create(TopicUtils.getUserTopic(user.getUid()), user.getUid());
@@ -59,7 +59,7 @@ public class UserEventListener {
 
     @EventListener
     public void onUserUpdateEvent(UserUpdateEvent event) {
-        User user = event.getUser();
+        UserEntity user = event.getUser();
         log.info("topic onUserUpdateEvent: {}", user.getUid());
         // 默认订阅组织主题
         if (StringUtils.hasText(user.getOrgUid())) {

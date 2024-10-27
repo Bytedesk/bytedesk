@@ -25,9 +25,9 @@ public class UploadCreateEvent extends ApplicationEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private final Upload upload;
+    private final UploadEntity upload;
     
-    public UploadCreateEvent(Object source, Upload upload) {
+    public UploadCreateEvent(Object source, UploadEntity upload) {
         super(source);
         this.upload = upload;
     }

@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -37,9 +37,9 @@ import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.rbac.auth.AuthUser;
-import com.bytedesk.core.rbac.organization.Organization;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
-import com.bytedesk.core.rbac.role.Role;
+import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -87,7 +87,7 @@ public class UserService {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         //
-        User user = modelMapper.map(request, User.class);
+        UserEntity user = modelMapper.map(request, UserEntity.class);
         user.setUid(uidUtils.getUid());
         user.setPlatform(request.getPlatform());
         //
@@ -134,10 +134,10 @@ public class UserService {
     @Transactional
     public UserResponse update(UserRequest request) {
 
-        User currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
-        Optional<User> userOptional = findByUid(currentUser.getUid());
+        UserEntity currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
+        Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
+            UserEntity user = userOptional.get();
 
             if (StringUtils.hasText(request.getUsername())) {
                 // 如果新用户名跟旧用户名不同，需要首先判断新用户名是否已经存在，如果存在则抛出异常
@@ -187,7 +187,7 @@ public class UserService {
 
             // TODO: 设置角色role
 
-            User updatedUser = save(user);
+            UserEntity updatedUser = save(user);
             if (updatedUser == null) {
                 throw new RuntimeException("User update failed..!!");
             }
@@ -202,10 +202,10 @@ public class UserService {
     @Transactional
     public UserResponse changePassword(UserRequest request) {
 
-        User currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
-        Optional<User> userOptional = findByUid(currentUser.getUid());
+        UserEntity currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
+        Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
+            UserEntity user = userOptional.get();
             String oldEncryptedPassword = user.getPassword(); // 假设这是数据库中加密后的密码
             String oldRawPassword = request.getOldPassword(); // 用户输入的旧密码
             String newRawPassword = request.getNewPassword(); // 用户输入的新密码
@@ -228,22 +228,22 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(UserRequest request) {
+    public UserEntity createUser(UserRequest request) {
         //
         if (StringUtils.hasText(request.getMobile())
             && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
-            Optional<User> userOptional = findByMobileAndPlatform(request.getMobile(), request.getPlatform());
+            Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), request.getPlatform());
             return userOptional.get();
         }
 
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndPlatform(request.getEmail(), request.getPlatform())) {
-            Optional<User> userOptional = findByEmailAndPlatform(request.getEmail(),
+            Optional<UserEntity> userOptional = findByEmailAndPlatform(request.getEmail(),
                     request.getPlatform());
             return userOptional.get();
         }
         //
-        User user = User.builder()
+        UserEntity user = UserEntity.builder()
                 .avatar(request.getAvatar())
                 // .username(request.getEmail())
                 .nickname(request.getNickname())
@@ -269,11 +269,11 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
         }
         //
-        Optional<Organization> orgOptional = organizationRepository.findByUid(request.getOrgUid());
-        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE, request.getOrgUid());
+        Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(request.getOrgUid());
+        Optional<RoleEntity> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE, request.getOrgUid());
         if (orgOptional.isPresent() && roleOptional.isPresent()) {
-            Organization organization = orgOptional.get();
-            Role role = roleOptional.get();
+            OrganizationEntity organization = orgOptional.get();
+            RoleEntity role = roleOptional.get();
             //
             user.addOrganizationRole(organization, role);
         }
@@ -281,7 +281,7 @@ public class UserService {
         return save(user);
     }
 
-    public User updateUser(User user, String password, String mobile, String email) {
+    public UserEntity updateUser(UserEntity user, String password, String mobile, String email) {
 
         if (StringUtils.hasText(password)) {
             user.setPassword(passwordEncoder.encode(password));
@@ -296,32 +296,32 @@ public class UserService {
 
     public void logout() {
         // TODO: 清理token，使其过期
-        User user = AuthUser.getCurrentUser();
+        UserEntity user = AuthUser.getCurrentUser();
         bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<UserLogoutEvent>(this, new UserLogoutEvent(this, user)));
     }
 
     @Cacheable(value = "user", key = "#email", unless = "#result == null")
-    public Optional<User> findByEmailAndPlatform(String email, String platform) {
+    public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
         return userRepository.findByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
     @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
-    public Optional<User> findByMobileAndPlatform(String mobile, String platform) {
+    public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
         return userRepository.findByMobileAndPlatformAndDeleted(mobile, platform, false);
     }
 
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
-    public Optional<User> findByUsernameAndPlatform(String username, String platform) {
+    public Optional<UserEntity> findByUsernameAndPlatform(String username, String platform) {
         return userRepository.findByUsernameAndPlatformAndDeleted(username, platform, false);
     }
 
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
-    public Optional<User> findByUid(String uid) {
+    public Optional<UserEntity> findByUid(String uid) {
         return userRepository.findByUid(uid);
     }
 
     @Cacheable(value = "admin", unless = "#result == null")
-    public Optional<User> getAdmin() {
+    public Optional<UserEntity> getAdmin() {
         return userRepository.findByUsernameAndPlatformAndDeleted(bytedeskProperties.getEmail(),
                 PlatformEnum.BYTEDESK.name(), false);
     }
@@ -361,7 +361,7 @@ public class UserService {
             // @CachePut(value = "user:exists", key = "#user.mobile"),
             // @CachePut(value = "user:exists", key = "#user.email"),
     })
-    public User save(@NonNull User user) {
+    public UserEntity save(@NonNull UserEntity user) {
         try {
             return userRepository.save(user);
         } catch (Exception e) {
@@ -380,7 +380,7 @@ public class UserService {
             @CacheEvict(value = "user:exists", key = "#user.mobile"),
             @CacheEvict(value = "user:exists", key = "#user.email"),
     })
-    public void delete(@NonNull User user) {
+    public void delete(@NonNull UserEntity user) {
         // userRepository.delete(user);
         user.setDeleted(true);
         save(user);
@@ -398,7 +398,7 @@ public class UserService {
             return;
         }
 
-        User admin = User.builder()
+        UserEntity admin = UserEntity.builder()
                 .email(bytedeskProperties.getEmail())
                 .username(bytedeskProperties.getEmail())
                 .password(new BCryptPasswordEncoder().encode(bytedeskProperties.getPassword()))
@@ -417,15 +417,15 @@ public class UserService {
 
     public void updateInitData() {
         //
-        Optional<Organization> orgOptional = organizationRepository.findByUid(BdConstants.DEFAULT_ORGANIZATION_UID);
-        Optional<Role> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
-                BdConstants.DEFAULT_ORGANIZATION_UID);
-        Optional<User> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(),
+        Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        Optional<RoleEntity> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
+                BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        Optional<UserEntity> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(),
                 PlatformEnum.BYTEDESK.name());
         if (orgOptional.isPresent() && roleOptional.isPresent() && adminOptional.isPresent()) {
-            Organization organization = orgOptional.get();
-            Role role = roleOptional.get();
-            User user = adminOptional.get();
+            OrganizationEntity organization = orgOptional.get();
+            RoleEntity role = roleOptional.get();
+            UserEntity user = adminOptional.get();
             //
             user.addOrganizationRole(organization, role);
             //

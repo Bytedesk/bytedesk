@@ -21,7 +21,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import com.bytedesk.core.base.BaseService;
 
-public class TicketService extends BaseService<Ticket, TicketRequest, TicketResponse> {
+public class TicketService extends BaseService<TicketEntity, TicketRequest, TicketResponse> {
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
@@ -36,7 +36,7 @@ public class TicketService extends BaseService<Ticket, TicketRequest, TicketResp
     }
 
     @Override
-    public Optional<Ticket> findByUid(String uid) {
+    public Optional<TicketEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
@@ -54,7 +54,7 @@ public class TicketService extends BaseService<Ticket, TicketRequest, TicketResp
     }
 
     @Override
-    public Ticket save(Ticket entity) {
+    public TicketEntity save(TicketEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
@@ -66,19 +66,19 @@ public class TicketService extends BaseService<Ticket, TicketRequest, TicketResp
     }
 
     @Override
-    public void delete(Ticket entity) {
+    public void delete(TicketRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, Ticket entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TicketEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public TicketResponse convertToResponse(Ticket entity) {
+    public TicketResponse convertToResponse(TicketEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }

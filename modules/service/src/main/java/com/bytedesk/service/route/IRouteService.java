@@ -14,20 +14,20 @@
  */
 package com.bytedesk.service.route;
 
-import com.bytedesk.ai.robot.Robot;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.service.agent.Agent;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.service.visitor.VisitorRequest;
-import com.bytedesk.service.workgroup.Workgroup;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import jakarta.annotation.Nonnull;
 
 public interface IRouteService {
 
-    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull Robot robot);
+    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull RobotEntity robot);
 
-    public MessageProtobuf routeAgent(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull Agent agent);
+    public MessageProtobuf routeAgent(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull AgentEntity agent);
 
-    public MessageProtobuf routeWorkgroup(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull Workgroup workgroup);
+    public MessageProtobuf routeWorkgroup(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull WorkgroupEntity workgroup);
 }

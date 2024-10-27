@@ -17,7 +17,7 @@ package com.bytedesk.ai.robot;
 import com.bytedesk.ai.settings.RobotServiceSettingsRequest;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 
@@ -48,13 +48,13 @@ public class RobotRequest extends BaseRequest {
     private RobotLlm llm = new RobotLlm();
 
     @Builder.Default
-    private String defaultReply = BdConstants.EMPTY_STRING;
+    private String defaultReply = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
     private String category = RobotCategoryEnum.DEFAULT.name();
 
     @Builder.Default
-    private String level = LevelEnum.ORGNIZATION.name();
+    private String level = LevelEnum.ORGANIZATION.name();
     
     @Builder.Default
     private Boolean published = false;

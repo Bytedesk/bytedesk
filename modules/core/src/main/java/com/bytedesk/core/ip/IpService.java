@@ -116,7 +116,7 @@ public class IpService {
     @CachePut(value = "ip", key = "#ipRequest.ip")
     public IpResponse blockIp(IpRequest ipRequest) {
         //
-        Optional<Ip> ipOptional = findByOrgUid(ipRequest.getOrgUid());
+        Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
         if (ipOptional.isPresent()) {
             // 更新
             if (StringUtils.hasText(ipRequest.getIp())) {
@@ -128,7 +128,7 @@ public class IpService {
             ipOptional.get().setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
             ipOptional.get().setReason(ipRequest.getReason());
 
-            Ip savedIp = save(ipOptional.get());
+            IpEntity savedIp = save(ipOptional.get());
             if (savedIp == null) {
                 throw new RuntimeException("failed to update ip");
             }
@@ -136,14 +136,14 @@ public class IpService {
             return convertToResponse(ipOptional.get());
         }
         //
-        Ip ip = modelMapper.map(ipRequest, Ip.class);
+        IpEntity ip = modelMapper.map(ipRequest, IpEntity.class);
         ip.setUid(uidUtils.getCacheSerialUid());
         if (StringUtils.hasText(ipRequest.getIp())) {
             ip.getIps().add(ipRequest.getIp());
         }
         ip.setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
         //
-        Ip savedIp = save(ip);
+        IpEntity savedIp = save(ip);
         if (savedIp == null) {
             throw new RuntimeException("failed to save ip");
         }
@@ -153,11 +153,11 @@ public class IpService {
 
     public IpResponse unblockIp(IpRequest ipRequest) {
 
-        Optional<Ip> ipOptional = findByOrgUid(ipRequest.getOrgUid());
+        Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
         if (ipOptional.isPresent()) {
             ipOptional.get().getIps().remove(ipRequest.getIp());
 
-            Ip savedIp = save(ipOptional.get());
+            IpEntity savedIp = save(ipOptional.get());
             if (savedIp == null) {
                 throw new RuntimeException("failed to unblock ip");
             }
@@ -242,15 +242,15 @@ public class IpService {
         return "Visitor";
     }
 
-    Optional<Ip> findByUid(String uid) {
+    Optional<IpEntity> findByUid(String uid) {
         return ipRepository.findByUid(uid);
     }
 
-    Optional<Ip> findByOrgUid(String orgUid) {
+    Optional<IpEntity> findByOrgUid(String orgUid) {
         return ipRepository.findFirstByOrgUid(orgUid);
     }
 
-    private Ip save(Ip ip) {
+    private IpEntity save(IpEntity ip) {
         try {
             return ipRepository.save(ip);
         } catch (Exception e) {
@@ -260,7 +260,7 @@ public class IpService {
         return null;
     }
 
-    public IpResponse convertToResponse(Ip ip) {
+    public IpResponse convertToResponse(IpEntity ip) {
         return modelMapper.map(ip, IpResponse.class);
     }
 

@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GroupSpecification extends BaseSpecification {
     
-    public static Specification<Group> search(GroupRequest request) {
+    public static Specification<GroupEntity> search(GroupRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

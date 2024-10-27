@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-29 11:32:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-14 10:21:24
+ * @LastEditTime: 2024-10-24 08:22:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,7 @@ public class MqttProperties {
 
     private String host = "0.0.0.0";
 
-    private int port = 9883;
+    // private int port = 9883;
 
     // private int tslPort = 9884;
 

@@ -78,7 +78,7 @@ public class MessageController extends BaseController<MessageRequest> {
      * @return json
      */
     @GetMapping("/query/topic")
-    public ResponseEntity<?> query(MessageRequest request) {
+    public ResponseEntity<?> queryByUser(MessageRequest request) {
 
         Page<MessageResponse> response = messageService.queryByThreadTopic(request);
         //
@@ -132,7 +132,7 @@ public class MessageController extends BaseController<MessageRequest> {
         String json = (String) map.get("json");
         log.debug("json {}", json);
         // stompMqService.sendJsonMessageToMq(json);
-        messageSendService.sendMessage(json);
+        messageSendService.sendJsonMessage(json);
         //
         return ResponseEntity.ok(JsonResult.success(json));
     }

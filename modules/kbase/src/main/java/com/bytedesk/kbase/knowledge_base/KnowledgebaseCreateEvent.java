@@ -25,9 +25,9 @@ public class KnowledgebaseCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private Knowledgebase knowledgebase;
+    private KnowledgebaseEntity knowledgebase;
 
-    public KnowledgebaseCreateEvent(Object source, Knowledgebase knowledgebase) {
+    public KnowledgebaseCreateEvent(Object source, KnowledgebaseEntity knowledgebase) {
         super(source);
         this.knowledgebase = knowledgebase;
     }

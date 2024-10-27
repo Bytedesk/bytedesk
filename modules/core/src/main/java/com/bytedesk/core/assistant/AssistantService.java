@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.BdConstants;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -47,14 +47,14 @@ public class AssistantService {
                 Sort.Direction.ASC,
                 "id");
 
-        Page<Assistant> assistantPage = assistantRepository.findAll(pageable);
+        Page<AssistantEntity> assistantPage = assistantRepository.findAll(pageable);
 
         return assistantPage.map(assistant -> convertToResponse(assistant));
     }
 
-    public Assistant create(AssistantRequest assistantRequest) {
+    public AssistantEntity create(AssistantRequest assistantRequest) {
 
-        Assistant assistant = modelMapper.map(assistantRequest, Assistant.class);
+        AssistantEntity assistant = modelMapper.map(assistantRequest, AssistantEntity.class);
         if (!StringUtils.hasText(assistant.getUid())) {
             assistant.setUid(uidUtils.getUid());
         }
@@ -62,11 +62,11 @@ public class AssistantService {
         return save(assistant);
     }
 
-    private Assistant save(Assistant assistant) {
+    private AssistantEntity save(AssistantEntity assistant) {
         return assistantRepository.save(assistant);
     }
 
-    public AssistantResponse convertToResponse(Assistant assistant) {
+    public AssistantResponse convertToResponse(AssistantEntity assistant) {
         return modelMapper.map(assistant, AssistantResponse.class);
     }
 
@@ -83,9 +83,9 @@ public class AssistantService {
                 .avatar(AvatarConsts.DEFAULT_FILE_ASSISTANT_AVATAR_URL)
                 .description(I18Consts.I18N_FILE_ASSISTANT_DESCRIPTION)
                 .build();
-        assistantRequest.setUid(BdConstants.DEFAULT_FILE_ASSISTANT_UID);
+        assistantRequest.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
         assistantRequest.setType(TypeConsts.TYPE_SYSTEM);
-        // assistantRequest.setOrgUid(BdConstants.DEFAULT_ORGANIZATION_UID);
+        // assistantRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         create(assistantRequest);
     }
 
