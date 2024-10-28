@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 17:29:50
+ * @LastEditTime: 2024-10-28 09:45:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -150,4 +150,3 @@
 <!-- - 此软件可能存在bug或不完善的地方，如造成损失，需自行负责 -->
 - 此为开源社区版，支持完全免费商用，无任何限制
 - 严禁用于含有木马、病毒、色情、赌博、诈骗等违法违规业务
-- 根据[《生成式人工智能服务管理暂行办法》](https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm)的要求，请勿对中国地区公众提供一切未经备案的生成式人工智能服务
