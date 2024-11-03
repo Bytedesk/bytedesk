@@ -1,0 +1,310 @@
+// 
+// dark-mode.scss
+// Theme Component
+// Dark mode related CSS
+
+[data-bs-theme="dark"] {
+
+    //Dark mode styles
+    --bs-gray-100: #313235;
+    --bs-gray-200: #464950;
+    --bs-gray-300: #5f5f68;
+    --bs-gray-400: #a1a1a8;
+    --bs-gray-500: #bfc0c9;
+    --bs-gray-600: #c5c6cc;
+    --bs-gray-700: #ffffffb3;
+    --bs-gray-800: #fffffff9;
+    --bs-gray-900: #fff;
+    --bs-light: #202227;
+    --bs-secondary-rgb: 197, 198, 204;
+    --bs-body-bg: #191a1f;
+    --bs-body-color: #a1a1a8;
+    --bs-mode:#0f0f10;
+    --bs-mode-rgb:15, 15, 16;
+    --bs-border-color: rgba(255, 255, 255, 0.07);
+    --bs-card-bg-dark: #141519;
+
+    // Navbar
+    .navbar {
+    --bs-navbar-color: var(--#{$prefix}gray-600);
+    --bs-navbar-disabled-color: var(--#{$prefix}gray-400);
+    }
+    .navbar-dark {
+      --bs-navbar-color: var(--#{$prefix}gray-900);
+    }
+
+    // Dropdown menu
+    .dropdown-menu {
+      --bs-dropdown-bg: var(--#{$prefix}mode);
+      --bs-dropdown-link-disabled-color: var(--#{$prefix}gray-200);
+      box-shadow:none;
+      --bs-dropdown-divider-bg: var(--#{$prefix}border-color);
+      border: 1px solid var(--#{$prefix}border-color);
+    }
+
+    .alert-light{
+      --bs-alert-bg: var(--#{$prefix}gray-600);
+      --bs-alert-border-color: var(--#{$prefix}gray-600);
+    }
+
+    // Buttons
+    .bg-light{
+      background-color: var(--#{$prefix}light) !important;
+    }
+    .btn-dark{
+      --bs-btn-bg: var(--#{$prefix}mode);
+    }
+    .btn-close {
+      filter: invert(1) grayscale(100%) brightness(300%);
+    }
+    .btn-secondary-soft{
+      background-color: rgba(var(--#{$prefix}secondary-rgb), 0.1);
+      color: var(--#{$prefix}gray-600);
+      &:hover{
+        background-color: rgba(var(--#{$prefix}secondary-rgb)) !important;
+        color: var(--#{$prefix}body-bg) !important;
+      }
+    }
+    .btn-secondary-soft-hover:hover{
+      background-color: rgba(var(--#{$prefix}secondary-rgb), 0.1);
+      color: var(--#{$prefix}gray-600) !important;
+    }
+    .btn-light{
+      --bs-btn-bg: var(--#{$prefix}light);
+      --bs-btn-color: var(--#{$prefix}gray-800);
+      --bs-btn-border-color: var(--#{$prefix}light);
+      --bs-btn-active-bg: var(--#{$prefix}gray-200);
+      --bs-btn-active-color: var(--#{$prefix}gray-800);
+    }
+
+    // Modal
+    .modal {
+      --bs-modal-bg: var(--#{$prefix}body-bg);
+      --bs-modal-footer-border-color: var(--#{$prefix}border-color);
+    } 
+    
+    // Card
+    .card {
+      --bs-card-cap-bg: var(--bs-card-bg-dark) !important;
+      --bs-card-bg: var(--bs-card-bg-dark) !important;
+      --bs-card-border-color: var(--#{$prefix}light);
+    }
+
+    // Offacanvas
+    .offcanvas, .offcanvas-xxl, .offcanvas-xl, .offcanvas-lg, .offcanvas-md, .offcanvas-sm {
+      --bs-offcanvas-bg: var(--#{$prefix}body-bg);
+    }
+
+    .popover{
+      --bs-popover-bg:var(--#{$prefix}body-bg);
+    }
+
+    // Accordion
+    .accordion{
+      --bs-accordion-bg: var(--#{$prefix}body-bg);
+      --bs-accordion-active-bg: var(--#{$prefix}body-bg);
+    }
+    .accordion-item{
+      background-color: var(--#{$prefix}body-bg);
+      color: var(--#{$prefix}gray-400);
+      .accordion-button{
+        color: var(--#{$prefix}gray-400);
+      }
+    }
+
+    // Background mode
+    .bg-mode{
+      background: var(--#{$prefix}mode);
+    }
+
+    .text-muted{
+      color:  var(--#{$prefix}gray-800) !important;
+    }
+
+    hr{
+      color: var(--#{$prefix}gray-300);
+    }
+
+    // Fill secondary
+    .fill-secondary{
+      fill: rgba(var(--#{$prefix}secondary-rgb)) !important;
+    }
+
+    // Shadow
+    .shadow, .shadow-lg, .shadow-sm{
+      box-shadow: none !important;
+    }
+    .navbar-nav .dropdown .dropdown-submenu:hover>.dropdown-menu {
+      box-shadow: none;
+    }
+
+    // Mobile mockup and mac mockup
+    .iphone-x{
+      box-shadow: 0px 0px 0px 11px var(--#{$prefix}gray-600), 0px 0px 0px 13px var(--#{$prefix}gray-600), 0px 0px 0px 20px var(--#{$prefix}gray-400);
+      &:after{
+        background-color: var(--#{$prefix}light);
+      }
+      &:before{
+        background-color: var(--#{$prefix}gray-600);
+      }
+    }
+    .mac_screen{
+      background: var(--#{$prefix}gray-700);
+      &:before {
+        border: none;
+      }
+    }
+
+    // Form control background
+    .form-control{
+      background-color: var(--#{$prefix}body-bg);
+      border-color: var(--bs-gray-100);
+      &:focus{
+        border-color: var(--bs-primary);
+      }
+    }
+
+    // Choices
+    .choices .choices__inner{
+      background-color: var(--#{$prefix}body-bg);
+      border: 1px solid var(--bs-gray-100);
+    }
+    .choices .choices__list--dropdown{
+      background-color: var(--#{$prefix}body-bg);
+      border: 1px solid var(--bs-gray-100);
+    }
+    .choices[data-type*=select-one] .choices__input{
+      background: var(--bs-body-bg);
+    }
+
+    // Flatpickr
+    .flatpickr-calendar{
+      background: var(--#{$prefix}mode);
+      border-color: var(--#{$prefix}mode);
+    }
+    .flatpickr-current-month .flatpickr-monthDropdown-months, .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+      background: var(--#{$prefix}mode);
+    }
+    .flatpickr-calendar.arrowBottom:before, .flatpickr-calendar.arrowBottom:after {
+      border-top-color: var(--#{$prefix}mode);
+    }
+    .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after, .flatpickr-current-month .numInputWrapper span.arrowUp:after {
+      border-bottom-color: var(--#{$prefix}mode);
+    }
+
+    // Tabs white
+    .nav-tabs-white{
+      .nav-item{
+        .nav-link.active, .nav-link:hover{
+          background: var(--#{$prefix}mode);
+        }
+      }
+    }
+
+    .navbar.navbar-icon {
+      .navbar-nav {
+        .nav-item {
+          .nav-link {
+            &.active {
+              &:before {
+                border-color: var(--bs-mode) transparent transparent transparent;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Responsive navbar
+    .navbar-expand {
+      @each $breakpoint in map-keys($grid-breakpoints) {
+        $next: breakpoint-next($breakpoint, $grid-breakpoints);
+        $infix: breakpoint-infix($next, $grid-breakpoints);
+        &#{$infix} {
+          @include media-breakpoint-down($next) {
+            .navbar-collapse{
+              background: var(--#{$prefix}mode) !important;
+            }
+          }
+        }
+      }
+    }
+
+    // Glightbox
+    .glightbox-clean .gslide-description {
+      background: var(--#{$prefix}mode);
+    }
+
+    // Preloader
+    .preloader {
+      background-color: var(--#{$prefix}mode);
+    }
+
+    // Ticket border
+    .ticket-border {
+      &:before {
+        background: var(--#{$prefix}mode);
+      }
+      &:after {
+        background: var(--#{$prefix}mode);
+      }
+    }
+
+    // story border
+    .stories .story > .item-link > .item-preview img {
+      border: 2px solid var(--#{$prefix}mode);
+    }
+    // Story scroll
+    .scroll-enable{
+      &.stories.carousel::-webkit-scrollbar-track
+      {
+        background-color: var(--#{$prefix}gray-200);
+      }
+      &.stories.carousel::-webkit-scrollbar
+      {
+        background-color: var(--#{$prefix}gray-200);
+      }
+      &.stories.carousel::-webkit-scrollbar-thumb
+      {
+        background-color: var(--#{$prefix}gray-400);
+      }
+    }
+  }
+  
+  // Dark mode switch
+  .modeswitch-item {
+    .btn-modeswitch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(-14%);
+      height: 40px;
+      width: 40px;
+      background: var(--#{$prefix}light);
+      border-radius: $border-radius;
+      transition: all 1s;
+      svg{
+      fill: var(--#{$prefix}gray-900);
+      }
+      &.active{
+        background: var(--#{$prefix}primary);
+        svg{
+          fill: var(--#{$prefix}white);
+          }
+      }
+    }
+  }
+
+// Dark mode item hide and show
+.dark-mode-item{
+  display: none !important;
+}
+
+[data-bs-theme="dark"]{
+  .dark-mode-item{
+    display: inline-block !important;
+  }
+  .light-mode-item{
+    display: none !important;
+  }
+}

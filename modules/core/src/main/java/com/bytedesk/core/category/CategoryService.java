@@ -193,6 +193,8 @@ public class CategoryService extends BaseService<CategoryEntity, CategoryRequest
         return list.stream().map(city -> convertToResponse(city)).collect(Collectors.toList());
     }
 
+
+
     //
     public void initData() {
 
@@ -208,7 +210,7 @@ public class CategoryService extends BaseService<CategoryEntity, CategoryRequest
                 .orderNo(0)
                 .level(LevelEnum.PLATFORM.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryContact.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载
@@ -220,7 +222,7 @@ public class CategoryService extends BaseService<CategoryEntity, CategoryRequest
                 .orderNo(1)
                 .level(LevelEnum.PLATFORM.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryThanks.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载
@@ -232,7 +234,7 @@ public class CategoryService extends BaseService<CategoryEntity, CategoryRequest
                 .orderNo(2)
                 .level(LevelEnum.PLATFORM.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryWelcome.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载
@@ -244,7 +246,7 @@ public class CategoryService extends BaseService<CategoryEntity, CategoryRequest
                 .orderNo(3)
                 .level(LevelEnum.PLATFORM.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
         // 此处设置orgUid方便超级管理员加载

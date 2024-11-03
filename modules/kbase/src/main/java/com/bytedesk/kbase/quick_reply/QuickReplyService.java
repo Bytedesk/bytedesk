@@ -201,7 +201,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .title(I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
                     .categoryUid(categoryContact.get().getUid())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .level(LevelEnum.PLATFORM)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
@@ -222,7 +222,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
                     .categoryUid(categoryThanks.get().getUid())
                     .level(LevelEnum.PLATFORM)
-                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
@@ -242,7 +242,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
                     .categoryUid(categoryWelcome.get().getUid())
                     .level(LevelEnum.PLATFORM)
-                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
@@ -262,7 +262,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
                     .categoryUid(categoryBye.get().getUid())
                     .level(LevelEnum.PLATFORM)
-                    .kbUid(BytedeskConsts.DEFAULT_KB_UID)
+                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载

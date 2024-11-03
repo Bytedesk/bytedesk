@@ -28,7 +28,7 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -45,7 +45,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mem")
 // @Tag(name = "member", description = "member apis")
-public class MemberController extends BaseController<MemberRequest> {
+public class MemberController extends BaseRestController<MemberRequest> {
 
     private final MemberService memberService;
 

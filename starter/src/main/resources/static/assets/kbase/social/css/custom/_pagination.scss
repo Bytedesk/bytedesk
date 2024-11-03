@@ -1,0 +1,38 @@
+// 
+// pagination.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+//
+
+// For better breakpoint
+.pagination{
+  .page-item{
+    margin-bottom: 5px;
+    float: left;
+  }
+}
+
+// pagination bordered
+.pagination-light{
+  .page-item{
+    margin: 2px;
+    &.active .page-link{
+      background-color: var(--bs-primary) !important;
+    }
+    &.disabled .page-link{
+      background-color: transparent !important;
+    }
+  }
+  .page-link{
+    border-color: var(--#{$prefix}light);
+    background-color: var(--#{$prefix}light);
+    border-radius: $border-radius-sm;
+    &:hover{
+      background-color: $pagination-hover-bg;
+      border-color: $pagination-hover-border-color;
+    }
+  }
+}

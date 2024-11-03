@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 15:21:08
+ * @LastEditTime: 2024-10-28 16:01:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,10 +69,8 @@ public class ArticleEntity extends BaseEntity {
     private String contentHtml;
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
     @Column(name = "article_type", nullable = false)
-    // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
-    private String type = KnowledgebaseTypeEnum.HELPDOC.name();
+    private String type = KnowledgebaseTypeEnum.HELPCENTER.name();
 
     // @Builder.Default
     // @ManyToMany
@@ -84,10 +82,19 @@ public class ArticleEntity extends BaseEntity {
     private List<String> tags = new ArrayList<>();
 
     @Builder.Default
+    @Column(name = "is_top")
+    private boolean top = false;
+
+    @Builder.Default
+    @Column(name = "is_published")
     private boolean published = false;
 
     @Builder.Default
+    @Column(name = "is_markdown")
     private boolean markdown = false;
+
+    @Builder.Default
+    private int readCount = 0;
 
     private String categoryUid; // 文章分类。生成页面时，先查询分类，后通过分类查询相关文章。
 

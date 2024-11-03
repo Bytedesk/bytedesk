@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-25 11:24:17
+ * @LastEditTime: 2024-10-30 12:23:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -91,7 +91,8 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException e) {
         // 
-        if (e.getMessage().contains("/vip/")) {
+        if (e.getMessage().contains("/vip/") 
+            || e.getMessage().contains("/wechat/")) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
         }
         // 

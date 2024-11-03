@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/visitor/api/v1/visitor_thread")
 @AllArgsConstructor
-public class VisitorThreadController extends BaseController<VisitorThreadRequest> {
+public class VisitorThreadController extends BaseRestController<VisitorThreadRequest> {
 
     private VisitorThreadService visitorThreadService;
  

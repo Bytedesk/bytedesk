@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 17:58:41
+ * @LastEditTime: 2024-10-28 12:43:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,9 +20,10 @@ public class TypeConsts {
     }
 
     public static final String TYPE_SYSTEM = "system";
-    public static final String TYPE_MOBILE = "mobile";
-    public static final String TYPE_EMAIL = "email";
-    public static final String TYPE_SCAN = "scan";
+    // 
+    // public static final String TYPE_MOBILE = "mobile";
+    // public static final String TYPE_EMAIL = "email";
+    // public static final String TYPE_SCAN = "scan";
 
     // 
     public static final String CUSTOMER_SERVICE = "CS";

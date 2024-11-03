@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-07 11:09:50
+ * @LastEditTime: 2024-10-28 13:42:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -228,6 +228,63 @@ public class UserService {
     }
 
     @Transactional
+    public UserResponse changeEmail(UserRequest request) {
+
+        UserEntity currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
+        Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            if (StringUtils.hasText(request.getEmail())) {
+                // 如果新邮箱跟旧邮箱不同，需要首先判断新邮箱是否已经存在，如果存在则抛出异常
+                if (!request.getEmail().equals(user.getEmail())) {
+                    if (existsByEmailAndPlatform(request.getEmail(),
+                            request.getPlatform())) {
+                        throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
+                    }
+                }
+                user.setEmail(request.getEmail());
+            } else {
+                throw new RuntimeException("Email is required..!!");
+            }
+            user.setEmailVerified(true);
+            user = save(user);
+
+            return ConvertUtils.convertToUserResponse(user);
+        } else {
+            throw new RuntimeException("User not found..!!");
+        }
+    }
+
+    @Transactional
+    public UserResponse changeMobile(UserRequest request) {
+
+        UserEntity currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
+        Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            if (StringUtils.hasText(request.getMobile())) {
+                // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
+                if (!request.getMobile().equals(user.getMobile())) {
+                    if (existsByMobileAndPlatform(request.getMobile(),
+                            request.getPlatform())) {
+                        throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+                    }
+                }
+                user.setMobile(request.getMobile());
+            } else {
+                throw new RuntimeException("Mobile is required..!!");
+            }
+            user.setMobileVerified(true);
+            user = save(user);
+
+            return ConvertUtils.convertToUserResponse(user);
+        } else {
+            throw new RuntimeException("User not found..!!");
+        }
+    }
+    
+
+    @Transactional
     public UserEntity createUser(UserRequest request) {
         //
         if (StringUtils.hasText(request.getMobile())
@@ -351,6 +408,10 @@ public class UserService {
         return userRepository.existsByEmailAndPlatformAndDeleted(email, platform, false);
     }
 
+    public Boolean existsBySuperUser() {
+        return userRepository.existsBySuperUserAndDeleted(true, false);
+    }
+
     @Caching(put = {
             @CachePut(value = "user", key = "#user.username", unless = "#user.username == null"),
             @CachePut(value = "user", key = "#user.mobile", unless = "#user.mobile == null"),
@@ -394,9 +455,13 @@ public class UserService {
 
     public void initData() {
 
-        if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), PlatformEnum.BYTEDESK.name())) {
+        if (existsBySuperUser()) {
             return;
         }
+
+        // if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), PlatformEnum.BYTEDESK.name())) {
+        //     return;
+        // }
 
         UserEntity admin = UserEntity.builder()
                 .email(bytedeskProperties.getEmail())

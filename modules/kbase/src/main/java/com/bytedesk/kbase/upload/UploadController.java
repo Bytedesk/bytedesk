@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:31:06
+ * @LastEditTime: 2024-11-02 10:45:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,8 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.base.BaseController;
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -45,13 +44,13 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/upload")
-public class UploadController extends BaseController<UploadRequest> {
+public class UploadController extends BaseRestController<UploadRequest> {
 
 	private final AuthService authService;
 
 	private final UploadService uploadService;
 
-	private final BytedeskProperties bytedeskProperties;
+	// private final BytedeskProperties bytedeskProperties;
 
 	private final UploadVectorStore uploadVectorStore;
 
@@ -72,9 +71,9 @@ public class UploadController extends BaseController<UploadRequest> {
 		// TODO: 检测是否同一文件，重复上传
 
 		// http://localhost:9003/file/20240319162820_img-service2.png
-		String uploadPath = uploadService.store(file, fileName);
-		// http://localhost:9003
-		String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+		// String uploadPath = uploadService.store(file, fileName);
+		// String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+		String fileUrl = uploadService.store(file, fileName);
 		//
 		UserEntity user = authService.getCurrentUser();
 		UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);

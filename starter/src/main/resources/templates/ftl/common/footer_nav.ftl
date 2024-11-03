@@ -4,15 +4,15 @@
 		<div class="row g-4 justify-content-between pt-5">
 
 			<!-- Widget 1 START -->
-			<div class="col-md-5 col-lg-4">
+			<div class="col-md-6 col-lg-6">
 				<!-- logo -->
 				<a class="me-0" href="index.html">
 					<#--  <img class="light-mode-item h-40px" src="assets/images/logo.svg" alt="logo">  -->
 					<#--  <img class="dark-mode-item h-40px" src="assets/images/logo-light.svg" alt="logo">  -->
 				</a>
 
-				<p class="my-4"><h3>微语 - 开源对话软件</h3></p>
-				<p ><h5>Chat As A Service(CAAS)</h5></p>
+				<p class="my-4"><h3>微语 - 重复工作自动化</h3></p>
+				<p ><h5>对话即服务-Chat As A Service(CAAS)</h5></p>
 				<!-- Newsletter -->
 				<#--  <form class="row row-cols-lg-auto g-2">
 					<div class="col-12">
@@ -26,7 +26,7 @@
 			<!-- Widget 1 END -->
 
 			<!-- Widget 2 START -->
-			<div class="col-md-7 col-lg-6">
+			<div class="col-md-6 col-lg-6">
 				<div class="row g-4 g-lg-5">
 					<!-- Link block -->
 					<div class="col-6 col-sm-4">
@@ -37,11 +37,6 @@
 							<#--  <li class="nav-item"><a class="nav-link" href="mailto:270580156@qq.com">270580156@qq.com</a></li>  -->
 							<#--  <li class="nav-item"><a class="nav-link" href="#">Privacy Policy</a></li>  -->
 							<#--  <li class="nav-item"><a class="nav-link" href="#">Sitemap</a></li>  -->
-							<#--  <li class="nav-item">
-								<a href="https://www.kefux.com/assets/img/qrcode/qiye.png" target="_blank">
-									<img src="https://www.kefux.com/assets/img/qrcode/qiye.png" style="height: 100px;"/>
-								</a>
-							</li>  -->
 						</ul>
 					</div>
 
@@ -52,6 +47,7 @@
 							<li class="nav-item"><a class="nav-link pt-0" href="https://www.weiyuai.cn/about.html" target="_blank">关于</a></li>
 							<#--  <li class="nav-item"><a class="nav-link" href="#">Download</a></li>  -->
 							<#--  <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>  -->
+							
 						</ul>
 					</div>
 
@@ -63,6 +59,18 @@
 							<#--  <li class="nav-item"><a class="nav-link" href="#"><i class="fab fa-instagram-square text-instagram-gradient me-2"></i>Instagram</a></li>  -->
 							<#--  <li class="nav-item"><a class="nav-link" href="https://twitter.com/bytedeskai" target="_blank"><i class="fab fa-twitter-square text-twitter me-2"></i>Twitter</a></li>  -->
 							<#--  <li class="nav-item"><a class="nav-link" href="#"><i class="fab fa-linkedin text-linkedin me-2"></i>Linkedin</a></li>  -->
+							<li class="nav-item">
+								服务号
+								<a href="/assets/images/qrcode/weiyu/qrcode_1280.jpg" target="_blank">
+									<img src="/assets/images/qrcode/weiyu/qrcode_1280.jpg" style="height: 100px;"/>
+								</a>
+							</li>
+							<li class="nav-item">
+								订阅号
+								<a href="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" target="_blank">
+									<img src="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" style="height: 100px;"/>
+								</a>
+							</li>
 						</ul>
 					</div>
 				</div>

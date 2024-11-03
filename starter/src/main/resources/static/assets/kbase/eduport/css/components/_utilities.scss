@@ -1,0 +1,103 @@
+// 
+// utilities.scss
+// Theme component for utility classes (helper classes)
+
+
+// text color on hover
+.text-primary-hover {
+  a {
+    color: var(--#{$prefix}gray-400);
+    &:hover {
+      color: var(--#{$prefix}primary) !important;
+    }
+  }
+}
+
+a.text-primary-hover, button.text-primary-hover {
+  color: var(--#{$prefix}gray-600);
+  transition: $transition-base;
+  &:hover {
+    color: var(--#{$prefix}primary) !important;
+  }
+}
+
+.text-primary-hover {
+  li {
+    color: var(--#{$prefix}gray-400);
+    &:hover {
+      color: var(--#{$prefix}primary) !important;
+    }
+  }
+}
+
+// font family
+.font-base {
+  font-family: $font-family-base !important;
+}
+
+.font-heading {
+  font-family: $headings-font-family !important;
+}
+
+// Filter
+.grayscale {
+  filter: grayscale(100%);
+  transition: all .6s ease;
+  &:hover {
+    filter: none;
+    -webkit-filter: grayscale(0%);
+  }
+}
+
+// On hover
+.zoom-hover {
+  transform: scale(1);
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
+// Icons fixed height and width
+.icon-sm {
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  text-align: center;
+  font-size: 75%;
+}
+.icon-md {
+  width: 2.6rem;
+  height: 2.6rem;
+  line-height: 2.6rem;
+  text-align: center;
+  font-size: .8rem;
+}
+.icon-lg {
+  width: 3.5rem;
+  height: 3.5rem;
+  line-height: 3.5rem;
+  text-align: center;
+  font-size: 1.2rem;
+}
+.icon-xl {
+  width: 5rem;
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+  font-size: 1.9rem;
+}
+
+.icon-xxl {
+  width: 7rem;
+  height: 7rem;
+  line-height: 7rem;
+  text-align: center;
+  font-size: 2.5rem;
+}
+
+
+// Card hover shadow
+.shadow-hover:hover{
+  transition: all .3s ease-in-out;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, .25);
+}

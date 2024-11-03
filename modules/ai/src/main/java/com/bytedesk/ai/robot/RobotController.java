@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/robot")
 @RequiredArgsConstructor
 @Tag(name = "robot", description = "robot description")
-public class RobotController extends BaseController<RobotRequest> {
+public class RobotController extends BaseRestController<RobotRequest> {
 
     private final RobotService robotService;
 

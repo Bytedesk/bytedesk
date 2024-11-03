@@ -22,7 +22,7 @@ public class CategoryConsts {
     public static final String CATEGORY_TYPE_AUTOREPLY = "AUTOREPLY";
     public static final String CATEGORY_TYPE_QUICKREPLY = "QUICKREPLY";
     public static final String CATEGORY_TYPE_FAQ = "FAQ";
-    public static final String CATEGORY_TYPE_HELPDOC = "HELPDOC";
+    public static final String CATEGORY_TYPE_HELPCENTER = "HELPCENTER";
     public static final String CATEGORY_TYPE_LLM = "LLM";
     public static final String CATEGORY_TYPE_KEYWORD = "KEYWORD";
     public static final String CATEGORY_TYPE_BLOG = "BLOG";

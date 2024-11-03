@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-26 12:03:53
+ * @LastEditTime: 2024-10-28 14:38:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
 import com.bytedesk.core.config.BytedeskProperties;
@@ -41,6 +42,7 @@ import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.push.email.PushServiceImplEmail;
 import com.bytedesk.core.push.sms.PushServiceImplSms;
+import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
@@ -77,61 +79,70 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
     // 验证码发送间隔阈值（单位：毫秒）
     private static final long VALIDATE_CODE_SEND_INTERVAL = 10 * 60 * 1000; // 10分钟
 
-    public Boolean sendEmailCode(String email, String client, String authType, String platform,
-            HttpServletRequest request) {
+    //String email, String client, String authType, String platform, String orgUid,
+    // public Boolean sendEmailCode(AuthRequest authRequest, HttpServletRequest request) {
+    //     // return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform, orgUid, request);
+    //     return sendCode(TypeConsts.TYPE_EMAIL, authRequest, request);
+    // }
 
-        return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform, request);
-    }
+    // // String mobile, String client, String authType, String platform, String orgUid, 
+    // public Boolean sendSmsCode(AuthRequest authRequest, HttpServletRequest request) {
+    //     // return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, orgUid, request);
+    //     return sendCode(TypeConsts.TYPE_MOBILE, authRequest, request);
+    // }
 
-    public Boolean sendSmsCode(String mobile, String client, String authType,
-            String platform, HttpServletRequest request) {
-
-        return sendCode(mobile, TypeConsts.TYPE_MOBILE, client, authType, platform, request);
-    }
-
-    private Boolean sendCode(String receiver, String type, String client, String authType,
-            String platform,
-            HttpServletRequest request) {
+    // String receiver, String type, String client, String authType, String platform, String orgUid,
+    public Boolean sendCode(AuthRequest authRequest, HttpServletRequest request) {
 
         String ip = ipService.getIp(request);
-
-         // 验证限制同一个ip发送数量、频率
+        String type = authRequest.getType();
+        String receiver = authRequest.getReceiver();
+        String client = authRequest.getClient();
+        String platform = authRequest.getPlatform();
+        String orgUid = authRequest.getOrgUid();
+        // 
+        // 验证限制同一个ip发送数量、频率
         // 检查是否短时间内已发送过验证码
-        if (!canSendValidateCode(ip)) {
+        if (!canSendValidateCode(ip, type)) {
             log.info("验证码发送过于频繁，IP: {}", ip);
             return false;
         }
-
-        // 注册验证码，如果账号已经存在，则直接抛出异常
-        if (authType.equals(AuthTypeEnum.MOBILE_REGISTER.name())) {
-
-            if (type.equals(TypeConsts.TYPE_MOBILE) && userService.existsByMobileAndPlatform(receiver, platform)) {
-                throw new MobileExistsException("mobile already exists");
+        // 
+        if (authRequest.getType().equals(AuthTypeEnum.MOBILE_REGISTER.name())) {
+            // 注册验证码，如果账号已经存在，则直接抛出异常
+            if (authRequest.isMobile() && userService.existsByMobileAndPlatform(receiver, platform)) {
+                throw new MobileExistsException("mobile already exists, please login directly");
             }
-
-            if (type.equals(TypeConsts.TYPE_EMAIL) && userService.existsByEmailAndPlatform(receiver, platform)) {
-                throw new EmailExistsException("email already exists");
+            if (authRequest.isEmail() && userService.existsByEmailAndPlatform(receiver, platform)) {
+                throw new EmailExistsException("email already exists, please login directly");
+            }
+        } else if (authRequest.getType().equals(AuthTypeEnum.EMAIL_RESET.name())) {
+            // 修改邮箱，如果账号已经存在，则直接抛出异常
+            if (authRequest.isEmail() && userService.existsByEmailAndPlatform(receiver, platform)) {
+                throw new EmailExistsException("email already exists, please use another one");
+            }
+        } else if (authRequest.getType().equals(AuthTypeEnum.MOBILE_RESET.name())) {
+            // 修改手机号，如果账号已经存在，则直接抛出异常
+            if (authRequest.isMobile() && userService.existsByMobileAndPlatform(receiver, platform)) {
+                throw new MobileExistsException("mobile already exists, please use another one");
             }
         }
-
         // check if has already send validate code within 15min
         if (existsByStatusAndTypeAndReceiver(PushStatusEnum.PENDING, type, receiver)) {
             return false;
         }
 
         String code = "";
-        if (Utils.isTestMobile(receiver)
-                || Utils.isTestEmail(receiver)
-                || bytedeskProperties.isInWhitelist(receiver)) {
-            code = bytedeskProperties.getMobileCode();
+        if (bytedeskProperties.isInWhitelist(receiver)) {
+            code = bytedeskProperties.getValidateCode();
             log.info("test code: {}", code);
         } else {
             code = Utils.getRandomCode();
         }
 
-        if (type.equals(TypeConsts.TYPE_EMAIL)) {
+        if (authRequest.isEmail()) {
             pushServiceImplEmail.send(receiver, code, request);
-        } else if (type.equals(TypeConsts.TYPE_MOBILE)) {
+        } else if (authRequest.isMobile()) {
             pushServiceImplSms.send(receiver, code, request);
         } else {
             return false;
@@ -148,24 +159,29 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
         pushRequest.setPlatform(platform);
         pushRequest.setIp(ip);
         pushRequest.setIpLocation(ipLocation);
+        pushRequest.setDeviceUid(authRequest.getDeviceUid());
+        if (StringUtils.hasText(authRequest.getUserUid())) {
+            pushRequest.setUserUid(authRequest.getUserUid());
+        }
+        pushRequest.setOrgUid(orgUid);
         create(pushRequest);
 
         // 更新IP最后发送验证码的时间
-        updateIpLastSentTime(ip);
+        updateIpLastSentTime(ip, type);
 
         return true;
     }
 
     // 检查是否可以发送验证码
-    private boolean canSendValidateCode(String ip) {
-        AtomicLong lastSentTime = ipLastSentTimeCache.getOrDefault(ip, new AtomicLong(0));
+    private boolean canSendValidateCode(String ip, String type) {
+        AtomicLong lastSentTime = ipLastSentTimeCache.getOrDefault(ip+":"+type, new AtomicLong(0));
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastSentTime.get()) >= VALIDATE_CODE_SEND_INTERVAL;
     }
 
     // 更新IP最后发送验证码的时间
-    private void updateIpLastSentTime(String ip) {
-        ipLastSentTimeCache.put(ip, new AtomicLong(System.currentTimeMillis()));
+    private void updateIpLastSentTime(String ip, String type) {
+        ipLastSentTimeCache.put(ip+":"+type, new AtomicLong(System.currentTimeMillis()));
     }
 
 
@@ -188,7 +204,8 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
         //
         PushEntity push = modelMapper.map(pushRequest, PushEntity.class);
         push.setUid(uidUtils.getCacheSerialUid());
-        push.setType(TypeConsts.TYPE_SCAN);
+        // push.setType(TypeConsts.TYPE_SCAN);
+        push.setType(AuthTypeEnum.SCAN_LOGIN.name());
         push.setSender(TypeConsts.TYPE_SYSTEM);
         push.setContent(Utils.getRandomCode());
         push.setIp(ip);
@@ -245,17 +262,17 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
         return convertToResponse(savedPush);
     }
 
-    public Boolean validateEmailCode(String email, String code) {
-        return validateCode(email, TypeConsts.TYPE_EMAIL, code);
-    }
+    // public Boolean validateEmailCode(String email, String code) {
+    //     return validateCode(email, code);
+    // }
 
-    public Boolean validateSmsCode(String mobile, String code) {
-        return validateCode(mobile, TypeConsts.TYPE_MOBILE, code);
-    }
+    // public Boolean validateSmsCode(String mobile, String code) {
+    //     return validateCode(mobile, code);
+    // }
 
-    public Boolean validateCode(String receiver, String type, String code) {
+    public Boolean validateCode(String receiver, String code) {
         // check if has already send validate code within 15min
-        Optional<PushEntity> pushOptional = findByStatusAndTypeAndReceiverAndContent(PushStatusEnum.PENDING, type, receiver,
+        Optional<PushEntity> pushOptional = findByStatusAndReceiverAndContent(PushStatusEnum.PENDING, receiver,
                 code);
         if (pushOptional.isPresent()) {
             // pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
@@ -268,9 +285,9 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
 
     // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result
     // == null")
-    public Optional<PushEntity> findByStatusAndTypeAndReceiverAndContent(PushStatusEnum status, String type, String receiver,
+    public Optional<PushEntity> findByStatusAndReceiverAndContent(PushStatusEnum status, String receiver,
             String content) {
-        return pushRepository.findByStatusAndTypeAndReceiverAndContent(status.name(), type, receiver, content);
+        return pushRepository.findByStatusAndReceiverAndContent(status.name(), receiver, content);
     }
 
     public Optional<PushEntity> findByDeviceUid(String deviceUid) {
@@ -312,7 +329,8 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
             // log.info("autoOutdateCode diffInMinutes {} {}", push.getContent(), diffInMinutes);
             //
-            if (push.getType().equals(TypeConsts.TYPE_SCAN)) {
+            // if (push.getType().equals(TypeConsts.TYPE_SCAN)) {
+            if (push.getType().equals(AuthTypeEnum.SCAN_LOGIN.name())) {
                 // log.info("autoOutdateCode scan TypeConsts.TYPE_SCAN");
                 // 扫码有效时间3分钟
                 if (diffInMinutes > 3) {

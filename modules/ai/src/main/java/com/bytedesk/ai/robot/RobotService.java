@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 22:11:06
+ * @LastEditTime: 2024-10-29 23:09:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -112,9 +112,9 @@ public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotRe
     @Override
     public RobotResponse create(RobotRequest request) {
 
-        if (existsByNicknameAndOrgUidAndDeleted(request.getNickname(), request.getOrgUid())) {
-            throw new RuntimeException("robot name already exists, please find another name");
-        }
+        // if (existsByNicknameAndOrgUidAndDeleted(request.getNickname(), request.getOrgUid())) {
+        //     throw new RuntimeException("robot name already exists, please find another name");
+        // }
         //
         // Kb kb = kbService.getKb(request.getNickname(), request.getOrgUid());
         RobotLlm llm = RobotLlm.builder().build();
@@ -149,7 +149,7 @@ public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotRe
                 }
             }
         } else {
-            log.info("robot faquids is null");
+            log.info("robot faq uids is null");
         }
 
         if (request.getServiceSettings() != null
@@ -403,9 +403,9 @@ public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotRe
         return modelMapper.map(entity, RobotResponse.class);
     }
 
-    private Boolean existsByNicknameAndOrgUidAndDeleted(String name, String orgUid) {
-        return robotRepository.existsByNicknameAndOrgUidAndDeleted(name, orgUid, false);
-    }
+    // private Boolean existsByNicknameAndOrgUidAndDeleted(String name, String orgUid) {
+    //     return robotRepository.existsByNicknameAndOrgUidAndDeleted(name, orgUid, false);
+    // }
 
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
         List<String> faqUids = Arrays.asList(
@@ -425,11 +425,12 @@ public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotRe
         return create(robotRequest);
     }
 
-    public RobotResponse createDefaultAgentAssistantRobot(String orgUid) {
+    public RobotResponse createDefaultAgentAssistantRobot(String orgUid, String uid) {
         //
         RobotRequest robotRequest = RobotRequest.builder()
                 .nickname(I18Consts.I18N_ROBOT_AGENT_ASSISTANT_NICKNAME)
                 .build();
+        robotRequest.setUid(uid);
         // robotRequest.setType(RobotTypeEnum.AGENT_ASSISTANT.name());
         robotRequest.setType(RobotTypeEnum.KB.name());
         robotRequest.setOrgUid(orgUid);
@@ -463,14 +464,14 @@ public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotRe
     }
 
     public void initData() {
-
-        if (robotRepository.count() > 0) {
-            return;
-        }
         //
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        createDefaultRobot(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
-        createDefaultAgentAssistantRobot(orgUid);
+        if (!existsByUid(BytedeskConsts.DEFAULT_ROBOT_UID)) {
+            createDefaultRobot(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
+        }
+        if (!existsByUid(BytedeskConsts.DEFAULT_AGENT_ASSISTANT_UID)) {
+            createDefaultAgentAssistantRobot(orgUid, BytedeskConsts.DEFAULT_AGENT_ASSISTANT_UID);
+        }
         //
         Map<String, ProviderJson> providerJsonMap = robotJsonService.loadProviders();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {

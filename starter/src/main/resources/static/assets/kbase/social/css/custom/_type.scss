@@ -1,0 +1,63 @@
+// 
+// type.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+//
+
+//
+// Emphasis
+//
+small,
+.small{
+  font-weight: $font-weight-light;
+}
+.smaller{
+  font-size: 60%;
+  font-weight: $font-weight-normal;
+}
+
+// dropcap
+.dropcap{
+  font-size: 4em;
+  font-weight: bold;
+  display: block;
+  float: left;
+  margin: .04em .2em 0 0;
+  color: $headings-color;
+  line-height: 1;
+}
+
+// Background overlay. Use with bootstrap bg colors and bg opacity classes like this >> bg-overlay bg-dark bg-opacity-10
+.bg-overlay{
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+//
+// blockquote
+//
+.blockquote{
+  position: relative;
+  padding-left: 80px;
+  &:before{
+    content: '"';
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 8rem;
+    line-height: 0.8em;
+    font-weight: $font-weight-bold;
+    color: var(--bs-primary);
+  }
+}
+.blockquote-footer{
+  margin-top: 12px;
+  padding-left: 80px;
+}

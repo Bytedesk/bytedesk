@@ -18,11 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 
 @RestController
 @RequestMapping("/api/v1/counter")
-public class CounterController extends BaseController<CounterRequest> {
+public class CounterController extends BaseRestController<CounterRequest> {
 
     @Override
     public ResponseEntity<?> queryByOrg(CounterRequest request) {

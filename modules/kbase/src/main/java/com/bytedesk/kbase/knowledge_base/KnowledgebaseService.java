@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:17:37
+ * @LastEditTime: 2024-10-30 15:57:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,10 +29,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.article.ArticleRequest;
+import com.bytedesk.kbase.article.ArticleResponse;
+import com.bytedesk.kbase.article.ArticleService;
 
 import lombok.AllArgsConstructor;
 
@@ -44,6 +51,10 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final CategoryService categoryService;
+
+    private final ArticleService articleService;
 
     @Override
     public Page<KnowledgebaseResponse> queryByOrg(KnowledgebaseRequest request) {
@@ -64,6 +75,7 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(value = "kb", key = "#uid", unless = "#result==null")
     @Override
     public Optional<KnowledgebaseEntity> findByUid(String uid) {
         return knowledgebaseRepository.findByUid(uid);
@@ -80,7 +92,9 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
         }
         entity.setName(request.getName());
         entity.setType(KnowledgebaseTypeEnum.fromValue(request.getType()).name());
+        entity.setHeadline(request.getHeadline());
         entity.setDescriptionHtml(request.getDescriptionHtml());
+        entity.setFooterHtml(request.getFooterHtml());
         entity.setEmbedding(request.getEmbedding());
         entity.setLanguage(request.getLanguage());
         entity.setLevel(request.getLevel());
@@ -103,7 +117,9 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
             KnowledgebaseEntity entity = optional.get();
             entity.setName(request.getName());
             // entity.setType(KownledgebaseTypeEnum.fromValue(request.getType()));
+            entity.setHeadline(request.getHeadline());
             entity.setDescriptionHtml(request.getDescriptionHtml());
+            entity.setFooterHtml(request.getFooterHtml());
             entity.setEmbedding(request.getEmbedding());
             entity.setLanguage(request.getLanguage());
             //
@@ -112,7 +128,6 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
             throw new RuntimeException("knowledge_base not found");
         }
     }
-
 
     public List<KnowledgebaseEntity> findByLevelAndType(LevelEnum level, KnowledgebaseTypeEnum type) {
         return knowledgebaseRepository.findByLevelAndTypeAndDeleted(level.name(), type.name(), false);
@@ -162,6 +177,41 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
         return modelMapper.map(entity, KnowledgebaseResponse.class);
     }
 
+    public Page<CategoryResponse> getCategories(KnowledgebaseEntity knowledgebaseEntity) {
+        // 
+        CategoryRequest categoryRequest = new CategoryRequest();
+        categoryRequest.setPageNumber(0);
+        categoryRequest.setPageSize(50);
+        categoryRequest.setType(KnowledgebaseTypeEnum.HELPCENTER.name());
+        categoryRequest.setKbUid(knowledgebaseEntity.getUid());
+        categoryRequest.setOrgUid(knowledgebaseEntity.getOrgUid());
+        // 
+        return categoryService.queryByOrg(categoryRequest);
+    }
+
+    public Page<ArticleResponse> getArticles(KnowledgebaseEntity knowledgebaseEntity) {
+        // 
+        ArticleRequest articleRequest = new ArticleRequest();
+        articleRequest.setPageNumber(0);
+        articleRequest.setPageSize(50);
+        articleRequest.setKbUid(knowledgebaseEntity.getUid());
+        articleRequest.setOrgUid(knowledgebaseEntity.getOrgUid());
+        // 
+        return articleService.queryByOrg(articleRequest);
+    }
+    
+    public Page<ArticleResponse> getArticlesByCategory(KnowledgebaseEntity knowledgebaseEntity, String categoryUid) {
+        // 
+        ArticleRequest articleRequest = new ArticleRequest();
+        articleRequest.setPageNumber(0);
+        articleRequest.setPageSize(50);
+        articleRequest.setCategoryUid(categoryUid);
+        articleRequest.setKbUid(knowledgebaseEntity.getUid());
+        articleRequest.setOrgUid(knowledgebaseEntity.getOrgUid());
+        // 
+        return articleService.queryByOrg(articleRequest);
+    }
+
     public void initData() {
 
         if (knowledgebaseRepository.count() > 0) {
@@ -169,26 +219,26 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
         }
         //
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        KnowledgebaseRequest kownledgebaseRequeqstQuickReplyPlatform = KnowledgebaseRequest.builder()
+        KnowledgebaseRequest kownledgebaseRequestQuickReplyPlatform = KnowledgebaseRequest.builder()
                 .name(KnowledgebaseConsts.KB_PLATFORM_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .level(LevelEnum.PLATFORM.name())
                 .build();
-        kownledgebaseRequeqstQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_UID);
-        kownledgebaseRequeqstQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
+        kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
         // 方便超级管理员加载，避免重新写一个接口拉取
-        kownledgebaseRequeqstQuickReplyPlatform.setOrgUid(orgUid);
-        create(kownledgebaseRequeqstQuickReplyPlatform);
+        kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
+        create(kownledgebaseRequestQuickReplyPlatform);
         
-        ////////////////////////////////////////////////////////////
         //
         KnowledgebaseRequest kownledgebaseRequestHelpdoc = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_HELPDOC_NAME)
+                .name(KnowledgebaseConsts.KB_HELPCENTER_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestHelpdoc.setType(KnowledgebaseTypeEnum.HELPDOC.name());
+        kownledgebaseRequestHelpdoc.setUid(BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
+        kownledgebaseRequestHelpdoc.setType(KnowledgebaseTypeEnum.HELPCENTER.name());
         kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
         //
@@ -210,32 +260,32 @@ public class KnowledgebaseService extends BaseService<KnowledgebaseEntity, Knowl
         kownledgebaseRequestKeyword.setOrgUid(orgUid);
         create(kownledgebaseRequestKeyword);
         // 
-        KnowledgebaseRequest kownledgebaseRequeqstFaq = KnowledgebaseRequest.builder()
+        KnowledgebaseRequest kownledgebaseRequestFaq = KnowledgebaseRequest.builder()
                 .name(KnowledgebaseConsts.KB_FAQ_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequeqstFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
-        kownledgebaseRequeqstFaq.setOrgUid(orgUid);
-        create(kownledgebaseRequeqstFaq);
+        kownledgebaseRequestFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
+        kownledgebaseRequestFaq.setOrgUid(orgUid);
+        create(kownledgebaseRequestFaq);
         //
-        KnowledgebaseRequest kownledgebaseRequeqstAutoReply = KnowledgebaseRequest.builder()
+        KnowledgebaseRequest kownledgebaseRequestAutoReply = KnowledgebaseRequest.builder()
                 .name(KnowledgebaseConsts.KB_AUTOREPLY_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequeqstAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
-        kownledgebaseRequeqstAutoReply.setOrgUid(orgUid);
-        create(kownledgebaseRequeqstAutoReply);
+        kownledgebaseRequestAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
+        kownledgebaseRequestAutoReply.setOrgUid(orgUid);
+        create(kownledgebaseRequestAutoReply);
         //
-        KnowledgebaseRequest kownledgebaseRequeqstQuickReply = KnowledgebaseRequest.builder()
+        KnowledgebaseRequest kownledgebaseRequestQuickReply = KnowledgebaseRequest.builder()
                 .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequeqstQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
-        kownledgebaseRequeqstQuickReply.setOrgUid(orgUid);
-        create(kownledgebaseRequeqstQuickReply);
+        kownledgebaseRequestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequestQuickReply.setOrgUid(orgUid);
+        create(kownledgebaseRequestQuickReply);
         //
         KnowledgebaseRequest kownledgebaseRequestTaboo = KnowledgebaseRequest.builder()
                 .name(KnowledgebaseConsts.KB_TABOO_NAME)

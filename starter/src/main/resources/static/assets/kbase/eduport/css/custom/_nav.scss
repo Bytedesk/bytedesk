@@ -1,0 +1,142 @@
+// 
+// nav.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+// 
+
+// Pills
+.nav-pills {
+  .nav-link {
+    cursor: pointer;
+    margin-bottom: 15px;
+    padding: 0.5rem 1rem;
+  }
+}
+
+// nav
+.nav.flex-column:not(.nav-pills) .nav-link {
+  padding-left: 0;
+  padding-top: 0.30rem;
+  padding-bottom: 0.30rem;
+}
+
+// nav divider
+.nav.nav-divider{
+  a:not(.dropdown-item){
+    color: inherit;
+  }
+  .nav-item+.nav-item:before{
+    content: "\2022";
+    color: inherit;
+    padding-left: .65rem;
+    padding-right: .75rem;
+    opacity: 0.8;
+  }
+  .nav-item{
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .nav-link{
+    padding: 0;
+    color: inherit;
+  }
+}
+
+//Nav pill primary soft
+.nav-pill-soft .nav-link {
+  background-color: rgba(var(--#{$prefix}primary-rgb), 0.1);
+  color: var(--#{$prefix}primary);
+  border: none;
+}
+.nav-pill-soft .nav-link.active, .nav-pill-soft .show > .nav-link {
+  color: var(--#{$prefix}white) !important;
+  background-color: var(--#{$prefix}primary);
+}
+
+//Nav pill dark soft
+.nav-pill-dark-soft .nav-link {
+  background-color: var(--#{$prefix}gray-200);
+  color: var(--#{$prefix}gray-800);
+  border: none;
+}
+.nav-pill-dark-soft .nav-link.active, .nav-pill-dark-soft .show > .nav-link {
+  color: var(--#{$prefix}gray-200);
+  background-color: var(--#{$prefix}gray-800);
+}
+
+//Nav pill bg soft
+.nav-pills-bg-soft{
+  background-color: rgba(var(--#{$prefix}primary-rgb), 0.1);
+  padding: 0.625rem 0;
+  border-radius: 0.625rem;
+}
+.nav-pills-bg-soft .nav-link{
+  color: var(--#{$prefix}primary);
+}
+
+// tab line
+.nav-pills.nav-tabs-line { 
+  padding: 0.625rem 0;
+  .nav-link {
+    border: transparent;
+    color: var(--#{$prefix}primary);
+  }
+  .nav-link.active {
+      color: var(--#{$prefix}primary);
+      background-color: rgba(var(--#{$prefix}primary-rgb), 0.1);
+    }
+  .nav-item {
+    margin-bottom: -2px;
+  }
+}
+
+// Nav bottom line
+.nav.nav-bottom-line{
+  .nav-link{
+    border: transparent;
+    font-weight: 600;
+    padding: ($nav-link-padding-y * 3) ($nav-link-padding-x * 1.3);
+  }
+  .nav-item:first-child .nav-link{
+    padding-left: 0;
+  }
+  .nav-link{
+    background: transparent;
+    border-bottom: 3px solid transparent;
+    &.active {
+      background: transparent;
+      color: var(--#{$prefix}primary);
+      border-bottom: 3px solid var(--#{$prefix}primary);
+    }
+  }
+  .nav-item{
+    margin-bottom: -2px;
+  }
+}
+
+//Nav tabs shadow
+.nav-tabs-bg-dark{
+  border-radius: $border-radius-lg;
+  background-color: var(--#{$prefix}dark);
+  padding: 1.5rem;
+}
+.nav-tabs-bg-dark .nav-link {
+  color: var(--#{$prefix}white);
+  border-radius: $border-radius-lg;
+  padding: 0.825rem;
+  margin-bottom: 5px;
+}
+.nav-tabs-bg-dark .nav-link.active, .nav-tabs-bg-dark .show > .nav-link {
+  color: var(--#{$prefix}dark) !important;
+  background-color: var(--#{$prefix}white);
+  border-radius: $border-radius;
+}
+
+
+
+
+
+

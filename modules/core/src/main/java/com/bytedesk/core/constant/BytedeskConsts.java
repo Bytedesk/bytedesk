@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 13:32:50
+ * @LastEditTime: 2024-10-30 15:59:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,8 +38,10 @@ public class BytedeskConsts {
     public static final String DEFAULT_WORKGROUP_UID = "df_wg_uid";
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid";
     public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid";
+    public static final String DEFAULT_AGENT_ASSISTANT_UID = "df_as_uid";
     public static final String DEFAULT_SYSTEM_UID = "df_sys_uid";
-    public static final String DEFAULT_KB_UID = "df_kb_uid";
+    public static final String DEFAULT_KB_QUICKREPLY_UID = "df_kb_uid";
+    public static final String DEFAULT_KB_HELPCENTER_UID = "df_hc_uid";
     public static final String DEFAULT_DY_UID = "df_dy_uid";
     // 
     public static final String ACTION_LOGIN_USERNAME = "loginWithUsernamePassword";

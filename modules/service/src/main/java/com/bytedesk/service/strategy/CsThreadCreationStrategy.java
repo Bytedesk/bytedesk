@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:57:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-29 22:25:57
+ * @LastEditTime: 2024-10-28 17:47:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,4 @@ import com.bytedesk.service.visitor.VisitorRequest;
 public interface CsThreadCreationStrategy {
     
     MessageProtobuf createCsThread(VisitorRequest visitorRequest);
-
-    
 }

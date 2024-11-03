@@ -1,0 +1,22 @@
+// 
+// list-group.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+// 
+
+// list group borderless
+.list-group-borderless {
+  .list-group-item {
+    border: none;
+    padding: 0.425rem 0;
+  }
+  a.list-group-item {
+    &:hover {
+      background-color: transparent;
+      color: var(--bs-primary);
+    }
+  }
+}

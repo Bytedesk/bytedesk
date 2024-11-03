@@ -1,0 +1,10 @@
+// 
+// Data overlayscrollbars
+// Vendor css override and new css added
+
+
+// Scrollbar color
+.os-theme-dark>.os-scrollbar>.os-scrollbar-track>.os-scrollbar-handle, 
+.os-theme-dark>.os-scrollbar:hover>.os-scrollbar-track>.os-scrollbar-handle{
+  background: rgba(var(--#{$prefix}secondary-rgb), 0.15);
+}

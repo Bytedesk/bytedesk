@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:37:47
+ * @LastEditTime: 2024-10-30 14:42:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,10 +56,8 @@ public class KnowledgebaseEntity extends BaseEntity {
     private String name;
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
     @Column(name = "kb_type", nullable = false)
-    // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
-    private String type = KnowledgebaseTypeEnum.HELPDOC.name();
+    private String type = KnowledgebaseTypeEnum.HELPCENTER.name();
 
     // headline标头
     @Builder.Default
@@ -67,7 +65,8 @@ public class KnowledgebaseEntity extends BaseEntity {
 
     // 自定义副标题
     @Builder.Default
-    private String subheadline = KnowledgebaseConsts.SUB_HEADLINE;
+    @Column(name = "sub_headline")
+    private String subHeadline = KnowledgebaseConsts.SUB_HEADLINE;
 
     // 自定义网址
     @Builder.Default
@@ -82,6 +81,9 @@ public class KnowledgebaseEntity extends BaseEntity {
     // 主题色
     @Builder.Default
     private String primaryColor = BytedeskConsts.EMPTY_STRING;
+
+    @Builder.Default
+    private String theme = KnowledgebaseThemeEnum.DEFAULT.name();
 
     /**
      * 知识库描述
@@ -108,21 +110,15 @@ public class KnowledgebaseEntity extends BaseEntity {
     private String css = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
-    private String embedding = KnowledgebaseConsts.KB_EMBEDING;
+    private String embedding = KnowledgebaseConsts.KB_EMBEDDING;
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private LanguageEnum language = LanguageEnum.ZH_CN;
     private String language = LanguageEnum.ZH_CN.name();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private LevelEnum level = LevelEnum.ORGANIZATION;
     private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
     private String platform = PlatformEnum.BYTEDESK.name();
 
     // @Builder.Default
@@ -135,8 +131,15 @@ public class KnowledgebaseEntity extends BaseEntity {
     private List<String> tags = new ArrayList<>();
 
     @Builder.Default
+    private boolean showChat = false;
+
+    @Builder.Default
     private boolean published = true;
 
     // 某人工客服快捷回复知识库
     private String agentUid;
+
+    public String getTheme() {
+        return this.theme.toLowerCase();
+    }
 }

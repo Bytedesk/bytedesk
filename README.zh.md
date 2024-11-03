@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 09:45:39
+ * @LastEditTime: 2024-10-29 12:52:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -141,6 +141,10 @@
 - <img src="./images/wechat_group.jpg" width="200">
 - 如群二维码过期，请添加微信，备注: 微语
 - <img src="./images/wechat.png" width="100">
+- 服务号
+- <img src="./images/wechat_mp.jpg" width="100">
+- 订阅号
+- <img src="./images/wechatai_mp.jpg" width="100">
 
 ## [写在前面](https://www.weiyuai.cn/)
 

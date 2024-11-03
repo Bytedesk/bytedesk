@@ -31,7 +31,7 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.message_unread.MessageUnreadService;
 // import com.bytedesk.core.socket.MqService;
 import com.bytedesk.core.utils.DateUtils;
@@ -48,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/message")
-public class MessageController extends BaseController<MessageRequest> {
+public class MessageController extends BaseRestController<MessageRequest> {
 
     private final MessageService messageService;
 

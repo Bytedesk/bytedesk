@@ -14,6 +14,8 @@
  */
 package com.bytedesk.core.notice;
 
-public class NoticeSpecification {
+import com.bytedesk.core.base.BaseSpecification;
+
+public class NoticeSpecification extends BaseSpecification {
     
 }

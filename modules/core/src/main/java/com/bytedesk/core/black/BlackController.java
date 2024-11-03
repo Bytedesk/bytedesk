@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/black")
 @AllArgsConstructor
-public class BlackController extends BaseController<BlackRequest> {
+public class BlackController extends BaseRestController<BlackRequest> {
 
     private final BlackService blackService;
 

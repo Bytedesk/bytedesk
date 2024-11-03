@@ -14,6 +14,44 @@
  */
 package com.bytedesk.core.notice;
 
-public class NoticeController {
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bytedesk.core.base.BaseRestController;
+
+@RestController
+@RequestMapping("/api/v1/notice")
+public class NoticeController extends BaseRestController<NoticeRequest> {
+
+    @Override
+    public ResponseEntity<?> queryByOrg(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUser(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public ResponseEntity<?> create(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public ResponseEntity<?> update(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public ResponseEntity<?> delete(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
     
 }

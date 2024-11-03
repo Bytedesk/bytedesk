@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 14:45:51
+ * @LastEditTime: 2024-11-01 17:32:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,8 +58,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
 
     private final IRouteService routeService;
 
-    // private final ThreadStateService threadStateService;
-
     private final IMessageSendService messageSendService;
 
     private final CounterService counterService;
@@ -111,15 +109,11 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 // 转机器人
                 // 将robot设置为agent
                 RobotEntity robot = workgroup.getServiceSettings().getRobot();
-                MessageProtobuf messageProtobuf = routeService.routeRobot(visitorRequest, thread, robot);
-                // threadStateService.autoAccept(thread);
-                return messageProtobuf;
+                return routeService.routeRobot(visitorRequest, thread, robot);
             }
         }
         // 
-        MessageProtobuf messageProtobuf = routeService.routeWorkgroup(visitorRequest, thread, workgroup);
-        // threadStateService.autoAccept(thread);
-        return messageProtobuf;
+        return routeService.routeWorkgroup(visitorRequest, thread, workgroup);
     }
 
     // Q-原样返回会话
@@ -129,9 +123,11 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         log.info("getWorkgroupProcessingMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
-        // 广播消息，由消息通道统一处理
-        messageSendService.sendProtobufMessage(messageProtobuf);
-
+        // 微信公众号等渠道不能重复推送”继续会话“消息
+        if (!visitorRequest.isWeChat()) {
+            // 广播消息，由消息通道统一处理
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        }
         return messageProtobuf;
     }
 

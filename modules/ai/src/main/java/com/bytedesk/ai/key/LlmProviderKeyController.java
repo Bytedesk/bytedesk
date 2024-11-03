@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/ai/key")
 @AllArgsConstructor
-public class LlmProviderKeyController extends BaseController<LlmProviderKeyRequest> {
+public class LlmProviderKeyController extends BaseRestController<LlmProviderKeyRequest> {
 
     private final LlmProviderKeyService service;
 

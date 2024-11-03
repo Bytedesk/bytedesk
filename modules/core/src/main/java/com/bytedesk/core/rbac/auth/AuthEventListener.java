@@ -61,7 +61,7 @@ public class AuthEventListener {
             contentObject.put(I18Consts.I18N_NOTICE_TITLE, action.getTitle());
             contentObject.put(I18Consts.I18N_NOTICE_CONTENT, action.getAction());
             contentObject.put(I18Consts.I18N_NOTICE_IP, action.getIp());
-            contentObject.put(I18Consts.I18N_NOTICE_IPLOCATION, action.getIpLocation());
+            contentObject.put(I18Consts.I18N_NOTICE_IP_LOCATION, action.getIpLocation());
             // 
             MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), user.getUid(), user.getOrgUid(),
                     JSON.toJSONString(contentObject));

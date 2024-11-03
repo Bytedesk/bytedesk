@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 17:07:55
+ * @LastEditTime: 2024-11-01 21:03:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.service.visitor;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 
@@ -71,6 +72,12 @@ public class VisitorRequest extends BaseRequest {
 
 	@Builder.Default
 	private String status = VisitorStatusEnum.ONLINE.name();
+
+	// wechat mp extra
+	private String threadExtra;
+	public Boolean isWeChat() {
+		return this.client.contains(ClientEnum.WECHAT.name());
+	}
 
 	public ThreadTypeEnum formatType() {
 		int typeInt;

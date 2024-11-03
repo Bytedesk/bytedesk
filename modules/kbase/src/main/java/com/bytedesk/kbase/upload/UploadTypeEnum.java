@@ -16,7 +16,7 @@ package com.bytedesk.kbase.upload;
 
 public enum UploadTypeEnum {
     ASSISTANT, // 文档助手，内部文档知识库问答
-    HELPDOC, // 帮助文档
+    HELPCENTER, // 帮助文档
     LLM, // 大模型
     KEYWORD, // 关键词
     FAQ, // 常见问题

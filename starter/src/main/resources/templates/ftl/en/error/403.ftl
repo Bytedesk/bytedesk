@@ -67,7 +67,7 @@
         <!-- 返回顶部 -->
         <#include "../../common/template/gotop.ftl"/>
 
-        <!--萝卜丝·智能客服代码 -->
+        <!--微语·智能客服代码 -->
         <#include "../common/template/bytedesk.ftl"/>
 
         <#--  网站统计代码  -->
