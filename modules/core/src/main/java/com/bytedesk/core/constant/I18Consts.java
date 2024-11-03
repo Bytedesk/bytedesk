@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 14:35:33
+ * @LastEditTime: 2024-10-30 12:23:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -95,7 +95,7 @@ public class I18Consts {
     public static final String I18N_QUICK_REPLY_BYE_CONTENT = I18N_PREFIX + "bye.content";//
     //
     public static final String I18N_VIP_REST_API = I18N_PREFIX + "vip.api";
-    // userd for init organization
+    // used for init organization
     public static final String I18N_FAQ_CATEGORY_DEMO_1 = I18N_PREFIX + "faq.category.demo.1";
     public static final String I18N_FAQ_CATEGORY_DEMO_2 = I18N_PREFIX + "faq.category.demo.2";
     //
@@ -116,7 +116,7 @@ public class I18Consts {
     public static final String I18N_NOTICE_TYPE = I18N_PREFIX + "notice.type";
     public static final String I18N_NOTICE_CONTENT = I18N_PREFIX + "notice.content";
     public static final String I18N_NOTICE_IP = I18N_PREFIX + "notice.ip";
-    public static final String I18N_NOTICE_IPLOCATION = I18N_PREFIX + "notice.ipLocation";
+    public static final String I18N_NOTICE_IP_LOCATION = I18N_PREFIX + "notice.ipLocation";
     public static final String I18N_NOTICE_URL = I18N_PREFIX + "notice.url";
     public static final String I18N_NOTICE_EXTRA = I18N_PREFIX + "notice.extra";
     // 

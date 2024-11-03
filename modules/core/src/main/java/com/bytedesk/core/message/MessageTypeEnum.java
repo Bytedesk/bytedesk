@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 18:15:48
+ * @LastEditTime: 2024-11-02 10:25:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ public enum MessageTypeEnum {
     VIDEO,
     MUSIC,
     LOCATION,
+    LINK,
     GOODS, // 商品
     CARD,
     EVENT, // 事件：离线、上线等

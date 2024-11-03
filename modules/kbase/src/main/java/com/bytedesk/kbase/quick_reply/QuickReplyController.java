@@ -28,7 +28,7 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/quickreply")
 @AllArgsConstructor
-public class QuickReplyController extends BaseController<QuickReplyRequest> {
+public class QuickReplyController extends BaseRestController<QuickReplyRequest> {
 
     private final QuickReplyService quickReplyService;
 

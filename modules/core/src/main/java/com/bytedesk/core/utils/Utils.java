@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 10:22:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-09 16:21:46
+ * @LastEditTime: 2024-10-28 16:12:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,7 +68,7 @@ public class Utils {
      * @return
      */
     public static boolean isTestMobile(String mobile) {
-        return mobile.startsWith("12345678");
+        return mobile.startsWith("123");
     }
 
     public static boolean isTestEmail(String email) {

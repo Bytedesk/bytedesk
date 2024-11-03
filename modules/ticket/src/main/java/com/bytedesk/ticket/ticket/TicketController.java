@@ -18,11 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 
 @RestController
 @RequestMapping("/api/v1/ticket")
-public class TicketController extends BaseController<TicketRequest> {
+public class TicketController extends BaseRestController<TicketRequest> {
 
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {

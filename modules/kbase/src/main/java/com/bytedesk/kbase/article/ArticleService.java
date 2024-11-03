@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:15:56
+ * @LastEditTime: 2024-10-29 16:49:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,8 +46,6 @@ public class ArticleService extends BaseService<ArticleEntity, ArticleRequest, A
     private final UidUtils uidUtils;
 
     private final AuthService authService;
-
-    // private final CategoryService categoryService;
 
     @Override
     public Page<ArticleResponse> queryByOrg(ArticleRequest request) {
@@ -161,7 +159,9 @@ public class ArticleService extends BaseService<ArticleEntity, ArticleRequest, A
 
     @Override
     public ArticleResponse convertToResponse(ArticleEntity entity) {
-        return modelMapper.map(entity, ArticleResponse.class);
+        ArticleResponse articleResponse = modelMapper.map(entity, ArticleResponse.class);
+        articleResponse.setUser(JSON.parseObject(entity.getUser(), UserProtobuf.class));
+        return articleResponse;
     }
 
 }

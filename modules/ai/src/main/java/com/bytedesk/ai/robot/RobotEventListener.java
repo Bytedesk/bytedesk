@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 18:06:58
+ * @LastEditTime: 2024-10-29 22:32:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,8 +80,8 @@ public class RobotEventListener {
         String orgUid = organization.getUid();
         log.info("robot - organization created: {}", organization.getName());
         //
-        robotService.createDefaultRobot(orgUid, uidUtils.getCacheSerialUid());
-        robotService.createDefaultAgentAssistantRobot(orgUid);
+        robotService.createDefaultRobot(orgUid, uidUtils.getUid());
+        robotService.createDefaultAgentAssistantRobot(orgUid, uidUtils.getUid());
     }
 
     @EventListener
@@ -246,11 +246,11 @@ public class RobotEventListener {
         // MessageUtils.notifyUser(clonedMessage);
         messageSendService.sendProtobufMessage(clonedMessage);
         // 知识库
-        if (bytedeskProperties.getJavaai()) {
+        if (bytedeskProperties.getJavaAi()) {
             zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);
         }
         // 通知python ai模块处理回答
-        if (bytedeskProperties.getPythonai()) {
+        if (bytedeskProperties.getPythonAi()) {
             messageCache.put(messageUid, message);
             redisPubsubService.sendQuestionMessage(messageUid, threadTopic, robot.getKbUid(),
                     query);

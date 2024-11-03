@@ -69,7 +69,7 @@ public class KeywordService extends BaseService<KeywordEntity, KeywordRequest, K
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "keyword", key = "#uid")
+    @Cacheable(value = "keyword", key = "#uid", unless = "#result==null")
     @Override
     public Optional<KeywordEntity> findByUid(String uid) {
         return keywordRepository.findByUid(uid);

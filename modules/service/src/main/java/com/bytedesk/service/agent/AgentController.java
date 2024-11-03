@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/agent")
-public class AgentController extends BaseController<AgentRequest> {
+public class AgentController extends BaseRestController<AgentRequest> {
 
     private final AgentService agentService;
 

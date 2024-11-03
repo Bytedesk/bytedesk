@@ -18,11 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 
 @RestController
 @RequestMapping("/api/v1/counter_visitor")
-public class CounterVisitorController extends BaseController<CounterVisitorRequest> {
+public class CounterVisitorController extends BaseRestController<CounterVisitorRequest> {
 
     
     

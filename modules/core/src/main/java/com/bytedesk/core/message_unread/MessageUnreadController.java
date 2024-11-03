@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/message_unread")
 @AllArgsConstructor
-public class MessageUnreadController extends BaseController<MessageUnreadRequest> {
+public class MessageUnreadController extends BaseRestController<MessageUnreadRequest> {
 
     private final MessageUnreadService messageUnreadService;
 

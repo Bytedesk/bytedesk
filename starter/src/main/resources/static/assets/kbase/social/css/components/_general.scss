@@ -1,0 +1,409 @@
+// 
+// general.scss
+// Theme general elements and helper styling
+
+// Bg white and dark according to theme mode
+.bg-mode{
+  background: $white;
+}
+
+// Filter
+.grayscale{
+  filter: grayscale(100%);
+  transition: all .6s ease;
+  &:hover {
+    filter: none;
+    -webkit-filter: grayscale(0%);
+  }
+}
+
+// Fixed width icon
+.fw-icon{
+  text-align: center;
+  width: 1.25em;
+  display: inline-block;
+}
+.icon-xs{
+  height: 1.5rem;
+  width: 1.5rem;
+  font-size: 0.6em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-sm{
+  height: 2rem;
+  width: 2rem;
+  font-size: 0.7em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-md {
+  height: 2.5rem;
+  width: 2.5rem;
+  font-size: 0.9em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-lg{
+  height: 3rem;
+  width: 3rem;
+  font-size: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-xl{
+  height: 4rem;
+  width: 4rem;
+  font-size: 1.6em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-xxl{
+  height: 5.125rem;
+  width: 5.125rem;
+  font-size: 2em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// GLightbox and plyr controls theme
+.plyr__control--overlaid, 
+.plyr--video .plyr__control.plyr__tab-focus, 
+.plyr--video .plyr__control:hover, 
+.plyr--video .plyr__control[aria-expanded=true]{
+  background: var(--bs-primary);
+}
+.plyr--full-ui input[type=range]{
+  color: var(--bs-primary);
+}
+
+/* rtl:raw:
+.glightbox-clean .gclose, .glightbox-modern .gclose{
+  right: auto !important;
+  left: 20px;
+}
+*/
+
+// password strength meter
+.password-strength-meter{
+  background-color: $input-group-addon-bg !important;
+}
+
+.glightbox-clean .gslide-description {
+  background: $white;
+}
+
+// Plyr controls none
+.plyr__controls-none{
+  .plyr__controls {
+    display: none;
+  }
+  .plyr--video {
+    border-radius: 20px;
+  }
+} 
+
+// Search
+.nav-search .dropdown-menu{
+  top: 120%;
+  visibility: hidden;
+  opacity: 0;
+  display: block;
+  transition: $transition-base;
+  width: 300px;
+  left: auto;
+  right: 0;
+}
+.nav-search .dropdown-menu.show{
+  top: 100%;
+  visibility: visible;
+  opacity: 1;
+}
+@include media-breakpoint-down(sm) {
+  .nav-search .dropdown-menu{
+    width: 100%;
+  }
+}
+
+// To flip element in RTL
+/* rtl:raw:
+  .rtl-flip {
+    transform: scaleX(-1);
+  }
+  .rtl-flip.bi:before{
+    transform: inherit;
+  }
+*/
+
+// pre loader
+.preloader {
+  background-color: $white;
+  position: fixed;
+  z-index: 1190;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  .preloader-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+  }
+}
+
+// nested comment
+
+.comment-wrap {
+  .comment-item {
+    position: relative;
+    .avatar {
+      position: relative;
+      z-index: 1;
+    }
+    &:last-child {
+			.comment-line-inner {
+				background: var(--bs-light);
+				height: 20px;
+			}
+		}
+  }
+  .comment-item-nested {
+    padding-left: 2.75rem;
+  }
+	& > .comment-item {
+		.comment-line-inner {
+			position: absolute;
+			left: 16px;
+			top: 0;
+			width: 2px;
+			background-color: var(--bs-light);
+			height: 100%;
+		}
+	}
+}
+.comment-item-nested {
+	.comment-item {
+    position: relative;
+		.comment-line-inner {
+			position: absolute;
+			left: -28px;
+			top: 0;
+			width: 2px;
+			background-color: var(--bs-light);
+			height: 100%;
+			&:before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 20px;
+				height: 2px;
+				width: 26px;
+				background: var(--bs-light);
+			}
+		}
+	}
+}
+
+// Rounded Helper
+@include media-breakpoint-up(lg) {
+  .rounded-end-lg-0 {
+    border-top-right-radius:0;
+    border-bottom-right-radius:0;
+  }
+  .rounded-start-lg-0{
+    border-top-left-radius:0;
+    border-bottom-left-radius:0;
+  }
+  .border-end-lg-0{
+    border-right: 0;
+  }
+}
+
+.rounded-top-0 {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+.rounded-bottom-0 {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+// flip-horizontal
+.flip-horizontal {
+  transform: scaleX(-1);
+  display: inline-block;
+}
+
+// Timeline
+.timeline{
+  width: 100%;
+  .timeline-item{
+    display: flex;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    position: relative;
+    &:last-child{
+      margin-bottom: 0;
+    }
+    .timeline-icon{
+      margin-right: 0.8rem;
+      position: relative;
+      position: relative;
+    }
+    .timeline-content{
+      width: 100%;
+    }
+    &:before{
+      content: "";
+      position: absolute;
+      width: 2px;
+      height: calc(100% - 1rem);
+      background-color: var(--#{$prefix}light);
+      top: 2.5rem;
+      left: 1.5rem;
+      transform: translatex(-50%);
+    }
+    &:last-child:before {
+      height: calc(100% - 2.5rem);
+    }
+  }
+}
+
+// Card chat height calculation
+@include media-breakpoint-up(lg) {
+  .card-chat {
+    height: calc(100vh - 5.1125rem - 1.5rem);
+  }
+  .card-chat-list {
+    height: calc(100vh - 10.112rem - 1.5rem);
+  }
+  .chat-conversation-content {
+    height: calc(100% - 5.25rem);
+  }
+  .chat-tab-list {
+    height: calc(100% - 0.75rem);
+  }
+ }
+
+// Typing Dot animation for chat 
+.typing {
+	.dot {
+		animation: TypingAnimation 1.8s infinite ease-in-out;
+		background-color: rgba(var(--#{$prefix}secondary-rgb), 0.7);
+		border-radius: 50%;
+		height: 7px;
+		margin-right: 4px;
+		vertical-align: middle;
+		width: 7px;
+		display: inline-block;
+		&:nth-child(1) {
+			animation-delay: 200ms;
+		}
+		&:nth-child(2) {
+			animation-delay: 300ms;
+		}
+		&:nth-child(3) {
+			animation-delay: 400ms;
+		}
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+}
+
+@keyframes TypingAnimation {
+  0% {
+    transform: translateY(0px);
+    background-color: rgba(var(--#{$prefix}secondary-rgb), 0.7); 
+  }
+  28% {
+    transform: translateY(-7px);
+    background-color: rgba(var(--#{$prefix}secondary-rgb), 0.4);
+  }
+  44% {
+    transform: translateY(0px);
+    background-color: rgba(var(--#{$prefix}secondary-rgb), 0.2);
+  }
+}
+
+// bootstrap icon line height
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before { 
+  line-height: 1.5;
+}
+
+// Fake password icon 
+.fakepasswordicon { 
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.fakepasswordicon.fa-eye:before {
+  content: "\f06e" !important;
+}
+
+// ticket
+.ticket-border {
+  border-left: 2px dashed var(--#{$prefix}gray-900);
+  padding-left: 50px;
+  position: relative;
+  &:before {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: $white;
+    content: "";
+    top: -50px;
+    left: -25px;
+    position: absolute;
+  }
+  &:after {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: $white;
+    content: "";
+    bottom: -50px;
+    left: -25px;
+    position: absolute;
+  }
+}
+@include media-breakpoint-down(sm) { 
+  .ticket-border {
+    padding-left: 0;
+    border: 0;
+    &:after, &:before { 
+      display: none;
+    }
+  }
+}
+
+// .plyr--audio .plyr__controls
+.plyr--audio .plyr__controls {
+  background: transparent;
+}
+
+.plyr--audio .plyr__control.plyr__tab-focus, .plyr--audio .plyr__control:hover, .plyr--audio .plyr__control[aria-expanded=true] {
+  background: var(--bs-primary);
+}
+
+// Disable textarea resizing
+[data-autoresize]{
+  resize: none;
+}
+
+// Tooltip text
+.tooltip-text-start .tooltip-inner{
+  text-align: left;
+}

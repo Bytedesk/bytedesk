@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-16 15:28:23
+ * @LastEditTime: 2024-11-02 10:50:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.kbase.upload;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 // import java.nio.file.Paths;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.storage.UploadStorageException;
@@ -59,6 +61,8 @@ public class UploadService extends BaseService<UploadEntity, UploadRequest, Uplo
 	private final ModelMapper modelMapper;
 
 	private final UploadRepository uploadRepository;
+
+	private final BytedeskProperties bytedeskProperties;
 
 	public UploadResponse create(UploadRequest request) {
 
@@ -89,6 +93,39 @@ public class UploadService extends BaseService<UploadEntity, UploadRequest, Uplo
 		return null;
 	}
 
+	// 给出图片URL地址，将其保存到本地
+    public String storeFromUrl(String url, String fileName) {
+        // 根据当前日期创建文件夹，格式如：2021/03/15
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        String currentDateFolder = LocalDate.now().format(formatter);
+
+        try {
+            // 构建包含日期文件夹的文件路径
+            Path dateFolderPath = this.uploadDir.resolve(currentDateFolder);
+            Files.createDirectories(dateFolderPath); // 创建日期文件夹（如果不存在）
+
+            Path destinationFile = dateFolderPath.resolve(fileName).normalize().toAbsolutePath();
+
+            if (!destinationFile.getParent().equals(dateFolderPath.toAbsolutePath())) {
+                // 这是一个安全检查
+                throw new UploadStorageException("Cannot store file outside current directory.");
+            }
+
+            // 下载并保存图片
+            URL imageUrl = new URL(url);
+            try (InputStream inputStream = imageUrl.openStream()) {
+                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            // return destinationFile.toString();
+			String uploadPath = currentDateFolder + "/" + fileName;
+			String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+			return fileUrl;
+        } catch (IOException e) {
+            throw new UploadStorageException("Failed to store file from URL.", e);
+        }
+    }
+
 	public String store(MultipartFile file, String fileName) {
 		// 根据当前日期创建文件夹，格式如：2021/03/15
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
@@ -115,36 +152,18 @@ public class UploadService extends BaseService<UploadEntity, UploadRequest, Uplo
 			}
 
 			// 返回包含日期文件夹的文件名路径
-			return currentDateFolder + "/" + fileName;
+			// return currentDateFolder + "/" + fileName;
+			// return destinationFile.toString();
+			// String uploadPath = destinationFile.toString();
+			String uploadPath = currentDateFolder + "/" + fileName;
+			String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+			return fileUrl;
 
 		} catch (IOException e) {
 			throw new UploadStorageException("Failed to store file.", e);
 		}
 	}
 
-	// public String store(MultipartFile file, String fileName) {
-	// 	// TODO: 根据当前日期创建文件夹，并存储文件，格式如下：2021/03/15/fileName
-	// 	try {
-	// 		if (file.isEmpty()) {
-	// 			throw new UploadStorageException("Failed to store empty file.");
-	// 		}
-	// 		Path destinationFile = this.uploadDir.resolve(
-	// 				Paths.get(fileName))
-	// 				.normalize().toAbsolutePath();
-	// 		if (!destinationFile.getParent().equals(this.uploadDir.toAbsolutePath())) {
-	// 			// This is a security check
-	// 			throw new UploadStorageException(
-	// 					"Cannot store file outside current directory.");
-	// 		}
-	// 		try (InputStream inputStream = file.getInputStream()) {
-	// 			Files.copy(inputStream, destinationFile,
-	// 					StandardCopyOption.REPLACE_EXISTING);
-	// 		}
-	// 		return destinationFile.getFileName().toString();
-	// 	} catch (IOException e) {
-	// 		throw new UploadStorageException("Failed to store file.", e);
-	// 	}
-	// }
 
 	public Stream<Path> loadAll() {
 		try {

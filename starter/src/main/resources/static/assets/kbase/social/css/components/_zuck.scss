@@ -1,0 +1,127 @@
+// 
+// zuck.scss
+// Vendor css override and new css added
+
+// stories style
+.stories .story > .item-link {
+  text-decoration: none;
+  color: $headings-color;
+}
+.stories .story > .item-link > .item-preview {
+  border-radius: 50%;
+  padding: 2px;
+  background: var(--bs-primary);
+  height: 5.125rem !important;
+  width: 5.125rem !important;
+}
+
+.stories.carousel .story{
+  height: auto !important;
+  width: 5.125rem !important;
+}
+
+.stories .story > .item-link > .item-preview img {
+  border-radius: 50%;
+  border: 2px solid $white;
+}
+.stories .story.seen {
+  opacity: 0.5;
+}
+.stories .story.seen > a > .item-preview {
+  background: $gray-500;
+}
+.stories .story.seen > a {
+  color: $body-color !important;
+}
+
+.stories.carousel .story>.item-link>.info .name{
+  font-weight: $font-weight-normal;
+  font-size: $font-size-sm;
+}
+
+// Close button
+#zuck-modal-content .story-viewer .head .right {
+  padding: 0px 30px;
+  .close{
+    color: $white;
+  }
+}
+#zuck-modal.with-effects {
+  height: 100vh !important;
+}
+
+// Stories square
+.stories-square.stories .story > .item-link > .item-preview {
+  border-radius: 5px;
+  height: 150px !important;
+  object-fit: cover;
+  width: auto !important;
+  max-height: inherit !important;
+  padding: 0 !important;
+}
+.stories-square.stories.carousel .story {
+  border-radius: 0;
+  height: 150px !important;
+  position: relative;
+  width: 120px !important;
+  max-width: inherit !important;
+  margin-bottom: 4px;
+}
+.stories-square.stories.carousel .story>.item-link>.info{
+  position: absolute;
+  left: 10px;
+  bottom: 6px;
+  color: $white;
+  text-align: left;
+  z-index: 1;
+}
+.stories-square.stories.carousel .story>.item-link>.item-preview img {
+  border-radius: 5px;
+  border: none;
+}
+.stories-square.stories .story.seen > a > .item-preview {
+  background: transparent ;
+}
+.stories-square.stories .item-preview {
+  position: relative;
+}
+.stories-square.stories .item-preview:before {
+  content: "";
+  position: absolute;
+  height: 50%;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba($black, 1)));
+  background-image: linear-gradient(180deg, transparent, rgba($black, 1));
+  z-index: 1;
+}
+
+@media (max-width: 1024px){
+  #zuck-modal-content .story-viewer.with-back-button .head .left>.back {
+    color: $white;
+  }
+}
+
+// Bottom scroll enable
+.scroll-enable{
+  &.stories.carousel::-webkit-scrollbar-track
+  {
+    border-radius: 5px;
+    background-color: $white;
+  }
+  &.stories.carousel::-webkit-scrollbar
+  {
+    width: 5px;
+    height: 8px;
+    border-radius: 5px;
+    background-color: $white;
+  }
+  &.stories.carousel::-webkit-scrollbar-thumb
+  {
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,.2);
+    background-color: $gray-400;
+  }
+}

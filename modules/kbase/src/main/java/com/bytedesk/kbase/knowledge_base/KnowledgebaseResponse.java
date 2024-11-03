@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 16:26:10
+ * @LastEditTime: 2024-10-29 17:49:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,8 @@ public class KnowledgebaseResponse extends BaseResponse {
     // headline标头
     private String headline;
 
+    private String subHeadline;
+
     // 自定义网址
     private String url;
 
@@ -45,6 +47,8 @@ public class KnowledgebaseResponse extends BaseResponse {
 
     // 主题色
     private String primaryColor;
+
+    private String theme;
 
     /**
      * 知识库描述
@@ -71,6 +75,8 @@ public class KnowledgebaseResponse extends BaseResponse {
     private String platform;
 
     private List<String> tags;
+
+    private Boolean showChat;
 
     private Boolean published;
 

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/visitor")
-public class VisitorController extends BaseController<VisitorRequest> {
+public class VisitorController extends BaseRestController<VisitorRequest> {
 
     private final VisitorService visitorService;
 

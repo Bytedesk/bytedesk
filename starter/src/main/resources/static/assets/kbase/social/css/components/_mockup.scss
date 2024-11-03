@@ -1,0 +1,269 @@
+// 
+// mockup.scss
+// Theme Component
+
+// iphone-x
+.iphone-x{
+  position: relative;
+  margin: 40px auto;
+  width: 360px;
+  height: 780px;
+  background-color: $dark;
+  border-radius: 40px;
+  box-shadow: 0px 0px 0px 11px $secondary, 0px 0px 0px 13px $secondary, 0px 0px 0px 20px shade-color($secondary, 20%);
+  
+  &:before,
+  &:after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  // home button indicator
+  &:after{
+    bottom: 7px;
+    width: 140px;
+    height: 4px;
+    background-color: $light;
+    border-radius: 10px;
+  }
+  
+  // frontal camera/speaker frame
+  &:before{
+    top: 0px;
+    width: 56%;
+    height: 30px;
+    background-color: $secondary;
+    border-radius: 0px 0px 40px 40px;
+  }
+  
+  i,
+  b,
+  s,
+  span{
+    position: absolute;
+    display: block;
+    color: transparent;
+  }
+  
+  // speaker
+  i{
+    top: 0px;
+    left: 50%;
+    transform: translate(-50%, 6px);
+    height: 8px;
+    width: 15%;
+    background-color: $black;
+    border-radius: 8px;
+    box-shadow: inset 0px -3px 3px 0px rgba(256, 256, 256, 0.2);
+  }
+  
+  // camera
+  b{
+    left: 10%;
+    top: 0px;
+    transform: translate(180px, 4px);
+    width: 12px;
+    height: 12px;
+    background-color: $black;
+    border-radius: 12px;
+    box-shadow: inset 0px -3px 2px 0px rgba(256, 256, 256, 0.2);
+    
+    &:after {
+      content: '';
+      position: absolute;
+      background-color: rgba($primary, 0.5);
+      width: 6px;
+      height: 6px;
+      top: 2px;
+      left: 2px;
+      top: 3px;
+      left: 3px;
+      display: block;
+      border-radius: 4px;
+      box-shadow: inset 0px -2px 2px rgba($black, 0.5);
+    }
+  }
+  
+  // time
+  s{
+    top: 50px;
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+    font-size: 70px;
+    font-weight: 100;
+    padding-top: 60px;
+  }
+  
+  // action buttons
+  span{
+    bottom: 50px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba($black, 0.3);
+    border-radius: 50%;
+    left: 30px;
+    
+    & + span {
+      left: auto;
+      right: 30px;
+    }
+  }
+}
+
+// iphone x small
+.iphone-x.iphone-x-small{
+  margin: 40px auto;
+  width: 300px;
+  height: 600px;
+}
+
+// iphone x half
+.iphone-x.iphone-x-half{
+  height: 300px;
+  background-image: url(../images/mockup/app-placeholder3.jpg);
+}
+
+// iphone x breakpoint
+@include media-breakpoint-down(sm){
+
+  .iphone-x, .iphone-x.iphone-x-small{
+    width: 260px;
+    height: 540px;
+    background-size: 100%;
+  }
+  .iphone-x{
+    &.iphone-x-half{
+      width: 240px;
+      height: 280px;
+      background-size: 100%;
+    }
+    b{
+      left: -6%;
+    }
+  }
+
+}
+
+// MACBOOK
+.mac_container{
+	width: 100%;
+	margin: 10px auto;
+}
+.mac_scaler{
+	margin: auto;
+	width: 100%;
+	padding-top: 57.875%;
+	height: 0px;
+	position: relative;
+}
+.mac_holder{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+}
+// mac screen
+.mac_screen{
+	margin: auto;
+	background: $secondary;
+	width: 86%;
+	height: 100%;
+	border-top-left-radius: 2% 3%;
+	border-top-right-radius: 2% 3%;
+	border-bottom-left-radius: 5% 3%;
+	border-bottom-right-radius: 5% 3%;
+	box-sizing: border-box;
+	padding: 3%;
+	position: relative;
+	overflow: hidden;
+	border: 1px solid $light;
+	&:before {
+		content: '';
+		position: absolute;
+		right: 0.3%;
+		top: 0.5%;
+		width: 36.5%;
+		height: 35%;
+		border: 1px solid $secondary;
+		border-bottom: none;
+		border-left: none;
+		border-top-right-radius: 4.5% 7%;
+	}
+	&:after {
+		content: '';
+		position: absolute;
+		right: -25%;
+		top: -25%;
+		width: 40%;
+		height: 150%;
+		background: rgba($light,0.2);
+		background: linear-gradient(rgba(255,255,255,0.2), rgba($light,0) 40%);
+		transform: rotate(-30deg);
+	}
+}
+
+// mac camera
+.mac_camera{
+	background: #333;
+	border-radius: 50%;
+	width: 1%;
+	height: 1.5%;
+	position: absolute;
+	left: 49.5%;
+	top: 2%;
+	&:after{
+		content: '';
+		position: absolute;
+		left: 35%;
+		top: 40%;
+		width: 30%;
+		height: 30%;
+		border-radius: 50%;
+		background: #777;
+	}
+}
+// mac bottom
+.mac_bottom{
+	background: #e9e9e9;
+	background: linear-gradient(#ccc 50%, #444);
+	width: 100%;
+	height: 3%;
+	position: relative;
+	top: -1.7%;
+	border-bottom-left-radius: 6% 50%;
+	border-bottom-right-radius: 6% 50%;
+}
+.mac_bottom_top_half{
+	width: 100%;
+	height: 50%;
+	background: #e9e9e9;
+	background: linear-gradient(90deg, #aaa, #f3f3f3 0.5%, #aaa 2.5%, #f3f3f3 5.5%, #f3f3f3 94.5%, #aaa 97.5%, #f3f3f3 99.5%, #aaa);
+}
+.mac_bottom:after{
+	content: '';
+	position: absolute;
+	right: 1%;
+	bottom: 11%;
+	width: 98%;
+	height: 0%;
+	box-shadow: 1px 0px 8px 1px #333;
+}
+// mac thumb
+.mac_thumb_space{
+	background: #bbb;
+	background: radial-gradient(90% 150% at 50% 1%, #eee 49%, #888);
+	margin: auto;
+	width: 15%;
+	height: 60%;
+	border-bottom-left-radius: 8% 100%;
+	border-bottom-right-radius: 8% 100%;
+}
+.mac_screen_content{
+	width: 100%;
+	height: 100%;
+	text-align: center;
+}

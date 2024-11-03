@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 15:56:58
+ * @LastEditTime: 2024-10-30 14:42:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ public class KnowledgebaseRequest extends BaseRequest {
 
     // 自定义副标题
     @Builder.Default
-    private String subheadline = KnowledgebaseConsts.SUB_HEADLINE;
+    private String subHeadline = KnowledgebaseConsts.SUB_HEADLINE;
 
     // 自定义网址
     @Builder.Default
@@ -61,6 +61,9 @@ public class KnowledgebaseRequest extends BaseRequest {
     // 主题色
     @Builder.Default
     private String primaryColor = BytedeskConsts.EMPTY_STRING;
+
+    @Builder.Default
+    private String theme = KnowledgebaseThemeEnum.DEFAULT.name();
 
     /**
      * 知识库描述
@@ -87,7 +90,7 @@ public class KnowledgebaseRequest extends BaseRequest {
     private String css = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
-    private String embedding = KnowledgebaseConsts.KB_EMBEDING;
+    private String embedding = KnowledgebaseConsts.KB_EMBEDDING;
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
@@ -104,11 +107,14 @@ public class KnowledgebaseRequest extends BaseRequest {
     // private PlatformEnum platform = PlatformEnum.BYTEDESK;
     private String platform = PlatformEnum.BYTEDESK.name();
 
-    // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPDOC;
+    // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPCENTER;
     // private String categoryUid;
 
     @Builder.Default
     private List<String> tags = new ArrayList<>();
+
+    @Builder.Default
+    private boolean showChat = false;
 
     @Builder.Default
     private Boolean published = true;

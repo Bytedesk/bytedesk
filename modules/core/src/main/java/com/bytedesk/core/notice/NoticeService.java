@@ -14,6 +14,76 @@
  */
 package com.bytedesk.core.notice;
 
-public class NoticeService {
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.stereotype.Service;
+
+import com.bytedesk.core.base.BaseService;
+
+@Service
+public class NoticeService extends BaseService<NoticeEntity, NoticeRequest, NoticeResponse> {
+
+    @Override
+    public Page<NoticeResponse> queryByOrg(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public Page<NoticeResponse> queryByUser(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public Optional<NoticeEntity> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+    }
+
+    @Override
+    public NoticeResponse create(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public NoticeResponse update(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public NoticeEntity save(NoticeEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    }
+
+    @Override
+    public void delete(NoticeRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            NoticeEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    @Override
+    public NoticeResponse convertToResponse(NoticeEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+    }
     
 }

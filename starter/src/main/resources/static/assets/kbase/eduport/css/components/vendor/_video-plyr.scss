@@ -1,0 +1,14 @@
+// 
+// video-plyr.scss
+// Vendor css override and new css added
+
+// Video player css
+.fullscreen-video .plyr--video{
+  height: 100vh;
+}
+.plyr--stopped.plyr__poster-enabled .plyr__poster {
+  background-size: cover;
+}
+.video-player .plyr--video{
+  border-radius: $border-radius-lg;
+}

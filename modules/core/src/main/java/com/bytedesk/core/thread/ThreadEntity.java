@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 15:08:43
+ * @LastEditTime: 2024-11-01 21:01:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -225,6 +225,10 @@ public class ThreadEntity extends BaseEntity {
 
     public UserProtobuf getUserProtobuf() {
         return JSON.parseObject(this.user, UserProtobuf.class);
+    }
+
+    public Boolean isWeChatMp() {
+        return this.client.equals(ClientEnum.WECHAT_MP.name());
     }
 
 }

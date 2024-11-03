@@ -1,0 +1,55 @@
+// 
+// apexchart.scss
+// Vendor css override and new css added
+
+.apexcharts-tooltip.apexcharts-theme-light{
+  background: var(--#{$prefix}white) !important;
+  border: 0 !important;
+  box-shadow: 0 12px 14px rgba(107, 124, 147, 0.30);
+}
+
+.apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title{
+  background: var(--#{$prefix}gray-100) !important;
+  border: 0 !important;
+  border-bottom: 1px $border-style var(--#{$prefix}gray-300) !important;
+  color: var(--#{$prefix}dark);
+}
+.apexcharts-theme-light .apexcharts-tooltip-text-y-value, 
+.apexcharts-theme-light .apexcharts-tooltip-text-goals-value, 
+.apexcharts-theme-light .apexcharts-tooltip-text-z-value, 
+.apexcharts-theme-light .apexcharts-tooltip-text-y-label{
+  color: var(--#{$prefix}dark);
+  margin-left: 1px !important;
+}
+
+.apexcharts-theme-dark .apexcharts-tooltip-text-y-value, 
+.apexcharts-theme-dark .apexcharts-tooltip-text-goals-value, 
+.apexcharts-theme-dark .apexcharts-tooltip-text-z-value, 
+.apexcharts-theme-dark .apexcharts-tooltip-text-y-label{
+  color: var(--#{$prefix}white);
+  margin-left: 1px !important;
+}
+
+.apexcharts-legend-text, .apexcharts-text, .apexcharts-title-text, .apexcharts-text tspan, .apexcharts-tooltip-title, .apexcharts-tooltip-text, .apexcharts-xaxistooltip-text, .apexcharts-yaxistooltip-text {
+  font-family: $font-family-base !important;
+}
+
+.apexcharts-xaxis text, .apexcharts-yaxis text{
+  fill: var(--#{$prefix}gray-400);
+}
+.apexcharts-xaxistooltip, .apexcharts-yaxistooltip{
+  background: var(--#{$prefix}white) !important;
+  box-shadow: 0 3px 14px rgba(107, 124, 147, 0.30);
+}
+
+.apexcharts-xaxistooltip-bottom:after {
+  border-bottom-color: var(--#{$prefix}body-bg) !important;
+}
+
+.apexcharts-xaxistooltip, .apexcharts-yaxistooltip, .apexcharts-yaxistooltip-left:before, .apexcharts-xaxistooltip-bottom:before {
+  border: none !important;
+}
+
+.apexcharts-xaxistooltip{
+  color: var(--#{$prefix}gray-700) !important;
+}

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-02 06:37:38
+ * @LastEditTime: 2024-10-30 11:17:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
 
 import lombok.AllArgsConstructor;
@@ -42,13 +43,15 @@ public class ArticleResponse extends BaseResponse {
 
     private KnowledgebaseTypeEnum type;
 
-    // private MessageTypeEnum contentType;
-
     private List<String> tags;
+
+    private Boolean top;
 
     private Boolean published;
 
     private Boolean markdown;
+
+    private Integer readCount;
 
     private String categoryUid;
 
@@ -56,7 +59,9 @@ public class ArticleResponse extends BaseResponse {
 
     private String orgUid;
 
+    private Date createdAt;
+
     private Date updatedAt;
 
-    private String user;
+    private UserProtobuf user;
 }

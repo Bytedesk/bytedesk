@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 15:49:18
+ * @LastEditTime: 2024-10-28 13:49:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.push.PushNotifier;
+// import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,9 +69,6 @@ public class PushServiceImplSms extends PushNotifier {
     public void send(String mobile, String content, HttpServletRequest request) {
         log.info("send sms to {}, content: {}", mobile, content);
 
-        // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
-
-        // not test mobile, send sms
         if (Utils.isTestMobile(mobile)) {
             return;
         }

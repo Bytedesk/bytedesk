@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.base.BaseController;
+import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/ai/model")
 @AllArgsConstructor
-public class LlmModelController extends BaseController<LlmModelRequest> {
+public class LlmModelController extends BaseRestController<LlmModelRequest> {
 
     private final LlmModelService service;
 

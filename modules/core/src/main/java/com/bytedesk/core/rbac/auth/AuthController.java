@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 18:02:47
+ * @LastEditTime: 2024-10-28 13:03:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,7 @@ public class AuthController {
 
         // validate sms code
         // 验证手机验证码
-        if (!pushService.validateSmsCode(userRequest.getMobile(), userRequest.getCode())) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode())) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
@@ -102,9 +102,7 @@ public class AuthController {
         }
 
         // send mobile code
-        Boolean result = pushService.sendSmsCode(authRequest.getMobile(), authRequest.getClient(),
-                authRequest.getType(),
-                authRequest.getPlatform(), request);
+        Boolean result = pushService.sendCode(authRequest, request);
         if (!result) {
             return ResponseEntity.ok().body(JsonResult.error("already send, don't repeat", -1, false));
         }
@@ -122,11 +120,11 @@ public class AuthController {
         }
         // validate mobile & code
         // 验证手机验证码
-        if (!pushService.validateSmsCode(authRequest.getMobile(), authRequest.getCode())) {
+        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode())) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
-        // if mobile already exists, if none, then registe
+        // if mobile already exists, if none, then register
         // 手机号是否已经注册，如果没有，则自动注册
         if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())) {
             UserRequest userRequest = new UserRequest();
@@ -153,11 +151,8 @@ public class AuthController {
         if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
             return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
         }
-
         // send email code
-        Boolean result = pushService.sendEmailCode(authRequest.getEmail(), authRequest.getClient(),
-                authRequest.getType(),
-                authRequest.getPlatform(), request);
+        Boolean result = pushService.sendCode(authRequest, request);
         if (!result) {
             return ResponseEntity.ok(JsonResult.error("already send, don't repeat", -1, false));
         }
@@ -171,7 +166,7 @@ public class AuthController {
         log.debug("login email {}", authRequest.toString());
 
         // validate email & code
-        if (!pushService.validateEmailCode(authRequest.getEmail(), authRequest.getCode())) {
+        if (!pushService.validateCode(authRequest.getEmail(), authRequest.getCode())) {
             return ResponseEntity.ok(JsonResult.error("validate code failed", -1, false));
         }
 

@@ -1,0 +1,70 @@
+//
+// accordion.scss
+// Extended from Bootstrap
+//
+
+// Additional style for theme
+// 
+
+// Accordion collapse plus/minus icon
+.accordion{
+  &.accordion-icon{
+    .accordion-item {
+      box-shadow: none;
+      border-radius: $accordion-border-radius;
+      border: 1px solid var(--#{$prefix}border-color);
+    }
+    .accordion-header{
+      position: relative;
+      .accordion-button{
+        background:transparent;
+        font-size: inherit;
+        transition: none;
+        box-shadow: none !important;
+        &[aria-expanded=true] {
+          border-bottom: 1px solid var(--#{$prefix}border-color);
+        }
+        &:after {
+          content:"";
+          background: var(--#{$prefix}gray-800) !important;
+          width: 10px;
+          height: 2px;
+          display: block;
+          position: absolute;
+          top: 47%;
+          right: 20px;
+          transform: translateY(-50%);
+          transition: $transition-base;
+          transform: rotateZ(0deg);
+          z-index: 9;
+        }
+        &:before {
+          content:"";
+          background: var(--#{$prefix}gray-800) !important;
+          width: 10px;
+          height: 2px;
+          display: block;
+          position: absolute;
+          top: 47%;
+          right: 20px;
+          transform: translateY(-50%);
+          transition: $transition-base;
+          transform: rotateZ(0deg);
+          z-index: 9;
+        }
+        &[aria-expanded=false]:after {
+          transform: rotateZ(90deg);
+        }
+        &[aria-expanded=true]:before {
+          transform: rotateZ(0deg);
+        }
+      }
+    }
+    .accordion-collapse{
+      border: none;
+    }
+    .accordion-body {
+      padding: 1rem;
+    }
+  }
+}

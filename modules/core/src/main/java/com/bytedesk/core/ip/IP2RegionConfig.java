@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2022-03-10 14:41:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-06 10:57:46
+ * @LastEditTime: 2024-10-29 21:34:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,7 +48,6 @@ public class IP2RegionConfig {
         if (!file.exists()) {
             // classpath:ip2region.xdb
             log.error("Error: Invalid ip2region.xdb file");
-            // 
             String tmpDir = System.getProperties().getProperty("java.io.tmpdir");
             dbPath = tmpDir + "ip.db";
             log.info("temp dir {}", dbPath);

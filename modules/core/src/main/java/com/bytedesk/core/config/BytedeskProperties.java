@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-25 11:25:29
+ * @LastEditTime: 2024-11-02 10:59:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 
 @Data
@@ -28,6 +29,25 @@ import lombok.Data;
 public class BytedeskProperties {
 
     public static final String CONFIG_PREFIX = "bytedesk";
+
+    private static volatile BytedeskProperties instance; // 使用volatile关键字确保可见性
+
+    @PostConstruct
+    public void init() {
+        // 这里我们使用双重检查锁定来确保线程安全地初始化instance变量
+        if (instance == null) {
+            synchronized (BytedeskProperties.class) {
+                if (instance == null) {
+                    instance = this;
+                }
+            }
+        }
+    }
+
+    public static BytedeskProperties getInstance() {
+        // 如果instance尚未初始化，将调用init方法进行初始化（由Spring的@PostConstruct保证）
+        return instance;
+    }
 
     private Boolean debug;
     
@@ -42,15 +62,19 @@ public class BytedeskProperties {
     private String mobile;
 
     private List<String> mobileWhitelist = new ArrayList<>();
+    private List<String> emailWhiteList = new ArrayList<>();
 
-    private String mobileCode;
+    private String validateCode;
     private String organizationName;
     private String organizationCode;
     // private String timezone;
 
     // ai
-    private Boolean javaai;
-    private Boolean pythonai;
+    private Boolean javaAi;
+    private Boolean pythonAi;
+
+    // 配置邮件发送方式，默认使用javamail，可选值：javamail/aliyun
+    private String emailType;
 
     // cors
     private String corsAllowedOrigins;
@@ -63,7 +87,6 @@ public class BytedeskProperties {
     private Integer cacheLevel;
     private String cachePrefix;
     private String redisStreamKey;
-    // private String redisPubsubChannel;
 
     // upload
     private String uploadType;
@@ -75,8 +98,8 @@ public class BytedeskProperties {
     private List<String> clusterNodes = new ArrayList<>();
 
     // 
-    public Boolean isInWhitelist(String mobile) {
-        return this.mobileWhitelist.contains(mobile);
+    public Boolean isInWhitelist(String receiver) {
+        return this.mobileWhitelist.contains(receiver) || this.emailWhiteList.contains(receiver);
     }
 
 }

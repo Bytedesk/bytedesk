@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 15:51:24
+ * @LastEditTime: 2024-10-28 16:10:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,10 @@
  */
 package com.bytedesk.core.push.email;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -26,9 +29,12 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.push.PushNotifier;
+import com.bytedesk.core.utils.Utils;
 
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,10 +42,28 @@ import lombok.extern.slf4j.Slf4j;
  * https://springdoc.cn/spring-boot-email/
  * https://springdoc.cn/spring/integration.html#mail
  * https://mailtrap.io/blog/spring-send-email/
+ * https://www.thymeleaf.org/doc/articles/springmail.html
+ * http://blog.didispace.com/springbootmailsender/
  */
 @Slf4j
 @Service
 public class PushServiceImplEmail extends PushNotifier {
+
+    @Autowired
+    private BytedeskProperties bytedeskProperties;
+
+    @Value("${aliyun.access.key.id:}")
+    private String accessKeyId;
+
+    @Value("${aliyun.access.key.secret:}")
+    private String accessKeySecret;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    @Value("${spring.mail.username:}")
+    private String from;
+
 
     @Async
     @Override
@@ -51,22 +75,23 @@ public class PushServiceImplEmail extends PushNotifier {
     @Async
     @Override
     public void send(String email, String content, HttpServletRequest request) {
-        log.info("send email to {}, content {}", email, content);
-        //
-        sendValidateCode(email, content);
+        // log.info("send email to {}, content {}", email, content);
+
+        if (Utils.isTestEmail(email)) {
+            return;
+        }
+
+        // 白名单邮箱使用固定验证码，无需真正发送验证码
+        if (bytedeskProperties.isInWhitelist(email)) {
+            return;
+        }
+
+        if (bytedeskProperties.getEmailType().equals("aliyun")) {
+            sendAliyunValidateCode(email, content);
+        } else {
+            sendJavaMailValidateCode(email, content);
+        }
     }
-
-    @Value("${aliyun.access.key.id:}")
-    private String accessKeyId;
-
-    @Value("${aliyun.access.key.secret:}")
-    private String accessKeySecret;
-
-    // @Autowired
-    // JavaMailSender javaMailSender;
-
-    // @Value("${spring.mail.self.username}")
-    // private String from;
 
     /**
      * 通过阿里云邮件推送SDK发送
@@ -74,11 +99,12 @@ public class PushServiceImplEmail extends PushNotifier {
      * @param email Email
      * @param code  验证码
      */
-    public void sendValidateCode(String email, String code) {
+    public void sendAliyunValidateCode(String email, String code) {
         
         if (!StringUtils.hasText(email)) {
             return;
         }
+        log.info("sendValidateCode email={} ,code={}", email, code);
 
         // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
 
@@ -122,4 +148,44 @@ public class PushServiceImplEmail extends PushNotifier {
         }
     }
 
+
+    public void sendJavaMailValidateCode(String email, String code) {
+        if (!StringUtils.hasText(email)) {
+            return;
+        }
+        log.info("sendJavaMailValidateCode email={} ,code={}", email, code);
+        // 
+        String content = "您的验证码是" + code + ", 15分钟内有效。开源在线客服&企业IM系统, https://www.weiyuai.cn";
+        sendJavaMail(email, "微语验证码", content);
+    }
+
+    /**
+     * 通过JavaMail发送
+     * https://springdoc.cn/spring-boot-email/
+     * 
+     * @param email
+     * @param content
+     */
+    public void sendJavaMail(String email, String subject, String content) {
+         // 创建一个邮件消息
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            // 创建 MimeMessageHelper
+            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+            // 发件人邮箱和邮件中显示的发件人名字
+            helper.setFrom(from, "weiyuai");
+            // 收件人邮箱
+            helper.setTo(email);
+            // 邮件标题
+            helper.setSubject(subject);
+            // 邮件正文，第二个参数表示是否是HTML正文
+            helper.setText(content, true);
+            
+            // 发送
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
 }

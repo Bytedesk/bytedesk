@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-19 10:05:17
+ * @LastEditTime: 2024-10-28 13:42:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,5 +43,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
     Boolean existsByMobileAndPlatformAndDeleted(String mobile, String platform, Boolean deleted);
 
     Boolean existsByEmailAndPlatformAndDeleted(String email, String platform, Boolean deleted);
+
+    Boolean existsBySuperUserAndDeleted(Boolean superUser, Boolean deleted);
 
 }

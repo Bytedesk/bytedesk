@@ -16,7 +16,7 @@ package com.bytedesk.ai.robot;
 
 public enum RobotTypeEnum {
     SERVICE, // 客服机器人
-    MARKETING, // 营销机器人
+    MARKETING, // 营销机器人，售前营销获客机器人
     KB, // 知识库机器人, 知识库对话
     KBDOC, // 知识库机器人, 知识库某一个文档对话
     LLM, // 问答机器人, 直接调用大模型

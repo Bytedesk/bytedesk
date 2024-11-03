@@ -1,0 +1,58 @@
+// 
+// card.scss
+// Extended from Bootstrap
+//
+
+// Quick fix for border radius issue in safari
+.card.overflow-hidden {
+  will-change: transform;
+}
+
+// 
+// Additional styles for theme
+// 
+
+// Hovering on card to show element
+.card{
+  .card-image{
+    position: relative;
+    .card-element-hover{
+      visibility: hidden;
+      margin-top: 20px;
+      opacity: 0;
+      transition: $transition-base;
+      z-index: 9;
+    }
+  }
+  &:hover{
+    .card-image{
+      .card-element-hover{
+        visibility: visible;
+        margin-top: 0px;
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// Card overlay on bottom
+.card{
+  &.card-overlay-bottom{
+    overflow: hidden;
+    &:before {
+      content: "";
+      position: absolute;
+      height: 50%;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-image: -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba($black, 1)));
+      background-image: linear-gradient(180deg, transparent, rgba($black, 1));
+      z-index: 1;
+    }
+  }
+  .card-img-overlay{
+    z-index: 2;
+  }
+}

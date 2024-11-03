@@ -1,0 +1,18 @@
+// 
+// offcanvas.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+//
+
+.offcanvas-sm {
+  width: $offcanvas-horizontal-width-sm;
+} 
+
+@include media-breakpoint-down(md) { 
+  .offcanvas-start {
+    width: 260px !important;
+  }
+}

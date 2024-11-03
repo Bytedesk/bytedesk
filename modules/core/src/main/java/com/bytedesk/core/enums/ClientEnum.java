@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-29 14:32:20
+ * @LastEditTime: 2024-11-01 17:42:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,18 +30,23 @@ public enum ClientEnum {
     LINUX,
     MACOS,
     WINDOWS,
+    // 
     FLUTTER,
     FLUTTER_WEB,
     FLUTTER_ANDROID,
     FLUTTER_IOS,
+    // 
     UNIAPP,
     UNIAPP_WEB,
     UNIAPP_ANDROID,
     UNIAPP_IOS,
+    // 
+    WECHAT,
     WECHAT_MINI,
     WECHAT_MP,
     WECHAT_WORK,
     WECHAT_KEFU,
+    WECHAT_CHANNEL,
     ;
 
     // 根据字符串查找对应的枚举常量

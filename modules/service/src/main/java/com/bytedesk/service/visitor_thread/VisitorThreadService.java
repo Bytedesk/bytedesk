@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:20:57
+ * @LastEditTime: 2024-11-01 21:04:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -124,8 +124,12 @@ public class VisitorThreadService extends BaseService<VisitorThreadEntity, Visit
         String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
         // 
-        String extra = ConvertServiceUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
-        thread.setExtra(extra);
+        if (visitorRequest.isWeChat()) {
+            thread.setExtra(visitorRequest.getThreadExtra());
+        } else {
+            String extra = ConvertServiceUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+            thread.setExtra(extra);
+        }
         //
         return thread;
     }
@@ -193,17 +197,16 @@ public class VisitorThreadService extends BaseService<VisitorThreadEntity, Visit
             long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            log.info("before autoCloseThread threadUid {} threadType {} threadId {} diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(), diffInMinutes);
+            // log.info("before autoCloseThread threadUid {} threadType {} threadId {} diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(), diffInMinutes);
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
                     || thread.getType().equals(ThreadTypeEnum.AGENT.name())
                     || thread.getType().equals(ThreadTypeEnum.KB.name())) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinutes = settings.getAutoCloseMin();
-                log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {}, diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes, diffInMinutes);
+                // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {}, diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes, diffInMinutes);
                 if (diffInMinutes > autoCloseMinutes) {
                     threadService.autoClose(thread);
-                    // threadStateService.autoClose(thread);
                 }
             }
         });

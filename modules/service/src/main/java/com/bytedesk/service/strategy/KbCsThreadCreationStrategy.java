@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:59:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 17:09:18
+ * @LastEditTime: 2024-10-29 07:12:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,7 +58,7 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         //
         ThreadEntity thread = getKbThread(visitorRequest, knowledgebase);
         //
-        return getKbMessage(visitorRequest, thread, knowledgebase);
+        return getRobotMessage(visitorRequest, thread, knowledgebase);
     }
 
     private ThreadEntity getKbThread(VisitorRequest visitorRequest, KnowledgebaseEntity kb) {
@@ -87,7 +87,7 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getKbMessage(VisitorRequest visitorRequest, ThreadEntity thread, KnowledgebaseEntity kb) {
+    private MessageProtobuf getRobotMessage(VisitorRequest visitorRequest, ThreadEntity thread, KnowledgebaseEntity kb) {
         thread.setContent(kb.getName());
         //
         // boolean isReenter = true;

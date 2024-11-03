@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 19:21:06
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-28 11:09:18
+ * @LastEditTime: 2024-11-02 10:45:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -41,7 +40,7 @@ public class UploadControllerVisitor {
 
     private final UploadService uploadService;
 
-    private final BytedeskProperties bytedeskProperties;
+    // private final BytedeskProperties bytedeskProperties;
 
     // 文件上传
     @PostMapping("/file")
@@ -60,9 +59,9 @@ public class UploadControllerVisitor {
         // TODO: image/avatar/file/video/voice
 
         // http://localhost:9003/file/20240319162820_img-service2.png
-        String uploadPath = uploadService.store(file, fileName);
-        // http://localhost:9003
-        String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+        // String uploadPath = uploadService.store(file, fileName);
+        // String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
+        String fileUrl = uploadService.store(file, fileName);
         // 
         UserProtobuf visitorProtobuf = UserProtobuf.builder()
                 .nickname(visitorNickname)
