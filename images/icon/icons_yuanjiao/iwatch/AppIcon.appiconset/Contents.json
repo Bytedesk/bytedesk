@@ -1,0 +1,144 @@
+{
+    "images": [
+        {
+            "size": "22x22",
+            "idiom": "universal",
+            "filename": "icon-22@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "24x24",
+            "idiom": "universal",
+            "filename": "icon-24@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "27.5x27.5",
+            "idiom": "universal",
+            "filename": "icon-27.5@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "29x29",
+            "idiom": "universal",
+            "filename": "icon-29@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "30x30",
+            "idiom": "universal",
+            "filename": "icon-30@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "32x32",
+            "idiom": "universal",
+            "filename": "icon-32@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "33x33",
+            "idiom": "universal",
+            "filename": "icon-33@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "40x40",
+            "idiom": "universal",
+            "filename": "icon-40@2x.png",
+            "scale": "2x"
+        },
+        {
+            "size": "43.5x43.5",
+            "idiom": "universal",
+            "filename": "icon-43.5@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "44x44",
+            "idiom": "universal",
+            "filename": "icon-44@2x.png",
+            "scale": "2x"
+        },
+        {
+            "size": "46x46",
+            "idiom": "universal",
+            "filename": "icon-46@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "50x50",
+            "idiom": "universal",
+            "filename": "icon-50@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "51x51",
+            "idiom": "universal",
+            "filename": "icon-51@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "54x54",
+            "idiom": "universal",
+            "filename": "icon-54@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "86x86",
+            "idiom": "universal",
+            "filename": "icon-86@2x.png",
+            "scale": "2x"
+        },
+        {
+            "size": "98x98",
+            "idiom": "universal",
+            "filename": "icon-98@2x.png",
+            "scale": "2x"
+        },
+        {
+            "size": "108x108",
+            "idiom": "universal",
+            "filename": "icon-108@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "117x117",
+            "idiom": "universal",
+            "filename": "icon-117@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "129x129",
+            "idiom": "universal",
+            "filename": "icon-129@2x.png",
+            "scale": "2x",
+            "platform": "watchos"
+        },
+        {
+            "size": "1024x1024",
+            "idiom": "universal",
+            "filename": "icon-1024.png",
+            "scale": "1x",
+            "platform": "watchos"
+        }
+    ],
+    "info": {
+        "version": 1,
+        "author": "icon.wuruihong.com"
+    }
+}
