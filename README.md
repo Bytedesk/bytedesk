@@ -14,7 +14,8 @@
 -->
 # Bytedesk
 
-Chat as a Service
+AI powered live-chat, email support, Omnichannel customer service & team im，alternative to slack + zendesk/intercom
+<!-- Chat as a Service -->
 
 ## Language
 
