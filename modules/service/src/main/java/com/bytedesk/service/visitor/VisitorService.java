@@ -29,7 +29,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.ip.IpService;
@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class VisitorService extends BaseService<VisitorEntity, VisitorRequest, VisitorResponse> {
+public class VisitorService extends BaseRestService<VisitorEntity, VisitorRequest, VisitorResponse> {
 
     private final VisitorRepository visitorRepository;
 

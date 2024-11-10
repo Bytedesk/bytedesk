@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 14:40:28
+ * @LastEditTime: 2024-11-07 17:02:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,8 +27,9 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * role table
@@ -42,6 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ RoleEntityListener.class })
 @Table(name = "bytedesk_core_role", uniqueConstraints = {
 	@UniqueConstraint(columnNames = { "name", "orgUid" }),
 })
@@ -53,37 +55,31 @@ public class RoleEntity extends BaseEntity {
 	@Column(nullable = false)
 	private String name;
 
-	private String displayName;
-
-	/**
-	 * value is a keyword in h2 db
-	 */
-	// @Column(name = "by_value", nullable = false)
-	// private String value;
-
 	private String description;
 
+	// 超级管理员、管理员等是平台角色，用户自定义角色是Level.ORGANIZATION
 	@Builder.Default
-	// @Enumerated(EnumType.STRING)
-	@Column(name = "role_type", nullable = false)
-	private String type = RoleTypeEnum.SYSTEM.name();
-	// private RoleTypeEnum type = RoleTypeEnum.SYSTEM;
+	private String level = LevelEnum.PLATFORM.name();
 
-	@JsonIgnore
 	@Builder.Default
 	@ManyToMany
-	@JoinTable(name = "bytedesk_core_role_authority", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
+	@JoinTable(
+		name = "bytedesk_core_role_authority", 
+		joinColumns = @JoinColumn(name = "role_id"), 
+		inverseJoinColumns = @JoinColumn(name = "authority_id")
+	)
 	private Set<AuthorityEntity> authorities = new HashSet<>();
 
-	/**
-	 * 除系统自带角色之外，
-	 * 允许管理员-自己创建角色
-	 */
-	// @JsonIgnore
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// @JsonBackReference("user-roles") // 避免无限递归
-	// private User user;
-	// private String orgUid;
+	// 去掉，不合理
+	// 角色关联的用户，反向查询，加快查询速度
+	// @Builder.Default
+	// private Set<String> memberUids = new HashSet<>();
+
+	// 除系统自带角色之外，允许管理员-自己创建角色
+	private String userUid;
+
+	@Builder.Default
+	private String platform = PlatformEnum.BYTEDESK.name();
 
 	public void addAuthority(AuthorityEntity authority) {
 		this.authorities.add(authority);

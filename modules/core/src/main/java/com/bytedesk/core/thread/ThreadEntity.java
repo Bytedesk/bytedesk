@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-01 21:01:44
+ * @LastEditTime: 2024-11-09 10:58:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,6 +37,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
+ * thread: 指的是一系列相关的信息或讨论按照时间顺序排列形成的一个连贯的交流脉络.
+ * 强调信息的连贯性和关联性，就像一条线将不同的消息或回复串联在一起，通常用于在线论坛、电子邮件、社交媒体等平台上，
+ * 指围绕特定主题展开的一系列连续的消息交流
+ * conversation: 更侧重于指人与人之间面对面或通过某种通信方式进行的较为直接和实时的语言交流互动，强调交流的过程和行为本身
+ * 通常用于描述两个或多个人之间的口头或书面的交流活动，更强调交流的互动性和即时性，使用的场景较为广泛，包括日常对话、商务谈判、电话交流等
+ * 综上考虑，此处使用 thread 表示会话更为合适
+ * 
  * every visitor <-> agent thread should only be one,
  * history records are stored in thread_log table
  */
@@ -229,6 +236,10 @@ public class ThreadEntity extends BaseEntity {
 
     public Boolean isWeChatMp() {
         return this.client.equals(ClientEnum.WECHAT_MP.name());
+    }
+
+    public Boolean isWeChatMini() {
+        return this.client.equals(ClientEnum.WECHAT_MINI.name());
     }
 
 }

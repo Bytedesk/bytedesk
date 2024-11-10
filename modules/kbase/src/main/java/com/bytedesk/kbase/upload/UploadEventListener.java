@@ -138,12 +138,6 @@ public class UploadEventListener {
                         // upload.getCategoryUid(),
                         upload.getKbUid(),
                         upload.getOrgUid())).sheet().doRead();
-            } else if (upload.getType().equals(UploadTypeEnum.MEMBER.name())) {
-                // TODO: 导入成员
-                // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
-                // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                // EasyExcel.read(filePath, MemberExcel.class, new
-                // MemberExcelListener(memberService)).sheet().doRead();
             }
         }
     }

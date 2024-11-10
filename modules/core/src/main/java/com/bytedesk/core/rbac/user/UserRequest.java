@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-18 09:35:54
+ * @LastEditTime: 2024-11-07 17:11:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -76,13 +76,9 @@ public class UserRequest extends BaseRequest {
 
 	// 需要前端传递字符串的情况下，使用string类型
 	@NotBlank(message = "platform required")
-	// @Builder.Default
-	// private String platform = BytedeskConsts.PLATFORM_BYTEDESK;
 	@Builder.Default
-	// private PlatformEnum platform = PlatformEnum.BYTEDESK;
 	private String platform = PlatformEnum.BYTEDESK.name();
 	
-	// private String orgUid;
 	// 注册验证码
 	private String captchaUid;
 	private String captchaCode;

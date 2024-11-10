@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-25 15:36:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 10:22:55
+ * @LastEditTime: 2024-11-07 17:10:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,12 +14,11 @@
  */
 package com.bytedesk.team.member;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.team.department.DepartmentResponse;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,7 +54,10 @@ public class MemberResponse extends BaseResponse {
 
     private String status;
 
-    private Set<DepartmentResponse> departments;
+    private String deptUid;
+
+    @Builder.Default
+	private Set<String> roleUids = new HashSet<>(); 
 
     private UserProtobuf user;
 }

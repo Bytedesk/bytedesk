@@ -20,10 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 
 @Service
-public class OAuthService extends BaseService<OAuthEntity, OAuthRequest, OAuthResponse> {
+public class OAuthService extends BaseRestService<OAuthEntity, OAuthRequest, OAuthResponse> {
 
     @Override
     public Page<OAuthResponse> queryByOrg(OAuthRequest request) {

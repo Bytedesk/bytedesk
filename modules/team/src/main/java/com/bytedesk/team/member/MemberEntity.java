@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:20:51
+ * @LastEditTime: 2024-11-07 17:17:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,15 +14,14 @@
  */
 package com.bytedesk.team.member;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.team.department.DepartmentEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -37,11 +36,10 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true, exclude = { "departments" })
+@EqualsAndHashCode(callSuper = true) // exclude = { "departments" }
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ MemberEntityListener.class })
-// @DiscriminatorValue("Member")
 @Table(name = "bytedesk_team_member", uniqueConstraints = {
     @UniqueConstraint(columnNames = { "email", "orgUid" }),
     @UniqueConstraint(columnNames = { "mobile", "orgUid" })
@@ -72,31 +70,33 @@ public class MemberEntity extends BaseEntity {
     private String mobile;
 
     @Builder.Default
-    private MemberStatusEnum status = MemberStatusEnum.PENDING;
+    private String status = MemberStatusEnum.PENDING.name();
 
-    @JsonIgnore
-    // 关联多个Department
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Set<DepartmentEntity> departments = new HashSet<>();
+    @Convert(converter = StringSetConverter.class)
+    @Column(length = 512)
+	private Set<String> roleUids = new HashSet<>(); 
 
-    /**
-     * login user info
-     */
+    // 一个人只能属于一个部门，一个部门可以有多个成员
     // @JsonIgnore
-    // @OneToOne(fetch = FetchType.EAGER)
+    // // 关联多个Department
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // private Set<DepartmentEntity> departments = new HashSet<>();
+    private String deptUid;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 
      // 添加、移除部门的方法
-    public void addDepartment(DepartmentEntity department) {
-        departments.add(department);
-        // department.getMembers().add(this); // 假设Department类中有getMembers()方法返回成员列表
-    }
+    // public void addDepartment(DepartmentEntity department) {
+    //     departments.add(department);
+    //     // department.getMembers().add(this); // 假设Department类中有getMembers()方法返回成员列表
+    // }
 
-    public void removeDepartment(DepartmentEntity department) {
-        departments.remove(department);
-        // department.getMembers().remove(this); // 假设Department类中有getMembers()方法返回成员列表
-    }
+    // public void removeDepartment(DepartmentEntity department) {
+    //     departments.remove(department);
+    //     // department.getMembers().remove(this); // 假设Department类中有getMembers()方法返回成员列表
+    // }
 
 }

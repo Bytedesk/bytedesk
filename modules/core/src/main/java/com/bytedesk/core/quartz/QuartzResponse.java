@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.quartz;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -70,6 +70,6 @@ public class QuartzResponse extends BaseResponse {
     private String orgUid;
 
     // 
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 21:20:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 14:44:49
+ * @LastEditTime: 2024-11-07 14:16:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,7 +63,6 @@ public class OrganizationResponse extends BaseResponse {
 
     // 认证状态：未认证、已认证、审核中、审核失败
     private String verifyStatus;
-    // private OrganizationVerifyStatusEnum verifyStatus;
 
     // 认证失败原因
     private String rejectReason;

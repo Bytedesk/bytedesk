@@ -14,7 +14,7 @@
  */
 package com.bytedesk.kbase.taboo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -35,5 +35,5 @@ public class TabooResponse extends BaseResponse {
 
     private String kbUid; // 对应知识库
 
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }

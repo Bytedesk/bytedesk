@@ -17,8 +17,8 @@ package com.bytedesk.core.channel;
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -47,8 +47,8 @@ public class ChannelEntity extends BaseEntityNoOrg {
 
     private String topic;
 
-    @Column(name = "channel_type", nullable = false)
-    private String type;
+    // @Column(name = "channel_type", nullable = false)
+    // private String type;
 
     private String nickname;
 
@@ -58,4 +58,6 @@ public class ChannelEntity extends BaseEntityNoOrg {
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
+    @Builder.Default
+    private String level = LevelEnum.PLATFORM.name();
 }

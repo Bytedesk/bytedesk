@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 15:41:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 15:59:59
+ * @LastEditTime: 2024-11-07 10:42:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,8 +34,8 @@ public class MemberSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             // 
-            if (StringUtils.hasText(request.getDepUid())) {
-                predicates.add(criteriaBuilder.and(root.get("departments").get("uid").in(request.getDepUid())));
+            if (StringUtils.hasText(request.getDeptUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("deptUid"), request.getDeptUid()));
             }
             //
             if (StringUtils.hasText(request.getNickname())) {

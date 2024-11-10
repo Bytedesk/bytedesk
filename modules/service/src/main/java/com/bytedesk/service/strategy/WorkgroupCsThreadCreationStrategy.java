@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-01 17:32:17
+ * @LastEditTime: 2024-11-08 15:48:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 // import com.bytedesk.core.thread.ThreadStateService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.counter.CounterResponse;
@@ -52,7 +52,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
 
     private final WorkgroupService workgroupService;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final VisitorThreadService visitorThreadService;
 
@@ -95,11 +95,12 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             // 存在会话，且已经关闭
             thread = threadOptional.get();
             thread.reInit();
-            // threadStateService.reInit(threadOptional.get());
         } else {
             // 不存在会话，创建会话
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
         }
+        thread = visitorThreadService.reinitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
+        // 
         thread.setSerialNumber(counter.getCurrentNumber());
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
@@ -128,11 +129,9 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             // 广播消息，由消息通道统一处理
             messageSendService.sendProtobufMessage(messageProtobuf);
         }
+        // 
         return messageProtobuf;
     }
 
-    
-
-    
 
 }

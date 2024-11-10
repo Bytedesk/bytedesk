@@ -34,4 +34,6 @@ public class NoticeRequest extends BaseRequest {
     private String title;
 
     // private String content;
+
+    private String url;
 }

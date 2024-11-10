@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 13:08:58
+ * @LastEditTime: 2024-11-07 10:43:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.team.member;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -65,15 +68,15 @@ public class MemberRequest extends BaseRequest {
     private Boolean inviteAccepted;
 
     @Builder.Default
-    private MemberStatusEnum status = MemberStatusEnum.PENDING;
+    private String status = MemberStatusEnum.PENDING.name();
 
-    // @Builder.Default
-    // private Boolean enabled = true;
+    @Builder.Default
+	private Set<String> roleUids = new HashSet<>(); 
 
     private String userUid;
 
     @NotBlank
-    private String depUid;
+    private String deptUid;
     // 
     // @NotBlank
     // private String orgUid;

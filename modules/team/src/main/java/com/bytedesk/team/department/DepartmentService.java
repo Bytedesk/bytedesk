@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-17 23:50:32
+ * @LastEditTime: 2024-11-07 11:45:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.team.department;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -24,20 +23,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.team.member.MemberService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class DepartmentService {
+public class DepartmentService extends BaseRestService<DepartmentEntity, DepartmentRequest, DepartmentResponse> {
 
     private final ModelMapper modelMapper;
 
@@ -45,34 +45,60 @@ public class DepartmentService {
 
     private final UidUtils uidUtils;
 
+    private final MemberService memberService;
+
     public Page<DepartmentResponse> queryByOrg(DepartmentRequest departmentRequest) {
-
-        Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(),
-                Sort.Direction.ASC,
-                "id");
-
+        Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(), Sort.Direction.ASC,"id");
         Specification<DepartmentEntity> specification = DepartmentSpecification.search(departmentRequest);
         Page<DepartmentEntity> page = departmentRepository.findAll(specification, pageable);
-
         return page.map(this::convertToResponse);
     }
 
-    public DepartmentResponse create(DepartmentRequest departmentRequest) {
+    @Override
+    public Page<DepartmentResponse> queryByUser(DepartmentRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
 
-        DepartmentEntity department = modelMapper.map(departmentRequest, DepartmentEntity.class);
-        department.setUid(uidUtils.getCacheSerialUid());
+    @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
+    public Optional<DepartmentEntity> findByNameAndOrgUid(String name, String orgUid) {
+        return departmentRepository.findByNameAndOrgUidAndDeleted(name, orgUid, false);
+    }
 
-        if (StringUtils.hasText(departmentRequest.getParentUid())) {
-            log.debug("parent_uid {}", departmentRequest.getParentUid());
-            Optional<DepartmentEntity> parentOptional = departmentRepository.findByUid(departmentRequest.getParentUid());
+    @Cacheable(value = "department", key = "#uid", unless = "#result == null")
+    public Optional<DepartmentEntity> findByUid(String uid) {
+        return departmentRepository.findByUid(uid);
+    }
+
+    public Boolean existsByNameAndOrgUid(String name, String orgUid) {
+        return departmentRepository.existsByNameAndOrgUid(name, orgUid);
+    }
+
+    public DepartmentResponse create(DepartmentRequest request) {
+        // 
+        if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
+            log.error("department  " + request.getName() + " already exists");
+            throw new RuntimeException("department " + request.getName() + " already exists");
+        }
+
+        DepartmentEntity department = modelMapper.map(request, DepartmentEntity.class);
+        if (StringUtils.hasText(department.getUid())) {
+            department.setUid(request.getUid());
+        } else {
+            department.setUid(uidUtils.getUid());
+        }
+
+        if (StringUtils.hasText(request.getParentUid())) {
+            // log.debug("parent_uid {}", request.getParentUid());
+            Optional<DepartmentEntity> parentOptional = departmentRepository.findByUid(request.getParentUid());
             if (parentOptional.isPresent()) {
                 parentOptional.get().addChild(department);
             }
         } else {
-            log.debug("parent_uid is null");
+            // log.debug("parent_uid is null");
             department.setParent(null);
         }
-        department.setOrgUid(departmentRequest.getOrgUid());
+        department.setOrgUid(request.getOrgUid());
 
         DepartmentEntity createdDepartment = save(department);
         if (createdDepartment == null) {
@@ -88,35 +114,18 @@ public class DepartmentService {
         Optional<DepartmentEntity> optional = findByUid(departmentRequest.getUid());
         if (optional.isPresent()) {
             DepartmentEntity department = optional.get();
-            modelMapper.map(departmentRequest, DepartmentEntity.class);
-            return convertToResponse(save(department));
+            // modelMapper.map(departmentRequest, DepartmentEntity.class);
+            department.setName(departmentRequest.getName());
+            department.setDescription(departmentRequest.getDescription());
+
+            DepartmentEntity savedEntity = save(department);
+            if (savedEntity == null) {
+                throw new RuntimeException("department update failed");
+            }
+            return convertToResponse(savedEntity);
         } else {
-            log.error("department not found");
             throw new RuntimeException("department not found");
         }
-    }
-
-    public void deleteByUid(DepartmentRequest departmentRequest) {
-        //
-        Optional<DepartmentEntity> optional = findByUid(departmentRequest.getUid());
-        if (optional.isPresent()) {
-            DepartmentEntity department = optional.get();
-            department.setDeleted(true);
-            save(department);
-        } else {
-            log.error("department not found");
-            throw new RuntimeException("department not found");
-        }
-    }
-
-    @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
-    public Optional<DepartmentEntity> findByNameAndOrgUid(String name, String orgUid) {
-        return departmentRepository.findByNameAndOrgUidAndDeleted(name, orgUid, false);
-    }
-
-    @Cacheable(value = "department", key = "#uid", unless = "#result == null")
-    public Optional<DepartmentEntity> findByUid(String uid) {
-        return departmentRepository.findByUid(uid);
     }
 
     public DepartmentEntity save(DepartmentEntity department) {
@@ -128,7 +137,42 @@ public class DepartmentService {
         return null;
     }
 
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<DepartmentEntity> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            DepartmentEntity department = optional.get();
+            // delete children departments
+            for (DepartmentEntity child : department.getChildren()) {
+                // child.setParent(null);
+                child.setDeleted(true);
+                save(child);
+            }
+            department.setDeleted(true);
+            save(department);
+            // remove department members
+            memberService.clearDepartmentUid(department.getUid());
+        } else {
+            log.error("department not found");
+            throw new RuntimeException("department not found");
+        }
+    }
+
+    @Override
+    public void delete(DepartmentRequest request) {
+        deleteByUid(request.getUid());
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            DepartmentEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
     public DepartmentResponse convertToResponse(DepartmentEntity department) {
+        // 过滤掉department.children中deleted为true的元素
+        department.getChildren().removeIf(child -> child.isDeleted());
         DepartmentResponse departmentResponse = modelMapper.map(department, DepartmentResponse.class);
         if (department.getParent() != null) {
             departmentResponse.setParentUid(department.getParent().getUid());
@@ -136,58 +180,5 @@ public class DepartmentService {
         return departmentResponse;
     }
 
-    public void initData() {
-
-        if (departmentRepository.count() > 0) {
-            return;
-        }
-        //
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        //
-        DepartmentEntity[] departments = new DepartmentEntity[] {
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN)
-                        .description(TypeConsts.DEPT_ADMIN)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build(),
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_HR)
-                        .description(TypeConsts.DEPT_HR)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build(),
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_ORG)
-                        .description(TypeConsts.DEPT_ORG)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build(),
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_IT)
-                        .description(TypeConsts.DEPT_IT)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build(),
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_MONEY)
-                        .description(TypeConsts.DEPT_MONEY)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build(),
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_MARKETING)
-                        .description(TypeConsts.DEPT_MARKETING)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build(),
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_SALES)
-                        .description(TypeConsts.DEPT_SALES)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build(),
-                DepartmentEntity.builder().name(I18Consts.I18N_PREFIX + TypeConsts.DEPT_CUSTOMER_SERVICE)
-                        .description(TypeConsts.DEPT_CUSTOMER_SERVICE)
-                        .type(TypeConsts.TYPE_SYSTEM)
-                        .build()
-        };
-
-        Arrays.stream(departments).forEach((department) -> {
-            Optional<DepartmentEntity> depOptional = findByNameAndOrgUid(department.getName(), orgUid);
-            if (!depOptional.isPresent()) {
-                department.setUid(uidUtils.getCacheSerialUid());
-                department.setOrgUid(orgUid);
-                departmentRepository.save(department);
-            }
-        });
-
-    }
 
 }

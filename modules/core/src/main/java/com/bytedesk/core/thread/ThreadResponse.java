@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.thread;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -68,7 +68,7 @@ public class ThreadResponse extends BaseResponse {
 
     private String agent;
 
-	private Date updatedAt;
+	private LocalDateTime updatedAt;
 
     private UserProtobuf user;
     //

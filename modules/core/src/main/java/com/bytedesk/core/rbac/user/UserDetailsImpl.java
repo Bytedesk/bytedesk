@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-18 09:35:07
+ * @LastEditTime: 2024-11-09 12:23:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,18 +15,22 @@
 package com.bytedesk.core.rbac.user;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+// import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
+// import java.util.stream.Collectors;
 
+import com.bytedesk.core.utils.ConvertUtils;
+
+@Slf4j
 @Data
 public class UserDetailsImpl implements UserDetails {
 
@@ -37,36 +41,38 @@ public class UserDetailsImpl implements UserDetails {
     private String avatar;
     private String mobile;
     private String email;
+    @JsonIgnore
+    private String password;
     private String description;
     // 
+    private boolean enabled;
     private boolean superUser;
     private boolean emailVerified;
     private boolean mobileVerified;
-    // private PlatformEnum platform;
     private String platform;
     // 
-    @JsonIgnore
-    private String password;
     private OrganizationEntity currentOrganization;
     private Set<UserOrganizationRoleEntity> userOrganizationRoles;
     // private Set<Role> roles;
     // private Set<String> organizations;
-    //
-    private boolean enabled;
     Collection<? extends GrantedAuthority> authorities;
 
-    private UserDetailsImpl(Long id, String uid, String username, String nickname, String avatar, String mobile,
-            String email, String password,
+    private UserDetailsImpl(
+            Long id, 
+            String uid, 
+            String username, 
+            String nickname, 
+            String avatar, 
+            String mobile,
+            String email, 
+            String password,
             Collection<? extends GrantedAuthority> authorities,
             OrganizationEntity currentOrganization,
             Set<UserOrganizationRoleEntity> userOrganizationRoles,
-            // Set<Role> roles,
-            // Set<String> organizations,
             String description,
             boolean superUser,
             boolean emailVerified,
             boolean mobileVerified,
-            // PlatformEnum platform,
             String platform,
             boolean enabled) {
         this.id = id;
@@ -77,38 +83,27 @@ public class UserDetailsImpl implements UserDetails {
         this.mobile = mobile;
         this.email = email;
         this.password = password;
-        this.authorities = authorities;
-        this.currentOrganization = currentOrganization;
-        this.userOrganizationRoles = userOrganizationRoles;
-        // this.roles = roles;
-        // this.organizations = organizations;
         this.description = description;
         // 
+        this.enabled = enabled;
         this.superUser = superUser;
         this.emailVerified = emailVerified;
         this.mobileVerified = mobileVerified;
         this.platform = platform;
         // 
-        this.enabled = enabled;
+        this.authorities = authorities;
+        this.currentOrganization = currentOrganization;
+        this.userOrganizationRoles = userOrganizationRoles;
     }
 
-    //
+    /**
+     * {@UserRestController#testSuperAuthority}
+     */
     public static UserDetailsImpl build(UserEntity user) {
         //
-        // Set<GrantedAuthority> authorities = user.getRoles().stream()
-        // .map(role -> new SimpleGrantedAuthority(role.getValue()))
-        // .collect(Collectors.toSet());
+        Set<GrantedAuthority> authorities = ConvertUtils.filterUserGrantedAuthorities(user);
+        // log.info("authorities: {}", authorities);
         // 
-        // Set<GrantedAuthority> authorities = user.getRoles().stream()
-        //         .flatMap(role -> role.getAuthorities().stream()
-        //                 .map(authority -> new SimpleGrantedAuthority(TypeConsts.ROLE_PREFIX + authority.getValue())))
-        //         .collect(Collectors.toSet());
-        // 
-        Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
-                .flatMap(uor -> uor.getRole().getAuthorities().stream()
-                        .map(authority -> new SimpleGrantedAuthority(authority.getValue())))
-                .collect(Collectors.toSet());
-
         return new UserDetailsImpl(user.getId(),
                 user.getUid(),
                 user.getUsername(),
@@ -120,8 +115,6 @@ public class UserDetailsImpl implements UserDetails {
                 authorities,
                 user.getCurrentOrganization(),
                 user.getUserOrganizationRoles(),
-                // user.getRoles(),
-                // user.getOrganizations(),
                 user.getDescription(),
                 user.isSuperUser(),
                 user.isEmailVerified(),
@@ -147,25 +140,21 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        // return true;
         return enabled;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        // return true;
         return enabled;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        // return true;
         return enabled;
     }
 
     @Override
     public boolean isEnabled() {
-        // return true;
         return enabled;
     }
 }

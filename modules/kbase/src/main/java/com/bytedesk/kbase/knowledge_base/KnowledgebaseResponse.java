@@ -14,7 +14,7 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -82,7 +82,7 @@ public class KnowledgebaseResponse extends BaseResponse {
 
     private String orgUid;
 
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     private String agentUid;
 }

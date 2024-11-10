@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 13:03:50
+ * @LastEditTime: 2024-11-05 11:15:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,7 +57,7 @@ public class AuthController {
 
     @ActionAnnotation(title = "auth", action = "register", description = "register")
     @PostMapping(value = "/register")
-    public ResponseEntity<?> register(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
         if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(), userRequest.getClient())) {
             return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
@@ -65,7 +65,7 @@ public class AuthController {
 
         // validate sms code
         // 验证手机验证码
-        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode())) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
@@ -112,7 +112,7 @@ public class AuthController {
 
     @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code")
     @PostMapping("/login/mobile")
-    public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
 
         if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
@@ -120,7 +120,7 @@ public class AuthController {
         }
         // validate mobile & code
         // 验证手机验证码
-        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode())) {
+        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
@@ -162,11 +162,11 @@ public class AuthController {
 
     @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code")
     @PostMapping("/login/email")
-    public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login email {}", authRequest.toString());
 
         // validate email & code
-        if (!pushService.validateCode(authRequest.getEmail(), authRequest.getCode())) {
+        if (!pushService.validateCode(authRequest.getEmail(), authRequest.getCode(), request)) {
             return ResponseEntity.ok(JsonResult.error("validate code failed", -1, false));
         }
 

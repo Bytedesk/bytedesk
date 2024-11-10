@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:17:59
+ * @LastEditTime: 2024-11-05 13:38:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
@@ -43,7 +43,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyRequest, QuickReplyResponse> {
+public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickReplyRequest, QuickReplyResponse> {
 
     private final QuickReplyRepository quickReplyRepository;
 
@@ -202,7 +202,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
                     .categoryUid(categoryContact.get().getUid())
                     .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                    .level(LevelEnum.PLATFORM)
+                    .level(LevelEnum.PLATFORM.name())
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
@@ -221,7 +221,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .title(I18Consts.I18N_QUICK_REPLY_THANKS_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
                     .categoryUid(categoryThanks.get().getUid())
-                    .level(LevelEnum.PLATFORM)
+                    .level(LevelEnum.PLATFORM.name())
                     .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
@@ -241,7 +241,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .title(I18Consts.I18N_QUICK_REPLY_WELCOME_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
                     .categoryUid(categoryWelcome.get().getUid())
-                    .level(LevelEnum.PLATFORM)
+                    .level(LevelEnum.PLATFORM.name())
                     .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
@@ -261,7 +261,7 @@ public class QuickReplyService extends BaseService<QuickReplyEntity, QuickReplyR
                     .title(I18Consts.I18N_QUICK_REPLY_BYE_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
                     .categoryUid(categoryBye.get().getUid())
-                    .level(LevelEnum.PLATFORM)
+                    .level(LevelEnum.PLATFORM.name())
                     .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());

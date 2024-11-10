@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-11 18:13:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 18:13:49
+ * @LastEditTime: 2024-11-08 11:16:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 
@@ -27,7 +28,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoleSpecification extends BaseSpecification {
 
-    public static Specification<RoleEntity> search(RoleRequest request) {
+    public static Specification<RoleEntity> searchBySuper(RoleRequest request) {
+        log.info("request: {}", request);
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // 过滤 level = LevelEnum.PLATFORM.name()
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
+            }
+            //
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<RoleEntity> searchByOrg(RoleRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

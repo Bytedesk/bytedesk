@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 13:42:12
+ * @LastEditTime: 2024-11-10 08:36:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,8 @@
 package com.bytedesk.core.rbac.user;
 
 import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,9 +30,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.exception.EmailExistsException;
@@ -39,6 +39,7 @@ import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.rbac.auth.AuthUser;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
+import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.uid.UidUtils;
@@ -123,8 +124,6 @@ public class UserService {
             user.setMobileVerified(true);
         }
         user.setEnabled(true);
-        //
-        // TODO: 设置角色role
         //
         user = save(user);
         //
@@ -229,7 +228,6 @@ public class UserService {
 
     @Transactional
     public UserResponse changeEmail(UserRequest request) {
-
         UserEntity currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
@@ -248,7 +246,7 @@ public class UserService {
             }
             user.setEmailVerified(true);
             user = save(user);
-
+            // 
             return ConvertUtils.convertToUserResponse(user);
         } else {
             throw new RuntimeException("User not found..!!");
@@ -257,7 +255,6 @@ public class UserService {
 
     @Transactional
     public UserResponse changeMobile(UserRequest request) {
-
         UserEntity currentUser = AuthUser.getCurrentUser(); // FIXME: 直接使用此user save，会报错
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
@@ -282,10 +279,9 @@ public class UserService {
             throw new RuntimeException("User not found..!!");
         }
     }
-    
 
     @Transactional
-    public UserEntity createUser(UserRequest request) {
+    public UserEntity createUserFromMember(UserRequest request, Set<String> roleUids) {
         //
         if (StringUtils.hasText(request.getMobile())
             && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
@@ -302,7 +298,6 @@ public class UserService {
         //
         UserEntity user = UserEntity.builder()
                 .avatar(request.getAvatar())
-                // .username(request.getEmail())
                 .nickname(request.getNickname())
                 .mobile(request.getMobile())
                 .num(request.getMobile())
@@ -310,9 +305,8 @@ public class UserService {
                 .superUser(false)
                 .emailVerified(false)
                 .mobileVerified(false)
-                .password(request.getPassword())
                 .build();
-        user.setUid(uidUtils.getCacheSerialUid());
+        user.setUid(uidUtils.getUid());
         // 
         if (StringUtils.hasText(request.getEmail())) {
             user.setUsername(request.getEmail());
@@ -326,29 +320,80 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
         }
         //
-        Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(request.getOrgUid());
-        Optional<RoleEntity> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_CUSTOMER_SERVICE, request.getOrgUid());
-        if (orgOptional.isPresent() && roleOptional.isPresent()) {
-            OrganizationEntity organization = orgOptional.get();
-            RoleEntity role = roleOptional.get();
-            //
-            user.addOrganizationRole(organization, role);
-        }
-        //
-        return save(user);
+        return updateUserRolesFromMember(user, request.getOrgUid(), roleUids);
     }
 
-    public UserEntity updateUser(UserEntity user, String password, String mobile, String email) {
-
-        if (StringUtils.hasText(password)) {
-            user.setPassword(passwordEncoder.encode(password));
+    // 
+    public UserEntity updateUserRolesFromMember(UserEntity user, String orgUid, Set<String> roleUids) {
+        // 
+        Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
+        if (!orgOptional.isPresent()) {
+            throw new RuntimeException("Organization not found..!!");
         }
+        user.removeOrganizationRoles(orgOptional.get());
+        // 
+        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_MEMBER);
+        if (roleOptional.isPresent()) {
+            OrganizationEntity organization = orgOptional.get();
+            RoleEntity role = roleOptional.get();
+            // 确保角色是持久化的
+            role = roleService.save(role);
+            user.addOrganizationRole(organization, role);
+        }
+        // 增加角色，遍历roleUids，逐个添加
+        for (String roleUid : roleUids) {
+            Optional<RoleEntity> optional = roleService.findByUid(roleUid);
+            if (optional.isPresent()) {
+                RoleEntity role = optional.get();
+                // 确保角色是持久化的
+                role = roleService.save(role);
+                user.addOrganizationRole(orgOptional.get(), role);
+            } else {
+                throw new RuntimeException("Role not found..!!");
+            }
+        }
+        // 
+        UserEntity savedEntity = save(user);
+        if (savedEntity == null) {
+            throw new RuntimeException("User create failed..!!");
+        }
+        // TODO: 发送邮件
+        // TODO: 短信通知
+        // TODO: 系统通知Notice
+        return savedEntity;
+    }
 
-        user.setMobile(mobile);
-        user.setNum(mobile);
-        user.setEmail(email);
+    public UserEntity addCustomerServiceRole(UserEntity user) {
+        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_CUSTOMER_SERVICE);
+        if (roleOptional.isPresent()) {
+            RoleEntity role = roleOptional.get();
+            // 确保角色是持久化的
+            role = roleService.save(role);
+            user.addOrganizationRole(user.getCurrentOrganization(), role);
+            // 
+            UserEntity savedEntity = save(user);
+            if (savedEntity == null) {
+                throw new RuntimeException("User add cs role failed..!!");
+            }
+            return savedEntity;
+        } else {
+            throw new RuntimeException("Role not found..!!");
+        }
+    }
 
-        return save(user);
+    public UserEntity removeCustomerServiceRole(UserEntity user) {
+        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_CUSTOMER_SERVICE);
+        if (roleOptional.isPresent()) {
+            user.removeOrganizationRole(user.getCurrentOrganization(), roleOptional.get());
+            // 
+            UserEntity savedEntity = save(user);
+            if (savedEntity == null) {
+                throw new RuntimeException("User remove cs role failed..!!");
+            }
+            return savedEntity;
+        } else {
+            throw new RuntimeException("Role not found..!!");
+        }
     }
 
     public void logout() {
@@ -359,28 +404,28 @@ public class UserService {
 
     @Cacheable(value = "user", key = "#email", unless = "#result == null")
     public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
-        return userRepository.findByEmailAndPlatformAndDeleted(email, platform, false);
+        return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
     @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
     public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
-        return userRepository.findByMobileAndPlatformAndDeleted(mobile, platform, false);
+        return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
     }
 
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
     public Optional<UserEntity> findByUsernameAndPlatform(String username, String platform) {
-        return userRepository.findByUsernameAndPlatformAndDeleted(username, platform, false);
+        return userRepository.findByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
-    @Cacheable(value = "user", key = "#uid", unless = "#result == null")
+    // @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     public Optional<UserEntity> findByUid(String uid) {
         return userRepository.findByUid(uid);
     }
 
     @Cacheable(value = "admin", unless = "#result == null")
     public Optional<UserEntity> getAdmin() {
-        return userRepository.findByUsernameAndPlatformAndDeleted(bytedeskProperties.getEmail(),
-                PlatformEnum.BYTEDESK.name(), false);
+        return userRepository.findByUsernameAndPlatformAndDeletedFalse(bytedeskProperties.getEmail(),
+                PlatformEnum.BYTEDESK.name());
     }
 
     //
@@ -389,7 +434,7 @@ public class UserService {
         if (!StringUtils.hasText(username)) {
             return false;
         }
-        return userRepository.existsByUsernameAndPlatformAndDeleted(username, platform, false);
+        return userRepository.existsByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#mobile", unless = "#result == null")
@@ -397,7 +442,7 @@ public class UserService {
         if (!StringUtils.hasText(mobile)) {
             return false;
         }
-        return userRepository.existsByMobileAndPlatformAndDeleted(mobile, platform, false);
+        return userRepository.existsByMobileAndPlatformAndDeletedFalse(mobile, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#email", unless = "#result == null")
@@ -405,11 +450,11 @@ public class UserService {
         if (!StringUtils.hasText(email)) {
             return false;
         }
-        return userRepository.existsByEmailAndPlatformAndDeleted(email, platform, false);
+        return userRepository.existsByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
     public Boolean existsBySuperUser() {
-        return userRepository.existsBySuperUserAndDeleted(true, false);
+        return userRepository.existsBySuperUserAndDeletedFalse(true);
     }
 
     @Caching(put = {
@@ -442,7 +487,6 @@ public class UserService {
             @CacheEvict(value = "user:exists", key = "#user.email"),
     })
     public void delete(@NonNull UserEntity user) {
-        // userRepository.delete(user);
         user.setDeleted(true);
         save(user);
     }
@@ -451,51 +495,6 @@ public class UserService {
     public String createNickname() {
         String randomId = uidUtils.getCacheSerialUid().substring(11, 15);
         return "User" + randomId;
-    }
-
-    public void initData() {
-
-        if (existsBySuperUser()) {
-            return;
-        }
-
-        // if (existsByMobileAndPlatform(bytedeskProperties.getMobile(), PlatformEnum.BYTEDESK.name())) {
-        //     return;
-        // }
-
-        UserEntity admin = UserEntity.builder()
-                .email(bytedeskProperties.getEmail())
-                .username(bytedeskProperties.getEmail())
-                .password(new BCryptPasswordEncoder().encode(bytedeskProperties.getPassword()))
-                .nickname(bytedeskProperties.getNickname())
-                .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
-                .mobile(bytedeskProperties.getMobile())
-                .num(bytedeskProperties.getMobile())
-                .superUser(true)
-                .emailVerified(true)
-                .mobileVerified(true)
-                .build();
-        admin.setUid(uidUtils.getCacheSerialUid());
-        //
-        save(admin);
-    }
-
-    public void updateInitData() {
-        //
-        Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        Optional<RoleEntity> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_SUPER,
-                BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        Optional<UserEntity> adminOptional = findByEmailAndPlatform(bytedeskProperties.getEmail(),
-                PlatformEnum.BYTEDESK.name());
-        if (orgOptional.isPresent() && roleOptional.isPresent() && adminOptional.isPresent()) {
-            OrganizationEntity organization = orgOptional.get();
-            RoleEntity role = roleOptional.get();
-            UserEntity user = adminOptional.get();
-            //
-            user.addOrganizationRole(organization, role);
-            //
-            save(user);
-        }
     }
 
 }

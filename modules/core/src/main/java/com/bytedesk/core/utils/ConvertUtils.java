@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-10 11:42:15
+ * @LastEditTime: 2024-11-09 12:21:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,8 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnread;
+import com.bytedesk.core.rbac.authority.AuthorityEntity;
+import com.bytedesk.core.rbac.authority.AuthorityResponse;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -39,23 +41,39 @@ public class ConvertUtils {
 
     private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
 
-    private ConvertUtils() {
-    }
+    private ConvertUtils() {}
 
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
-        UserResponse userResponse = modelMapper.map(userDetails, UserResponse.class);
-
-        return userResponse;
+        // 无需进行authorities转换，因为UserDetailsImpl中已经包含了authorities
+        return modelMapper.map(userDetails, UserResponse.class);
     }
 
     public static UserResponse convertToUserResponse(UserEntity user) {
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
-                .flatMap(uor -> uor.getRole().getAuthorities().stream()
-                        .map(authority -> new SimpleGrantedAuthority(authority.getValue())))
-                .collect(Collectors.toSet());
+        Set<GrantedAuthority> authorities = filterUserGrantedAuthorities(user);
         userResponse.setAuthorities(authorities);
         return userResponse;
+    }
+
+    public static Set<GrantedAuthority> filterUserGrantedAuthorities(UserEntity user) {
+        // 添加用户的权限，使用方式，如：@PreAuthorize("hasAnyAuthority('SUPER', 'ADMIN')")
+        Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
+                .filter(uor -> uor.getOrganization().equals(user.getCurrentOrganization())) // 过滤步骤
+                .flatMap(uor -> uor.getRoles().stream()
+                        .flatMap(role -> role.getAuthorities().stream()
+                                .map(authority -> new SimpleGrantedAuthority(authority.getValue()))))
+                .collect(Collectors.toSet());
+        // log.info("authorities only: {}", authorities);
+
+        // 添加用户的角色，使用方式，在Controller或Service方法配置注解：@PreAuthorize("hasAnyRole('ADMIN', 'SUPER', 'CS')")，
+        // 无需加角色前缀ROLE_，因为已经在RoleEntity的name中配置了
+        authorities.addAll(user.getUserOrganizationRoles().stream()
+                .filter(uor -> uor.getOrganization().equals(user.getCurrentOrganization())) // 过滤步骤
+                .flatMap(uor -> uor.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName())))
+                .collect(Collectors.toSet()));
+        // log.info("authorities with roles: {}", authorities);
+        return authorities;
     }
 
     public static UserProtobuf convertToUserProtobuf(UserEntity user) {
@@ -74,8 +92,16 @@ public class ConvertUtils {
         return threadProtobuf;
     }
 
-    public static RoleResponse convertToRoleResponse(RoleEntity role) {
-        return modelMapper.map(role, RoleResponse.class);
+    public static RoleResponse convertToRoleResponse(RoleEntity entity) {
+        // return modelMapper.map(role, RoleResponse.class);
+        RoleResponse roleResponse = modelMapper.map(entity, RoleResponse.class);
+                // 将Set<AuthorityEntity> authorities转换为Set<AuthorityResponse> authorities
+                roleResponse.setAuthorities(
+                                entity.getAuthorities().stream()
+                                                .map(authorityEntity -> ConvertUtils
+                                                                .convertToAuthorityResponse(authorityEntity))
+                                                .collect(Collectors.toSet()));
+                return roleResponse;
     }
 
     public static MessageResponse convertToMessageResponse(MessageEntity message) {
@@ -102,6 +128,10 @@ public class ConvertUtils {
         messageResponse.setUser(user);
 
         return messageResponse;
+    }
+
+    public static AuthorityResponse convertToAuthorityResponse(AuthorityEntity authorityEntity) {
+        return modelMapper.map(authorityEntity, AuthorityResponse.class);
     }
 
 }

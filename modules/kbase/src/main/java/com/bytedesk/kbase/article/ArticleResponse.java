@@ -14,7 +14,7 @@
  */
 package com.bytedesk.kbase.article;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -59,9 +59,9 @@ public class ArticleResponse extends BaseResponse {
 
     private String orgUid;
 
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     private UserProtobuf user;
 }

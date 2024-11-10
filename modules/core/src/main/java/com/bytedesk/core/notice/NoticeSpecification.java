@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:29:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-01 09:29:26
+ * @LastEditTime: 2024-11-08 07:24:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,28 @@
  */
 package com.bytedesk.core.notice;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseSpecification;
+
+import jakarta.persistence.criteria.Predicate;
 
 public class NoticeSpecification extends BaseSpecification {
     
+    public static Specification<NoticeEntity> search(NoticeRequest request) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            //
+            if (StringUtils.hasText(request.getContent())) {
+                predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
+            }
+            //
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }

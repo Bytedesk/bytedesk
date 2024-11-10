@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-11 17:36:16
+ * @LastEditTime: 2024-11-06 12:52:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -32,18 +31,21 @@ import java.util.Optional;
  * @author im.bytedesk.com
  */
 @Repository
-// @Transactional(readOnly = true)
 @Tag(name = "roles - 角色")
 public interface RoleRepository extends JpaRepository<RoleEntity, Long>, JpaSpecificationExecutor<RoleEntity> {
 
-    Optional<RoleEntity> findByNameAndOrgUidAndDeleted(String name, String orgUid, Boolean deleted);
+    Optional<RoleEntity> findByUid(String uid);
 
-    List<RoleEntity> findByTypeAndOrgUidAndDeleted(String type, String orgUid, Boolean deleted);
+    Optional<RoleEntity> findByNameAndLevel(String name, String level);
 
+    Optional<RoleEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
+    // List<RoleEntity> findByTypeAndOrgUidAndDeleted(String type, String orgUid, Boolean deleted);
     // Page<Role> findByUser(User user, Pageable pageable);
-    Page<RoleEntity> findByOrgUidAndDeleted(String orgUid, boolean deleted, Pageable pageable);
+    Page<RoleEntity> findByOrgUidAndDeletedFalse(String orgUid, Pageable pageable);
 
-    Boolean existsByNameAndOrgUidAndDeleted(String name, String orgUid, boolean deleted);
+    Boolean existsByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
+
+    Boolean existsByNameAndLevel(String name, String level);
 
     @Transactional
     void deleteById(@NonNull Long id);

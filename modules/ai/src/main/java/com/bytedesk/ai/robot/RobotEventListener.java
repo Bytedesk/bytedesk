@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 22:32:13
+ * @LastEditTime: 2024-11-07 16:06:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,7 +43,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.redis.pubsub.RedisPubsubService;
 import com.bytedesk.core.thread.ThreadProtobuf;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -63,7 +63,7 @@ public class RobotEventListener {
 
     private final UidUtils uidUtils;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final RedisPubsubService redisPubsubService;
 

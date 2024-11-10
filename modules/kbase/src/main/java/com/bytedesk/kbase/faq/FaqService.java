@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:16:49
+ * @LastEditTime: 2024-11-06 22:38:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,22 +28,20 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryService;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class FaqService extends BaseService<FaqEntity, FaqRequest, FaqResponse> {
+public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqResponse> {
 
     private final FaqRepository faqRepository;
 
@@ -71,9 +70,14 @@ public class FaqService extends BaseService<FaqEntity, FaqRequest, FaqResponse> 
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(value = "faq", key="#uid", unless = "#result == null")
     @Override
     public Optional<FaqEntity> findByUid(String uid) {
         return faqRepository.findByUid(uid);
+    }
+
+    public Boolean existsByUid(String uid) {
+        return faqRepository.existsByUid(uid);
     }
 
     @Override
@@ -81,7 +85,7 @@ public class FaqService extends BaseService<FaqEntity, FaqRequest, FaqResponse> 
 
         FaqEntity entity = modelMapper.map(request, FaqEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
-            entity.setUid(uidUtils.getDefaultSerialUid());
+            entity.setUid(uidUtils.getUid());
         }
         entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
         //
@@ -90,7 +94,6 @@ public class FaqService extends BaseService<FaqEntity, FaqRequest, FaqResponse> 
         // if (categoryOptional.isPresent()) {
         //     entity.setCategory(categoryOptional.get());
         // }
-
         return convertToResponse(save(entity));
     }
 
@@ -215,33 +218,33 @@ public class FaqService extends BaseService<FaqEntity, FaqRequest, FaqResponse> 
         return faq;
     }
 
-    public void initData() {
+    // public void initData() {
 
-        if (faqRepository.count() > 0) {
-            return;
-        }
+    //     if (faqRepository.count() > 0) {
+    //         return;
+    //     }
 
-        //
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        FaqRequest faqDemo1 = FaqRequest.builder()
-                .title(I18Consts.I18N_FAQ_DEMO_TITLE_1)
-                .content(I18Consts.I18N_FAQ_DEMO_CONTENT_1)
-                .type(MessageTypeEnum.TEXT.name())
-                .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
-                .build();
-        faqDemo1.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1);
-        faqDemo1.setOrgUid(orgUid);
-        create(faqDemo1);
-        //
-        FaqRequest faqDemo2 = FaqRequest.builder()
-                .title(I18Consts.I18N_FAQ_DEMO_TITLE_2)
-                .content(I18Consts.I18N_FAQ_DEMO_CONTENT_2)
-                .type(MessageTypeEnum.IMAGE.name())
-                .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
-                .build();
-        faqDemo2.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
-        faqDemo2.setOrgUid(orgUid);
-        create(faqDemo2);
-    }
+    //     //
+    //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    //     FaqRequest faqDemo1 = FaqRequest.builder()
+    //             .title(I18Consts.I18N_FAQ_DEMO_TITLE_1)
+    //             .content(I18Consts.I18N_FAQ_DEMO_CONTENT_1)
+    //             .type(MessageTypeEnum.TEXT.name())
+    //             .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
+    //             .build();
+    //     faqDemo1.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1);
+    //     faqDemo1.setOrgUid(orgUid);
+    //     create(faqDemo1);
+    //     //
+    //     FaqRequest faqDemo2 = FaqRequest.builder()
+    //             .title(I18Consts.I18N_FAQ_DEMO_TITLE_2)
+    //             .content(I18Consts.I18N_FAQ_DEMO_CONTENT_2)
+    //             .type(MessageTypeEnum.IMAGE.name())
+    //             .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
+    //             .build();
+    //     faqDemo2.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+    //     faqDemo2.setOrgUid(orgUid);
+    //     create(faqDemo2);
+    // }
 
 }

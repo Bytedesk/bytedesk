@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 17:42:44
+ * @LastEditTime: 2024-11-08 12:43:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.core.message;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.message_unread.MessageUnreadService;
@@ -171,14 +168,7 @@ public class MessageController extends BaseRestController<MessageRequest> {
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
             //
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("status", "failure");
-            jsonObject.put("message", "download faied " + e.getMessage());
-            try {
-                response.getWriter().println(JSON.toJSONString(jsonObject));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            return JsonResult.error(e.getMessage());
         }
 
         return "";

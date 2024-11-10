@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:33:36
+ * @LastEditTime: 2024-11-06 10:45:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,9 +29,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -42,7 +40,7 @@ import lombok.AllArgsConstructor;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class CategoryService extends BaseService<CategoryEntity, CategoryRequest, CategoryResponse> {
+public class CategoryService extends BaseRestService<CategoryEntity, CategoryRequest, CategoryResponse> {
 
     private final CategoryRepository categoryRepository;
 
@@ -196,87 +194,87 @@ public class CategoryService extends BaseService<CategoryEntity, CategoryRequest
 
 
     //
-    public void initData() {
+    // public void initData() {
 
-        if (categoryRepository.count() > 0) {
-            return;
-        }
+    //     if (categoryRepository.count() > 0) {
+    //         return;
+    //     }
 
-        //
-        // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
-        // init quick reply categories
-        CategoryRequest categoryContact = CategoryRequest.builder()
-                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
-                .orderNo(0)
-                .level(LevelEnum.PLATFORM.name())
-                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                .build();
-        categoryContact.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
-        // 此处设置orgUid方便超级管理员加载
-        categoryContact.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        create(categoryContact);
+    //     //
+    //     // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
+    //     // init quick reply categories
+    //     CategoryRequest categoryContact = CategoryRequest.builder()
+    //             .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
+    //             .orderNo(0)
+    //             .level(LevelEnum.PLATFORM.name())
+    //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //             .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+    //             .build();
+    //     categoryContact.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+    //     // 此处设置orgUid方便超级管理员加载
+    //     categoryContact.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    //     create(categoryContact);
 
-        CategoryRequest categoryThanks = CategoryRequest.builder()
-                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
-                .orderNo(1)
-                .level(LevelEnum.PLATFORM.name())
-                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                .build();
-        categoryThanks.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
-        // 此处设置orgUid方便超级管理员加载
-        categoryThanks.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        create(categoryThanks);
+    //     CategoryRequest categoryThanks = CategoryRequest.builder()
+    //             .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
+    //             .orderNo(1)
+    //             .level(LevelEnum.PLATFORM.name())
+    //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //             .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+    //             .build();
+    //     categoryThanks.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+    //     // 此处设置orgUid方便超级管理员加载
+    //     categoryThanks.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    //     create(categoryThanks);
 
-        CategoryRequest categoryWelcome = CategoryRequest.builder()
-                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
-                .orderNo(2)
-                .level(LevelEnum.PLATFORM.name())
-                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                .build();
-        categoryWelcome.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
-        // 此处设置orgUid方便超级管理员加载
-        categoryWelcome.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        create(categoryWelcome);
+    //     CategoryRequest categoryWelcome = CategoryRequest.builder()
+    //             .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
+    //             .orderNo(2)
+    //             .level(LevelEnum.PLATFORM.name())
+    //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //             .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+    //             .build();
+    //     categoryWelcome.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+    //     // 此处设置orgUid方便超级管理员加载
+    //     categoryWelcome.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    //     create(categoryWelcome);
 
-        CategoryRequest categoryBye = CategoryRequest.builder()
-                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
-                .orderNo(3)
-                .level(LevelEnum.PLATFORM.name())
-                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                .build();
-        categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
-        // 此处设置orgUid方便超级管理员加载
-        categoryBye.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        create(categoryBye);
+    //     CategoryRequest categoryBye = CategoryRequest.builder()
+    //             .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
+    //             .orderNo(3)
+    //             .level(LevelEnum.PLATFORM.name())
+    //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //             .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+    //             .build();
+    //     categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+    //     // 此处设置orgUid方便超级管理员加载
+    //     categoryBye.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    //     create(categoryBye);
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
-        //
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        CategoryRequest categoryFaqDemoRequest1 = CategoryRequest.builder()
-                .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
-                .orderNo(0)
-                .level(LevelEnum.ORGANIZATION.name())
-                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .build();
-        categoryFaqDemoRequest1.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
-        categoryFaqDemoRequest1.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1);
-        categoryFaqDemoRequest1.setOrgUid(orgUid);
-        create(categoryFaqDemoRequest1);
-        //
-        CategoryRequest categoryFaqDemoRequest2 = CategoryRequest.builder()
-                .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
-                .orderNo(0)
-                .level(LevelEnum.ORGANIZATION.name())
-                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .build();
-        categoryFaqDemoRequest2.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
-        categoryFaqDemoRequest2.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2);
-        categoryFaqDemoRequest2.setOrgUid(orgUid);
-        create(categoryFaqDemoRequest2);
-    }
+    //     ///////////////////////////////////////////////////////////////////////////////////////////////////
+    //     //
+    //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    //     CategoryRequest categoryFaqDemoRequest1 = CategoryRequest.builder()
+    //             .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
+    //             .orderNo(0)
+    //             .level(LevelEnum.ORGANIZATION.name())
+    //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //             .build();
+    //     categoryFaqDemoRequest1.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+    //     categoryFaqDemoRequest1.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1);
+    //     categoryFaqDemoRequest1.setOrgUid(orgUid);
+    //     create(categoryFaqDemoRequest1);
+    //     //
+    //     CategoryRequest categoryFaqDemoRequest2 = CategoryRequest.builder()
+    //             .name(I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
+    //             .orderNo(0)
+    //             .level(LevelEnum.ORGANIZATION.name())
+    //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //             .build();
+    //     categoryFaqDemoRequest2.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+    //     categoryFaqDemoRequest2.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2);
+    //     categoryFaqDemoRequest2.setOrgUid(orgUid);
+    //     create(categoryFaqDemoRequest2);
+    // }
 
 }

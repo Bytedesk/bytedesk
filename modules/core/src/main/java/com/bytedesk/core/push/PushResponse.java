@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.push;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -56,5 +56,5 @@ public class PushResponse extends BaseResponse {
 
     private PlatformEnum platform;
 
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

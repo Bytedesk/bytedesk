@@ -23,4 +23,6 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
 
     Optional<FaqEntity> findByUid(String uid);
 
+    Boolean existsByUid(String uid);
+
 }

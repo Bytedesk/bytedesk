@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:19:47
+ * @LastEditTime: 2024-11-08 14:10:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,14 +26,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TagService extends BaseService<TagEntity, TagRequest, TagResponse> {
+public class TagService extends BaseRestService<TagEntity, TagRequest, TagResponse> {
 
     private final TagRepository tagRepository;
 
@@ -43,12 +43,10 @@ public class TagService extends BaseService<TagEntity, TagRequest, TagResponse> 
 
     @Override
     public Page<TagResponse> queryByOrg(TagRequest request) {
-
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
         Specification<TagEntity> spec = TagSpecification.search(request);
         Page<TagEntity> page = tagRepository.findAll(spec, pageable);
-        
         return page.map(this::convertToResponse);
     }
 
@@ -58,7 +56,7 @@ public class TagService extends BaseService<TagEntity, TagRequest, TagResponse> 
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "tag", key = "#uid")
+    @Cacheable(value = "tag", key = "#uid", unless="#result==null")
     @Override
     public Optional<TagEntity> findByUid(String uid) {
         return tagRepository.findByUid(uid);
@@ -79,8 +77,20 @@ public class TagService extends BaseService<TagEntity, TagRequest, TagResponse> 
 
     @Override
     public TagResponse update(TagRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Optional<TagEntity> optional = tagRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            TagEntity entity = optional.get();
+            modelMapper.map(request, entity);
+            //
+            TagEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update tag failed");
+            }
+            return convertToResponse(savedEntity);
+        }
+        else {
+            throw new RuntimeException("Tag not found");
+        }
     }
 
     @Override
@@ -88,9 +98,8 @@ public class TagService extends BaseService<TagEntity, TagRequest, TagResponse> 
         try {
             return tagRepository.save(entity);
         } catch (Exception e) {
-            // TODO: handle exception
+            throw new RuntimeException(e.getMessage());
         }
-        return null;
     }
 
     @Override
@@ -121,9 +130,5 @@ public class TagService extends BaseService<TagEntity, TagRequest, TagResponse> 
     public TagResponse convertToResponse(TagEntity entity) {
         return modelMapper.map(entity, TagResponse.class);
     }
-    
-    // public Boolean existsByPlatform(PlatformEnum platform) {
-    //     return tagRepository.existsByPlatform(platform.name());
-    // }
     
 }

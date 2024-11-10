@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 13:03:20
+ * @LastEditTime: 2024-11-06 15:17:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,28 +24,26 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.config.BytedeskProperties;
-import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class OrganizationService {
+public class OrganizationService extends BaseRestService<OrganizationEntity, OrganizationRequest, OrganizationResponse> {
 
     private final AuthService authService;
 
@@ -53,27 +51,44 @@ public class OrganizationService {
 
     private final RoleService roleService;
 
-    private final BytedeskProperties bytedeskProperties;
-
     private final OrganizationRepository organizationRepository;
 
     private final UidUtils uidUtils;
 
     private final ModelMapper modelMapper;
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    @Override
+    public Page<OrganizationResponse> queryByOrg(OrganizationRequest request) {
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,"id");
+        Specification<OrganizationEntity> specification = OrganizationSpecification.search(request);
+        Page<OrganizationEntity> orgPage = organizationRepository.findAll(specification, pageable);
+        return orgPage.map(this::convertToResponse);
+    }
 
-    public Page<OrganizationResponse> query(OrganizationRequest pageParam) {
-
+    @Override
+    public Page<OrganizationResponse> queryByUser(OrganizationRequest request) {
+        
         UserEntity user = authService.getCurrentUser();
 
-        Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "id");
 
         Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
 
         return orgPage.map(organization -> convertToResponse(organization));
     }
+
+    // public Page<OrganizationResponse> query(OrganizationRequest pageParam) {
+
+    //     UserEntity user = authService.getCurrentUser();
+
+    //     Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
+    //             "id");
+
+    //     Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
+
+    //     return orgPage.map(organization -> convertToResponse(organization));
+    // }
 
     @Transactional
     public OrganizationResponse create(OrganizationRequest organizationRequest) {
@@ -85,46 +100,36 @@ public class OrganizationService {
             throw new RuntimeException("Organization with code: " + organizationRequest.getCode() + " already exists.");
         }
         //
-        UserEntity user = authService.getCurrentUser();
-        String orgUid = uidUtils.getCacheSerialUid();
+        UserEntity authUser = authService.getCurrentUser();
+        UserEntity user = userService.findByUid(authUser.getUid())
+                .orElseThrow(() -> new RuntimeException("User not found."));
+        String orgUid = uidUtils.getUid();
         //
         OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
         organization.setUid(orgUid);
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
         //
-        try {
-            //
-            OrganizationEntity savedOrganization = save(organization);
-            if (savedOrganization == null) {
-                throw new RuntimeException("Failed to create organization.");
-            }
-            //
-            log.info("Organization created with UID: {}", orgUid);
-            // 初始化组织的角色
-            roleService.initOrgRoles(orgUid);
-            //
-            Optional<RoleEntity> roleOptional = roleService.findByNameAndOrgUid(TypeConsts.ROLE_ADMIN, orgUid);
-            if (roleOptional.isPresent()) {
-                log.info("roleOptional success");
-                user.addOrganizationRole(savedOrganization, roleOptional.get());
-                userService.save(user);
-            } else {
-                log.info("roleOptional fail");
-            }
-            // 
-            // 放到listener中会报错，所以放在此处
-            // event listener order 1. member, 2. category, 3. faq, 4. quickbutton, 5.
-            // robot, 6. agent, 7. workgroup,
-            // bytedeskEventPublisher.publishOrganizationCreateEvent(organization);
-            //
-            return convertToResponse(savedOrganization);
-
-        } catch (Exception e) {
-            // 如果在事务中发生异常，则重新抛出以触发事务回滚
-            e.printStackTrace();
-            throw new RuntimeException("Error occurred during organization creation", e);
+        OrganizationEntity savedOrganization = save(organization);
+        if (savedOrganization == null) {
+            throw new RuntimeException("Failed to create organization.");
         }
+        log.info("Organization created with UID: {}", orgUid);
+        // 初始化组织的角色
+        // roleService.initOrgRoles(orgUid);
+        // Optional<RoleEntity> roleOptional =
+        // roleService.findByNameAndOrgUid(RoleConsts.ROLE_ADMIN, orgUid);
+        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_ADMIN);
+        if (roleOptional.isPresent()) {
+            log.info("roleOptional success");
+            user.addOrganizationRole(savedOrganization, roleOptional.get());
+            userService.save(user);
+        } else {
+            throw new RuntimeException("Failed to save admin role.");
+        }
+        //
+        return convertToResponse(savedOrganization);
+
     }
 
     public OrganizationResponse update(OrganizationRequest organizationRequest) {
@@ -192,6 +197,18 @@ public class OrganizationService {
         return null;
     }
 
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    }
+
+    @Override
+    public void delete(OrganizationRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             OrganizationEntity organization) {
         log.info("handleOptimisticLockingFailureException: " + e.getMessage());
@@ -201,26 +218,29 @@ public class OrganizationService {
         return modelMapper.map(organization, OrganizationResponse.class);
     }
 
-    public void initData() {
+    
+    
 
-        if (organizationRepository.count() > 0) {
-            return;
-        }
-        //
-        Optional<UserEntity> adminOptional = userService.getAdmin();
-        if (adminOptional.isPresent()) {
-            //
-            OrganizationEntity organization = OrganizationEntity.builder()
-                    .name(bytedeskProperties.getOrganizationName())
-                    .code(bytedeskProperties.getOrganizationCode())
-                    .description(bytedeskProperties.getOrganizationName() + " Description")
-                    .user(adminOptional.get())
-                    .build();
-            organization.setUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-            //
-            save(organization);
-        }
+    // public void initData() {
 
-    }
+    // if (organizationRepository.count() > 0) {
+    // return;
+    // }
+    // //
+    // Optional<UserEntity> adminOptional = userService.getAdmin();
+    // if (adminOptional.isPresent()) {
+    // //
+    // OrganizationEntity organization = OrganizationEntity.builder()
+    // .name(bytedeskProperties.getOrganizationName())
+    // .code(bytedeskProperties.getOrganizationCode())
+    // .description(bytedeskProperties.getOrganizationName() + " Description")
+    // .user(adminOptional.get())
+    // .build();
+    // organization.setUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    // //
+    // save(organization);
+    // }
+
+    // }
 
 }

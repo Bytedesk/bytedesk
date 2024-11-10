@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-01 09:28:17
+ * @LastEditTime: 2024-11-08 07:15:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,44 +14,51 @@
  */
 package com.bytedesk.core.notice;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.JsonResult;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/notice")
+@AllArgsConstructor
 public class NoticeController extends BaseRestController<NoticeRequest> {
+
+    private NoticeService noticeService;
 
     @Override
     public ResponseEntity<?> queryByOrg(NoticeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        Page<NoticeResponse> page = noticeService.queryByOrg(request);
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(NoticeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        Page<NoticeResponse> page = noticeService.queryByUser(request);
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> create(NoticeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        NoticeResponse notice = noticeService.create(request);
+        return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
     public ResponseEntity<?> update(NoticeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        NoticeResponse notice = noticeService.update(request);
+        return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
     public ResponseEntity<?> delete(NoticeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        noticeService.delete(request);
+        return ResponseEntity.ok(JsonResult.success());
     }
     
 }

@@ -21,14 +21,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class CounterVisitorService extends BaseService<CounterVisitorEntity, CounterVisitorRequest, CounterVisitorResponse> {
+public class CounterVisitorService extends BaseRestService<CounterVisitorEntity, CounterVisitorRequest, CounterVisitorResponse> {
     
     private final CounterVisitorRepository counterVisitorRepository;
 

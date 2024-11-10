@@ -98,8 +98,6 @@ public class KnowledgebaseRequest extends BaseRequest {
     private String language = LanguageEnum.ZH_CN.name();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private LevelEnum level = LevelEnum.ORGANIZATION;
     private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default

@@ -14,6 +14,8 @@
  */
 package com.bytedesk.core.notice;
 
+import java.time.LocalDateTime;
+
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -32,4 +34,11 @@ import lombok.experimental.Accessors;
 public class NoticeResponse extends BaseResponse {
     
     private String title;
+
+    private String content;
+
+    private String url;
+
+    private LocalDateTime createdAt;
+
 }

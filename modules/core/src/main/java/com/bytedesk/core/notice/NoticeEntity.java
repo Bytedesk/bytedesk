@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:27:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 10:43:10
+ * @LastEditTime: 2024-11-08 07:31:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,4 +44,5 @@ public class NoticeEntity extends BaseEntity {
 
     private String content;
 
+    private String url;
 }

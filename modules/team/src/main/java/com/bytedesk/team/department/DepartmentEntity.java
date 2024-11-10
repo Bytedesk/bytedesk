@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:20:00
+ * @LastEditTime: 2024-11-07 10:21:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,9 +46,6 @@ public class DepartmentEntity extends BaseEntity {
 
     private String description;
 
-    @Column(name = "department_type")
-    private String type;
-
     // 关联上级部门
     @JsonIgnore
     @ManyToOne
@@ -66,20 +63,6 @@ public class DepartmentEntity extends BaseEntity {
     // @ManyToMany(mappedBy = "departments", fetch = FetchType.LAZY)
     // private Set<Member> members = new HashSet<>();
 
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // // @JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name =
-    // "none", value = ConstraintMode.NO_CONSTRAINT))
-    // @JsonBackReference("organization-departments")
-    // private Organization organization;
-    // private String orgUid;
-
-    /** created by */
-    // @JsonIgnore
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // // @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "none",
-    // value = ConstraintMode.NO_CONSTRAINT))
-    // private User user;
 
     public void addChild(DepartmentEntity child) {
         children.add(child);

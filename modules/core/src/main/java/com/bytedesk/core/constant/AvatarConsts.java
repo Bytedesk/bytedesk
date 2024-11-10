@@ -16,7 +16,6 @@ package com.bytedesk.core.constant;
 
 /**
  * 头像常量, 可以去这里获取 https://www.iconfont.cn/
- * TODO: 头像不能引用外部链接，使用本地或本服务器地址
  *
  * @author bytedesk.com
  */
@@ -24,8 +23,7 @@ public class AvatarConsts {
 
     // EffectiveJava Item 22
     // Prevents instantiation
-    private AvatarConsts() {
-    }
+    private AvatarConsts() {}
 
     /**
      * default avatar

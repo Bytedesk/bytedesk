@@ -40,7 +40,7 @@ import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 // import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JsonResultCodeEnum;
@@ -76,7 +76,7 @@ public class ZhipuaiService {
 
     private final UidUtils uidUtils;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final ModelMapper modelMapper;
 

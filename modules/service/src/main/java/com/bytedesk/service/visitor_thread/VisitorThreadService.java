@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-01 21:04:46
+ * @LastEditTime: 2024-11-08 14:05:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.visitor_thread;
 
-import java.util.Date;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -31,11 +31,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 // import com.bytedesk.core.thread.back.ThreadStateService;
@@ -52,11 +52,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class VisitorThreadService extends BaseService<VisitorThreadEntity, VisitorThreadRequest, VisitorThreadResponse> {
+public class VisitorThreadService
+        extends BaseRestService<VisitorThreadEntity, VisitorThreadRequest, VisitorThreadResponse> {
 
     private final VisitorThreadRepository visitorThreadRepository;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     // private final ThreadStateService threadStateService;
 
@@ -123,11 +124,26 @@ public class VisitorThreadService extends BaseService<VisitorThreadEntity, Visit
         //
         String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
-        // 
+        //
+        // if (visitorRequest.isWeChat()) {
+        //     thread.setExtra(visitorRequest.getThreadExtra());
+        // } else {
+        //     String extra = ConvertServiceUtils
+        //             .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+        //     thread.setExtra(extra);
+        // }
+        //
+        return thread;
+    }
+
+    public ThreadEntity reinitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
+        //
         if (visitorRequest.isWeChat()) {
             thread.setExtra(visitorRequest.getThreadExtra());
         } else {
-            String extra = ConvertServiceUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+            String extra = ConvertServiceUtils
+                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
             thread.setExtra(extra);
         }
         //
@@ -148,8 +164,21 @@ public class VisitorThreadService extends BaseService<VisitorThreadEntity, Visit
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
+        // // 考虑到配置可能变化，更新配置
+        // String extra = ConvertServiceUtils
+        //         .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        // thread.setExtra(extra);
+        // // 考虑到客服信息发生变化，更新客服信息
+        // String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
+        // thread.setAgent(agentString);
+        //
+        return thread;
+    }
+
+    public ThreadEntity reinitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
-        String extra = ConvertServiceUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        String extra = ConvertServiceUtils
+                .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         thread.setExtra(extra);
         // 考虑到客服信息发生变化，更新客服信息
         String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
@@ -194,17 +223,26 @@ public class VisitorThreadService extends BaseService<VisitorThreadEntity, Visit
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
             // 计算两个日期之间的毫秒差
-            long diffInMilliseconds = Math.abs(new Date().getTime() - thread.getUpdatedAt().getTime());
+            // long diffInMilliseconds = Math.abs(new Date().getTime() -
+            // thread.getUpdatedAt().getTime());
+            // LocalDateTime转为时间戳需借助ZoneId和系统默认时区
+            long currentTimeMillis = System.currentTimeMillis();
+            long updatedAtMillis = thread.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            // log.info("before autoCloseThread threadUid {} threadType {} threadId {} diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(), diffInMinutes);
+            // log.info("before autoCloseThread threadUid {} threadType {} threadId {}
+            // diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(),
+            // diffInMinutes);
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
                     || thread.getType().equals(ThreadTypeEnum.AGENT.name())
                     || thread.getType().equals(ThreadTypeEnum.KB.name())) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinutes = settings.getAutoCloseMin();
-                // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {}, diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes, diffInMinutes);
+                // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {},
+                // diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes,
+                // diffInMinutes);
                 if (diffInMinutes > autoCloseMinutes) {
                     threadService.autoClose(thread);
                 }

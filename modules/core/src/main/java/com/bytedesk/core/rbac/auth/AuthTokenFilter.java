@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-23 20:49:57
+ * @LastEditTime: 2024-11-04 16:53:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,19 +65,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
   private String parseAccessToken(HttpServletRequest request) {
     String headerAuth = request.getHeader("Authorization");
-
-    // read header
+    // read post header
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
       return headerAuth.substring(7);
     }
-
-    // read parameter
+    // read url get parameter
     headerAuth = request.getParameter("accessToken");
     if (StringUtils.hasText(headerAuth)) {
       // log.info("accessToken from request param: {}", headerAuth);
       return headerAuth;
     }
-
     return null;
   }
 }

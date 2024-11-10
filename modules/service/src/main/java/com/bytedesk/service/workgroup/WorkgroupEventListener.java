@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:20:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-12 17:27:57
+ * @LastEditTime: 2024-11-06 15:27:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,16 +68,11 @@ public class WorkgroupEventListener {
             orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2
         );
         // 
-        // List<String> quickButtonUids = Arrays.asList(
-        //     orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
-        //     orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2
-        // );
-        // 
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();
         worktimeUids.add(worktimeUid);
         
-        // // add workgroups
+        // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_DESCRIPTION)

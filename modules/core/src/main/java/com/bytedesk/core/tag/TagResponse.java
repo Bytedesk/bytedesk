@@ -14,18 +14,23 @@
  */
 package com.bytedesk.core.tag;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
+
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
 @Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public class TagResponse extends BaseResponse {
 
     private String name;
@@ -34,5 +39,5 @@ public class TagResponse extends BaseResponse {
 
     private String color;
 
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

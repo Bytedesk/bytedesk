@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:54:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 10:54:06
+ * @LastEditTime: 2024-11-07 16:03:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,8 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import org.springframework.jms.support.destination.DynamicDestinationResolver;
 
+// import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
@@ -37,6 +39,7 @@ import jakarta.jms.Session;
 @EnableJms
 @Configuration
 public class JmsArtemisConfig {
+
     
     @Bean
 	public JmsListenerContainerFactory<?> jmsArtemisQueueFactory(ConnectionFactory connectionFactory,
@@ -65,6 +68,8 @@ public class JmsArtemisConfig {
 		MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
 		converter.setTargetType(MessageType.TEXT);
 		converter.setTypeIdPropertyName("_type");
+		// ObjectMapper objectMapper， for transforming localDateTime to json
+		// converter.setObjectMapper(objectMapper);
 		return converter;
 	}
 

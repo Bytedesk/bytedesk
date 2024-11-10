@@ -41,7 +41,7 @@ public class QuickReplyRequest extends BaseRequest {
     // private MessageTypeEnum type = MessageTypeEnum.TEXT;
 
     @Builder.Default
-    private LevelEnum level = LevelEnum.ORGANIZATION;
+    private String level = LevelEnum.ORGANIZATION.name();
 
     private String categoryUid;
 

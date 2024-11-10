@@ -19,9 +19,9 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 
-public class TicketService extends BaseService<TicketEntity, TicketRequest, TicketResponse> {
+public class TicketService extends BaseRestService<TicketEntity, TicketRequest, TicketResponse> {
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {

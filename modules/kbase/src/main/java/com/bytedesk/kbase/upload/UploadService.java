@@ -39,7 +39,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -52,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UploadService extends BaseService<UploadEntity, UploadRequest, UploadResponse> {
+public class UploadService extends BaseRestService<UploadEntity, UploadRequest, UploadResponse> {
 
 	private final Path uploadDir;
 
