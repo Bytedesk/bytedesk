@@ -14,7 +14,7 @@
  */
 package com.bytedesk.kbase.keyword;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -51,5 +51,5 @@ public class KeywordResponse extends BaseResponse {
 
     private String kbUid; // 对应知识库
     
-    private Date updatedAt; 
+    private LocalDateTime updatedAt; 
 }

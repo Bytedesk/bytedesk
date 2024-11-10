@@ -14,7 +14,7 @@
  */
 package com.bytedesk.kbase.auto_reply;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -43,5 +43,5 @@ public class AutoReplyResponse extends BaseResponse {
     
     private String orgUid;
 
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }

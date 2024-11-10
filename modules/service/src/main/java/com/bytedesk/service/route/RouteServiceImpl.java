@@ -26,7 +26,7 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.strategy.ThreadMessageUtil;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class RouteServiceImpl implements IRouteService {
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final IMessageSendService messageSendService;
 

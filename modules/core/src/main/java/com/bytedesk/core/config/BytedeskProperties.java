@@ -75,6 +75,8 @@ public class BytedeskProperties {
 
     // 配置邮件发送方式，默认使用javamail，可选值：javamail/aliyun
     private String emailType;
+    // 是否支持注册，默认不支持
+    private Boolean enableRegistration;
 
     // cors
     private String corsAllowedOrigins;

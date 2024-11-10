@@ -22,14 +22,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class CounterService extends BaseService<CounterEntity, CounterRequest, CounterResponse> {
+public class CounterService extends BaseRestService<CounterEntity, CounterRequest, CounterResponse> {
 
     private final CounterRepository counterRepository;
 

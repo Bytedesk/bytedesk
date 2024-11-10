@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:20:19
+ * @LastEditTime: 2024-11-06 12:26:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,8 +68,6 @@ public class WorkgroupEntity extends BaseEntity {
      * route type
      */
     @Builder.Default
-    // private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
-    // private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
     private String routeType = WorkgroupRouteEnum.ROBIN.name();
 
     @Builder.Default
@@ -119,15 +117,15 @@ public class WorkgroupEntity extends BaseEntity {
     // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
     public AgentEntity nextAgent() {
 
-        if (routeType.equals(WorkgroupRouteEnum.ROBIN)) {
+        if (routeType.equals(WorkgroupRouteEnum.ROBIN.name())) {
 
             // return assignAgentByRobin();
 
-        } else if (routeType.equals(WorkgroupRouteEnum.AVERAGE)) {
+        } else if (routeType.equals(WorkgroupRouteEnum.AVERAGE.name())) {
 
-        } else if (routeType.equals(WorkgroupRouteEnum.IDLE)) {
+        } else if (routeType.equals(WorkgroupRouteEnum.IDLE.name())) {
 
-        } else if (routeType.equals(WorkgroupRouteEnum.LESS)) {
+        } else if (routeType.equals(WorkgroupRouteEnum.LESS.name())) {
 
         }
 

@@ -145,6 +145,14 @@
             <version>2.0.53</version>
             <scope>provided</scope>
         </dependency>
+        <!-- for transforming LocalDateTime -->
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.18.1</version>
+            <scope>provided</scope>
+		</dependency>
 
         <!-- http://127.0.0.1:9003/swagger-ui/index.html -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->

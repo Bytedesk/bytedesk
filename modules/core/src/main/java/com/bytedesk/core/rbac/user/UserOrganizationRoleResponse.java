@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 10:20:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 11:06:02
+ * @LastEditTime: 2024-11-05 16:21:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,10 @@
  */
 package com.bytedesk.core.rbac.user;
 
-import com.bytedesk.core.rbac.organization.OrganizationResponse;
+import java.util.Set;
+
+// import com.bytedesk.core.rbac.organization.OrganizationResponse;
+import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.rbac.role.RoleResponse;
 
 import lombok.AllArgsConstructor;
@@ -30,7 +33,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class UserOrganizationRoleResponse {
 
-    private OrganizationResponse organization;
+    private OrganizationResponseSimple organization;
 
-    private RoleResponse role;
+    // private RoleResponse role;
+    private Set<RoleResponse> roles;
 }

@@ -14,7 +14,6 @@
  */
 package com.bytedesk.kbase.taboo;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -24,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.DateUtils;
@@ -111,15 +108,8 @@ public class TabooController extends BaseRestController<TabooRequest> {
             response.reset();
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
-            //
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("status", "failure");
-            jsonObject.put("message", "download faied " + e.getMessage());
-            try {
-                response.getWriter().println(JSON.toJSONString(jsonObject));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            // 
+            return JsonResult.error(e.getMessage());
         }
 
         return "";

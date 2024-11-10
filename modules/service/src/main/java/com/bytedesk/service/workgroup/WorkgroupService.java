@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 11:22:28
+ * @LastEditTime: 2024-11-06 12:20:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +32,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotService;
-import com.bytedesk.core.constant.I18Consts;
-// import com.bytedesk.core.quick_button.QuickButton;
-// import com.bytedesk.core.quick_button.QuickButtonService;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentService;
@@ -64,8 +59,6 @@ public class WorkgroupService {
 
     private final WorktimeService worktimeService;
 
-    // private final QuickButtonService quickButtonService;
-
     private final FaqService faqService;
 
     private final ModelMapper modelMapper;
@@ -90,7 +83,7 @@ public class WorkgroupService {
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest workgroupRequest) {
         //
-        // // 使用映射会把默认值给清空为null
+        // 使用映射会把默认值给清空为null
         // Workgroup workgroup = modelMapper.map(workgroupRequest, Workgroup.class);
         WorkgroupEntity workgroup = WorkgroupEntity.builder()
                 .nickname(workgroupRequest.getNickname())
@@ -114,9 +107,9 @@ public class WorkgroupService {
             workgroupRequest.setServiceSettings(serviceSettings);
         }
         //
-        Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
-        while (worktimeTterator.hasNext()) {
-            String worktimeUid = worktimeTterator.next();
+        Iterator<String> worktimeIterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
+        while (worktimeIterator.hasNext()) {
+            String worktimeUid = worktimeIterator.next();
             Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
                 WorktimeEntity worktimeEntity = worktimeOptional.get();
@@ -156,7 +149,6 @@ public class WorkgroupService {
                 Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
                     FaqEntity faqEntity = faqOptional.get();
-
                     workgroup.getServiceSettings().getFaqs().add(faqEntity);
                 } else {
                     throw new RuntimeException("faq " + faqUid + " not found");
@@ -280,9 +272,9 @@ public class WorkgroupService {
             }
         }
         //
-        Iterator<String> worktimeTterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
-        while (worktimeTterator.hasNext()) {
-            String worktimeUid = worktimeTterator.next();
+        Iterator<String> worktimeIterator = workgroupRequest.getServiceSettings().getWorktimeUids().iterator();
+        while (worktimeIterator.hasNext()) {
+            String worktimeUid = worktimeIterator.next();
             Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
             if (worktimeOptional.isPresent()) {
                 WorktimeEntity worktimeEntity = worktimeOptional.get();
@@ -393,42 +385,42 @@ public class WorkgroupService {
         });
     }
 
-    public void initData() {
+    // public void initData() {
 
-        if (workgroupRepository.count() > 0) {
-            return;
-        }
+    //     if (workgroupRepository.count() > 0) {
+    //         return;
+    //     }
 
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        //
-        List<String> agentUids = Arrays.asList(
-                BytedeskConsts.DEFAULT_AGENT_UID);
-        //
-        List<String> faqUids = Arrays.asList(
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
-        //
-        // List<String> quickButtonUids = Arrays.asList(
-        // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
-        // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
-        //
-        List<String> worktimeUids = new ArrayList<>();
-        String worktimeUid = worktimeService.createDefault();
-        worktimeUids.add(worktimeUid);
-        //
-        // add workgroups
-        WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
-                .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
-                .agentUids(agentUids)
-                .build();
-        workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
-        workgroupRequest.setOrgUid(orgUid);
-        //
-        workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
-        //
-        create(workgroupRequest);
-    }
+    //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    //     //
+    //     List<String> agentUids = Arrays.asList(
+    //             BytedeskConsts.DEFAULT_AGENT_UID);
+    //     //
+    //     List<String> faqUids = Arrays.asList(
+    //             orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
+    //             orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+    //     //
+    //     // List<String> quickButtonUids = Arrays.asList(
+    //     // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
+    //     // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
+    //     //
+    //     List<String> worktimeUids = new ArrayList<>();
+    //     String worktimeUid = worktimeService.createDefault();
+    //     worktimeUids.add(worktimeUid);
+    //     //
+    //     // add workgroups
+    //     WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
+    //             .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
+    //             .agentUids(agentUids)
+    //             .build();
+    //     workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
+    //     workgroupRequest.setOrgUid(orgUid);
+    //     //
+    //     workgroupRequest.getServiceSettings().setFaqUids(faqUids);
+    //     workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
+    //     workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
+    //     //
+    //     create(workgroupRequest);
+    // }
 
 }

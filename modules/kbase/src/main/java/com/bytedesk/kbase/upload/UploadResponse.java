@@ -14,7 +14,7 @@
  */
 package com.bytedesk.kbase.upload;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -52,7 +52,7 @@ public class UploadResponse extends BaseResponse {
 
     private String user;
 
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     private List<String> docIdList;
 }

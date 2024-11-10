@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:14:11
+ * @LastEditTime: 2024-11-06 11:03:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,9 +36,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
-import com.bytedesk.core.constant.BytedeskConsts;
-// import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -50,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, QuartzResponse> {
+public class QuartzService extends BaseRestService<QuartzEntity, QuartzRequest, QuartzResponse> {
 
     private Scheduler scheduler;
 
@@ -255,31 +253,31 @@ public class QuartzService extends BaseService<QuartzEntity, QuartzRequest, Quar
         deleteByUid(quartzRequest.getUid());
     }
 
-    //
-    public void initData() {
-        if (quartzRepository.count() > 0) {
-            return;
-        }
+    // //
+    // public void initData() {
+    //     if (quartzRepository.count() > 0) {
+    //         return;
+    //     }
 
-        //
-        String jobname = "test1name";
-        String group = "testgroup";
-        QuartzRequest quartzRequest = QuartzRequest.builder()
-                .jobName(jobname)
-                .jobGroup(group)
-                .jobClassName("com.bytedesk.core.quartz.QuartzJob")
-                .jobMethodName("test1")
-                .description("quartz test")
-                .cronExpression("*/5 * * * * ?")
-                .triggerName(jobname + "trigger")
-                .triggerGroup(group)
-                .triggerType("cron")
-                .triggerState("started")
-                .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
-                .build();
-        create(quartzRequest);
-        //
-        // startJob(quartzRequest);
-    }
+    //     //
+    //     String jobName = "test1name";
+    //     String group = "testGroup";
+    //     QuartzRequest quartzRequest = QuartzRequest.builder()
+    //             .jobName(jobName)
+    //             .jobGroup(group)
+    //             .jobClassName("com.bytedesk.core.quartz.QuartzJob")
+    //             .jobMethodName("test1")
+    //             .description("quartz test")
+    //             .cronExpression("*/5 * * * * ?")
+    //             .triggerName(jobName + "trigger")
+    //             .triggerGroup(group)
+    //             .triggerType("cron")
+    //             .triggerState("started")
+    //             .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
+    //             .build();
+    //     create(quartzRequest);
+    //     //
+    //     // startJob(quartzRequest);
+    // }
 
 }

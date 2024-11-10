@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.message;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.ClientEnum;
@@ -53,7 +53,7 @@ public class MessageResponse extends BaseResponse {
 	// private String client;
 	private ClientEnum client;
 
-	private Date createdAt;
+	private LocalDateTime createdAt;
 
 	// private ThreadProtobuf thread;
 	private String threadTopic;

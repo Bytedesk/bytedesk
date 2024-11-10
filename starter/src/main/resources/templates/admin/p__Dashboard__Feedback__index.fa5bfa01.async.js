@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[1179],{24200:function(e,n,c){c.r(n);var i=c(52676);n.default=function(){return(0,i.jsx)("div",{children:(0,i.jsx)("h1",{children:"Feedback-客户之声-意见反馈-抓取社交媒体账号内容-舆情监测"})})}}}]);

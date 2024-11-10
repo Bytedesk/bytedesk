@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 14:54:34
+ * @LastEditTime: 2024-11-05 18:36:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,8 @@
  */
 package com.bytedesk.service.visitor;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.context.event.EventListener;
@@ -39,7 +41,9 @@ public class VisitorEventListener {
         List<VisitorEntity> visitorList = visitorService.findByStatus(VisitorStatusEnum.ONLINE.name());
         visitorList.forEach(visitor -> {
             log.info("visitor: {}", visitor.getUid());
-            if (System.currentTimeMillis() - visitor.getUpdatedAt().getTime() > 5 * 60 * 1000) {
+            // 使用Duration计算时间差
+            if (Duration.between(visitor.getUpdatedAt(), LocalDateTime.now()).toMillis() > 5 * 60 * 1000) {
+            // if (System.currentTimeMillis() - visitor.getUpdatedAt().getTime() > 5 * 60 * 1000) {
                 log.info("visitor: {} offline", visitor.getUid());
                 visitorService.updateStatus(visitor.getUid(), VisitorStatusEnum.OFFLINE.name());
             }

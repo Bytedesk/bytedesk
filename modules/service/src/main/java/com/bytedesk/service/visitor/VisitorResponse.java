@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.visitor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.ClientEnum;
@@ -62,7 +62,7 @@ public class VisitorResponse extends BaseResponse {
 	// private String client;
 	private ClientEnum client;
 
-	private Date updatedAt;
+	private LocalDateTime updatedAt;
 
 	private String status;
 

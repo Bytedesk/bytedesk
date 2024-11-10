@@ -26,7 +26,7 @@ import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -43,7 +43,7 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final RobotService robotService;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final UidUtils uidUtils;
 

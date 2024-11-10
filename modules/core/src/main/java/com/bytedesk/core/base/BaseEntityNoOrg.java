@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-03 07:24:08
+ * @LastEditTime: 2024-11-05 18:26:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,13 +29,12 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-// import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 // import java.time.ZonedDateTime;
-import java.util.Date;
+// import java.time.LocalDateTime;
 
 /**
  * Date -> ZonedDateTime ？
@@ -72,12 +71,12 @@ public abstract class BaseEntityNoOrg implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
     @CreatedDate
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     @LastModifiedDate
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     /**
 	 * soft delete

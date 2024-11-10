@@ -27,14 +27,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotJsonService.ModelJson;
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class LlmModelService extends BaseService<LlmModelEntity, LlmModelRequest, LlmModelResponse> {
+public class LlmModelService extends BaseRestService<LlmModelEntity, LlmModelRequest, LlmModelResponse> {
 
     private final LlmModelRepository repository;
 

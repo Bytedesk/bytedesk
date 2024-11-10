@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadCreateEvent;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.team.member.MemberEntity;
 
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class GroupEventListener {
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final GroupService groupService;
 

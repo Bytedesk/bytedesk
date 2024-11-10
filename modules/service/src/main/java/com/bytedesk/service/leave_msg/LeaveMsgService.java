@@ -25,7 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class LeaveMsgService extends BaseService<LeaveMsgEntity, LeaveMsgRequest, LeaveMsgResponse> {
+public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgRequest, LeaveMsgResponse> {
 
     private final LeaveMsgRepository LeaveMsgRepository;
 

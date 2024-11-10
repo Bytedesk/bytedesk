@@ -15,7 +15,7 @@
 package com.bytedesk.team.group;
 
 import java.util.List;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.base.BaseResponse;
@@ -61,5 +61,5 @@ public class GroupResponse extends BaseResponse {
 
     private UserProtobuf creator;
 
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

@@ -40,7 +40,7 @@ public class ThreadEventListener {
 
     private final TopicCacheService topicCacheService;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final ThreadPersistCache threadPersistCache;
 

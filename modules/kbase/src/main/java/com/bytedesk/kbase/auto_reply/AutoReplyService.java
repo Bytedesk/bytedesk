@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:16:22
+ * @LastEditTime: 2024-11-06 22:43:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
@@ -38,7 +39,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class AutoReplyService extends BaseService<AutoReplyEntity, AutoReplyRequest, AutoReplyResponse> {
+public class AutoReplyService extends BaseRestService<AutoReplyEntity, AutoReplyRequest, AutoReplyResponse> {
 
     private final AutoReplyRepository autoReplyRepository;
 
@@ -67,6 +68,7 @@ public class AutoReplyService extends BaseService<AutoReplyEntity, AutoReplyRequ
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(value = "auto_reply", key="#uid", unless = "#result == null")
     @Override
     public Optional<AutoReplyEntity> findByUid(String uid) {
         return autoReplyRepository.findByUid(uid);

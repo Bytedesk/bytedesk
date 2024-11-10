@@ -27,14 +27,14 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 // import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QueueService extends BaseService<QueueEntity, QueueRequest, QueueResponse> {
+public class QueueService extends BaseRestService<QueueEntity, QueueRequest, QueueResponse> {
 
     private final QueueRepository queueRepository;
 

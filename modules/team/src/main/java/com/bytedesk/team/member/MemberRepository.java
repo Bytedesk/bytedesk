@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-28 12:12:32
+ * @LastEditTime: 2024-11-07 10:39:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,9 @@
  */
 package com.bytedesk.team.member;
 
+import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 // import org.springframework.data.repository.query.Param;
@@ -39,19 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 // @PreAuthorize("hasRole('ROLE_USER')")
 public interface MemberRepository extends JpaRepository<MemberEntity, Long>, JpaSpecificationExecutor<MemberEntity> {
 
-    // @Override
-    // @PreAuthorize("#member?.user == null or #member?.user?.username ==
-    // authentication?.username")
-    // Member save(@Param("member") Member member);
-
-    // @Override
-    // // @PreAuthorize("@memberRepository.findById(#id)?.user?.username ==
-    // // authentication?.username")
-    // void deleteById(@Param("id") Long id);
-
-    // @Override
-    // // @PreAuthorize("#member?.user?.username == authentication?.username")
-    // void delete(@Param("member") Member member);
+    List<MemberEntity> findByDeptUidAndDeleted(String deptUid, Boolean deleted);
 
     Optional<MemberEntity> findByUidAndDeleted(String uid, Boolean deleted);
 
@@ -62,12 +49,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
     Optional<MemberEntity> findByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
 
     Optional<MemberEntity> findByUserAndOrgUidAndDeleted(UserEntity user, String orgUid, Boolean deleted);
-
-    Page<MemberEntity> findByDepartmentsUidInAndOrgUidAndDeleted(String dids[],
-            String orgUid, Boolean deleted, Pageable pageable);
-
-    // Page<Member> findByOrgUidAndDeleted(String orgUid, boolean deleted, Pageable
-    // pageable);
 
     Boolean existsByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
 

@@ -40,7 +40,7 @@ public class VisitorThreadResponse extends BaseResponse {
 
     // private String extra;
 
-	// private Date createdAt;
+	// private LocalDateTime createdAt;
 
     // private UserProtobuf user;
 

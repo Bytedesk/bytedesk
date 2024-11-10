@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserCreateEvent;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ChannelEventListener {
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     @EventListener
     public void onUserCreateEvent(UserCreateEvent event) {

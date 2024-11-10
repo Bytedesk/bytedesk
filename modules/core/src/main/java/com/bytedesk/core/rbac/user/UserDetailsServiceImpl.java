@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-18 09:37:41
+ * @LastEditTime: 2024-11-07 12:55:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.core.rbac.user;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,14 +39,32 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+	// 防止循环依赖
+	// @Autowired
+	// private UserService userService;
 	@Autowired
-	private UserService userService;
+	private UserRepository userRepository;
+
+	@Cacheable(value = "user", key = "#email", unless = "#result == null")
+    public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
+        return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
+    }
+
+    @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
+    public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
+        return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
+    }
+
+    @Cacheable(value = "user", key = "#username", unless = "#result == null")
+    public Optional<UserEntity> findByUsernameAndPlatform(String username, String platform) {
+        return userRepository.findByUsernameAndPlatformAndDeletedFalse(username, platform);
+    }
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		log.debug("loadUserByUsername {}", username);
 		//
-		Optional<UserEntity> userOptional = userService.findByUsernameAndPlatform(username, PlatformEnum.BYTEDESK.name());
+		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, PlatformEnum.BYTEDESK.name());
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -60,7 +79,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();
 		log.debug("loadUserByUsername {}, username {}, platform {}", subject, username, platform);
 		//
-		Optional<UserEntity> userOptional = userService.findByUsernameAndPlatform(username, PlatformEnum.fromValue(platform).name());
+		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, PlatformEnum.fromValue(platform).name());
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -73,7 +92,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetailsImpl loadUserByEmailAndPlatform(String email, String platform) {
 		log.debug("loadUserByEmail {}", email);
 		//
-		Optional<UserEntity> userOptional = userService.findByEmailAndPlatform(email, platform);
+		Optional<UserEntity> userOptional = findByEmailAndPlatform(email, platform);
 		if (!userOptional.isPresent()) {
 			throw new EmailNotFoundException("email " + email + " is not found");
 		}
@@ -86,7 +105,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetailsImpl loadUserByMobileAndPlatform(String mobile, String platform) {
 		log.debug("loadUserByMobile {}", mobile);
 		//
-		Optional<UserEntity> userOptional = userService.findByMobileAndPlatform(mobile, platform);
+		Optional<UserEntity> userOptional = findByMobileAndPlatform(mobile, platform);
 		if (!userOptional.isPresent()) {
 			throw new MobileNotFoundException("mobile " + mobile + " is not found");
 		}

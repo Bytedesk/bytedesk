@@ -1,10 +1,12 @@
 package com.bytedesk.core.rbac.user;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.lang.NonNull;
 
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -104,32 +106,77 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Builder.Default
 	private String platform = PlatformEnum.BYTEDESK.name();
 	
+	// 同一时刻，用户只能在一个组织下，用户可以切换组织
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	private OrganizationEntity currentOrganization;
 
+	// 一个用户可以属于多个组织，每个组织中可以多个角色
 	@Builder.Default
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserOrganizationRoleEntity> userOrganizationRoles = new HashSet<>();
 
 	// 添加方法以简化对用户组织和角色的管理
-	public void addOrganizationRole(OrganizationEntity organization, RoleEntity role) {
-		UserOrganizationRoleEntity uor = UserOrganizationRoleEntity.builder().user(this).organization(organization).role(role)
-				.build();
-		this.userOrganizationRoles.add(uor);
-		//
-		if (this.currentOrganization == null) {
-			this.currentOrganization = organization;
-		}
-	}
+    public void addOrganizationRole(OrganizationEntity organization, RoleEntity role) {
+        UserOrganizationRoleEntity uor = userOrganizationRoles.stream()
+            .filter(u -> u.getOrganization().equals(organization))
+            .findFirst()
+            .orElseGet(() -> {
+                UserOrganizationRoleEntity newUor = UserOrganizationRoleEntity.builder()
+                    .user(this)
+                    .organization(organization)
+                    .build();
+                userOrganizationRoles.add(newUor);
+                return newUor;
+            });
+        uor.getRoles().add(role);
+		// 角色有效期为30天
+		// uor.startDate(LocalDateTime.now());
+        // uor.endDate(LocalDateTime.now().plusDays(30));
+        //
+        if (this.currentOrganization == null) {
+            this.currentOrganization = organization;
+        }
+    }
 
-	public void removeOrganizationRole(OrganizationEntity organization, RoleEntity role) {
-		UserOrganizationRoleEntity uor = UserOrganizationRoleEntity.builder().user(this).organization(organization).role(role)
-				.build();
-		if (this.userOrganizationRoles.contains(uor)) {
-			this.userOrganizationRoles.remove(uor);
+    public void removeOrganizationRole(@NonNull OrganizationEntity organization, RoleEntity role) {
+        userOrganizationRoles.stream()
+            .filter(u -> u.getOrganization().equals(organization))
+            .findFirst()
+            .ifPresent(uor -> uor.getRoles().remove(role));
+    }
+
+	// 遍历userOrganizationRoles，删除organization所对应的所有role
+	public void removeOrganizationRoles(@NonNull OrganizationEntity organization) {
+		// userOrganizationRoles.removeIf(uor -> uor.getOrganization().equals(organization));
+		Iterator<UserOrganizationRoleEntity> iterator = userOrganizationRoles.iterator();
+		while (iterator.hasNext()) {
+			UserOrganizationRoleEntity uor = iterator.next();
+			if (uor.getOrganization().equals(organization)) {
+				// 遍历uor的roles，删除role
+				uor.getRoles().clear();
+			}
 		}
 	}
+	
+	// 添加方法以简化对用户组织和角色的管理
+	// public void addOrganizationRole(OrganizationEntity organization, RoleEntity role) {
+	// 	UserOrganizationRoleEntity uor = UserOrganizationRoleEntity.builder().user(this).organization(organization).role(role)
+	// 			.build();
+	// 	this.userOrganizationRoles.add(uor);
+	// 	//
+	// 	if (this.currentOrganization == null) {
+	// 		this.currentOrganization = organization;
+	// 	}
+	// }
+
+	// public void removeOrganizationRole(OrganizationEntity organization, RoleEntity role) {
+	// 	UserOrganizationRoleEntity uor = UserOrganizationRoleEntity.builder().user(this).organization(organization).role(role)
+	// 			.build();
+	// 	if (this.userOrganizationRoles.contains(uor)) {
+	// 		this.userOrganizationRoles.remove(uor);
+	// 	}
+	// }
 
 	@Builder.Default
 	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
@@ -146,7 +193,6 @@ public class UserEntity extends BaseEntityNoOrg {
 		return this.currentOrganization.getUid();
 	}
 
-	//
 	// 定义性别枚举
 	public enum Sex {
 		MALE,

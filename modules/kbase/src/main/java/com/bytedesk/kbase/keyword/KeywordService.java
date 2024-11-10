@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:17:11
+ * @LastEditTime: 2024-11-06 22:44:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class KeywordService extends BaseService<KeywordEntity, KeywordRequest, KeywordResponse> {
+public class KeywordService extends BaseRestService<KeywordEntity, KeywordRequest, KeywordResponse> {
 
     private final KeywordRepository keywordRepository;
 
@@ -69,7 +69,7 @@ public class KeywordService extends BaseService<KeywordEntity, KeywordRequest, K
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "keyword", key = "#uid", unless = "#result==null")
+    @Cacheable(value = "keyword", key = "#uid", unless = "#result == null")
     @Override
     public Optional<KeywordEntity> findByUid(String uid) {
         return keywordRepository.findByUid(uid);

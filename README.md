@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 12:53:10
+ * @LastEditTime: 2024-11-10 08:23:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -136,9 +136,8 @@ Chat as a Service
 - 订阅号
 - <img src="./images/wechatai_mp.jpg" width="100">
 
-## License
-
-- support business usage
-- must not remove trademark && logo info
-- selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
-- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权，请勿用于非法用途。
+<!-- ## License -->
+<!-- - support business usage -->
+<!-- - must not remove trademark && logo info -->
+<!-- - selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. -->
+<!-- - 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权，请勿用于非法用途。 -->

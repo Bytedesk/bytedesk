@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 10:18:30
+ * @LastEditTime: 2024-11-09 15:51:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.team.member;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
@@ -31,10 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
@@ -42,15 +40,12 @@ import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.department.DepartmentEntity;
-import com.bytedesk.team.department.DepartmentService;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +57,6 @@ public class MemberService {
 
     private final UserService userService;
 
-    private final DepartmentService departmentService;
-
     private final MemberRepository memberRepository;
 
     private final ModelMapper modelMapper;
@@ -72,34 +65,32 @@ public class MemberService {
 
     private final AuthService authService;
 
-    private final BytedeskProperties bytedeskProperties;
+    private final ThreadRestService threadService;
 
-    private final ThreadService threadService;
+    public Page<MemberResponse> queryByOrg(MemberRequest request) {
 
-    public Page<MemberResponse> queryByOrg(MemberRequest memberRequest) {
-
-        Pageable pageable = PageRequest.of(memberRequest.getPageNumber(), memberRequest.getPageSize(),
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(),
                 Sort.Direction.ASC,
                 "id");
 
-        Specification<MemberEntity> spec = MemberSpecification.search(memberRequest);
+        Specification<MemberEntity> spec = MemberSpecification.search(request);
         
         Page<MemberEntity> memberPage = memberRepository.findAll(spec, pageable);
 
         return memberPage.map(this::convertToResponse);
     }
 
-    public MemberResponse query(MemberRequest memberRequest) {
+    public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getCurrentUser();
-        Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, memberRequest.getOrgUid());
+        Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
         if (!memberOptional.isPresent()) {
             throw new RuntimeException("Member does not exist."); // 抛出具体的异常
         }
         return convertToResponse(memberOptional.get());
     }
 
-    public MemberResponse queryByUserUid(MemberRequest memberRequest) {
-        Optional<MemberEntity> memberOptional = findByUserUid(memberRequest.getUid());
+    public MemberResponse queryByUserUid(MemberRequest request) {
+        Optional<MemberEntity> memberOptional = findByUserUid(request.getUid());
         if (!memberOptional.isPresent()) {
             throw new RuntimeException("Member does not exist."); // 抛出具体的异常
         }
@@ -107,47 +98,41 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse create(MemberRequest memberRequest) {
+    public MemberResponse create(MemberRequest request) {
         //
-        if (StringUtils.hasText(memberRequest.getEmail())
-                && existsByEmailAndOrgUid(memberRequest.getEmail(), memberRequest.getOrgUid())) {
-            throw new EmailExistsException("Email " + memberRequest.getEmail() + " already exists..!!");
+        if (StringUtils.hasText(request.getEmail())
+                && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {
+            throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
         }
-        if (StringUtils.hasText(memberRequest.getMobile())
-                && existsByMobileAndOrgUid(memberRequest.getMobile(), memberRequest.getOrgUid())) {
-            throw new MobileExistsException("Mobile " + memberRequest.getMobile() + " already exists..!!");
-        }
-        // 查找部门信息
-        Optional<DepartmentEntity> depOptional = departmentService.findByUid(memberRequest.getDepUid());
-        if (!depOptional.isPresent()) {
-            throw new RuntimeException("Department does not exist."); // 抛出具体的异常
+        if (StringUtils.hasText(request.getMobile())
+                && existsByMobileAndOrgUid(request.getMobile(), request.getOrgUid())) {
+            throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         //
-        MemberEntity member = modelMapper.map(memberRequest, MemberEntity.class);
-        member.setUid(uidUtils.getCacheSerialUid());
+        MemberEntity member = modelMapper.map(request, MemberEntity.class);
+        member.setUid(uidUtils.getUid());
         //
-        member.addDepartment(depOptional.get());
-        member.setOrgUid(depOptional.get().getOrgUid());
-        //
+        member.setDeptUid(request.getDeptUid());
+        member.setOrgUid(request.getOrgUid());
+        member.setRoleUids(request.getRoleUids());
         // 尝试根据邮箱和平台查找用户
-        UserRequest userRequest = modelMapper.map(memberRequest, UserRequest.class);
+        UserRequest userRequest = modelMapper.map(request, UserRequest.class);
         userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
         userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
-        userRequest.setOrgUid(depOptional.get().getOrgUid());
+        userRequest.setOrgUid(request.getOrgUid());
         //
         UserEntity user = null;
-        if (StringUtils.hasText(memberRequest.getMobile())) {
-            user = userService.findByMobileAndPlatform(memberRequest.getMobile(),
+        if (StringUtils.hasText(request.getMobile())) {
+            user = userService.findByMobileAndPlatform(request.getMobile(),
                     PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUser(userRequest));
-        } else if (StringUtils.hasText(memberRequest.getEmail())) {
-            user = userService.findByEmailAndPlatform(memberRequest.getEmail(),
+                    .orElseGet(() -> userService.createUserFromMember(userRequest, request.getRoleUids()));
+        } else if (StringUtils.hasText(request.getEmail())) {
+            user = userService.findByEmailAndPlatform(request.getEmail(),
                     PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUser(userRequest));
+                    .orElseGet(() -> userService.createUserFromMember(userRequest, request.getRoleUids()));
         } else {
             throw new RuntimeException("mobile and email should not be both null.");
         }
-
         // 设置用户到成员对象中
         member.setUser(user);
         //
@@ -161,33 +146,44 @@ public class MemberService {
         return convertToResponse(saveMember);
     }
 
-    public MemberResponse update(MemberRequest memberRequest) {
+    @Transactional
+    public MemberResponse update(MemberRequest request) {
         //
-        Optional<MemberEntity> memberOptional = findByUid(memberRequest.getUid());
+        Optional<MemberEntity> memberOptional = findByUid(request.getUid());
         if (!memberOptional.isPresent()) {
             throw new RuntimeException("Failed to find member.");
         }
-        Optional<DepartmentEntity> depOptional = departmentService.findByUid(memberRequest.getDepUid());
-        if (!depOptional.isPresent()) {
-            throw new RuntimeException("Failed to find department.");
-        }
         //
         MemberEntity member = memberOptional.get();
+        // 
+        // modelMapper.map(memberRequest, member);
+        member.setDeptUid(request.getDeptUid());
+        member.setNickname(request.getNickname());
+        member.setEmail(request.getEmail());
+        member.setMobile(request.getMobile());
+        member.setJobTitle(request.getJobTitle());
+        member.setJobNo(request.getJobNo());
+        member.setSeatNo(request.getSeatNo());
+        member.setTelephone(request.getTelephone());
+        member.setRoleUids(request.getRoleUids());
+        // 
+        UserEntity user = member.getUser();
+        userService.updateUserRolesFromMember(user, request.getOrgUid(), request.getRoleUids());
         //
-        modelMapper.map(memberRequest, member);
-        // member.setJobNo(memberRequest.getJobNo());
-        // member.setNickname(memberRequest.getNickname());
-        // member.setSeatNo(memberRequest.getSeatNo());
-        // member.setTelephone(memberRequest.getTelephone());
-        // member.setEmail(memberRequest.getEmail());
-        //
-        member.getDepartments().clear();
-        member.addDepartment(depOptional.get());
-        member.setOrgUid(depOptional.get().getOrgUid());
-        //
-        MemberEntity result = save(member);
+        MemberEntity savedMember = save(member);
+        if (savedMember == null) {
+            throw new RuntimeException("Failed to save member.");
+        }
+ 
+        return convertToResponse(savedMember);
+    }
 
-        return convertToResponse(result);
+    public void clearDepartmentUid(String deptUid) {
+        List<MemberEntity> members = memberRepository.findByDeptUidAndDeleted(deptUid, false);
+        for (MemberEntity member : members) {
+            member.setDeptUid(null);
+            save(member);
+        }
     }
 
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
@@ -255,13 +251,49 @@ public class MemberService {
     }
 
     public MemberEntity convertExcelToMember(MemberExcel memberExcel, String orgUid) {
-        // Member member = Member.builder().build();
+        // 去重
+        if (StringUtils.hasText(memberExcel.getEmail()) && existsByEmailAndOrgUid(memberExcel.getEmail(), orgUid)) {
+            return null;
+        }
+        if (StringUtils.hasText(memberExcel.getMobile()) && existsByMobileAndOrgUid(memberExcel.getMobile(), orgUid)) {
+            return null;
+        }
+        // 创建member
         MemberEntity member = modelMapper.map(memberExcel, MemberEntity.class);
-        member.setUid(uidUtils.getCacheSerialUid());
+        member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
-        // TODO: 生成user
-
-        return member;
+        // 生成user
+        // 尝试根据邮箱和平台查找用户
+        UserRequest userRequest = UserRequest.builder().build();
+        userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
+        userRequest.setNickname(memberExcel.getNickname());
+        userRequest.setEmail(memberExcel.getEmail());
+        userRequest.setMobile(memberExcel.getMobile());
+        userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
+        userRequest.setOrgUid(orgUid);
+        //
+        UserEntity user = null;
+        if (StringUtils.hasText(memberExcel.getMobile())) {
+            user = userService.findByMobileAndPlatform(memberExcel.getMobile(),
+                    PlatformEnum.BYTEDESK.name())
+                    .orElseGet(() -> userService.createUserFromMember(userRequest, new HashSet<>()));
+        } else if (StringUtils.hasText(memberExcel.getEmail())) {
+            user = userService.findByEmailAndPlatform(memberExcel.getEmail(),
+                    PlatformEnum.BYTEDESK.name())
+                    .orElseGet(() -> userService.createUserFromMember(userRequest, new HashSet<>()));
+        } else {
+            throw new RuntimeException("mobile and email should not be both null.");
+        }
+        // 设置用户到成员对象中
+        member.setUser(user);
+        //
+        MemberEntity saveMember = save(member);
+        if (saveMember == null) {
+            // 根据业务逻辑决定如何处理保存失败的情况
+            // 例如，可以抛出一个异常或返回一个错误响应
+            throw new RuntimeException("Failed to save member.");
+        }
+        return saveMember;
     }
 
     public MemberExcel convertToExcel(MemberResponse member) {
@@ -320,11 +352,11 @@ public class MemberService {
         reverseThread.setOrgUid(thread.getOrgUid());
         reverseThread.setOwner(reverseMemberOptional.get().getUser());
         //
-        ThreadEntity savedTherad = threadService.save(reverseThread);
-        if (savedTherad == null) {
+        ThreadEntity savedThread = threadService.save(reverseThread);
+        if (savedThread == null) {
             throw new RuntimeException("reverseThread save error");
         }
-        return savedTherad;
+        return savedThread;
     }
 
     /** 同事私聊会话：org/member/{self_member_uid}/{other_member_uid} */
@@ -337,62 +369,5 @@ public class MemberService {
         return reverseThreadOptional.get();
     }
 
-    //
-    private static final String[] departments = {
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_ADMIN,
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_HR,
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_ORG,
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_IT,
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_MONEY,
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_MARKETING,
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_SALES,
-            I18Consts.I18N_PREFIX + TypeConsts.DEPT_CUSTOMER_SERVICE
-    };
-
-    public void initData() {
-        //
-        if (memberRepository.count() > 0) {
-            return;
-        }
-        //
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        for (int i = 0; i < departments.length; i++) {
-            String department = departments[i];
-            Optional<DepartmentEntity> depOptional = departmentService.findByNameAndOrgUid(department, orgUid);
-            if (depOptional.isPresent()) {
-                if (i == 0) {
-                    MemberRequest memberRequest = MemberRequest.builder()
-                            .jobNo("000")
-                            .jobTitle(I18Consts.I18N_ADMIN)
-                            .nickname("User000")
-                            .seatNo("000")
-                            .telephone("000")
-                            .mobile(bytedeskProperties.getMobile())
-                            .email(bytedeskProperties.getEmail())
-                            .depUid(depOptional.get().getUid())
-                            .build();
-                    memberRequest.setOrgUid(orgUid);
-                    create(memberRequest);
-                } else {
-                    String userNo = String.format("%03d", i);
-                    MemberRequest memberRequest = MemberRequest.builder()
-                            .jobNo(userNo)
-                            .jobTitle(I18Consts.I18N_MEMBER)
-                            .password(bytedeskProperties.getPasswordDefault())
-                            .nickname("User" + userNo)
-                            .seatNo(userNo)
-                            .telephone(userNo)
-                            .mobile("12345678" + userNo)
-                            .email(userNo + "@email.com")
-                            .depUid(depOptional.get().getUid())
-                            .build();
-                    memberRequest.setOrgUid(orgUid);
-                    create(memberRequest);
-                }
-
-            }
-        }
-
-    }
-
+    
 }

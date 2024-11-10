@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 10:32:24
+ * @LastEditTime: 2024-11-07 16:07:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.starter.controller;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.utils.NetUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -133,6 +135,16 @@ public class HelloController {
 		log.info("hello callback {}", requestBody);
 		return ResponseEntity.ok(JsonResult.success("callback", requestBody));
 	}
+
+	// http://127.0.0.1:9003/hello/local/time
+	@GetMapping("/local/time")
+    public MessageProtobuf getExampleMessage() {
+        MessageProtobuf message = new MessageProtobuf();
+        message.setContent("Hello, World!");
+        message.setCreatedAt(new Date());
+        return message;
+    }
+	
 
 	// https://spring.io/guides/gs/rest-service-cors
 	// private static final String template = "Hello, %s!";

@@ -26,14 +26,14 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.ai.robot.RobotJsonService.ProviderJson;
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class LlmProviderService extends BaseService<LlmProviderEntity, LlmProviderRequest, LlmProviderResponse> {
+public class LlmProviderService extends BaseRestService<LlmProviderEntity, LlmProviderRequest, LlmProviderResponse> {
 
     private final LlmProviderRepository repository;
 
@@ -43,14 +43,10 @@ public class LlmProviderService extends BaseService<LlmProviderEntity, LlmProvid
 
     @Override
     public Page<LlmProviderResponse> queryByOrg(LlmProviderRequest request) {
-
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
                 "updatedAt");
-
         Specification<LlmProviderEntity> specification = LlmProviderSpecification.search(request);
-
         Page<LlmProviderEntity> page = repository.findAll(specification, pageable);
-
         return page.map(this::convertToResponse);
     }
 

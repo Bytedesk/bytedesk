@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 12:52:33
+ * @LastEditTime: 2024-11-10 07:38:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,10 @@
 -->
 # 微语
 
-不仅仅是一款 **企业IM**
-<!-- 开源企业协作管理系统，支持企业IM、在线客服、知识库、工单系统、AI助手等。 -->
+一款开源即时通讯系统，支持社交/社群IM、企业IM、在线客服、知识库、AI助手等。
+<!-- 一款聊天软件 -->
+<!-- 可编排AI知识库问答 + 对接自有业务系统 + 转人工客服。 -->
+<!-- 不仅仅是一款 **企业IM** -->
 <!-- 致力于实现企业管理软件一站式解决方案。 -->
 
 ## 语言
@@ -25,22 +27,50 @@
 
 ## 介绍
 
-### 企业/团队IM
+### 企业IM
+
+- 企业成员管理
+- 聊天记录监控
+- 自定义通知，如：接收运维报警、股票实时报价等
+- 更利于企业内部员工之间协作
+
+### AI对话
+
+- 可编排AI知识库问答
+- 对接知识库
+- 大模型对话
+- 拖拽式配置
+- 可对接调用第三方知识库问答系统接口
+- 实时调用自有业务系统Api
+- 实现系统解耦，更利于扩展
+
+### 转人工客服
+
+- 实现人工客服兜底
+- 提供转人工客服接口，可为第三方AI知识库问答系统提供转人工解决方案
+- 支持多渠道
+
+### 社交IM
+
+- 加好友
+- 群聊/讨论组
+
+<!-- ### 企业/团队IM
 
 - 多层组织架构
 - 角色管理
 - 权限管理
 - 聊天记录管理
 - 同事对话
-- 群组/讨论组
+- 群组/讨论组 -->
 
-### AI助手
+<!-- ### AI助手
 
 - 大模型对话LLM
 - 知识库对话RAG
-- 更适合团队使用，一人配置，多人使用。
+- 更适合团队使用，一人配置，多人使用。 -->
 
-### 在线客服：跟客户聊
+<!-- ### 在线客服：跟客户聊
 
 - 支持多渠道：
   - 平台渠道：Web/H5/React/Android/iOS/Uniapp/Flutter、
@@ -59,7 +89,7 @@
 - 公告、
 - 敏感词、
 - CRM、
-- 报表功能，
+- 报表功能， -->
 
 ## 快速开始
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 12:23:15
+ * @LastEditTime: 2024-11-08 11:07:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,10 +15,12 @@
 package com.bytedesk.core.exception;
 
 import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
+import org.springframework.http.HttpStatus;
 // import org.apache.coyote.BadRequestException; // tomcat
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -93,7 +95,7 @@ public class GlobalControllerAdvice {
         // 
         if (e.getMessage().contains("/vip/") 
             || e.getMessage().contains("/wechat/")) {
-            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
         }
         // 
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage(),404));
@@ -139,11 +141,16 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(JsonResult.error("Http Request Method Not Supported Exception", 400));
     }
 
+    @ExceptionHandler(value = AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(JsonResult.error("Authorization Denied Exception", 403));
+    }
+
     @ExceptionHandler(Exception.class)
     // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> handleException(Exception e) {
         // if (bytedeskProperties.getDebug()) {
-            log.error("not handled exception:", e);
+        log.error("not handled exception:", e);
         // }
         return ResponseEntity.badRequest().body(JsonResult.error("Internal Server Error"));
     }

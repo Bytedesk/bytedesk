@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:40:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-28 11:05:24
+ * @LastEditTime: 2024-11-07 14:13:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.action;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -53,5 +53,5 @@ public class ActionResponse extends BaseResponse {
 
     private UserProtobuf user;
 
-    public Date createdAt;
+    public LocalDateTime createdAt;
 }

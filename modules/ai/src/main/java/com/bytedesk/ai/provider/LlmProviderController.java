@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:03:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:30:20
+ * @LastEditTime: 2024-11-08 15:44:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,8 +41,10 @@ public class LlmProviderController extends BaseRestController<LlmProviderRequest
 
     @Override
     public ResponseEntity<?> queryByUser(LlmProviderRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+        
+        Page<LlmProviderResponse> page = service.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override

@@ -22,7 +22,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -41,7 +41,7 @@ public class KbdocCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final UploadService uploadService;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     private final UidUtils uidUtils;
 

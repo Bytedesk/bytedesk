@@ -20,7 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.DateUtils;
 
@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class WorktimeService extends BaseService<WorktimeEntity, WorktimeRequest, WorktimeResponse> {
+public class WorktimeService extends BaseRestService<WorktimeEntity, WorktimeRequest, WorktimeResponse> {
 
     private final WorktimeRepository worktimeRepository;
 

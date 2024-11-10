@@ -20,10 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 
 @Service
-public class EmailTemplateService extends BaseService<EmailTemplateEntity, EmailTemplateRequest, EmailTemplateResponse> {
+public class EmailTemplateService extends BaseRestService<EmailTemplateEntity, EmailTemplateRequest, EmailTemplateResponse> {
 
     @Override
     public Page<EmailTemplateResponse> queryByOrg(EmailTemplateRequest request) {

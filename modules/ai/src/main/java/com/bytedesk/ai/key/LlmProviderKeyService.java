@@ -26,14 +26,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class LlmProviderKeyService extends BaseService<LlmProviderKeyEntity, LlmProviderKeyRequest, LlmProviderKeyResponse> {
+public class LlmProviderKeyService extends BaseRestService<LlmProviderKeyEntity, LlmProviderKeyRequest, LlmProviderKeyResponse> {
 
     private final LlmProviderKeyRepository repository;
 

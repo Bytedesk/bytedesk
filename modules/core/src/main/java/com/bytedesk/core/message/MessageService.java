@@ -29,7 +29,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 // import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 // import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageService extends BaseService<MessageEntity, MessageRequest, MessageResponse> {
+public class MessageService extends BaseRestService<MessageEntity, MessageRequest, MessageResponse> {
 
     private final MessageRepository messageRepository;
 

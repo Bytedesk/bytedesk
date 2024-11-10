@@ -30,7 +30,8 @@ import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+// import java.time.LocalDateTime;
 
 // 可以根据需要选择是否使用 @Component 注解
 // 如果该方法不需要被Spring容器管理，则不需要此注解
@@ -48,8 +49,8 @@ public class ThreadMessageUtil {
                 .build();
         message.setUid(UidUtils.getInstance().getUid());
         message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(new Date());
-        message.setUpdatedAt(new Date());
+        message.setCreatedAt(LocalDateTime.now());
+        message.setUpdatedAt(LocalDateTime.now());
         // 
         if (user.getType().equals(UserTypeEnum.ROBOT.name())) {
             message.setType(MessageTypeEnum.WELCOME.name());
@@ -78,8 +79,10 @@ public class ThreadMessageUtil {
                 .build();
         message.setUid(thread.getUid()); // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
         message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(new Date());
-        message.setUpdatedAt(new Date());
+        message.setCreatedAt(LocalDateTime.now());
+        message.setUpdatedAt(LocalDateTime.now());
+        // message.setCreatedAt(new Date());
+        // message.setUpdatedAt(new Date());
         message.setThreadTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());

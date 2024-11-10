@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:06:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 12:15:35
+ * @LastEditTime: 2024-11-05 14:19:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,11 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -50,10 +47,11 @@ public class ChannelService {
         return channelPage.map(channel -> convertToResponse(channel));
     }
 
-    public ChannelEntity create(ChannelRequest channelRequest) {
-
-        ChannelEntity channel = modelMapper.map(channelRequest, ChannelEntity.class);
-        channel.setUid(uidUtils.getCacheSerialUid());
+    public ChannelEntity create(ChannelRequest request) {
+        ChannelEntity channel = modelMapper.map(request, ChannelEntity.class);
+        if (!StringUtils.hasText(request.getUid())) {
+            channel.setUid(uidUtils.getUid());
+        }
 
         return save(channel);
     }
@@ -66,21 +64,21 @@ public class ChannelService {
         return modelMapper.map(channel, ChannelResponse.class);
     }
 
-    public void initData() {
+    // public void initData() {
 
-        if (channelRepository.count() > 0) {
-            return;
-        }
+    //     if (channelRepository.count() > 0) {
+    //         return;
+    //     }
 
-        ChannelRequest channelRequest = ChannelRequest.builder()
-                .topic(TopicUtils.TOPIC_SYSTEM_NOTIFICATION)
-                .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
-                .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
-                .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
-                .build();
-        channelRequest.setType(TypeConsts.TYPE_SYSTEM);
-        // channelRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        create(channelRequest);
-    }
+    //     ChannelRequest channelRequest = ChannelRequest.builder()
+    //             .topic(TopicUtils.TOPIC_SYSTEM_NOTIFICATION)
+    //             .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
+    //             .avatar(AvatarConsts.DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL)
+    //             .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
+    //             .build();
+    //     channelRequest.setType(TypeConsts.TYPE_SYSTEM);
+    //     // channelRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    //     create(channelRequest);
+    // }
 
 }

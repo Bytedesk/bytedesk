@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 09:55:35
+ * @LastEditTime: 2024-11-05 16:04:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,32 +64,32 @@ public class KnowledgebaseEventListener {
                 kownledgebaseRequestKeyword.setOrgUid(orgUid);
                 knowledgebaseService.create(kownledgebaseRequestKeyword);
                 //
-                KnowledgebaseRequest kownledgebaseRequeqestFaq = KnowledgebaseRequest.builder()
+                KnowledgebaseRequest kownledgebaseRequestFaq = KnowledgebaseRequest.builder()
                                 .name(KnowledgebaseConsts.KB_FAQ_NAME)
                                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                                 .language(LanguageEnum.ZH_CN.name())
                                 .build();
-                kownledgebaseRequeqestFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
-                kownledgebaseRequeqestFaq.setOrgUid(orgUid);
-                knowledgebaseService.create(kownledgebaseRequeqestFaq);
+                kownledgebaseRequestFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
+                kownledgebaseRequestFaq.setOrgUid(orgUid);
+                knowledgebaseService.create(kownledgebaseRequestFaq);
                 //
-                KnowledgebaseRequest kownledgebaseRequeqestAutoReply = KnowledgebaseRequest.builder()
+                KnowledgebaseRequest kownledgebaseRequestAutoReply = KnowledgebaseRequest.builder()
                                 .name(KnowledgebaseConsts.KB_AUTOREPLY_NAME)
                                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                                 .language(LanguageEnum.ZH_CN.name())
                                 .build();
-                kownledgebaseRequeqestAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
-                kownledgebaseRequeqestAutoReply.setOrgUid(orgUid);
-                knowledgebaseService.create(kownledgebaseRequeqestAutoReply);
+                kownledgebaseRequestAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
+                kownledgebaseRequestAutoReply.setOrgUid(orgUid);
+                knowledgebaseService.create(kownledgebaseRequestAutoReply);
                 //
-                KnowledgebaseRequest kownledgebaseRequeqestQuickReply = KnowledgebaseRequest.builder()
+                KnowledgebaseRequest kownledgebaseRequestQuickReply = KnowledgebaseRequest.builder()
                                 .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
                                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                                 .language(LanguageEnum.ZH_CN.name())
                                 .build();
-                kownledgebaseRequeqestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
-                kownledgebaseRequeqestQuickReply.setOrgUid(orgUid);
-                knowledgebaseService.create(kownledgebaseRequeqestQuickReply);
+                kownledgebaseRequestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+                kownledgebaseRequestQuickReply.setOrgUid(orgUid);
+                knowledgebaseService.create(kownledgebaseRequestQuickReply);
                 //
                 KnowledgebaseRequest kownledgebaseRequestTaboo = KnowledgebaseRequest.builder()
                                 .name(KnowledgebaseConsts.KB_TABOO_NAME)

@@ -39,7 +39,7 @@ import com.bytedesk.ai.robot.RobotJsonService.ProviderJson;
 import com.bytedesk.ai.robot.RobotJsonService.RobotJson;
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -47,7 +47,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.core.thread.ThreadService;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.constant.AvatarConsts;
 // import com.bytedesk.core.quick_button.QuickButton;
@@ -62,7 +62,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotResponse> {
+public class RobotService extends BaseRestService<RobotEntity, RobotRequest, RobotResponse> {
 
     private final RobotRepository robotRepository;
 
@@ -80,7 +80,7 @@ public class RobotService extends BaseService<RobotEntity, RobotRequest, RobotRe
 
     private final LlmModelService llmModelService;
 
-    private final ThreadService threadService;
+    private final ThreadRestService threadService;
 
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {

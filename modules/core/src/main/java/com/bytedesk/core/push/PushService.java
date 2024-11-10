@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 14:38:56
+ * @LastEditTime: 2024-11-05 18:34:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,11 @@
  */
 package com.bytedesk.core.push;
 
-import java.util.Date;
+import java.time.ZoneId;
+// import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
@@ -34,7 +32,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseService;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.exception.EmailExistsException;
@@ -55,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class PushService extends BaseService<PushEntity, PushRequest, PushResponse> {
+public class PushService extends BaseRestService<PushEntity, PushRequest, PushResponse> {
 
     private final PushRepository pushRepository;
 
@@ -73,12 +71,9 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
 
     private final IpService ipService;
 
-    // 用于存储每个IP最后发送验证码的时间的缓存
-    private final ConcurrentHashMap<String, AtomicLong> ipLastSentTimeCache = new ConcurrentHashMap<>();
+    private final PushFilterService pushFilterService;
 
-    // 验证码发送间隔阈值（单位：毫秒）
-    private static final long VALIDATE_CODE_SEND_INTERVAL = 10 * 60 * 1000; // 10分钟
-
+    
     //String email, String client, String authType, String platform, String orgUid,
     // public Boolean sendEmailCode(AuthRequest authRequest, HttpServletRequest request) {
     //     // return sendCode(email, TypeConsts.TYPE_EMAIL, client, authType, platform, orgUid, request);
@@ -103,7 +98,7 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
         // 
         // 验证限制同一个ip发送数量、频率
         // 检查是否短时间内已发送过验证码
-        if (!canSendValidateCode(ip, type)) {
+        if (!pushFilterService.canSendCode(ip)) {
             log.info("验证码发送过于频繁，IP: {}", ip);
             return false;
         }
@@ -125,6 +120,16 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
             // 修改手机号，如果账号已经存在，则直接抛出异常
             if (authRequest.isMobile() && userService.existsByMobileAndPlatform(receiver, platform)) {
                 throw new MobileExistsException("mobile already exists, please use another one");
+            }
+        } else if (authRequest.getType().equals(AuthTypeEnum.EMAIL_VERIFY.name())) {
+            // 验证邮箱，如果账号不存在，则直接抛出异常
+            if (authRequest.isEmail() && !userService.existsByEmailAndPlatform(receiver, platform)) {
+                throw new EmailExistsException("email not exists");
+            } 
+        } else if (authRequest.getType().equals(AuthTypeEnum.MOBILE_VERIFY.name())) {
+            // 验证手机号，如果账号不存在，则直接抛出异常
+            if (authRequest.isMobile() && !userService.existsByMobileAndPlatform(receiver, platform)) {
+                throw new MobileExistsException("mobile not exists");
             }
         }
         // check if has already send validate code within 15min
@@ -167,23 +172,27 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
         create(pushRequest);
 
         // 更新IP最后发送验证码的时间
-        updateIpLastSentTime(ip, type);
+        pushFilterService.updateIpLastSentTime(ip);
 
         return true;
     }
 
-    // 检查是否可以发送验证码
-    private boolean canSendValidateCode(String ip, String type) {
-        AtomicLong lastSentTime = ipLastSentTimeCache.getOrDefault(ip+":"+type, new AtomicLong(0));
-        long currentTime = System.currentTimeMillis();
-        return (currentTime - lastSentTime.get()) >= VALIDATE_CODE_SEND_INTERVAL;
+    public Boolean validateCode(String receiver,  String code, HttpServletRequest request) {        
+        // check if has already send validate code within 15min
+        Optional<PushEntity> pushOptional = findByStatusAndReceiverAndContent(PushStatusEnum.PENDING, receiver, code);
+        if (pushOptional.isPresent()) {
+            // pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
+            pushOptional.get().setStatus(PushStatusEnum.CONFIRMED.name());
+            save(pushOptional.get());
+            // 
+            String ip = ipService.getIp(request);
+            pushFilterService.removeIpLastSentTime(ip);
+            // 
+            return true;
+        }
+        return false;
     }
-
-    // 更新IP最后发送验证码的时间
-    private void updateIpLastSentTime(String ip, String type) {
-        ipLastSentTimeCache.put(ip+":"+type, new AtomicLong(System.currentTimeMillis()));
-    }
-
+    
 
     public PushResponse scanQuery(PushRequest pushRequest, HttpServletRequest request) {
 
@@ -270,18 +279,7 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
     //     return validateCode(mobile, code);
     // }
 
-    public Boolean validateCode(String receiver, String code) {
-        // check if has already send validate code within 15min
-        Optional<PushEntity> pushOptional = findByStatusAndReceiverAndContent(PushStatusEnum.PENDING, receiver,
-                code);
-        if (pushOptional.isPresent()) {
-            // pushOptional.get().setStatus(StatusConsts.CODE_STATUS_CONFIRM);
-            pushOptional.get().setStatus(PushStatusEnum.CONFIRMED.name());
-            save(pushOptional.get());
-            return true;
-        }
-        return false;
-    }
+    
 
     // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result
     // == null")
@@ -324,7 +322,13 @@ public class PushService extends BaseService<PushEntity, PushRequest, PushRespon
         // log.info("autoOutdateCode pendingPushes {}", pendingPushes.size());
         pendingPushes.forEach(push -> {
             // 计算两个日期之间的毫秒差
-            long diffInMilliseconds = Math.abs(new Date().getTime() - push.getUpdatedAt().getTime());
+            // long diffInMilliseconds = Math.abs(new Date().getTime() - push.getUpdatedAt().getTime());
+            // 将LocalDateTime转换为时间戳
+            long currentTimeMillis = System.currentTimeMillis();
+            ZoneId systemZone = ZoneId.systemDefault(); // 获取系统默认时区
+            long updatedAtMillis = push.getUpdatedAt().atZone(systemZone).toInstant().toEpochMilli();
+            long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
+
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
             // log.info("autoOutdateCode diffInMinutes {} {}", push.getContent(), diffInMinutes);
