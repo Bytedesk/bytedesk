@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 11:07:45
+ * @LastEditTime: 2024-11-13 23:30:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,7 +109,8 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         // 方便测试，打印异常堆栈信息
-        e.printStackTrace();
+        log.error("not handled exception:", e.getMessage());
+        // e.printStackTrace();
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 

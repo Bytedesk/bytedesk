@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-01 16:38:52
+ * @LastEditTime: 2024-11-11 16:44:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -141,6 +141,7 @@ public class AvatarConsts {
 
     // 创建LLM对话默认使用智谱AI作为头像
     public static final String LLM_THREAD_DEFAULT_AVATAR = "https://cdn.weiyuai.cn/assets/images/llm/provider/zhipu.png";
+    public static final String LLM_THREAD_DEFAULT_AVATAR_BASE_URL = "https://cdn.weiyuai.cn/assets/images/llm/provider/";
 
     /**
      * 测试头像：

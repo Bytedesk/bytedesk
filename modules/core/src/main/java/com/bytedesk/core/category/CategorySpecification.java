@@ -43,6 +43,9 @@ public class CategorySpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getKbUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
             }
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

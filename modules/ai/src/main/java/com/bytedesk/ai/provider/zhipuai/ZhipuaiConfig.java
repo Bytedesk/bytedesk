@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-17 22:24:11
+ * @LastEditTime: 2024-11-10 23:30:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,7 +54,6 @@ public class ZhipuaiConfig {
     ZhiPuAiEmbeddingOptions ZhiPuAiEmbeddingOptions() {
         return ZhiPuAiEmbeddingOptions.builder()
                 .withModel(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
-                // .withModel("GLM-4")
                 .build();
     }
 

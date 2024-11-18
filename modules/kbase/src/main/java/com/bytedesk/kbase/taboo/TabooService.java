@@ -32,7 +32,7 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
-import com.bytedesk.core.category.CategoryService;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -47,7 +47,7 @@ public class TabooService extends BaseRestService<TabooEntity, TabooRequest, Tab
 
     private final UidUtils uidUtils;
 
-    private final CategoryService categoryService;
+    private final CategoryRestService categoryService;
 
     @Override
     public Page<TabooResponse> queryByOrg(TabooRequest request) {

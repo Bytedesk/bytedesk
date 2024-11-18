@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-27 16:30:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-27 16:37:07
+ * @LastEditTime: 2024-11-11 10:48:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,9 +26,9 @@ import com.bytedesk.core.message.MessageProtobuf;
 @Service
 public class QwenService {
     
-    public void sendWsMessage(String query, RobotLlm robotllm, MessageProtobuf messageProtobuf) {
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
         //
-        String prompt = robotllm.getPrompt() + "\n" + query;
+        String prompt = robotLlm.getPrompt() + "\n" + query;
         // 
         QwenLlmConfig config = new QwenLlmConfig();
         config.setApiKey("sk-28a6be3236****");

@@ -1,341 +1,142 @@
 {
     "ollama": {
-        "api": {
-            "url": "http: //localhost:11434/v1/"
-        },
-        "websites": {
-            "webUrl": "https://ollama.com/",
-            "docsUrl": "https://github.com/ollama/ollama/tree/main/docs",
-            "modelsUrl": "https://ollama.com/library"
-        },
-        "app": {
-            "uid": "ollama",
-            "nickname": "Ollama",
-            "url": "https://ollama.com/",
-            "logo": "ollama.png"
-        }
+        "nickname": "Ollama",
+        "logo": "ollama.png",
+        "apiUrl": "http://127.0.0.1:11434",
+        "webUrl": "https://ollama.com/",
+        "status": "PRODUCTION"
     },
     "zhipu": {
-        "api": {
-            "url": "https://open.bigmodel.cn/api/paas/v4/"
-        },
-        "websites": {
-            "webUrl": "https://open.bigmodel.cn/",
-            "apiKeyUrl": "https://open.bigmodel.cn/usercenter/apikeys",
-            "docsUrl": "https://open.bigmodel.cn/dev/howuse/introduction",
-            "modelsUrl": "https://open.bigmodel.cn/modelcenter/square"
-        },
-        "app": {
-            "uid": "zhipu",
-            "nickname": "智谱",
-            "url": "https://chatglm.cn/main/alltoolsdetail",
-            "logo": "zhipu.png"
-        }
+        "nickname": "智谱",
+        "logo": "zhipu.png",    
+        "apiUrl": "https://open.bigmodel.cn/api/paas/v4/",
+        "webUrl": "https://open.bigmodel.cn/",
+        "status": "PRODUCTION"
     },
-    "baidu": {
-        "api": {
-            "url": ""
-        },
-        "websites": {
-            "webUrl": "https://openai.com/",
-            "apiKeyUrl": "https://platform.openai.com/api-keys",
-            "docsUrl": "https://platform.openai.com/docs",
-            "modelsUrl": "https://platform.openai.com/docs/models"
-        },
-        "app": {
-            "uid": "baidu",
-            "nickname": "文心一言",
-            "url": "https://chatgpt.com/",
-            "logo": "openai.png"
-        }
+    "yiyan": {
+        "nickname": "文心一言",
+        "logo": "yiyan.png",
+        "apiUrl": "https://yiyan.baidu.com/",
+        "webUrl": "https://yiyan.baidu.com/",
+        "status": "DEVELOPMENT"
     },
     "qwen": {
-        "api": {
-            "url": "https://dashscope.aliyuncs.com/compatible-mode/v1/"
-        },
-        "websites": {
-            "webUrl": "https://dashscope.aliyun.com/",
-            "apiKeyUrl": "https://help.aliyun.com/zh/dashscope/developer-reference/acquisition-and-configuration-of-api-key",
-            "docsUrl": "https://help.aliyun.com/zh/dashscope/",
-            "modelsUrl": "https://dashscope.console.aliyun.com/model"
-        },
-        "app": {
-            "uid": "qwen",
-            "nickname": "通义千问",
-            "url": "https://tongyi.aliyun.com/qianwen/",
-            "logo": "dashscope.png"
-        }
+        "nickname": "通义千问",
+        "logo": "dashscope.png",
+        "apiUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1/",
+        "webUrl": "https://dashscope.aliyun.com/",
+        "status": "DEVELOPMENT"
     },
     "hunyuan": {
-        "api": {
-            "url": "https://open.bigmodel.cn/api/paas/v4/"
-        },
-        "websites": {
-            "webUrl": "https://open.bigmodel.cn/",
-            "apiKeyUrl": "https://open.bigmodel.cn/usercenter/apikeys",
-            "docsUrl": "https://open.bigmodel.cn/dev/howuse/introduction",
-            "modelsUrl": "https://open.bigmodel.cn/modelcenter/square"
-        },
-        "app": {
-            "uid": "hunyuan",
-            "nickname": "腾讯混元",
-            "url": "https://chatglm.cn/main/alltoolsdetail",
-            "logo": "zhipu.png"
-        }
+        "nickname": "腾讯混元",
+        "logo": "hunyuan.png",
+        "apiUrl": "https://hunyuan.tencent.com/",
+        "webUrl": "https://hunyuan.tencent.com/",
+        "status": "DEVELOPMENT"
     },
-    "xunfei": {
-        "api": {
-            "url": "https://open.bigmodel.cn/api/paas/v4/"
-        },
-        "websites": {
-            "webUrl": "https://open.bigmodel.cn/",
-            "apiKeyUrl": "https://open.bigmodel.cn/usercenter/apikeys",
-            "docsUrl": "https://open.bigmodel.cn/dev/howuse/introduction",
-            "modelsUrl": "https://open.bigmodel.cn/modelcenter/square"
-        },
-        "app": {
-            "uid": "xunfei",
-            "nickname": "讯飞星火",
-            "url": "https://chatglm.cn/main/alltoolsdetail",
-            "logo": "zhipu.png"
-        }
+    "xinghuo": {
+        "nickname": "讯飞星火",
+        "logo": "xinghuo.png",
+        "apiUrl": "https://xinghuo.xfyun.cn/sparkapi",
+        "webUrl": "https://xinghuo.xfyun.cn/sparkapi",
+        "status": "DEVELOPMENT"
     },
     "moonshot": {
-        "api": {
-            "url": "https://api.moonshot.cn"
-        },
-        "websites": {
-            "webUrl": "https://moonshot.ai/",
-            "apiKeyUrl": "https://platform.moonshot.cn/console/api-keys",
-            "docsUrl": "https://platform.moonshot.cn/docs/",
-            "modelsUrl": "https://platform.moonshot.cn/docs/intro#%E6%A8%A1%E5%9E%8B%E5%88%97%E8%A1%A8"
-        },
-        "app": {
-            "uid": "moonshot",
-            "nickname": "Kimi",
-            "url": "https://kimi.moonshot.cn/",
-            "logo": "moonshot.jpg"
-        }
+        "nickname": "Kimi",
+        "logo": "moonshot.jpg",
+        "apiUrl": "https://api.moonshot.cn",
+        "webUrl": "https://moonshot.ai/",
+        "status": "DEVELOPMENT"
     },
     "baichuan": {
-        "api": {
-            "url": "https://api.baichuan-ai.com"
-        },
-        "websites": {
-            "webUrl": "https://www.baichuan-ai.com/",
-            "apiKeyUrl": "https://platform.baichuan-ai.com/console/apikey",
-            "docsUrl": "https://platform.baichuan-ai.com/docs",
-            "modelsUrl": "https://platform.baichuan-ai.com/price"
-        },
-        "app": {
-            "uid": "baichuan",
-            "nickname": "百小应",
-            "url": "https://ying.baichuan-ai.com/chat",
-            "logo": "baichuan.png"
-        }
+        "nickname": "百小应",
+        "logo": "baichuan.png",
+        "apiUrl": "https://api.baichuan-ai.com",
+        "webUrl": "https://www.baichuan-ai.com/",
+        "status": "DEVELOPMENT"
     },
     "doubao": {
-        "api": {
-            "url": "https://ark.cn-beijing.volces.com/api/v3/"
-        },
-        "websites": {
-            "webUrl": "https://console.volcengine.com/ark/",
-            "apiKeyUrl": "https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey",
-            "docsUrl": "https://www.volcengine.com/docs/82379/1182403",
-            "modelsUrl": "https://console.volcengine.com/ark/region:ark+cn-beijing/endpoint"
-        },
-        "app": {
-            "uid": "doubao",
-            "nickname": "豆包",
-            "url": "https://www.doubao.com/chat/",
-            "logo": "doubao.png"
-        }
+        "nickname": "豆包",
+        "logo": "doubao.png",
+        "apiUrl": "https://ark.cn-beijing.volces.com/api/v3/",
+        "webUrl": "https://console.volcengine.com/ark/",
+        "status": "DEVELOPMENT"
     },
     "minimax": {
-        "api": {
-            "url": "https://api.minimax.chat/v1/"
-        },
-        "websites": {
-            "webUrl": "https://platform.minimaxi.com/",
-            "apiKeyUrl": "https://platform.minimaxi.com/user-center/basic-information/interface-key",
-            "docsUrl": "https://platform.minimaxi.com/document/Announcement",
-            "modelsUrl": "https://platform.minimaxi.com/document/Models"
-        },
-        "app": {
-            "uid": "minimax",
-            "nickname": "海螺",
-            "url": "https://hailuoai.com/",
-            "logo": "minimax.png"
-        }
+        "nickname": "Minimax",
+        "logo": "minimax.png",
+        "apiUrl": "https://api.minimax.chat/v1/",
+        "webUrl": "https://platform.minimaxi.com/",
+        "status": "DEVELOPMENT"
     },
     "silicon": {
-        "api": {
-            "url": "https://cloud.siliconflow.cn"
-        },
-        "websites": {
-            "webUrl": "https://www.siliconflow.cn/",
-            "apiKeyUrl": "https://cloud.siliconflow.cn/account/ak?referrer=clxty1xuy0014lvqwh5z50i88",
-            "docsUrl": "https://docs.siliconflow.cn/",
-            "modelsUrl": "https://docs.siliconflow.cn/docs/model-names"
-        },
-        "app": {
-            "uid": "silicon",
-            "nickname": "SiliconFlow",
-            "url": "https://cloud.siliconflow.cn/playground/chat",
-            "logo": "silicon.png"
-        }
+        "nickname": "SiliconFlow",
+        "logo": "silicon.png",
+        "apiUrl": "https://cloud.siliconflow.cn",
+        "webUrl": "https://www.siliconflow.cn/",
+        "status": "DEVELOPMENT"
     },
     "deepseek": {
-        "api": {
-            "url": "https://api.deepseek.com"
-        },
-        "websites": {
-            "webUrl": "https://deepseek.com/",
-            "apiKeyUrl": "https://platform.deepseek.com/api_keys",
-            "docsUrl": "https://platform.deepseek.com/api-docs/",
-            "modelsUrl": "https://platform.deepseek.com/api-docs/"
-        },
-        "app": {
-            "uid": "deepseek",
-            "nickname": "DeepSeek",
-            "url": "https://chat.deepseek.com/",
-            "logo": "deepseek.png"
-        }
+        "nickname": "DeepSeek",
+        "logo": "deepseek.png",
+        "apiUrl": "https://api.deepseek.com",
+        "webUrl": "https://deepseek.com/",
+        "status": "DEVELOPMENT"
     },
     "yi": {
-        "api": {
-            "url": "https://api.lingyiwanwu.com"
-        },
-        "websites": {
-            "webUrl": "https://platform.lingyiwanwu.com/",
-            "apiKeyUrl": "https://platform.lingyiwanwu.com/apikeys",
-            "docsUrl": "https://platform.lingyiwanwu.com/docs",
-            "modelsUrl": "https://platform.lingyiwanwu.com/docs#%E6%A8%A1%E5%9E%8B"
-        },
-        "app": {
-            "uid": "yi",
-            "nickname": "Yi",
-            "url": "https://www.wanzhi.com/",
-            "logo": "yi.png"
-        }
+        "nickname": "Yi",
+        "logo": "yi.png",
+        "apiUrl": "https://api.lingyiwanwu.com",
+        "webUrl": "https://platform.lingyiwanwu.com/",
+        "status": "DEVELOPMENT"
     },
     "stepfun": {
-        "api": {
-            "url": "https://api.stepfun.com"
-        },
-        "websites": {
-            "webUrl": "https://platform.stepfun.com/",
-            "apiKeyUrl": "https://platform.stepfun.com/interface-key",
-            "docsUrl": "https://platform.stepfun.com/docs/overview/concept",
-            "modelsUrl": "https://platform.stepfun.com/docs/llm/text"
-        },
-        "app": {
-            "uid": "stepfun",
-            "nickname": "跃问",
-            "url": "https://yuewen.cn/chats/new",
-            "logo": "stepfun.png"
-        }
+        "nickname": "StepFun",
+        "logo": "stepfun.png",
+        "apiUrl": "https://api.stepfun.com",
+        "webUrl": "https://platform.stepfun.com/",
+        "status": "DEVELOPMENT"
     },
     "openrouter": {
-        "api": {
-            "url": "https://openrouter.ai/api/v1/"
-        },
-        "websites": {
-            "webUrl": "https://openrouter.ai/",
-            "apiKeyUrl": "https://openrouter.ai/settings/keys",
-            "docsUrl": "https://openrouter.ai/docs/quick-start",
-            "modelsUrl": "https://openrouter.ai/docs/models"
-        },
-        "app": {
-            "uid": "openrouter",
-            "nickname": "OpenRouter",
-            "url": "https://openrouter.ai",
-            "logo": "openrouter.png"
-        }
+        "nickname": "OpenRouter",
+        "logo": "openrouter.png",
+        "apiUrl": "https://openrouter.ai/api/v1/",
+        "webUrl": "https://openrouter.ai/",
+        "status": "DEVELOPMENT"
     },
     "groq": {
-        "api": {
-            "url": "https://api.groq.com/openai"
-        },
-        "websites": {
-            "webUrl": "https://groq.com/",
-            "apiKeyUrl": "https://console.groq.com/keys",
-            "docsUrl": "https://console.groq.com/docs/quickstart",
-            "modelsUrl": "https://console.groq.com/docs/models"
-        },
-        "app": {
-            "uid": "groq",
-            "nickname": "Groq",
-            "url": "https://chat.groq.com/",
-            "logo": "groq.png"
-        }
+        "nickname": "Groq",
+        "logo": "groq.png",
+        "apiUrl": "https://api.groq.com/openai",
+        "webUrl": "https://groq.com/",
+        "status": "DEVELOPMENT"
     },
     "anthropic": {
-        "api": {
-            "url": "https://api.anthropic.com/"
-        },
-        "websites": {
-            "webUrl": "https://anthropic.com/",
-            "apiKeyUrl": "https://console.anthropic.com/settings/keys",
-            "docsUrl": "https://docs.anthropic.com/en/docs",
-            "modelsUrl": "https://docs.anthropic.com/en/docs/about-claude/models"
-        },
-        "app": {
-            "uid": "anthropic",
-            "nickname": "Claude",
-            "url": "https://claude.ai/",
-            "logo": "anthropic.jpeg"
-        }
+        "nickname": "Anthropic",
+        "logo": "anthropic.jpeg",
+        "apiUrl": "https://api.anthropic.com/",
+        "webUrl": "https://anthropic.com/",
+        "status": "DEVELOPMENT"
     },
     "openai": {
-        "api": {
-            "url": "https://api.openai.com"
-        },
-        "websites": {
-            "webUrl": "https://openai.com/",
-            "apiKeyUrl": "https://platform.openai.com/api-keys",
-            "docsUrl": "https://platform.openai.com/docs",
-            "modelsUrl": "https://platform.openai.com/docs/models"
-        },
-        "app": {
-            "uid": "openai",
-            "nickname": "OpenAI",
-            "url": "https://chatgpt.com/",
-            "logo": "openai.png"
-        }
+        "nickname": "OpenAI",
+        "logo": "openai.png",
+        "apiUrl": "https://api.openai.com",
+        "webUrl": "https://openai.com/",
+        "status": "DEVELOPMENT"
     },
     "gemini": {
-        "api": {
-            "url": "https://generativelanguage.googleapis.com"
-        },
-        "websites": {
-            "webUrl": "https://gemini.google.com/",
-            "apiKeyUrl": "https://aistudio.google.com/app/apikey",
-            "docsUrl": "https://ai.google.dev/gemini-api/docs",
-            "modelsUrl": "https://ai.google.dev/gemini-api/docs/models/gemini"
-        },
-        "app": {
-            "uid": "gemini",
-            "nickname": "Gemini",
-            "url": "https://gemini.google.com/",
-            "logo": "gemini.png"
-        }
+        "nickname": "Gemini",
+        "logo": "gemini.png",
+        "apiUrl": "https://generativelanguage.googleapis.com",
+        "webUrl": "https://gemini.google.com/",
+        "status": "DEVELOPMENT"
     },
     "aihubmix": {
-        "api": {
-            "url": "https://aihubmix.com"
-        },
-        "websites": {
-            "webUrl": "https://aihubmix.com/",
-            "apiKeyUrl": "https://aihubmix.com/token",
-            "docsUrl": "https://doc.aihubmix.com/",
-            "modelsUrl": "https://aihubmix.com/models"
-        },
-        "app": {
-            "uid": "aihubmix",
-            "nickname": "aihubmix",
-            "url": "https://aihubmix.com",
-            "logo": "aihubmix.jpg"
-        }
+        "nickname": "AIHubMix",
+        "logo": "aihubmix.jpg",
+        "apiUrl": "https://aihubmix.com",
+        "webUrl": "https://aihubmix.com/",
+        "status": "DEVELOPMENT"
     }
 }

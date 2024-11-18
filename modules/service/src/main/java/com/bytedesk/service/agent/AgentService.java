@@ -39,7 +39,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotService;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.action.ActionRequest;
 import com.bytedesk.core.action.ActionService;
 import com.bytedesk.core.action.ActionTypeEnum;
@@ -83,7 +83,7 @@ public class AgentService extends BaseRestService<AgentEntity, AgentRequest, Age
 
     private final AuthService authService;
 
-    private final RobotService robotService;
+    private final RobotRestService robotService;
 
     private final FaqService faqService;
 

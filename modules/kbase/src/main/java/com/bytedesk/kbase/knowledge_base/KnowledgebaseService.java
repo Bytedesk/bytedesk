@@ -32,7 +32,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
-import com.bytedesk.core.category.CategoryService;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.article.ArticleRequest;
@@ -51,7 +51,7 @@ public class KnowledgebaseService extends BaseRestService<KnowledgebaseEntity, K
 
     private final UidUtils uidUtils;
 
-    private final CategoryService categoryService;
+    private final CategoryRestService categoryService;
 
     private final ArticleService articleService;
 

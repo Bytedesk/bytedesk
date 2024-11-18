@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-19 09:58:39
+ * @LastEditTime: 2024-11-11 12:34:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,29 +12,26 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.provider.ollama;
+// package com.bytedesk.ai.provider.ollama;
 
-import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+// import org.springframework.context.annotation.Configuration;
 
-/**
- * https://ollama.com/
- * https://www.promptingguide.ai/
- * https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
- */
-@Configuration
-public class OllamaConfig {
+// /**
+//  * https://ollama.com/
+//  * https://www.promptingguide.ai/
+//  * https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
+//  */
+// @Configuration
+// public class OllamaConfig {
 
-    @Value("${spring.ai.ollama.base-url}")
-    private String ollamaBaseUrl;
+    // @Value("${spring.ai.ollama.base-url}")
+    // private String ollamaBaseUrl;
 
-    @Value("${spring.ai.ollama.chat.options.model}")
-    private String ollamaChatModel;
+    // @Value("${spring.ai.ollama.chat.options.model}")
+    // private String ollamaChatModel;
 
-    @Value("${spring.ai.ollama.embedding.options.model}")
-    private String ollamaEmbeddingModel;
+    // @Value("${spring.ai.ollama.embedding.options.model}")
+    // private String ollamaEmbeddingModel;
 
     // @Value("${spring.ai.vectorstore.pgvector.dimensions}")
     // private int pgVectorDimensions;
@@ -42,10 +39,10 @@ public class OllamaConfig {
     // @Autowired
     // VectorStore vectorStore;
 
-    @Bean
-    OllamaApi ollamaApi() {
-        return new OllamaApi(ollamaBaseUrl);
-    }
+    // @Bean
+    // OllamaApi ollamaApi() {
+    //     return new OllamaApi(ollamaBaseUrl);
+    // }
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
     // @Bean
@@ -85,4 +82,4 @@ public class OllamaConfig {
     //             ollamaEmbeddingModel).withTemperature(0.9));
     // }
 
-}
+// }

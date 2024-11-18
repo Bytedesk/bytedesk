@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotService;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TicketCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
-    private final RobotService robotService;
+    private final RobotRestService robotService;
 
     private final ThreadRestService threadService;
 

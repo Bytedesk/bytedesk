@@ -22,8 +22,8 @@ import com.bytedesk.core.message.MessageProtobuf;
 @Service
 public class SparkService {
 
-    public void sendWsMessage(String query, RobotLlm robotllm, MessageProtobuf messageProtobuf) {
-        // String prompt = robotllm.getPrompt() + "\n" + query;
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
+        // String prompt = robotLlm.getPrompt() + "\n" + query;
     }
     
 }

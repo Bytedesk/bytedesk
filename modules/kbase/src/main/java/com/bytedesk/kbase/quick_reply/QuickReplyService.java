@@ -32,7 +32,7 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
-import com.bytedesk.core.category.CategoryService;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
@@ -51,7 +51,7 @@ public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickRe
 
     private final UidUtils uidUtils;
 
-    private final CategoryService categoryService;
+    private final CategoryRestService categoryService;
 
     @Override
     public Page<QuickReplyResponse> queryByOrg(QuickReplyRequest request) {

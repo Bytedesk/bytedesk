@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/visitor/api/v1/zhipuai")
+@RequestMapping("/zhipuai")
 @AllArgsConstructor
 public class ZhipuaiController {
 
@@ -61,7 +61,7 @@ public class ZhipuaiController {
 
     private final ZhipuaiService zhipuaiService;
 
-    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/chat
+    // http://127.0.0.1:9003/zhipuai/chat
     @GetMapping("/chat")
     public ResponseEntity<?> generation() {
         ChatResponse response = chatModel.call(
@@ -74,7 +74,7 @@ public class ZhipuaiController {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/image
+    // http://127.0.0.1:9003/zhipuai/image
     @GetMapping("/image")
     public ResponseEntity<?> image() {
         ImageResponse response = zhiPuAiImageModel.call(new ImagePrompt("A light cream colored mini golden doodle"));
@@ -84,7 +84,7 @@ public class ZhipuaiController {
     //
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/sse?uid=&sid=&content=hi
+    // http://127.0.0.1:9003/zhipuai/sse?uid=&sid=&content=hi
     @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> sseEndpoint(
             @RequestParam(value = "uid", required = true) String uid,
@@ -116,7 +116,7 @@ public class ZhipuaiController {
         return ResponseEntity.ok().body(emitter);
     }
 
-    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/sse/test
+    // http://127.0.0.1:9003/zhipuai/sse/test
     @GetMapping(value = "/sse/test", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> sseTest(@RequestParam(value = "q", defaultValue = "讲个笑话") String question) {
         log.info("sseTest question {}", question);
@@ -161,7 +161,7 @@ public class ZhipuaiController {
         executorService.shutdown();
     }
 
-    // http://127.0.0.1:9003/visitor/api/v1/zhipuai/stream-sse
+    // http://127.0.0.1:9003/zhipuai/stream-sse
     @GetMapping("/stream-sse")
     public void streamSse(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

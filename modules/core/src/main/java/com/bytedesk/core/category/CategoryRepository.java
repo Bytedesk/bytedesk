@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 18:10:33
+ * @LastEditTime: 2024-11-13 17:57:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,6 +35,10 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>,
     Optional<CategoryEntity> findByNameAndKbUidAndDeleted(String name, String kbUid, Boolean deleted);
 
     List<CategoryEntity> findByKbUidAndDeleted(String kbUid, Boolean deleted);
+
+    Boolean existsByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
+
+    Boolean existsByUid(String uid);
 
 //     List<Category> findByLevelAndDeleted(String level, Boolean deleted);
 

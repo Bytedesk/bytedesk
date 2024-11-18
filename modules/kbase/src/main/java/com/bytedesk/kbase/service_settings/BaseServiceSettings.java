@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:17:15
+ * @LastEditTime: 2024-11-10 21:21:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,16 +42,12 @@ import lombok.EqualsAndHashCode;
 public class BaseServiceSettings implements Serializable {
 
     @NotBlank
-    // @Enumerated(EnumType.STRING)
-    // private LanguageEnum language = LanguageEnum.ZH_CN;
     private String language = LanguageEnum.ZH_CN.name();
 
     @NotBlank
     private boolean autoPop = false;
 
-    /**
-     * 公告栏是否显示
-     */
+    // 
     @NotBlank
     private boolean showTopTip = false;
     // 公告

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 22:24:39
+ * @LastEditTime: 2024-11-13 17:08:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,9 +32,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * 
- */
 @Entity
 @Data
 @Builder
@@ -73,15 +70,9 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_REPLY;
 
-    @Builder.Default
-    @Column(name = "robot_category")
-    private String category = RobotCategoryEnum.DEFAULT.name();
-
     // service、ask、chat
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
     @Column(name = "robot_type", nullable = false)
-    // private RobotTypeEnum type = RobotTypeEnum.SERVICE;
     private String type = RobotTypeEnum.SERVICE.name();
 
     // private、team、public
@@ -101,6 +92,12 @@ public class RobotEntity extends BaseEntity {
     // private boolean isPrivate = false;
 
     private String kbUid; // 对应知识库
+
+    // @Builder.Default
+    // @Column(name = "robot_category")
+    // private String category = RobotCategoryEnum.DEFAULT.name();
+    // 机器人分类
+    private String categoryUid;
 
     // only used when created by user, not by org
     // private String userUid; // 创建用户

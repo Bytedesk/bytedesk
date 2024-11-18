@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CategoryEventListener {
 
-    private final CategoryService categoryService;
+    private final CategoryRestService categoryService;
 
     @Order(2)
     @EventListener

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-24 15:26:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-29 23:16:18
+ * @LastEditTime: 2024-11-11 17:26:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,14 +16,11 @@ package com.bytedesk.ai.robot;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,60 +44,6 @@ public class RobotJsonService {
             throw new RuntimeException("Failed to load robots.json", e);
         }
     }
-    
-    // 加载models.json，模型列表
-    public Map<String, List<ModelJson>> loadModels() {
-        try {
-            Resource resource = resourceLoader.getResource("classpath:json/models.json");
-            ObjectMapper objectMapper = new ObjectMapper();
-            MapType mapType = objectMapper.getTypeFactory().constructMapType(
-                    Map.class, // 或者使用具体的Map实现类，如LinkedHashMap.class
-                    objectMapper.getTypeFactory().constructType(String.class), // key的类型
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, ModelJson.class) // value的类型，即List<ModelJson>
-            );
-            // 使用getInputStream()而不是getFile()
-            Map<String, List<ModelJson>> models = objectMapper.readValue(resource.getInputStream(), mapType);
-            // for (Map.Entry<String, List<ModelJson>> entry : models.entrySet()) {
-            //     String key = entry.getKey();
-            //     // log.info("loadModels key {} value {}", key, entry.getValue());
-            //     List<ModelJson> values = entry.getValue(); //(List<ModelJson>) entry.getValue();
-            //     StringBuilder sb = new StringBuilder();
-            //     for (ModelJson model : values) {
-            //         // sb.append(objectMapper.writeValueAsString(model));
-            //         sb.append(model.getName());
-            //         sb.append("\n");
-            //     }
-            //     log.info("loadModels key: {} value: {}", key, sb.toString());
-            // }
-            return models;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load providers.json", e);
-        }
-    }
-
-    public Map<String, ProviderJson> loadProviders() {
-        try {
-            Resource resource = resourceLoader.getResource("classpath:json/providers.json");
-            ObjectMapper objectMapper = new ObjectMapper();
-            MapType mapType = objectMapper.getTypeFactory().constructMapType(
-                    Map.class, // 或者使用具体的Map实现类，如LinkedHashMap.class
-                    objectMapper.getTypeFactory().constructType(String.class), // key的类型
-                    objectMapper.getTypeFactory().constructType(ProviderJson.class) // value的类型
-            );
-            // 使用getInputStream()而不是getFile()
-            Map<String, ProviderJson> providers = objectMapper.readValue(resource.getInputStream(), mapType);
-            // 你可以遍历providers映射，并访问每个Provider对象的属性
-            // for (Map.Entry<String, ProviderJson> entry : providers.entrySet()) {
-            //     String key = entry.getKey();
-            //     // log.info("loadProviders key: {} value: {}", key, entry.getValue());
-            //     ProviderJson provider = entry.getValue();
-            //     log.info("loadProviders key {} api.url {}", key, provider.getApi().getUrl());
-            // }
-            return providers;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load providers.json", e);
-        }
-    }
 
     // 定义一个Robot类，与JSON结构相匹配
     @Data
@@ -113,46 +56,5 @@ public class RobotJsonService {
         private String prompt;
         private String description;
     }
-
-    // 
-    @Data
-    public static class ModelJson {
-        private String uid;
-        private String provider;
-        private String nickname;
-        private String category;
-    }
-
-    @Data
-    public static class ProviderJson {
-        private Api api;
-        private Websites websites;
-        private App app;
-        
-        @Data
-        public
-        static class Api {
-            private String url;
-        }
-
-        @Data
-        public
-        static class Websites {
-            private String webUrl;
-            private String apiKeyUrl;
-            private String docsUrl;
-            private String modelsUrl;
-        }
-
-        @Data
-        public
-        static class App {
-            private String uid;
-            private String nickname;
-            private String url;
-            private String logo;
-        }
-    }
-    
 
 }

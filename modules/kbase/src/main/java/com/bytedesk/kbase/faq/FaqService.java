@@ -33,7 +33,7 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
-import com.bytedesk.core.category.CategoryService;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -49,7 +49,7 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
 
     private final UidUtils uidUtils;
 
-    private final CategoryService categoryService;
+    private final CategoryRestService categoryService;
 
     @Override
     public Page<FaqResponse> queryByOrg(FaqRequest request) {
