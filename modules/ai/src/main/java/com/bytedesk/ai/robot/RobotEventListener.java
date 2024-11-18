@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 16:06:45
+ * @LastEditTime: 2024-11-13 17:00:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.provider.ollama.OllamaService;
+import com.bytedesk.ai.provider.ollama.OllamaChatService;
 import com.bytedesk.ai.provider.zhipuai.ZhipuaiService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.enums.ClientEnum;
@@ -55,11 +55,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class RobotEventListener {
 
-    private final RobotService robotService;
+    private final RobotRestService robotService;
 
     private final ZhipuaiService zhipuaiService;
 
-    private final OllamaService ollamaService;
+    private final OllamaChatService ollamaService;
 
     private final UidUtils uidUtils;
 
@@ -79,8 +79,9 @@ public class RobotEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("robot - organization created: {}", organization.getName());
-        //
+        // 为每个组织创建一个机器人
         robotService.createDefaultRobot(orgUid, uidUtils.getUid());
+        // 为每个组织创建一个客服助手
         robotService.createDefaultAgentAssistantRobot(orgUid, uidUtils.getUid());
     }
 
@@ -91,25 +92,6 @@ public class RobotEventListener {
         //
         processMessage(messageJson);
     }
-
-    // @EventListener
-    // public void onMessageProtoEvent(MessageProtoEvent event) {
-    //     // log.info("MessageProtoEvent");
-    //     try {
-    //         MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
-    //         //
-    //         try {
-    //             String messageJson = MessageConvertUtils.toJson(messageProto);
-    //             //
-    //             processMessage(messageJson);
-
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         }
-    //     } catch (InvalidProtocolBufferException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
 
     private void processMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
@@ -187,7 +169,6 @@ public class RobotEventListener {
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
             clonedMessage.setUid(uidUtils.getCacheSerialUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
-            // MessageUtils.notifyUser(clonedMessage);
             messageSendService.sendProtobufMessage(clonedMessage);
             //
             // TODO: 获取大模型配置
@@ -200,7 +181,6 @@ public class RobotEventListener {
                 // 目前所有的模型都使用zhipu
                 zhipuaiService.sendWsMessage(query, robotProtobuf.getLlm(), message);
             }
-
         } else if (threadProtobuf.getType().equals(ThreadTypeEnum.AGENT)
                 || threadProtobuf.getType().equals(ThreadTypeEnum.WORKGROUP)
                 || threadProtobuf.getType().equals(ThreadTypeEnum.KB)

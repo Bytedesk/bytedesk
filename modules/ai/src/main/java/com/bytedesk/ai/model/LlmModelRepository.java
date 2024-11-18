@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-25 17:13:53
+ * @LastEditTime: 2024-11-12 22:54:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,11 +24,17 @@ public interface LlmModelRepository extends JpaRepository<LlmModelEntity, Long>,
 
     Optional<LlmModelEntity> findByUid(String uid);
 
+    // Optional<LlmModelEntity> findByNameAndLevel(String name, String level);
+
     Boolean existsByUid(String uid);
+
+    Boolean existsByNameAndLevel(String name, String level);
+
+    Boolean existsByNameAndProviderUid(String name, String providerUid);
 
     // Optional<LlmModel> findByNickname(String nickname);
 
     // Boolean existsByNickname(String nickname);
 
-    List<LlmModelEntity> findByProvider(String provider);
+    List<LlmModelEntity> findByProviderUid(String providerUid);
 }

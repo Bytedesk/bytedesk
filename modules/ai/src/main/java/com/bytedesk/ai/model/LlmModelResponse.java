@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:20:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-25 17:59:04
+ * @LastEditTime: 2024-11-12 12:06:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,16 +29,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LlmModelResponse extends BaseResponse {
 
-    // private String name;
+    private String name;
 
     private String nickname;
 
-    // https://cdn.weiyuai.cn/assets/images/llm/model/baichuan.png
-    // private String avatar;
-
     private String description;
 
-    private String provider;
+    private String providerUid;
 
-    private String category;
+    private String level;
 }

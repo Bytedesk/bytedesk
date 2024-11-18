@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 22:24:14
+ * @LastEditTime: 2024-11-13 18:46:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,8 +50,10 @@ public class RobotRequest extends BaseRequest {
     @Builder.Default
     private String defaultReply = BytedeskConsts.EMPTY_STRING;
 
-    @Builder.Default
-    private String category = RobotCategoryEnum.DEFAULT.name();
+    // @Builder.Default
+    // private String category = RobotCategoryEnum.DEFAULT.name();
+    // 机器人分类
+    private String categoryUid;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();

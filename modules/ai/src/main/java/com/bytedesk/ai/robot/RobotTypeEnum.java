@@ -20,6 +20,7 @@ public enum RobotTypeEnum {
     KB, // 知识库机器人, 知识库对话
     KBDOC, // 知识库机器人, 知识库某一个文档对话
     LLM, // 问答机器人, 直接调用大模型
+    RAG, // 文档问答机器人
     // AGENT_ASSISTANT, // 客服助理机器人
     // TICKET_ASSISTANT, // 工单助手机器人
             ;

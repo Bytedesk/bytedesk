@@ -22,9 +22,9 @@ import com.bytedesk.core.message.MessageProtobuf;
 @Service
 public class CozeService {
     
-    public void sendWsMessage(String query, RobotLlm robotllm, MessageProtobuf messageProtobuf) {
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
         //
-        // String textPrompt = robotllm.getPrompt() + "\n" + query;
+        // String textPrompt = robotLlm.getPrompt() + "\n" + query;
         // TextPrompt prompt = new TextPrompt(textPrompt);
         // CozeLlm llm;
         // CozeChatOptions options;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 11:06:39
+ * @LastEditTime: 2024-11-13 18:54:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,9 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.category.CategoryConsts;
 import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.category.CategoryService;
+import com.bytedesk.core.category.CategoryRepository;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
@@ -38,15 +40,82 @@ public class QuickReplyInitializer implements SmartInitializingSingleton {
 
     private final QuickReplyRepository quickReplyRepository;
 
-    private final CategoryService categoryService;
+    private final CategoryRestService categoryService;
+
+    private final CategoryRepository categoryRepository;
 
     @Override
     public void afterSingletonsInstantiated() {
-        init();
+        // 
+        initQuickReplyCategory();
+        initQuickReply();
+    }
+
+    // 快捷回复
+    // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
+    // init quick reply categories
+    private void initQuickReplyCategory() {
+
+        if (categoryRepository.count() > 0) {
+            return;
+        }
+
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // 快捷回复-询问联系方式
+        CategoryRequest categoryContact = CategoryRequest.builder()
+                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
+                .orderNo(0)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .build();
+        categoryContact.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+        // 此处设置orgUid方便超级管理员加载
+        categoryContact.setOrgUid(orgUid);
+        categoryService.create(categoryContact);
+
+        // 快捷回复-感谢
+        CategoryRequest categoryThanks = CategoryRequest.builder()
+                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
+                .orderNo(1)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .build();
+        categoryThanks.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+        // 此处设置orgUid方便超级管理员加载
+        categoryThanks.setOrgUid(orgUid);
+        categoryService.create(categoryThanks);
+
+        // 快捷回复-问候
+        CategoryRequest categoryWelcome = CategoryRequest.builder()
+                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
+                .orderNo(2)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .build();
+        categoryWelcome.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+        // 此处设置orgUid方便超级管理员加载
+        categoryWelcome.setOrgUid(orgUid);
+        categoryService.create(categoryWelcome);
+
+        // 快捷回复-告别
+        CategoryRequest categoryBye = CategoryRequest.builder()
+                .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
+                .orderNo(3)
+                .level(LevelEnum.PLATFORM.name())
+                .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .build();
+        categoryBye.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+        // 此处设置orgUid方便超级管理员加载
+        categoryBye.setOrgUid(orgUid);
+        categoryService.create(categoryBye);
     }
 
     // @PostConstruct
-    public void init() {
+    public void initQuickReply() {
         if (quickReplyRepository.count() > 0) {
             return;
         }

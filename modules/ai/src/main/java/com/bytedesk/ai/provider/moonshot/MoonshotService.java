@@ -27,9 +27,9 @@ import com.bytedesk.core.message.MessageProtobuf;
 @Service
 public class MoonshotService {
 
-    public void sendWsMessage(String query, RobotLlm robotllm, MessageProtobuf messageProtobuf) {
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
         //
-        String prompt = robotllm.getPrompt() + "\n" + query;
+        String prompt = robotLlm.getPrompt() + "\n" + query;
         // 
         MoonshotLlmConfig config = new MoonshotLlmConfig();
         ChatOptions chatOptions = new ChatOptions();

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:08:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-25 22:33:41
+ * @LastEditTime: 2024-11-12 18:36:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,12 +31,19 @@ public class LlmModelSpecification extends BaseSpecification {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder,
-            // request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             // 
-            if (StringUtils.hasText(request.getProvider())) {
-                predicates.add(criteriaBuilder.equal(root.get("provider"), request.getProvider()));
+            if (StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
+            // 
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
+            }
+            // 
+            if (StringUtils.hasText(request.getProviderUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("providerUid"), request.getProviderUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

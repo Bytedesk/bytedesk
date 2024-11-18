@@ -20,7 +20,8 @@
 	<properties>
 		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 		<langchain4j.version>0.35.0</langchain4j.version>
-		<agentsflex.version>1.0.0-beta.11</agentsflex.version>
+		<agentsflex.version>1.0.0-rc.1</agentsflex.version>
+		<ollama4j.version>1.0.89</ollama4j.version>
 	</properties>
 
 	<dependencies>
@@ -84,11 +85,11 @@
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://central.sonatype.com/artifact/io.github.ollama4j/ollama4j/overview -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>io.github.ollama4j</groupId>
 			<artifactId>ollama4j</artifactId>
-			<version>1.0.84</version>
-		</dependency> -->
+			<version>${ollama4j.version}</version>
+		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
@@ -158,7 +159,7 @@
 		<!-- <dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-spring-boot-starter</artifactId>
-			<version>0.35.0</version>
+			<version>${langchain4j.version}</version>
 		</dependency> -->
 
 		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-ollama-spring-boot-starter -->

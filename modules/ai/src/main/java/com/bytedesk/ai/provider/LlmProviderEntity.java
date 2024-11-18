@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:11:34
+ * @LastEditTime: 2024-11-12 22:16:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,12 @@
  */
 package com.bytedesk.ai.provider;
 
-import com.bytedesk.core.base.BaseEntityNoOrg;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.LevelEnum;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +35,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_ai_llm_provider")
-public class LlmProviderEntity extends BaseEntityNoOrg {
+@EntityListeners({ LlmProviderEntityListener.class })
+@Table(name = "bytedesk_ai_provider")
+public class LlmProviderEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,19 +46,23 @@ public class LlmProviderEntity extends BaseEntityNoOrg {
     private String nickname;
 
     // https://cdn.weiyuai.cn/assets/images/llm/model/baichuan.png
-    private String avatar;
+    private String logo;
     // 
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
     // 
     private String apiUrl;
-    // private String apiKey;
+    private String apiKey;
     // 
     private String webUrl;
-    private String apiKeyUrl;
-    private String docsUrl;
-    private String modelsUrl;
+    // private String apiKeyUrl;
+    // private String docsUrl;
+    // private String modelsUrl;
     // 
     @Builder.Default
-    private String status = LlmProviderStatusEnum.DEVELPMENT.name();
+    private String status = LlmProviderStatusEnum.DEVELOPMENT.name();
+
+    @Builder.Default
+    private String level = LevelEnum.PLATFORM.name();
+    
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:50:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-26 10:56:12
+ * @LastEditTime: 2024-11-12 11:54:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,9 @@
  */
 package com.bytedesk.ai.provider;
 
-import com.bytedesk.core.base.BaseRequestNoOrg;
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.LevelEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class LlmProviderRequest extends BaseRequestNoOrg {
+public class LlmProviderRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
     
@@ -37,20 +38,23 @@ public class LlmProviderRequest extends BaseRequestNoOrg {
     private String nickname;
 
     // https://cdn.weiyuai.cn/assets/images/llm/model/baichuan.png
-    private String avatar;
+    private String logo;
     //
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
-
     //
     private String apiUrl;
-    // private String apiKey;
+    private String apiKey;
     //
     private String webUrl;
-    private String apiKeyUrl;
-    private String docsUrl;
-    private String modelsUrl;
+    // private String apiKeyUrl;
+    // private String docsUrl;
+    // private String modelsUrl;
     //
+    // @Builder.Default
+    // private String status = LlmProviderStatusEnum.DEVELOPMENT.name();
+    private String status;
+
     @Builder.Default
-    private String status = LlmProviderStatusEnum.DEVELPMENT.name();
+    private String level = LevelEnum.PLATFORM.name();
 }

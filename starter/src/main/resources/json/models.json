@@ -2,375 +2,261 @@
     "ollama": [],
     "silicon": [
         {
-            "uid": "Qwen/Qwen2-7B-Instruct",
-            "provider": "silicon",
-            "nickname": "Qwen2-7B-Instruct",
-            "category": "Qwen2"
+            "name": "Qwen/Qwen2-7B-Instruct",
+            "nickname": "Qwen2-7B-Instruct"
         },
         {
-            "uid": "Qwen/Qwen2-72B-Instruct",
-            "provider": "silicon",
-            "nickname": "Qwen2-72B-Instruct",
-            "category": "Qwen2"
+            "name": "Qwen/Qwen2-72B-Instruct",
+            "nickname": "Qwen2-72B-Instruct"
         },
         {
-            "uid": "THUDM/glm-4-9b-chat",
-            "provider": "silicon",
-            "nickname": "GLM-4-9B-Chat",
-            "category": "GLM"
+            "name": "THUDM/glm-4-9b-chat",
+            "nickname": "GLM-4-9B-Chat"
         },
         {
-            "uid": "deepseek-ai/DeepSeek-V2-Chat",
-            "provider": "silicon",
-            "nickname": "DeepSeek-V2-Chat",
-            "category": "DeepSeek"
+            "name": "deepseek-ai/DeepSeek-V2-Chat",
+            "nickname": "DeepSeek-V2-Chat"
         },
         {
-            "uid": "deepseek-ai/DeepSeek-Coder-V2-Instruct",
-            "provider": "silicon",
-            "nickname": "DeepSeek-Coder-V2-Instruct",
-            "category": "DeepSeek"
+            "name": "deepseek-ai/DeepSeek-Coder-V2-Instruct",
+            "nickname": "DeepSeek-Coder-V2-Instruct"
         }
     ],
     "openai": [
         {
-            "uid": "gpt-4o",
-            "provider": "openai",
-            "nickname": " GPT-4o",
-            "category": "GPT 4o"
+            "name": "gpt-4o",
+            "nickname": " GPT-4o"
         },
         {
-            "uid": "gpt-4o-mini",
-            "provider": "openai",
-            "nickname": " GPT-4o-mini",
-            "category": "GPT 4o"
+            "name": "gpt-4o-mini",
+            "nickname": " GPT-4o-mini"
         },
         {
-            "uid": "gpt-4-turbo",
-            "provider": "openai",
-            "nickname": " GPT-4 Turbo",
-            "category": "GPT 4"
+            "name": "gpt-4-turbo",
+            "nickname": " GPT-4 Turbo"
         },
         {
-            "uid": "gpt-4",
-            "provider": "openai",
-            "nickname": " GPT-4",
-            "category": "GPT 4"
+            "name": "gpt-4",
+            "nickname": " GPT-4"
         }
     ],
     "gemini": [
         {
-            "uid": "gemini-1.5-flash",
-            "provider": "gemini",
-            "nickname": "Gemini 1.5 Flash",
-            "category": "Gemini 1.5"
+            "name": "gemini-1.5-flash",
+            "nickname": "Gemini 1.5 Flash"
         },
         {
-            "uid": "gemini-1.5-pro-exp-0801",
-            "provider": "gemini",
-            "nickname": "Gemini 1.5 Pro Experimental 0801",
-            "category": "Gemini 1.5"
+            "name": "gemini-1.5-pro-exp-0801",
+            "nickname": "Gemini 1.5 Pro Experimental 0801"
         }
     ],
     "anthropic": [
         {
-            "uid": "claude-3-5-sonnet-20240620",
-            "provider": "anthropic",
-            "nickname": "Claude 3.5 Sonnet",
-            "category": "Claude 3.5"
+            "name": "claude-3-5-sonnet-20240620",
+            "nickname": "Claude 3.5 Sonnet"
         },
         {
-            "uid": "claude-3-opus-20240229",
-            "provider": "anthropic",
-            "nickname": "Claude 3 Opus",
-            "category": "Claude 3"
+            "name": "claude-3-opus-20240229",
+            "nickname": "Claude 3 Opus"
         },
         {
-            "uid": "claude-3-sonnet-20240229",
-            "provider": "anthropic",
-            "nickname": "Claude 3 Sonnet",
-            "category": "Claude 3"
+            "name": "claude-3-sonnet-20240229",
+            "nickname": "Claude 3 Sonnet"
         },
         {
-            "uid": "claude-3-haiku-20240307",
-            "provider": "anthropic",
-            "nickname": "Claude 3 Haiku",
-            "category": "Claude 3"
+            "name": "claude-3-haiku-20240307",
+            "nickname": "Claude 3 Haiku"
         }
     ],
     "deepseek": [
         {
-            "uid": "deepseek-chat",
-            "provider": "deepseek",
-            "nickname": "DeepSeek Chat",
-            "category": "DeepSeek Chat"
+            "name": "deepseek-chat",
+            "nickname": "DeepSeek Chat"
         },
         {
-            "uid": "deepseek-coder",
-            "provider": "deepseek",
-            "nickname": "DeepSeek Coder",
-            "category": "DeepSeek Coder"
+            "name": "deepseek-coder",
+            "nickname": "DeepSeek Coder"
         }
     ],
     "yi": [
         {
-            "uid": "yi-large",
-            "provider": "yi",
-            "nickname": "Yi-Large",
-            "category": "Yi"
+            "name": "yi-large",
+            "nickname": "Yi-Large"
         },
         {
-            "uid": "yi-large-turbo",
-            "provider": "yi",
-            "nickname": "Yi-Large-Turbo",
-            "category": "Yi"
+            "name": "yi-large-turbo",
+            "nickname": "Yi-Large-Turbo"
         },
         {
-            "uid": "yi-large-rag",
-            "provider": "yi",
-            "nickname": "Yi-Large-Rag",
-            "category": "Yi"
+            "name": "yi-large-rag",
+            "nickname": "Yi-Large-Rag"
         },
         {
-            "uid": "yi-medium",
-            "provider": "yi",
-            "nickname": "Yi-Medium",
-            "category": "Yi"
+            "name": "yi-medium",
+            "nickname": "Yi-Medium"
         },
         {
-            "uid": "yi-medium-200k",
-            "provider": "yi",
-            "nickname": "Yi-Medium-200k",
-            "category": "Yi"
+            "name": "yi-medium-200k",
+            "nickname": "Yi-Medium-200k"
         },
         {
-            "uid": "yi-spark",
-            "provider": "yi",
-            "nickname": "Yi-Spark",
-            "category": "Yi"
+            "name": "yi-spark",
+            "nickname": "Yi-Spark"
         }
     ],
     "zhipu": [
         {
-            "uid": "glm-4",
-            "provider": "zhipu",
-            "nickname": "GLM-4",
-            "category": "GLM-4"
+            "name": "glm-4",
+            "nickname": "GLM-4"
         },
         {
-            "uid": "glm-4-plus",
-            "provider": "zhipu",
-            "nickname": "GLM-4-Plus",
-            "category": "GLM-4"
+            "name": "glm-4-plus",
+            "nickname": "GLM-4-Plus"
         },
         {
-            "uid": "glm-4-air",
-            "provider": "zhipu",
-            "nickname": "GLM-4-Air",
-            "category": "GLM-4"
+            "name": "glm-4-air",
+            "nickname": "GLM-4-Air"
         },
         {
-            "uid": "glm-4-airx",
-            "provider": "zhipu",
-            "nickname": "GLM-4-AirX",
-            "category": "GLM-4"
+            "name": "glm-4-airx",
+            "nickname": "GLM-4-AirX"
         },
         {
-            "uid": "glm-4-flash",
-            "provider": "zhipu",
-            "nickname": "GLM-4-Flash(免费)",
-            "category": "GLM-4"
+            "name": "glm-4-flash",
+            "nickname": "GLM-4-Flash(免费)"
         },
         {
-            "uid": "glm-4v",
-            "provider": "zhipu",
-            "nickname": "GLM 4V",
-            "category": "GLM-4v"
+            "name": "glm-4v",
+            "nickname": "GLM 4V"
         },
         {
-            "uid": "glm-4v-plus",
-            "provider": "zhipu",
-            "nickname": "GLM-4V-Plus",
-            "category": "GLM-4v"
+            "name": "glm-4v-plus",
+            "nickname": "GLM-4V-Plus"
         },
         {
-            "uid": "glm-4-alltools",
-            "provider": "zhipu",
-            "nickname": "GLM-4-AllTools",
-            "category": "GLM-4-AllTools"
+            "name": "glm-4-alltools",
+            "nickname": "GLM-4-AllTools"
         }
     ],
     "moonshot": [
         {
-            "uid": "moonshot-v1-8k",
-            "provider": "moonshot",
-            "nickname": "Moonshot V1 8k",
-            "category": "Moonshot V1"
+            "name": "moonshot-v1-8k",
+            "nickname": "Moonshot V1 8k"
         },
         {
-            "uid": "moonshot-v1-32k",
-            "provider": "moonshot",
-            "nickname": "Moonshot V1 32k",
-            "category": "Moonshot V1"
+            "name": "moonshot-v1-32k",
+            "nickname": "Moonshot V1 32k"
         },
         {
-            "uid": "moonshot-v1-128k",
-            "provider": "moonshot",
-            "nickname": "Moonshot V1 128k",
-            "category": "Moonshot V1"
+            "name": "moonshot-v1-128k",
+            "nickname": "Moonshot V1 128k"
         }
     ],
     "baichuan": [
         {
-            "uid": "Baichuan4",
-            "provider": "baichuan",
-            "nickname": "Baichuan4",
-            "category": "Baichuan4"
+            "name": "Baichuan4",
+            "nickname": "Baichuan4"
         },
         {
-            "uid": "Baichuan3-Turbo",
-            "provider": "baichuan",
-            "nickname": "Baichuan3 Turbo",
-            "category": "Baichuan3"
+            "name": "Baichuan3-Turbo",
+            "nickname": "Baichuan3 Turbo"
         },
         {
-            "uid": "Baichuan3-Turbo-128k",
-            "provider": "baichuan",
-            "nickname": "Baichuan3 Turbo 128k",
-            "category": "Baichuan3"
+            "name": "Baichuan3-Turbo-128k",
+            "nickname": "Baichuan3 Turbo 128k"
         }
     ],
     "qwen": [
         {
-            "uid": "qwen-turbo",
-            "provider": "qwen",
-            "nickname": "Qwen Turbo",
-            "category": "Qwen"
+            "name": "qwen-turbo",
+            "nickname": "Qwen Turbo"
         },
         {
-            "uid": "qwen-plus",
-            "provider": "qwen",
-            "nickname": "Qwen Plus",
-            "category": "Qwen"
+            "name": "qwen-plus",
+            "nickname": "Qwen Plus"
         },
         {
-            "uid": "qwen-max",
-            "provider": "qwen",
-            "nickname": "Qwen Max",
-            "category": "Qwen"
+            "name": "qwen-max",
+            "nickname": "Qwen Max"
         }
     ],
     "stepfun": [
         {
-            "uid": "step-1-8k",
-            "provider": "stepfun",
-            "nickname": "Step 1 8K",
-            "category": "Step 1"
+            "name": "step-1-8k",
+            "nickname": "Step 1 8K"
         },
         {
-            "uid": "step-1-flash",
-            "provider": "stepfun",
-            "nickname": "Step 1 Flash",
-            "category": "Step 1"
+            "name": "step-1-flash",
+            "nickname": "Step 1 Flash"
         }
     ],
     "doubao": [],
     "minimax": [
         {
-            "uid": "abab6.5s-chat",
-            "provider": "minimax",
-            "nickname": "abab6.5s",
-            "category": "abab6"
+            "name": "abab6.5s-chat",
+            "nickname": "abab6.5s"
         },
         {
-            "uid": "abab6.5g-chat",
-            "provider": "minimax",
-            "nickname": "abab6.5g",
-            "category": "abab6"
+            "name": "abab6.5g-chat",
+            "nickname": "abab6.5g"
         },
         {
-            "uid": "abab6.5t-chat",
-            "provider": "minimax",
-            "nickname": "abab6.5t",
-            "category": "abab6"
+            "name": "abab6.5t-chat",
+            "nickname": "abab6.5t"
         },
         {
-            "uid": "abab5.5s-chat",
-            "provider": "minimax",
-            "nickname": "abab5.5s",
-            "category": "abab5"
+            "name": "abab5.5s-chat",
+            "nickname": "abab5.5s"
         }
     ],
     "aihubmix": [
         {
-            "uid": "gpt-4o-mini",
-            "provider": "aihubmix",
-            "nickname": "GPT-4o Mini",
-            "category": "GPT-4o"
+            "name": "gpt-4o-mini",
+            "nickname": "GPT-4o Mini"
         },
         {
-            "uid": "aihubmix-Llama-3-70B-Instruct",
-            "provider": "aihubmix",
-            "nickname": "Llama 3 70B Instruct",
-            "category": "Llama3"
+            "name": "aihubmix-Llama-3-70B-Instruct",
+            "nickname": "Llama 3 70B Instruct"
         }
     ],
     "openrouter": [
         {
-            "uid": "google/gemma-2-9b-it:free",
-            "provider": "openrouter",
-            "nickname": "Google: Gemma 2 9B",
-            "category": "Gemma"
+            "name": "google/gemma-2-9b-it:free",
+            "nickname": "Google: Gemma 2 9B"
         },
         {
-            "uid": "microsoft/phi-3-mini-128k-instruct:free",
-            "provider": "openrouter",
-            "nickname": "Phi-3 Mini 128K Instruct",
-            "category": "Phi"
+            "name": "microsoft/phi-3-mini-128k-instruct:free",
+            "nickname": "Phi-3 Mini 128K Instruct"
         },
         {
-            "uid": "microsoft/phi-3-medium-128k-instruct:free",
-            "provider": "openrouter",
-            "nickname": "Phi-3 Medium 128K Instruct",
-            "category": "Phi"
+            "name": "microsoft/phi-3-medium-128k-instruct:free",
+            "nickname": "Phi-3 Medium 128K Instruct"
         },
         {
-            "uid": "meta-llama/llama-3-8b-instruct:free",
-            "provider": "openrouter",
-            "nickname": "Meta: Llama 3 8B Instruct",
-            "category": "Llama3"
+            "name": "meta-llama/llama-3-8b-instruct:free",
+            "nickname": "Meta: Llama 3 8B Instruct"
         },
         {
-            "uid": "mistralai/mistral-7b-instruct:free",
-            "provider": "openrouter",
-            "nickname": "Mistral: Mistral 7B Instruct",
-            "category": "Mistral"
+            "name": "mistralai/mistral-7b-instruct:free",
+            "nickname": "Mistral: Mistral 7B Instruct"
         }
     ],
     "groq": [
         {
-            "uid": "llama3-8b-8192",
-            "provider": "groq",
-            "nickname": "LLaMA3 8B",
-            "category": "Llama3"
+            "name": "llama3-8b-8192",
+            "nickname": "LLaMA3 8B"
         },
         {
-            "uid": "llama3-70b-8192",
-            "provider": "groq",
-            "nickname": "LLaMA3 70B",
-            "category": "Llama3"
+            "name": "llama3-70b-8192",
+            "nickname": "LLaMA3 70B"
         },
         {
-            "uid": "mixtral-8x7b-32768",
-            "provider": "groq",
-            "nickname": "Mixtral 8x7B",
-            "category": "Mixtral"
+            "name": "mixtral-8x7b-32768",
+            "nickname": "Mixtral 8x7B"
         },
         {
-            "uid": "gemma-7b-it",
-            "provider": "groq",
-            "nickname": "Gemma 7B",
-            "category": "Gemma"
+            "name": "gemma-7b-it",
+            "nickname": "Gemma 7B"
         }
     ]
 }

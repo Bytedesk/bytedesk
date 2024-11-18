@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotService;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentService;
@@ -55,7 +55,7 @@ public class WorkgroupService {
 
     private final AgentService agentService;
 
-    private final RobotService robotService;
+    private final RobotRestService robotService;
 
     private final WorktimeService worktimeService;
 
