@@ -5,7 +5,6 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-
 # 
 # github：依次添加以下变量，
 # 路径：Settings -> Secrets And Variables -> Actions
@@ -14,13 +13,13 @@
 # SERVER_PASSWORD / Secret：服务器密码
 # SERVER_PORT / Secret：服务器端口
 
-name: mycicd
+name: cicd
 on:
   push:
     branches: main
     # 打标签的时候触发
-    # tags:
-    #   - '*'
+    tags:
+      - '*'
 jobs:
   build:
     runs-on: ubuntu-latest # 运行环境
