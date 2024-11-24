@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 16:10:37
+ * @LastEditTime: 2024-11-19 10:59:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -77,12 +77,18 @@ public class PushServiceImplEmail extends PushNotifier {
     public void send(String email, String content, HttpServletRequest request) {
         // log.info("send email to {}, content {}", email, content);
 
+        // 测试邮箱不发送邮件
         if (Utils.isTestEmail(email)) {
             return;
         }
 
         // 白名单邮箱使用固定验证码，无需真正发送验证码
         if (bytedeskProperties.isInWhitelist(email)) {
+            return;
+        }
+
+        // 调试模式不发送邮件
+        if (bytedeskProperties.getDebug()) {
             return;
         }
 

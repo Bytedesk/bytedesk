@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-18 14:03:43
+ * @LastEditTime: 2024-11-22 15:07:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,10 +46,7 @@ public class AgentResponse extends BaseResponse {
 
     private String description;
 
-    // private String acceptStatus;
-    // private AgentStatusEnum status;
     private String status;
-    // private Boolean enabled;
 
     private Boolean connected;
 
@@ -60,8 +57,6 @@ public class AgentResponse extends BaseResponse {
     private Integer maxThreadCount;
 
     private Integer currentThreadCount;
-
-    // private String welcomeTip;
 
     // private UserResponse user;
     private MemberResponseSimple member;

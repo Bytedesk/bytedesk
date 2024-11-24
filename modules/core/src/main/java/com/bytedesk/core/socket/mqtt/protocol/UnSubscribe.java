@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-30 10:23:56
+ * @LastEditTime: 2024-11-20 12:26:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,11 +17,8 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
-import com.bytedesk.core.socket.mqtt.MqService;
-// import com.bytedesk.core.topic.TopicService;
-// import com.bytedesk.core.redis.RedisUserService;
-// import com.bytedesk.core.socket.mqtt.service.MqttSubscribeService;
-import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
+import com.bytedesk.core.socket.mqtt.MqttService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,20 +29,13 @@ import java.util.List;
 @AllArgsConstructor
 public class UnSubscribe {
 
-    // private final MqttSubscribeService mqttSubscribeStoreService;
-
-    // private final RedisUserService redisUserService;
-
-    // private final TopicService topicService;
-
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
-    private final MqService mqService;
+    private final MqttService mqService;
 
     public void processUnSubscribe(Channel channel, MqttUnsubscribeMessage mqttUnsubscribeMessage) {
         // log.debug("processUnSubscribe {}", mqttUnsubscribeMessage.toString());
         //
         List<String> topicFilters = mqttUnsubscribeMessage.payload().topics();
-        String clientId = ChannelUtils.getClientId(channel);
+        String clientId = MqttChannelUtils.getClientId(channel);
         log.info("unsubscribe clientId {}", clientId);
         // 用户clientId格式: uid/client
         // final String uid = clientId.split("/")[0];

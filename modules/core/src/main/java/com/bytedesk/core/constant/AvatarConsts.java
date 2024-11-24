@@ -143,6 +143,9 @@ public class AvatarConsts {
     public static final String LLM_THREAD_DEFAULT_AVATAR = "https://cdn.weiyuai.cn/assets/images/llm/provider/zhipu.png";
     public static final String LLM_THREAD_DEFAULT_AVATAR_BASE_URL = "https://cdn.weiyuai.cn/assets/images/llm/provider/";
 
+    // 机器人头像
+    public static final String DEFAULT_ROBOT_AVATAR = "https://cdn.weiyuai.cn/avatars/robot.png";
+
     /**
      * 测试头像：
      * https://cdn.weiyuai.cn/avatars/girl.png

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-02 10:59:11
+ * @LastEditTime: 2024-11-19 11:51:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -98,6 +98,11 @@ public class BytedeskProperties {
     // cluster
     private Boolean cluster;
     private List<String> clusterNodes = new ArrayList<>();
+
+    // 
+    public Boolean isAdmin(String receiver) {
+        return receiver.equals(this.mobile) || receiver.equals(this.email);
+    }
 
     // 
     public Boolean isInWhitelist(String receiver) {

@@ -28,8 +28,9 @@ import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.worktime.WorktimeService;
 
 import lombok.AllArgsConstructor;
@@ -40,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkgroupEventListener {
 
-    private final AgentService agentService;
+    private final AgentRestService agentService;
     
     private final WorkgroupService workgroupService;
 
@@ -64,8 +65,8 @@ public class WorkgroupEventListener {
         });
         // 
         List<String> faqUids = Arrays.asList(
-            orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
-            orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2
+            orgUid + FaqConsts.FAQ_DEMO_UID_1,
+            orgUid + FaqConsts.FAQ_DEMO_UID_2
         );
         // 
         List<String> worktimeUids = new ArrayList<>();

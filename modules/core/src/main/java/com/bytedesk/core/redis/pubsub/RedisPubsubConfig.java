@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-23 17:13:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-23 17:41:48
+ * @LastEditTime: 2024-11-20 17:30:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,36 +32,15 @@ public class RedisPubsubConfig {
     // @Value("${bytedesk.redis-pubsub-channel}")
     // private String redisPubsubChannel;
 
-    /**
-     * 监听object
-     * 
-     * @param connectionFactory
-     * @param listenerAdapter
-     * @return
-     */
+    // 监听object
     @Bean
     public RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
             MessageListenerAdapter listener) {
-
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-
-        container.addMessageListener(listener, new PatternTopic(RedisPubsubConst.BYTEDESK_PUBSUB_CHANNEL_OBJECT));
-
-        return container;
-    }
-
-    // 监听string
-    @Bean
-    RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory,
-            RedisPubsubStringListener redisStringListener) {
-        //
-        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
-        redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
         // 订阅topic - subscribe
-        redisMessageListenerContainer.addMessageListener(redisStringListener,
-                new ChannelTopic(RedisPubsubConst.BYTEDESK_PUBSUB_CHANNEL_STRING));
-        return redisMessageListenerContainer;
+        container.addMessageListener(listener, new PatternTopic(RedisPubsubConst.BYTEDESK_PUBSUB_CHANNEL_OBJECT));
+        return container;
     }
 
     /**
@@ -83,5 +62,30 @@ public class RedisPubsubConfig {
         // 
         return adapter;
     }
+
+    // 监听string
+    @Bean
+    RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory,
+            RedisPubsubStringListener redisStringListener) {
+        //
+        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+        redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
+        // 订阅topic - subscribe
+        redisMessageListenerContainer.addMessageListener(redisStringListener,
+                new ChannelTopic(RedisPubsubConst.BYTEDESK_PUBSUB_CHANNEL_STRING));
+        return redisMessageListenerContainer;
+    }
+
+    // 监听key过期事件
+    @Bean
+    RedisMessageListenerContainer redisKeyExpireListenerContainer(RedisConnectionFactory connectionFactory,
+                                            RedisKeyExpirationListener listenerAdapter) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(listenerAdapter, new PatternTopic(RedisPubsubConst.BYTEDESK_PUBSUB_KEY_EXPIRE));
+        return container;
+    }
+
+    
 
 }

@@ -21,6 +21,7 @@ import com.bytedesk.core.enums.LanguageEnum;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +40,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ VisitorEntityListener.class })
 @Table(name = "bytedesk_service_visitor")
 public class VisitorEntity extends BaseEntity {
 

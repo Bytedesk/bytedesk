@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 12:20:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 22:01:27
+ * @LastEditTime: 2024-11-23 15:48:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ public class RoleConsts {
     // member - 团队成员
     public static final String ROLE_MEMBER = "ROLE_MEMBER";
     // customer service - 客服
-    public static final String ROLE_CUSTOMER_SERVICE = "ROLE_CS";
+    public static final String ROLE_AGENT = "ROLE_AGENT";
 
 
     /**
@@ -49,22 +49,6 @@ public class RoleConsts {
      * 免费注册用户
      */
     // public static final String ROLE_FREE = "ROLE_FREE";
-    /**
-     * 普通员工：非客服人员
-     */
-    // public static final String ROLE_MEMBER = "ROLE_MEMBER";
-    /**
-     * 智能客服：客服机器人
-     */
-    // public static final String ROLE_ROBOT = "ROLE_ROBOT";
-    /**
-     * 访客
-     */
-    // public static final String ROLE_VISITOR = "ROLE_VISITOR";
-    /**
-     * IM注册用户
-     */
-    // public static final String ROLE_USER = "ROLE_USER";
 
     /**
      * 工作组：
@@ -81,26 +65,5 @@ public class RoleConsts {
     //  */
     // public static final String ROLE_WORKGROUP_CHECKER = "ROLE_WORKGROUP_CHECKER";
 
-    // /**
-    //  * 良师宝用户+管理员
-    //  */
-    // public static final String ROLE_LIANGSHIBAO_USER = "ROLE_LIANGSHIBAO_USER";
-    // public static final String ROLE_LIANGSHIBAO_ADMIN = "ROLE_LIANGSHIBAO_ADMIN";
-    /**
-     * 剪贴助手-微同步
-     */
-    // public static final String ROLE_WEITONGBU_USER = "ROLE_WEITONGBU_USER";
-    /**
-     * 微语AI
-     */
-    // public static final String ROLE_WEIYU_AI_USER = "ROLE_WEIYU_AI_USER";
-    /**
-     * 微语TTS-文字转语音
-     */
-    // public static final String ROLE_WEIYU_TTS_USER = "ROLE_WEIYU_TTS_USER";
-    /**
-     * 招投标
-     */
-    // public static final String ROLE_ZHAOTOUBIAO_USER = "ROLE_ZHAOTOUBIAO_USER";
 
 }

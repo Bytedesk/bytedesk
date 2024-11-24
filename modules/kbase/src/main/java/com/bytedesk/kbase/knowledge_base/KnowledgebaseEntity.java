@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 14:42:28
+ * @LastEditTime: 2024-11-22 16:04:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,7 +48,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ KnowledgebaseEntityListener.class })
-@Table(name = "bytedesk_kb_base")
+@Table(name = "bytedesk_kbase")
 public class KnowledgebaseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -127,7 +127,7 @@ public class KnowledgebaseEntity extends BaseEntity {
 
     @Builder.Default
     @ElementCollection
-    @CollectionTable(name = "bytedesk_kb_base_tags")
+    @CollectionTable(name = "bytedesk_kbase_base_tags")
     private List<String> tags = new ArrayList<>();
 
     @Builder.Default

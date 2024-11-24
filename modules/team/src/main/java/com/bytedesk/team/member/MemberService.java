@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-09 15:51:21
+ * @LastEditTime: 2024-11-22 12:21:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.team.member;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
@@ -125,11 +124,11 @@ public class MemberService {
         if (StringUtils.hasText(request.getMobile())) {
             user = userService.findByMobileAndPlatform(request.getMobile(),
                     PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUserFromMember(userRequest, request.getRoleUids()));
+                    .orElseGet(() -> userService.createUserFromMember(userRequest));
         } else if (StringUtils.hasText(request.getEmail())) {
             user = userService.findByEmailAndPlatform(request.getEmail(),
                     PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUserFromMember(userRequest, request.getRoleUids()));
+                    .orElseGet(() -> userService.createUserFromMember(userRequest));
         } else {
             throw new RuntimeException("mobile and email should not be both null.");
         }
@@ -168,7 +167,7 @@ public class MemberService {
         member.setRoleUids(request.getRoleUids());
         // 
         UserEntity user = member.getUser();
-        userService.updateUserRolesFromMember(user, request.getOrgUid(), request.getRoleUids());
+        userService.updateUserRolesFromMember(user, request.getRoleUids());
         //
         MemberEntity savedMember = save(member);
         if (savedMember == null) {
@@ -276,11 +275,11 @@ public class MemberService {
         if (StringUtils.hasText(memberExcel.getMobile())) {
             user = userService.findByMobileAndPlatform(memberExcel.getMobile(),
                     PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUserFromMember(userRequest, new HashSet<>()));
+                    .orElseGet(() -> userService.createUserFromMember(userRequest));
         } else if (StringUtils.hasText(memberExcel.getEmail())) {
             user = userService.findByEmailAndPlatform(memberExcel.getEmail(),
                     PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUserFromMember(userRequest, new HashSet<>()));
+                    .orElseGet(() -> userService.createUserFromMember(userRequest));
         } else {
             throw new RuntimeException("mobile and email should not be both null.");
         }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-13 17:00:06
+ * @LastEditTime: 2024-11-23 20:44:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,10 +25,11 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.provider.ollama.OllamaChatService;
-import com.bytedesk.ai.provider.zhipuai.ZhipuaiService;
+import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
+import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiService;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageCache;
 import com.bytedesk.core.message.MessageExtra;
@@ -83,6 +84,8 @@ public class RobotEventListener {
         robotService.createDefaultRobot(orgUid, uidUtils.getUid());
         // 为每个组织创建一个客服助手
         robotService.createDefaultAgentAssistantRobot(orgUid, uidUtils.getUid());
+        // 为每个组织自动导入智能体
+        robotService.initRobotJson(orgUid, LevelEnum.ORGANIZATION.name());
     }
 
     @EventListener
@@ -170,7 +173,6 @@ public class RobotEventListener {
             clonedMessage.setUid(uidUtils.getCacheSerialUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
             messageSendService.sendProtobufMessage(clonedMessage);
-            //
             // TODO: 获取大模型配置
             // robotProtobuf.getLlm().getProvider()
             // robotProtobuf.getLlm().getModel()
@@ -237,4 +239,5 @@ public class RobotEventListener {
         }
     }
 
+    
 }

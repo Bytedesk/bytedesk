@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-04 12:07:11
+ * @LastEditTime: 2024-11-22 17:59:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,26 +31,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class StompBrokerAvailabilityListener implements ApplicationListener<BrokerAvailabilityEvent> {
 
-    /**
-     * 来自ApplicationListener的接口
-     * 监听 "system" connection to the broker is lost and re-established
-     *
-     * TODO: SimpMessagingTemplate should subscribe to this event and avoid sending
-     * messages at times when the broker is not available.
-     * TODO: In any case, SimpMessagingTemplate should be prepared to handle
-     * MessageDeliveryException when sending a message.
-     *
-     * TODO: 持久化断开、建立连接时间，并在建立连接后通知前端
-     *
-     * @param brokerAvailabilityEvent event
-     */
     @Override
     public void onApplicationEvent(@NonNull BrokerAvailabilityEvent brokerAvailabilityEvent) {
         //
         if (brokerAvailabilityEvent.isBrokerAvailable()) {
-            log.debug("broker available: " + brokerAvailabilityEvent.toString());
+            log.debug("stomp broker available: " + brokerAvailabilityEvent.toString());
         } else {
-            log.error("lost connection to broker: " + brokerAvailabilityEvent.toString());
+            log.error("stomp lost connection to broker: " + brokerAvailabilityEvent.toString());
         }
     }
 

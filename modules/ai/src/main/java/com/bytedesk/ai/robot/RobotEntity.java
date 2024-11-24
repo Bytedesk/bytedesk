@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-13 17:08:20
+ * @LastEditTime: 2024-11-23 13:05:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+// 智能体
 @Entity
 @Data
 @Builder
@@ -49,14 +50,10 @@ public class RobotEntity extends BaseEntity {
     private String nickname = I18Consts.I18N_ROBOT_NICKNAME;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+    private String avatar = AvatarConsts.DEFAULT_ROBOT_AVATAR;
 
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
-
-    @Embedded
-    @Builder.Default
-    private RobotServiceSettings serviceSettings = new RobotServiceSettings();
 
     @Embedded
     @Builder.Default
@@ -65,6 +62,10 @@ public class RobotEntity extends BaseEntity {
     @Embedded
     @Builder.Default
     private RobotFlow flow = new RobotFlow();
+
+    @Embedded
+    @Builder.Default
+    private RobotServiceSettings serviceSettings = new RobotServiceSettings();
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default

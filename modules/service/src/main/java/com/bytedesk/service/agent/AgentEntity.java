@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:18:27
+ * @LastEditTime: 2024-11-22 15:35:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,9 +55,8 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ AgentEntityListener.class })
-// @DiscriminatorValue("Agent")
 @Table(name = "bytedesk_service_agent", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "userUid", "orgUid" })
+    @UniqueConstraint(columnNames = { "userUid", "orgUid" })
 })
 public class AgentEntity extends BaseEntity {
 
@@ -78,7 +77,7 @@ public class AgentEntity extends BaseEntity {
     private String email;
 
     @Builder.Default
-    private String status = AgentStateEnum.AVAILABLE.name();
+    private String status = AgentStatusEnum.OFFLINE.name();
 
     @Builder.Default
     @Column(name = "is_connected")
@@ -117,19 +116,19 @@ public class AgentEntity extends BaseEntity {
     private String userUid;
 
     public Boolean isAvailable() {
-        return this.status.equals(AgentStateEnum.AVAILABLE.name());
+        return this.status.equals(AgentStatusEnum.AVAILABLE.name());
     }
 
     public Boolean isOffline() {
-        return this.status.equals(AgentStateEnum.OFFLINE.name());
+        return this.status.equals(AgentStatusEnum.OFFLINE.name());
     }
 
     public Boolean isBusy() {
-        return this.status.equals(AgentStateEnum.BUSY.name());
+        return this.status.equals(AgentStatusEnum.BUSY.name());
     }
 
     public Boolean isAway() {
-        return this.status.equals(AgentStateEnum.AWAY.name());
+        return this.status.equals(AgentStatusEnum.AWAY.name());
     }
 
     // 是否可以接待
@@ -137,5 +136,4 @@ public class AgentEntity extends BaseEntity {
         return this.isConnected() && this.isAvailable();
     }
 
-    
 }

@@ -27,7 +27,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 // import com.bytedesk.core.thread.ThreadStateService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.counter.CounterResponse;
 import com.bytedesk.service.counter.CounterService;
 import com.bytedesk.service.counter_visitor.CounterVisitorService;
@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
-    private final AgentService agentService;
+    private final AgentRestService agentService;
 
     private final ThreadRestService threadService;
 

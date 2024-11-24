@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-09 07:57:50
+ * @LastEditTime: 2024-11-20 10:43:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
+
 import lombok.AllArgsConstructor;
 
 @Component("agentInitializer")
@@ -27,10 +28,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AgentInitializer implements SmartInitializingSingleton {
 
-    private final AgentService agentService;
+    private final AgentRestService agentService;
     private final AgentRepository agentRepository;
-    // private final MemberService memberService;
-    // private final WorktimeService worktimeService;
     private final BytedeskProperties bytedeskProperties;
 
     @Override
@@ -47,7 +46,8 @@ public class AgentInitializer implements SmartInitializingSingleton {
         // 
         String mobile = bytedeskProperties.getMobile();
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        agentService.createFromMember(mobile, orgUid, true);
+        String agentUid = BytedeskConsts.DEFAULT_AGENT_UID;
+        agentService.createFromMember(mobile, orgUid, agentUid);
     }
     
 }

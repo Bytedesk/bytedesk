@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-13 18:02:05
+ * @LastEditTime: 2024-11-23 12:55:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,8 +35,12 @@ import com.bytedesk.ai.robot.RobotJsonService.RobotJson;
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -47,6 +51,7 @@ import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import lombok.AllArgsConstructor;
@@ -69,16 +74,16 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final ThreadRestService threadService;
 
+    private final RobotJsonService robotJsonService;
+
+    private final CategoryRestService categoryService;
+
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC,
                 "updatedAt");
-
         Specification<RobotEntity> specification = RobotSpecification.search(request);
-
         Page<RobotEntity> page = robotRepository.findAll(specification, pageable);
-
         return page.map(this::convertToResponse);
     }
 
@@ -91,21 +96,16 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     public RobotResponse queryByUid(String uid) {
         Optional<RobotEntity> robotOptional = robotRepository.findByUid(uid);
         if (robotOptional.isPresent()) {
-            return modelMapper.map(robotOptional.get(), RobotResponse.class);
+            return convertToResponse(robotOptional.get());
+        } else {
+            throw new RuntimeException("robot not found");
         }
-        return null;
     }
 
     @Override
     public RobotResponse create(RobotRequest request) {
-
-        // if (existsByNicknameAndOrgUidAndDeleted(request.getNickname(), request.getOrgUid())) {
-        //     throw new RuntimeException("robot name already exists, please find another name");
-        // }
         //
-        // Kb kb = kbService.getKb(request.getNickname(), request.getOrgUid());
         RobotLlm llm = RobotLlm.builder().build();
-        //
         // Robot robot = modelMapper.map(request, Robot.class);
         RobotEntity robot = RobotEntity.builder().build();
         if (StringUtils.hasText(request.getUid())) {
@@ -114,7 +114,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             robot.setUid(uidUtils.getCacheSerialUid());
         }
         robot.setNickname(request.getNickname());
-
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
         robot.setLlm(llm);
@@ -234,6 +233,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         //
         RobotEntity robot = robotOptional.get();
+        // robot = modelMapper.map(request, RobotEntity.class);
         robot.setNickname(request.getNickname());
         robot.setAvatar(request.getAvatar());
         robot.setDescription(request.getDescription());
@@ -393,8 +393,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     // 为每个组织创建一个机器人
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
         List<String> faqUids = Arrays.asList(
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+                orgUid + FaqConsts.FAQ_DEMO_UID_1,
+                orgUid + FaqConsts.FAQ_DEMO_UID_2);
         //
         RobotRequest robotRequest = RobotRequest.builder()
                 .nickname(I18Consts.I18N_ROBOT_NICKNAME)
@@ -422,24 +422,58 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return create(robotRequest);
     }
 
-    // 从json创建平台机器人
-    public RobotResponse createRobotFromJson(RobotJson robotJson, String categoryUid) {
+    public void initRobotJson(String orgUid, String level) {
+        //
+        List<RobotJson> robotJsons = robotJsonService.loadRobots();
+        for (RobotJson robotJson : robotJsons) {
+            String uid = orgUid + "_" + robotJson.getUid();
+            if (!existsByUid(uid)) {
+                String categoryUid = null;
+                Optional<CategoryEntity> categoryOptional = categoryService
+                        .findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(robotJson.getCategory(),
+                                CategoryTypeEnum.ROBOT.name(), orgUid, level, BytedeskConsts.PLATFORM_BYTEDESK);
+                if (!categoryOptional.isPresent()) {
+                    CategoryRequest categoryRequest = CategoryRequest.builder()
+                            .name(robotJson.getCategory())
+                            .orderNo(0)
+                            .level(level)
+                            .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                            .build();
+                    categoryRequest.setType(CategoryTypeEnum.ROBOT.name());
+                    categoryRequest.setOrgUid(orgUid);
+                    CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+                    if (categoryResponse != null) {
+                        categoryUid = categoryResponse.getUid();
+                    } else {
+                        throw new RuntimeException("create category failed");
+                    }
+                } else {
+                    categoryUid = categoryOptional.get().getUid();
+                }
+                createPromptRobotFromJson(orgUid, robotJson, categoryUid, level);
+            }
+        }
+    }
+
+    // 从json创建平台智能体
+    public RobotResponse createPromptRobotFromJson(String orgUid, RobotJson robotJson, String categoryUid,
+            String level) {
         log.info("robotJson {}", robotJson.getNickname());
+        String uid = orgUid + "_" + robotJson.getUid();
         RobotLlm llm = RobotLlm.builder().prompt(robotJson.getPrompt()).build();
         //
         RobotEntity robot = RobotEntity.builder()
                 .nickname(robotJson.getNickname())
-                .avatar(robotJson.getAvatar())
+                .avatar(AvatarConsts.DEFAULT_ROBOT_AVATAR)
                 .description(robotJson.getDescription())
                 .type(robotJson.getType())
-                // .category(robotJson.getCategory())
                 .categoryUid(categoryUid)
-                .level(LevelEnum.PLATFORM.name())
+                .level(level)
                 .llm(llm)
                 .published(true)
                 .build();
-        robot.setUid(robotJson.getUid());
-        robot.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        robot.setUid(uid);
+        robot.setOrgUid(orgUid);
 
         RobotEntity savedRobot = save(robot);
         if (savedRobot == null) {
@@ -448,5 +482,46 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return convertToResponse(savedRobot);
     }
 
+    // 创建智能体机器人
+    public RobotResponse createPromptRobot(RobotRequest request) {
+        //
+        RobotEntity robot = modelMapper.map(request, RobotEntity.class);
+        robot.setUid(uidUtils.getUid());
+        robot.setType(RobotTypeEnum.LLM.name());
+        robot.setDefaultReply(I18Consts.I18N_ROBOT_REPLY);
+        //
+        RobotLlm llm = RobotLlm.builder().prompt(request.getLlm().getPrompt()).build();
+        robot.setLlm(llm);
+        //
+        RobotEntity savedRobot = save(robot);
+        if (savedRobot == null) {
+            throw new RuntimeException("create robot failed");
+        }
+        return convertToResponse(savedRobot);
+    }
+
+    public RobotResponse updatePromptRobot(RobotRequest request) {
+        Optional<RobotEntity> robotOptional = findByUid(request.getUid());
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot " + request.getUid() + " not found");
+        }
+        //
+        RobotEntity robot = robotOptional.get();
+        // robot = modelMapper.map(request, RobotEntity.class);
+        robot.setNickname(request.getNickname());
+        robot.setAvatar(request.getAvatar());
+        robot.setDescription(request.getDescription());
+        robot.setCategoryUid(request.getCategoryUid());
+        //
+        RobotLlm llm = robot.getLlm();
+        llm.setPrompt(request.getLlm().getPrompt());
+        robot.setLlm(llm);
+        //
+        RobotEntity savedRobot = save(robot);
+        if (savedRobot == null) {
+            throw new RuntimeException("update robot " + request.getUid() + " failed");
+        }
+        return convertToResponse(savedRobot);
+    }
 
 }

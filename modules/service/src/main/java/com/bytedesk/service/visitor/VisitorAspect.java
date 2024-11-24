@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 18:12:14
+ * @LastEditTime: 2024-11-23 10:46:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.ip.IpUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -67,7 +68,7 @@ public class VisitorAspect {
             // 注意：不能在类上注解@Async，否则会获取不到 HttpServletRequest，attributes为空
             HttpServletRequest request = attributes.getRequest();
             String ipAddress = request.getRemoteAddr();
-            String ip = ipService.getIp(request);
+            String ip = IpUtils.getIp(request);
             String ipLocation = ipService.getIpLocation(ip);
             log.info("ipAddress {}, ip {}, ipLocation {}", ipAddress, ip, ipLocation);
             // 接下来的操作...

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-30 14:18:25
+ * @LastEditTime: 2024-11-20 16:07:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@
 package com.bytedesk.core.socket.mqtt;
 
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
@@ -24,36 +24,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * 会话存储接口类
- *
- */
-// @Slf4j
+@Slf4j
 @Service
 @AllArgsConstructor
 public class MqttSessionService {
 
-    private Map<String, MqttSession> clientidSessionMap = new ConcurrentHashMap<>();
+    // considering cluster mode, use redis to store sessions
+    private Map<String, MqttSession> clientIdSessionMap = new ConcurrentHashMap<>();
 
     public void put(String clientId, MqttSession mqttSession) {
-        clientidSessionMap.put(clientId, mqttSession);
+        clientIdSessionMap.put(clientId, mqttSession);
     }
 
     public MqttSession get(String clientId) {
-        return clientidSessionMap.get(clientId);
+        return clientIdSessionMap.get(clientId);
     }
 
     public boolean containsKey(String clientId) {
-        return clientidSessionMap.containsKey(clientId);
+        return clientIdSessionMap.containsKey(clientId);
     }
 
     public void remove(String clientId) {
-        clientidSessionMap.remove(clientId);
+        if (clientIdSessionMap.containsKey(clientId)) {
+            clientIdSessionMap.remove(clientId);
+        } else {
+            log.warn("Attempted to remove non-existent clientId: {}", clientId);
+        }
     }
 
     public List<String> getAllClientIds() {
-        if (clientidSessionMap.keySet().size() > 0) {
-            return new ArrayList<>(clientidSessionMap.keySet());
+        if (clientIdSessionMap.keySet().size() > 0) {
+            return new ArrayList<>(clientIdSessionMap.keySet());
         } else {
             return new ArrayList<>();
         }

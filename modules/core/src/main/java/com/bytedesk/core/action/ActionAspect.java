@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-17 16:53:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-02 22:37:35
+ * @LastEditTime: 2024-11-23 10:48:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.ip.IpUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -92,7 +93,7 @@ public class ActionAspect {
             // 注意：不能在类上注解@Async，否则会获取不到 HttpServletRequest，attributes为空
             HttpServletRequest request = attributes.getRequest();
             String ipAddress = request.getRemoteAddr();
-            String ip = ipService.getIp(request);
+            String ip = IpUtils.getClientIp(request);
             String ipLocation = ipService.getIpLocation(ip);
             log.info("ipAddress {}, ip {}, ipLocation {}", ipAddress, ip, ipLocation);
             actionRequest.setIp(ip);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-24 15:26:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-11 17:26:35
+ * @LastEditTime: 2024-11-23 13:04:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,7 @@ public class RobotJsonService {
     public static class RobotJson {
         private String uid;
         private String nickname;
-        private String avatar;
+        // private String avatar;
         private String type;
         private String category;
         private String prompt;

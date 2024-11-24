@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:10:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 23:22:35
+ * @LastEditTime: 2024-11-19 18:19:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,8 @@ import com.bytedesk.ai.model.LlmModelJsonService;
 import com.bytedesk.ai.model.LlmModelJsonService.ModelJson;
 import com.bytedesk.ai.model.LlmModelRestService;
 import com.bytedesk.ai.provider.LlmProviderJsonService.ProviderJson;
+import com.bytedesk.core.enums.LevelEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,20 +50,22 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
 
     // @PostConstruct
     public void init() {
+        // init platform providers
+        String level = LevelEnum.PLATFORM.name();
         Map<String, ProviderJson> providerJsonMap = llmProviderJsonService.loadProviders();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
             String providerName = entry.getKey();
             ProviderJson providerJson = entry.getValue();
             // log.info("initialize provider {}", providerName);
-            if (!llmProviderService.existsByNameAndLevel(providerName)) {
-                llmProviderService.createFromProviderJson(providerName, providerJson);
+            if (!llmProviderService.existsByNameAndLevel(providerName, level)) {
+                llmProviderService.createFromProviderJson(providerName, providerJson, level);
             }
         }
         // 
         Map<String, List<ModelJson>> modelJsonMap = llmModelJsonService.loadModels();
         for (Map.Entry<String, List<ModelJson>> entry : modelJsonMap.entrySet()) {
             String providerName = entry.getKey();
-            Optional<LlmProviderEntity> provider = llmProviderService.findByName(providerName);
+            Optional<LlmProviderEntity> provider = llmProviderService.findByName(providerName, level);
             if (provider.isPresent()) {
                 String providerUid = provider.get().getUid();
                 // log.warn("provider exists {} {} ", providerName, providerUid);
@@ -73,6 +77,19 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                 }
             } else {
                 log.warn("provider not exists {} ", providerName);
+            }
+        }
+        // init super admin providers, models will be created in LlmModelEventListener
+        level = LevelEnum.ORGANIZATION.name();
+        for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
+            String providerName = entry.getKey();
+            ProviderJson providerJson = entry.getValue();
+            // log.info("initialize provider {}", providerName);
+            String status = providerJson.getStatus();
+            if (status.equals(LlmProviderStatusEnum.PRODUCTION.name())) {
+                if (!llmProviderService.existsByNameAndLevel(providerName, level)) {
+                    llmProviderService.createFromProviderJson(providerName, providerJson, level);
+                }
             }
         }
     }

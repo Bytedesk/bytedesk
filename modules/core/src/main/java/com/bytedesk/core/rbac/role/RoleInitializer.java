@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 14:14:21
+ * @LastEditTime: 2024-11-22 11:31:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class RoleInitializer {
         // 3. 团队成员
         createMember();
         // 4. 客服
-        createCustomerService();
+        createAgent();
     }
 
     private void createSuper() {
@@ -61,7 +61,7 @@ public class RoleInitializer {
 
         RoleRequest roleRequest = RoleRequest.builder()
                 .name(RoleConsts.ROLE_SUPER)
-                .description("Super Admin")
+                .description("Super")
                 .level(LevelEnum.PLATFORM.name())
                 .build();
 
@@ -147,13 +147,13 @@ public class RoleInitializer {
         roleService.create(roleRequest);
     }
 
-    private void createCustomerService() {
-        if (roleService.existsByNamePlatform(RoleConsts.ROLE_CUSTOMER_SERVICE)) {
+    private void createAgent() {
+        if (roleService.existsByNamePlatform(RoleConsts.ROLE_AGENT)) {
             return;
         }
         RoleRequest roleRequest = RoleRequest.builder()
-                .name(RoleConsts.ROLE_CUSTOMER_SERVICE)
-                .description("Customer Service")
+                .name(RoleConsts.ROLE_AGENT)
+                .description("Agent")
                 .level(LevelEnum.PLATFORM.name())
                 .build();
         // 初始化权限前缀数组

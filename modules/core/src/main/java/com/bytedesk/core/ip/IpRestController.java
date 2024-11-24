@@ -67,7 +67,7 @@ public class IpRestController {
      */
     @GetMapping("/")
     public JsonResult<?> ip(HttpServletRequest request) {
-        return new JsonResult<>("your ip", 200, IpUtils.clientIp(request));
+        return new JsonResult<>("your ip", 200, IpUtils.getClientIp(request));
     }
 
     /**
@@ -82,7 +82,7 @@ public class IpRestController {
     @GetMapping("/location")
     public JsonResult<?> location(HttpServletRequest request) {
 
-        String ip = IpUtils.clientIp(request);
+        String ip = IpUtils.getClientIp(request);
         // location: "中国|0|湖北省|武汉市|联通"
         String location = ipService.getIpLocation(ip);
         // 

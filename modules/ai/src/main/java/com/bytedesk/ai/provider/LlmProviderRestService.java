@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-13 10:27:07
+ * @LastEditTime: 2024-11-23 12:52:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.ai.provider;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -29,7 +30,6 @@ import com.bytedesk.ai.provider.LlmProviderJsonService.ProviderJson;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -64,12 +64,16 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return repository.findByUid(uid);
     }
 
-    public Optional<LlmProviderEntity> findByName(String name) {
-        return repository.findByNameAndLevel(name, LevelEnum.PLATFORM.name());
+    public Optional<LlmProviderEntity> findByName(String name, String level) {
+        return repository.findByNameAndLevel(name, level);
     }
 
-    public Boolean existsByNameAndLevel(String name) {
-        return repository.existsByNameAndLevel(name, LevelEnum.PLATFORM.name());
+    public List<LlmProviderEntity> findByStatusAndLevelAndDeletedFalse(String status, String level) {
+        return repository.findByStatusAndLevelAndDeletedFalse(status, level);
+    }
+
+    public Boolean existsByNameAndLevel(String name, String level) {
+        return repository.existsByNameAndLevel(name, level);
     }
 
     public Boolean existsByNameAndLevelAndOrgUid(String name, String level, String orgUid) {
@@ -93,7 +97,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return convertToResponse(savedProvider);
     }
 
-    public LlmProviderResponse createFromProviderJson(String providerName, ProviderJson providerJson) {
+    public LlmProviderResponse createFromProviderJson(String providerName, ProviderJson providerJson, String level) {
 
         LlmProviderRequest request = LlmProviderRequest.builder()
                 .name(providerName)
@@ -101,13 +105,10 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
                 .logo(AvatarConsts.LLM_THREAD_DEFAULT_AVATAR_BASE_URL + providerJson.getLogo())
                 .apiUrl(providerJson.getApiUrl())
                 .webUrl(providerJson.getWebUrl())
-                // .apiKeyUrl(providerJson.getWebsites().getApiKeyUrl())
-                // .docsUrl(providerJson.getWebsites().getDocsUrl())
-                // .modelsUrl(providerJson.getWebsites().getModelsUrl())
                 .status(providerJson.getStatus())
                 .build();
         request.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        request.setLevel(LevelEnum.PLATFORM.name());
+        request.setLevel(level);
 
         return create(request);
     }

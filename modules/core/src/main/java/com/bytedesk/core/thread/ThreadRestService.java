@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 09:56:46
+ * @LastEditTime: 2024-11-23 12:45:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -131,8 +131,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         return convertToResponse(savedThread);
     }
-
-
     
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
@@ -295,7 +293,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 updateThread,
                 messageTypeEnum,
                 content);
-        // MessageUtils.notifyUser(messageProtobuf);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
         return convertToResponse(updateThread);

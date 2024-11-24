@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class PushEventListener {
 
-    private final PushService pushService;
+    private final PushRestService pushService;
 
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {

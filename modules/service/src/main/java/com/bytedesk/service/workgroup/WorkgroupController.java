@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 10:50:54
+ * @LastEditTime: 2024-11-18 17:14:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,34 +16,26 @@ package com.bytedesk.service.workgroup;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
+import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
 
-/**
- * 
- */
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/workgroup")
-public class WorkgroupController {
+public class WorkgroupController extends BaseRestController<WorkgroupRequest> {
 
     private final WorkgroupService workgroupService;
 
-    /**
-     * query
-     * 
-     * @param workgroupRequest
-     * @return
-     */
-    @GetMapping("/query/org")
+    @PreAuthorize(RolePermissions.ROLE_ADMIN)
     public ResponseEntity<?> queryByOrg(WorkgroupRequest workgroupRequest) {
 
         Page<WorkgroupResponse> workgroups = workgroupService.queryByOrg(workgroupRequest);
@@ -51,14 +43,13 @@ public class WorkgroupController {
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
-    /**
-     * create
-     *
-     * @param workgroupRequest workgroup
-     * @return json
-     */
+    @Override
+    public ResponseEntity<?> queryByUser(WorkgroupRequest arg0) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
     @ActionAnnotation(title = "workgroup", action = "create", description = "create workgroup")
-    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest workgroupRequest) {
 
         WorkgroupResponse workgroup = workgroupService.create(workgroupRequest);
@@ -68,14 +59,7 @@ public class WorkgroupController {
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
-    /**
-     * update
-     *
-     * @param workgroupRequest workgroup
-     * @return json
-     */
     @ActionAnnotation(title = "workgroup", action = "update", description = "update workgroup")
-    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest workgroupRequest) {
 
         WorkgroupResponse workgroup = workgroupService.update(workgroupRequest);
@@ -86,19 +70,15 @@ public class WorkgroupController {
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
-    /**
-     * delete
-     *
-     * @param workgroupRequest workgroup
-     * @return json
-     */
     @ActionAnnotation(title = "workgroup", action = "delete", description = "delete workgroup")
-    @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest workgroupRequest) {
 
         workgroupService.deleteByUid(workgroupRequest.getUid());
         //
         return ResponseEntity.ok(JsonResult.success(workgroupRequest));
     }
+    
+
+    
 
 }

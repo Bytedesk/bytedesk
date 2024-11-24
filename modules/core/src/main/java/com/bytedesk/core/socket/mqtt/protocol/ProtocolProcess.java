@@ -1,8 +1,9 @@
 package com.bytedesk.core.socket.mqtt.protocol;
 
 import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.socket.mqtt.MqService;
+import com.bytedesk.core.socket.mqtt.MqttService;
 import com.bytedesk.core.socket.mqtt.MqttAuthService;
+import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.socket.mqtt.MqttMessageIdService;
 import com.bytedesk.core.socket.mqtt.MqttSessionService;
 
@@ -11,11 +12,6 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * 协议处理
- *
- * @author jackning
- */
 @Data
 @Component
 public class ProtocolProcess {
@@ -30,10 +26,13 @@ public class ProtocolProcess {
     private MqttMessageIdService mqttMessageIdService;
 
     @Autowired
-    private MqService mqService;
+    private MqttService mqService;
 
     @Autowired
     private IMessageSendService messageSendService;
+
+    @Autowired
+    private MqttConnectionService mqttConnectionService;
 
     private Connect connect;
 
@@ -57,11 +56,7 @@ public class ProtocolProcess {
 
     public Connect connect() {
         if (connect == null) {
-            connect = new Connect(
-                    mqttAuthService,
-                    mqttSessionStoreService,
-                    mqService
-            );
+            connect = new Connect(mqttAuthService, mqttSessionStoreService, mqService);
         }
         return connect;
     }
@@ -89,17 +84,14 @@ public class ProtocolProcess {
 
     public DisConnect disConnect() {
         if (disConnect == null) {
-            disConnect = new DisConnect(
-                    mqttSessionStoreService,
-                    mqService
-            );
+            disConnect = new DisConnect(mqttSessionStoreService, mqService);
         }
         return disConnect;
     }
 
     public PingReq pingReq() {
         if (pingReq == null) {
-            pingReq = new PingReq();
+            pingReq = new PingReq(mqttConnectionService);
         }
         return pingReq;
     }
@@ -113,33 +105,23 @@ public class ProtocolProcess {
 
     public PubAck pubAck() {
         if (pubAck == null) {
-            pubAck = new PubAck(
-            // mqttDupPublishMessageStoreService
-            );
+            pubAck = new PubAck();
         }
         return pubAck;
     }
 
     public PubRec pubRec() {
         if (pubRec == null) {
-            pubRec = new PubRec(
-            // mqttDupPublishMessageStoreService, mqttDupPubRelMessageStoreService
-            );
+            pubRec = new PubRec();
         }
         return pubRec;
     }
 
     public PubComp pubComp() {
         if (pubComp == null) {
-            pubComp = new PubComp(
-            // mqttDupPubRelMessageStoreService
-            );
+            pubComp = new PubComp();
         }
         return pubComp;
-    }
-
-    public MqttSessionService getMqttSessionStoreService() {
-        return mqttSessionStoreService;
     }
 
 }

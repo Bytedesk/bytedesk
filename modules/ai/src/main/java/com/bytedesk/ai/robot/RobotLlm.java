@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-26 17:27:17
+ * @LastEditTime: 2024-11-19 18:26:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,20 +68,4 @@ public class RobotLlm {
     // 上下文消息数，默认3条。一同传递给大模型
     @Builder.Default
     private int contextMsgCount = 3;
-
-    // 等待时间，单位为秒。超过此等待时间大模型没有回复，则自动转接人工
-    // @Builder.Default
-    // private int waitSeconds = 10;
-
-    // 默认是true，表示使用自定义模型, false表示云服务（需要在配置文件中配置相关参数）
-    // @Builder.Default
-    // @Column(name = "is_custom")
-    // private boolean custom = true;
-
-    // private String apiUrl;
-
-    // private String apiKey;
-
-    // private String apiSecret;
-
 }

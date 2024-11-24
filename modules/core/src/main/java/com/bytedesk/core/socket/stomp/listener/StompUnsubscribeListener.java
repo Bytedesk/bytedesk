@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-29 17:59:07
+ * @LastEditTime: 2024-11-22 18:21:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import lombok.AllArgsConstructor;
 
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * published when a new STOMP UNSUBSCRIBE is received.
@@ -32,23 +32,17 @@ import lombok.AllArgsConstructor;
  * 
  * @author bytedesk.com
  */
-// @Slf4j
+@Slf4j
 @Component
 @AllArgsConstructor
 public class StompUnsubscribeListener implements ApplicationListener<SessionUnsubscribeEvent> {
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
-    /**
-     * 监听来自stomp，也即web端的取消订阅事件
-     *
-     * @param sessionUnsubscribeEvent event
-     */
     @Override
-    public void onApplicationEvent(@NonNull SessionUnsubscribeEvent sessionUnsubscribeEvent) {
-        // log.debug(sessionUnsubscribeEvent.toString());
+    public void onApplicationEvent(@NonNull SessionUnsubscribeEvent event) {
+        log.debug("SessionUnsubscribeEvent: {}", event.toString());
 
         //
-        // MessageHeaders headers = sessionUnsubscribeEvent.getMessage().getHeaders();
+        // MessageHeaders headers = event.getMessage().getHeaders();
         // Principal principal = SimpMessageHeaderAccessor.getUser(headers);
         // if (principal == null) {
         // return;

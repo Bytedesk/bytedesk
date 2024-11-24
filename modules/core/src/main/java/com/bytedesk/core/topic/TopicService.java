@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-19 12:23:18
+ * @LastEditTime: 2024-11-20 11:19:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,6 @@ public class TopicService {
 
     private final UidUtils uidUtils;
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
     private final ActionService actionService;
 
     private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();

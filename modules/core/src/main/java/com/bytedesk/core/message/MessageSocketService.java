@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 18:25:35
+ * @LastEditTime: 2024-11-20 12:18:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.socket.mqtt.MqttMessageIdService;
 import com.bytedesk.core.socket.mqtt.MqttSession;
 import com.bytedesk.core.socket.mqtt.MqttSessionService;
-// import com.bytedesk.core.socket.mqtt.service.MqttSubscribeService;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.socket.protobuf.model.ThreadProto;
 import com.bytedesk.core.socket.protobuf.model.UserProto;

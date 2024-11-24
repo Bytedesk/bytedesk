@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 23:02:00
+ * @LastEditTime: 2024-11-20 11:24:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
 import com.bytedesk.core.message.IMessageSendService;
-// import com.bytedesk.core.socket.MqService;
-import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.utils.MessageConvertUtils;
 
@@ -30,7 +29,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class Publish {
 
-    // private final MqService mqService;
     private final IMessageSendService messageSendService;
 
     //
@@ -48,11 +46,11 @@ public class Publish {
         }
         // QoS=1
         else if (mqttPublishMessage.fixedHeader().qosLevel() == MqttQoS.AT_LEAST_ONCE) {
-            ChannelUtils.sendPubAckMessage(channel, mqttPublishMessage.variableHeader().packetId());
+            MqttChannelUtils.sendPubAckMessage(channel, mqttPublishMessage.variableHeader().packetId());
         }
         // QoS=2
         else if (mqttPublishMessage.fixedHeader().qosLevel() == MqttQoS.EXACTLY_ONCE) {
-            ChannelUtils.sendPubRecMessage(channel, mqttPublishMessage.variableHeader().packetId());
+            MqttChannelUtils.sendPubRecMessage(channel, mqttPublishMessage.variableHeader().packetId());
         }
         // retain=1, 保留消息
         if (mqttPublishMessage.fixedHeader().isRetain()) {

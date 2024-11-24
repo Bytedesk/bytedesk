@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:17:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-13 19:11:55
+ * @LastEditTime: 2024-11-23 10:48:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.core.ip;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -24,13 +25,48 @@ public class IpUtils {
     private IpUtils() {
     }
     
+    // 正则表达式用于匹配IPv4地址
+    private static final String IPV4_PATTERN = "(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])";
+
+    // 正则表达式用于匹配IPv6地址
+    private static final String IPV6_PATTERN = "([0-9a-f]{1,4}:){7}([0-9a-f]){1,4}|([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}){2}|([0-9a-f]{1,4}:){5}(:[0-9a-f]{1,4}){3}|([0-9a-f]{1,4}:){4}(:[0-9a-f]{1,4}){4}|([0-9a-f]{1,4}:){3}(:[0-9a-f]{1,4}){5}|([0-9a-f]{1,4}:){2}(:[0-9a-f]{1,4}){6}|([0-9a-f]{1,4}:)(:[0-9a-f]{1,4}){7}|(:(:[0-9a-f]{1,4}){7})|(::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))";
+
+    /**
+     * 验证IP地址格式是否正确
+     * 
+     * @param ip 要验证的IP地址
+     * @return 如果格式正确则返回true，否则返回false
+     */
+    public static boolean isValidIp(String ip) {
+        // 验证IPv4地址
+        if (Pattern.matches(IPV4_PATTERN, ip)) {
+            return true;
+        }
+        // 验证IPv6地址
+        if (Pattern.matches(IPV6_PATTERN, ip)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 获取客户端ip
+     * 
+     * @param request
+     * @return
+     */
+    public static String getIp(HttpServletRequest request) {
+        return IpUtils.getClientIp(request);
+    }
+
+    
     /**
      * 获取访客来源ip
      * 
      * @return ip
      */
     @SuppressWarnings("null")
-    public static String clientIp(HttpServletRequest request) {
+    public static String getClientIp(HttpServletRequest request) {
 
         String unknown = "unknown";
         String localhost = "127.0.0.1";

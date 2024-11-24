@@ -37,8 +37,7 @@ public class MqttIdleStateHandler extends IdleStateHandler {
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         super.channelIdle(ctx, evt);
-        // String clientId = (String)
-        // ctx.channel().attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).get();
+        // String clientId = (String) ctx.channel().attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).get();
         // log.debug("client {} is idle, close now {}", clientId);
         // 直接关掉空闲连接
         ctx.channel().close();

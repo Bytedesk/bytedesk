@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 22:16:18
+ * @LastEditTime: 2024-11-19 20:56:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,9 +55,6 @@ public class LlmProviderEntity extends BaseEntity {
     private String apiKey;
     // 
     private String webUrl;
-    // private String apiKeyUrl;
-    // private String docsUrl;
-    // private String modelsUrl;
     // 
     @Builder.Default
     private String status = LlmProviderStatusEnum.DEVELOPMENT.name();

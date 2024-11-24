@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:57:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 10:39:14
+ * @LastEditTime: 2024-11-20 15:37:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,16 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
+
+
 // https://spring.io/guides/gs/messaging-jms
 @Slf4j
 @Component
 public class JmsArtemisListener {
     
+
+	// queue point to point
+
 	@JmsListener(destination = JmsArtemisConstants.QUEUE_STRING_NAME, containerFactory = "jmsArtemisQueueFactory")
 	public void receiveQueueMessage(String json) {
 		log.info("jms receiveQueueMessage string {}", json);
@@ -49,7 +54,7 @@ public class JmsArtemisListener {
 		log.info("jms receiveQueueMessage test {}", message);
 	}
 
-	///////////////
+	// topic pub sub
 
 	@JmsListener(destination = JmsArtemisConstants.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
 	public void receiveTopicMessage(String json) {

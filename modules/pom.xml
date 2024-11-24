@@ -113,8 +113,6 @@
             <artifactId>spring-boot-starter-mail</artifactId>
             <scope>provided</scope>
         </dependency>
-        
-        
 
         <!--
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor -->
@@ -122,12 +120,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- querydsl crud增强-->

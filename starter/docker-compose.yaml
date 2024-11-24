@@ -17,7 +17,7 @@ services:
       - "6379:6379"
   bytedesk:
     # image: bytedesk/bytedesk:latest
-    image: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:0.4.9
+    image: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:0.5.0
     container_name: bytedesk
     depends_on:
       - bytedesk-db

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 10:43:56
+ * @LastEditTime: 2024-11-22 11:24:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,15 +41,18 @@ public class MemberInitializer implements SmartInitializingSingleton {
     public void init() {
         //
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        if (!memberService.existsByEmailAndOrgUid(bytedeskProperties.getEmail(), orgUid)) {
+        String nickname = bytedeskProperties.getNickname();
+        String email = bytedeskProperties.getEmail();
+        String mobile = bytedeskProperties.getMobile();
+        if (!memberService.existsByEmailAndOrgUid(email, orgUid)) {
             MemberRequest memberRequest = MemberRequest.builder()
                     .jobNo("001")
                     .jobTitle(I18Consts.I18N_ADMIN)
-                    .nickname(bytedeskProperties.getNickname())
+                    .nickname(nickname)
                     .seatNo("001")
                     .telephone("001")
-                    .mobile(bytedeskProperties.getMobile())
-                    .email(bytedeskProperties.getEmail())
+                    .mobile(mobile)
+                    .email(email)
                     .status(MemberStatusEnum.ACTIVE.name())
                     .deptUid(DepartmentConsts.DEFAULT_DEPT_ADMIN_UID)
                     .build();

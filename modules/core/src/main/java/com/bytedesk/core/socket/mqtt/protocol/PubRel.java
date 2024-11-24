@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-02-29 10:54:42
+ * @LastEditTime: 2024-11-20 12:26:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,23 +14,19 @@
  */
 package com.bytedesk.core.socket.mqtt.protocol;
 
-import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * PUBREL连接处理
- *
- * @author jackning
- */
 @Slf4j
 public class PubRel {
 
     public void processPubRel(Channel channel, MqttMessageIdVariableHeader variableHeader) {
         //
         int messageId = variableHeader.messageId();
-        String clientId = ChannelUtils.getClientId(channel);
+        String clientId = MqttChannelUtils.getClientId(channel);
         log.debug("PUBREL - clientId: {}, messageId: {}", clientId, messageId);
 
         MqttMessage pubCompMessage = MqttMessageFactory.newMessage(
