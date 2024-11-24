@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -183,7 +183,7 @@ public class KeywordService extends BaseRestService<KeywordEntity, KeywordReques
                     .name(excel.getCategory())
                     .kbUid(kbUid)
                     .build();
-            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_KEYWORD);
+            categoryRequest.setType(CategoryTypeEnum.KEYWORD.name());
             categoryRequest.setOrgUid(orgUid);
             //
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);

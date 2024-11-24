@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 18:36:35
+ * @LastEditTime: 2024-11-20 12:42:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,16 +31,15 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class VisitorEventListener {
 
-    private final VisitorService visitorService;
+    private final VisitorRestService visitorService;
 
     // 更新访客在线状态：检测updatedAt时间戳，如果超过五分钟则更新为离线状态
     @EventListener
     public void onQuartzFiveMinEvent(QuartzFiveMinEvent event) {
         // log.info("visitor quartz five min event");
-        // 
         List<VisitorEntity> visitorList = visitorService.findByStatus(VisitorStatusEnum.ONLINE.name());
         visitorList.forEach(visitor -> {
-            log.info("visitor: {}", visitor.getUid());
+            // log.info("visitor: {}", visitor.getUid());
             // 使用Duration计算时间差
             if (Duration.between(visitor.getUpdatedAt(), LocalDateTime.now()).toMillis() > 5 * 60 * 1000) {
             // if (System.currentTimeMillis() - visitor.getUpdatedAt().getTime() > 5 * 60 * 1000) {

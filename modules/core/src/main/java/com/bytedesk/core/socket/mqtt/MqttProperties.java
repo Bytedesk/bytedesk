@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-29 11:32:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 08:22:38
+ * @LastEditTime: 2024-11-20 12:16:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,21 +21,20 @@ import lombok.Data;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "bytedesk.socket")
+@ConfigurationProperties(prefix = MqttProperties.CONFIG_PREFIX)
 public class MqttProperties {
+
+    public static final String CONFIG_PREFIX = "bytedesk.socket";
 
     private String host = "0.0.0.0";
 
     // private int port = 9883;
-
     // private int tslPort = 9884;
 
     private int websocketPort = 9885;
     
     // private int websocketTlsPort = 9886;
-
     // private String sslCertPath = "";
-
     // private String sslKeyPath = "";
 
     private String leakDetectorLevel = "SIMPLE";

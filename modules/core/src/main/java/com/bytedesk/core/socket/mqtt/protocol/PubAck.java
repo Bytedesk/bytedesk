@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-11 11:16:44
+ * @LastEditTime: 2024-11-20 12:25:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,23 +14,20 @@
  */
 package com.bytedesk.core.socket.mqtt.protocol;
 
+import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessageIdVariableHeader;
-// import com.bytedesk.core.socket.mqtt.service.MqttDupPublishMessageStoreService;
-import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * PUBACK连接处理
- */
 @Slf4j
 @AllArgsConstructor
 public class PubAck {
 
     public void processPubAck(Channel channel, MqttMessageIdVariableHeader variableHeader) {
         //
-        String clientId = ChannelUtils.getClientId(channel);
+        String clientId = MqttChannelUtils.getClientId(channel);
         int messageId = variableHeader.messageId();
         log.debug("PUBACK - clientId: {}, messageId: {}", clientId, messageId);
         //

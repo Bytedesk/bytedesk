@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 12:40:31
+ * @LastEditTime: 2024-11-22 13:10:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,10 +22,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.config.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.authority.AuthorityInitializer;
-import com.bytedesk.core.rbac.role.RoleConsts;
-import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleInitializer;
-import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserInitializer;
 import com.bytedesk.core.rbac.user.UserService;
@@ -53,7 +50,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
 
     private final OrganizationService organizationService;
 
-    private final RoleService roleService;
+    // private final RoleService roleService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -73,9 +70,9 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
         }
         log.info("Organization: Default Organization Initializing...");
         //
-        Optional<UserEntity> adminOptional = userService.getAdmin();
-        if (adminOptional.isPresent()) {
-            UserEntity user = adminOptional.get();
+        Optional<UserEntity> superOptional = userService.getSuper();
+        if (superOptional.isPresent()) {
+            UserEntity user = superOptional.get();
             //
             OrganizationEntity organization = OrganizationEntity.builder()
                     .name(bytedeskProperties.getOrganizationName())
@@ -87,19 +84,15 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
             //
            OrganizationEntity savedOrganization = organizationService.save(organization);
             if (savedOrganization != null) {
-                Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_SUPER);
-                if (roleOptional.isPresent()) {
-                    RoleEntity role = roleOptional.get();
-                    user.addOrganizationRole(savedOrganization, role);
-                    userService.save(user);
-                } else {
-                    throw new RuntimeException("Organization: Super Role Not Found");
-                }
+                user.setCurrentOrganization(savedOrganization);
+                user = userService.addSuperRole(user);
+                user = userService.addAdminRole(user);
+                user = userService.addMemberRole(user);
             } else {
                 throw new RuntimeException("Organization: Default Organization Save Failed");
             }
         } else {
-            throw new RuntimeException("Organization: Admin User Not Found");
+            throw new RuntimeException("Organization: Super User Not Found");
         }
     }
     

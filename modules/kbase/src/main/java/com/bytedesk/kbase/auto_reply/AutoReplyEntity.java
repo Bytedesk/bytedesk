@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 15:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 10:41:55
+ * @LastEditTime: 2024-11-22 16:04:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_kb_auto_reply")
+@Table(name = "bytedesk_kbase_auto_reply")
 public class AutoReplyEntity extends BaseEntity {
 
     @Builder.Default

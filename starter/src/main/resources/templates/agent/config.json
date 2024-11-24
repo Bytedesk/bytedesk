@@ -1,6 +1,6 @@
 {
     "enabled": false,
-    "apiHost": "api.weiyuai.cn",
-    "htmlHost": "www.weiyuai.cn",
-    "protocol": "https"
+    "apiUrl": "http://127.0.0.1:9003",
+    "websocketUrl": "ws://127.0.0.1:9885/websocket",
+    "htmlUrl": "http://127.0.0.1:9006"
 }

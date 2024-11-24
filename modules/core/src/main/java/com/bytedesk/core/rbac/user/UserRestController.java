@@ -21,7 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.action.ActionAnnotation;
-import com.bytedesk.core.push.PushService;
+import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.authority.AuthorityPermissions;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -42,7 +42,7 @@ public class UserRestController {
 
     private final AuthService authService;
 
-    private final PushService pushService;
+    private final PushRestService pushService;
 
     /**
      * get user info

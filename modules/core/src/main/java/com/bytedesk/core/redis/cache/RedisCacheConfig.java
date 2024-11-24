@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-27 18:45:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 11:04:43
+ * @LastEditTime: 2024-11-19 13:06:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,7 @@ import java.time.Duration;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.CachingConfigurer;
-import org.springframework.cache.annotation.EnableCaching;
+// import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,13 +28,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 /**
  * cache config
+ * https://docs.spring.io/spring-boot/reference/io/caching.html
  * https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html
  * https://docs.spring.io/spring-framework/reference/integration/cache/annotations.html#cache-spel-context
  * https://docs.spring.io/spring-boot/docs/3.2.0/reference/htmlsingle/#io.caching
  * https://www.51cto.com/article/753777.html
  */
 @Configuration
-@EnableCaching
+// @EnableCaching // 开启缓存
 public class RedisCacheConfig implements CachingConfigurer {
 
     // @Bean
@@ -92,7 +93,7 @@ public class RedisCacheConfig implements CachingConfigurer {
 
     // /**
     // * https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html
-    // * 使用自定义rediscache时，遇到下面错误：
+    // * 使用自定义redisCache时，遇到下面错误：
     // * FIXME: SerializationException: Could not read JSON:failed to lazily
     // initialize a collection: could not initialize proxy - no Session
     // * @return

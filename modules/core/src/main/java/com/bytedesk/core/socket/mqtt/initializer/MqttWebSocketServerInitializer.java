@@ -26,13 +26,14 @@ import io.netty.handler.codec.mqtt.MqttDecoder;
 import io.netty.handler.codec.mqtt.MqttEncoder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
+
+import com.bytedesk.core.socket.mqtt.MqttConsts;
 import com.bytedesk.core.socket.mqtt.handler.MqttTransportHandler;
 import com.bytedesk.core.socket.mqtt.initializer.websocket.BinaryWebSocketFrameHandler;
 import com.bytedesk.core.socket.mqtt.initializer.websocket.ByteBufToWebSocketFrameEncoder;
 import com.bytedesk.core.socket.mqtt.initializer.websocket.ContinuationWebSocketFrameHandler;
 import com.bytedesk.core.socket.mqtt.initializer.websocket.TextWebSocketFrameHandler;
 import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
-import com.bytedesk.core.socket.mqtt.util.MqttConsts;
 
 /**
  * @author bytedesk.com on 2019-07-05

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 13:49:04
+ * @LastEditTime: 2024-11-19 10:58:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,12 +69,18 @@ public class PushServiceImplSms extends PushNotifier {
     public void send(String mobile, String content, HttpServletRequest request) {
         log.info("send sms to {}, content: {}", mobile, content);
 
+        // 测试手机号不发送验证码
         if (Utils.isTestMobile(mobile)) {
             return;
         }
 
         // 白名单手机号使用固定验证码，无需真正发送验证码
         if (bytedeskProperties.isInWhitelist(mobile)) {
+            return;
+        }
+
+        // 测试环境不发送验证码
+        if (bytedeskProperties.getDebug()) {
             return;
         }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 10:42:31
+ * @LastEditTime: 2024-11-22 18:14:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,8 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
+import com.bytedesk.core.socket.stomp.handler.CustomWebSocketHandlerDecoratorFactory;
+
 /**
  * https://docs.spring.io/spring-framework/reference/web/websocket/stomp/enable.html
  *
@@ -34,8 +36,6 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 @EnableWebSocketMessageBroker
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
-    //
-    // static final String MESSAGE_PREFIX = "/topic"; // <3>
     /**
      * /stomp is the HTTP URL for the endpoint to which a WebSocket (or SockJS)
      * client needs to connect for the WebSocket handshake.
@@ -56,7 +56,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         // '*' when the request's credentials mode is 'include'. The credentials mode of
         // requests initiated by the XMLHttpRequest is controlled by the withCredentials
         // attribute.
-        // sockjs only used for older browers
+        // sockjs only used for older browsers
         stompEndpointRegistry.addEndpoint("/sockjs")
                 .setAllowedOriginPatterns("*")
                 .withSockJS()
@@ -119,6 +119,12 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         registration.setSendTimeLimit(15 * 1000).setSendBufferSizeLimit(512 * 1024);
         registration.setMessageSizeLimit(128 * 1024);
         // registration.setTimeToFirstMessage(30000);
+        registration.addDecoratorFactory(customWebSocketHandlerDecoratorFactory());
+    }
+
+    @Bean
+    public CustomWebSocketHandlerDecoratorFactory customWebSocketHandlerDecoratorFactory() {
+        return new CustomWebSocketHandlerDecoratorFactory();
     }
 
 }

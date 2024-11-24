@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-12 22:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 23:14:32
+ * @LastEditTime: 2024-11-19 17:44:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,7 +47,7 @@ public class LlmModelEventListener {
         }
         log.info("LlmModelEventListener onLlmProviderCreateEvent {}", lpmEntity.getName());
         // 
-        Optional<LlmProviderEntity> llmProviderPlatform = llmProviderRestService.findByName(lpmEntity.getName());
+        Optional<LlmProviderEntity> llmProviderPlatform = llmProviderRestService.findByName(lpmEntity.getName(), LevelEnum.PLATFORM.name());
         if (llmProviderPlatform.isPresent()) {
             List<LlmModelEntity> llmModelEntitiesPlatform = llmModelRestService.findByProviderUid(llmProviderPlatform.get().getUid());
             for (LlmModelEntity llmModel : llmModelEntitiesPlatform) {
@@ -64,7 +64,6 @@ public class LlmModelEventListener {
         } else {
             log.error("LlmModelEventListener onLlmProviderCreateEvent not found {}", lpmEntity.getName());
         }
-
     }
     
 }

@@ -1,18 +1,19 @@
 package com.bytedesk.core.rbac.user;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.lang.NonNull;
 
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.role.RoleEntity;
@@ -117,7 +118,11 @@ public class UserEntity extends BaseEntityNoOrg {
 	private Set<UserOrganizationRoleEntity> userOrganizationRoles = new HashSet<>();
 
 	// 添加方法以简化对用户组织和角色的管理
-    public void addOrganizationRole(OrganizationEntity organization, RoleEntity role) {
+    public void addOrganizationRole(RoleEntity role) {
+        OrganizationEntity organization = this.currentOrganization;
+        if (organization == null) {
+            return;
+        }
         UserOrganizationRoleEntity uor = userOrganizationRoles.stream()
             .filter(u -> u.getOrganization().equals(organization))
             .findFirst()
@@ -131,30 +136,53 @@ public class UserEntity extends BaseEntityNoOrg {
             });
         uor.getRoles().add(role);
 		// 角色有效期为30天
-		// uor.startDate(LocalDateTime.now());
+		uor.setStartDate(LocalDateTime.now());
         // uor.endDate(LocalDateTime.now().plusDays(30));
         //
-        if (this.currentOrganization == null) {
-            this.currentOrganization = organization;
-        }
+        // if (this.currentOrganization == null) {
+        //     this.currentOrganization = organization;
+        // }
     }
 
-    public void removeOrganizationRole(@NonNull OrganizationEntity organization, RoleEntity role) {
+	// 判断organization是否包含role
+	public boolean containsRole(RoleEntity role) {
+		OrganizationEntity organization = this.currentOrganization;
+		if (organization == null) {
+			return false;
+		}
+		return userOrganizationRoles.stream().filter(u -> u.getOrganization().equals(organization)).findFirst()
+				.map(uor -> uor.getRoles().contains(role)).orElse(false);
+	}
+
+    public void removeOrganizationRole(RoleEntity role) {
+        OrganizationEntity organization = this.currentOrganization;
+        if (organization == null) {
+            return;
+        }
         userOrganizationRoles.stream()
             .filter(u -> u.getOrganization().equals(organization))
             .findFirst()
             .ifPresent(uor -> uor.getRoles().remove(role));
     }
 
-	// 遍历userOrganizationRoles，删除organization所对应的所有role
-	public void removeOrganizationRoles(@NonNull OrganizationEntity organization) {
-		// userOrganizationRoles.removeIf(uor -> uor.getOrganization().equals(organization));
+	// 遍历userOrganizationRoles，删除organization所对应的除系统角色之外的所有role
+	public void removeOrganizationRoles() {
+		OrganizationEntity organization = this.currentOrganization;
+		if (organization == null) {
+			return;
+		}
 		Iterator<UserOrganizationRoleEntity> iterator = userOrganizationRoles.iterator();
 		while (iterator.hasNext()) {
 			UserOrganizationRoleEntity uor = iterator.next();
 			if (uor.getOrganization().equals(organization)) {
+				// 判断role.level是否为LevelEnum.PLATFORM.name(), 如果不是，则删除
+				for (RoleEntity role : uor.getRoles()) {
+					if (!role.getLevel().equals(LevelEnum.PLATFORM.name())) {
+						uor.getRoles().remove(role);
+					}
+				}
 				// 遍历uor的roles，删除role
-				uor.getRoles().clear();
+				// uor.getRoles().clear();
 			}
 		}
 	}

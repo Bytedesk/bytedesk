@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-24 10:14:23
+ * @LastEditTime: 2024-11-22 23:50:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,16 +14,18 @@
  */
 package com.bytedesk.core.socket.stomp.listener;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
-// import com.bytedesk.core.event.BytedeskEventPublisher;
-
 import lombok.AllArgsConstructor;
 
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * published when a new STOMP SUBSCRIBE is received.
@@ -32,37 +34,44 @@ import lombok.AllArgsConstructor;
  * 
  * @author bytedesk.com
  */
-// @Slf4j
+@Slf4j
 @Component
 @AllArgsConstructor
 public class StompSubscribeListener implements ApplicationListener<SessionSubscribeEvent> {
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
-    /**
-     * 监听来自stomp，也即web端的订阅事件
-     *
-     * @param sessionSubscribeEvent event
-     */
-    @Override
-    public void onApplicationEvent(@NonNull SessionSubscribeEvent sessionSubscribeEvent) {
-        // log.debug(sessionSubscribeEvent.toString());
-        //
-        // MessageHeaders headers = sessionSubscribeEvent.getMessage().getHeaders();
-        // Principal principal = SimpMessageHeaderAccessor.getUser(headers);
-        // if (principal == null) {
-        // return;
-        // }
-        // log.debug("principal.getName(): " + principal.getName());
-        //
-        // Optional<User> userOptional =
-        // userRepository.findFirstByUsername(principal.getName());
-        // if (!userOptional.isPresent()) {
-        // return;
-        // }
-        // String sessionId = SimpMessageHeaderAccessor.getSessionId(headers);
-        // String destination = SimpMessageHeaderAccessor.getDestination(headers);
-        // log.debug("subscribe: " + destination);
+    private final Set<String> subscriptions = new HashSet<>();
 
+    @Override
+    public void onApplicationEvent(@NonNull SessionSubscribeEvent event) {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String sessionId = headerAccessor.getSessionId();
+        String destination = headerAccessor.getDestination();
+        log.debug("SessionSubscribeEvent: {}", event.toString());
+        log.debug("SessionSubscribeEvent: sessionId={}, destination={}", sessionId, destination);
+
+        if (sessionId == null || destination == null) {
+            return;
+        }
+
+        String subscriptionKey = sessionId + ":" + destination;
+
+        synchronized (subscriptions) {
+            if (subscriptions.contains(subscriptionKey)) {
+                log.debug("Duplicate subscription detected: {}", subscriptionKey);
+                return;
+            }
+            subscriptions.add(subscriptionKey);
+        }
+
+        // 处理订阅逻辑，例如存储到数据库或其他操作
+    }
+
+    // 清理过期的订阅
+    public void removeSubscription(String sessionId, String destination) {
+        String subscriptionKey = sessionId + ":" + destination;
+        synchronized (subscriptions) {
+            subscriptions.remove(subscriptionKey);
+        }
     }
 
 }

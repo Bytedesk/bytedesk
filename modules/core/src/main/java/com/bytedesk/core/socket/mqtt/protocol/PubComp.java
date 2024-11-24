@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-15 16:29:42
+ * @LastEditTime: 2024-11-20 12:25:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,18 +14,13 @@
  */
 package com.bytedesk.core.socket.mqtt.protocol;
 
+import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessageIdVariableHeader;
-// import com.bytedesk.core.socket.mqtt.service.MqttDupPubRelMessageStoreService;
-import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * PUBCOMP连接处理
- *
- * @author jackning
- */
 @Slf4j
 @AllArgsConstructor
 public class PubComp {
@@ -34,7 +29,7 @@ public class PubComp {
     // mqttDupPubRelMessageStoreService;
 
     public void processPubComp(Channel channel, MqttMessageIdVariableHeader variableHeader) {
-        String clientId = ChannelUtils.getClientId(channel);
+        String clientId = MqttChannelUtils.getClientId(channel);
         int messageId = variableHeader.messageId();
         log.debug("PUBCOMP - clientId: {}, messageId: {}", clientId, messageId);
         // mqttDupPubRelMessageStoreService.remove(clientId, messageId);

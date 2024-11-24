@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 15:17:31
+ * @LastEditTime: 2024-11-22 12:24:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,9 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.role.RoleConsts;
-import com.bytedesk.core.rbac.role.RoleEntity;
-import com.bytedesk.core.rbac.role.RoleService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
@@ -49,7 +46,7 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
 
     private final UserService userService;
 
-    private final RoleService roleService;
+    // private final RoleService roleService;
 
     private final OrganizationRepository organizationRepository;
 
@@ -67,28 +64,12 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
 
     @Override
     public Page<OrganizationResponse> queryByUser(OrganizationRequest request) {
-        
         UserEntity user = authService.getCurrentUser();
-
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "id");
-
         Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
-
         return orgPage.map(organization -> convertToResponse(organization));
     }
-
-    // public Page<OrganizationResponse> query(OrganizationRequest pageParam) {
-
-    //     UserEntity user = authService.getCurrentUser();
-
-    //     Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
-    //             "id");
-
-    //     Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
-
-    //     return orgPage.map(organization -> convertToResponse(organization));
-    // }
 
     @Transactional
     public OrganizationResponse create(OrganizationRequest organizationRequest) {
@@ -114,19 +95,8 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
         if (savedOrganization == null) {
             throw new RuntimeException("Failed to create organization.");
         }
-        log.info("Organization created with UID: {}", orgUid);
-        // 初始化组织的角色
-        // roleService.initOrgRoles(orgUid);
-        // Optional<RoleEntity> roleOptional =
-        // roleService.findByNameAndOrgUid(RoleConsts.ROLE_ADMIN, orgUid);
-        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_ADMIN);
-        if (roleOptional.isPresent()) {
-            log.info("roleOptional success");
-            user.addOrganizationRole(savedOrganization, roleOptional.get());
-            userService.save(user);
-        } else {
-            throw new RuntimeException("Failed to save admin role.");
-        }
+        user.setCurrentOrganization(savedOrganization);
+        userService.addAdminRole(user);
         //
         return convertToResponse(savedOrganization);
 
@@ -149,14 +119,11 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
         organization.setLogo(organizationRequest.getLogo());
         organization.setCode(organizationRequest.getCode());
         organization.setDescription(organizationRequest.getDescription());
-
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
-
         if (updatedOrganization == null) {
             throw new RuntimeException("Failed to update organization.");
         }
-
         // 转换为响应对象
         return convertToResponse(updatedOrganization);
     }

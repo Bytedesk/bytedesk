@@ -14,6 +14,7 @@
  */
 package com.bytedesk.ai.provider;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,6 @@ public interface LlmProviderRepository extends JpaRepository<LlmProviderEntity, 
     Boolean existsByNameAndLevel(String name, String level);
 
     Boolean existsByNameAndLevelAndOrgUidAndDeletedFalse(String name, String level, String orgUid);
+
+    List<LlmProviderEntity> findByStatusAndLevelAndDeletedFalse(String status, String level);
 }

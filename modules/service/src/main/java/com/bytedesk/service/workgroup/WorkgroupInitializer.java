@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 12:36:20
+ * @LastEditTime: 2024-11-22 16:22:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.service.worktime.WorktimeService;
 
 import lombok.AllArgsConstructor;
@@ -55,8 +56,8 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         List<String> agentUids = Arrays.asList(BytedeskConsts.DEFAULT_AGENT_UID);
         //
         List<String> faqUids = Arrays.asList(
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
-                orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
+                orgUid + FaqConsts.FAQ_DEMO_UID_1,
+                orgUid + FaqConsts.FAQ_DEMO_UID_2);
         //
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();

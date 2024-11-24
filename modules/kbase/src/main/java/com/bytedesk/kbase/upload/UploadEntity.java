@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:18:06
+ * @LastEditTime: 2024-11-22 16:05:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,9 +38,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * Upload
- */
 @Entity
 @Data
 @Builder
@@ -49,7 +46,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ UploadEntityListener.class })
-@Table(name = "bytedesk_kb_upload")
+@Table(name = "bytedesk_kbase_upload")
 public class UploadEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

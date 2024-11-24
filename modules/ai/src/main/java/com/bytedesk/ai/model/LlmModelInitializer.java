@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:11:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 12:39:50
+ * @LastEditTime: 2024-11-19 18:16:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,12 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class LlmModelInitializer implements SmartInitializingSingleton {
 
-    // private final LlmModelService llmModelService;
-
-    // private final LlmModelJsonService llmModelJsonService;
-
-    // private final LlmProviderService llmProviderService;
-
     @Override
     public void afterSingletonsInstantiated() {
         init();
@@ -42,23 +36,6 @@ public class LlmModelInitializer implements SmartInitializingSingleton {
     public void init() {
         // 不能保证在provider初始化之后执行,所以迁移到providerInitializer中执行
         // log.warn("init LLM models...");
-        // Map<String, List<ModelJson>> modelJsonMap = llmModelJsonService.loadModels();
-        // for (Map.Entry<String, List<ModelJson>> entry : modelJsonMap.entrySet()) {
-        //     String providerName = entry.getKey();
-        //     Optional<LlmProviderEntity> provider = llmProviderService.findByName(providerName);
-        //     if (provider.isPresent()) {
-        //         String providerUid = provider.get().getUid();
-        //         log.warn("provider exists {} {} ", providerName, providerUid);
-        //         List<ModelJson> modelJsons = entry.getValue();
-        //         for (ModelJson modelJson : modelJsons) {
-        //             if (!llmModelService.existsByNameAndProviderUid(modelJson.getName(), providerUid)) {
-        //                 llmModelService.createFromModelJson(providerUid, modelJson);
-        //             }
-        //         }
-        //     } else {
-        //         log.warn("provider not exists {} ", providerName);
-        //     }
-        // }
     }
     
 }

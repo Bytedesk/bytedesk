@@ -14,12 +14,10 @@
  */
 package com.bytedesk.core.socket.mqtt.protocol;
 
+import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
-// import com.bytedesk.core.socket.mqtt.model.MqttDupPubRelMessage;
-// import com.bytedesk.core.socket.mqtt.service.MqttDupPubRelMessageStoreService;
-// import com.bytedesk.core.socket.mqtt.service.MqttDupPublishMessageStoreService;
-import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +34,7 @@ public class PubRec {
         public void processPubRec(Channel channel, MqttMessageIdVariableHeader variableHeader) {
                 //
                 int messageId = variableHeader.messageId();
-                String clientId = ChannelUtils.getClientId(channel);
+                String clientId = MqttChannelUtils.getClientId(channel);
                 log.debug("PUBREC - clientId: {}, messageId: {}", clientId, messageId);
                 //
                 // mqttDupPublishMessageStoreService.remove(clientId, messageId);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 12:38:18
+ * @LastEditTime: 2024-11-22 15:07:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,8 +39,7 @@ public class ConvertServiceUtils {
 
     private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
     
-    private ConvertServiceUtils() {
-    }
+    private ConvertServiceUtils() {}
 
     //
     public static VisitorResponse convertToVisitorResponse(VisitorEntity visitor) {
@@ -60,11 +59,6 @@ public class ConvertServiceUtils {
     public static String convertToUserProtobufJSONString(VisitorRequest visitorRequest) {
         return JSON.toJSONString(convertToUserProtobuf(visitorRequest));
     }
-
-    // public static UserProtobuf convertToUserResponseSimple(AgentResponseSimple
-    // agentResponseSimple) {
-    // return modelMapper.map(agentResponseSimple, UserProtobuf.class);
-    // }
 
     public static UserProtobuf convertToUserResponseSimple(UserProtobuf visitorResponseSimple) {
         return modelMapper.map(visitorResponseSimple, UserProtobuf.class);

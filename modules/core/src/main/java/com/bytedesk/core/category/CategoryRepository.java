@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-13 17:57:07
+ * @LastEditTime: 2024-11-19 14:56:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,24 +26,16 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>,
     List<CategoryEntity> findByParentAndPlatformAndDeletedOrderByOrderNoAsc(CategoryEntity parent, String platform,
                     Boolean deleted);
             
-    Optional<CategoryEntity> findByNameAndTypeAndOrgUidAndPlatformAndDeleted(String name, String type, String orgUid, String platform,
-                    Boolean deleted);
+    Optional<CategoryEntity> findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeletedFalse(String name, String type, String orgUid, String level, String platform);
             
-    Optional<CategoryEntity> findByNameAndTypeAndLevelAndPlatformAndDeleted(String name, String type, String level, String platform,
-            Boolean deleted);
+    Optional<CategoryEntity> findByNameAndTypeAndLevelAndPlatformAndDeletedFalse(String name, String type, String level, String platform);
 
-    Optional<CategoryEntity> findByNameAndKbUidAndDeleted(String name, String kbUid, Boolean deleted);
+    Optional<CategoryEntity> findByNameAndKbUidAndDeletedFalse(String name, String kbUid);
 
-    List<CategoryEntity> findByKbUidAndDeleted(String kbUid, Boolean deleted);
+    List<CategoryEntity> findByKbUidAndDeletedFalse(String kbUid);
 
     Boolean existsByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
 
     Boolean existsByUid(String uid);
-
-//     List<Category> findByLevelAndDeleted(String level, Boolean deleted);
-
-//     List<Category> findByLevelAndOrgUidAndDeleted(String level, String orgUid, Boolean deleted);
-
-//     List<Category> findByLevelAndAgentUidAndDeleted(String level, String agentUid, Boolean deleted);
     
 }

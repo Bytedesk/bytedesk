@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 22:58:55
+ * @LastEditTime: 2024-11-22 18:02:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,6 +55,7 @@ public class StompController {
             @DestinationVariable(value = "sid") String sid,
             @DestinationVariable(value = "uid") String uid,
             String message) {
+        // principal: null, sid: org.workgroup.df_wg_uid, uid: 1513088171901063, message:
         log.debug("principal: {}, sid: {}, uid: {}, message: {}", principal, sid, uid, message);
         // TODO: 发送回执
         // 转发给mq

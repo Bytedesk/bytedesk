@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 12:20:10
+ * @LastEditTime: 2024-11-22 16:22:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.agent.AgentService;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.service.settings.ServiceSettings;
@@ -53,7 +53,7 @@ public class WorkgroupService {
 
     private final WorkgroupRepository workgroupRepository;
 
-    private final AgentService agentService;
+    private final AgentRestService agentService;
 
     private final RobotRestService robotService;
 
@@ -384,43 +384,5 @@ public class WorkgroupService {
             save(workgroup);
         });
     }
-
-    // public void initData() {
-
-    //     if (workgroupRepository.count() > 0) {
-    //         return;
-    //     }
-
-    //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    //     //
-    //     List<String> agentUids = Arrays.asList(
-    //             BytedeskConsts.DEFAULT_AGENT_UID);
-    //     //
-    //     List<String> faqUids = Arrays.asList(
-    //             orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1,
-    //             orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
-    //     //
-    //     // List<String> quickButtonUids = Arrays.asList(
-    //     // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_1,
-    //     // orgUid + I18Consts.I18N_QUICK_BUTTON_DEMO_TITLE_2);
-    //     //
-    //     List<String> worktimeUids = new ArrayList<>();
-    //     String worktimeUid = worktimeService.createDefault();
-    //     worktimeUids.add(worktimeUid);
-    //     //
-    //     // add workgroups
-    //     WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
-    //             .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
-    //             .agentUids(agentUids)
-    //             .build();
-    //     workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
-    //     workgroupRequest.setOrgUid(orgUid);
-    //     //
-    //     workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-    //     workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
-    //     workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
-    //     //
-    //     create(workgroupRequest);
-    // }
 
 }

@@ -58,7 +58,7 @@ public class IpInterceptor implements HandlerInterceptor {
         // String orgUid = request.getParameter("orgUid"); // 将"paramName"替换为实际的参数名
         // log.info("参数'orgUid'的值为：" + orgUid);
 
-        String ip = ipService.getIp(request);
+        String ip = IpUtils.getIp(request);
         // 检查IP是否在黑名单中
         if (BLACKLISTED_IPS.contains(ip)) {
             log.warn("Blocked IP address: {}", ip);

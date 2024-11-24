@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.utils.JsonResult;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,22 +43,22 @@ public class JmsArtemisController {
 	@GetMapping("/artemis/queue")
 	public ResponseEntity<?> getJmsQueueArtemis() {
 		if (!bytedeskProperties.getDebug()) {
-			return ResponseEntity.status(503).body("debug is false");
+			return ResponseEntity.status(503).body(JsonResult.error("debug is false"));
 		}
 
 		jmsArtemisService.testQueue();
-		return ResponseEntity.ok("success");
+		return ResponseEntity.ok(JsonResult.success("send artemis queue message success"));
  	}
 
 	// http://127.0.0.1:9003/jms/artemis/topic
 	@GetMapping("/artemis/topic")
 	public ResponseEntity<?> getJmsTopicArtemis() {
 		if (!bytedeskProperties.getDebug()) {
-			return ResponseEntity.status(503).body("debug is false");
+			return ResponseEntity.status(503).body(JsonResult.error("debug is false"));
 		}
 		
 		jmsArtemisService.testTopic();
-		return ResponseEntity.ok("success");
+		return ResponseEntity.ok(JsonResult.success("send artemis topic message success"));
  	}
 
 }

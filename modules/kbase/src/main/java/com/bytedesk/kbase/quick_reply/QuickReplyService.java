@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 13:38:44
+ * @LastEditTime: 2024-11-22 16:18:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,10 +26,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -83,7 +84,11 @@ public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickRe
     public QuickReplyResponse create(QuickReplyRequest request) {
 
         QuickReplyEntity entity = modelMapper.map(request, QuickReplyEntity.class);
-        entity.setUid(uidUtils.getCacheSerialUid());
+        if (StringUtils.hasText(request.getUid())) {
+            entity.setUid(request.getUid());
+        } else {
+            entity.setUid(uidUtils.getUid());
+        }
         entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
 
         return convertToResponse(save(entity));
@@ -169,7 +174,7 @@ public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickRe
                     .name(excel.getCategory())
                     .kbUid(kbUid)
                     .build();
-            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_QUICKREPLY);
+            categoryRequest.setType(CategoryTypeEnum.QUICKREPLY.name());
             categoryRequest.setOrgUid(orgUid);
             //
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
@@ -192,7 +197,7 @@ public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickRe
         // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
         Optional<CategoryEntity> categoryContact = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT,
-                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
+                CategoryTypeEnum.QUICKREPLY.name(),
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryContact.isPresent()) {
@@ -212,7 +217,7 @@ public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickRe
         //
         Optional<CategoryEntity> categoryThanks = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS,
-                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
+                CategoryTypeEnum.QUICKREPLY.name(),
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryThanks.isPresent()) {
@@ -232,7 +237,7 @@ public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickRe
         //
         Optional<CategoryEntity> categoryWelcome = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME,
-                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
+                CategoryTypeEnum.QUICKREPLY.name(),
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryWelcome.isPresent()) {
@@ -252,7 +257,7 @@ public class QuickReplyService extends BaseRestService<QuickReplyEntity, QuickRe
 
         Optional<CategoryEntity> categoryBye = categoryService.findByNameAndTypeAndLevelAndPlatform(
                 I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE,
-                CategoryConsts.CATEGORY_TYPE_QUICKREPLY,
+                CategoryTypeEnum.QUICKREPLY.name(),
                 LevelEnum.PLATFORM,
                 PlatformEnum.BYTEDESK);
         if (categoryBye.isPresent()) {

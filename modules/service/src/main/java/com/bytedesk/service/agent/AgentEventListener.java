@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-09 07:57:59
+ * @LastEditTime: 2024-11-22 17:19:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,9 @@
  */
 package com.bytedesk.service.agent;
 
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,11 +24,16 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
+import com.bytedesk.core.thread.ThreadCreateEvent;
+import com.bytedesk.core.thread.ThreadUpdateEvent;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
@@ -37,11 +45,10 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AgentEventListener {
 
-    private final AgentService agentService;
-    // private final MemberService memberService;
-    // private final WorktimeService worktimeService;
+    private final AgentRestService agentService;
     private final KnowledgebaseService knowledgebaseService;
-    // private final UidUtils uidUtils;
+    private final UidUtils uidUtils;
+    private final MqttConnectionService mqttConnectionService;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
     @Order(6)
@@ -53,8 +60,8 @@ public class AgentEventListener {
         log.info("agent - organization created: {}", organization.getName());
         //
         String mobile = user.getMobile();
-        agentService.createFromMember(mobile, orgUid, false);
-        // 
+        String agentUid = uidUtils.getUid();
+        agentService.createFromMember(mobile, orgUid, agentUid);
     }
     
     // 新创建客服，创建默认知识库
@@ -83,8 +90,7 @@ public class AgentEventListener {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
-        // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
-        //
+        log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         agentService.updateConnect(uid, true);
     }
 
@@ -93,29 +99,41 @@ public class AgentEventListener {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
-        // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
-        //
+        log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
         agentService.updateConnect(uid, false);
     }
 
-        
-    // TODO: 定时ping客服，检查在线状态
-    // @EventListener
-    // public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
-    //     // log.info("agent quartz five second event: " + event);
-    // }
+    // 更新agent在线状态
+    @EventListener
+    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+        // log.info("agent QuartzOneMinEvent");
+        List<AgentEntity> agents = agentService.findAllConnected();
+        Set<String> userIds = mqttConnectionService.isConnectedUserUids();
+        // 遍历agents，判断是否在线，如果不在，则更新为离线状态
+        for (AgentEntity agent : agents) {
+            String userUid = agent.getUserUid();
+            if (!userIds.contains(userUid)) {
+                log.info("agent updateConnect uid {} offline", userUid);
+                agentService.updateConnect(userUid, false);
+            }
+        }
+        // 遍历userIds，更新为在线状态
+        for (String userUid : userIds) {
+            agentService.updateConnect(userUid, true);            
+        }
+    }
 
-    // // TODO: 新创建会话，更新客服当前接待数量
-    // @EventListener
-    // public void onThreadCreateEvent(ThreadCreateEvent event) {
-    //     // log.info("agent onThreadCreateEvent: " + event);
-    // }
+    // TODO: 新创建会话，更新客服当前接待数量
+    @EventListener
+    public void onThreadCreateEvent(ThreadCreateEvent event) {
+        // log.info("agent onThreadCreateEvent: " + event);
+    }
 
-    // // TODO: 会话关闭，更新客服当前接待数量
-    // @EventListener
-    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-    //     // log.info("agent onThreadUpdateEvent: " + event);
-    // }
+    // TODO: 会话关闭，更新客服当前接待数量
+    @EventListener
+    public void onThreadUpdateEvent(ThreadUpdateEvent event) {
+        // log.info("agent onThreadUpdateEvent: " + event);
+    }
 
     
 }

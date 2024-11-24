@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 13:05:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 13:43:21
+ * @LastEditTime: 2024-11-20 15:30:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,13 +22,13 @@ import org.quartz.TriggerBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.bytedesk.core.quartz.job.Daily0Job;
-import com.bytedesk.core.quartz.job.Daily8Job;
-import com.bytedesk.core.quartz.job.FiveMinJob;
-import com.bytedesk.core.quartz.job.FiveSecondJob;
-import com.bytedesk.core.quartz.job.HalfHourJob;
-import com.bytedesk.core.quartz.job.HourlyJob;
-import com.bytedesk.core.quartz.job.OneMinJob;
+import com.bytedesk.core.quartz.job.QuartzDaily0Job;
+import com.bytedesk.core.quartz.job.QuartzDaily8Job;
+import com.bytedesk.core.quartz.job.QuartzFiveMinJob;
+import com.bytedesk.core.quartz.job.QuartzFiveSecondJob;
+import com.bytedesk.core.quartz.job.QuartzHalfHourJob;
+import com.bytedesk.core.quartz.job.QuartzHourlyJob;
+import com.bytedesk.core.quartz.job.QuartzOneMinJob;
 
 import static org.quartz.CronScheduleBuilder.*;
 
@@ -66,7 +66,7 @@ public class QuartzConfig {
      */
     @Bean
     public JobDetail fiveSecondJobJobDetail() {
-        return JobBuilder.newJob(FiveSecondJob.class)
+        return JobBuilder.newJob(QuartzFiveSecondJob.class)
                 .withIdentity("FiveSecondJob", "bytedesk")
                 .withDescription("run one 5 seconds")
                 .storeDurably()
@@ -88,37 +88,11 @@ public class QuartzConfig {
     }
 
     /**
-     * 每5分钟运行一次
-     */
-    @Bean
-    public JobDetail fiveMinJobJobDetail() {
-        return JobBuilder.newJob(FiveMinJob.class)
-                .withIdentity("FiveMinJob", "bytedesk")
-                .withDescription("run once 5 minutes")
-                .storeDurably()
-                .build();
-    }
-
-    @Bean
-    public Trigger fiveMinJobTrigger() {
-            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
-                            .simpleSchedule()
-                            .withIntervalInMinutes(5)
-                            .repeatForever();
-            return TriggerBuilder.newTrigger()
-                            .forJob(fiveMinJobJobDetail())
-                            .withIdentity("fiveMinJobTrigger", "bytedesk")
-                            .withDescription("run once 5 minutes")
-                            .withSchedule(scheduleBuilder)
-                            .build();
-    }
-    
-    /**
      * 每1分钟运行一次
      */
     @Bean
     public JobDetail oneMinJobJobDetail() {
-            return JobBuilder.newJob(OneMinJob.class)
+            return JobBuilder.newJob(QuartzOneMinJob.class)
                             .withIdentity("OneMinJob", "bytedesk")
                             .withDescription("run once 1 minutes")
                             .storeDurably()
@@ -140,12 +114,39 @@ public class QuartzConfig {
     }
 
     /**
+     * 每5分钟运行一次
+     */
+    @Bean
+    public JobDetail fiveMinJobJobDetail() {
+        return JobBuilder.newJob(QuartzFiveMinJob.class)
+                .withIdentity("FiveMinJob", "bytedesk")
+                .withDescription("run once 5 minutes")
+                .storeDurably()
+                .build();
+    }
+
+    @Bean
+    public Trigger fiveMinJobTrigger() {
+            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
+                            .simpleSchedule()
+                            .withIntervalInMinutes(5)
+                            .repeatForever();
+            return TriggerBuilder.newTrigger()
+                            .forJob(fiveMinJobJobDetail())
+                            .withIdentity("fiveMinJobTrigger", "bytedesk")
+                            .withDescription("run once 5 minutes")
+                            .withSchedule(scheduleBuilder)
+                            .build();
+    }
+    
+    
+    /**
      * 每小时整点运行一次
      */
     @Bean
     public JobDetail hourlyJobDetail() {
         return JobBuilder.newJob(
-                HourlyJob.class)
+                QuartzHourlyJob.class)
                 .withIdentity("HourlyJob", "bytedesk")
                 .withDescription("run once every hour")
                 .storeDurably()
@@ -166,7 +167,7 @@ public class QuartzConfig {
      */
     @Bean
     public JobDetail halfHourJobDetail() {
-        return JobBuilder.newJob(HalfHourJob.class)
+        return JobBuilder.newJob(QuartzHalfHourJob.class)
                 .withIdentity("HalfHourJob", "bytedesk")
                 .withDescription("run once every half hour ").storeDurably().build();
     }
@@ -187,7 +188,7 @@ public class QuartzConfig {
      */
     @Bean
     public JobDetail daily0JobDetail() {
-        return JobBuilder.newJob(Daily0Job.class).withIdentity("Daily0Job", "bytedesk")
+        return JobBuilder.newJob(QuartzDaily0Job.class).withIdentity("Daily0Job", "bytedesk")
                 .withDescription("run once at 0 o'click").storeDurably().build();
     }
 
@@ -205,7 +206,7 @@ public class QuartzConfig {
      */
     @Bean
     public JobDetail daily8JobDetail() {
-        return JobBuilder.newJob(Daily8Job.class)
+        return JobBuilder.newJob(QuartzDaily8Job.class)
                 .withIdentity("Daily8Job", "bytedesk")
                 .withDescription("run once at 8 o'clock")
                 .storeDurably().build();

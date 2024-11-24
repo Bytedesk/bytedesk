@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-12 22:05:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 22:31:49
+ * @LastEditTime: 2024-11-22 11:59:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@ public class LlmProviderEntityListener {
     @PostPersist
     public void postPersist(LlmProviderEntity entity) {
         LlmProviderEntity clonedEntity = SerializationUtils.clone(entity);
-        log.info("LlmProviderEntityListener postPersist: {}", clonedEntity.getName());
+        // log.info("LlmProviderEntityListener postPersist: {}", clonedEntity.getName());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishGenericApplicationEvent(
@@ -42,7 +42,7 @@ public class LlmProviderEntityListener {
     @PostUpdate
     public void postUpdate(LlmProviderEntity entity) {
         LlmProviderEntity clonedEntity = SerializationUtils.clone(entity);
-        log.info("LlmProviderEntityListener postUpdate: {}", clonedEntity.getName());
+        // log.info("LlmProviderEntityListener postUpdate: {}", clonedEntity.getName());
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishGenericApplicationEvent(

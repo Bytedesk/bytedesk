@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.kaptcha.KaptchaCacheService;
-import com.bytedesk.core.push.PushService;
+import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
@@ -49,7 +49,7 @@ public class AuthController {
 
     private AuthService authService;
 
-    private PushService pushService;
+    private PushRestService pushService;
 
     private KaptchaCacheService kaptchaCacheService;
 

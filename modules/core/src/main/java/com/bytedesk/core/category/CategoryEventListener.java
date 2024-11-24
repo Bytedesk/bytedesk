@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-21 14:28:06
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 07:18:17
+ * @LastEditTime: 2024-11-19 15:34:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,7 +48,7 @@ public class CategoryEventListener {
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 // .orgUid(orgUid)
                 .build();
-        categoryFaqDemoRequest1.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+        categoryFaqDemoRequest1.setType(CategoryTypeEnum.FAQ.name());
         categoryFaqDemoRequest1.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1);
         categoryFaqDemoRequest1.setOrgUid(orgUid);
         categoryService.create(categoryFaqDemoRequest1);
@@ -60,7 +60,7 @@ public class CategoryEventListener {
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 // .orgUid(orgUid)
                 .build();
-        categoryFaqDemoRequest2.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+        categoryFaqDemoRequest2.setType(CategoryTypeEnum.FAQ.name());
         categoryFaqDemoRequest2.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2);
         categoryFaqDemoRequest1.setOrgUid(orgUid);
         categoryService.create(categoryFaqDemoRequest2);

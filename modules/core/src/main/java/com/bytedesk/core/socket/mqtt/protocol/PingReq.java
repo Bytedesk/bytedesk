@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-01 10:34:56
+ * @LastEditTime: 2024-11-22 15:40:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,23 +15,28 @@
 
 package com.bytedesk.core.socket.mqtt.protocol;
 
-import com.bytedesk.core.socket.mqtt.util.ChannelUtils;
+import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
+import com.bytedesk.core.socket.mqtt.MqttConnectionService;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
 
-/**
- *
- * @author bytedesk.com
- */
-@Slf4j
+// @Slf4j
+@AllArgsConstructor
 public class PingReq {
 
+    private final MqttConnectionService mqttConnectionService;
+
+    // client send ping every 30 seconds
     public void processPingReq(Channel channel, MqttMessage message) {
         //
-        String clientId = ChannelUtils.getClientId(channel);
-        log.info("PINGREQ - clientId: {}", clientId);
+        String clientId = MqttChannelUtils.getClientId(channel);
+        // log.info("PINGREQ - clientId: {}", clientId);
+        mqttConnectionService.addConnected(clientId);
 
+        // send ping response PINGRESP
         MqttMessage pingRespMessage = MqttMessageFactory.newMessage(
                 new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0),
                 null,

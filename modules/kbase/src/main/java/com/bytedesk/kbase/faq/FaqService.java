@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.category.CategoryConsts;
+import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -206,7 +206,7 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
                     .name(excel.getCategory())
                     .kbUid(kbUid)
                     .build();
-            categoryRequest.setType(CategoryConsts.CATEGORY_TYPE_FAQ);
+            categoryRequest.setType(CategoryTypeEnum.FAQ.name());
             categoryRequest.setOrgUid(orgUid);
             // 
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
@@ -217,34 +217,5 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
         // 
         return faq;
     }
-
-    // public void initData() {
-
-    //     if (faqRepository.count() > 0) {
-    //         return;
-    //     }
-
-    //     //
-    //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    //     FaqRequest faqDemo1 = FaqRequest.builder()
-    //             .title(I18Consts.I18N_FAQ_DEMO_TITLE_1)
-    //             .content(I18Consts.I18N_FAQ_DEMO_CONTENT_1)
-    //             .type(MessageTypeEnum.TEXT.name())
-    //             .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
-    //             .build();
-    //     faqDemo1.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_1);
-    //     faqDemo1.setOrgUid(orgUid);
-    //     create(faqDemo1);
-    //     //
-    //     FaqRequest faqDemo2 = FaqRequest.builder()
-    //             .title(I18Consts.I18N_FAQ_DEMO_TITLE_2)
-    //             .content(I18Consts.I18N_FAQ_DEMO_CONTENT_2)
-    //             .type(MessageTypeEnum.IMAGE.name())
-    //             .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
-    //             .build();
-    //     faqDemo2.setUid(orgUid + I18Consts.I18N_FAQ_DEMO_TITLE_2);
-    //     faqDemo2.setOrgUid(orgUid);
-    //     create(faqDemo2);
-    // }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 12:16:29
+ * @LastEditTime: 2024-11-18 17:12:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,15 +15,18 @@
 package com.bytedesk.service.counter;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.rbac.role.RolePermissions;
 
 @RestController
 @RequestMapping("/api/v1/counter")
 public class CounterController extends BaseRestController<CounterRequest> {
 
+    @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(CounterRequest request) {
         // TODO Auto-generated method stub

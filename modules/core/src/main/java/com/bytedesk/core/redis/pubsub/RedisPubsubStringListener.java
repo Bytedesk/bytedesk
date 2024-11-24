@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 17:13:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 17:54:29
+ * @LastEditTime: 2024-11-20 17:18:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,8 +41,6 @@ public class RedisPubsubStringListener implements MessageListener {
     private final BytedeskEventPublisher eventPublisher;
 
     private final MessageCache messageCache;
-
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final IMessageSendService messageSendService;
 

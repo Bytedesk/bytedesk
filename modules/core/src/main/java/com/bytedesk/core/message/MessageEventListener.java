@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 16:07:06
+ * @LastEditTime: 2024-11-22 17:52:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,30 +58,6 @@ public class MessageEventListener {
             e.printStackTrace();
         }
     }
-
-    // @EventListener
-    // public void onMessageProtoEvent(MessageProtoEvent event) {
-    //     log.info("MessageProtoEvent");
-    //     //
-    //     try {
-    //         MessageProto.Message messageProto = MessageProto.Message.parseFrom(event.getMessageBytes());
-    //         // JSON
-    //         try {
-    //             String messageJson = MessageConvertUtils.toJson(messageProto);
-    //             //
-    //             messageJson = processMessage(messageJson);
-    //             messageSocketService.sendJsonMessage(messageJson);
-    //             // process处理完毕之后，重新发送proto消息
-    //             messageProto = MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(), messageJson);
-    //             messageSocketService.sendProtoMessage(messageProto);
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         }
-    //         //
-    //     } catch (InvalidProtocolBufferException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
 
     private String processMessage(String messageJson) {
         // log.info("processMessage {}", messageJson);

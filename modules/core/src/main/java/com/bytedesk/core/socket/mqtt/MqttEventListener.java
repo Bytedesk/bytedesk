@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 10:44:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 10:44:12
+ * @LastEditTime: 2024-11-20 22:36:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.core.socket.mqtt;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.topic.TopicService;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MqttEventListener {
 
     private final TopicService topicService;
+
+    private final MqttConnectionService mqttConnectionService;
 
     @EventListener
     public void onMqttConnectedEvent(MqttConnectedEvent event) {
@@ -63,5 +66,10 @@ public class MqttEventListener {
         topicService.unsubscribe(event.getTopic(), event.getClientId());
     }
 
+    @EventListener
+    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+        // log.info("mqtt QuartzOneMinEvent");
+        mqttConnectionService.cleanExpiredClients();
+    }
 
 }

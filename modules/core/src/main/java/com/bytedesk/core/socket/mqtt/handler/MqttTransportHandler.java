@@ -9,18 +9,15 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 
+import com.bytedesk.core.socket.mqtt.MqttConsts;
 import com.bytedesk.core.socket.mqtt.MqttSession;
 import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
-import com.bytedesk.core.socket.mqtt.util.MqttConsts;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
-/**
- * 消息处理
- *
- * @author jackning
- */
+
 @Slf4j
 @ChannelHandler.Sharable
 public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessage> {
@@ -43,8 +40,6 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
             Throwable cause = mqttMessage.decoderResult().cause();
             // FIXME: cause java.lang.IllegalArgumentException: unknown message type: 0
             // FIXME: cause io.netty.handler.codec.mqtt.MqttIdentifierRejectedException:
-            // invalid clientIdentifier:
-            // 2020123122315526f2610d810f7496b89eb8a87404bb36b/android
             log.error("cause {}", cause.toString());
             //
             if (cause instanceof MqttUnacceptableProtocolVersionException) {
@@ -130,9 +125,7 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-
-        // String clientId = (String)
-        // ctx.channel().attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).get();
+        // String clientId = (String)ctx.channel().attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).get();
         // FIXME: clientId is null ?
         // log.debug("channelActive " + clientId);
     }

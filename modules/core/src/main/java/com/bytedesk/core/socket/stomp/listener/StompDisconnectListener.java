@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-24 10:10:39
+ * @LastEditTime: 2024-11-20 18:18:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 // import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -36,10 +38,17 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @AllArgsConstructor
 public class StompDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
     @Override
-    public void onApplicationEvent(@NonNull SessionDisconnectEvent evet) {
-        log.debug("SessionDisconnectEvent {}", evet.toString());
+    public void onApplicationEvent(@NonNull SessionDisconnectEvent event) {
+        log.debug("stomp sessionDisconnectEvent {}", event.toString());
+        StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
+        if (headerAccessor != null) {
+            String login = headerAccessor.getLogin();
+            log.info("stomp disconnection with uid:  {}", login);
+            // 处理 login 值，例如存储到数据库或日志记录
+        } else {
+            log.info("stomp disconnection without uid");
+        }
         // TODO: 访客离线，通知客服端
         
     }
