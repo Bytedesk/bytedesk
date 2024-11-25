@@ -1,5 +1,5 @@
 # https://spring.io/guides/topicals/spring-boot-docker
-# https://hub.docker.com/r/jackning/bytedesk
+# https://hub.docker.com/r/bytedesk/bytedesk
 # maven
 FROM eclipse-temurin:17-jdk
 # FROM adoptopenjdk:17-jdk-hotspot
