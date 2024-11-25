@@ -8,6 +8,7 @@
 # 
 # github：依次添加以下变量，
 # 路径：Settings -> Secrets And Variables -> Actions
+# Repository secrets -> New repository secret -> 输入变量名和值
 # SERVER_HOST / Secret：服务器公网IP
 # SERVER_USERNAME / Secret：服务器用户名
 # SERVER_PASSWORD / Secret：服务器密码
@@ -64,7 +65,7 @@ jobs:
           file: ./starter/Dockerfile  # 确保 Dockerfile 文件路径正确
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:latest
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64,windows/arm64,macos/amd64,macos/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/x86,windows/arm64,macos/x86,macos/arm64
       # 登录阿里云 Docker
       - name: login to aliyun docker
         run: echo ${{ secrets.ALIYUN_DOCKER_PASSWORD }} | docker login --username ${{ secrets.ALIYUN_DOCKER_USERNAME }} --password-stdin registry.cn-hangzhou.aliyuncs.com
@@ -76,4 +77,4 @@ jobs:
           file: ./starter/Dockerfile  # 确保 Dockerfile 文件路径正确
           push: true
           tags: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:latest
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64,windows/arm64,macos/amd64,macos/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/x86,windows/arm64,macos/x86,macos/arm64
