@@ -1,8 +1,8 @@
 # https://spring.io/guides/topicals/spring-boot-docker
 # https://hub.docker.com/r/jackning/bytedesk
 # maven
-# FROM eclipse-temurin:17-jdk
-FROM adoptopenjdk:17-jdk-hotspot
+FROM eclipse-temurin:17-jdk
+# FROM adoptopenjdk:17-jdk-hotspot
 # maintainer
 LABEL maintainer="270580156@qq.com"
 # Set the working directory in the container
