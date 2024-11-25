@@ -44,6 +44,10 @@ jobs:
           mvn -B -DskipTests=true install --file pom.xml
           cd starter 
           mvn -B -DskipTests=true package --file pom.xml
+      # 提取 Git 标签
+      - name: Extract Git tag
+        id: extract_tag
+        run: echo "TAG=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
       # https://github.com/docker/login-action
       - name: login to docker hub
         uses: docker/login-action@v3
@@ -58,16 +62,19 @@ jobs:
           docker buildx create --use --name mybuilder
           docker buildx inspect mybuilder --bootstrap
       # 构建并推送 Docker 镜像到 Docker Hub
+      # https://hub.docker.com/r/bytedesk/bytedesk
       - name: Build and push Docker image to Docker Hub
         uses: docker/build-push-action@v6
         with:
           context: ./starter  # 确保构建上下文路径正确
           file: ./starter/Dockerfile  # 确保 Dockerfile 文件路径正确
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:${{ env.TAG }}
+          # https://hub.docker.com/_/eclipse-temurin
           # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64
           platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64
       # 登录阿里云 Docker
+      # https://registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:latest
       - name: login to aliyun docker
         run: echo ${{ secrets.ALIYUN_DOCKER_PASSWORD }} | docker login --username ${{ secrets.ALIYUN_DOCKER_USERNAME }} --password-stdin registry.cn-hangzhou.aliyuncs.com
       # 构建并推送 Docker 镜像到阿里云
@@ -77,6 +84,7 @@ jobs:
           context: ./starter  # 确保构建上下文路径正确
           file: ./starter/Dockerfile  # 确保 Dockerfile 文件路径正确
           push: true
-          tags: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:latest
+          tags: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:${{ env.TAG }}
+          # https://hub.docker.com/_/eclipse-temurin
           # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64
           platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64
