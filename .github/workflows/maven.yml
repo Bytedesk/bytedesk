@@ -58,6 +58,7 @@ jobs:
           # dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:latest
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64,windows/arm64,macos/amd64,macos/arm64
       # https://github.com/actions/upload-artifact
       # https://github.com/actions/download-artifact
       # - name: Upload artifact
