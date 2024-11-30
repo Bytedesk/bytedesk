@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-30 10:24:36
+ * @LastEditTime: 2024-11-30 10:32:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,12 +14,15 @@
 -->
 # 微语
 
-局域网即时通讯IM
-<!-- 一款开源即时通讯系统，支持社交/社群IM、企业IM、在线客服、知识库、帮助中心、工单系统、AI助手等。 -->
+一款开源即时通讯系统，支持社交/社群IM、企业IM、在线客服、知识库、帮助中心、工单系统、AI助手等。
 <!-- 一款聊天软件 -->
 <!-- 可编排AI知识库问答 + 对接自有业务系统 + 转人工客服。 -->
 <!-- 不仅仅是一款 **企业IM** -->
 <!-- 致力于实现企业管理软件一站式解决方案。 -->
+
+:::tip
+微语仍处于早期的快速迭代阶段，文档可能落后于开发，导致功能描述可能不符，以最新发布的软件版本为准
+:::
 
 ## 语言
 
@@ -30,6 +33,7 @@
 
 ### 企业IM
 
+- 局域网即时通讯
 - 企业成员管理
 - 聊天记录监控
 - 自定义通知，如：接收运维报警、股票实时报价等
@@ -170,8 +174,8 @@
 - [微信](./images/wechat.png)
 - 微语技术支持群：
 - <img src="./images/wechat_group.jpg" width="200">
-- 如群二维码过期，请添加微信，备注: 微语
-- <img src="./images/wechat.png" width="100">
+<!-- - 如群二维码过期，请添加微信，备注: 微语 -->
+<!-- - <img src="./images/wechat.png" width="100"> -->
 - 服务号
 - <img src="./images/wechat_mp.jpg" width="100">
 - 订阅号
