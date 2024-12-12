@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 11:19:23
+ * @LastEditTime: 2024-12-04 16:56:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,21 +18,18 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.action.ActionService;
+import com.bytedesk.core.action.ActionRestService;
 import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -50,9 +47,9 @@ public class TopicService {
 
     private final UidUtils uidUtils;
 
-    private final ActionService actionService;
+    private final ActionRestService actionService;
 
-    private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
+    // private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
 
     public void create(String topic, String uid) {
         TopicRequest topicRequest = TopicRequest.builder()
@@ -122,7 +119,7 @@ public class TopicService {
     }
 
     public void unsubscribe(String topic, String clientId) {
-        // 用户clientId格式: uid/client/deviceUid
+        // 用户clientId格式: userUid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
             TopicEntity topicElement = topicOptional.get();
@@ -140,15 +137,28 @@ public class TopicService {
 
     @Async
     public void addClientId(String clientId) {
-        concurrentMap.remove(clientId);
+        // concurrentMap.remove(clientId);
 
-        // 用户clientId格式: uid/client/deviceUid
+        // 用户clientId格式: userUid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
             TopicEntity topic = topicOptional.get();
             if (!topic.getClientIds().contains(clientId)) {
                 log.info("addClientId: {}", clientId);
                 topic.getClientIds().add(clientId);
+                save(topic);
+            }
+        }
+    }
+
+    private void doRemoveClientId(String clientId) {
+        // 用户clientId格式: userUid/client/deviceUid
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
+        if (topicOptional.isPresent()) {
+            TopicEntity topic = topicOptional.get();
+            if (topic.getClientIds().contains(clientId)) {
+                log.info("removeClientId: {}", clientId);
+                topic.getClientIds().remove(clientId);
                 save(topic);
             }
         }
@@ -161,27 +171,14 @@ public class TopicService {
         doRemoveClientId(clientId);
     }
 
-    private void doRemoveClientId(String clientId) {
-        // 用户clientId格式: uid/client/deviceUid
-        Optional<TopicEntity> topicOptional = findByClientId(clientId);
-        if (topicOptional.isPresent()) {
-            TopicEntity topic = topicOptional.get();
-            if (topic.getClientIds().contains(clientId)) {
-                log.info("removeClientId: {}", clientId);
-                topic.getClientIds().remove(clientId);
-                save(topic);
-            }
-        }
-    }
-
     // 5分钟没有重连成功的话，就删除掉
-    @Scheduled(fixedDelay = 5 * 60 * 1000)
-    public void scheduleTask() {
-        // log.info("scheduleTask");
-        concurrentMap.forEach((key, value) -> {
-            doRemoveClientId(key);
-        });
-    }
+    // @Scheduled(fixedDelay = 5 * 60 * 1000)
+    // public void scheduleTask() {
+    //     // log.info("scheduleTask");
+    //     concurrentMap.forEach((key, value) -> {
+    //         doRemoveClientId(key);
+    //     });
+    // }
 
     @Cacheable(value = "topic", key = "#uid")
     public Optional<TopicEntity> findByUid(String uid) {
@@ -190,9 +187,9 @@ public class TopicService {
 
     @Cacheable(value = "topic", key = "#clientId", unless = "#result == null")
     public Optional<TopicEntity> findByClientId(String clientId) {
-        // 用户clientId格式: uid/client/deviceUid
-        final String uid = clientId.split("/")[0];
-        return findByUserUid(uid);
+        // 用户clientId格式: userUid/client/deviceUid
+        final String userUid = clientId.split("/")[0];
+        return findByUserUid(userUid);
     }
 
     @Cacheable(value = "topic", key = "#uid", unless = "#result == null")
@@ -203,8 +200,6 @@ public class TopicService {
     @Cacheable(value = "topic", key = "#topic", unless="#result == null")
     public Set<TopicEntity> findByTopic(String topic) {
         return topicRepository.findByTopicsContains(topic);
-        // return topics;
-        // return topics.stream().map(this::convertToTopicResponse).toList();
     }
 
     @Caching(put = {

@@ -64,7 +64,7 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
 
     @Override
     public Page<OrganizationResponse> queryByUser(OrganizationRequest request) {
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "id");
         Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
@@ -81,7 +81,7 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
             throw new RuntimeException("Organization with code: " + organizationRequest.getCode() + " already exists.");
         }
         //
-        UserEntity authUser = authService.getCurrentUser();
+        UserEntity authUser = authService.getUser();
         UserEntity user = userService.findByUid(authUser.getUid())
                 .orElseThrow(() -> new RuntimeException("User not found."));
         String orgUid = uidUtils.getUid();

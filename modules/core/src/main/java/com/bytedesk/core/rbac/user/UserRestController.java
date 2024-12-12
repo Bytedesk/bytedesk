@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 10:21:54
+ * @LastEditTime: 2024-12-05 10:14:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,14 +44,9 @@ public class UserRestController {
 
     private final PushRestService pushService;
 
-    /**
-     * get user info
-     * 
-     * @return
-     */
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
-        UserEntity user = authService.getCurrentUser(); // 返回的是缓存，导致修改后的数据无法获取
+        UserEntity user = authService.getUser(); // 返回的是缓存，导致修改后的数据无法获取
         Optional<UserEntity> userOptional = userService.findByUid(user.getUid());
         if (userOptional.isPresent()) {
             UserResponse userResponse = ConvertUtils.convertToUserResponse(userOptional.get());
@@ -61,12 +56,6 @@ public class UserRestController {
         }
     }
 
-    /**
-     * update user info
-     * 
-     * @param userRequest
-     * @return
-     */
     @ActionAnnotation(title = "user", action = "update", description = "update user info")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
@@ -115,7 +104,6 @@ public class UserRestController {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    /**  */
     @ActionAnnotation(title = "user", action = "logout", description = "logout")
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {

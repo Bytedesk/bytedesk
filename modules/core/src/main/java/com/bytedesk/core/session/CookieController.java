@@ -46,7 +46,7 @@ public class CookieController {
      * @param username
      * @return
      */
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public ResponseEntity<?> getCookie(@CookieValue(value = "v_vid", defaultValue = "no vid") String vid) {
 
         return ResponseEntity.ok(JsonResult.success("get cookie", 200, vid));

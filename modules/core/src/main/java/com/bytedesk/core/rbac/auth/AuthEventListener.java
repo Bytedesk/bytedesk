@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-19 11:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 17:36:37
+ * @LastEditTime: 2024-12-04 14:13:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,9 +60,9 @@ public class AuthEventListener {
             contentObject.put(I18Consts.I18N_NOTICE_CONTENT, action.getAction());
             contentObject.put(I18Consts.I18N_NOTICE_IP, action.getIp());
             contentObject.put(I18Consts.I18N_NOTICE_IP_LOCATION, action.getIpLocation());
+            String content = JSON.toJSONString(contentObject);
             // 
-            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), user.getUid(), user.getOrgUid(),
-                    JSON.toJSONString(contentObject));
+            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), user.getUid(), user.getOrgUid(), content);
             messageSendService.sendProtobufMessage(message);
         }
     }

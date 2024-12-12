@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 15:49:11
+ * @LastEditTime: 2024-12-07 11:29:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,11 +28,10 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.counter.CounterResponse;
-import com.bytedesk.service.counter.CounterService;
-import com.bytedesk.service.counter_visitor.CounterVisitorService;
-import com.bytedesk.service.route.IRouteService;
-import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.queue.QueueResponse;
+import com.bytedesk.service.queue.QueueServiceMy;
+// import com.bytedesk.service.counter_visitor.CounterVisitorService;
+import com.bytedesk.service.route.RouteService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 
@@ -43,7 +42,9 @@ import com.bytedesk.core.thread.ThreadEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-// 一对一客服对话
+/**
+ * @author jackning 270580156@qq.com
+ */
 @Slf4j
 @Component("agentCsThreadStrategy")
 @AllArgsConstructor
@@ -55,15 +56,12 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final VisitorThreadService visitorThreadService;
 
-    private final IRouteService routeService;
+    // private final IRouteService routeService;
+    private final RouteService routeService;
     
-    // private final ThreadStateService threadStateService;
-
     private final IMessageSendService messageSendService;
 
-    private final CounterService counterService;
-
-    private final CounterVisitorService counterVisitorService;
+    private final QueueServiceMy visitorQueueService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -75,37 +73,40 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         String agentUid = visitorRequest.getSid();
         String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
         // 是否已经存在会话
-        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
-        if (threadOptional.isPresent() && !threadOptional.get().isClosed() && !visitorRequest.getForceAgent()) {
-            log.info("Already have a processing thread {}", topic);
-            return getAgentProcessingMessage(visitorRequest, threadOptional.get());
-        }
-        //
-        AgentEntity agent = agentService.findByUid(agentUid)
-                .orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
-        // 
-        String orgUid = visitorRequest.getOrgUid();
-        String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
-        CounterResponse counter = counterService.getNumber(orgUid, topic, visitor);
-        counterVisitorService.saveNumber(orgUid, topic, counter.getCurrentNumber(), visitor);
-        log.info("counter topic: {}, count {}", topic, counter.getCurrentNumber());
-        //
         ThreadEntity thread = null;
-        if (threadOptional.isPresent()) {
-            // 存在会话，且已经关闭
+        AgentEntity agent = null;
+        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
+        if (threadOptional.isPresent() ) {
             thread = threadOptional.get();
-            thread.reInit();
+            if (thread.isProcessing() && !visitorRequest.getForceAgent()) {
+                // 返回未关闭，或 非留言状态的会话
+                log.info("Already have a processing thread {}", topic);
+                return getAgentProcessingMessage(visitorRequest, threadOptional.get());
+            } else {
+                // 会话已经关闭，重新初始化会话
+                thread = threadOptional.get().reInit();
+                agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
+            }
         } else {
             // 不存在会话，创建会话
+            agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
             thread = visitorThreadService.getAgentThread(visitorRequest, agent, topic);
         }
-        thread = visitorThreadService.reinitAgentThreadExtra(thread, agent);
         // 
-        thread.setSerialNumber(counter.getCurrentNumber());
+        // String orgUid = visitorRequest.getOrgUid();
+        // String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
+        // QueueMemberResponse counter = counterService.getNumber(orgUid, topic, visitor);
+        // counterVisitorService.saveNumber(orgUid, topic, counter.getCurrentNumber(), visitor);
+        // log.info("counter topic: {}, count {}", topic, counter.getCurrentNumber());
+        //
+        thread = visitorThreadService.reinitAgentThreadExtra(thread, agent);
+        QueueResponse queueResponse = visitorQueueService.enqueue(thread);
+        log.info("Enqueued to queue {}", queueResponse.toString());
+        // thread.setSerialNumber(counter.getCurrentNumber());
+
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             // 判断是否需要转机器人
-            // Boolean isOffline = !agent.isConnected() || !agent.isAvailable();
             Boolean isOffline = !agent.isConnectedAndAvailable();
             Boolean transferToRobot = agent.getServiceSettings().shouldTransferToRobot(isOffline);
             if (transferToRobot) {

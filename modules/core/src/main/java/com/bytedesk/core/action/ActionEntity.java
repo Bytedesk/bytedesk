@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:31:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:07:01
+ * @LastEditTime: 2024-12-04 14:13:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -82,10 +82,7 @@ public class ActionEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 
-
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
      private String platform = PlatformEnum.BYTEDESK.name();
 
 }

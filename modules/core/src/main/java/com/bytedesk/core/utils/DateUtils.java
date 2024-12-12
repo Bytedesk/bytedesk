@@ -30,8 +30,8 @@ public class DateUtils {
     private static final String timeFormat = "HH:mm:ss";
 
     public static String formatDatetimeNow() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(datetimeFormat);
-        return dateFormater.format(new Date());
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(datetimeFormat);
+        return dateFormatter.format(new Date());
     }
 
     public static String formatDatetimeToString(Date date) {
@@ -40,9 +40,9 @@ public class DateUtils {
     }
 
     public static Date formatStringToDateTime(String date) {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(datetimeFormat);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(datetimeFormat);
         try {
-            return dateFormater.parse(date);
+            return dateFormatter.parse(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -50,13 +50,13 @@ public class DateUtils {
     }
 
     public static String formatDatetimeUid() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(datetimeUidFormat);
-        return dateFormater.format(new Date());
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(datetimeUidFormat);
+        return dateFormatter.format(new Date());
     }
 
     public static String formatDateNow() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormat);
-        return dateFormater.format(new Date());
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat);
+        return dateFormatter.format(new Date());
     }
 
     public static Date formatStringToTime(String time) {
@@ -78,13 +78,13 @@ public class DateUtils {
     }
 
     public static String formatDateSlashNow() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormatSlash);
-        return dateFormater.format(new Date());
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormatSlash);
+        return dateFormatter.format(new Date());
     }
 
     public static String formatDateSlashNowNoZero() {
-        SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormatSlashNoZero);
-        return dateFormater.format(new Date());
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormatSlashNoZero);
+        return dateFormatter.format(new Date());
     }
 
     public static String formatDateToString(Date date) {
@@ -108,7 +108,7 @@ public class DateUtils {
     // 将英文日期格式 转未 中文日期格式
     // 29 January, 2017
     // enDate:29 January,2017, cnDate 2017-01-29
-    public static String transformEndateToCnDate(String enDate) {
+    public static String transformEnDateToCnDate(String enDate) {
         if (!StringUtils.hasText(enDate)) {
             return "";
         }
@@ -157,7 +157,7 @@ public class DateUtils {
     // 将英文日期格式 转未 中文日期格式
     // 日期 + 1
     public static String transformDateForVoa(String enDate) {
-        String cnDate = transformEndateToCnDate(enDate);
+        String cnDate = transformEnDateToCnDate(enDate);
         return dateStringAddOneDayToString(cnDate);
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-03 12:37:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 11:46:22
+ * @LastEditTime: 2024-12-05 09:11:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,5 +22,6 @@ public enum UserTypeEnum {
     MEMBER,
     ASSISTANT,
     CHANNEL,
-    USER
+    USER,
+    MONITOR
 }

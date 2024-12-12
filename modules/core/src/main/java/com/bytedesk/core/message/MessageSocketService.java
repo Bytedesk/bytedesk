@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 12:18:14
+ * @LastEditTime: 2024-12-04 15:41:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,15 +62,21 @@ public class MessageSocketService {
         if (messageObject == null) {
             throw new RuntimeException("messageObject is null");
         }
+
         if (messageObject.getThread() == null) {
             throw new RuntimeException("thread is null");
         }
-        if (messageObject.getThread().getTopic() == null) {
-            throw new RuntimeException("thread.topic is null");
+
+        String topicStr = messageObject.getThread().getTopic();
+        if (topicStr == null) {
+            throw new IllegalArgumentException("The topic field in thread is null.");
         }
-        // 注：将 /org/agent/default_agent_uid/1418711693000834 中 ‘/’ 替换为 ‘.’，然后拼接上 /topic/
-        String topic = TopicUtils.TOPIC_PREFIX + messageObject.getThread().getTopic().replace("/", ".");
+        // 将topic中的'/'替换为'.'，以符合Stomp客户端的topic格式要求
+        // 例如，将 /org/agent/default_agent_uid/1418711693000834 转换为
+        // /topic/org.agent.default_agent_uid.1418711693000834
+        String topic = TopicUtils.TOPIC_PREFIX + topicStr.replace("/", ".");
         log.debug("stomp topic {}, {}", topic, messageJson);
+
         // 发送给Stomp客户端
         simpMessagingTemplate.convertAndSend(topic, messageJson);
     }
@@ -78,39 +84,41 @@ public class MessageSocketService {
     // 发送消息给mqtt客户端
     public void sendProtoMessage(@NonNull MessageProto.Message messageProto) {
         log.debug("send proto message");
-        ThreadTypeEnum threadType = ThreadTypeEnum.valueOf(messageProto.getThread().getType());
+        ThreadProto.Thread thread = messageProto.getThread(); // 提取线程信息到临时变量
+        ThreadTypeEnum threadType = ThreadTypeEnum.valueOf(thread.getType());
+        String topic = thread.getTopic(); // 提取主题信息到临时变量
 
         if (threadType.equals(ThreadTypeEnum.MEMBER)) {
-            log.info("reverse member message");
-            // 同事一对一
-            String threadUid = messageProto.getThread().getUid();
+            log.info("Reversing member message for topic: {}", topic);
+            // 同事一对一消息反转处理
+            String threadUid = thread.getUid();
             String reverseThreadUid = new StringBuffer(threadUid).reverse().toString();
-            String threadTopic = messageProto.getThread().getTopic();
-            String reverseThreadTopic = TopicUtils.getOrgMemberTopicReverse(threadTopic);
+            String reverseThreadTopic = TopicUtils.getOrgMemberTopicReverse(topic);
             //
             UserProto.User user = messageProto.getUser();
-            ThreadProto.Thread thread = messageProto.getThread().toBuilder()
+            ThreadProto.Thread reverseThread = thread.toBuilder()
                     .setTopic(reverseThreadTopic)
                     .setUid(reverseThreadUid)
                     .setUser(user)
                     .build();
             //
-            MessageProto.Message reverseMessage = messageProto.toBuilder().setThread(thread).build();
+            MessageProto.Message reverseMessage = messageProto.toBuilder().setThread(reverseThread).build();
             doSendToSubscribers(reverseThreadTopic, reverseMessage);
-            //
         } else if (threadType.equals(ThreadTypeEnum.GROUP)) {
-            // 群聊
-            log.info("send group message");
+            // 群聊消息处理（当前无特定处理，预留扩展）
+            log.info("Sending group message for topic: {}", topic);
+            // 可以在此处添加未来群聊消息的处理逻辑
         }
-        //
-        String topic = messageProto.getThread().getTopic();        
+        // 发送原始消息给订阅者
         doSendToSubscribers(topic, messageProto);
     }
 
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
-        // log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={}, clientId={}",
-        //         messageProto.getUser().getNickname(), messageProto.getContent(), topic, messageProto.getType(),
-        //         messageProto.getClient());
+        // log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={},
+        // clientId={}",
+        // messageProto.getUser().getNickname(), messageProto.getContent(), topic,
+        // messageProto.getType(),
+        // messageProto.getClient());
         Set<TopicEntity> topicSet = topicService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
         topicSet.forEach(topicElement -> {
@@ -122,8 +130,10 @@ public class MessageSocketService {
     }
 
     private void doSendMessage(String topic, @NonNull MessageProto.Message messageProto, String clientId) {
-        // log.debug("doSendMessage: user={}, content={}, topic={}, type={}, clientId={}",
-        //                  messageProto.getUser().getNickname(), messageProto.getContent(), topic, messageProto.getType(), clientId);
+        // log.debug("doSendMessage: user={}, content={}, topic={}, type={},
+        // clientId={}",
+        // messageProto.getUser().getNickname(), messageProto.getContent(), topic,
+        // messageProto.getType(), clientId);
         MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
         boolean dup = false;
         boolean retain = false;
@@ -143,6 +153,5 @@ public class MessageSocketService {
             mqttSession.getChannel().writeAndFlush(publishMessage);
         }
     }
-
 
 }

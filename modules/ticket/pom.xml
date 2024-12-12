@@ -10,9 +10,9 @@
 		<version>${revision}</version>
 	</parent>
 
-	<artifactId>bytedesk-modules-ticket</artifactId>
+	<artifactId>bytedesk-module-ticket</artifactId>
 
-	<name>bytedesk-modules-ticket</name>
+	<name>bytedesk-module-ticket</name>
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>
@@ -61,6 +61,43 @@
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
+		<!-- Excel导出 -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+
+		<!-- PDF导出 -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.5.13.3</version>
+		</dependency>
+
+		<!-- CSV导出 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.10.0</version>
+		</dependency>
+
+		<!-- Email -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<!-- Thymeleaf for email templates -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
 
 	</dependencies>
 

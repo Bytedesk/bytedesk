@@ -36,6 +36,9 @@ public enum ClientEnum {
     FLUTTER_WEB,
     FLUTTER_ANDROID,
     FLUTTER_IOS,
+    FLUTTER_MACOS,
+    FLUTTER_WINDOWS,
+    FLUTTER_LINUX,
     // 
     UNIAPP,
     UNIAPP_WEB,

@@ -148,7 +148,7 @@ public class VisitorThreadEntity extends BaseEntity {
     // 机器人和agent可以同时存在，人工接待的时候，机器人可以同时给出答案，客服可以选用
     // 存储机器人信息
     // @Builder.Default
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSONB)
     // @JdbcTypeCode(SqlTypes.JSON)
     // private String robot = BytedeskConsts.EMPTY_JSON_STRING;
 

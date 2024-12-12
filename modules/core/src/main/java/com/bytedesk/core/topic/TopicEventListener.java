@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-25 10:37:07
+ * @LastEditTime: 2024-12-04 17:42:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,14 +15,17 @@
 package com.bytedesk.core.topic;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserLogoutEvent;
+import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +38,9 @@ public class TopicEventListener {
     private final TopicService topicService;
 
     private final TopicCacheService topicCacheService;
+
+    private final MqttConnectionService mqttConnectionService;
+
     // 此处使用static，否则在定时器中无法读取初始化时期的数据
     // private final static TopicCacheService topicCacheService = new TopicCacheService();
     // private final static String cacheKey = "topicList";
@@ -73,11 +79,28 @@ public class TopicEventListener {
     }
 
     @EventListener
+    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+        Set<String> clientIds = mqttConnectionService.getConnectedClientIds();
+        // log.info("topic QuartzOneMinEvent {}", clientIds);
+        // current connected clientIds
+        if (clientIds != null) {
+            // todo: clear topic clientIds not in clientIds
+
+            // add clientIds to topic
+            for (String clientId : clientIds) {
+                // 用户clientId格式: userUid/client/deviceUid
+                // log.info("topic onQuartzOneMinEvent connected clientId: {}", clientId);
+                topicService.addClientId(clientId);
+            }
+        }
+    }
+
+    @EventListener
     public void onUserLogoutEvent(GenericApplicationEvent<UserLogoutEvent> event) {
         UserLogoutEvent userLogoutEvent = event.getObject();
         UserEntity user = userLogoutEvent.getUser();
         log.info("topic onUserLogoutEvent: {}", user.getUsername());
-        // TODO: 用户登录之后，删除相关clientId
+        // TODO: user logout event, remove user from topic
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 12:55:38
+ * @LastEditTime: 2024-12-06 12:04:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,8 @@ import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.UsernameExistsException;
-import com.bytedesk.core.rbac.auth.AuthUser;
+import com.bytedesk.core.rbac.auth.AuthService;
+// import com.bytedesk.core.rbac.auth.AuthUser;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.role.RoleConsts;
@@ -71,6 +72,8 @@ public class UserService {
     private final OrganizationRepository organizationRepository;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final AuthService authService;
 
     @Transactional
     public UserResponse register(UserRequest request) {
@@ -135,7 +138,7 @@ public class UserService {
     @Transactional
     public UserResponse update(UserRequest request) {
 
-        UserEntity currentUser = AuthUser.getCurrentUser();
+        UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -201,7 +204,7 @@ public class UserService {
     @Transactional
     public UserResponse changePassword(UserRequest request) {
 
-        UserEntity currentUser = AuthUser.getCurrentUser(); 
+        UserEntity currentUser = authService.getUser(); 
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -228,7 +231,7 @@ public class UserService {
 
     @Transactional
     public UserResponse changeEmail(UserRequest request) {
-        UserEntity currentUser = AuthUser.getCurrentUser(); 
+        UserEntity currentUser = authService.getUser(); 
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -255,7 +258,7 @@ public class UserService {
 
     @Transactional
     public UserResponse changeMobile(UserRequest request) {
-        UserEntity currentUser = AuthUser.getCurrentUser(); 
+        UserEntity currentUser = authService.getUser(); 
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -331,11 +334,12 @@ public class UserService {
     }
 
     public UserEntity updateUserRolesFromMember(UserEntity user, Set<String> roleUids) {
-        // 
-        // Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
-        // if (!orgOptional.isPresent()) {
-        //     throw new RuntimeException("Organization not found..!!");
-        // }
+        // 首先判断是否有变化，如果无变化则不更新
+        if (user.getRoleUids() != null && user.getRoleUids().equals(roleUids)) {
+            return user;
+        }
+
+        // 删除所有角色
         user.removeOrganizationRoles();
         // 
         // 增加角色，遍历roleUids，逐个添加
@@ -355,9 +359,6 @@ public class UserService {
         if (savedEntity == null) {
             throw new RuntimeException("User create failed..!!");
         }
-        // TODO: 发送邮件
-        // TODO: 短信通知
-        // TODO: 系统通知Notice
         return savedEntity;
     }
 
@@ -521,7 +522,7 @@ public class UserService {
 
     public void logout() {
         // TODO: 清理token，使其过期
-        UserEntity user = AuthUser.getCurrentUser();
+        UserEntity user = authService.getUser();
         bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<UserLogoutEvent>(this, new UserLogoutEvent(this, user)));
     }
 

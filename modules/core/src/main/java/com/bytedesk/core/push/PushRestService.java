@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 10:48:19
+ * @LastEditTime: 2024-11-28 21:00:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.core.push;
 
 import java.time.ZoneId;
-// import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -78,9 +77,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         String ip = IpUtils.getClientIp(request);
         String type = authRequest.getType();
         String receiver = authRequest.getReceiver();
-        // String client = authRequest.getClient();
         String platform = authRequest.getPlatform();
-        // String orgUid = authRequest.getOrgUid();
         // 
         // 验证限制同一个ip发送数量、频率
         // 检查是否短时间内已发送过验证码

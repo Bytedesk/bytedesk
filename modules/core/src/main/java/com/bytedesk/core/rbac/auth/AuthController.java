@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 11:15:21
+ * @LastEditTime: 2024-12-03 12:24:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.kaptcha.KaptchaCacheService;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.rbac.user.UserRequest;
@@ -60,13 +61,13 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
         if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(), userRequest.getClient())) {
-            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
         // validate sms code
         // 验证手机验证码
         if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
-            return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
         UserResponse userResponse = userService.register(userRequest);
@@ -80,7 +81,7 @@ public class AuthController {
         log.debug("login {}", authRequest.toString());
 
         if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
-            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -98,16 +99,16 @@ public class AuthController {
                 authRequest.getType());
 
         if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
-            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
         // send mobile code
         Boolean result = pushService.sendCode(authRequest, request);
         if (!result) {
-            return ResponseEntity.ok().body(JsonResult.error("already send, don't repeat", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
         }
 
-        return ResponseEntity.ok().body(JsonResult.success("send mobile code success"));
+        return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
     @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code")
@@ -116,12 +117,12 @@ public class AuthController {
         log.debug("login mobile {}", authRequest.toString());
 
         if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
-            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // validate mobile & code
         // 验证手机验证码
         if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
-            return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
         // if mobile already exists, if none, then register
@@ -149,15 +150,15 @@ public class AuthController {
         log.debug("send email code {}", authRequest.toString());
 
         if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getClient())) {
-            return ResponseEntity.ok().body(JsonResult.error("captcha code failed", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // send email code
         Boolean result = pushService.sendCode(authRequest, request);
         if (!result) {
-            return ResponseEntity.ok(JsonResult.error("already send, don't repeat", -1, false));
+            return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
         }
 
-        return ResponseEntity.ok(JsonResult.success("send email code success"));
+        return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
     @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code")
@@ -167,7 +168,7 @@ public class AuthController {
 
         // validate email & code
         if (!pushService.validateCode(authRequest.getEmail(), authRequest.getCode(), request)) {
-            return ResponseEntity.ok(JsonResult.error("validate code failed", -1, false));
+            return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
         // 邮箱是否已经注册，如果没有，则自动注册

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:17:41
+ * @LastEditTime: 2024-12-02 16:06:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,6 +53,8 @@ public class BaseServiceSettingsResponse {
     private String topTip = I18Consts.I18N_TOP_TIP;
 
     private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
+
+    private String queueTip = I18Consts.I18N_QUEUE_TIP;
 
     private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:34:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-21 10:34:58
+ * @LastEditTime: 2024-12-09 07:30:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,8 +36,8 @@ public class AutoReplySettings implements Serializable {
     
     // 自动回复开关
     @Builder.Default
-    @Column(name = "autoreply_enabled")
-    private Boolean enabled = false;
+    @Column(name = "is_autoreply_enabled")
+    private boolean autoReplEnabled = false;
 
     // 自动回复类型
     @Builder.Default

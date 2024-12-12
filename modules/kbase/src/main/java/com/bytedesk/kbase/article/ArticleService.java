@@ -79,7 +79,7 @@ public class ArticleService extends BaseRestService<ArticleEntity, ArticleReques
         ArticleEntity entity = modelMapper.map(request, ArticleEntity.class);
         entity.setUid(uidUtils.getCacheSerialUid());
         // 
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
         UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
         entity.setUser(JSON.toJSONString(userProtobuf));
         // 

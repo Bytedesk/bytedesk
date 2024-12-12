@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:43:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:17:59
+ * @LastEditTime: 2024-12-04 09:50:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,88 +14,58 @@
  */
 package com.bytedesk.service.worktime;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-/**
- * 
- */
-@Entity
 @Data
 @Builder
-@Accessors(chain = true)
+@Entity
+@Table(name = "bytedesk_worktime")
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "bytedesk_service_worktime")
 public class WorktimeEntity extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Builder.Default
+    @Column(name = "start_time", nullable = false)
+    private String startTime = "09:00";  // 开始时间
 
-    @Column(name = "start_time")
-    @JsonFormat(pattern = "HH:mm:ss")
-    @Temporal(TemporalType.TIME)
-    private Date startTime;
+    @Builder.Default
+    @Column(name = "end_time", nullable = false)
+    private String endTime = "18:00";    // 结束时间
 
-    @Column(name = "end_time")
-    @JsonFormat(pattern = "HH:mm:ss")
-    @Temporal(TemporalType.TIME)
-    private Date endTime;
-    
+    @Builder.Default
+    @Column(name = "work_days", nullable = false)
+    private String workDays = "1,2,3,4,5";  // 工作日(1-7代表周一到周日)
+
     /**
-     * 是否工作时间
+     * 检查当前时间是否在工作时间内
      */
     public boolean isWorkTime() {
-
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-        String timeString = formatter.format(new Date());
-
-        Date now = null;
-        try {
-            now = formatter.parse(timeString);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        // 1. 检查是否是工作日
+        int dayOfWeek = LocalDate.now().getDayOfWeek().getValue();
+        if (!workDays.contains(String.valueOf(dayOfWeek))) {
+            return false;
         }
 
-        Calendar calendarNow = Calendar.getInstance();
-        calendarNow.setTime(now);
-        calendarNow.set(0, 0, 0);
+        // 2. 检查是否在工作时间段内
+        LocalTime now = LocalTime.now();
+        LocalTime start = LocalTime.parse(startTime);
+        LocalTime end = LocalTime.parse(endTime);
 
-        Calendar calendarStart = Calendar.getInstance();
-        calendarStart.setTime(startTime);
-        calendarStart.set(0, 0, 0);
-
-        Calendar calendarEnd = Calendar.getInstance();
-        calendarEnd.setTime(endTime);
-        calendarEnd.set(0, 0, 0);
-
-        boolean result1 = calendarNow.getTime().after(calendarStart.getTime());
-        boolean result2 = calendarNow.getTime().before(calendarEnd.getTime());
-
-        // logger.info("startTime {}, nowTime {}, endTime {}, result1 {}, result2 {}",
-        // calendarStart.getTime().toString(), calendarNow.getTime().toString(),
-        // calendarEnd.getTime().toString(),
-        // result1 ? "before true" : "before false",
-        // result2 ? "end true" : "end false");
-
-        return result1 && result2;
+        if (end.isAfter(start)) {
+            // 普通情况: 09:00-18:00
+            return now.isAfter(start) && now.isBefore(end);
+        } else {
+            // 跨天情况: 22:00-06:00
+            return now.isAfter(start) || now.isBefore(end);
+        }
     }
-
 }

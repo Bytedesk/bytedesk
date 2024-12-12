@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-23 11:50:46
+ * @Date: 2024-12-06 12:34:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-30 19:46:53
+ * @LastEditTime: 2024-12-06 14:35:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,73 +14,67 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.data.domain.Pageable;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.ticket.ticket.dto.TicketCreateRequest;
+import com.bytedesk.ticket.ticket.dto.TicketSearchRequest;
+import com.bytedesk.ticket.ticket.dto.TicketUpdateRequest;
 
-public class TicketService extends BaseRestService<TicketEntity, TicketRequest, TicketResponse> {
+public interface TicketService {
 
-    @Override
-    public Page<TicketResponse> queryByOrg(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
-    }
-
-    @Override
-    public Page<TicketResponse> queryByUser(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public Optional<TicketEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
-    }
-
-    @Override
-    public TicketResponse create(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-    @Override
-    public TicketResponse update(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public TicketEntity save(TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
-
-    @Override
-    public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
-    }
-
-    @Override
-    public void delete(TicketRequest entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    @Override
-    public TicketResponse convertToResponse(TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
-    }
-
-}
+    TicketEntity createTicket(TicketCreateRequest request);
+    
+    TicketEntity updateTicket(Long ticketId, TicketUpdateRequest request);
+    
+    void deleteTicket(Long ticketId);
+    
+    TicketEntity getTicket(Long ticketId);
+    
+    Page<TicketEntity> searchTickets(TicketSearchRequest request, Pageable pageable);
+        
+    void resolve(Long ticketId, String resolution);
+    
+    void close(Long ticketId, String reason);
+    
+    void reopen(Long ticketId, String reason);
+        
+    void transferTicket(Long ticketId, Long fromUserId, Long toUserId, String reason);
+    
+    void setDueDate(Long ticketId, LocalDateTime dueDate);
+    
+    void updateDueDate(Long ticketId, LocalDateTime newDueDate, String reason);
+    
+    Page<TicketEntity> getTickets(Pageable pageable);
+    
+    Page<TicketEntity> searchTickets(TicketSearchCriteria criteria, Pageable pageable);
+    
+    void assignTicket(Long ticketId, Long assignedTo);
+    
+    void updateStatus(Long ticketId, String status);
+    
+    void updatePriority(Long ticketId, String priority);
+    
+    void updateDueDate(Long ticketId, LocalDateTime dueDate);
+    
+    Page<TicketEntity> getMyTickets(Long userId, Pageable pageable);
+    
+    Page<TicketEntity> getAssignedTickets(Long assignedTo, Pageable pageable);
+    
+    Page<TicketEntity> getOverdueTickets(String status, Pageable pageable);
+    
+    void resolveTicket(Long ticketId, String resolution);
+    
+    void closeTicket(Long ticketId);
+    
+    void reopenTicket(Long ticketId);
+    
+    void addSatisfactionRating(Long ticketId, Integer rating, String comment);
+    
+    List<TicketEntity> getUnresolvedTickets();
+    
+    List<TicketEntity> getUnassignedTickets();
+} 

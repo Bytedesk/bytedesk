@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 15:47:48
+ * @LastEditTime: 2024-12-07 13:58:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,12 +14,11 @@
  */
 package com.bytedesk.service.agent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,10 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.action.ActionService;
+import com.bytedesk.core.action.ActionRestService;
 import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -49,17 +46,15 @@ import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
-import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqService;
+import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.settings.ServiceSettings;
-import com.bytedesk.service.settings.ServiceSettingsRequest;
+import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
-import com.bytedesk.service.worktime.WorktimeEntity;
-import com.bytedesk.service.worktime.WorktimeService;
 import com.bytedesk.team.member.MemberEntity;
-import com.bytedesk.team.member.MemberService;
+import com.bytedesk.team.member.MemberRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,21 +70,19 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final UidUtils uidUtils;
 
-    private final MemberService memberService;
+    private final MemberRestService memberService;
 
     private final UserService userService;
 
     private final AuthService authService;
 
-    private final RobotRestService robotService;
-
-    private final FaqService faqService;
-
-    private final WorktimeService worktimeService;
-
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final ActionService actionService;
+    private final ActionRestService actionService;
+
+    private final ServiceSettingsService serviceSettingsService;
+
+    private final MqttConnectionService mqttConnectionService;
 
     public Page<AgentResponse> queryByOrg(AgentRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
@@ -101,12 +94,15 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Override
     public Page<AgentResponse> queryByUser(AgentRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "id");
+        Specification<AgentEntity> spec = AgentSpecification.search(request);
+        Page<AgentEntity> agentPage = agentRepository.findAll(spec, pageable);
+        return agentPage.map(this::convertToResponse);
     }
 
     public AgentResponse query(AgentRequest request) {
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = findByUserUidAndOrgUid(user.getUid(), request.getOrgUid());
         if (!agentOptional.isPresent()) {
             throw new RuntimeException("agent not found");
@@ -123,9 +119,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         }
         // 一个user仅能绑定一个坐席
         if (existsByUserUidAndOrgUid(memberOptional.get().getUser().getUid(), request.getOrgUid())) {
-            throw new RuntimeException("user already has an agent..!!");
+            throw new RuntimeException(I18ServiceConsts.I18N_AGENT_EXISTS);
         }
+        // 
         MemberEntity member = memberOptional.get();
+        UserEntity user = member.getUser();
         userService.addAgentRole(member.getUser());
         //
         AgentEntity agent = AgentEntity.builder()
@@ -136,78 +134,19 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         if (StringUtils.hasText(request.getUid())) {
             agent.setUid(request.getUid());
         } else {
-            agent.setUid(uidUtils.getCacheSerialUid());
+            agent.setUid(uidUtils.getUid());
         }
         agent.setOrgUid(request.getOrgUid());
         agent.setMember(member);
-        agent.setUserUid(member.getUser().getUid());
-        //
-        if (request.getServiceSettings() == null
-                || request.getServiceSettings().getWorktimeUids() == null
-                || request.getServiceSettings().getWorktimeUids().isEmpty()) {
-            ServiceSettingsRequest serviceSettings = ServiceSettingsRequest.builder().build();
-            List<String> worktimeUids = new ArrayList<>();
-            String worktimeUid = worktimeService.createDefault();
-            worktimeUids.add(worktimeUid);
-            serviceSettings.setWorktimeUids(worktimeUids);
-            request.setServiceSettings(serviceSettings);
-        }
-        //
-        Iterator<String> worktimeIterator = request.getServiceSettings().getWorktimeUids().iterator();
-        while (worktimeIterator.hasNext()) {
-            String worktimeUid = worktimeIterator.next();
-            // log.info("worktimeUid {}", worktimeUid);
-            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
-            if (worktimeOptional.isPresent()) {
-                WorktimeEntity worktimeEntity = worktimeOptional.get();
-
-                agent.getServiceSettings().getWorktimes().add(worktimeEntity);
-            } else {
-                throw new RuntimeException(worktimeUid + " is not found.");
-            }
-        }
-        //
-        if (request.getServiceSettings() != null
-                && request.getServiceSettings().getFaqUids() != null
-                && request.getServiceSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String faqUid = iterator.next();
-                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
-                if (faqOptional.isPresent()) {
-                    FaqEntity faqEntity = faqOptional.get();
-                    log.info("agent faqUid added {}", faqUid);
-
-                    agent.getServiceSettings().getFaqs().add(faqEntity);
-                } else {
-                    throw new RuntimeException("agent faq " + faqUid + " not found");
-                }
-            }
-        } else {
-            log.info("agent faq uids is null");
-        }
-        // log.info("agent {}", agent);
-        if (request.getServiceSettings() != null
-                && request.getServiceSettings().getQuickFaqUids() != null
-                && request.getServiceSettings().getQuickFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String quickFaqUid = iterator.next();
-                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
-                if (quickFaqOptional.isPresent()) {
-                    FaqEntity quickFaqEntity = quickFaqOptional.get();
-                    log.info("quickFaqUid added {}", quickFaqUid);
-                    agent.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
-                } else {
-                    throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
-                }
-            }
+        agent.setUserUid(user.getUid());
+        // 
+        Set<String> userIds = mqttConnectionService.getConnectedUserUids();
+        if (userIds.contains(agent.getUserUid())) {
+            agent.setConnected(true);
         }
         // 保存Agent并检查返回值
         AgentEntity savedAgent = save(agent);
         if (savedAgent == null) {
-            // 根据业务逻辑决定如何处理保存失败的情况
-            // 例如，可以抛出一个异常或返回一个错误响应
             throw new RuntimeException("Failed to save agent.");
         }
         // 返回保存后的Agent
@@ -231,11 +170,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agentRequest.setUid(agentUid);
         agentRequest.setOrgUid(orgUid);
         //
-        List<String> worktimeUids = new ArrayList<>();
-        String worktimeUid = worktimeService.createDefault();
-        worktimeUids.add(worktimeUid);
-        //
-        agentRequest.getServiceSettings().setWorktimeUids(worktimeUids);
+        // List<String> worktimeUids = new ArrayList<>();
+        // String worktimeUid = worktimeService.createDefault();
+        // worktimeUids.add(worktimeUid);
+        // agentRequest.getServiceSettings().setWorktimeUids(worktimeUids);
         //
         create(agentRequest);
     }
@@ -262,114 +200,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 暂不允许修改绑定成员
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
-        //
-        ServiceSettings serviceSettings = modelMapper.map(request.getServiceSettings(), ServiceSettings.class);
-        //
-        if (StringUtils.hasText(request.getServiceSettings().getRobotUid())) {
-            Optional<RobotEntity> robotOptional = robotService.findByUid(request.getServiceSettings().getRobotUid());
-            if (robotOptional.isPresent()) {
-                RobotEntity robot = robotOptional.get();
-                serviceSettings.setRobot(robot);
-            } else {
-                throw new RuntimeException(request.getServiceSettings().getRobotUid() + " is not found.");
-            }
-        }
-        //
-        Iterator<String> worktimeIterator = request.getServiceSettings().getWorktimeUids().iterator();
-        while (worktimeIterator.hasNext()) {
-            String worktimeUid = worktimeIterator.next();
-            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
-            if (worktimeOptional.isPresent()) {
-                WorktimeEntity worktimeEntity = worktimeOptional.get();
-                serviceSettings.getWorktimes().add(worktimeEntity);
-            } else {
-                throw new RuntimeException(worktimeUid + " is not found.");
-            }
-        }
-        //
-        if (request.getServiceSettings() != null
-                && request.getServiceSettings().getFaqUids() != null
-                && request.getServiceSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String faqUid = iterator.next();
-                log.info("update faq {}", faqUid);
-                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
-                if (faqOptional.isPresent()) {
-                    FaqEntity faqEntity = faqOptional.get();
-
-                    log.info("save update faq {}", faqEntity.getUid());
-                    serviceSettings.getFaqs().add(faqEntity);
-                } else {
-                    throw new RuntimeException("faq " + faqUid + " not found");
-                }
-            }
-        }
-        //
-        if (request.getServiceSettings() != null
-                && request.getServiceSettings().getQuickFaqUids() != null
-                && request.getServiceSettings().getQuickFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String quickFaqUid = iterator.next();
-                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
-                if (quickFaqOptional.isPresent()) {
-                    FaqEntity quickFaqEntity = quickFaqOptional.get();
-                    log.info("quickFaqUid added {}", quickFaqUid);
-                    serviceSettings.getQuickFaqs().add(quickFaqEntity);
-                } else {
-                    throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
-                }
-            }
-        }
-        //
-        if (request.getServiceSettings().getGuessFaqUids() != null
-                && request.getServiceSettings().getGuessFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceSettings().getGuessFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String guessFaqUid = iterator.next();
-                Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
-                if (guessFaqOptional.isPresent()) {
-                    FaqEntity guessFaq = guessFaqOptional.get();
-                    log.info("guessFaqUid added {}", guessFaqUid);
-                    serviceSettings.getGuessFaqs().add(guessFaq);
-                } else {
-                    throw new RuntimeException("guessFaq " + guessFaqUid + " not found");
-                }
-            }
-        }
-        //
-        if (request.getServiceSettings().getHotFaqUids() != null
-                && request.getServiceSettings().getHotFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceSettings().getHotFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String hotFaqUid = iterator.next();
-                Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
-                if (hotFaqOptional.isPresent()) {
-                    FaqEntity hotFaq = hotFaqOptional.get();
-                    log.info("hotFaqUid added {}", hotFaqUid);
-                    serviceSettings.getHotFaqs().add(hotFaq);
-                } else {
-                    throw new RuntimeException("hotFaq " + hotFaqUid + " not found");
-                }
-            }
-        }
-        //
-        if (request.getServiceSettings().getShortcutFaqUids() != null
-                && request.getServiceSettings().getShortcutFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceSettings().getShortcutFaqUids().iterator();
-            while (iterator.hasNext()) {
-                String shortcutFaqUid = iterator.next();
-                Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
-                if (shortcutFaqOptional.isPresent()) {
-                    FaqEntity shortcutFaq = shortcutFaqOptional.get();
-                    log.info("shortcutFaqUid added {}", shortcutFaqUid);
-                    serviceSettings.getShortcutFaqs().add(shortcutFaq);
-                } else {
-                    throw new RuntimeException("shortcutFaq " + shortcutFaqUid + " not found");
-                }
-            }
-        }
+        // 
+        ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
         //
         agent.setServiceSettings(serviceSettings);
         // 自动回复
@@ -392,11 +224,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         agent.setStatus(request.getStatus()); // 更新接待状态
         log.info("agent: {}", agent.toString());
-        // 保存Agent并检查返回值
+        // 
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
-            // 根据业务逻辑决定如何处理保存失败的情况
-            // 例如，可以抛出一个异常或返回一个错误响应
             throw new RuntimeException("Failed to save agent.");
         }
         bytedeskEventPublisher.publishGenericApplicationEvent(
@@ -409,28 +239,24 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     @Transactional
     public AgentResponse updateAutoReply(AgentRequest request) {
         AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
-        // 自动回复
+        //
         AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
                 AutoReplySettings.class);
         agent.setAutoReplySettings(autoReplySettings);
         //
-        // 保存Agent，并检查返回值
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
-            // 如果保存失败，可以选择抛出异常或记录日志，这里以抛出异常为例
             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
         }
-        // 转换并返回AgentResponse
         return convertToResponse(updatedAgent);
     }
 
-    // FIXME: org.springframework.orm.ObjectOptimisticLockingFailureException: Row
-    // was updated or deleted by another transaction (or unsaved-value mapping was
-    // incorrect) : [com.bytedesk.service.agent.Agent#1]
     @Async
     public void updateConnect(String userUid, boolean connected) {
         // 参数uid是userUid，非agent uid，所以无法直接更新
         agentRepository.updateConnectedByUserUid(connected, userUid);
+        // TODO: redis cache agent online status
+
     }
 
     @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
@@ -561,5 +387,66 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
         // notifyUserOfFailure(agent);
     }
+
+    // if (request.getServiceSettings() == null
+        //         || request.getServiceSettings().getWorktimeUids() == null
+        //         || request.getServiceSettings().getWorktimeUids().isEmpty()) {
+        //     ServiceSettingsRequest serviceSettings = ServiceSettingsRequest.builder().build();
+        //     List<String> worktimeUids = new ArrayList<>();
+        //     String worktimeUid = worktimeService.createDefault();
+        //     worktimeUids.add(worktimeUid);
+        //     serviceSettings.setWorktimeUids(worktimeUids);
+        //     request.setServiceSettings(serviceSettings);
+        // }
+        // //
+        // Iterator<String> worktimeIterator = request.getServiceSettings().getWorktimeUids().iterator();
+        // while (worktimeIterator.hasNext()) {
+        //     String worktimeUid = worktimeIterator.next();
+        //     // log.info("worktimeUid {}", worktimeUid);
+        //     Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
+        //     if (worktimeOptional.isPresent()) {
+        //         WorktimeEntity worktimeEntity = worktimeOptional.get();
+        //         agent.getServiceSettings().getWorktimes().add(worktimeEntity);
+        //     } else {
+        //         throw new RuntimeException(worktimeUid + " is not found.");
+        //     }
+        // }
+        // //
+        // if (request.getServiceSettings() != null
+        //         && request.getServiceSettings().getFaqUids() != null
+        //         && request.getServiceSettings().getFaqUids().size() > 0) {
+        //     Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
+        //     while (iterator.hasNext()) {
+        //         String faqUid = iterator.next();
+        //         Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
+        //         if (faqOptional.isPresent()) {
+        //             FaqEntity faqEntity = faqOptional.get();
+        //             log.info("agent faqUid added {}", faqUid);
+
+        //             agent.getServiceSettings().getFaqs().add(faqEntity);
+        //         } else {
+        //             throw new RuntimeException("agent faq " + faqUid + " not found");
+        //         }
+        //     }
+        // } else {
+        //     log.info("agent faq uids is null");
+        // }
+        // // log.info("agent {}", agent);
+        // if (request.getServiceSettings() != null
+        //         && request.getServiceSettings().getQuickFaqUids() != null
+        //         && request.getServiceSettings().getQuickFaqUids().size() > 0) {
+        //     Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
+        //     while (iterator.hasNext()) {
+        //         String quickFaqUid = iterator.next();
+        //         Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
+        //         if (quickFaqOptional.isPresent()) {
+        //             FaqEntity quickFaqEntity = quickFaqOptional.get();
+        //             log.info("quickFaqUid added {}", quickFaqUid);
+        //             agent.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
+        //         } else {
+        //             throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
+        //         }
+        //     }
+        // }
 
 }

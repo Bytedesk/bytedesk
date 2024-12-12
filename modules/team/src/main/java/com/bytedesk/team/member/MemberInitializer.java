@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MemberInitializer implements SmartInitializingSingleton {
 
-    private final MemberService memberService;
+    private final MemberRestService memberService;
 
     private final BytedeskProperties bytedeskProperties;
 

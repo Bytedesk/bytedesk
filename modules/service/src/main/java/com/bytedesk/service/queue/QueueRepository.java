@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-14 17:44:53
+ * @LastEditTime: 2024-12-09 10:29:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,36 @@
  */
 package com.bytedesk.service.queue;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+// import org.springframework.data.jpa.repository.Query;
 
 public interface QueueRepository extends JpaRepository<QueueEntity, Long>, JpaSpecificationExecutor<QueueEntity> {
 
     Optional<QueueEntity> findByUid(String uid);
 
-    // Optional<Queue> findByQueueUid(String queueUid);
+    Optional<QueueEntity> findByDay(String day);
+    
+    // Optional<QueueEntity> findByThreadUid(String threadUid);
+
+    Optional<QueueEntity> findByThreadTopicAndDayAndDeletedFalse(String threadTopic, String day);
+    
+    List<QueueEntity> findByStatus(String status);
+    
+//     List<QueueEntity> findByStatusOrderByPriorityDesc(String status);
+    
+    int countByStatus(String status);
+    
+//     int countByPriorityGreaterThan(int priority);
+    
+    // @Query("SELECT AVG(TIMESTAMPDIFF(MINUTE, q.queueTime, q.endTime)) " +
+    //        "FROM QueueEntity q WHERE q.status = 'COMPLETED'")
+    // Double calculateAverageWaitTime();
+    
+    // @Query("SELECT MAX(TIMESTAMPDIFF(MINUTE, q.queueTime, q.endTime)) " +
+    //        "FROM QueueEntity q WHERE q.status = 'COMPLETED'")
+    // Integer calculateMaxWaitTime();
 }

@@ -108,8 +108,8 @@ public class RoleService extends BaseRestService<RoleEntity, RoleRequest, RoleRe
                         role.setLevel(LevelEnum.ORGANIZATION.name());
                 }
                 // 添加创建人
-                if (authService.getCurrentUser() != null) {
-                        role.setUserUid(authService.getCurrentUser().getUid());
+                if (authService.getUser() != null) {
+                        role.setUserUid(authService.getUser().getUid());
                 }
                 //
                 if (request.getAuthorityUids() != null) {

@@ -1,0 +1,50 @@
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.list-group-item a {
+    color: #333;
+    text-decoration: none;
+}
+
+.list-group-item a:hover {
+    color: #0d6efd;
+}
+
+.badge {
+    font-weight: normal;
+}
+
+.pagination {
+    margin-bottom: 0;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+}
+
+.feedback-content {
+    line-height: 1.6;
+    font-size: 1.1rem;
+    white-space: pre-wrap;
+}
+
+.reply {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.reply:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.btn-link {
+    text-decoration: none;
+} 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-10 21:20:45
+ * @LastEditTime: 2024-12-07 15:17:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,14 +47,17 @@ public class ServiceSettings extends BaseServiceSettings {
     // 开启机器人之后，robot字段为必填
     @Builder.Default
     private boolean defaultRobot = false;
+    
     @Builder.Default
     private boolean offlineRobot = false;
+
     @Builder.Default
     private boolean nonWorktimeRobot = false;
 
     // TODO: 当排队人数超过指定值时，自动分配机器人
     // @Builder.Default
     // private boolean queueRobot = false;
+    
     // @Builder.Default
     // private int queueRobotCount = 100;
 
@@ -73,27 +76,58 @@ public class ServiceSettings extends BaseServiceSettings {
     private RobotEntity robot;
 
     //
-    public boolean isWorkTime() {
-        if (this.worktimes == null || this.worktimes.isEmpty()) {
+    public boolean isInServiceTime() {
+        if (worktimes == null || worktimes.isEmpty()) {
             return true;
         }
-        return this.worktimes.stream().anyMatch(w -> w.isWorkTime());
+        return worktimes.stream()
+            .anyMatch(WorktimeEntity::isWorkTime);
     }
 
     //
     public Boolean shouldTransferToRobot(Boolean isOffline) {
-        if (this.defaultRobot) {
+        if (defaultRobot) {
             // 默认机器人优先接待
             return true;
-        } else if (isOffline && this.offlineRobot) {
-            // 所有客服离线，且设置机器人离线优先接待
+        } else if (isOffline && offlineRobot) {
+            // 所有客服离线,且设置机器人离线接待
             return true;
-        } else if (this.nonWorktimeRobot && !isWorkTime()) {
-            // 设置非工作时间机器人接待，且当前非工作时间，转机器人
+        } else if (nonWorktimeRobot && !isInServiceTime()) {
+            // 非工作时间,且设置机器人非工作时间接待
             return true;
         }
         return false;
     }
 
+    /**
+     * 检查是否超载
+     */
+    public boolean isOverloaded() {
+        // 1. 检查总会话数是否超限
+        if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
+            return true;
+        }
+
+        // 2. 检查等待队列是否超限 
+        if (getWaitingThreadCount() >= getMaxWaitingThreads()) {
+            return true;
+        }
+
+        // 3. 检查客服平均负载是否超限
+        if (getOnlineAgentCount() > 0) {
+            double avgLoad = (double) getCurrentThreadCount() / getOnlineAgentCount();
+            if (avgLoad >= getMaxThreadPerAgent()) {
+                return true;
+            }
+        }
+
+        // 4. 检查负载率是否超过告警阈值
+        double loadRate = (double) getCurrentThreadCount() / getMaxConcurrentThreads();
+        if (loadRate >= getAlertThreshold()) {
+            return true;
+        }
+
+        return false;
+    }
 
 }

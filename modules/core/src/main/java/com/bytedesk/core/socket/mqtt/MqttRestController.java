@@ -59,7 +59,7 @@ public class MqttRestController {
     @GetMapping("/connected/clients")
     public ResponseEntity<?> isConnectedClients() {
 
-        Set<String> clientIds = mqttConnectionService.isConnectedClientIds();
+        Set<String> clientIds = mqttConnectionService.getConnectedClientIds();
 
         return ResponseEntity.ok(JsonResult.success(clientIds));
     }

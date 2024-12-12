@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MemberExcelListener implements ReadListener<MemberExcel> {
 
-    private final MemberService memberService;
+    private final MemberRestService memberService;
 
     private final String orgUid;
     

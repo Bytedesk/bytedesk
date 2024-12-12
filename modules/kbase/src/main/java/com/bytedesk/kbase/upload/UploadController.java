@@ -77,7 +77,7 @@ public class UploadController extends BaseRestController<UploadRequest> {
 		// String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
 		String fileUrl = uploadService.store(file, fileName);
 		//
-		UserEntity user = authService.getCurrentUser();
+		UserEntity user = authService.getUser();
 		UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
 		//
 		UploadRequest uploadRequest = UploadRequest.builder()

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 12:23:34
+ * @LastEditTime: 2024-12-03 12:32:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,12 @@ public class I18Consts {
     // public static final String ZH_TW = "zh-TW";
 
     public static final String I18N_PREFIX = "i18n.";
+    // captcha
+    public static final String I18N_AUTH_CAPTCHA_SEND_SUCCESS = I18N_PREFIX + "auth.captcha.send.success";
+    public static final String I18N_AUTH_CAPTCHA_ERROR = I18N_PREFIX + "auth.captcha.error";
+    public static final String I18N_AUTH_CAPTCHA_EXPIRED = I18N_PREFIX + "auth.captcha.expired";
+    public static final String I18N_AUTH_CAPTCHA_ALREADY_SEND = I18N_PREFIX + "auth.captcha.already.send";
+    public static final String I18N_AUTH_CAPTCHA_VALIDATE_FAILED = I18N_PREFIX + "auth.captcha.validate.failed";
     // "文件助手"
     public static final String I18N_FILE_ASSISTANT_NAME = I18N_PREFIX + "file.assistant";
     // "手机、电脑文件互传"
@@ -47,6 +53,7 @@ public class I18Consts {
     public static final String I18N_TOP_TIP = I18N_PREFIX + "top.tip";
     public static final String I18N_LEAVEMSG_TIP = I18N_PREFIX + "leavemsg.tip";
     public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip";
+    public static final String I18N_QUEUE_TIP = I18N_PREFIX + "queue.tip";
     //
     public static final String I18N_WORKGROUP_NICKNAME = I18N_PREFIX + "workgroup.nickname";
     public static final String I18N_WORKGROUP_DESCRIPTION = I18N_PREFIX + "workgroup.description";

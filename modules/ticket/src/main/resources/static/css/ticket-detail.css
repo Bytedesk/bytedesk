@@ -1,0 +1,87 @@
+/* 工单详情样式 */
+.ticket-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* 评论样式 */
+.comment {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+}
+
+.comment:last-child {
+    border-bottom: none;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.comment-content {
+    white-space: pre-wrap;
+}
+
+.comment-attachments {
+    margin-top: 0.5rem;
+}
+
+.comment-attachments .list-group-item {
+    padding: 0.5rem 1rem;
+}
+
+/* 附件样式 */
+.attachments .list-group-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attachments .fa-file {
+    color: #6c757d;
+}
+
+/* 工单信息样式 */
+.ticket-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    color: #6c757d;
+}
+
+.ticket-meta .badge {
+    font-size: 0.875rem;
+}
+
+/* 工单操作样式 */
+.ticket-actions .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.ticket-actions select {
+    margin-bottom: 0.5rem;
+}
+
+/* 评论表单样式 */
+.comment-form {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.comment-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.comment-form .custom-file {
+    margin-bottom: 1rem;
+}
+
+.comment-form .form-check {
+    margin: 1rem 0;
+} 

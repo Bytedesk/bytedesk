@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 15:31:56
+ * @LastEditTime: 2024-12-07 14:47:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,11 +15,7 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -41,7 +37,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 
+ WorkgroupEntity和skills的区别主要在于:
+组织结构 vs 能力标签
+WorkgroupEntity是组织结构层面的分组,比如"售前组"、"售后组"、"技术支持组"等
+Skills是能力标签层面的标识,比如"Java"、"Python"、"数据库"等技术能力
  */
 @Entity
 @Data
@@ -64,18 +63,12 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
-    /**
-     * route type
-     */
     @Builder.Default
-    private String routeType = WorkgroupRouteEnum.ROBIN.name();
+    private String routingMode = WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
 
     @Builder.Default
     private String status = WorkgroupStateEnum.AVAILABLE.name();
 
-    /**
-     * recent chat agent should be routed first
-     */
     @Builder.Default
     @Column(name = "is_recent")
     private boolean recent = false;
@@ -84,21 +77,11 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private ServiceSettings serviceSettings = new ServiceSettings();
 
-    /**
-     * one wg can have many agents, one agent can belong to many wgs
-     */
     @JsonIgnore
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list
     private List<AgentEntity> agents = new ArrayList<>();
-
-    /**
-     * 路由队列，用于分配客服
-     */
-    @Transient
-    @Builder.Default
-    private Queue<AgentEntity> agentQueue = new LinkedList<>();
 
     // TODO: 处理留言agent
 
@@ -117,15 +100,14 @@ public class WorkgroupEntity extends BaseEntity {
     // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
     public AgentEntity nextAgent() {
 
-        if (routeType.equals(WorkgroupRouteEnum.ROBIN.name())) {
-
+        if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
             // return assignAgentByRobin();
 
-        } else if (routeType.equals(WorkgroupRouteEnum.AVERAGE.name())) {
+        } else if (routingMode.equals(WorkgroupRoutingModeEnum.AVERAGE.name())) {
 
-        } else if (routeType.equals(WorkgroupRouteEnum.IDLE.name())) {
+        } else if (routingMode.equals(WorkgroupRoutingModeEnum.IDLE.name())) {
 
-        } else if (routeType.equals(WorkgroupRouteEnum.LESS.name())) {
+        } else if (routingMode.equals(WorkgroupRoutingModeEnum.LESS.name())) {
 
         }
 
@@ -133,30 +115,33 @@ public class WorkgroupEntity extends BaseEntity {
     }
 
     /**
+     * 路由队列，用于分配客服
+     */
+    // @Transient
+    // @Builder.Default
+    // private Queue<AgentEntity> agentQueue = new LinkedList<>();
+
+    /**
      * 轮询分配算法实现访客到客服的分配
      * @return 分配到的客服
      */
-    public AgentEntity assignAgentByRobin() {
-        if (agentQueue.isEmpty()) {
-            // 如果队列为空，则先将所有客服加入队列
-            // agentQueue.addAll(agents);
-            Iterator<AgentEntity> iterator = agents.iterator();
-            while (iterator.hasNext()) {
-                AgentEntity agent = iterator.next();
-                if (agent.isConnected() && agent.isAvailable()) {
-                    agentQueue.add(agent);
-                }
-            }
-        }
-
-        // 从队列头部获取一个客服
-        AgentEntity assignedAgent = agentQueue.poll();
-
-        // 为了保证轮询的连续性，将该客服重新加入队列尾部
-        agentQueue.offer(assignedAgent);
-
-        return assignedAgent;
-    }
+    // public AgentEntity assignAgentByRobin() {
+    //     if (agentQueue.isEmpty()) {
+    //         Iterator<AgentEntity> iterator = agents.iterator();
+    //         while (iterator.hasNext()) {
+    //             AgentEntity agent = iterator.next();
+    //             if (agent.isConnected() && agent.isAvailable()) {
+    //                 agentQueue.add(agent);
+    //             }
+    //         }
+    //     }
+    //     // 从队列头部获取一个客服
+    //     AgentEntity assignedAgent = agentQueue.poll();
+    //     // 为了保证轮询的连续性，将该客服重新加入队列尾部
+    //     agentQueue.offer(assignedAgent);
+    //     // 返回分配到的客服
+    //     return assignedAgent;
+    // }
 
     public boolean isConnected() {
         if (this.agents == null || this.agents.isEmpty()) {

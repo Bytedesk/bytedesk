@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.RobotJsonService.RobotJson;
+import com.bytedesk.ai.robot.RobotJsonLoader.RobotJson;
 import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
@@ -74,7 +74,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final ThreadRestService threadService;
 
-    private final RobotJsonService robotJsonService;
+    private final RobotJsonLoader robotJsonService;
 
     private final CategoryRestService categoryService;
 
@@ -165,7 +165,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     public ThreadResponse createThread(ThreadRequest request) {
         //
-        UserEntity owner = authService.getCurrentUser();
+        UserEntity owner = authService.getUser();
         String topic = request.getTopic();
         //
         Optional<ThreadEntity> threadOptional = threadService.findByTopicAndOwner(topic, owner);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:13:27
+ * @LastEditTime: 2024-12-04 17:03:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,8 +86,8 @@ public class MessagePersistService {
 
     // 处理消息通知，已处理的消息返回true，未处理的消息返回false
     private boolean dealWithMessageNotification(MessageTypeEnum type, MessageProtobuf messageProtobuf) {
-        String content = messageProtobuf.getContent();
-        log.info("dealWithMessageNotification: {}, {}", type, content);
+        // String content = messageProtobuf.getContent();
+        // log.info("dealWithMessageNotification: {}, {}", type, content);
 
         // 正在输入/消息预知 - 不保存
         if (type.equals(MessageTypeEnum.TYPING)
@@ -175,7 +175,7 @@ public class MessagePersistService {
     private void dealWithMessageReceipt(MessageTypeEnum type, @Nonnull MessageProtobuf message) {
         log.info("dealWithMessageReceipt: {}", type);
         // 回执消息内容存储被回执消息的uid
-        // 当status已经为read时，不处理。防止deliverd在后面更新read消息
+        // 当status已经为read时，不处理。防止delivered在后面更新read消息
         Optional<MessageEntity> messageOpt = messageService.findByUid(message.getContent());
         if (messageOpt.isPresent() && messageOpt.get().getStatus() != MessageStatusEnum.READ.name()) {
             MessageEntity messageEntity = messageOpt.get();

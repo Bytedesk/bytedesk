@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -30,6 +31,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -74,10 +76,12 @@ public class UserEntity extends BaseEntityNoOrg {
 	// @Column(unique = true) // email + platform unique
 	private String email;
 
-	// TODO: including country
 	// @Digits(message = "phone length error", fraction = 0, integer = 11)
 	// @Column(unique = true) // mobile + platform unique
-	private String mobile;
+    // only support chinese mobile number, 
+    // TODO: support other country mobile number using libphonenumber library
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Invalid mobile number format")
+    private String mobile;
 
 	@Builder.Default
 	private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
@@ -144,6 +148,15 @@ public class UserEntity extends BaseEntityNoOrg {
         // }
     }
 
+	public Set<String> getRoleUids() {
+		OrganizationEntity organization = this.currentOrganization;
+		if (organization == null) {
+			return new HashSet<>();
+		}
+		return userOrganizationRoles.stream().filter(u -> u.getOrganization().equals(organization))
+				.flatMap(uor -> uor.getRoles().stream()).map(r -> r.getUid()).collect(Collectors.toSet());
+	}
+
 	// 判断organization是否包含role
 	public boolean containsRole(RoleEntity role) {
 		OrganizationEntity organization = this.currentOrganization;
@@ -181,8 +194,6 @@ public class UserEntity extends BaseEntityNoOrg {
 						uor.getRoles().remove(role);
 					}
 				}
-				// 遍历uor的roles，删除role
-				// uor.getRoles().clear();
 			}
 		}
 	}

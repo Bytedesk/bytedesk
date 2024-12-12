@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 12:45:34
+ * @LastEditTime: 2024-12-04 15:45:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,9 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -67,6 +69,8 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
     private final IMessageSendService messageSendService;
 
+    private final BytedeskEventPublisher bytedeskEventPublisher;
+
     public Page<ThreadResponse> queryByOrg(ThreadRequest request) {
 
         // 优先加载最近更新的会话记录，updatedAt越大越新
@@ -83,7 +87,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     /**  */
     public Page<ThreadResponse> query(ThreadRequest pageParam) {
 
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
 
         // 优先加载最近更新的会话记录，updatedAt越大越新
         Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
@@ -105,7 +109,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
      */
     public ThreadResponse create(ThreadRequest request) {
 
-        UserEntity owner = authService.getCurrentUser();
+        UserEntity owner = authService.getUser();
         //
         Optional<ThreadEntity> threadOptional = findByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
@@ -113,7 +117,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         //
         ThreadEntity thread = modelMapper.map(request, ThreadEntity.class);
-        thread.setUid(uidUtils.getCacheSerialUid());
+        thread.setUid(uidUtils.getUid());
         thread.setState(ThreadStateEnum.STARTED.name());
         //
         String user = JSON.toJSONString(request.getUser());
@@ -200,7 +204,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // 系统通知会话：system/{user_uid}
     public ThreadResponse createSystemChannelThread(UserEntity user) {
         //
-        // String topic = TopicUtils.TOPIC_SYSTEM_PREFIX + user.getUid();
         String topic = TopicUtils.getSystemTopic(user.getUid());
         //
         Optional<ThreadEntity> threadOptional = findByTopicAndOwner(topic, user);
@@ -284,6 +287,8 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
+        // 
+        bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<ThreadCloseEvent>(this, new ThreadCloseEvent(this, updateThread)));
         // 发布关闭消息, 通知用户
         String content = threadRequest.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED

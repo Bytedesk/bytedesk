@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AutoReplyExcelListener implements ReadListener<AutoReplyExcel> {
 
-    private final AutoReplyService autoreplyService;
+    private final AutoReplyRestService autoreplyService;
 
     // private final String categoryUid;
 

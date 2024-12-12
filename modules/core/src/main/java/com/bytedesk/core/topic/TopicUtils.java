@@ -124,7 +124,7 @@ public class TopicUtils {
     //////////////////////////////////////////////////////////////////////////
 
     public static Boolean isOrgMemberTopic(String topic) {
-        return topic.startsWith(TOPIC_ORG_MEMBER_PATTERN);
+        return topic.startsWith(TOPIC_ORG_MEMBER_PREFIX);
     }
 
     public static String formatOrgMemberTopic(String memberUid) {

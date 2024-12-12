@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 19:17:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 16:06:18
+ * @LastEditTime: 2024-11-29 10:57:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,7 +73,7 @@ public class KaptchaRestController {
             e.printStackTrace();
         }
         //
-        return ResponseEntity.ok(JsonResult.error("kaptcha failed"));
+        return ResponseEntity.ok(JsonResult.error("kaptcha get failed"));
     }
 
     // 验证验证码
@@ -87,7 +87,7 @@ public class KaptchaRestController {
         if (kaptchaCacheService.checkKaptcha(captchaUid, captchaCode, client)) {
             return ResponseEntity.ok(JsonResult.success("kaptcha success"));
         } else {
-            return ResponseEntity.ok(JsonResult.error("kaptcha failed", -1));
+            return ResponseEntity.ok(JsonResult.error("kaptcha check failed", -1));
         }
     }
 

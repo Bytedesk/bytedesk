@@ -27,7 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.model.LlmModelJsonService.ModelJson;
+import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
