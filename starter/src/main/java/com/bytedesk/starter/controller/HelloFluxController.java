@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-12 10:36:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-10 23:39:11
+ * @LastEditTime: 2024-12-07 10:43:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ public class HelloFluxController {
 
     // router中优先运行
     // http://localhost:9003/flux/
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public String index() {
         return "Hello Bytedesk AI Flux";
     }

@@ -1,0 +1,207 @@
+{
+  "version": "6",
+  "id": "clpntkei400011aboogh27ead",
+  "name": "Basic ChatGPT",
+  "events": [
+    {
+      "id": "ewnfbo0exlu7ihfu2lu2lusm",
+      "outgoingEdgeId": "pn7omb9mx5xxc4mzq028fcmq",
+      "graphCoordinates": { "x": -228.25, "y": -123.31 },
+      "type": "start"
+    }
+  ],
+  "groups": [
+    {
+      "id": "t3tv4dm3khwmiotjle5jb65g",
+      "title": "",
+      "graphCoordinates": { "x": 10.94, "y": -121.96 },
+      "blocks": [
+        {
+          "id": "s6eky7dd3md9hto9y4wsuj7h",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "You need to add your OpenAI credentials to make this bot work. 🪄"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "nqsu9f13q5j8tt56bcbuto62",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Once it's done, delete this group and connect the "
+                  },
+                  { "bold": true, "text": "Start" },
+                  { "text": " event with " },
+                  { "bold": true, "text": "Intro" },
+                  { "text": " 🚀" }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "qfrz5nwm63g12dajsjxothb5",
+      "title": "User input",
+      "graphCoordinates": { "x": 198.64, "y": 179.04 },
+      "blocks": [
+        {
+          "id": "ovgk70u0kfxrbtz9dy4e040o",
+          "type": "text_input",
+          "options": { "variableId": "vudksu3zyrat6s1bq6qne0rx3" }
+        },
+        {
+          "id": "m4jadtknjb3za3gvxj1xdn1k",
+          "outgoingEdgeId": "fpj0xacppqd1s5slyljzhzc9",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vabkycu0qqff5d6ar2ama16pf",
+            "type": "Append value(s)",
+            "item": "{{User Message}}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "a6ymhjwtkqwp8t127plz8qmk",
+      "title": "ChatGPT reply",
+      "graphCoordinates": { "x": 624.57, "y": 200.09 },
+      "blocks": [
+        {
+          "id": "p4q3wbk4wcw818qocrvu7dxs",
+          "type": "openai",
+          "options": {
+            "action": "Create chat completion",
+            "messages": [
+              {
+                "role": "Dialogue",
+                "dialogueVariableId": "vabkycu0qqff5d6ar2ama16pf"
+              }
+            ],
+            "responseMapping": [
+              {
+                "item": "Message content",
+                "variableId": "vni6kwbch8zlq92dclgcivzyr"
+              }
+            ]
+          }
+        },
+        {
+          "id": "myldn1l1nfdwwm8qvza71rwv",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "{{Assistant Message}}" }] }
+            ]
+          },
+          "groupId": "a6ymhjwtkqwp8t127plz8qmk"
+        },
+        {
+          "id": "yblc864bzipaqfja7b2o3oo0",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vabkycu0qqff5d6ar2ama16pf",
+            "type": "Append value(s)",
+            "item": "{{Assistant Message}}"
+          },
+          "outgoingEdgeId": "at8takz56suqmaul5teazymb"
+        }
+      ]
+    },
+    {
+      "id": "c5f00f3oclwi1srcz10jjt9u",
+      "title": "Intro",
+      "graphCoordinates": { "x": -183.19, "y": 156.03 },
+      "blocks": [
+        {
+          "id": "vzcrfk4vl9gy8igu0ysja5nc",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "Hi there 👋" }] }
+            ]
+          }
+        },
+        {
+          "id": "gphm5wy1md9cunwkdtbzg6nq",
+          "outgoingEdgeId": "h5sk58j0ryrxmfv4gmw7r4dw",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "How can I help?" }] }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "h5sk58j0ryrxmfv4gmw7r4dw",
+      "from": { "blockId": "gphm5wy1md9cunwkdtbzg6nq" },
+      "to": { "groupId": "qfrz5nwm63g12dajsjxothb5" }
+    },
+    {
+      "id": "fpj0xacppqd1s5slyljzhzc9",
+      "from": { "blockId": "m4jadtknjb3za3gvxj1xdn1k" },
+      "to": { "groupId": "a6ymhjwtkqwp8t127plz8qmk" }
+    },
+    {
+      "id": "pn7omb9mx5xxc4mzq028fcmq",
+      "from": { "eventId": "ewnfbo0exlu7ihfu2lu2lusm" },
+      "to": { "groupId": "t3tv4dm3khwmiotjle5jb65g" }
+    },
+    {
+      "from": {
+        "blockId": "yblc864bzipaqfja7b2o3oo0",
+        "groupId": "a6ymhjwtkqwp8t127plz8qmk"
+      },
+      "to": { "groupId": "qfrz5nwm63g12dajsjxothb5" },
+      "id": "at8takz56suqmaul5teazymb"
+    }
+  ],
+  "variables": [
+    {
+      "id": "vni6kwbch8zlq92dclgcivzyr",
+      "name": "Assistant Message",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vudksu3zyrat6s1bq6qne0rx3",
+      "name": "User Message",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vabkycu0qqff5d6ar2ama16pf",
+      "name": "Chat history",
+      "isSessionVariable": true
+    }
+  ],
+  "theme": {},
+  "selectedThemeTemplateId": null,
+  "settings": { "general": {} },
+  "createdAt": "2023-12-02T08:56:27.244Z",
+  "updatedAt": "2023-12-02T09:00:25.221Z",
+  "icon": "🤖",
+  "folderId": null,
+  "publicId": null,
+  "customDomain": null,
+  "resultsTablePreferences": null,
+  "isArchived": false,
+  "isClosed": false,
+  "whatsAppCredentialsId": null
+}

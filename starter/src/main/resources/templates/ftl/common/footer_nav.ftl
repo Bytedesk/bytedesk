@@ -13,6 +13,7 @@
 
 				<p class="my-4"><h3>微语 - 重复工作自动化</h3></p>
 				<p ><h5>对话即服务-Chat As A Service(CAAS)</h5></p>
+				<#--  开源即时通讯平台、重复工作自动化、开源AI应用创新平台  -->
 				<!-- Newsletter -->
 				<#--  <form class="row row-cols-lg-auto g-2">
 					<div class="col-12">
