@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-31 15:40:55
+ * @LastEditTime: 2024-12-03 15:54:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,7 +47,7 @@ public class PageRouteController {
 	 * 管理后台
 	 * http://127.0.0.1:9003/admin
 	 */
-	@GetMapping({"/admin", "/admin/{path:[^\\.]*}", "/admin/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	@GetMapping({"/admin", "/admin/", "/admin/{path:[^\\.]*}", "/admin/{path:[^\\.]*}/{path2:[^\\.]*}"})
 	public String admin(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
 		if (path != null && path2 != null) {
 			log.info("admin path: {}, {}", path, path2);
@@ -62,7 +62,7 @@ public class PageRouteController {
 	 * web聊天/客服端
 	 * http://127.0.0.1:9003/agent
 	 */
-	@GetMapping({"/agent", "/agent/{path:[^\\.]*}", "/agent/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	@GetMapping({"/agent", "/agent/", "/agent/{path:[^\\.]*}", "/agent/{path:[^\\.]*}/{path2:[^\\.]*}"})
 	public String agent(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
 		if (path != null && path2 != null) {
 			log.info("agent path: {}, {}", path, path2);
@@ -80,7 +80,7 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/chat/frame
 	 * http://127.0.0.1:9003/chat/float
 	 */
-	@GetMapping({"/chat", "/chat/", "/chat/{type:demo|frame|float|ticket|feedback|number|queue}"})
+	@GetMapping({"/chat", "/chat/", "/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter}"})
 	public String handleChatRoutes(@PathVariable(required = false) String type) {
 		return "/chat/index.html";
 	}

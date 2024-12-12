@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-28 14:13:42
+ * @LastEditTime: 2024-11-26 09:07:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,7 +47,7 @@ public class PageTemplateController {
      * @return
      */
     @GetMapping("/static")
-    public JsonResult<?> staticlize() {
+    public JsonResult<?> staticize() {
 
         pageService.index();
         // pageService.plan();

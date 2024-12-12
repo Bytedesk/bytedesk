@@ -1,0 +1,646 @@
+{
+  "version": "6",
+  "id": "cloo0wet7000h1aor38uwjxjw",
+  "name": "Movie recommendation",
+  "events": [
+    {
+      "id": "u6lpjibfjhyoqij5wjf9kvnl",
+      "outgoingEdgeId": "wfec8f4e1jtden2wqna6nrso",
+      "graphCoordinates": { "x": 0, "y": 0 },
+      "type": "start"
+    }
+  ],
+  "groups": [
+    {
+      "id": "mjnkukpkpvf4ha2g4n5m804v",
+      "title": "Menu",
+      "graphCoordinates": { "x": 243.1, "y": 12.32 },
+      "blocks": [
+        {
+          "id": "kjlf184vxf0uorniwje28iqb",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vh5bxx07kl3016wr1undh2yb3",
+            "expressionToEvaluate": "2f584d1ffe2b7fb082dd4e05038e9bd7"
+          }
+        },
+        {
+          "id": "f5rr5wi9zldun13tw79u9z2n",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Welcome to our film recommendation bot 👋" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "c7swi84rmdvrul0wz5kxtplm",
+          "type": "image",
+          "content": {
+            "url": "https://media3.giphy.com/media/BElb9DVpHezcZufOhl/giphy-downsized.gif?cid=fe3852a3uwhsp1sc3j6avr625v5e94h1v8o3wfb1ii3xwswk&rid=giphy-downsized.gif&ct=g"
+          }
+        },
+        {
+          "id": "nlihfc4ptxnxoktqblh6mcql",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "It is powered by The Movie DB API 🚀" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "vr73urm54d9mq2oqg7ey1xh8",
+          "type": "image",
+          "content": {
+            "url": "https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg"
+          }
+        },
+        {
+          "id": "g5yyuh9g75x7xa7fgqhhi1zz",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "How can I we help?" }] }
+            ]
+          }
+        },
+        {
+          "id": "tzf45bvd8iquoxz7qgta8v94",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "kaimvzg9igdtktgou5m3s1bw",
+              "outgoingEdgeId": "t8qyjpigrz7cdl8gxl1wxlwj",
+              "content": "Select a genre 💅"
+            },
+            {
+              "id": "i8ls2f8inq2ovuijj6l7rbcq",
+              "outgoingEdgeId": "tjn2ljosqyd4aj9dk8mnifsu",
+              "content": "See what's trending 🔝"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kq1g5z6pz4buot7sawqdrr3s",
+      "title": "Genre",
+      "graphCoordinates": { "x": 607.85, "y": 295.32 },
+      "blocks": [
+        {
+          "id": "ecwz96cghzp4ji3lyx7taxt1",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "Sure!" }] }]
+          }
+        },
+        {
+          "id": "gd4lt2pcljer6zaf7v9hkr1k",
+          "type": "webhook",
+          "options": {
+            "variablesForTest": [
+              {
+                "id": "oqbhwya4cewto5pfjmftjmpn",
+                "variableId": "vh5bxx07kl3016wr1undh2yb3",
+                "value": "2f584d1ffe2b7fb082dd4e05038e9bd7"
+              }
+            ],
+            "responseVariableMapping": [
+              {
+                "id": "bm186wvb4e2aqj1myx5gc251",
+                "variableId": "vx0bbqzug4vk3zpc31ly8k7al",
+                "bodyPath": "data.genres.flatMap(item => item.name)"
+              },
+              {
+                "id": "xsrhvxf3hv74e2hkokmdflbc",
+                "variableId": "vwc00rydyp035vtb0nlaqyzwr",
+                "bodyPath": "data.genres.flatMap(item => item.id)"
+              }
+            ],
+            "isAdvancedConfig": true,
+            "webhook": {
+              "queryParams": [
+                {
+                  "id": "gq6m7x2k20qzrj752qi2zpmu",
+                  "key": "api_key",
+                  "value": "{{API Key}}"
+                }
+              ],
+              "method": "GET",
+              "url": "https://api.themoviedb.org/3/genre/movie/list"
+            }
+          }
+        },
+        {
+          "id": "qeyvu7uq5tkvo7uo8iaj87z5",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "Select your desired genre 👇" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "nwuk2clo78hmnh4d0g31u9xg",
+          "type": "choice input",
+          "items": [
+            { "id": "ri3avm9p0i96p8gx4028b6ye", "content": "Click to edit" }
+          ],
+          "options": {
+            "variableId": "vkmbb3rb2hcfd2io1fhf7rz5x",
+            "dynamicVariableId": "vx0bbqzug4vk3zpc31ly8k7al"
+          }
+        },
+        {
+          "id": "j7pm34um4piuyabwlobjc356",
+          "outgoingEdgeId": "tfuuwjnpn7mftd5s65mbhytd",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vwewa4yugqch2sswdpneszk3i",
+            "type": "Map item with same index",
+            "mapListItemParams": {
+              "baseItemVariableId": "vkmbb3rb2hcfd2io1fhf7rz5x",
+              "baseListVariableId": "vx0bbqzug4vk3zpc31ly8k7al",
+              "targetListVariableId": "vwc00rydyp035vtb0nlaqyzwr"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "d6v9lh83c7zuwrhf2mmo6nxo",
+      "title": "Trending",
+      "graphCoordinates": { "x": 599.83, "y": 880.98 },
+      "blocks": [
+        {
+          "id": "edokvbp15ubqeuydw9n7wf4w",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "Sure!" }] }]
+          }
+        },
+        {
+          "id": "pwxb57b8nc2bp764vcdstois",
+          "type": "webhook",
+          "options": {
+            "variablesForTest": [
+              {
+                "id": "oqbhwya4cewto5pfjmftjmpn",
+                "variableId": "vh5bxx07kl3016wr1undh2yb3",
+                "value": "2f584d1ffe2b7fb082dd4e05038e9bd7"
+              }
+            ],
+            "responseVariableMapping": [
+              {
+                "id": "g5ga79m1dzgp28chaxlj2i72",
+                "variableId": "vkzk96oh1pmdjv2bt5ps60qc0",
+                "bodyPath": "data.results.flatMap(item => item.title)"
+              },
+              {
+                "id": "albmykstahw37np5gjuafxie",
+                "variableId": "vcmybxcoaytd2geo5sqx7v8hw",
+                "bodyPath": "data.results.flatMap(item => item.id)"
+              }
+            ],
+            "isAdvancedConfig": true,
+            "webhook": {
+              "queryParams": [
+                {
+                  "id": "x9nxr63itm2lvbe8dmi53mi7",
+                  "key": "api_key",
+                  "value": "{{API Key}}"
+                }
+              ],
+              "method": "GET",
+              "url": "https://api.themoviedb.org/3/trending/movie/week"
+            }
+          }
+        },
+        {
+          "id": "ruhgtbpv18cy2g5ujavljkku",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "Here are popular movies this week 👇" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "krcvvncnqtn99v0qe1dzudrk",
+          "type": "choice input",
+          "items": [
+            { "id": "dicb6lnv5kapkq0tygnx1abh", "content": "Click to edit" }
+          ],
+          "options": {
+            "variableId": "vulnb1om2fk8mvkcesl8s15cr",
+            "dynamicVariableId": "vkzk96oh1pmdjv2bt5ps60qc0"
+          }
+        },
+        {
+          "id": "mgn6uuw2yebmengsukjramjx",
+          "outgoingEdgeId": "ual6xszx6tfcxqrnihc6zrvx",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vzslfw8oyo1f08uo5rpkegn0x",
+            "type": "Map item with same index",
+            "mapListItemParams": {
+              "baseItemVariableId": "vulnb1om2fk8mvkcesl8s15cr",
+              "baseListVariableId": "vkzk96oh1pmdjv2bt5ps60qc0",
+              "targetListVariableId": "vcmybxcoaytd2geo5sqx7v8hw"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "v35sky44jzz9fkwwul2qxufl",
+      "title": "Movies by genre",
+      "graphCoordinates": { "x": 952.84, "y": 294.85 },
+      "blocks": [
+        {
+          "id": "g2pgwx5yr1ou9vkoy6gdwuor",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Here are trending movies for the {{Selected genre}} genre"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "a2datk3pv8o6xgitwjsq61m2",
+          "type": "webhook",
+          "options": {
+            "variablesForTest": [
+              {
+                "id": "oqbhwya4cewto5pfjmftjmpn",
+                "variableId": "vh5bxx07kl3016wr1undh2yb3",
+                "value": "2f584d1ffe2b7fb082dd4e05038e9bd7"
+              },
+              {
+                "id": "rofxlzwrcv1ksy8aub8cfi6p",
+                "variableId": "vwewa4yugqch2sswdpneszk3i",
+                "value": "16"
+              }
+            ],
+            "responseVariableMapping": [
+              {
+                "id": "w8k1bxjsfkjxt64eev1ib96w",
+                "variableId": "vad8vq3jfyybxo4la57hfd529",
+                "bodyPath": "data.results.flatMap(item => item.title)"
+              },
+              {
+                "id": "zysikjyevakboax3czzec7nt",
+                "variableId": "vhc2pc1sv4xc778r9od2ctooz",
+                "bodyPath": "data.results.flatMap(item => item.id)"
+              }
+            ],
+            "isAdvancedConfig": true,
+            "webhook": {
+              "queryParams": [
+                {
+                  "id": "mgwlp399a056o9jo93tjqp02",
+                  "key": "api_key",
+                  "value": "{{API Key}}"
+                },
+                {
+                  "id": "dv4wioynywqo57jq8lakq3yr",
+                  "key": "with_genres",
+                  "value": "{{Selected genre ID}}"
+                }
+              ],
+              "method": "GET",
+              "url": "https://api.themoviedb.org/3/discover/movie"
+            }
+          }
+        },
+        {
+          "id": "tr5y76tx9ca336f8ob9odfa6",
+          "type": "choice input",
+          "items": [
+            { "id": "uy2xwxoqhqol852cqsq17r9l", "content": "Click to edit" }
+          ],
+          "options": {
+            "variableId": "vyyr3j2pu76uzvf88laai8snl",
+            "dynamicVariableId": "vad8vq3jfyybxo4la57hfd529"
+          }
+        },
+        {
+          "id": "vudr8jrv2k3x0ubemt39tv7a",
+          "outgoingEdgeId": "r4wyd2185zhen98r5pmx53g9",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vzslfw8oyo1f08uo5rpkegn0x",
+            "type": "Map item with same index",
+            "mapListItemParams": {
+              "baseItemVariableId": "vyyr3j2pu76uzvf88laai8snl",
+              "baseListVariableId": "vad8vq3jfyybxo4la57hfd529",
+              "targetListVariableId": "vhc2pc1sv4xc778r9od2ctooz"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "uozlg88loeb8xegu6y4le6k8",
+      "title": "Movie details",
+      "graphCoordinates": { "x": 1151.05, "y": 913.34 },
+      "blocks": [
+        {
+          "id": "ve9m7fromxw4tbm8558n8520",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "Excellent choice 🔥" }] }
+            ]
+          }
+        },
+        {
+          "id": "xag9d5i5td40kdt3poyq5g4b",
+          "type": "webhook",
+          "options": {
+            "variablesForTest": [
+              {
+                "id": "oqbhwya4cewto5pfjmftjmpn",
+                "variableId": "vh5bxx07kl3016wr1undh2yb3",
+                "value": "2f584d1ffe2b7fb082dd4e05038e9bd7"
+              },
+              {
+                "id": "ja5qwkznouhm00x8zvlghuk4",
+                "variableId": "vzslfw8oyo1f08uo5rpkegn0x",
+                "value": "965839"
+              }
+            ],
+            "responseVariableMapping": [
+              {
+                "id": "dsfek7nejs1a7qqs4v61z709",
+                "variableId": "vdvjx1w1sorma4zq0qtsdqrdi",
+                "bodyPath": "data.imdb_id"
+              },
+              {
+                "id": "dtd0rrmz04m5gsi1gq855v1d",
+                "variableId": "vzns0wpumgo8vxjdty2w5t54a",
+                "bodyPath": "data.overview"
+              },
+              {
+                "id": "y53g06r3xml0f3jmpctlsgm1",
+                "variableId": "vzf5ryexokpr4dihiur2spm8z",
+                "bodyPath": "data.poster_path"
+              }
+            ],
+            "isAdvancedConfig": true,
+            "webhook": {
+              "queryParams": [
+                {
+                  "id": "f33u3unbezibfdv54kbkien3",
+                  "key": "api_key",
+                  "value": "{{API Key}}"
+                }
+              ],
+              "method": "GET",
+              "url": "https://api.themoviedb.org/3/movie/{{Selected Movie ID}}"
+            }
+          }
+        },
+        {
+          "id": "d0rsus9shxj8iowczbcaw53i",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vwitf3um5uweynypc0hxxwm14",
+            "expressionToEvaluate": "https://image.tmdb.org/t/p/w185{{Poster path}}"
+          }
+        },
+        {
+          "id": "nqnry4c1z3wwcni8rwpduuhe",
+          "type": "image",
+          "content": { "url": "{{Poster URL}}" }
+        },
+        {
+          "id": "lhljw54rdykyqtjiuh6jsl5c",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "{{Movie Overview}}" }] }
+            ]
+          }
+        },
+        {
+          "id": "yifjhiamifo1y4ay7vols0mm",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "n4818dnrb4arw1xh5v0ot8vz",
+              "outgoingEdgeId": "fteu5frsbj8wejfhhwzuv8t1",
+              "content": "Watch the movie"
+            },
+            {
+              "id": "j9d1pf2tndax0itezys7t73c",
+              "outgoingEdgeId": "zb79atxs2itliks4d00e35uy",
+              "content": "Find something else"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "x4d8cdsyzoqz6vzsurnb8twc",
+      "title": "redirect to IMDB",
+      "graphCoordinates": { "x": 1523.21, "y": 1433.33 },
+      "blocks": [
+        {
+          "id": "mw0e0bzwiokhndkkncp9niu2",
+          "type": "redirect",
+          "options": {
+            "url": "https://m.imdb.com/title/{{IMDB ID}}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "x9610wtdv125hg56wicm2qmv",
+      "title": "",
+      "graphCoordinates": { "x": 1523.2, "y": 1620.1 },
+      "blocks": [
+        {
+          "id": "efto9jivvcvomj3kltf57hbb",
+          "type": "jump",
+          "options": {
+            "groupId": "mjnkukpkpvf4ha2g4n5m804v",
+            "blockId": "tzf45bvd8iquoxz7qgta8v94"
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "wfec8f4e1jtden2wqna6nrso",
+      "from": { "eventId": "u6lpjibfjhyoqij5wjf9kvnl" },
+      "to": { "groupId": "mjnkukpkpvf4ha2g4n5m804v" }
+    },
+    {
+      "id": "t8qyjpigrz7cdl8gxl1wxlwj",
+      "from": {
+        "blockId": "tzf45bvd8iquoxz7qgta8v94",
+        "itemId": "kaimvzg9igdtktgou5m3s1bw"
+      },
+      "to": { "groupId": "kq1g5z6pz4buot7sawqdrr3s" }
+    },
+    {
+      "id": "tfuuwjnpn7mftd5s65mbhytd",
+      "from": { "blockId": "j7pm34um4piuyabwlobjc356" },
+      "to": { "groupId": "v35sky44jzz9fkwwul2qxufl" }
+    },
+    {
+      "id": "r4wyd2185zhen98r5pmx53g9",
+      "from": { "blockId": "vudr8jrv2k3x0ubemt39tv7a" },
+      "to": { "groupId": "uozlg88loeb8xegu6y4le6k8" }
+    },
+    {
+      "id": "fteu5frsbj8wejfhhwzuv8t1",
+      "from": {
+        "blockId": "yifjhiamifo1y4ay7vols0mm",
+        "itemId": "n4818dnrb4arw1xh5v0ot8vz"
+      },
+      "to": { "groupId": "x4d8cdsyzoqz6vzsurnb8twc" }
+    },
+    {
+      "id": "tjn2ljosqyd4aj9dk8mnifsu",
+      "from": {
+        "blockId": "tzf45bvd8iquoxz7qgta8v94",
+        "itemId": "i8ls2f8inq2ovuijj6l7rbcq"
+      },
+      "to": { "groupId": "d6v9lh83c7zuwrhf2mmo6nxo" }
+    },
+    {
+      "id": "ual6xszx6tfcxqrnihc6zrvx",
+      "from": { "blockId": "mgn6uuw2yebmengsukjramjx" },
+      "to": { "groupId": "uozlg88loeb8xegu6y4le6k8" }
+    },
+    {
+      "id": "zb79atxs2itliks4d00e35uy",
+      "from": {
+        "blockId": "yifjhiamifo1y4ay7vols0mm",
+        "itemId": "j9d1pf2tndax0itezys7t73c"
+      },
+      "to": { "groupId": "x9610wtdv125hg56wicm2qmv" }
+    }
+  ],
+  "variables": [
+    {
+      "id": "vh5bxx07kl3016wr1undh2yb3",
+      "name": "API Key",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vx0bbqzug4vk3zpc31ly8k7al",
+      "name": "Genres",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vkmbb3rb2hcfd2io1fhf7rz5x",
+      "name": "Selected genre",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vwc00rydyp035vtb0nlaqyzwr",
+      "name": "Genre IDs",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vwewa4yugqch2sswdpneszk3i",
+      "name": "Selected genre ID",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vad8vq3jfyybxo4la57hfd529",
+      "name": "Movies",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vhc2pc1sv4xc778r9od2ctooz",
+      "name": "Movie IDs",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vyyr3j2pu76uzvf88laai8snl",
+      "name": "Selected Movie",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vzslfw8oyo1f08uo5rpkegn0x",
+      "name": "Selected Movie ID",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vdvjx1w1sorma4zq0qtsdqrdi",
+      "name": "IMDB ID",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vzns0wpumgo8vxjdty2w5t54a",
+      "name": "Movie Overview",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vzf5ryexokpr4dihiur2spm8z",
+      "name": "Poster path",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vwitf3um5uweynypc0hxxwm14",
+      "name": "Poster URL",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vkzk96oh1pmdjv2bt5ps60qc0",
+      "name": "Trending Movies",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vcmybxcoaytd2geo5sqx7v8hw",
+      "name": "Trending IDs",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vulnb1om2fk8mvkcesl8s15cr",
+      "name": "Selected Trending Movie",
+      "isSessionVariable": true
+    }
+  ],
+  "theme": {},
+  "selectedThemeTemplateId": null,
+  "settings": {},
+  "createdAt": "2023-11-07T07:42:02.490Z",
+  "updatedAt": "2023-11-07T07:55:03.222Z",
+  "icon": "🍿",
+  "folderId": null,
+  "publicId": null,
+  "customDomain": null,
+  "workspaceId": "proWorkspace",
+  "resultsTablePreferences": null,
+  "isArchived": false,
+  "isClosed": false,
+  "whatsAppCredentialsId": null
+}
