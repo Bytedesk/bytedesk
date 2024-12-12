@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 17:17:41
+ * @LastEditTime: 2024-12-05 10:11:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,7 +52,7 @@ public class MemberEntity extends BaseEntity {
     private String nickname;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+    private String avatar = AvatarConsts.DEFAULT_USER_AVATAR_URL;
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
@@ -67,6 +68,9 @@ public class MemberEntity extends BaseEntity {
     @Email(message = "email format error")
     private String email;
 
+    // only support chinese mobile number, 
+    // TODO: support other country mobile number using libphonenumber library
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Invalid mobile number format")
     private String mobile;
 
     @Builder.Default

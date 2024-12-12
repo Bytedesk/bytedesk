@@ -21,10 +21,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.model.LlmModelJsonService;
-import com.bytedesk.ai.model.LlmModelJsonService.ModelJson;
+import com.bytedesk.ai.model.LlmModelJsonLoader;
+import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.ai.model.LlmModelRestService;
-import com.bytedesk.ai.provider.LlmProviderJsonService.ProviderJson;
+import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
 import com.bytedesk.core.enums.LevelEnum;
 
 import lombok.AllArgsConstructor;
@@ -37,11 +37,11 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
 
     private final LlmProviderRestService llmProviderService;
 
-    private final LlmProviderJsonService llmProviderJsonService;
+    private final LlmProviderJsonLoader llmProviderJsonService;
 
     private final LlmModelRestService llmModelService;
 
-    private final LlmModelJsonService llmModelJsonService;
+    private final LlmModelJsonLoader llmModelJsonService;
 
     @Override
     public void afterSingletonsInstantiated() {

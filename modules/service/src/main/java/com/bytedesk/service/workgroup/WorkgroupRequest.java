@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 16:27:18
+ * @LastEditTime: 2024-12-07 14:47:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,9 +45,7 @@ public class WorkgroupRequest extends BaseRequest {
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
     @Builder.Default
-    // private String routeType = RouteConsts.ROUTE_TYPE_ROBIN;
-    // private WorkgroupRouteEnum routeType = WorkgroupRouteEnum.ROBIN;
-    private String routeType = WorkgroupRouteEnum.ROBIN.name();
+    private String routingMode = WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
 
     @Builder.Default
     private Boolean recent = false;
@@ -59,8 +57,4 @@ public class WorkgroupRequest extends BaseRequest {
     @NotEmpty(message = "agentUids must not be empty")
     @Builder.Default
     private List<String> agentUids = new ArrayList<String>();
-
-    // organization oid
-    // @NotBlank
-    // private String orgUid;
 }

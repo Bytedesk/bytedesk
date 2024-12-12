@@ -31,7 +31,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.member.MemberEntity;
-import com.bytedesk.team.member.MemberService;
+import com.bytedesk.team.member.MemberRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -48,7 +48,7 @@ public class GroupService extends BaseRestService<GroupEntity, GroupRequest, Gro
 
     private UidUtils uidUtils;
 
-    private MemberService memberService;
+    private MemberRestService memberService;
 
     // private ThreadService threadService;
 
@@ -86,7 +86,7 @@ public class GroupService extends BaseRestService<GroupEntity, GroupRequest, Gro
     @Override
     public GroupResponse create(GroupRequest request) {
 
-        UserEntity creator = authService.getCurrentUser();
+        UserEntity creator = authService.getUser();
         // 
         GroupEntity group = GroupEntity.builder().build();
         group.setName(request.getName());

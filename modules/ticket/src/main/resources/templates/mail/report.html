@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .container { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .section { margin: 20px 0; }
+        .stats-table { width: 100%; border-collapse: collapse; }
+        .stats-table th, .stats-table td { 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            text-align: left; 
+        }
+        .stats-table th { background-color: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${report.title}">Report Title</h1>
+            <p>
+                Period: 
+                <span th:text="${#temporals.format(report.startTime, 'yyyy-MM-dd')}">Start Date</span>
+                -
+                <span th:text="${#temporals.format(report.endTime, 'yyyy-MM-dd')}">End Date</span>
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Basic Statistics</h2>
+            <table class="stats-table">
+                <tr th:each="stat : ${basicStats}">
+                    <th th:text="${stat.key}">Metric</th>
+                    <td th:text="${stat.value}">Value</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Response Time Statistics</h2>
+            <table class="stats-table">
+                <tr th:each="stat : ${responseStats}">
+                    <th th:text="${stat.key}">Metric</th>
+                    <td th:text="${stat.value}">Value</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <p>Please find the detailed report attached.</p>
+        </div>
+    </div>
+</body>
+</html> 

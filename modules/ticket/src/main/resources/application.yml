@@ -1,0 +1,12 @@
+spring:
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: noreply@bytedesk.com
+    password: your-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true 

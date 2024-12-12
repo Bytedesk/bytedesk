@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 16:20:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-21 13:12:31
+ * @LastEditTime: 2024-12-04 16:36:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -74,16 +74,16 @@ public class MqttConnectionService {
     // }
 
     // 获取所有已连接的clientId
-    public Set<String> isConnectedClientIds() {
+    public Set<String> getConnectedClientIds() {
         long now = System.currentTimeMillis();
         // 获取所有未过期的clientId
         return stringRedisTemplate.opsForZSet().rangeByScore(RedisConsts.CONNECTED_MQTT_CLIENT_IDS, now, Double.MAX_VALUE);
     }
 
-    public Set<String> isConnectedUserUids() {
+    public Set<String> getConnectedUserUids() {
         // 用户clientId格式: userUid/client/deviceUid
         // 将clientId按/分割，取第一个元素为userUid
-        Set<String> clientIds = isConnectedClientIds();
+        Set<String> clientIds = getConnectedClientIds();
         return clientIds.stream().map(clientId -> clientId.split("/")[0]).collect(Collectors.toSet());
     }
     

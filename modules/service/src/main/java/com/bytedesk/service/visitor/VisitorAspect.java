@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 10:46:17
+ * @LastEditTime: 2024-12-02 10:55:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -77,8 +77,6 @@ public class VisitorAspect {
         // TODO: check if visitor is banned
 
         // TODO: check if visitor ip is banned
-
-        // TODO: check is agent is online
         
     }
 

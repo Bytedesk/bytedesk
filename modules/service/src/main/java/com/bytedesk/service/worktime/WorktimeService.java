@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.DateUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -58,8 +57,8 @@ public class WorktimeService extends BaseRestService<WorktimeEntity, WorktimeReq
 
         // Worktime worktime = modelMapper.map(request, Worktime.class);
         WorktimeEntity worktime = WorktimeEntity.builder()
-        .startTime(DateUtils.formatStringToTime(request.getStartTime()))
-        .endTime(DateUtils.formatStringToTime(request.getEndTime()))
+        .startTime(request.getStartTime())
+        .endTime(request.getEndTime())
         .build();
         worktime.setUid(uidUtils.getCacheSerialUid());
 
@@ -73,8 +72,8 @@ public class WorktimeService extends BaseRestService<WorktimeEntity, WorktimeReq
         if (optional.isPresent()) {
             WorktimeEntity worktime = optional.get();
             // modelMapper.map(request, worktime);
-            worktime.setStartTime(DateUtils.formatStringToTime(request.getStartTime()));
-            worktime.setEndTime(DateUtils.formatStringToTime(request.getEndTime()));
+            worktime.setStartTime(request.getStartTime());
+            worktime.setEndTime(request.getEndTime());
             // 
             return convertToResponse(save(worktime));
         } else {
@@ -114,8 +113,8 @@ public class WorktimeService extends BaseRestService<WorktimeEntity, WorktimeReq
         // return modelMapper.map(entity, WorktimeResponse.class);
         WorktimeResponse worktimeResponse = WorktimeResponse.builder()
                 // .uid(entity.getUid())
-                .startTime(DateUtils.formatTimeToString(entity.getStartTime()))
-                .endTime(DateUtils.formatTimeToString(entity.getEndTime()))
+                .startTime(entity.getStartTime())
+                .endTime(entity.getEndTime())
                 .build();
         worktimeResponse.setUid(entity.getUid());
         return worktimeResponse;

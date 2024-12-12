@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 12:47:20
+ * @LastEditTime: 2024-12-04 12:10:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 
  * http://127.0.0.1:9003/swagger-ui/index.html
  * https://www.bezkoder.com/swagger-3-annotations/#Swagger_3_annotations
  */
@@ -43,14 +42,8 @@ import lombok.RequiredArgsConstructor;
 // @Tag(name = "member", description = "member apis")
 public class MemberRestController extends BaseRestController<MemberRequest> {
 
-    private final MemberService memberService;
+    private final MemberRestService memberService;
 
-    /**
-     * query by orgUid
-     * 
-     * @param memberRequest
-     * @return
-     */
     @Override
     public ResponseEntity<?> queryByOrg(MemberRequest memberRequest) {
         //
@@ -75,12 +68,6 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
-    /**
-     * create
-     *
-     * @param memberRequest role
-     * @return json
-     */
     @ActionAnnotation(title = "member", action = "create", description = "create member")
     @Override
     public ResponseEntity<?> create(@RequestBody MemberRequest memberRequest) {
@@ -90,12 +77,6 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(member));
     }
 
-    /**
-     * update
-     *
-     * @param memberRequest role
-     * @return json
-     */
     @ActionAnnotation(title = "member", action = "update", description = "update member")
     @Override
     public ResponseEntity<?> update(@RequestBody MemberRequest memberRequest) {
@@ -105,12 +86,6 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(member));
     }
 
-    /**
-     * delete
-     *
-     * @param memberRequest role
-     * @return json
-     */
     @ActionAnnotation(title = "member", action = "delete", description = "delete member")
     @Override
     public ResponseEntity<?> delete(@RequestBody MemberRequest memberRequest) {

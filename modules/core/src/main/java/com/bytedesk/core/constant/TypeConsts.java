@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 18:10:47
+ * @LastEditTime: 2024-12-11 10:22:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -102,7 +102,7 @@ public class TypeConsts {
 
     //
     public static final String COLUMN_TYPE_TEXT = "TEXT"; // length = 65534
-    public static final String COLUMN_TYPE_JSON = "json"; //
+    public static final String COLUMN_TYPE_JSON = "json"; // replace with jsonb?
     //
     // public static final String ACTION_TYPE_FAILED = "failed";
     // public static final String ACTION_TYPE_LOG = "log";

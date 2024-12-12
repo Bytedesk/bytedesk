@@ -46,7 +46,7 @@ public class SessionController {
      * @param session
      * @return
      */
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public ResponseEntity<?> getSession(HttpSession session) {
         log.info("sessionId:[{}]", session.getId());
         //

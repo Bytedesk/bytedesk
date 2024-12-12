@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-09 10:58:01
+ * @LastEditTime: 2024-12-11 10:23:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,10 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.thread;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -143,8 +147,7 @@ public class ThreadEntity extends BaseEntity {
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
-    // of type character varying
+    // for postgres compatibility，[ERROR: column "extra" is of type json but expression is of type character varying
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
@@ -154,7 +157,6 @@ public class ThreadEntity extends BaseEntity {
      * 在用户私聊中，存储对方用户信息
      * 机器人会话中，存储访客信息
      * 群组会话中，存储群组信息
-     * FIXME: 同事对话中，对方更新头像之后，不能及时同步更新
      * 注意：h2 db 不能使用 user, 所以重定义为 thread_user
      */
     @Builder.Default
@@ -167,42 +169,73 @@ public class ThreadEntity extends BaseEntity {
      * 技能组客服对话中，存储技能组信息
      * 机器人对话中，存储机器人信息
      * 用户私聊、群聊、同事会话中，无需存储，使用owner字段信息
-     * FIXME: 头像、昵称和机器人大模型中参数修改之后，不能及时同步更新
      */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
+    private String agentUid;
 
-    // 机器人和agent可以同时存在，人工接待的时候，机器人可以同时给出答案，客服可以选用
-    // 存储机器人信息
-    // @Builder.Default
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
-    // private String robot = BytedeskConsts.EMPTY_JSON_STRING;
+    // multi agent assistants: monitoring agent、quality check agent、robot agent
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String multiAgents = BytedeskConsts.EMPTY_JSON_STRING;
 
     // belongs to user
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity owner;
 
-    public void reInit() {
+    /**
+     // 示例1: 技术支持
+    thread.setRequiredSkills("java,spring,mysql");
+    // 示例2: 多语言支持
+    thread.setRequiredSkills("english,spanish");
+    // 示例3: 产品支持
+    thread.setRequiredSkills("product-a,technical");
+    // 示例4: 分级支持
+    thread.setRequiredSkills("level-2,database");
+     */
+    @Column(length = 500)
+    private String requiredSkills;  // 会话所需技能,逗号分隔
+    
+    public List<String> getRequiredSkillList() {
+        if (requiredSkills == null || requiredSkills.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(requiredSkills.split(","));
+    }
+
+    public ThreadEntity reInit() {
         this.state = ThreadStateEnum.INITIAL.name();
-        this.unread = false;
-        this.unreadCount = 1;
-        this.mute = false;
         this.hide = false;
-        this.star = 0;
-        this.folded = false;
         this.solved = false;
         this.rated = false;
         this.autoClose = false;
         this.robot = false;
+        return this;
     }
 
     //
     public Boolean isClosed() {
         return this.state.equals(ThreadStateEnum.CLOSED.name());
+    }
+
+    public Boolean isStarted() {
+        return this.state.equals(ThreadStateEnum.STARTED.name());
+    }
+
+    public Boolean isOffline() {
+        return this.state.equals(ThreadStateEnum.OFFLINE.name());
+    }
+
+    public Boolean isQueuing() {
+        return this.state.equals(ThreadStateEnum.QUEUING.name());
+    }
+
+    public Boolean isProcessing() {
+        return !this.isClosed() && !this.isOffline();
     }
 
     public Boolean isCustomerService() {
@@ -240,6 +273,26 @@ public class ThreadEntity extends BaseEntity {
 
     public Boolean isWeChatMini() {
         return this.client.equals(ClientEnum.WECHAT_MINI.name());
+    }
+
+    public ThreadEntity setOffline() {
+        this.state = ThreadStateEnum.OFFLINE.name();
+        return this;
+    }
+
+    public ThreadEntity setStart() {
+        this.state = ThreadStateEnum.STARTED.name();
+        return this;
+    }
+
+    public ThreadEntity setClose() {
+        this.state = ThreadStateEnum.CLOSED.name();
+        return this;
+    }
+
+    public ThreadEntity setQueuing() {
+        this.state = ThreadStateEnum.QUEUING.name();
+        return this;
     }
 
 }

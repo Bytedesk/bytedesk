@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 09:50:26
+ * @LastEditTime: 2024-12-02 11:16:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,6 +51,8 @@ public class ThreadResponse extends BaseResponse {
     private Boolean top;
 
     private Boolean unread;
+
+    private Integer serialNumber;
 
     private Integer unreadCount;
 

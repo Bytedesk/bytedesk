@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 16:22:31
+ * @LastEditTime: 2024-12-04 09:47:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
  */
 package com.bytedesk.service.workgroup;
 
-import java.util.ArrayList;
+// import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,8 +24,8 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.faq.FaqConsts;
-import com.bytedesk.service.worktime.WorktimeService;
+// import com.bytedesk.kbase.faq.FaqConsts;
+// import com.bytedesk.service.worktime.WorktimeService;
 
 import lombok.AllArgsConstructor;
 
@@ -36,9 +36,9 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
 
     private final WorkgroupRepository workgroupRepository;
 
-    private final WorkgroupService workgroupService;
+    private final WorkgroupRestService workgroupService;
 
-    private final WorktimeService worktimeService;
+    // private final WorktimeService worktimeService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -55,13 +55,13 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         List<String> agentUids = Arrays.asList(BytedeskConsts.DEFAULT_AGENT_UID);
         //
-        List<String> faqUids = Arrays.asList(
-                orgUid + FaqConsts.FAQ_DEMO_UID_1,
-                orgUid + FaqConsts.FAQ_DEMO_UID_2);
-        //
-        List<String> worktimeUids = new ArrayList<>();
-        String worktimeUid = worktimeService.createDefault();
-        worktimeUids.add(worktimeUid);
+        // List<String> faqUids = Arrays.asList(
+        //         orgUid + FaqConsts.FAQ_DEMO_UID_1,
+        //         orgUid + FaqConsts.FAQ_DEMO_UID_2);
+        // //
+        // List<String> worktimeUids = new ArrayList<>();
+        // String worktimeUid = worktimeService.createDefault();
+        // worktimeUids.add(worktimeUid);
         //
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
@@ -71,9 +71,9 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
         workgroupRequest.setOrgUid(orgUid);
         //
-        workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
+        // workgroupRequest.getServiceSettings().setFaqUids(faqUids);
+        // workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
+        // workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
         //
         workgroupService.create(workgroupRequest);
     }

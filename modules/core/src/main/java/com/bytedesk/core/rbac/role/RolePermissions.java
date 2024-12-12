@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-04 21:13:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 11:21:59
+ * @LastEditTime: 2024-12-05 10:16:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ public class RolePermissions {
     public static final String ROLE_SUPER = "hasRole('SUPER')";
     public static final String ROLE_ADMIN = "hasAnyRole('SUPER', 'ADMIN')";
     public static final String ROLE_MEMBER = "hasAnyRole('SUPER', 'ADMIN', 'MEMBER')";
-    public static final String ROLE_CUSTOMER_SERVICE = "hasAnyRole('SUPER', 'ADMIN', 'CS')";
+    public static final String ROLE_AGENT = "hasAnyRole('SUPER', 'ADMIN', 'AGENT')";
 
 
 }

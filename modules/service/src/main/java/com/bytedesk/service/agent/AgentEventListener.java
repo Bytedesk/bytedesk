@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 17:19:43
+ * @LastEditTime: 2024-12-02 15:42:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.event.GenericApplicationEvent;
@@ -28,10 +29,14 @@ import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
+import com.bytedesk.core.thread.ThreadCloseEvent;
 import com.bytedesk.core.thread.ThreadCreateEvent;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadUpdateEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
@@ -84,7 +89,6 @@ public class AgentEventListener {
         knowledgebaseService.create(kownledgebaseRequestQuickReply);
     }
 
-
     @EventListener
     public void onMqttConnectedEvent(MqttConnectedEvent event) {
         String clientId = event.getClientId();
@@ -108,7 +112,7 @@ public class AgentEventListener {
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
         // log.info("agent QuartzOneMinEvent");
         List<AgentEntity> agents = agentService.findAllConnected();
-        Set<String> userIds = mqttConnectionService.isConnectedUserUids();
+        Set<String> userIds = mqttConnectionService.getConnectedUserUids();
         // 遍历agents，判断是否在线，如果不在，则更新为离线状态
         for (AgentEntity agent : agents) {
             String userUid = agent.getUserUid();
@@ -134,6 +138,22 @@ public class AgentEventListener {
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
         // log.info("agent onThreadUpdateEvent: " + event);
     }
+
+    @EventListener
+    public void onThreadCloseEvent(GenericApplicationEvent<ThreadCloseEvent> event) {
+        ThreadCloseEvent threadCloseEvent = (ThreadCloseEvent) event.getObject();
+        ThreadEntity thread = threadCloseEvent.getThread();
+        log.info("agent onThreadCloseEvent: {}", thread.getAgent());
+        String agentString = thread.getAgent();
+        UserProtobuf agentProtobuf = JSON.parseObject(agentString, UserProtobuf.class);
+        if (agentProtobuf.getType().equals(UserTypeEnum.AGENT.name())) {
+            // 减少客服当前接待数量
+            AgentEntity agent = agentService.findByUid(agentProtobuf.getUid()).orElseThrow(() -> new RuntimeException("agent not found"));
+            agent.decreaseThreadCount();
+            agentService.save(agent);
+        }
+    }
+
 
     
 }

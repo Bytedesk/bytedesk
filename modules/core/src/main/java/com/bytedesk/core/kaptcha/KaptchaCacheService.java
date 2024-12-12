@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 17:48:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-12 16:04:35
+ * @LastEditTime: 2024-11-29 10:58:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,47 +16,59 @@ package com.bytedesk.core.kaptcha;
 
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-// import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.redis.RedisConsts;
 
-/**
- * TODO: 用Redis替代
- */
-// @Slf4j
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
-// @AllArgsConstructor
+@AllArgsConstructor
 public class KaptchaCacheService {
     
+    private final StringRedisTemplate stringRedisTemplate;
+
     // 验证码5分钟过期
-    Cache<String, String> kaptchaCache = Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
+    private static final long EXPIRE_TIME = 5; // 5分钟
+
+    // 验证码5分钟过期
+    // Cache<String, String> kaptchaCache = Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
 
     public void putKaptcha(String key, String value) {
-        kaptchaCache.put(key, value);
+        // kaptchaCache.put(key, value);
+        stringRedisTemplate.opsForValue().set(RedisConsts.BYTEDESK_REDIS_PREFIX + key, value, EXPIRE_TIME, TimeUnit.MINUTES);
     }
 
     public Boolean hasKaptcha(String key) {
-        return kaptchaCache.getIfPresent(key) != null;
+        // return kaptchaCache.getIfPresent(key) != null;
+        return stringRedisTemplate.hasKey(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
     }
 
     public String getKaptcha(String key) {
-        return kaptchaCache.getIfPresent(key);
+        // return kaptchaCache.getIfPresent(key);
+        return stringRedisTemplate.opsForValue().get(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
     }
 
-    public Boolean checkKaptcha(String key, String value, String client) {
+    public Boolean checkKaptcha(String key, String value, @NonNull String client) {
         // flutter手机端验证码暂时不做校验, TODO: 后续需要优化
-        if (client != null && client.contains("flutter")) {
+        if (client != null && client.toLowerCase().contains(ClientEnum.FLUTTER.name().toLowerCase())) {
             return true;
         }
+        log.info("checkKaptcha key: " + key + ", value: " + value);
 
-        String cachedValue = kaptchaCache.getIfPresent(key);
+        // String cachedValue = kaptchaCache.getIfPresent(key);
+        String cachedValue = stringRedisTemplate.opsForValue().get(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
         return cachedValue != null && cachedValue.equals(value);
     }
 
     public void removeKaptcha(String key) {
-        kaptchaCache.invalidate(key);
+        // kaptchaCache.invalidate(key);
+        stringRedisTemplate.delete(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
     }
 
 }

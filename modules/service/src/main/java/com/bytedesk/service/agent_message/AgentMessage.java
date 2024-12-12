@@ -42,7 +42,7 @@ package com.bytedesk.service.agent_message;
 //     private String content;
 
 //     @Builder.Default
-//     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+//     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSONB)
 //     @JdbcTypeCode(SqlTypes.JSON)
 //     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
@@ -67,7 +67,7 @@ package com.bytedesk.service.agent_message;
 //     // private User user;
 //     // h2 db 不能使用 user, 所以重定义为 message_user
 //     @Builder.Default
-//     @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+//     @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSONB)
 //     @JdbcTypeCode(SqlTypes.JSON)
 //     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 // }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 14:05:23
+ * @LastEditTime: 2024-12-02 11:21:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -125,14 +125,6 @@ public class VisitorThreadService
         String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
         //
-        // if (visitorRequest.isWeChat()) {
-        //     thread.setExtra(visitorRequest.getThreadExtra());
-        // } else {
-        //     String extra = ConvertServiceUtils
-        //             .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
-        //     thread.setExtra(extra);
-        // }
-        //
         return thread;
     }
 
@@ -164,14 +156,7 @@ public class VisitorThreadService
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
-        // // 考虑到配置可能变化，更新配置
-        // String extra = ConvertServiceUtils
-        //         .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
-        // thread.setExtra(extra);
-        // // 考虑到客服信息发生变化，更新客服信息
-        // String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
-        // thread.setAgent(agentString);
-        //
+        // 
         return thread;
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 22:50:54
+ * @LastEditTime: 2024-12-05 12:11:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.thread;
 
-import java.util.List;
+// import java.util.List;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -24,6 +24,7 @@ import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserUpdateEvent;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicService;
@@ -40,9 +41,8 @@ public class ThreadEventListener {
 
     private final TopicCacheService topicCacheService;
 
-    private final ThreadRestService threadService;
-
-    private final ThreadPersistCache threadPersistCache;
+    // private final ThreadRestService threadService;
+    // private final ThreadPersistCache threadPersistCache;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
@@ -57,6 +57,7 @@ public class ThreadEventListener {
         // 创建客服会话之后，需要订阅topic
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
+                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
                 || thread.getType().equals(ThreadTypeEnum.LLM.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
@@ -88,6 +89,7 @@ public class ThreadEventListener {
         
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
+                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
                 || thread.getType().equals(ThreadTypeEnum.LLM.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
@@ -123,11 +125,19 @@ public class ThreadEventListener {
 
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        List<ThreadEntity> threadList = threadPersistCache.getListForPersist();
-        if (threadList != null) {
-            threadList.forEach(thread -> {
-                threadService.save(thread);
-            });
-        }
+        // List<ThreadEntity> threadList = threadPersistCache.getListForPersist();
+        // if (threadList != null) {
+        //     threadList.forEach(thread -> {
+        //         threadService.save(thread);
+        //     });
+        // }
     }
+
+    @EventListener
+    public void onUserUpdateEvent(UserUpdateEvent event) {
+        // todo: on user avatar update, update thread entity user avatar
+        // update member thread avatar
+    }
+
+    
 }

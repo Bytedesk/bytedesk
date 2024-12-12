@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 11:51:23
+ * @LastEditTime: 2024-11-28 17:52:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -100,12 +101,24 @@ public class BytedeskProperties {
     private List<String> clusterNodes = new ArrayList<>();
 
     // 
-    public Boolean isAdmin(String receiver) {
+    public Boolean isAdmin(@NonNull String receiver) {
+        // receiver 是否为空
+        if (receiver == null || receiver.isEmpty()) {
+            return false;
+        }
+        // receiver 是否等于当前用户的手机号或者邮箱
         return receiver.equals(this.mobile) || receiver.equals(this.email);
     }
 
     // 
-    public Boolean isInWhitelist(String receiver) {
+    public Boolean isInWhitelist(@NonNull String receiver) {
+        // receiver 是否为空
+        if (receiver == null || receiver.isEmpty()) {
+            return false;
+        }
+        if (this.mobileWhitelist == null || this.emailWhiteList == null) {
+            return false;
+        }
         return this.mobileWhitelist.contains(receiver) || this.emailWhiteList.contains(receiver);
     }
 

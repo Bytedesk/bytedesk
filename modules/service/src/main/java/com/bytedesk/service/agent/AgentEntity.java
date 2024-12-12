@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 15:35:28
+ * @LastEditTime: 2024-12-09 07:32:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,9 @@
  */
 package com.bytedesk.service.agent;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -35,6 +36,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -66,14 +69,17 @@ public class AgentEntity extends BaseEntity {
     private String nickname;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+    private String avatar = AvatarConsts.DEFAULT_AGENT_AVATAR_URL;
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
-    // show on agent card
+    // only support chinese mobile number, 
+    // TODO: support other country mobile number using libphonenumber library
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Invalid mobile number format")
     private String mobile;
 
+    @Email(message = "email format error")
     private String email;
 
     @Builder.Default
@@ -82,6 +88,10 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_connected")
     private boolean connected = false;
+
+    @Builder.Default
+    @Column(name = "is_enabled")
+    private boolean enabled = true;
 
     @Embedded
     @Builder.Default
@@ -104,7 +114,6 @@ public class AgentEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
     // of type character varying
-    @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     // org member
@@ -114,6 +123,35 @@ public class AgentEntity extends BaseEntity {
 
     // for quick query, space exchange for speed
     private String userUid;
+
+    /**
+     主要用途：
+        精准分配：将会话分配给最合适的客服
+        专业服务：确保客服具备处理特定问题的能力
+        分层支持：实现初级/高级支持分流
+        多语言支持：按语言技能分配
+        产品线划分：不同产品对应不同技能组
+     */
+    @Column(length = 1000)
+    private String skills;  // 技能标签,逗号分隔,如: "java,python,database"
+    
+    // 将skills字符串转换为List
+    public List<String> getSkillList() {
+        if (skills == null || skills.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(skills.split(","));
+    }
+    
+    // 检查是否具备某个技能
+    public boolean hasSkill(String skill) {
+        return getSkillList().contains(skill);
+    }
+    
+    // 检查是否具备所有必需技能
+    public boolean hasRequiredSkills(List<String> requiredSkills) {
+        return getSkillList().containsAll(requiredSkills);
+    }
 
     public Boolean isAvailable() {
         return this.status.equals(AgentStatusEnum.AVAILABLE.name());
@@ -135,5 +173,19 @@ public class AgentEntity extends BaseEntity {
     public Boolean isConnectedAndAvailable() {
         return this.isConnected() && this.isAvailable();
     }
+
+    public Boolean canAcceptMore() {
+        return this.currentThreadCount < this.maxThreadCount;
+    }
+
+    public void increaseThreadCount() {
+        this.currentThreadCount++;
+    }
+    public void decreaseThreadCount() {
+        if (this.currentThreadCount > 0) {
+            this.currentThreadCount--;
+        }
+    }
+
 
 }

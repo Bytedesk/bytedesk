@@ -81,7 +81,7 @@ public class RobotEntity extends BaseEntity {
     private String level = LevelEnum.ORGANIZATION.name();
 
     // @Builder.Default
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSONB)
     // @JdbcTypeCode(SqlTypes.JSON)
     // private String flow = BytedeskConsts.EMPTY_JSON_STRING;
 

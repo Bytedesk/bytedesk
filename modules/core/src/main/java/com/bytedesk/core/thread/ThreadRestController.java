@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 14:17:52
+ * @LastEditTime: 2024-12-04 15:44:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -139,7 +139,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
             //
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("status", "failure");
-            jsonObject.put("message", "download faied " + e.getMessage());
+            jsonObject.put("message", "download failed " + e.getMessage());
             try {
                 response.getWriter().println(JSON.toJSONString(jsonObject));
             } catch (IOException e1) {

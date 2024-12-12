@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ActionAspect {
 
-    private final ActionService actionService;
+    private final ActionRestService actionService;
 
     private final IpService ipService;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:32:58
+ * @LastEditTime: 2024-12-06 16:04:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,6 +80,10 @@ public class CategoryEntity extends BaseEntity {
 
     // knowledge base uid
     private String kbUid;
+
+    @Builder.Default
+    @Column(name = "post_count")
+    private Integer postCount = 0;
 
     public void addChild(CategoryEntity child) {
         children.add(child);

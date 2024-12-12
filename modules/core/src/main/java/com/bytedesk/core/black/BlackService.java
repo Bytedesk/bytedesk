@@ -72,7 +72,7 @@ public class BlackService extends BaseRestService<BlackEntity, BlackRequest, Bla
 
     @Override
     public BlackResponse create(BlackRequest request) {
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
         // 
         BlackEntity entity = modelMapper.map(request, BlackEntity.class);
         entity.setUid(uidUtils.getUid());

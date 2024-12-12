@@ -1,57 +1,136 @@
-/*
- * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-23 11:50:36
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-23 11:50:38
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
- *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
- */
 package com.bytedesk.ticket.ticket;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
-import com.bytedesk.core.base.BaseRestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import com.bytedesk.ticket.ticket.dto.*;
+import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/ticket")
-public class TicketController extends BaseRestController<TicketRequest> {
+@RequestMapping("/api/v1/tickets")
+public class TicketController {
 
-    @Override
-    public ResponseEntity<?> queryByOrg(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    @Autowired
+    private TicketService ticketService;
+
+    // 创建工单
+    @PostMapping
+    public ResponseEntity<TicketEntity> createTicket(
+            @Valid @RequestBody TicketCreateRequest request,
+            @AuthenticationPrincipal Long userId) {
+        request.setUserId(userId);
+        return ResponseEntity.ok(ticketService.createTicket(request));
     }
 
-    @Override
-    public ResponseEntity<?> queryByUser(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    // 更新工单
+    @PutMapping("/{ticketId}")
+    public ResponseEntity<TicketEntity> updateTicket(
+            @PathVariable Long ticketId,
+            @Valid @RequestBody TicketUpdateRequest request) {
+        return ResponseEntity.ok(ticketService.updateTicket(ticketId, request));
     }
 
-    @Override
-    public ResponseEntity<?> create(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    // 删除工单
+    @DeleteMapping("/{ticketId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteTicket(@PathVariable Long ticketId) {
+        ticketService.deleteTicket(ticketId);
+        return ResponseEntity.ok().build();
     }
 
-    @Override
-    public ResponseEntity<?> update(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    // 获取工单详情
+    @GetMapping("/{ticketId}")
+    public ResponseEntity<TicketEntity> getTicket(@PathVariable Long ticketId) {
+        return ResponseEntity.ok(ticketService.getTicket(ticketId));
     }
 
-    @Override
-    public ResponseEntity<?> delete(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    // 搜索工单
+    @GetMapping("/search")
+    public ResponseEntity<Page<TicketEntity>> searchTickets(
+            @ModelAttribute TicketSearchRequest request,
+            Pageable pageable) {
+        return ResponseEntity.ok(ticketService.searchTickets(request, pageable));
     }
-    
-}
+
+    // 更新工单状态
+    @PutMapping("/{ticketId}/status")
+    public ResponseEntity<Void> updateStatus(
+            @PathVariable Long ticketId,
+            @Valid @RequestBody TicketStatusRequest request) {
+        switch (request.getStatus()) {
+            case "resolved" -> ticketService.resolve(ticketId, request.getResolution());
+            case "closed" -> ticketService.close(ticketId, request.getReason());
+            case "open" -> ticketService.reopen(ticketId, request.getReason());
+            default -> ticketService.updateStatus(ticketId, request.getStatus());
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    // 分配工单
+    @PutMapping("/{ticketId}/assign")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
+    public ResponseEntity<Void> assignTicket(
+            @PathVariable Long ticketId,
+            @Valid @RequestBody TicketAssignRequest request) {
+        ticketService.assignTicket(ticketId, request.getAssigneeId());
+        return ResponseEntity.ok().build();
+    }
+
+    // 获取我的工单
+    @GetMapping("/my")
+    public ResponseEntity<Page<TicketEntity>> getMyTickets(
+            @AuthenticationPrincipal Long userId,
+            Pageable pageable) {
+        return ResponseEntity.ok(ticketService.getMyTickets(userId, pageable));
+    }
+
+    // 获取逾期工单
+    @GetMapping("/overdue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
+    public ResponseEntity<Page<TicketEntity>> getOverdueTickets(
+            @RequestParam(required = false) String status,
+            Pageable pageable) {
+        return ResponseEntity.ok(ticketService.getOverdueTickets(status, pageable));
+    }
+
+    // 获取未分配工单
+    @GetMapping("/unassigned")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
+    public ResponseEntity<List<TicketEntity>> getUnassignedTickets() {
+        return ResponseEntity.ok(ticketService.getUnassignedTickets());
+    }
+
+    // 获取未解决工单
+    @GetMapping("/unresolved")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
+    public ResponseEntity<List<TicketEntity>> getUnresolvedTickets() {
+        return ResponseEntity.ok(ticketService.getUnresolvedTickets());
+    }
+
+    // 批量更新工单
+    @PutMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> batchUpdateTickets(
+            @RequestBody List<TicketUpdateRequest> requests) {
+        // requests.forEach(request -> 
+        //     ticketService.updateTicket(request.getId(), request));
+        return ResponseEntity.ok().build();
+    }
+
+    // 导出工单
+    @GetMapping("/export")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
+    public ResponseEntity<byte[]> exportTickets(
+            @ModelAttribute TicketSearchRequest request,
+            @RequestParam(defaultValue = "excel") String format) {
+        // TODO: 实现导出功能
+        return ResponseEntity.ok().build();
+    }
+} 

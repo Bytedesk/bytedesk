@@ -65,7 +65,7 @@ public class IpRestController {
      *
      * @return json
      */
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public JsonResult<?> ip(HttpServletRequest request) {
         return new JsonResult<>("your ip", 200, IpUtils.getClientIp(request));
     }

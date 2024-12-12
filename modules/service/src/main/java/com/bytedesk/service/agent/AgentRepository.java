@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 15:27:39
+ * @LastEditTime: 2024-12-09 10:30:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,4 +58,60 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
     @Query(value = "update bytedesk_service_agent set status = :status where uuid = :uid", nativeQuery = true)
     void updateStatusByUid(@Param("status") String status, @Param("uid") String uid);
     
+    // 根据状态和启用状态查找客服
+    @Query("SELECT a.id FROM AgentEntity a WHERE a.status = ?1 AND a.enabled = ?2")
+    List<Long> findByStatusAndEnabled(String status, boolean enabled);
+    
+    // 根据技能和启用状态查找客服
+    @Query("SELECT a.id FROM AgentEntity a WHERE a.skills LIKE %?1% AND a.enabled = ?2")
+    List<Long> findBySkillsAndEnabled(List<String> skills, boolean enabled);
+    
+    // 根据在线状态和启用状态查找客服
+    @Query("SELECT a.id FROM AgentEntity a WHERE a.connected = ?1 AND a.enabled = ?2")
+    List<Long> findByConnectedAndEnabled(boolean connected, boolean enabled);
+    
+    // 获取客服状态
+    @Query("SELECT a.status FROM AgentEntity a WHERE a.id = ?1")
+    String getAgentStatus(Long agentId);
+    
+    // 更新客服状态
+    @Modifying
+    @Query("UPDATE AgentEntity a SET a.status = ?2 WHERE a.id = ?1")
+    void updateStatus(Long agentId, String status);
+    
+    // 增加工作负载
+    // @Modifying
+    // @Query("UPDATE AgentEntity a SET a.workload = a.workload + 1 WHERE a.id = ?1")
+    // void incrementWorkload(Long agentId);
+    
+    // 减少工作负载
+    // @Modifying
+    // @Query("UPDATE AgentEntity a SET a.workload = a.workload - 1 WHERE a.id = ?1")
+    // void decrementWorkload(Long agentId);
+
+    @Query("SELECT a.uid FROM AgentEntity a WHERE a.status = :status AND a.enabled = true")
+    List<String> findByStatusAndEnabled(@Param("status") String status);
+    
+    @Query("SELECT a.uid FROM AgentEntity a WHERE a.skills LIKE %:skill% AND a.enabled = true")
+    List<String> findBySkillsAndEnabled(@Param("skill") String skill);
+    
+    @Query("SELECT a.uid FROM AgentEntity a WHERE a.connected = :connected AND a.enabled = true")
+    List<String> findByConnectedAndEnabled(@Param("connected") boolean connected);
+    
+    @Query("SELECT a.status FROM AgentEntity a WHERE a.uid = :agentUid")
+    String getAgentStatus(@Param("agentUid") String agentUid);
+    
+    @Modifying
+    @Query("UPDATE AgentEntity a SET a.status = :status WHERE a.uid = :agentUid")
+    void updateStatus(@Param("agentUid") String agentUid, @Param("status") String status);
+    
+    // @Modifying
+    // @Query("UPDATE AgentEntity a SET a.workload = a.workload + 1 WHERE a.uid = :agentUid")
+    // void incrementWorkload(@Param("agentUid") String agentUid);
+    
+    // @Modifying
+    // @Query("UPDATE AgentEntity a SET a.workload = a.workload - 1 WHERE a.uid = :agentUid")
+    // void decrementWorkload(@Param("agentUid") String agentUid);
+    
+    boolean existsByUid(String uid);
 }

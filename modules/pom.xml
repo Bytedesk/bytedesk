@@ -16,12 +16,15 @@
 
     <modules>
         <module>ai</module>
+        <!-- <module>callcenter</module> -->
         <module>core</module>
+        <module>forum</module>
         <module>kbase</module>
         <module>service</module>
         <module>social</module>
         <module>team</module>
         <module>ticket</module>
+        <module>voc</module>
     </modules>
 
     <dependencies>
@@ -45,6 +48,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- sso/ OpenID Connect (OIDC)  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -331,6 +341,35 @@
             <artifactId>commons-pool2</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- validate mobile phone number format -->
+        <!-- https://github.com/google/libphonenumber/ -->
+        <!-- https://www.baeldung.com/java-libphonenumber -->
+        <!-- https://mvnrepository.com/artifact/com.googlecode.libphonenumber -->
+        <!-- libphonenumber：用于校验手机号的正确性，提供了：getNumberType，isNumberMatch ，getExampleNumber 等方法。 -->
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>8.13.51</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- carrier：用于获取手机号的供应商。通过初始化PhoneNumberToCarrierMapper ，调用getNameForNumber可获取运营商信息。 -->
+        <!-- https://mvnrepository.com/artifact/com.googlecode.libphonenumber/carrier -->
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>carrier</artifactId>
+            <version>1.235</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- geocoder：用于获取手机号的归属地。通过初始化PhoneNumberOfflineGeocoder ，调用getDescriptionForNumber方法可获取手机归属地 -->
+        <!-- https://mvnrepository.com/artifact/com.googlecode.libphonenumber/geocoder -->
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>geocoder</artifactId>
+            <version>2.245</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <!--  -->
         <dependency>

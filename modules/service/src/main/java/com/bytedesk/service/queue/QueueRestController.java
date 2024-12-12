@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-18 17:13:03
+ * @LastEditTime: 2024-12-02 14:53:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,42 +28,46 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/queue")
-public class QueueRestController extends BaseRestController<QueueRequest> {
+@RequestMapping("/api/v1/visitor/queue")
+public class QueueRestController extends BaseRestController <QueueRequest> {
 
-    private final QueueService queueService;
+    private final QueueRestService queueService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(QueueRequest request) {
+    public ResponseEntity<?> queryByOrg (QueueRequest request) {
         
-        Page<QueueResponse> page = queueService.queryByOrg(request);
+        Page <QueueResponse> page = queueService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(QueueRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+    public ResponseEntity<?> queryByUser (QueueRequest request) {
+        
+        Page <QueueResponse> page = queueService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
-    public ResponseEntity<?> create(QueueRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    public ResponseEntity<?> create (QueueRequest request) {
+        
+        return ResponseEntity.ok(JsonResult.success(queueService.create(request)));
     }
 
     @Override
-    public ResponseEntity<?> update(QueueRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public ResponseEntity<?> update (QueueRequest request) {
+        
+        return ResponseEntity.ok(JsonResult.success(queueService.update(request)));
     }
 
     @Override
-    public ResponseEntity<?> delete(QueueRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    public ResponseEntity<?> delete (QueueRequest request) {
+
+        queueService.delete(request);
+        
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     

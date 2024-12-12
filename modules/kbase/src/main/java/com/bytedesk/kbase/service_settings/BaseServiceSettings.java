@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-10 21:21:19
+ * @LastEditTime: 2024-12-07 14:56:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,16 +29,16 @@ import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.faq.FaqEntity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@MappedSuperclass
+@Embeddable
 public class BaseServiceSettings implements Serializable {
 
     @NotBlank
@@ -50,6 +50,7 @@ public class BaseServiceSettings implements Serializable {
     // 
     @NotBlank
     private boolean showTopTip = false;
+    
     // 公告
     @NotBlank
     private String topTip = I18Consts.I18N_TOP_TIP;
@@ -59,6 +60,7 @@ public class BaseServiceSettings implements Serializable {
     // show rate btn on chat toolbar
     @NotBlank
     private boolean showRateBtn = false;
+    
     // TODO: 自定义评价最低消息数量，未达到最低对话消息数，禁止评价
     @NotBlank
     private int rateMsgCount = 3;
@@ -88,6 +90,9 @@ public class BaseServiceSettings implements Serializable {
     @NotBlank
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
+
+    @NotBlank
+    private String queueTip = I18Consts.I18N_QUEUE_TIP;
 
     @NotBlank
     private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;
@@ -129,4 +134,30 @@ public class BaseServiceSettings implements Serializable {
 
     // validate until date, when expire the service will be disabled
     private Date validateUntil;
+
+    // 负载相关配置
+    @Column(name = "max_concurrent_threads")
+    private int maxConcurrentThreads = 1000;  // 最大并发会话数
+
+    @Column(name = "max_waiting_threads")
+    private int maxWaitingThreads = 100;  // 最大等待会话数
+
+    @Column(name = "max_thread_per_agent")
+    private int maxThreadPerAgent = 10;  // 每个客服最大会话数
+
+    @Column(name = "max_waiting_time")
+    private int maxWaitingTime = 300;  // 最大等待时间(秒)
+
+    @Column(name = "alert_threshold")
+    private double alertThreshold = 0.8;  // 负载告警阈值(0-1)
+
+    // 统计数据
+    @Column(name = "current_thread_count")
+    private int currentThreadCount = 0;  // 当前会话数
+
+    @Column(name = "waiting_thread_count")
+    private int waitingThreadCount = 0;  // 等待会话数
+
+    @Column(name = "online_agent_count")
+    private int onlineAgentCount = 0;  // 在线客服数
 }

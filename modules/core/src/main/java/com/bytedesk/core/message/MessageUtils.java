@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:15:26
+ * @LastEditTime: 2024-12-04 14:20:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,8 @@ public class MessageUtils {
         String topic = TopicUtils.getSystemTopic(userUid);
         ThreadProtobuf thread = ThreadUtils.getThreadProtobuf(topic, ThreadTypeEnum.CHANNEL, sender);
         // 
-        MessageExtra extra = MessageUtils.getMessageExtra(orgUid);
+        MessageExtra messageExtra = MessageUtils.getMessageExtra(orgUid);
+        String extra = JSON.toJSONString(messageExtra);
         // 
         MessageProtobuf message = MessageProtobuf.builder()
                 .uid(messageUid)
@@ -52,7 +53,7 @@ public class MessageUtils {
                 .client(ClientEnum.SYSTEM)
                 .thread(thread)
                 .user(sender)
-                .extra(JSON.toJSONString(extra))
+                .extra(extra)
                 .build();
         return message;
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 10:04:04
+ * @LastEditTime: 2024-12-05 09:36:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,6 +41,9 @@ public class AutoReplySpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getKbUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+            }
+            if (StringUtils.hasText(request.getUserUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

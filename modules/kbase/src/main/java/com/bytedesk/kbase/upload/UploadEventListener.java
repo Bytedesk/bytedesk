@@ -35,7 +35,7 @@ import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.AutoReplyExcel;
 import com.bytedesk.kbase.auto_reply.AutoReplyExcelListener;
-import com.bytedesk.kbase.auto_reply.AutoReplyService;
+import com.bytedesk.kbase.auto_reply.AutoReplyRestService;
 import com.bytedesk.kbase.faq.FaqExcel;
 import com.bytedesk.kbase.faq.FaqExcelListener;
 import com.bytedesk.kbase.faq.FaqService;
@@ -63,7 +63,7 @@ public class UploadEventListener {
 
     private final FaqService faqService;
 
-    private final AutoReplyService autoReplyService;
+    private final AutoReplyRestService autoReplyService;
 
     private final QuickReplyService quickReplyService;
 

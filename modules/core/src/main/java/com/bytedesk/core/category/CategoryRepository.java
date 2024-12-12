@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 14:56:38
+ * @LastEditTime: 2024-12-06 12:20:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>, JpaSpecificationExecutor<CategoryEntity> {
     Optional<CategoryEntity> findByUid(String uid);
@@ -38,4 +41,13 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>,
 
     Boolean existsByUid(String uid);
     
+    @Modifying
+    @Transactional
+    @Query("UPDATE CategoryEntity c SET c.postCount = c.postCount + 1 WHERE c.id = ?1")
+    void incrementPostCount(Long categoryId);
+    
+    @Modifying
+    @Transactional
+    @Query("UPDATE CategoryEntity c SET c.postCount = c.postCount - 1 WHERE c.id = ?1")
+    void decrementPostCount(Long categoryId);
 }

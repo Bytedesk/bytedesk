@@ -49,7 +49,7 @@ public class AuthService {
 
     private ModelMapper modelMapper;
 
-    public UserEntity getCurrentUser() {
+    public UserEntity getUser() {
         // not logged in
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             return null;

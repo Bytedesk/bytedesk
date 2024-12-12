@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.member.MemberService;
+import com.bytedesk.team.member.MemberRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class DepartmentService extends BaseRestService<DepartmentEntity, Departm
 
     private final UidUtils uidUtils;
 
-    private final MemberService memberService;
+    private final MemberRestService memberService;
 
     public Page<DepartmentResponse> queryByOrg(DepartmentRequest departmentRequest) {
         Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(), Sort.Direction.ASC,"id");

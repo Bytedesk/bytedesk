@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:13:10
+ * @LastEditTime: 2024-12-05 12:05:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,9 +28,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-// import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
-// import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -42,11 +42,29 @@ public class MessageService extends BaseRestService<MessageEntity, MessageReques
 
     private final MessageRepository messageRepository;
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final AuthService authService;
 
     public Page<MessageResponse> queryByOrg(MessageRequest request) {
 
-        // 优先加载最新聊天记录，也即：id越大越新
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "createdAt");
+
+        Specification<MessageEntity> specs = MessageSpecification.search(request);
+
+        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
+
+        return messagePage.map(ConvertUtils::convertToMessageResponse);
+    }
+
+    @Override
+    public Page<MessageResponse> queryByUser(MessageRequest request) {
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
@@ -60,25 +78,14 @@ public class MessageService extends BaseRestService<MessageEntity, MessageReques
     @Cacheable(value = "message", key = "#request.threadTopic", unless = "#result == null")
     public Page<MessageResponse> queryByThreadTopic(MessageRequest request) {
 
-        // 优先加载最新聊天记录，也即：id越大越新
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
-        Page<MessageEntity> messagePage = messageRepository.findByThreadTopic(request.getThreadTopic(), pageable);
+        Specification<MessageEntity> specs = MessageSpecification.search(request);
+
+        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
 
         return messagePage.map(ConvertUtils::convertToMessageResponse);
-    }
-
-    public Page<MessageResponse> queryUnread(MessageRequest request) {
-
-        // 优先加载最新聊天记录，也即：id越大越新
-        // Pageable pageable = PageRequest.of(request.getPageNumber(),
-        // request.getPageSize(), Sort.Direction.DESC,"createdAt");
-        // Specification<Message> specs = MessageSpecification.unread(request);
-        // Page<Message> messagePage = messageRepository.findAll(specs, pageable);
-        // return messagePage.map(ConvertUtils::convertToMessageResponse);
-
-        return null;
     }
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
@@ -86,6 +93,17 @@ public class MessageService extends BaseRestService<MessageEntity, MessageReques
         return messageRepository.findByUid(uid);
     }
 
+    @Override
+    public MessageResponse create(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public MessageResponse update(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
 
     @Caching(put = {
             @CachePut(value = "message", key = "#message.uid"),
@@ -123,35 +141,16 @@ public class MessageService extends BaseRestService<MessageEntity, MessageReques
     }
 
     @Override
-    public Page<MessageResponse> queryByUser(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public MessageResponse create(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-    @Override
-    public MessageResponse update(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
     public MessageResponse convertToResponse(MessageEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, MessageEntity message) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            MessageEntity message) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
-
-    
 
 }

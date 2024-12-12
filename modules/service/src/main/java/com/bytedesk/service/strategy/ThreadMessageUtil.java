@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 17:06:14
+ * @LastEditTime: 2024-12-03 10:17:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,6 @@ import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 
@@ -57,7 +56,7 @@ public class ThreadMessageUtil {
             message.setContent(thread.getContent());
         }
         //
-        if (thread.getState().equals(ThreadStateEnum.OFFLINE.name())) {
+        if (thread.isOffline()) {
             message.setType(MessageTypeEnum.LEAVE_MSG.name());
         }
         message.setThreadTopic(thread.getTopic());
@@ -81,8 +80,28 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        // message.setCreatedAt(new Date());
-        // message.setUpdatedAt(new Date());
+        message.setThreadTopic(thread.getTopic());
+        //
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        message.setExtra(JSON.toJSONString(extra));
+        //
+        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+    }
+
+
+    public static MessageProtobuf getThreadOfflineMessage(UserProtobuf user, ThreadEntity thread) {
+        // ... 方法的实现保持不变 ...
+        MessageEntity message = MessageEntity.builder()
+                .content(I18Consts.I18N_REENTER_TIP)
+                .type(MessageTypeEnum.LEAVE_MSG.name())
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(JSON.toJSONString(user))
+                .build();
+        message.setUid(thread.getUid()); // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
+        message.setOrgUid(thread.getOrgUid());
+        message.setCreatedAt(LocalDateTime.now());
+        message.setUpdatedAt(LocalDateTime.now());
         message.setThreadTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());

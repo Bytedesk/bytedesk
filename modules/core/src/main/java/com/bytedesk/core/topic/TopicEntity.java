@@ -45,7 +45,7 @@ public class TopicEntity extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
 
-    /** 为防止后添加的记录，clientIds缺失，所以用数组代替，这样每个用户在topic中只有一条记录，cliendIds可共用 */
+    /** 为防止后添加的记录，clientIds缺失，所以用数组代替，这样每个用户在topic中只有一条记录，clientIds可共用 */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     @Convert(converter = StringSetConverter.class)
