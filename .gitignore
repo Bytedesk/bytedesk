@@ -29,6 +29,7 @@ application-prod-pg.properties
 application-prod-mysql.properties
 application-dev-pg-private.properties
 application-dev-oracle.properties
+application-local.properties
 projects/*
 liangshibao/*
 tiku/*
