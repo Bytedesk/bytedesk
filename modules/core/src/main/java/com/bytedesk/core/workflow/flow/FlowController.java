@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-10 12:15:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-11 11:24:19
+ * @LastEditTime: 2024-12-14 12:47:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,7 @@ import com.bytedesk.core.utils.JsonResult;
 @RestController
 @RequestMapping("/api/v1/flow")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:9012", "http://localhost:5173"})
+// @CrossOrigin(origins = {"http://localhost:9012", "http://localhost:5173"})
 public class FlowController extends BaseRestController<FlowRequest> {
 
     private final FlowRestService flowService;
