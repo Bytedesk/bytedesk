@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-10 12:15:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-14 12:47:03
+ * @LastEditTime: 2024-12-14 16:25:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,14 +24,16 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
 @RestController
-@RequestMapping("/api/v1/flow")
+// @RequestMapping("/api/v1/flow")
+@RequestMapping("/flow") // for testing
 @RequiredArgsConstructor
-// @CrossOrigin(origins = {"http://localhost:9012", "http://localhost:5173"})
+@CrossOrigin(origins = {"http://127.0.0.1:9010"})
 public class FlowController extends BaseRestController<FlowRequest> {
 
     private final FlowRestService flowService;
 
     // http://localhost:8080/api/v1/flow/query/org
+    // http://localhost:9003/flow/query/org?pageNumber=0&pageSize=10
     @Override
     public ResponseEntity<?> queryByOrg(FlowRequest request) {
 
