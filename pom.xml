@@ -25,13 +25,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>channels</module>
         <module>modules</module>
-        <module>plugins</module>
-        <module>projects</module>
         <module>starter</module>
-        <module>vendors</module>
-        <module>vip</module>
     </modules>
 
     <properties>
