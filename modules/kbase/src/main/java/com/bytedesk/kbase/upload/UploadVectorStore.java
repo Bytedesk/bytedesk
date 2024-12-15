@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 08:46:08
+ * @LastEditTime: 2024-12-15 19:34:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,10 +26,10 @@ import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
-import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -184,7 +184,7 @@ public class UploadVectorStore {
 		storeDocuments(docList, upload);
 	}
 
-	// 存储到vectore store
+	// 存储到vector store
 	private void storeDocuments(List<Document> docList, UploadEntity upload) {
 		// log.info("Parsing document, this will take a while.");
 		List<String> docIdList = new ArrayList<>();
@@ -216,7 +216,7 @@ public class UploadVectorStore {
 		SearchRequest searchRequest = SearchRequest.query(query)
 				.withTopK(2);
 		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
-		List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
+		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		// TODO: 将 query, kbUid 对应的 contentList 缓存到Redis中，下次直接从Redis中取
 		//
 		return contentList;
@@ -237,7 +237,7 @@ public class UploadVectorStore {
 		// .withSimilarityThreshold(0.5)
 		// .withFilterExpression(expression);
 		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
-		List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
+		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		//
 		return contentList;
@@ -259,45 +259,6 @@ public class UploadVectorStore {
 	// similarDocuments.stream().map(Document::getContent).toList();
 	// //
 	// return contentList;
-	// }
-
-	// bean not found
-	// @Value("classpath:/kbase/beijing_ruankao_notice.pdf")
-	// private Resource ruankaoResource;
-
-	// public void loadLocalPdf() {
-	// // for test
-	// // String fileName = "classpath:/kbase/beijing_ruankao_notice.pdf";
-	// // readPdf(fileName);
-	// }
-	//
-	// private static final String[] KEYS = { "name", "abv", "ibu", "description" };
-	// //
-	// @Value("classpath:/kbase/beers.json.gz")
-	// private Resource beers;
-	// //
-	// public void loadLocalJsonBeers() throws IOException {
-	// Map<String, Object> indexInfo =
-	// vectorStore.getJedis().ftInfo(properties.getIndex());
-	// int numDocs = Integer.parseInt((String) indexInfo.getOrDefault("num_docs",
-	// "0"));
-	// if (numDocs > 20000) {
-	// log.info("Embeddings already loaded. Skipping");
-	// return;
-	// }
-	// Resource file = beers;
-	// if (beers.getFilename().endsWith(".gz")) {
-	// GZIPInputStream inputStream = new GZIPInputStream(beers.getInputStream());
-	// file = new InputStreamResource(inputStream, "beers.json.gz");
-	// }
-	// log.info("Creating Embeddings...");
-	// // tag::loader[]
-	// // Create a JSON reader with fields relevant to our use case
-	// JsonReader loader = new JsonReader(file, KEYS);
-	// // Use the autowired VectorStore to insert the documents into Redis
-	// vectorStore.add(loader.get());
-	// // end::loader[]
-	// log.info("Embeddings created.");
 	// }
 
 }

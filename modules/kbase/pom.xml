@@ -43,6 +43,7 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
 		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-redis-store-spring-boot-starter -->
