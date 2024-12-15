@@ -74,8 +74,8 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:latest
           # tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:${{ env.TAG }} # 自动设置为当前的 Git 标签
           # https://hub.docker.com/_/eclipse-temurin
-          # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64
+          # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64,windows/amd64
+          platforms: linux/amd64,linux/arm64
       # 登录阿里云 Docker
       # https://registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:latest
       - name: login to aliyun docker
@@ -90,5 +90,5 @@ jobs:
           tags: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:latest
           # tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:${{ env.TAG }} # 自动设置为当前的 Git 标签
           # https://hub.docker.com/_/eclipse-temurin
-          # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64
+          # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64,windows/amd64
+          platforms: linux/amd64,linux/arm64
