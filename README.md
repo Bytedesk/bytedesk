@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-12 11:48:02
+ * @LastEditTime: 2024-12-15 21:57:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
 -->
 # Bytedesk
 
-AI powered live-chat, email support, Omnichannel customer service & team im，alternative to slack + zendesk/intercom
+Enterprise IM Solution with AI powered live-chat, email support, Omnichannel customer service，alternative to slack + zendesk/intercom
 <!-- Chat as a Service -->
 
 ## Language
@@ -24,7 +24,7 @@ AI powered live-chat, email support, Omnichannel customer service & team im，al
 
 ## Introduction
 
-### Chat With Your Team
+### Team IM
 
 - Multi-level organizational structure
 - Role management
@@ -32,12 +32,12 @@ AI powered live-chat, email support, Omnichannel customer service & team im，al
 - Chat record management
 - Group chat
 
-### Chat With AI
+### AI Chat
 
 - Chat with LLM
 - Chat with Knowledge base(RAG)
 
-### Chat With Your Customers
+### Customer Service
 
 - Support multiple channels
 - multiple routing strategies, and detailed assessment indicators
