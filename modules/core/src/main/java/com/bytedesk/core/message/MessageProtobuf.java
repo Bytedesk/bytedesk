@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 16:04:33
+ * @LastEditTime: 2024-12-16 15:56:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,8 @@
 package com.bytedesk.core.message;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+// import java.util.Date;
 
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -51,7 +52,7 @@ public class MessageProtobuf implements Serializable {
 
 	private MessageStatusEnum status;
 
-	private Date createdAt;
+	private LocalDateTime createdAt;
 
 	private ClientEnum client;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 17:52:47
+ * @LastEditTime: 2024-12-16 15:56:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,8 @@
 package com.bytedesk.core.message;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDateTime;
+// import java.util.Date;
 import java.util.List;
 
 import org.springframework.context.event.EventListener;
@@ -71,7 +72,8 @@ public class MessageEventListener {
             throw new RuntimeException("thread is null");
         }
         // 替换掉客户端时间戳，统一各个客户端时间戳，防止出现因为客户端时间戳不一致导致的消息乱序
-        messageProtobuf.setCreatedAt(new Date());
+        // messageProtobuf.setCreatedAt(new Date());
+        messageProtobuf.setCreatedAt(LocalDateTime.now());
 
         // 1. 拦截黑名单用户消息
         // 2. 过滤敏感词，将敏感词替换为*
