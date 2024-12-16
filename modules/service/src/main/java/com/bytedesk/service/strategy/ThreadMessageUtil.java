@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-03 10:17:05
+ * @LastEditTime: 2024-12-16 15:52:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 
 import java.time.LocalDateTime;
@@ -89,10 +90,12 @@ public class ThreadMessageUtil {
     }
 
 
-    public static MessageProtobuf getThreadOfflineMessage(UserProtobuf user, ThreadEntity thread) {
+    public static MessageProtobuf getThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
+
+        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
-                .content(I18Consts.I18N_REENTER_TIP)
+                .content(thread.getContent())
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())

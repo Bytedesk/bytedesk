@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 14:20:54
+ * @LastEditTime: 2024-12-16 15:57:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,8 @@
  */
 package com.bytedesk.core.message;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+// import java.util.Date;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -49,7 +50,7 @@ public class MessageUtils {
                 .type(MessageTypeEnum.NOTICE)
                 .content(content)
                 .status(MessageStatusEnum.SUCCESS)
-                .createdAt(new Date())
+                .createdAt(LocalDateTime.now())
                 .client(ClientEnum.SYSTEM)
                 .thread(thread)
                 .user(sender)
@@ -70,7 +71,7 @@ public class MessageUtils {
                 .type(type)
                 .content(content)
                 .status(MessageStatusEnum.SUCCESS)
-                .createdAt(new Date())
+                .createdAt(LocalDateTime.now())
                 .client(ClientEnum.SYSTEM)
                 .thread(threadProtobuf)
                 .user(sender)

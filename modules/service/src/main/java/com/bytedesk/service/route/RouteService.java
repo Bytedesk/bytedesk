@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 11:52:49
+ * @LastEditTime: 2024-12-16 15:52:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -98,6 +98,11 @@ public class RouteService {
             // 客服离线或小休不接待状态，则进入留言
             thread.setOffline();
             thread.setContent(agent.getServiceSettings().getLeavemsgTip());
+            threadService.save(thread);
+            //
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
+            messageSendService.sendProtobufMessage(messageProtobuf);
+            return messageProtobuf;
         }
         threadService.save(thread);
         //
@@ -138,6 +143,15 @@ public class RouteService {
             // 客服离线 或 非接待状态
             thread.setOffline();
             thread.setContent(workgroup.getServiceSettings().getLeavemsgTip());
+            thread.setOwner(agent.getMember().getUser());
+            UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
+            thread.setAgent(JSON.toJSONString(agentProtobuf));
+            threadService.save(thread);
+            //
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
+            // 广播消息，由消息通道统一处理
+            messageSendService.sendProtobufMessage(messageProtobuf);
+            return messageProtobuf;
         }
         //
         thread.setOwner(agent.getMember().getUser());
