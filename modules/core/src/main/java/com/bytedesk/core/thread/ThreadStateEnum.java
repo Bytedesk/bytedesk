@@ -16,8 +16,8 @@ package com.bytedesk.core.thread;
 
 public enum ThreadStateEnum {
     INITIAL, // 初始状态
-    STARTED, // 开始会话
     QUEUING, // 排队中
+    STARTED, // 开始会话
     OFFLINE, // 客服不在线
     CLOSED, // 会话已结束
     ;
