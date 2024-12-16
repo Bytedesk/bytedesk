@@ -51,13 +51,14 @@ public class RouteService {
 
     private final QueueServiceMy visitorQueueService;
 
-    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread, @Nonnull RobotEntity robot) {
-        // 
+    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
+            @Nonnull RobotEntity robot) {
+        //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         // 使用agent的serviceSettings配置
         UserProtobuf agentProtobuf = ConvertAiUtils.convertToUserProtobuf(robot);
         thread.setAgent(JSON.toJSONString(agentProtobuf));
-        // 
+        //
         thread.setRobot(true);
         thread.setUnreadCount(0);
         threadService.save(thread);
@@ -65,11 +66,12 @@ public class RouteService {
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agentProtobuf, thread);
         // 广播消息，由消息通道统一处理
         // messageService.notifyUser(messageProtobuf);
-        // 
+        //
         return messageProtobuf;
     }
 
-    public MessageProtobuf routeAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread, @Nonnull AgentEntity agent) {
+    public MessageProtobuf routeAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread,
+            @Nonnull AgentEntity agent) {
         log.info("RouteService routeAgent: {}", agent.getUid());
 
         if (agent.isConnectedAndAvailable()) {
@@ -87,13 +89,21 @@ public class RouteService {
                 // 进入排队队列
                 // 插入队列
                 visitorQueueService.enqueue(thread);
-                // 
+                //
                 thread.setQueuing();
                 thread.setUnreadCount(0);
                 thread.setContent(agent.getServiceSettings().getQueueTip());
 
                 // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
             }
+            threadService.save(thread);
+            //
+            UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
+            // 广播消息，由消息通道统一处理
+            messageSendService.sendProtobufMessage(messageProtobuf);
+            //
+            return messageProtobuf;
         } else {
             // 客服离线或小休不接待状态，则进入留言
             thread.setOffline();
@@ -104,19 +114,10 @@ public class RouteService {
             messageSendService.sendProtobufMessage(messageProtobuf);
             return messageProtobuf;
         }
-        threadService.save(thread);
-        //
-        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
-        //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
-        // 广播消息，由消息通道统一处理
-        // MessageUtils.notifyUser(messageProtobuf);
-        messageSendService.sendProtobufMessage(messageProtobuf);
-        //
-        return messageProtobuf;
     }
 
-    public MessageProtobuf routeWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    public MessageProtobuf routeWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         log.info("RouteServiceImplVip routeWorkgroup: {}", workgroup.getUid());
         // TODO: 所有客服都离线或小休不接待状态，则进入留言
 
@@ -138,6 +139,18 @@ public class RouteService {
             // 客服在线 且 接待状态
             thread.setUnreadCount(1);
             thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
+            //
+            thread.setOwner(agent.getMember().getUser());
+            UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
+            thread.setAgent(JSON.toJSONString(agentProtobuf));
+            threadService.save(thread);
+            //
+            UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
+            // 广播消息，由消息通道统一处理
+            messageSendService.sendProtobufMessage(messageProtobuf);
+
+            return messageProtobuf;
         } else {
             // 离线状态永远显示离线提示语，不显示“继续会话”
             // 客服离线 或 非接待状态
@@ -153,18 +166,7 @@ public class RouteService {
             messageSendService.sendProtobufMessage(messageProtobuf);
             return messageProtobuf;
         }
-        //
-        thread.setOwner(agent.getMember().getUser());
-        UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
-        thread.setAgent(JSON.toJSONString(agentProtobuf));
-        threadService.save(thread);
-        //
-        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
-        // 广播消息，由消息通道统一处理
-        messageSendService.sendProtobufMessage(messageProtobuf);
 
-        return messageProtobuf;
     }
 
 }
