@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-10 23:43:34
+ * @LastEditTime: 2024-12-16 17:32:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.starter.controller;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -141,7 +140,6 @@ public class HelloMvcController {
     public MessageProtobuf getExampleMessage() {
         MessageProtobuf message = new MessageProtobuf();
         message.setContent("Hello, World!");
-        message.setCreatedAt(new Date());
         return message;
     }
 	
