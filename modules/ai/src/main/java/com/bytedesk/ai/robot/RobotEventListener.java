@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 20:44:08
+ * @LastEditTime: 2024-12-16 16:20:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.ai.robot;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -166,7 +167,7 @@ public class RobotEventListener {
                     .user(user)
                     .client(ClientEnum.SYSTEM_AUTO)
                     .extra(JSONObject.toJSONString(extraObject))
-                    .createdAt(new Date())
+                    .createdAt(LocalDateTime.now())
                     .build();
             // 返回一个输入中消息，让访客端显示输入中
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
@@ -218,7 +219,7 @@ public class RobotEventListener {
                 .user(user)
                 .client(ClientEnum.SYSTEM_AUTO)
                 .extra(JSONObject.toJSONString(extra))
-                .createdAt(new Date())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         // 返回一个输入中消息，让访客端显示输入中
