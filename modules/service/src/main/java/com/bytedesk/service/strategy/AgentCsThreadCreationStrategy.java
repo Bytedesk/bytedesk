@@ -99,7 +99,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // counterVisitorService.saveNumber(orgUid, topic, counter.getCurrentNumber(), visitor);
         // log.info("counter topic: {}, count {}", topic, counter.getCurrentNumber());
         //
-        thread = visitorThreadService.reinitAgentThreadExtra(thread, agent);
+        thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
         QueueResponse queueResponse = visitorQueueService.enqueue(thread);
         log.info("Enqueued to queue {}", queueResponse.toString());
         // thread.setSerialNumber(counter.getCurrentNumber());

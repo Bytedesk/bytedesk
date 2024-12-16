@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-02 11:21:44
+ * @LastEditTime: 2024-12-16 15:35:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -114,12 +114,13 @@ public class VisitorThreadService
 
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         // TODO: 到visitor thread表中拉取
-        ThreadEntity thread = ThreadEntity.builder().build();
+        ThreadEntity thread = ThreadEntity.builder()
+                .topic(topic)
+                .state(ThreadStateEnum.INITIAL.name())
+                .type(ThreadTypeEnum.WORKGROUP.name())
+                .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
+                .build();
         thread.setUid(uidUtils.getUid());
-        thread.setTopic(topic);
-        thread.setState(ThreadStateEnum.INITIAL.name());
-        // thread.setType(ThreadTypeEnum.WORKGROUP.name());
-        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         thread.setOrgUid(workgroup.getOrgUid());
         //
         String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
@@ -128,7 +129,7 @@ public class VisitorThreadService
         return thread;
     }
 
-    public ThreadEntity reinitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
+    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
         //
         if (visitorRequest.isWeChat()) {
@@ -144,12 +145,13 @@ public class VisitorThreadService
 
     public ThreadEntity getAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         // TODO: 到visitor thread表中拉取
-        ThreadEntity thread = ThreadEntity.builder().build();
+        ThreadEntity thread = ThreadEntity.builder()
+                .topic(topic)
+                .state(ThreadStateEnum.INITIAL.name())
+                .type(ThreadTypeEnum.AGENT.name())
+                .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
+                .build();
         thread.setUid(uidUtils.getUid());
-        thread.setTopic(topic);
-        thread.setState(ThreadStateEnum.INITIAL.name());
-        thread.setType(ThreadTypeEnum.AGENT.name());
-        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         //
         String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
@@ -160,7 +162,7 @@ public class VisitorThreadService
         return thread;
     }
 
-    public ThreadEntity reinitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
+    public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
         String extra = ConvertServiceUtils
                 .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());

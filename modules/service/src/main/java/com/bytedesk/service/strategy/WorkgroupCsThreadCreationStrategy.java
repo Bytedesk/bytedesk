@@ -94,7 +94,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             // 不存在会话，创建会话
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
         }
-        thread = visitorThreadService.reinitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
+        thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
         // thread.setSerialNumber(counter.getCurrentNumber());
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
