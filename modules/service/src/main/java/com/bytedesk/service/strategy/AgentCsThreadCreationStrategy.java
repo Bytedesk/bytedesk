@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 11:29:05
+ * @LastEditTime: 2024-12-16 15:02:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -71,7 +71,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
     public MessageProtobuf createAgentCsThread(VisitorRequest visitorRequest) {
         //
         String agentUid = visitorRequest.getSid();
-        String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgAgentThreadTopic(agentUid, visitorRequest.getUid());
         // 是否已经存在会话
         ThreadEntity thread = null;
         AgentEntity agent = null;
