@@ -3429,12 +3429,12 @@ reference = "mirrors"
 
 [[package]]
 name = "pdfplumber"
-version = "0.5.3"
+version = "0.5.4"
 description = "Plumb a PDF for detailed information about each char, rectangle, and line."
 optional = false
 python-versions = "*"
 files = [
-    {file = "pdfplumber-0.5.3.tar.gz", hash = "sha256:48b318b5f3e618115ff34c492b7061665a1c4d35daae89605e20abe79f3d33b1"},
+    {file = "pdfplumber-0.5.4.tar.gz", hash = "sha256:48b318b5f3e618115ff34c492b7061665a1c4d35daae89605e20abe79f3d33b1"},
 ]
 
 [package.dependencies]

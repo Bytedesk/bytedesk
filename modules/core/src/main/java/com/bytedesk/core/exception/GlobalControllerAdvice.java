@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-28 17:46:33
+ * @LastEditTime: 2024-12-16 11:26:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -117,7 +117,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e) {
-        return ResponseEntity.ok().body(JsonResult.error("Username or password is incorrect"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT));
     }
 
     @ExceptionHandler(value = NullPointerException.class)
