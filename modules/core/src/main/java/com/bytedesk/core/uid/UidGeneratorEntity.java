@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2021-02-24 15:52:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:14:37
+ * @LastEditTime: 2024-12-16 17:02:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
