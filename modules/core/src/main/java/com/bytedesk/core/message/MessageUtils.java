@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 15:57:19
+ * @LastEditTime: 2024-12-16 16:21:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -79,28 +79,6 @@ public class MessageUtils {
                 .build();
         return message;
     }
-
-    // 服务器发送回执
-    // public static MessageProtobuf createReceiptMessage(String messageUid, ThreadEntity thread, MessageTypeEnum type, String content) {
-    //     //
-    //     UserProtobuf sender = UserUtils.getSystemChannelUser();
-    //     // 
-    //     ThreadProtobuf threadProtobuf = thread.toProtobuf();
-    //     MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-    //     //
-    //     MessageProtobuf message = MessageProtobuf.builder()
-    //             .uid(messageUid)
-    //             .type(type)
-    //             .content(content)
-    //             .status(MessageStatusEnum.SUCCESS)
-    //             .createdAt(new Date())
-    //             .client(ClientEnum.SYSTEM)
-    //             .thread(threadProtobuf)
-    //             .user(sender)
-    //             .extra(JSON.toJSONString(extra))
-    //             .build();
-    //     return message;
-    // }
 
     public static void notifyUser(MessageProtobuf messageProtobuf) {
         String json = JSON.toJSONString(messageProtobuf);
