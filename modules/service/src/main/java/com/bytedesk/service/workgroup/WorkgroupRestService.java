@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 14:36:22
+ * @LastEditTime: 2024-12-17 11:43:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,7 +75,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 .nickname(request.getNickname())
                 .build();
         if (!StringUtils.hasText(request.getUid())) {
-            workgroup.setUid(uidUtils.getCacheSerialUid());
+            workgroup.setUid(uidUtils.getUid());
         } else {
             workgroup.setUid(request.getUid());
         }
