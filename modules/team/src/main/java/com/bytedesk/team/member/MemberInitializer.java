@@ -34,7 +34,8 @@ public class MemberInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        init();
+        // 迁移到 WorkgroupInitializer 执行
+        // init();
     }
 
     // @PostConstruct

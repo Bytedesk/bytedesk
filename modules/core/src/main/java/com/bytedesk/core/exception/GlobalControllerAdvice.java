@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 11:26:59
+ * @LastEditTime: 2024-12-17 12:27:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -148,6 +149,11 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = AuthorizationDeniedException.class)
     public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(JsonResult.error("Authorization Denied Exception", 403));
+    }
+
+    @ExceptionHandler(value = RequestRejectedException.class)
+    public ResponseEntity<?> handleRequestRejectedException(RequestRejectedException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error("Request Rejected Exception"));
     }
 
     @ExceptionHandler(Exception.class)
