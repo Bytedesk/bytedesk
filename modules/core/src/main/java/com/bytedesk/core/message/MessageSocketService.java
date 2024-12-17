@@ -114,11 +114,9 @@ public class MessageSocketService {
     }
 
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
-        // log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={},
-        // clientId={}",
+        // log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={}, clientId={}",
         // messageProto.getUser().getNickname(), messageProto.getContent(), topic,
-        // messageProto.getType(),
-        // messageProto.getClient());
+        // messageProto.getType(), messageProto.getClient());
         Set<TopicEntity> topicSet = topicService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
         topicSet.forEach(topicElement -> {
@@ -130,8 +128,7 @@ public class MessageSocketService {
     }
 
     private void doSendMessage(String topic, @NonNull MessageProto.Message messageProto, String clientId) {
-        // log.debug("doSendMessage: user={}, content={}, topic={}, type={},
-        // clientId={}",
+        // log.debug("doSendMessage: user={}, content={}, topic={}, type={}, clientId={}",
         // messageProto.getUser().getNickname(), messageProto.getContent(), topic,
         // messageProto.getType(), clientId);
         MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
