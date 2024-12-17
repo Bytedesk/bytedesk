@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:57:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 15:37:59
+ * @LastEditTime: 2024-12-17 15:15:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,10 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JmsArtemisListener {
-    
 
 	// queue point to point
-
 	@JmsListener(destination = JmsArtemisConstants.QUEUE_STRING_NAME, containerFactory = "jmsArtemisQueueFactory")
 	public void receiveQueueMessage(String json) {
 		log.info("jms receiveQueueMessage string {}", json);
