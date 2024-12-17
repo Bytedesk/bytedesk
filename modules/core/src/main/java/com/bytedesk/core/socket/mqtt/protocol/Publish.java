@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 11:24:39
+ * @LastEditTime: 2024-12-17 23:19:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,11 +64,10 @@ public class Publish {
         // 注意：不能去掉，否则无法解析protobuf
         publishMessage.payload().getBytes(publishMessage.payload().readerIndex(), messageBytes);
         // publish message event, developers can listener to new message
-        // mqService.sendProtoMessageToMq(messageBytes);
         try {
             MessageProto.Message messageProto = MessageProto.Message.parseFrom(messageBytes);
             String messageJson = MessageConvertUtils.toJson(messageProto);
-            // mqService.sendJsonMessageToMq(messageJson);
+            // 
             messageSendService.sendJsonMessage(messageJson);
         } catch (Exception e) {
             e.printStackTrace();
