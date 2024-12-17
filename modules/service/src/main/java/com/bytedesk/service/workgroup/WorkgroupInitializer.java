@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 11:44:44
+ * @LastEditTime: 2024-12-17 12:31:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,8 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 // import com.bytedesk.kbase.faq.FaqConsts;
 // import com.bytedesk.service.worktime.WorktimeService;
+import com.bytedesk.service.agent.AgentInitializer;
+import com.bytedesk.team.member.MemberInitializer;
 
 import lombok.AllArgsConstructor;
 
@@ -34,12 +36,18 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class WorkgroupInitializer implements SmartInitializingSingleton {
 
+    private final MemberInitializer memberInitializer;
+    private final AgentInitializer agentInitializer;
     private final WorkgroupRepository workgroupRepository;
 
     private final WorkgroupRestService workgroupService;
 
     @Override
     public void afterSingletonsInstantiated() {
+        // 确保 MemberInitializer 先执行完成
+        memberInitializer.init();
+        // 确保 AgentInitializer 先执行完成
+        agentInitializer.init();
         init();
     }
 
