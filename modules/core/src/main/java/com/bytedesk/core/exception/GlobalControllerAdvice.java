@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 12:27:13
+ * @LastEditTime: 2024-12-17 16:19:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -154,6 +155,11 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = RequestRejectedException.class)
     public ResponseEntity<?> handleRequestRejectedException(RequestRejectedException ex) {
         return ResponseEntity.badRequest().body(JsonResult.error("Request Rejected Exception"));
+    }
+
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    public ResponseEntity<?> handleMEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error("EntityNotFoundException"));
     }
 
     @ExceptionHandler(Exception.class)
