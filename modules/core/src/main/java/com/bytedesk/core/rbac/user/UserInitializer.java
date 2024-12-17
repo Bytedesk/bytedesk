@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 12:17:39
+ * @LastEditTime: 2024-12-17 10:45:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,7 +39,8 @@ public class UserInitializer {
 
     private final UidUtils uidUtils;
 
-    // @PostConstruct
+    // OrganizationInitializer 中初始化后执行
+    // 初始化超级管理员账号
     public void init() {
         // 系统只能存在一个超级管理员账号
         if (userService.existsBySuperUser()) {

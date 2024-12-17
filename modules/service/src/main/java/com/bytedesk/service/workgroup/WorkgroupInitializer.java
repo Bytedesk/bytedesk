@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 09:47:10
+ * @LastEditTime: 2024-12-17 11:44:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,8 +38,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
 
     private final WorkgroupRestService workgroupService;
 
-    // private final WorktimeService worktimeService;
-
     @Override
     public void afterSingletonsInstantiated() {
         init();
@@ -55,14 +53,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         List<String> agentUids = Arrays.asList(BytedeskConsts.DEFAULT_AGENT_UID);
         //
-        // List<String> faqUids = Arrays.asList(
-        //         orgUid + FaqConsts.FAQ_DEMO_UID_1,
-        //         orgUid + FaqConsts.FAQ_DEMO_UID_2);
-        // //
-        // List<String> worktimeUids = new ArrayList<>();
-        // String worktimeUid = worktimeService.createDefault();
-        // worktimeUids.add(worktimeUid);
-        //
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
@@ -70,10 +60,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .build();
         workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
         workgroupRequest.setOrgUid(orgUid);
-        //
-        // workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-        // workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
-        // workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
         //
         workgroupService.create(workgroupRequest);
     }
