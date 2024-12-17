@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 15:56:56
+ * @LastEditTime: 2024-12-17 17:30:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,7 +55,6 @@ public class MessageEventListener {
                     messageJson);
             messageSocketService.sendProtoMessage(message);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -72,7 +71,6 @@ public class MessageEventListener {
             throw new RuntimeException("thread is null");
         }
         // 替换掉客户端时间戳，统一各个客户端时间戳，防止出现因为客户端时间戳不一致导致的消息乱序
-        // messageProtobuf.setCreatedAt(new Date());
         messageProtobuf.setCreatedAt(LocalDateTime.now());
 
         // 1. 拦截黑名单用户消息
