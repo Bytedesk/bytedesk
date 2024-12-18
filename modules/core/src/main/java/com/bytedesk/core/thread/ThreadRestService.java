@@ -267,6 +267,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .autoClose(true)
                 .state(ThreadStateEnum.CLOSED.name())
                 .build();
+        threadRequest.setUid(thread.getUid());
         return close(threadRequest);
     }
 

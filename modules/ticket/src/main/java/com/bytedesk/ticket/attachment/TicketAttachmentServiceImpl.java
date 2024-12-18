@@ -29,10 +29,10 @@ public class TicketAttachmentServiceImpl implements TicketAttachmentService {
     @Autowired
     private CommentConfig commentConfig;
     
-    @Value("${bytedesk.upload-dir}")
+    @Value("${bytedesk.upload.dir}")
     private String uploadPath;
     
-    @Value("${bytedesk.upload-url}")
+    @Value("${bytedesk.upload.url}")
     private String uploadUrl;
 
     @Override
