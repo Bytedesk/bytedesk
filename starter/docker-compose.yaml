@@ -22,8 +22,10 @@ services:
       - redis_data:/data
 
   bytedesk:
-    # image: bytedesk/bytedesk:latest
-    image: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:latest
+    # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
+    # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest # aliyun enterprise
+    # mage: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest # aliyun community
     container_name: bytedesk
     depends_on:
       - bytedesk-db
