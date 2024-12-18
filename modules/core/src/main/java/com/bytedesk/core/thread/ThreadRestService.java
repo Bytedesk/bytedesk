@@ -320,7 +320,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a unique result: 4 results were returned
     @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
     public List<ThreadEntity> findListByTopic(@NonNull String topic) {
-        return threadRepository.findFirstByTopicAndDeleted(topic, false);
+        return threadRepository.findByTopicAndDeleted(topic, false);
     }
 
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")

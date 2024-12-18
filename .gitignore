@@ -42,7 +42,7 @@ logs/
 *.log
 logs/*
 back/
-uploader/
+uploads/
 *.tmp
 h2db/
 .DS_Store

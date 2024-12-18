@@ -44,7 +44,7 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         /** used for member thread type */
         Optional<ThreadEntity> findFirstByTopicAndOwnerAndDeleted(String topic, UserEntity owner, Boolean deleted);
 
-        List<ThreadEntity> findFirstByTopicAndDeleted(String topic, Boolean deleted);
+        List<ThreadEntity> findByTopicAndDeleted(String topic, Boolean deleted);
 
         Optional<ThreadEntity> findFirstByTopicAndDeleted(String topic, Boolean deleted);
 
