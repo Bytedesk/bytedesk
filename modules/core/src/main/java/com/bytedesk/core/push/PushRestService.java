@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-28 21:00:10
+ * @LastEditTime: 2024-12-18 16:26:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
@@ -89,30 +90,30 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         if (type.equals(AuthTypeEnum.MOBILE_REGISTER.name())) {
             // 注册验证码，如果账号已经存在，则直接抛出异常
             if (authRequest.isMobile() && userService.existsByMobileAndPlatform(receiver, platform)) {
-                throw new MobileExistsException("mobile already exists, please login directly");
+                throw new MobileExistsException(I18Consts.I18N_MOBILE_ALREADY_EXISTS);
             }
             if (authRequest.isEmail() && userService.existsByEmailAndPlatform(receiver, platform)) {
-                throw new EmailExistsException("email already exists, please login directly");
+                throw new EmailExistsException(I18Consts.I18N_EMAIL_ALREADY_EXISTS);
             }
         } else if (type.equals(AuthTypeEnum.EMAIL_RESET.name())) {
             // 修改邮箱，如果账号已经存在，则直接抛出异常
             if (authRequest.isEmail() && userService.existsByEmailAndPlatform(receiver, platform)) {
-                throw new EmailExistsException("email already exists, please use another one");
+                throw new EmailExistsException(I18Consts.I18N_EMAIL_ALREADY_EXISTS);
             }
         } else if (type.equals(AuthTypeEnum.MOBILE_RESET.name())) {
             // 修改手机号，如果账号已经存在，则直接抛出异常
             if (authRequest.isMobile() && userService.existsByMobileAndPlatform(receiver, platform)) {
-                throw new MobileExistsException("mobile already exists, please use another one");
+                throw new MobileExistsException(I18Consts.I18N_MOBILE_ALREADY_EXISTS);
             }
         } else if (type.equals(AuthTypeEnum.EMAIL_VERIFY.name())) {
             // 验证邮箱，如果账号不存在，则直接抛出异常
             if (authRequest.isEmail() && !userService.existsByEmailAndPlatform(receiver, platform)) {
-                throw new EmailExistsException("email not exists");
+                throw new EmailExistsException(I18Consts.I18N_EMAIL_NOT_EXISTS);
             } 
         } else if (type.equals(AuthTypeEnum.MOBILE_VERIFY.name())) {
             // 验证手机号，如果账号不存在，则直接抛出异常
             if (authRequest.isMobile() && !userService.existsByMobileAndPlatform(receiver, platform)) {
-                throw new MobileExistsException("mobile not exists");
+                throw new MobileExistsException(I18Consts.I18N_MOBILE_NOT_EXISTS);
             }
         }
         

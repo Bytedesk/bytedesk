@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 11:26:38
+ * @LastEditTime: 2024-12-18 16:26:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,10 @@ public class I18Consts {
     public static final String I18N_PREFIX = "i18n.";
     // 
     public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = I18N_PREFIX + "username.or.password.incorrect";
+    public static final String I18N_MOBILE_ALREADY_EXISTS = I18N_PREFIX + "mobile.already.exists";
+    public static final String I18N_EMAIL_ALREADY_EXISTS = I18N_PREFIX + "email.already.exists";
+    public static final String I18N_MOBILE_NOT_EXISTS = I18N_PREFIX + "mobile.not.exists";
+    public static final String I18N_EMAIL_NOT_EXISTS = I18N_PREFIX + "email.not.exists";
     // captcha
     public static final String I18N_AUTH_CAPTCHA_SEND_SUCCESS = I18N_PREFIX + "auth.captcha.send.success";
     public static final String I18N_AUTH_CAPTCHA_ERROR = I18N_PREFIX + "auth.captcha.error";
