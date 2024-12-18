@@ -25,7 +25,7 @@ public interface VisitorThreadRepository extends JpaRepository<VisitorThreadEnti
 
     Boolean existsByUid(String uid);
 
-    Optional<VisitorThreadEntity> findByTopic(String topic);
+    Optional<VisitorThreadEntity> findFirstByTopic(String topic);
 
     Boolean existsByTopic(String topic);
 }

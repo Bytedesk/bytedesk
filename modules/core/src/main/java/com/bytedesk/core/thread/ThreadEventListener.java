@@ -113,7 +113,7 @@ public class ThreadEventListener {
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
-        // Optional<Thread> threadOptional = threadService.findByTopic(message.getThreadTopic());
+        // Optional<Thread> threadOptional = threadService.findFirstByTopic(message.getThreadTopic());
         // if (threadOptional.isPresent()) {
         //     Thread thread = threadOptional.get();
         //     thread.setHide(false);

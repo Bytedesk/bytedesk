@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-21 07:28:35
+ * @LastEditTime: 2024-12-18 17:20:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,11 +42,13 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         Boolean existsByUid(String uid);
 
         /** used for member thread type */
-        Optional<ThreadEntity> findByTopicAndOwnerAndDeleted(String topic, UserEntity owner, Boolean deleted);
+        Optional<ThreadEntity> findFirstByTopicAndOwnerAndDeleted(String topic, UserEntity owner, Boolean deleted);
 
-        Optional<ThreadEntity> findByTopicAndDeleted(String topic, Boolean deleted);
+        List<ThreadEntity> findFirstByTopicAndDeleted(String topic, Boolean deleted);
 
-        Optional<ThreadEntity> findByTopicAndStateNotContainingAndDeleted(String topic, String state, Boolean deleted);
+        Optional<ThreadEntity> findFirstByTopicAndDeleted(String topic, Boolean deleted);
+
+        Optional<ThreadEntity> findFirstByTopicAndStateNotContainingAndDeleted(String topic, String state, Boolean deleted);
 
         // @Query(value = "select * from core_thread t where t.topic like ?1 and t.state not in ?2 and t.is_deleted = ?3", nativeQuery = true)
         @Query(value = "select * from core_thread t where t.topic = ?1 and t.state not in ?2 and t.is_deleted = ?3 LIMIT 1", nativeQuery = true)
@@ -56,7 +58,7 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         Page<ThreadEntity> findByOwnerAndHideAndDeleted(UserEntity owner, Boolean hide, Boolean deleted, Pageable pageable);
 
-        List<ThreadEntity> findByTopic(String topic);
+        List<ThreadEntity> findFirstByTopic(String topic);
 
         // FIXME: h2不兼容 JSON_EXTRACT
         // FIXME: PostgreSQL ERROR: function json_extract(json, unknown) does not exist

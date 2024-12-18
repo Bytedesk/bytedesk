@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 16:03:33
+ * @LastEditTime: 2024-12-18 17:25:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -144,7 +144,7 @@ public class RobotEventListener {
         } else if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
             log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // 大模型对话，无知识库
-            Optional<ThreadEntity> threadOptional = threadService.findByTopic(threadTopic);
+            Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
             if (!threadOptional.isPresent()) {
                 throw new RuntimeException("thread with topic " + threadTopic + " not found");
             }
@@ -189,7 +189,7 @@ public class RobotEventListener {
                 || threadProtobuf.getType().equals(ThreadTypeEnum.KBDOC)) {
             log.info("robot agent/workgroup threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // TODO: 取消查库
-            ThreadEntity thread = threadService.findByTopic(threadTopic)
+            ThreadEntity thread = threadService.findFirstByTopic(threadTopic)
                     .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic + " not found"));
             UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
             // 当前会话为机器人接待，而且是访客发送的消息

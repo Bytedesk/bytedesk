@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 12:55:07
+ * @LastEditTime: 2024-12-18 17:25:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -168,7 +168,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         UserEntity owner = authService.getUser();
         String topic = request.getTopic();
         //
-        Optional<ThreadEntity> threadOptional = threadService.findByTopicAndOwner(topic, owner);
+        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
         if (threadOptional.isPresent()) {
             return threadService.convertToResponse(threadOptional.get());
         }
@@ -208,7 +208,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     public ThreadResponse updateThread(ThreadRequest request) {
         //
         String topic = request.getTopic();
-        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("thread not found");
         }

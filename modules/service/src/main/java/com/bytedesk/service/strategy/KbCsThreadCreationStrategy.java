@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:59:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 07:12:24
+ * @LastEditTime: 2024-12-18 17:23:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,18 +53,18 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
     public MessageProtobuf createKbCsThread(VisitorRequest visitorRequest) {
 
         String kbUid = visitorRequest.getSid();
-        KnowledgebaseEntity knowledgebase = knowledgebaseService.findByUid(kbUid)
-                .orElseThrow(() -> new RuntimeException("Knowledgebase " + kbUid + " not found"));
+        KnowledgebaseEntity knowledgeBase = knowledgebaseService.findByUid(kbUid)
+                .orElseThrow(() -> new RuntimeException("KnowledgeBase " + kbUid + " not found"));
         //
-        ThreadEntity thread = getKbThread(visitorRequest, knowledgebase);
+        ThreadEntity thread = getKbThread(visitorRequest, knowledgeBase);
         //
-        return getRobotMessage(visitorRequest, thread, knowledgebase);
+        return getRobotMessage(visitorRequest, thread, knowledgeBase);
     }
 
     private ThreadEntity getKbThread(VisitorRequest visitorRequest, KnowledgebaseEntity kb) {
         //
         String topic = TopicUtils.formatOrgKbThreadTopic(kb.getUid(), visitorRequest.getUid());
-        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadOptional.get();
         }

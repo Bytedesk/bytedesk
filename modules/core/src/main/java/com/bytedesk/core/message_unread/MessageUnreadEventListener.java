@@ -99,7 +99,7 @@ public class MessageUnreadEventListener {
             String groupUid = splits[2];
             log.info("groupUid {}", groupUid);
             // TODO: 缓存群聊未读消息
-            // Set<Topic> topics = topicService.findByTopic(threadTopic);
+            // Set<Topic> topics = topicService.findFirstByTopic(threadTopic);
             // for (Topic topic : topics) {
             // Set<String> clientIds = topic.getClientIds();
             // for (String clientId : clientIds) {

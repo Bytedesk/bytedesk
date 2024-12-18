@@ -93,8 +93,8 @@ public class VisitorThreadService
     }
 
     @Cacheable(value = "visitor_thread", key = "#topic", unless = "#result == null")
-    public Optional<VisitorThreadEntity> findByTopic(String topic) {
-        return visitorThreadRepository.findByTopic(topic);
+    public Optional<VisitorThreadEntity> findFirstByTopic(String topic) {
+        return visitorThreadRepository.findFirstByTopic(topic);
     }
 
     public VisitorThreadEntity create(ThreadEntity thread) {
