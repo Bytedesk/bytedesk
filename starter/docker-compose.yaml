@@ -29,21 +29,23 @@ services:
       - bytedesk-db
       - bytedesk-redis
     environment:
+      # db config
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-bytedesk:3306/bytedesk_im
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=r8FqfdbWUaN3
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      # redis config
       - SPRING_DATA_REDIS_HOST=redis-bytedesk
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_DATA_REDIS_PASSWORD=qfRxz3tVT8Nh
       - SPRING_DATA_REDIS_DATABASE=0
-      # 添加上传配置
+      # upload config
       - UPLOAD_DIR=/app/uploads
       - UPLOAD_URL=http://127.0.0.1:9003
     ports:
       - 9003:9003
     volumes:
-      # 映射上传目录
+      # upload data volume
       - upload_data:/app/uploads
 
 volumes:
