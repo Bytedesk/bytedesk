@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-18 17:11:41
+ * @LastEditTime: 2024-12-18 17:36:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,9 +51,7 @@ public class UploadController extends BaseRestController<UploadRequest> {
 	private final AuthService authService;
 
 	private final UploadService uploadService;
-
-	// private final BytedeskProperties bytedeskProperties;
-
+	
 	private final UploadVectorStore uploadVectorStore;
 
 	@ActionAnnotation(title = "upload", action = "uploadFile", description = "upload File")

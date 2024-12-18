@@ -7,6 +7,9 @@ services:
       MYSQL_ROOT_PASSWORD: "r8FqfdbWUaN3"
     ports:
       - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
   bytedesk-redis:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
@@ -15,6 +18,9 @@ services:
       - docker.env
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   bytedesk:
     # image: bytedesk/bytedesk:latest
     image: registry.cn-hangzhou.aliyuncs.com/weiyuai/bytedesk:latest
@@ -31,5 +37,16 @@ services:
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_DATA_REDIS_PASSWORD=qfRxz3tVT8Nh
       - SPRING_DATA_REDIS_DATABASE=0
+      # 添加上传配置
+      - UPLOAD_DIR=/app/uploads
+      - UPLOAD_URL=http://127.0.0.1:9003
     ports:
       - 9003:9003
+    volumes:
+      # 映射上传目录
+      - upload_data:/app/uploads
+
+volumes:
+  mysql_data:
+  redis_data:
+  upload_data:  # 添加上传数据卷
