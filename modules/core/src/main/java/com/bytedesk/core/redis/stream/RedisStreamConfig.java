@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class RedisStreamConfig {
     
-    @Value("${bytedesk.redis-stream-key}")
+    @Value("${bytedesk.cache.redis-stream-key}")
     private String streamKey;
 
     // @Autowired

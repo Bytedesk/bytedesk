@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-28 17:52:27
+ * @LastEditTime: 2024-12-18 21:15:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,75 +51,305 @@ public class BytedeskProperties {
     }
 
     private Boolean debug;
+
+    // 管理员配置
+    private Admin admin = new Admin();
     
-    private String email;
+    // 组织配置
+    private Organization organization = new Organization();
 
-    private String password;
+    // 功能开关配置
+    private Features features = new Features();
 
-    private String passwordDefault;
+    // CORS配置
+    private Cors cors = new Cors();
 
-    private String nickname;
+    // JWT配置 
+    private Jwt jwt = new Jwt();
 
-    private String mobile;
+    // 缓存配置
+    private Cache cache = new Cache();
 
-    private List<String> mobileWhitelist = new ArrayList<>();
-    private List<String> emailWhiteList = new ArrayList<>();
+    // 上传配置
+    private Upload upload = new Upload();
 
-    private String validateCode;
-    private String organizationName;
-    private String organizationCode;
-    // private String timezone;
+    // 集群配置
+    private Cluster cluster = new Cluster();
 
-    // ai
-    private Boolean javaAi;
-    private Boolean pythonAi;
+    // 知识库配置
+    private Kbase kbase = new Kbase();
 
-    // 配置邮件发送方式，默认使用javamail，可选值：javamail/aliyun
-    private String emailType;
-    // 是否支持注册，默认不支持
-    private Boolean enableRegistration;
+    // 阿里云配置
+    private Aliyun aliyun = new Aliyun();
 
-    // cors
-    private String corsAllowedOrigins;
+    // 腾讯云配置
+    private Tencent tencent = new Tencent();
 
-    // jwt
-    private String jwtSecretKey;
-    private String jwtExpiration;
+    // 微信支付配置
+    private WechatPay wechatPay = new WechatPay();
 
-    // cache
-    private Integer cacheLevel;
-    private String cachePrefix;
-    private String redisStreamKey;
+    @Data
+    public static class Admin {
+        private String email;
+        private String password;
+        private String passwordDefault;
+        private String nickname;
+        private String mobile;
+        private List<String> mobileWhitelist = new ArrayList<>();
+        private List<String> emailWhitelist = new ArrayList<>();
+        private String validateCode;
+    }
 
-    // upload
-    private String uploadType;
-    private String uploadDir;
-    private String uploadUrl;
-    
-    // cluster
-    private Boolean cluster;
-    private List<String> clusterNodes = new ArrayList<>();
+    @Data 
+    public static class Organization {
+        private String name;
+        private String code;
+    }
 
-    // 
+    @Data
+    public static class Features {
+        private Boolean javaAi = false;
+        private Boolean pythonAi = true;
+        private String emailType = "javamail";
+        private Boolean enableRegistration = false;
+        private String avatarUrl;
+    }
+
+    @Data
+    public static class Cors {
+        private String allowedOrigins;
+    }
+
+    @Data
+    public static class Jwt {
+        private String secretKey;
+        private String expiration;
+        private String refreshTokenExpiration;
+    }
+
+    @Data
+    public static class Cache {
+        private Integer level;
+        private String prefix;
+        private String redisStreamKey;
+    }
+
+    @Data
+    public static class Upload {
+        private String type;
+        private String dir;
+        private String url;
+    }
+
+    @Data
+    public static class Cluster {
+        private Boolean enabled;
+        private List<String> nodes = new ArrayList<>();
+        private String host = "230.0.0.0";
+        private int port = 6781;
+    }
+
+    @Data
+    public static class Kbase {
+        private String theme;
+        private String htmlPath;
+        private String apiUrl;
+    }
+
+    @Data
+    public static class Aliyun {
+        private String accessKeyId;
+        private String accessKeySecret;
+        private Oss oss = new Oss();
+        private Sms sms = new Sms();
+
+        @Data
+        public static class Oss {
+            private String endpoint;
+            private String baseUrl;
+            private String bucketName;
+        }
+
+        @Data
+        public static class Sms {
+            private String signName;
+            private String templateCode;
+        }
+    }
+
+    @Data
+    public static class Tencent {
+        private String appId;
+        private String secretId;
+        private String secretKey;
+        private Bucket bucket = new Bucket();
+
+        @Data
+        public static class Bucket {
+            private String location;
+            private String name;
+            private String domain;
+        }
+    }
+
+    @Data
+    public static class WechatPay {
+        private Boolean enabled = false;
+        private String certPath;
+        private String appId;
+        private String mchId;
+        private String key;
+        private String notifyUrl;
+    }
+
+    // 为了保持向后兼容,添加getter方法
+    public String getEmail() {
+        return admin.getEmail();
+    }
+
+    public String getPassword() {
+        return admin.getPassword();
+    }
+
+    public String getPasswordDefault() {
+        return admin.getPasswordDefault();
+    }
+
+    public String getNickname() {
+        return admin.getNickname();
+    }
+
+    public String getMobile() {
+        return admin.getMobile();
+    }
+
+    public List<String> getMobileWhitelist() {
+        return admin.getMobileWhitelist();
+    }
+
+    public List<String> getEmailWhitelist() {
+        return admin.getEmailWhitelist();
+    }
+
+    public String getValidateCode() {
+        return admin.getValidateCode();
+    }
+
+    public String getOrganizationName() {
+        return organization.getName();
+    }
+
+    public String getOrganizationCode() {
+        return organization.getCode();
+    }
+
+    public Boolean getJavaAi() {
+        return features.getJavaAi();
+    }
+
+    public Boolean getPythonAi() {
+        return features.getPythonAi();
+    }
+
+    public String getEmailType() {
+        return features.getEmailType();
+    }
+
+    public Boolean getEnableRegistration() {
+        return features.getEnableRegistration();
+    }
+
+    public String getAvatarUrl() {
+        return features.getAvatarUrl();
+    }
+
+    public String getCorsAllowedOrigins() {
+        return cors.getAllowedOrigins();
+    }
+
+    public String getJwtSecretKey() {
+        return jwt.getSecretKey();
+    }
+
+    public String getJwtExpiration() {
+        return jwt.getExpiration();
+    }
+
+    public String getJwtRefreshTokenExpiration() {
+        return jwt.getRefreshTokenExpiration();
+    }
+
+    public Integer getCacheLevel() {
+        return cache.getLevel();
+    }
+
+    public String getCachePrefix() {
+        return cache.getPrefix();
+    }
+
+    public String getRedisStreamKey() {
+        return cache.getRedisStreamKey();
+    }
+
+    public String getUploadType() {
+        return upload.getType();
+    }
+
+    public String getUploadDir() {
+        return upload.getDir();
+    }
+
+    public String getUploadUrl() {
+        return upload.getUrl();
+    }
+
+    public Boolean getClusterEnabled() {
+        return cluster.getEnabled();
+    }
+
+    public List<String> getClusterNodes() {
+        return cluster.getNodes();
+    }
+
+    public String getClusterHost() {
+        return cluster.getHost();
+    }
+
+    public int getClusterPort() {
+        return cluster.getPort();
+    }
+
+    public String getKbaseTheme() {
+        return kbase.getTheme();
+    }
+
+    public String getKbaseHtmlPath() {
+        return kbase.getHtmlPath();
+    }
+
+    public String getKbaseApiUrl() {
+        return kbase.getApiUrl();
+    }
+
     public Boolean isAdmin(@NonNull String receiver) {
-        // receiver 是否为空
         if (receiver == null || receiver.isEmpty()) {
             return false;
         }
-        // receiver 是否等于当前用户的手机号或者邮箱
-        return receiver.equals(this.mobile) || receiver.equals(this.email);
+        return receiver.equals(admin.getMobile()) || receiver.equals(admin.getEmail());
     }
 
-    // 
     public Boolean isInWhitelist(@NonNull String receiver) {
-        // receiver 是否为空
         if (receiver == null || receiver.isEmpty()) {
             return false;
         }
-        if (this.mobileWhitelist == null || this.emailWhiteList == null) {
+        if (admin.getMobileWhitelist() == null || admin.getEmailWhitelist() == null) {
             return false;
         }
-        return this.mobileWhitelist.contains(receiver) || this.emailWhiteList.contains(receiver);
+        return admin.getMobileWhitelist().contains(receiver) || 
+               admin.getEmailWhitelist().contains(receiver);
     }
+
+
+
 
 }

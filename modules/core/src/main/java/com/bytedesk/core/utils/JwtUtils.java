@@ -35,10 +35,10 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtUtils {
 
-  @Value("${bytedesk.jwt-secret-key}")
+  @Value("${bytedesk.jwt.secret-key}")
   private String jwtSecret;
 
-  @Value("${bytedesk.jwt-expiration}")
+  @Value("${bytedesk.jwt.expiration}")
   private long jwtExpirationMs;
 
   /**

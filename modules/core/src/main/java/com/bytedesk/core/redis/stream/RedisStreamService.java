@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisStreamService {
 
-    @Value("${bytedesk.redis-stream-key}")
+    @Value("${bytedesk.cache.redis-stream-key}")
     private String streamKey;
 
     @Autowired

@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class RedisStreamListener implements StreamListener<String, ObjectRecord<String, RedisEvent>> {
 
-    @Value("${bytedesk.redis-stream-key}")
+    @Value("${bytedesk.cache.redis-stream-key}")
     private String streamKey;
 
     // @Autowired
