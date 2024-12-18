@@ -71,7 +71,7 @@ jobs:
           context: ./starter  # 确保构建上下文路径正确
           file: ./starter/Dockerfile  # 确保 Dockerfile 文件路径正确
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk-ce:latest
           # tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:${{ env.TAG }} # 自动设置为当前的 Git 标签
           # https://hub.docker.com/_/eclipse-temurin
           # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64,windows/amd64
@@ -87,7 +87,7 @@ jobs:
           context: ./starter  # 确保构建上下文路径正确
           file: ./starter/Dockerfile  # 确保 Dockerfile 文件路径正确
           push: true
-          tags: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
+          tags: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest
           # tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bytedesk:${{ env.TAG }} # 自动设置为当前的 Git 标签
           # https://hub.docker.com/_/eclipse-temurin
           # eclipse-temurin:17-jdk暂时不支持更多架构，暂时渠道：windows/arm64,macos/amd64,macos/arm64,windows/amd64
