@@ -21,7 +21,7 @@ public class QueueMemberService {
 
     // agentUid 代表 技能组uid/客服uid
     // public QueueMemberResponse getNumber(String orgUid, String topic, String visitor) {
-    //     Optional<QueueMemberEntity> counterOptional = findByTopic(topic);
+    //     Optional<QueueMemberEntity> counterOptional = findFirstByTopic(topic);
     //     if (counterOptional.isPresent()) {
     //         QueueMemberEntity counter = counterOptional.get();
     //         counter.increaseSerialNumber();

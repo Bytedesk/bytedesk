@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-18 15:00:14
+ * @LastEditTime: 2024-12-18 17:24:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -98,7 +98,7 @@ public class ZhipuaiService {
      */
     public void getSseAnswer(String uid, String sid, String question, SseEmitter emitter) {
         String topic = sid + "/" + uid;
-        ThreadEntity thread = threadService.findByTopic(topic)
+        ThreadEntity thread = threadService.findFirstByTopic(topic)
                 .orElseThrow(() -> new RuntimeException("thread with topic: " + topic + " not found"));
 
         RobotMessage robotMessage = RobotMessage.builder().question(question).build();

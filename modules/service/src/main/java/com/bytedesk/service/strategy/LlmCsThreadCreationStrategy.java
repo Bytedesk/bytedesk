@@ -68,7 +68,7 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
         String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
         // TODO: 到visitor thread表中拉取
         ThreadEntity thread = ThreadEntity.builder().build();
-        Optional<ThreadEntity> threadOptional = threadService.findByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             thread = threadOptional.get();
         } else {

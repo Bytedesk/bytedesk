@@ -32,7 +32,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, Long> {
     // boolean existsByTopicAndUid(String topic, String uid);
 
     // exact match 精确匹配
-    // List<Topic> findByTopicAndUid(String topic, String uid);
+    // List<Topic> findFirstByTopicAndUid(String topic, String uid);
 
     /**
       * TODO: wildcard match 通配符匹配 topic
@@ -40,11 +40,11 @@ public interface TopicRepository extends JpaRepository<TopicEntity, Long> {
       * 单层通配符"+"：只能匹配一层主题。例如，"aaa/+"可以匹配"aaa/bbb"，但不能匹配"aaa/bbb/ccc"。
       * 多层通配符"#"：可以匹配多层主题。例如，"aaa/#"不但可以匹配"aaa/bbb"，还可以匹配"aaa/bbb/ccc/ddd"。它必须作为主题的最后一个级别使用，并且只能出现在最后
       */
-    // List<Topic> findByTopicStartsWith(String topic);
-    // List<Topic> findByTopic(String topic);
+    // List<Topic> findFirstByTopicStartsWith(String topic);
+    // List<Topic> findFirstByTopic(String topic);
     // 
     @Query(value="select * from bytedesk_core_topic where topics like %:topic% ", nativeQuery = true)
-    Set<TopicEntity> findByTopicsContains(@Param("topic") String topic);
+    Set<TopicEntity> findFirstByTopicsContains(@Param("topic") String topic);
 
     // void deleteByTopicAndUid(String topic, String uid);
 }

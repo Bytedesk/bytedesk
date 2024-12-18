@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 15:45:38
+ * @LastEditTime: 2024-12-18 17:21:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -111,7 +111,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
         UserEntity owner = authService.getUser();
         //
-        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(request.getTopic(), owner);
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
@@ -140,7 +140,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // 同事群组会话：org/group/{group_uid}
     public ThreadResponse createGroupMemberThread(ThreadEntity thread, UserEntity owner) {
         //
-        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(thread.getTopic(), owner);
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(thread.getTopic(), owner);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
@@ -170,7 +170,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         String topic = TopicUtils.TOPIC_FILE_PREFIX + user.getUid();
         //
-        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(topic, user);
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
@@ -206,7 +206,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         String topic = TopicUtils.getSystemTopic(user.getUid());
         //
-        Optional<ThreadEntity> threadOptional = findByTopicAndOwner(topic, user);
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
@@ -238,7 +238,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public ThreadResponse update(ThreadRequest threadRequest) {
-        Optional<ThreadEntity> threadOptional = findByTopic(threadRequest.getTopic());
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("update thread " + threadRequest.getTopic() + " not found");
         }
@@ -271,7 +271,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public ThreadResponse close(ThreadRequest threadRequest) {
-        Optional<ThreadEntity> threadOptional = findByTopic(threadRequest.getTopic());
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("close thread " + threadRequest.getTopic() + " not found");
         }
@@ -313,18 +313,24 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
-    public Optional<ThreadEntity> findByTopicAndOwner(@NonNull String topic, UserEntity user) {
-        return threadRepository.findByTopicAndOwnerAndDeleted(topic, user, false);
+    public Optional<ThreadEntity> findFirstByTopicAndOwner(@NonNull String topic, UserEntity user) {
+        return threadRepository.findFirstByTopicAndOwnerAndDeleted(topic, user, false);
+    }
+
+    // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a unique result: 4 results were returned
+    @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
+    public List<ThreadEntity> findListByTopic(@NonNull String topic) {
+        return threadRepository.findFirstByTopicAndDeleted(topic, false);
     }
 
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    public Optional<ThreadEntity> findByTopic(@NonNull String topic) {
-        return threadRepository.findByTopicAndDeleted(topic, false);
+    public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
+        return threadRepository.findFirstByTopicAndDeleted(topic, false);
     }
 
     // 找到某个访客当前对应某技能组未关闭会话
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    public Optional<ThreadEntity> findByTopicNotClosed(String topic) {
+    public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
         List<String> states = Arrays.asList(new String[] { ThreadStateEnum.CLOSED.name()});
         return threadRepository.findTopicAndStatesNotInAndDeleted(topic, states, false);
     }
@@ -362,7 +368,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             @CacheEvict(value = "thread", key = "#thread.topic")
     })
     public void delete(@NonNull ThreadRequest entity) {
-        Optional<ThreadEntity> threadOptional = findByTopic(entity.getTopic());
+        Optional<ThreadEntity> threadOptional = findByUid(entity.getUid());
         threadOptional.ifPresent(thread -> {
             thread.setDeleted(true);
             save(thread);

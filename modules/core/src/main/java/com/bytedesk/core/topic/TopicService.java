@@ -198,8 +198,8 @@ public class TopicService {
     }
 
     @Cacheable(value = "topic", key = "#topic", unless="#result == null")
-    public Set<TopicEntity> findByTopic(String topic) {
-        return topicRepository.findByTopicsContains(topic);
+    public Set<TopicEntity> findFirstByTopic(String topic) {
+        return topicRepository.findFirstByTopicsContains(topic);
     }
 
     @Caching(put = {
