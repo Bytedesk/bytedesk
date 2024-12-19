@@ -25,7 +25,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.service.route.RouteService;
+import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;

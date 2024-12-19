@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 14:24:50
+ * @LastEditTime: 2024-12-19 15:52:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,6 +51,64 @@ public enum ClientEnum {
     WECHAT_WORK,
     WECHAT_KEFU,
     WECHAT_CHANNEL,
+    //
+    // 社交媒体渠道
+    XIAOHONGSHU,     // 小红书
+    DOUYIN,          // 抖音
+    KUAISHOU,        // 快手
+    BILIBILI,        // B站
+    WEIBO,           // 微博
+    ZHIHU,           // 知乎
+    TOUTIAO,         // 头条
+    DOUBAN,          // 豆瓣
+    //
+    // 电商渠道
+    TAOBAO,          // 淘宝
+    TMALL,           // 天猫
+    JD,              // 京东
+    PINDUODUO,       // 拼多多
+    MEITUAN,         // 美团
+    ELEME,           // 饿了么
+    DIANPING,        // 大众点评
+    //
+    // 企业渠道
+    DINGTALK,        // 钉钉
+    FEISHU,          // 飞书
+    WECOM,           // 企业微信
+    //
+    // 其他渠道
+    EMAIL,           // 邮件
+    SMS,             // 短信
+    PHONE,           // 电话
+    //
+    // 海外社交媒体
+    TWITTER,         // Twitter/X
+    FACEBOOK,        // Facebook
+    INSTAGRAM,       // Instagram
+    LINKEDIN,        // LinkedIn
+    YOUTUBE,         // YouTube
+    TIKTOK,          // TikTok
+    PINTEREST,       // Pinterest
+    REDDIT,          // Reddit
+    SNAPCHAT,        // Snapchat
+    //
+    // 海外即时通讯
+    WHATSAPP,        // WhatsApp
+    TELEGRAM,        // Telegram
+    LINE,            // LINE
+    KAKAO,           // KakaoTalk
+    VIBER,           // Viber
+    SIGNAL,          // Signal
+    DISCORD,         // Discord
+    SLACK,           // Slack
+    MESSENGER,       // Facebook Messenger
+    //
+    // 海外电商
+    AMAZON,          // 亚马逊
+    EBAY,            // eBay
+    SHOPIFY,         // Shopify
+    LAZADA,          // 来赞达
+    SHOPEE,          // 虾皮
     ;
 
     // 根据字符串查找对应的枚举常量

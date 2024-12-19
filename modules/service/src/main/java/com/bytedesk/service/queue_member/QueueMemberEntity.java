@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 14:58:45
+ * @LastEditTime: 2024-12-19 15:21:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -74,8 +74,8 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "first_response")
     private boolean firstResponse;  // 是否首次响应
 
-    @Column(name = "end_time")
-    private LocalDateTime endTime;  // 结束时间
+    @Column(name = "close_time")
+    private LocalDateTime closeTime;  // 结束时间
 
     @Column(name = "agent_uid")
     private String agentUid;  // 服务客服
@@ -103,7 +103,7 @@ public class QueueMemberEntity extends BaseEntity {
         if (QueueMemberStatusEnum.PROCESSING.name().equals(newStatus)) {
             this.startTime = LocalDateTime.now();
         } else if (QueueMemberStatusEnum.valueOf(newStatus).isEndStatus()) {
-            this.endTime = LocalDateTime.now();
+            this.closeTime = LocalDateTime.now();
         }
     }
 }

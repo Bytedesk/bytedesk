@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.route;
+package com.bytedesk.service.routing;
 
 // import com.bytedesk.ai.robot.RobotEntity;
 // import com.bytedesk.core.message.MessageProtobuf;
