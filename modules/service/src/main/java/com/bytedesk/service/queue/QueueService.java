@@ -47,7 +47,7 @@ public class QueueService {
     private ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void joinQueue(String threadUid, String visitorUid) {
+    public void joinQueue(String threadTopic, String visitorUid) {
         // 1. 获取或创建队列
         QueueEntity queue = getOrCreateQueue();
         if (!queue.canJoin()) {
@@ -57,7 +57,7 @@ public class QueueService {
         // 2. 创建队列成员
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
-            .threadUid(threadUid)
+            .threadTopic(threadTopic)
             .visitorUid(visitorUid)
             .queueNumber(queue.getNextNumber())
             .joinTime(LocalDateTime.now())
@@ -78,7 +78,7 @@ public class QueueService {
             .orElseGet(() -> {
                 QueueEntity queue = QueueEntity.builder()
                     .day(today)
-                    .status(QueueStatusEnum.ACTIVE.name())
+                    .status(QueueStatusEnum.AVAILABLE.name())
                     .build();
                 return queueRepository.save(queue);
             });
@@ -103,7 +103,7 @@ public class QueueService {
 
     
     @Transactional
-    public int enqueue(String threadUid, int priority) {
+    public int enqueue(String threadTopic, int priority) {
         // 1. 获取或创建队列
         QueueEntity queue = getOrCreateQueue();
         if (!queue.canJoin()) {
@@ -113,7 +113,7 @@ public class QueueService {
         // 2. 创建队列成员
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
-            .threadUid(threadUid)
+            .threadTopic(threadTopic)
             .priority(priority)
             .queueNumber(queue.getNextNumber())
             .joinTime(LocalDateTime.now())
@@ -125,7 +125,7 @@ public class QueueService {
         updateQueueStats(queue);
 
         // 4. 返回队列位置
-        return getQueuePosition(threadUid);
+        return getQueuePosition(threadTopic);
     }
 
     
@@ -217,7 +217,7 @@ public class QueueService {
                     .orElseThrow(() -> new RuntimeException("Queue not found"));
                 updateQueueStats(queue);
                 
-                log.info("Thread {} queue timeout", member.getThreadUid());
+                log.info("Thread {} queue timeout", member.getThreadTopic());
             }
         }
     }

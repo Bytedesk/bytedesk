@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 20:15:09
+ * @LastEditTime: 2024-12-19 13:46:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-
 /**
  * @author Jackning <270580156@qq.com>
  */
@@ -49,8 +48,8 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "queue_uid", nullable = false)
     private String queueUid;  // 关联队列
 
-    @Column(name = "thread_uid", nullable = false)
-    private String threadUid;  // 关联会话
+    @Column(name = "thread_topic", nullable = false)
+    private String threadTopic;  // 关联会话
 
     @Column(name = "visitor_uid", nullable = false)
     private String visitorUid;  // 访客ID
