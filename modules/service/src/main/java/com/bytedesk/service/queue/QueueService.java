@@ -73,6 +73,7 @@ public class QueueService {
     }
 
     private QueueEntity getOrCreateQueue() {
+        // 按照ISO 8601标准格式化日期，即yyyy-MM-dd格式
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         return queueRepository.findByDay(today)
             .orElseGet(() -> {
@@ -100,7 +101,6 @@ public class QueueService {
         Double avgWaitTime = memberRepository.calculateAverageWaitTime(queueUid);
         return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     }
-
     
     @Transactional
     public int enqueue(String threadTopic, int priority) {
@@ -130,9 +130,9 @@ public class QueueService {
 
     
     @Transactional
-    public void dequeue(String threadUid, QueueStatusEnum status) {
+    public void dequeue(String threadTopic, QueueStatusEnum status) {
         // 1. 查找队列成员
-        QueueMemberEntity member = memberRepository.findByThreadUid(threadUid)
+        QueueMemberEntity member = memberRepository.findByThreadTopic(threadTopic)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
 
         // 2. 更新状态
@@ -155,8 +155,8 @@ public class QueueService {
     }
 
     
-    public int getQueuePosition(String threadUid) {
-        QueueMemberEntity member = memberRepository.findByThreadUid(threadUid)
+    public int getQueuePosition(String threadTopic) {
+        QueueMemberEntity member = memberRepository.findByThreadTopic(threadTopic)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
         return memberRepository.countByQueueUidAndPriorityGreaterThan(
             member.getQueueUid(), member.getPriority());
@@ -178,7 +178,7 @@ public class QueueService {
 
     
     public int getEstimatedWaitTime(String threadUid) {
-        QueueMemberEntity member = memberRepository.findByThreadUid(threadUid)
+        QueueMemberEntity member = memberRepository.findByThreadTopic(threadUid)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
             
         // 1. 获取前面等待数量

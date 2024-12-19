@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-09 10:24:36
+ * @LastEditTime: 2024-12-19 18:19:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,14 +43,16 @@ public class LeaveMsgSettings implements Serializable {
     @Column(name = "is_leave_msg_enabled")
     private boolean leaveMsgEnabled = true;
 
+    // 处理留言agent
+    @Builder.Default
+    private String leaveMsgAgentUid = BytedeskConsts.EMPTY_STRING;
+
     // 是否支持留言提醒
     @Builder.Default
     private Boolean leaveMsgNotify = false;
 
     // 留言提醒类型
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private LeaveMsgNotifyTypeEnum leaveMsgNotifyType = LeaveMsgNotifyTypeEnum.EMAIL;
     private String leaveMsgNotifyType = LeaveMsgNotifyTypeEnum.EMAIL.name();
 
     // 留言提醒邮箱
