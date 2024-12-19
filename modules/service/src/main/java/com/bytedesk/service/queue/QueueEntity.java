@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 14:15:54
+ * @LastEditTime: 2024-12-19 16:15:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,13 +57,13 @@ public class QueueEntity extends BaseEntity {
     private int avgWaitTime = 0;  // 平均等待时间(秒)
 
     // 队列配置
-    // @Builder.Default
-    // @Column(name = "max_waiting")
-    // private int maxWaiting = 100;  // 最大等待人数
+    @Builder.Default
+    @Column(name = "max_waiting")
+    private int maxWaiting = 10000;  // 最大等待人数
 
-    // @Builder.Default
-    // @Column(name = "max_wait_time")
-    // private int maxWaitTime = 1800;  // 最大等待时间(秒)
+    @Builder.Default
+    @Column(name = "max_wait_time")
+    private int maxWaitTime = 24 * 60 * 60;  // 最大等待时间(秒)
 
     // 队列状态
     @Builder.Default

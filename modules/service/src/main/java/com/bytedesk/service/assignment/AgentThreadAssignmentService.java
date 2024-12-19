@@ -1,4 +1,4 @@
-package com.bytedesk.service.thread;
+package com.bytedesk.service.assignment;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ThreadAssignmentService {
+public class AgentThreadAssignmentService {
 
     @Autowired
     private ThreadRepository threadRepository;

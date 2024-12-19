@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-07 11:30:02
+ * @Date: 2024-12-07 11:30:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 13:06:43
+ * @LastEditTime: 2024-12-19 16:07:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,79 +14,104 @@
  */
 package com.bytedesk.service.agent;
 
-import java.util.List;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- * 客服服务接口
- * 提供客服状态管理、分配策略等功能
- */
-public interface AgentService {
+import com.bytedesk.service.rating.RatingRepository;
 
-    /**
-     * 获取可用客服列表
-     * @return 可用客服ID列表
-     */
-    List<AgentEntity> getAvailableAgents();
+import lombok.extern.slf4j.Slf4j;
+import java.util.*;
+
+@Slf4j
+@Service
+public class AgentService {
+
+    @Autowired
+    private AgentRepository agentRepository;
     
-    /**
-     * 根据技能获取客服
-     * @param skills 所需技能列表
-     * @return 符合技能要求的客服ID列表
-     */
-    List<String> getAgentsBySkills(List<String> skills);
+    @Autowired
+    private AgentThreadRepository agentThreadRepository;
     
-    /**
-     * 获取在线客服列表
-     * @return 在线客服ID列表
-     */
-    List<String> getOnlineAgents();
+    @Autowired
+    private RatingRepository ratingRepository;    
+
+    //  获取可用客服列表
+    public List<AgentEntity> getAvailableAgents() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAvailableAgents'");
+    }
+
+    // 根据技能获取客服
+    public List<String> getAgentsBySkills(List<String> skills) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAgentsBySkills'");
+    }
+
+    //  获取在线客服列表
+    public List<String> getOnlineAgents() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getOnlineAgents'");
+    }
+
+    // 获取客服工作负载
+    public int getAgentWorkload(String agentUid) {
+        return agentThreadRepository.countActiveThreadsByAgent(agentUid);
+    }
+
+    // 获取客服评分
+    public double getAgentRating(String agentUid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAgentRating'");
+    }
+
+    // 获取客服平均响应时间
+    public long getAverageResponseTime(String agentUid) {
+        Long avgTime = 0L;//threadAgentRepository.getAverageResponseTime(agentUid);
+        return avgTime != null ? avgTime : 0L;
+    }
+
+    // 更新客服状态
+    @Transactional
+    public void updateAgentStatus(String agentUid, String status) {
+        agentRepository.updateStatus(agentUid, status);
+        
+        if ("offline".equals(status)) {
+            List<String> activeThreads = agentThreadRepository.findActiveThreadsByAgent(agentUid);
+            activeThreads.forEach(this::unassignThread);
+        }
+    }
+
+    // 分配会话给客服
+    @Transactional
+    public void assignThread(String threadUid, String agentUid) {
+        agentThreadRepository.updateAssignedAgent(threadUid, agentUid);
+        // agentRepository.incrementWorkload(agentUid);
+        log.info("Thread {} assigned to agent {}", threadUid, agentUid);
+    }
+
+    // 取消分配会话
+    @Transactional
+    public void unassignThread(String threadUid) {
+        String currentAgent = agentThreadRepository.getAssignedAgent(threadUid);
+        if (currentAgent != null) {
+            // agentRepository.decrementWorkload(currentAgent);
+        }
+        agentThreadRepository.updateAssignedAgent(threadUid, null);
+        log.info("Thread {} unassigned from agent {}", threadUid, currentAgent);
+    }
+
+    // 获取客服统计信息
+    public Map<String, Object> getAgentStats(String agentUid) {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("activeThreads", getAgentWorkload(agentUid));
+        stats.put("rating", getAgentRating(agentUid));
+        stats.put("avgResponseTime", getAverageResponseTime(agentUid));
+        stats.put("totalThreads", agentThreadRepository.countTotalThreadsByAgent(agentUid));
+        stats.put("resolvedThreads", agentThreadRepository.countResolvedThreadsByAgent(agentUid));
+        stats.put("satisfactionRate", ratingRepository.getSatisfactionRating(agentUid));
+        return stats;
+    }
+
     
-    /**
-     * 获取客服工作负载
-     * @param agentId 客服ID
-     * @return 当前会话数
-     */
-    int getAgentWorkload(String agentUid);
-    
-    /**
-     * 获取客服评分
-     * @param agentId 客服ID
-     * @return 客服评分(1-5)
-     */
-    double getAgentRating(String agentUid);
-    
-    /**
-     * 获取客服平均响应时间
-     * @param agentId 客服ID
-     * @return 平均响应时间(毫秒)
-     */
-    long getAverageResponseTime(String agentUid);
-    
-    /**
-     * 更新客服状态
-     * @param agentId 客服ID
-     * @param status 新状态
-     */
-    void updateAgentStatus(String agentUid, String status);
-    
-    /**
-     * 分配会话给客服
-     * @param threadId 会话ID
-     * @param agentId 客服ID
-     */
-    void assignThread(String threadUid, String agentUid);
-    
-    /**
-     * 取消分配会话
-     * @param threadId 会话ID
-     */
-    void unassignThread(String threadUid);
-    
-    /**
-     * 获取客服统计信息
-     * @param agentId 客服ID
-     * @return 统计信息
-     */
-    Map<String, Object> getAgentStats(String agentUid);
-} 
+}

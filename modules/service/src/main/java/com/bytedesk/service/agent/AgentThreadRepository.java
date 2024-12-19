@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-07 11:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 15:56:39
+ * @LastEditTime: 2024-12-19 16:02:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.thread;
+package com.bytedesk.service.agent;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,7 +23,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 
 import java.util.List;
 
-public interface ThreadAgentRepository extends JpaRepository<ThreadEntity, Long> {
+public interface AgentThreadRepository extends JpaRepository<ThreadEntity, Long> {
 
     // 统计客服的活跃会话数
     @Query("SELECT COUNT(t) FROM ThreadEntity t WHERE t.agentUid = :agentUid AND t.state = 'active'")
