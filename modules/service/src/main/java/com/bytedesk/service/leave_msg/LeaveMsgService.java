@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:20:04
+ * @LastEditTime: 2024-12-19 12:09:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,8 +42,6 @@ public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgReq
 
     private final ModelMapper modelMapper;
 
-    // private final ThreadService threadService;
-
     @Override
     public Page<LeaveMsgResponse> queryByOrg(LeaveMsgRequest request) {
 
@@ -59,8 +57,15 @@ public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgReq
 
     @Override
     public Page<LeaveMsgResponse> queryByUser(LeaveMsgRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "updatedAt");
+
+        Specification<LeaveMsgEntity> spec = LeaveMsgSpecification.search(request);
+
+        Page<LeaveMsgEntity> page = LeaveMsgRepository.findAll(spec, pageable);
+
+        return page.map(this::convertToResponse);
     }
 
     @Override
@@ -73,19 +78,14 @@ public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgReq
     public LeaveMsgResponse create(LeaveMsgRequest request) {
         log.info("request {}", request);
 
-        LeaveMsgEntity LeaveMsg = modelMapper.map(request, LeaveMsgEntity.class);
-        LeaveMsg.setUid(uidUtils.getCacheSerialUid());
+        LeaveMsgEntity leaveMsg = modelMapper.map(request, LeaveMsgEntity.class);
+        leaveMsg.setUid(uidUtils.getCacheSerialUid());
+        leaveMsg.setStatus(LeaveMsgStatusEnum.UNREAD.name());
+        
         //
-        // Optional<Thread> thread = threadService.findByUid(request.getThreadUid());
-        // if (thread.isPresent()) {
-        // // LeaveMsg.setThread(thread.get());
-        // LeaveMsg.setThreadTopic(thread.get().getTopic());
-        // LeaveMsg.setOrgUid(thread.get().getOrgUid());
-        // } else {
-        // throw new RuntimeException("Thread not found");
-        // }
+
         // 保存留言
-        LeaveMsgEntity savedLeaveMsg = save(LeaveMsg);
+        LeaveMsgEntity savedLeaveMsg = save(leaveMsg);
         if (savedLeaveMsg == null) {
             throw new RuntimeException("LeaveMsg not saved");
         }
@@ -95,8 +95,19 @@ public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgReq
 
     @Override
     public LeaveMsgResponse update(LeaveMsgRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
+        Optional<LeaveMsgEntity> leaveMsgOptional = findByUid(request.getUid());
+        if (leaveMsgOptional.isPresent()) {
+            LeaveMsgEntity leaveMsg = leaveMsgOptional.get();
+            leaveMsg.setStatus(request.getStatus());
+
+            LeaveMsgEntity updateLeaveMsg = save(leaveMsg);
+            if (updateLeaveMsg == null) {
+                throw new RuntimeException("LeaveMsg not updated");
+            }
+            return convertToResponse(updateLeaveMsg);
+        }
+        throw new RuntimeException("LeaveMsg not found");
     }
 
     @Override
@@ -111,14 +122,17 @@ public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgReq
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<LeaveMsgEntity> leaveMsgOptional = findByUid(uid);
+        if (leaveMsgOptional.isPresent()) {
+            LeaveMsgEntity leaveMsg = leaveMsgOptional.get();
+            leaveMsg.setDeleted(true);
+            save(leaveMsg);
+        }
     }
 
     @Override
     public void delete(LeaveMsgRequest entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(entity.getUid());
     }
 
     @Override
