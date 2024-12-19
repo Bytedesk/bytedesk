@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 16:52:50
+ * @LastEditTime: 2024-12-19 12:36:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.queue.QueueServiceMy;
+// import com.bytedesk.service.queue.QueueServiceMy;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.strategy.ThreadMessageUtil;
@@ -49,7 +49,7 @@ public class RouteService {
 
     private final AgentRestService agentRestService;
 
-    private final QueueServiceMy visitorQueueService;
+    // private final QueueServiceMy visitorQueueService;
 
     public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
             @Nonnull RobotEntity robot) {
@@ -87,7 +87,7 @@ public class RouteService {
             } else {
                 // 进入排队队列
                 // 插入队列
-                visitorQueueService.enqueue(thread);
+                // visitorQueueService.enqueue(thread);
                 //
                 thread.setQueuing();
                 thread.setUnreadCount(0);
