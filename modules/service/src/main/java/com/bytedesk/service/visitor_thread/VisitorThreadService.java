@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 15:35:09
+ * @LastEditTime: 2024-12-19 15:12:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,8 +58,6 @@ public class VisitorThreadService
     private final VisitorThreadRepository visitorThreadRepository;
 
     private final ThreadRestService threadService;
-
-    // private final ThreadStateService threadStateService;
 
     private final ModelMapper modelMapper;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 12:36:13
+ * @LastEditTime: 2024-12-19 15:47:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,10 +28,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-// import com.bytedesk.service.queue.QueueResponse;
-// import com.bytedesk.service.queue.QueueServiceMy;
-// import com.bytedesk.service.counter_visitor.CounterVisitorService;
-import com.bytedesk.service.route.RouteService;
+import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 
@@ -95,11 +92,8 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // 计数器，排队号
         // String orgUid = visitorRequest.getOrgUid();
         // String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
-        // QueueMemberResponse counter = counterService.getNumber(orgUid, topic, visitor);
-        // counterVisitorService.saveNumber(orgUid, topic, counter.getCurrentNumber(), visitor);
-        // log.info("counter topic: {}, count {}", topic, counter.getCurrentNumber());
         //
-        // thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
+        thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
         // QueueResponse queueResponse = visitorQueueService.enqueue(thread);
         // log.info("Enqueued to queue {}", queueResponse.toString());
         // thread.setSerialNumber(counter.getCurrentNumber());
