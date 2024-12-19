@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 13:46:06
+ * @LastEditTime: 2024-12-19 14:58:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,6 +67,12 @@ public class QueueMemberEntity extends BaseEntity {
 
     @Column(name = "start_time")
     private LocalDateTime startTime;  // 开始服务时间
+
+    @Column(name = "first_response_time")
+    private LocalDateTime firstResponseTime;  // 首次响应时间
+
+    @Column(name = "first_response")
+    private boolean firstResponse;  // 是否首次响应
 
     @Column(name = "end_time")
     private LocalDateTime endTime;  // 结束时间
