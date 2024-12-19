@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-30 22:48:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 14:46:24
+ * @LastEditTime: 2024-12-19 18:25:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,22 +37,10 @@ public enum WorkgroupRoutingModeEnum {
     CONSISTENT_HASH,
     // 最快响应时间, 选择响应最快的客服, 提高用户体验, 激励客服提高效率
     FASTEST_RESPONSE,
-
-    
-    // 当日内按照接待个数平均分配，少者优先, 0点清空前一天，并开始新的一天计数
-    AVERAGE,
-    // 当前饱和度，饱和度越低，空缺位置越多，优先分配
-    IDLE,
-    // 当前正在进行中对话数量，少者优先
-    LESS,
     // 广播给所有客服，客服抢单
     BROADCAST,
     // 熟客优先，最近会话优先分配
-    RECENT,
-    // TODO: 智能分配，还没有想清楚，待后续完善
-    // SMART,
-    // TODO: 根据客服满意度评分等其他因素自动分配
-    // RATE,
+    // RECENT, # 同 CONSISTENT_HASH
     // 优先级分配
     // PRIORITY,
 }

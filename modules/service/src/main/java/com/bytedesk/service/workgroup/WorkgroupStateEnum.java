@@ -15,7 +15,6 @@
 package com.bytedesk.service.workgroup;
 
 public enum WorkgroupStateEnum {
-    INITIAL, // 初始化状态
     AVAILABLE, // 可接待状态
     BUSY, // 忙碌状态
     OFFLINE, // 离线状态

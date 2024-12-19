@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 16:15:14
+ * @LastEditTime: 2024-12-19 17:54:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -100,7 +100,7 @@ public class QueueEntity extends BaseEntity {
      * 检查是否可以加入队列
      */
     public boolean canJoin() {
-        return status.equals(QueueStatusEnum.AVAILABLE.name());
-            // && waitingNumber < maxWaiting;
+        return status.equals(QueueStatusEnum.AVAILABLE.name())
+            && waitingNumber < maxWaiting;
     }
 }

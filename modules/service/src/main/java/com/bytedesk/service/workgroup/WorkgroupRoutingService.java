@@ -1,4 +1,4 @@
-package com.bytedesk.service.assignment;
+package com.bytedesk.service.workgroup;
 
 import java.util.List;
 import java.util.Map;
@@ -9,13 +9,12 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class WorkgroupThreadAssignmentService {
+public class WorkgroupRoutingService {
 
     // 轮询计数器
     private final Map<String, AtomicInteger> roundRobinCounters = new ConcurrentHashMap<>();
@@ -164,5 +163,29 @@ public class WorkgroupThreadAssignmentService {
     private double getAverageResponseTime(AgentEntity agent) {
         // TODO: 从统计数据中获取实际响应时间
         return 30.0; // 默认30秒
+    }
+
+    /**
+     * 计算会话优先级
+     */
+    public int calculatePriority(ThreadEntity thread) {
+        int priority = 0;
+        
+        // 1. VIP访客优先级
+        // if(thread.getVisitor().isVip()) {
+        //     priority += 100;
+        // }
+        
+        // 2. 老客户优先级
+        // if(thread.getVisitor().getVisitCount() > 10) {
+        //     priority += 50;
+        // }
+        
+        // 3. 紧急程度
+        // if(thread.isUrgent()) {
+        //     priority += 30;
+        // }
+        
+        return priority;
     }
 }

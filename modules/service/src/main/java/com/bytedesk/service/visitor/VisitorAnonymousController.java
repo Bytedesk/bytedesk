@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 14:55:44
+ * @LastEditTime: 2024-12-19 17:46:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/visitor/api/v1")
-public class VisitorRestControllerAnonymous {
+public class VisitorAnonymousController {
 
     private final VisitorRestService visitorService;
 
@@ -48,12 +48,14 @@ public class VisitorRestControllerAnonymous {
 
     private final IMessageSendService messageSendService;
 
+    @VisitorAnnotation(title = "visitor", action = "pre", description = "pre visit page")
     @GetMapping("/pre")
     public ResponseEntity<?> pre(HttpServletRequest request) {
         //
         return ResponseEntity.ok(JsonResult.success("pre"));
     }
 
+    @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
     @ApiRateLimiter(value = 10.0, timeout = 1)
     @GetMapping("/init")
     public ResponseEntity<?> init(VisitorRequest visitorRequest, HttpServletRequest request) {
@@ -74,6 +76,7 @@ public class VisitorRestControllerAnonymous {
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
     }
 
+    @VisitorAnnotation(title = "visitor", action = "ping", description = "ping")
     @GetMapping("/ping")
     public ResponseEntity<?> ping(VisitorRequest request) {
 
@@ -85,6 +88,7 @@ public class VisitorRestControllerAnonymous {
     }
 
     // 访客拉取未读消息
+    @VisitorAnnotation(title = "visitor", action = "getMessageUnread", description = "get unread messages")
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
         // TODO: 拉取visitor_message表，非消息主表

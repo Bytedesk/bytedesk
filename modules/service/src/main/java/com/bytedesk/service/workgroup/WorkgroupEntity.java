@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 14:47:37
+ * @LastEditTime: 2024-12-19 18:37:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,9 +69,9 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private String status = WorkgroupStateEnum.AVAILABLE.name();
 
-    @Builder.Default
-    @Column(name = "is_recent")
-    private boolean recent = false;
+    // @Builder.Default
+    // @Column(name = "is_recent")
+    // private boolean recent = false;
 
     @Embedded
     @Builder.Default
@@ -82,8 +82,6 @@ public class WorkgroupEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list
     private List<AgentEntity> agents = new ArrayList<>();
-
-    // TODO: 处理留言agent
 
     // TODO: 监控管理员agent
 
@@ -103,11 +101,7 @@ public class WorkgroupEntity extends BaseEntity {
         if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
             // return assignAgentByRobin();
 
-        } else if (routingMode.equals(WorkgroupRoutingModeEnum.AVERAGE.name())) {
-
-        } else if (routingMode.equals(WorkgroupRoutingModeEnum.IDLE.name())) {
-
-        } else if (routingMode.equals(WorkgroupRoutingModeEnum.LESS.name())) {
+        } else if (routingMode.equals(WorkgroupRoutingModeEnum.LEAST_ACTIVE.name())) {
 
         }
 
