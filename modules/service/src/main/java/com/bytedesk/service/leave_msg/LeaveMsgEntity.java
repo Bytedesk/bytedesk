@@ -66,6 +66,9 @@ public class LeaveMsgEntity extends BaseEntity {
     private String threadTopic;
 
     @Builder.Default
+    private String status = LeaveMsgStatusEnum.UNREAD.name();
+
+    @Builder.Default
     @Column(name = "leavemsg_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
