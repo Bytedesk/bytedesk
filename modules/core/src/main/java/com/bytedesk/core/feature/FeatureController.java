@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-19 10:35:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 10:37:01
+ * @LastEditTime: 2024-12-19 11:01:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,14 +15,34 @@
 package com.bytedesk.core.feature;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.utils.JsonResult;
+
+import lombok.AllArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 // anonymous api
 @RestController
 @RequestMapping("/features")
+@AllArgsConstructor
 public class FeatureController {
     
-    
+    private final BytedeskProperties bytedeskProperties;
+
+    // http://127.0.0.1:9003/features/get
+    @GetMapping("/get")
+    public ResponseEntity<?> get() {
+
+        FeatureResponseSimple featureResponseSimple = FeatureResponseSimple.builder()
+            .edition(bytedeskProperties.getEdition())
+        .build();
+
+        return ResponseEntity.ok(JsonResult.success(featureResponseSimple));
+    }
 
 
 }
