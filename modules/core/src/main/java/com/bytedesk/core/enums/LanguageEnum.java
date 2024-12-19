@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 14:19:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-10 11:38:37
+ * @LastEditTime: 2024-12-19 14:45:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,49 @@
  */
 package com.bytedesk.core.enums;
 
-// TODO: add more language support
 public enum LanguageEnum {
-    EN,
-    ZH_CN,
-    ZH_TW;
+    EN,       // English
+    ZH_CN,    // Simplified Chinese
+    ZH_TW,    // Traditional Chinese
+    ES,       // Spanish
+    FR,       // French
+    DE,       // German
+    IT,       // Italian
+    JA,       // Japanese
+    KO,       // Korean
+    PT,       // Portuguese
+    RU,       // Russian
+    AR,       // Arabic
+    HI,       // Hindi
+    BN,       // Bengali
+    PA,       // Punjabi
+    VI,       // Vietnamese
+    ID,       // Indonesian
+    TH,       // Thai
+    MS,       // Malay
+    TR,       // Turkish
+    FA,       // Persian
+    UR,       // Urdu
+    HE,       // Hebrew
+    NL,       // Dutch
+    SV,       // Swedish
+    DA,       // Danish
+    FI,       // Finnish
+    NO,       // Norwegian
+    EL,       // Greek
+    HU,       // Hungarian
+    CS,       // Czech
+    RO,       // Romanian
+    PL,       // Polish
+    UK,       // Ukrainian
+    SK,       // Slovak
+    BG,       // Bulgarian
+    HR,       // Croatian
+    SR,       // Serbian
+    SL,       // Slovenian
+    LT,       // Lithuanian
+    LV,       // Latvian
+    ET;       // Estonian
 
     public static LanguageEnum fromValue(String value) {
         for (LanguageEnum type : LanguageEnum.values()) {

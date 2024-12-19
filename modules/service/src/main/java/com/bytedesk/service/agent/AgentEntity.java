@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-09 07:32:02
+ * @LastEditTime: 2024-12-19 14:20:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,6 @@ public class AgentEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // show to the visitors
     private String nickname;
 
     @Builder.Default
@@ -79,7 +78,7 @@ public class AgentEntity extends BaseEntity {
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Invalid mobile number format")
     private String mobile;
 
-    @Email(message = "email format error")
+    @Email(message = I18Consts.I18N_EMAIL_FORMAT_ERROR)
     private String email;
 
     @Builder.Default

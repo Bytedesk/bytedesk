@@ -19,7 +19,8 @@ package com.bytedesk.service.queue;
  */
 public enum QueueStatusEnum {
     
-    ACTIVE("active"),       // 队列开放中
+    AVAILABLE("available"),       // 队列可接待
+    QUEUING("queuing"),        // 队列排队中
     PAUSED("paused"),      // 队列暂停
     CLOSED("closed"),      // 队列关闭
     MAINTENANCE("maintenance"); // 系统维护

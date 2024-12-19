@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 12:32:29
+ * @LastEditTime: 2024-12-19 14:15:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ public class QueueEntity extends BaseEntity {
     // 队列基本信息
     @Builder.Default
     @Column(name = "current_number")
-    private int currentNumber = 1;  // 当前排队号码
+    private int currentNumber = 0;  // 当前排队号码
 
     @Builder.Default
     @Column(name = "waiting_number")
@@ -57,23 +57,27 @@ public class QueueEntity extends BaseEntity {
     private int avgWaitTime = 0;  // 平均等待时间(秒)
 
     // 队列配置
-    @Builder.Default
-    @Column(name = "max_waiting")
-    private int maxWaiting = 100;  // 最大等待人数
+    // @Builder.Default
+    // @Column(name = "max_waiting")
+    // private int maxWaiting = 100;  // 最大等待人数
 
-    @Builder.Default
-    @Column(name = "max_wait_time")
-    private int maxWaitTime = 1800;  // 最大等待时间(秒)
+    // @Builder.Default
+    // @Column(name = "max_wait_time")
+    // private int maxWaitTime = 1800;  // 最大等待时间(秒)
 
     // 队列状态
     @Builder.Default
     @Column(nullable = false)
-    private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
-
-    private String threadTopic;
+    private String status = QueueStatusEnum.AVAILABLE.name();  // 队列状态
 
     @Column(name = "queue_day")
     private String day;  // 队列日期(YYYY-MM-DD)
+
+    @Column(name = "thread_topic")
+    private String threadTopic;
+
+    @Column(name = "next_agent_uid")
+    private String nextAgentUid;  // 下一个客服
 
     /**
      * 获取下一个排队号码
@@ -96,7 +100,7 @@ public class QueueEntity extends BaseEntity {
      * 检查是否可以加入队列
      */
     public boolean canJoin() {
-        return status.equals(QueueStatusEnum.ACTIVE.name()) 
-            && waitingNumber < maxWaiting;
+        return status.equals(QueueStatusEnum.AVAILABLE.name());
+            // && waitingNumber < maxWaiting;
     }
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 16:26:29
+ * @LastEditTime: 2024-12-19 14:45:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,13 +20,6 @@ public class I18Consts {
     private I18Consts() {
     }
 
-    // public static final String EN = "en";
-    // public static final String ZH = "zh";
-    //
-    // public static final String EN_US = "en-US";
-    // public static final String ZH_CN = "zh-CN";
-    // public static final String ZH_TW = "zh-TW";
-
     public static final String I18N_PREFIX = "i18n.";
     // 
     public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = I18N_PREFIX + "username.or.password.incorrect";
@@ -34,6 +27,7 @@ public class I18Consts {
     public static final String I18N_EMAIL_ALREADY_EXISTS = I18N_PREFIX + "email.already.exists";
     public static final String I18N_MOBILE_NOT_EXISTS = I18N_PREFIX + "mobile.not.exists";
     public static final String I18N_EMAIL_NOT_EXISTS = I18N_PREFIX + "email.not.exists";
+    public static final String I18N_EMAIL_FORMAT_ERROR = I18N_PREFIX + "email.format.error";
     // captcha
     public static final String I18N_AUTH_CAPTCHA_SEND_SUCCESS = I18N_PREFIX + "auth.captcha.send.success";
     public static final String I18N_AUTH_CAPTCHA_ERROR = I18N_PREFIX + "auth.captcha.error";
@@ -138,7 +132,9 @@ public class I18Consts {
     // 
     public static final String I18N_AUTO_CLOSED = I18N_PREFIX + "auto.closed";
     public static final String I18N_AGENT_CLOSED = I18N_PREFIX + "agent.closed";
+    public static final String I18N_AGENT_TRANSFER = I18N_PREFIX + "agent.transfer";
     // 
+    
     
 
 }
