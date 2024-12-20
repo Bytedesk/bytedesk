@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 10:21:15
+ * @LastEditTime: 2024-12-20 11:14:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,8 +86,8 @@ public class ThreadEntity extends BaseEntity {
     private String state = ThreadStateEnum.INITIAL.name();
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
-    @Builder.Default
-    private int serialNumber = 1;
+    // @Builder.Default
+    // private int serialNumber = 1;
 
     // 客户端需要此字段，暂时保留，TODO: 需要与真实未读消息数同步
     @Builder.Default

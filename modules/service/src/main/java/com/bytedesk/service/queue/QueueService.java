@@ -17,7 +17,7 @@ import com.bytedesk.core.topic.TopicUtils;
 // import com.bytedesk.core.thread.ThreadRepository;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentService;
-import com.bytedesk.service.queue.event.QueueMemberJoinedEvent;
+import com.bytedesk.service.queue.event.QueueMemberEnqueueEvent;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
@@ -56,7 +56,7 @@ public class QueueService {
         // 2. 创建队列成员
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
-            .threadTopic(threadEntity.getTopic())
+            .threadUid(threadEntity.getUid())
             .visitorUid(visitorRequest.getUid())
             .queueNumber(queue.getNextNumber())
             .enqueueTime(LocalDateTime.now())
@@ -69,7 +69,7 @@ public class QueueService {
         updateQueueStats(queue);
         
         // 4. 发布事件
-        eventPublisher.publishEvent(new QueueMemberJoinedEvent(member));
+        eventPublisher.publishEvent(new QueueMemberEnqueueEvent(member));
 
         return member;
     }
@@ -79,7 +79,7 @@ public class QueueService {
         String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(threadTopic);
         // 按照ISO 8601标准格式化日期，即yyyy-MM-dd格式
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        return queueRestService.findByQueueTopicAndDay(threadTopic, today)
+        return queueRestService.findByQueueTopicAndDay(queueTopic, today)
             .orElseGet(() -> {
                 QueueEntity queue = QueueEntity.builder()
                     .day(today)
@@ -177,7 +177,6 @@ public class QueueService {
         return (queuePosition * avgThreadDuration) / onlineAgents.size();
     }
 
-    
     @Transactional
     public void checkQueueTimeout() {
         // 1. 获取所有等待中的成员
@@ -196,7 +195,7 @@ public class QueueService {
                     .orElseThrow(() -> new RuntimeException("Queue not found"));
                 updateQueueStats(queue);
                 
-                log.info("Thread {} queue timeout", member.getThreadTopic());
+                log.info("Thread {} queue timeout", member.getThreadUid());
             }
         }
     }

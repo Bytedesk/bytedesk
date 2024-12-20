@@ -14,7 +14,10 @@
  */
 package com.bytedesk.service.queue_member;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.service.queue.event.QueueMemberEnqueueEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +27,16 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class QueueMemberEventListener {
 
-    // private QueueMemberRestService counterService;
+
+    @EventListener
+    public void onQueueMemberJoinedEvent(QueueMemberEnqueueEvent event) {
+        log.info("queue member enqueue event ");
+    }
+
+
     
+
+    // private QueueMemberRestService counterService;
     // @EventListener
     // public void onQuartzDay0Event(QuartzDay0Event event) {
     //     log.info("counter quartz day0 event ");
