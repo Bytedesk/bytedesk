@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 10:59:11
+ * @LastEditTime: 2024-12-20 11:04:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -88,6 +88,9 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "first_response")
     private boolean firstResponse = false;  // 是否首次响应
 
+    @Column(name = "avg_response_time")
+    private int avgResponseTime;  // 平均响应时间(秒)
+
     @Column(name = "close_time")
     private LocalDateTime closeTime;  // 结束时间
 
@@ -98,12 +101,12 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "priority")
     private int priority = 0;  // 优先级(0-100)
 
-    // 已解决
+    // 是否已解决
     @Builder.Default
     @Column(name = "is_solved")
     private boolean solved = false;
 
-    // 已评价
+    // 是否已评价
     @Builder.Default
     @Column(name = "is_rated")
     private boolean rated = false;
