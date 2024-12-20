@@ -84,6 +84,7 @@ public class QueueService {
                 QueueEntity queue = QueueEntity.builder()
                     .day(today)
                     .queueTopic(queueTopic)
+                    .queueType(threadEntity.getType())
                     .status(QueueStatusEnum.ACTIVE.name())
                     .build();
                 queue.setOrgUid(threadEntity.getOrgUid());
@@ -111,7 +112,7 @@ public class QueueService {
     @Transactional
     public void dequeue(String threadTopic, QueueStatusEnum status) {
         // 1. 查找队列成员
-        QueueMemberEntity member = memberRepository.findByThreadTopic(threadTopic)
+        QueueMemberEntity member = memberRepository.findByThreadUid(threadTopic)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
 
         // 2. 更新状态
@@ -135,7 +136,7 @@ public class QueueService {
 
     
     public int getQueuePosition(String threadTopic) {
-        QueueMemberEntity member = memberRepository.findByThreadTopic(threadTopic)
+        QueueMemberEntity member = memberRepository.findByThreadUid(threadTopic)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
         return memberRepository.countByQueueUidAndPriorityGreaterThan(
             member.getQueueUid(), member.getPriority());
@@ -157,7 +158,7 @@ public class QueueService {
 
     
     public int getEstimatedWaitTime(String threadUid) {
-        QueueMemberEntity member = memberRepository.findByThreadTopic(threadUid)
+        QueueMemberEntity member = memberRepository.findByThreadUid(threadUid)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
             
         // 1. 获取前面等待数量
