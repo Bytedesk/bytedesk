@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 10:36:08
+ * @LastEditTime: 2024-12-20 11:36:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 
     Optional<QueueMemberEntity> findByUid(String uid);
 
-    Optional<QueueMemberEntity> findByThreadTopic(String threadTopic);
+    Optional<QueueMemberEntity> findByThreadUid(String threadUid);
 
     List<QueueMemberEntity> findByStatus(String status);
 

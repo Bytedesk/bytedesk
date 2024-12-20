@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:07:53
+ * @LastEditTime: 2024-12-20 11:33:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -69,8 +70,8 @@ public class QueueEntity extends BaseEntity {
     // agentUid or workgroupUid
     private String queueTopic;
 
-    // @Column(name = "next_agent_uid")
-    // private String nextAgentUid;  // 下一个客服
+    @Builder.Default
+    private String queueType = ThreadTypeEnum.WORKGROUP.name();  // 队列类型，AGENT或WORKGROUP
 
     /**
      * 获取下一个排队号码

@@ -32,7 +32,7 @@ public class QueueMemberRequest extends BaseRequest {
 
     private String queueUid;  // 关联队列
 
-    private String threadTopic;  // 关联会话
+    private String threadUid;  // 关联会话
 
     private String visitorUid;  // 访客ID
 
