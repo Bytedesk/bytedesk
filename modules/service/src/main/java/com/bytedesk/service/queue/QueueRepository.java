@@ -29,7 +29,7 @@ public interface QueueRepository extends JpaRepository<QueueEntity, Long>, JpaSp
     
     // Optional<QueueEntity> findByThreadUid(String threadUid);
 
-    Optional<QueueEntity> findByThreadTopicAndDayAndDeletedFalse(String threadTopic, String day);
+    Optional<QueueEntity> findByQueueTopicAndDayAndDeletedFalse(String queueTopic, String day);
     
     List<QueueEntity> findByStatus(String status);
     

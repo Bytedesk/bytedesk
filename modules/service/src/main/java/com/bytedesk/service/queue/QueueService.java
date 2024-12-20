@@ -76,7 +76,7 @@ public class QueueService {
         String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(threadTopic);
         // 按照ISO 8601标准格式化日期，即yyyy-MM-dd格式
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        return queueRestService.findByThreadTopicAndDay(threadTopic, today)
+        return queueRestService.findByQueueTopicAndDay(threadTopic, today)
             .orElseGet(() -> {
                 QueueEntity queue = QueueEntity.builder()
                     .day(today)

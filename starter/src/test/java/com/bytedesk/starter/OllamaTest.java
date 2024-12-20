@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 11:23:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-11 11:42:24
+ * @LastEditTime: 2024-12-20 10:32:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,30 +15,24 @@
 package com.bytedesk.starter;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaModel;
-import org.springframework.ai.ollama.api.OllamaOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class OllamaTest {
     
-    @Autowired
-    private OllamaChatModel chatModel;
+    // @Autowired
+    // private OllamaChatModel chatModel;
 
     @Test
     void ollamaChat() {
-        ChatResponse response = chatModel.call(
-                new Prompt(
-                        "Spring Boot适合做什么？",
-                        OllamaOptions.builder()
-                                .withModel(OllamaModel.MISTRAL)
-                                .withTemperature(0.4)
-                                .build()
-                ));
-        System.out.println(response);
+        // ChatResponse response = chatModel.call(
+        //         new Prompt(
+        //                 "Spring Boot适合做什么？",
+        //                 OllamaOptions.builder()
+        //                         .withModel(OllamaModel.MISTRAL)
+        //                         .withTemperature(0.4)
+        //                         .build()
+        //         ));
+        // System.out.println(response);
     }
 }
