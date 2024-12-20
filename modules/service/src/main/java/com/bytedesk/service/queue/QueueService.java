@@ -22,6 +22,7 @@ import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
+import com.bytedesk.service.visitor.VisitorRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,10 +46,10 @@ public class QueueService {
     private ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void enqueue(ThreadEntity threadEntity, String visitorUid) {
+    public QueueMemberEntity enqueue(ThreadEntity threadEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
         QueueEntity queue = getOrCreateQueue(threadEntity);
-        if (!queue.canJoin()) {
+        if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
         
@@ -56,7 +57,7 @@ public class QueueService {
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
             .threadTopic(threadEntity.getTopic())
-            .visitorUid(visitorUid)
+            .visitorUid(visitorRequest.getUid())
             .queueNumber(queue.getNextNumber())
             .enqueueTime(LocalDateTime.now())
             .status(QueueMemberStatusEnum.WAITING.name())
@@ -69,6 +70,8 @@ public class QueueService {
         
         // 4. 发布事件
         eventPublisher.publishEvent(new QueueMemberJoinedEvent(member));
+
+        return member;
     }
 
     private QueueEntity getOrCreateQueue(ThreadEntity threadEntity) {

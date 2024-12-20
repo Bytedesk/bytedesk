@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 15:17:23
+ * @LastEditTime: 2024-12-20 10:50:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,6 +86,7 @@ public class ServiceSettings extends BaseServiceSettings {
 
     //
     public Boolean shouldTransferToRobot(Boolean isOffline) {
+
         if (defaultRobot) {
             // 默认机器人优先接待
             return true;

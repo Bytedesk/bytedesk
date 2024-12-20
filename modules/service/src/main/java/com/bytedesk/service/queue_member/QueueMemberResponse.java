@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-06 07:28:01
+ * @LastEditTime: 2024-12-20 11:00:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,20 +31,50 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QueueMemberResponse extends BaseResponse {
 
-    private String queueUid;
-    
-    private Integer currentNumber;
+    private String queueUid;  // 关联队列
 
-    private Integer waitingNumber;
+    private String threadTopic;  // 关联会话
 
-    private Integer waitSeconds;
-    
-    private String state;   
+    private String visitorUid;  // 访客ID
 
-    private String threadTopic;
-    
-    private String visitor;
+    @Builder.Default
+    private int beforeNumber = 0;  // 前面排队人数
 
-    private LocalDateTime acceptedAt;
+    @Builder.Default
+    private int waitTime = 0;  // 等待时间(秒)
+
+    @Builder.Default
+    private int queueNumber = 1;  // 排队号码
+
+    @Builder.Default
+    private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
+
+    @Builder.Default
+    private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
+
+    @Builder.Default
+    private String acceptType = QueueMemberAcceptTypeEnum.AUTO.name();  // 接单方式
+
+    private LocalDateTime acceptTime;  // 开始服务时间
+
+    private LocalDateTime firstResponseTime;  // 首次响应时间
+
+    @Builder.Default
+    private boolean firstResponse = false;  // 是否首次响应
+
+    private LocalDateTime closeTime;  // 结束时间
+
+    private String agentUid;  // 服务客服
+
+    @Builder.Default
+    private int priority = 0;  // 优先级(0-100)
+
+    // 已解决
+    @Builder.Default
+    private boolean solved = false;
+
+    // 已评价
+    @Builder.Default
+    private boolean rated = false;
     
 }

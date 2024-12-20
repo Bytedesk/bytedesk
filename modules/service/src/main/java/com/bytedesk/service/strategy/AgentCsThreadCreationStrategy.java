@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 07:29:13
+ * @LastEditTime: 2024-12-20 10:54:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,8 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.queue.QueueService;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
@@ -58,7 +60,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
     
     private final IMessageSendService messageSendService;
 
-    // private final QueueServiceMy visitorQueueService;
+    private final QueueService queueService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -90,11 +92,10 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
             thread = visitorThreadService.getAgentThread(visitorRequest, agent, topic);
         }
         // 计数器，排队号
-        // String orgUid = visitorRequest.getOrgUid();
         // String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
         thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
-        // QueueResponse queueResponse = visitorQueueService.enqueue(thread);
-        // log.info("Enqueued to queue {}", queueResponse.toString());
+        QueueMemberEntity memberEntity = queueService.enqueue(thread, visitorRequest);
+        log.info("Enqueued to queue {}", memberEntity.toString());
         // thread.setSerialNumber(counter.getCurrentNumber());
 
         // 未强制转人工的情况下，判断是否转机器人
@@ -105,8 +106,11 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
             if (transferToRobot) {
                 // 转机器人
                 RobotEntity robot = agent.getServiceSettings().getRobot();
-                // 
-                return routeService.routeRobot(visitorRequest, thread, robot);
+                if (robot != null) {
+                    return routeService.routeRobot(visitorRequest, thread, robot);
+                } else {
+                    throw new RuntimeException("Robot not found");
+                }
             }
         }
         // 
