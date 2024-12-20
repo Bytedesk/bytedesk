@@ -47,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/message")
 public class MessageRestController extends BaseRestController<MessageRequest> {
 
-    private final MessageService messageService;
+    private final MessageRestService messageService;
 
     private final IMessageSendService messageSendService;
 

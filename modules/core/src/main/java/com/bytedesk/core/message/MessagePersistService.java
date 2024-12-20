@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessagePersistService {
 
-    private final MessageService messageService;
+    private final MessageRestService messageService;
 
     private final ModelMapper modelMapper;
 
