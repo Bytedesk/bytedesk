@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:04:14
+ * @LastEditTime: 2024-12-20 11:07:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,25 +45,22 @@ public class QueueMemberEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "queue_uid", nullable = false)
+    @Column(nullable = false)
     private String queueUid;  // 关联队列
 
-    @Column(name = "thread_topic", nullable = false)
+    @Column(nullable = false)
     private String threadTopic;  // 关联会话
 
-    @Column(name = "visitor_uid", nullable = false)
+    @Column(nullable = false)
     private String visitorUid;  // 访客ID
 
     @Builder.Default
-    @Column(name = "before_number")
     private int beforeNumber = 0;  // 前面排队人数
 
     @Builder.Default
-    @Column(name = "wait_time")
     private int waitTime = 0;  // 等待时间(秒)
 
     @Builder.Default
-    @Column(name = "queue_number")
     private int queueNumber = 1;  // 排队号码
 
     @Builder.Default
@@ -71,34 +68,30 @@ public class QueueMemberEntity extends BaseEntity {
     private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
     @Builder.Default
-    @Column(name = "enqueue_time", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
 
     @Builder.Default
-    @Column(name = "accept_type")
     private String acceptType = QueueMemberAcceptTypeEnum.AUTO.name();  // 接单方式
 
-    @Column(name = "accept_time")
     private LocalDateTime acceptTime;  // 开始服务时间
 
-    @Column(name = "first_response_time")
     private LocalDateTime firstResponseTime;  // 首次响应时间
 
     @Builder.Default
-    @Column(name = "first_response")
     private boolean firstResponse = false;  // 是否首次响应
 
-    @Column(name = "avg_response_time")
     private int avgResponseTime;  // 平均响应时间(秒)
 
-    @Column(name = "close_time")
+    private LocalDateTime lastResponseTime;  // 最后响应时间
+
+    private LocalDateTime leaveTime;  // 离开时间
+
     private LocalDateTime closeTime;  // 结束时间
 
-    @Column(name = "agent_uid")
     private String agentUid;  // 服务客服
 
     @Builder.Default
-    @Column(name = "priority")
     private int priority = 0;  // 优先级(0-100)
 
     // 是否已解决
