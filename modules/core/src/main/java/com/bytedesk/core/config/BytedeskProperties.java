@@ -120,6 +120,7 @@ public class BytedeskProperties {
         private Boolean pythonAi = true;
         private String emailType = "javamail";
         private Boolean enableRegistration = false;
+        private Integer freeDays = 30;
         private String avatarUrl;
     }
 

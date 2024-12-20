@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 10:14:08
+ * @LastEditTime: 2024-12-20 12:26:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,12 +31,6 @@ public class UserEntityListener {
 
     // 无法注入bean，否则报错
     // private static TopicService topicService;
-
-    // private BytedeskEventPublisher bytedeskEventPublisher;
-
-    // public UserEntityListener() {
-    //     this.bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-    // }
 
     @PostPersist
     public void postPersist(UserEntity user) {

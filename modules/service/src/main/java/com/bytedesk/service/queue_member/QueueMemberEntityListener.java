@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:52:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 10:56:21
+ * @LastEditTime: 2024-12-20 12:31:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,12 @@
  */
 package com.bytedesk.service.queue_member;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
+
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.service.queue_member.event.QueueMemberCreateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -25,13 +30,17 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueMemberEntityListener {
 
     @PostPersist
-    public void onPostPersist(QueueMemberEntity counter) {
-        log.info("QueueMemberEntityListener onPostPersist: {}", counter);
+    public void onPostPersist(QueueMemberEntity queueMember) {
+        log.info("QueueMemberEntityListener onPostPersist: {}", queueMember);
+        QueueMemberEntity clonedEntity = SerializationUtils.clone(queueMember);
+        // 
+        ApplicationEventPublisher eventPublisher = ApplicationContextHolder.getBean(ApplicationEventPublisher.class);
+        eventPublisher.publishEvent(new QueueMemberCreateEvent(clonedEntity));
     }
 
     @PostUpdate
-    public void onPostUpdate(QueueMemberEntity counter) {
-        log.info("QueueMemberEntityListener onPostUpdate: {}", counter);
+    public void onPostUpdate(QueueMemberEntity queueMember) {
+        log.info("QueueMemberEntityListener onPostUpdate: {}", queueMember);
     }
     
 }

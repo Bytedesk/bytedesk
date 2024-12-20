@@ -23,6 +23,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.thread.ThreadProtobuf;

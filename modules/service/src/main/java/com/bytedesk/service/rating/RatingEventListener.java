@@ -21,7 +21,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.message.MessageEntity;
 // import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.message.MessageUpdateEvent;
+import com.bytedesk.core.message.event.MessageUpdateEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

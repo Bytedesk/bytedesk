@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.message.MessageEntity;
-import com.bytedesk.core.message.MessageCreateEvent;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageUpdateEvent;
+import com.bytedesk.core.message.event.MessageCreateEvent;
+import com.bytedesk.core.message.event.MessageUpdateEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;

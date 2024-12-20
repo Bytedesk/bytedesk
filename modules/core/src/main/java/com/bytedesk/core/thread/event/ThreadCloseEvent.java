@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-04 20:44:12
+ * @Date: 2024-04-23 08:51:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 20:44:15
+ * @LastEditTime: 2024-12-20 12:34:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,24 +12,24 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.message;
+package com.bytedesk.core.thread.event;
 
 import org.springframework.context.ApplicationEvent;
+
+import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class MessageUpdateEvent extends ApplicationEvent {
+public class ThreadCloseEvent extends ApplicationEvent {
 
-    private static final long serialVersionUID = 1L;
-    
-    private final MessageEntity message;
+    private ThreadEntity thread;
 
-    public MessageUpdateEvent(Object source, MessageEntity message) {
+    public ThreadCloseEvent(Object source, ThreadEntity thread) {
         super(source);
-        this.message = message;
+        this.thread = thread;
     }
 
 }
