@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 12:58:02
+ * @LastEditTime: 2024-12-20 14:34:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.service.routing;
+
+import java.time.LocalDateTime;
 
 // import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,10 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue.QueueService;
+import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 // import com.bytedesk.service.queue.QueueServiceMy;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -52,6 +57,8 @@ public class RouteService {
     private final AgentRestService agentRestService;
 
     private final QueueService queueService;
+
+    private final QueueMemberRestService queueMemberRestService; ;
 
     public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
             @Nonnull RobotEntity robot) {
@@ -89,6 +96,11 @@ public class RouteService {
                 // 增加接待数量，待优化
                 agent.increaseThreadCount();
                 agentRestService.save(agent);
+                // 
+                memberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+                memberEntity.setAcceptTime(LocalDateTime.now());
+                memberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+                queueMemberRestService.save(memberEntity);
             } else {
                 // 进入排队队列
                 thread.setQueuing();

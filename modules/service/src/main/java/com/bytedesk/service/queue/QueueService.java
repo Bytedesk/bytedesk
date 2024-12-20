@@ -99,7 +99,7 @@ public class QueueService {
         int waiting = memberRepository.countByQueueUidAndStatus(
             queue.getUid(), QueueMemberStatusEnum.WAITING.name());
         int serving = memberRepository.countByQueueUidAndStatus(
-            queue.getUid(), QueueMemberStatusEnum.PROCESSING.name());
+            queue.getUid(), QueueMemberStatusEnum.SERVING.name());
         int finished = memberRepository.countByQueueUidAndEndStatusIsTrue(queue.getUid());
         int avgWait = calculateAverageWaitTime(queue.getUid());
         

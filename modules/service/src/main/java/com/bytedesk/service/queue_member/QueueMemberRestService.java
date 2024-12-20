@@ -108,7 +108,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         try {
             return visitorQueueMemberRepository.save(entity);
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
         return null;
     }
