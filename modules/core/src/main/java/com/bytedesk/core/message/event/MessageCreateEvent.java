@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-10-18 07:51:24
+ * @Date: 2024-07-04 20:42:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 07:57:09
+ * @LastEditTime: 2024-12-20 12:33:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,22 +12,25 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.queue_member;
+package com.bytedesk.core.message.event;
 
 import org.springframework.context.ApplicationEvent;
+
+import com.bytedesk.core.message.MessageEntity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class QueueMemberUpdateEvent extends ApplicationEvent {
-    
-    private final static long serialVersionUID = 1L;
+public class MessageCreateEvent extends ApplicationEvent {
 
-    private QueueMemberEntity counter;
+    private static final long serialVersionUID = 1L;
 
-    public QueueMemberUpdateEvent(Object source, QueueMemberEntity counter) {
+    private final MessageEntity message;
+
+    public MessageCreateEvent(Object source, MessageEntity message) {
         super(source);
-        this.counter = counter;
+        this.message = message;
     }
 }

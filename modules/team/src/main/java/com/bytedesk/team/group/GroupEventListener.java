@@ -21,9 +21,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadCreateEvent;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.team.member.MemberEntity;
 
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-02-23 14:43:57
+ * @Date: 2024-02-28 11:43:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-15 18:06:52
+ * @LastEditTime: 2024-04-12 18:02:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,22 +12,22 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.message;
+package com.bytedesk.core.message.event;
 
-// import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEvent;
 
-// import lombok.Data;
-// import lombok.EqualsAndHashCode;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-// @Data
-// @EqualsAndHashCode(callSuper = false)
-// public class MessageProtoEvent extends ApplicationEvent {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class MessageJsonEvent extends ApplicationEvent {
 
-//     private byte[] messageBytes;
+    private String json;
 
-//     public MessageProtoEvent(Object source, byte[] messageBytes) {
-//         super(source);
-//         this.messageBytes = messageBytes;
-//     }
-
-// }
+    public MessageJsonEvent(Object source, String json) {
+        super(source);
+        this.json = json;
+    }
+    
+}

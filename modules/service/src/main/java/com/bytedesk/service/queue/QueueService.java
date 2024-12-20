@@ -6,44 +6,37 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.topic.TopicUtils;
-// import com.bytedesk.core.thread.ThreadEntity;
-// import com.bytedesk.core.thread.ThreadRepository;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentService;
-import com.bytedesk.service.queue.event.QueueMemberEnqueueEvent;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class QueueService {
 
-    @Autowired
-    private QueueRepository queueRepository;
+    private final QueueRepository queueRepository;
     
-    @Autowired
-    private QueueMemberRepository memberRepository;
+    private final QueueMemberRepository memberRepository;
 
-    @Autowired
-    private AgentService agentService;
+    private final AgentService agentService;
 
-    @Autowired
-    public QueueRestService queueRestService;
+    public final QueueRestService queueRestService;
 
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private final UidUtils uidUtils;
 
     @Transactional
     public QueueMemberEntity enqueue(ThreadEntity threadEntity, VisitorRequest visitorRequest) {
@@ -54,22 +47,10 @@ public class QueueService {
         }
         
         // 2. 创建队列成员
-        QueueMemberEntity member = QueueMemberEntity.builder()
-            .queueUid(queue.getUid())
-            .threadUid(threadEntity.getUid())
-            .visitorUid(visitorRequest.getUid())
-            .queueNumber(queue.getNextNumber())
-            .enqueueTime(LocalDateTime.now())
-            .status(QueueMemberStatusEnum.WAITING.name())
-            .build();
-        member.setOrgUid(threadEntity.getOrgUid());
-        memberRepository.save(member);
+        QueueMemberEntity member = createQueueMemberEntity(threadEntity, visitorRequest, queue);
         
         // 3. 更新队列统计
         updateQueueStats(queue);
-        
-        // 4. 发布事件
-        eventPublisher.publishEvent(new QueueMemberEnqueueEvent(member));
 
         return member;
     }
@@ -87,9 +68,25 @@ public class QueueService {
                     .queueType(threadEntity.getType())
                     .status(QueueStatusEnum.ACTIVE.name())
                     .build();
+                queue.setUid(uidUtils.getUid());
                 queue.setOrgUid(threadEntity.getOrgUid());
                 return queueRepository.save(queue);
             });
+    }
+
+    public QueueMemberEntity createQueueMemberEntity(ThreadEntity threadEntity, VisitorRequest visitorRequest, QueueEntity queue) {
+        QueueMemberEntity member = QueueMemberEntity.builder()
+            .queueUid(queue.getUid())
+            .threadUid(threadEntity.getUid())
+            .visitorUid(visitorRequest.getUid())
+            .queueNumber(queue.getNextNumber())
+            .enqueueTime(LocalDateTime.now())
+            .status(QueueMemberStatusEnum.WAITING.name())
+            .build();
+        member.setUid(uidUtils.getUid());
+        member.setOrgUid(threadEntity.getOrgUid());
+        memberRepository.save(member);
+        return member;
     }
 
     private void updateQueueStats(QueueEntity queue) {
