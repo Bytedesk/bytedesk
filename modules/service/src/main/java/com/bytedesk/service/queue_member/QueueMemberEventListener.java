@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 14:59:32
+ * @LastEditTime: 2024-12-20 10:56:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,7 @@
  */
 package com.bytedesk.service.queue_member;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import com.bytedesk.core.quartz.event.QuartzDay0Event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class QueueMemberEventListener {
 
-    private QueueMemberRestService counterService;
+    // private QueueMemberRestService counterService;
     
-    // TODO: 每日0点执行，设置counter为currentNumber=0
-    // TODO: 每日定时清零，或手动清零
-    @EventListener
-    public void onQuartzDay0Event(QuartzDay0Event event) {
-        log.info("counter quartz day0 event ");
-        counterService.deleteAll();
-    }
+    // @EventListener
+    // public void onQuartzDay0Event(QuartzDay0Event event) {
+    //     log.info("counter quartz day0 event ");
+    //     // counterService.deleteAll();
+    // }
 }

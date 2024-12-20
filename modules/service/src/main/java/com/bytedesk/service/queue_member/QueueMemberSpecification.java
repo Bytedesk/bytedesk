@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-06 09:47:25
+ * @LastEditTime: 2024-12-20 11:01:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 
@@ -34,26 +33,27 @@ public class QueueMemberSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
 
-            if (StringUtils.hasText(request.getUserUid())) {
-                String jsonExtractFunction;
-                switch (request.getDbType().toLowerCase()) {
-                    case "mysql":
-                        jsonExtractFunction = "JSON_EXTRACT";
-                        break;
-                    case "postgresql":
-                        jsonExtractFunction = "JSONB_EXTRACT_PATH_TEXT";
-                        break;
-                    case "oracle":
-                        jsonExtractFunction = "JSON_VALUE";
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unsupported database type: " + request.getDbType());
-                }
+            // 
+            // if (StringUtils.hasText(request.getUserUid())) {
+            //     String jsonExtractFunction;
+            //     switch (request.getDbType().toLowerCase()) {
+            //         case "mysql":
+            //             jsonExtractFunction = "JSON_EXTRACT";
+            //             break;
+            //         case "postgresql":
+            //             jsonExtractFunction = "JSONB_EXTRACT_PATH_TEXT";
+            //             break;
+            //         case "oracle":
+            //             jsonExtractFunction = "JSON_VALUE";
+            //             break;
+            //         default:
+            //             throw new IllegalArgumentException("Unsupported database type: " + request.getDbType());
+            //     }
 
-                String jsonPath = "$.uid";
-                String jsonQuery = String.format("%s(v.user, '%s')", jsonExtractFunction, jsonPath);
-                predicates.add(criteriaBuilder.equal(criteriaBuilder.function(jsonQuery, String.class), request.getUserUid()));
-            }
+            //     String jsonPath = "$.uid";
+            //     String jsonQuery = String.format("%s(v.user, '%s')", jsonExtractFunction, jsonPath);
+            //     predicates.add(criteriaBuilder.equal(criteriaBuilder.function(jsonQuery, String.class), request.getUserUid()));
+            // }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

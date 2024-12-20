@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:52:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 07:53:36
+ * @LastEditTime: 2024-12-20 10:56:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,12 +26,12 @@ public class QueueMemberEntityListener {
 
     @PostPersist
     public void onPostPersist(QueueMemberEntity counter) {
-        log.info("counter onPostPersist: {}", counter);
+        log.info("QueueMemberEntityListener onPostPersist: {}", counter);
     }
 
     @PostUpdate
     public void onPostUpdate(QueueMemberEntity counter) {
-        log.info("counter onPostUpdate: {}", counter);
+        log.info("QueueMemberEntityListener onPostUpdate: {}", counter);
     }
     
 }
