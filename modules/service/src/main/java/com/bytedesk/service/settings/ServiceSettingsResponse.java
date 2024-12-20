@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 21:33:20
+ * @LastEditTime: 2024-12-20 17:19:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,10 +54,13 @@ public class ServiceSettingsResponse extends BaseServiceSettingsResponse {
     private Boolean nonWorktimeRobot = false;
 
     @Builder.Default
-    private List<WorktimeResponse> worktimes = new ArrayList<>();
+    private Boolean queueRobot = false;
+    
+    @Builder.Default
+    private Integer queueRobotCount = 100;
 
-    // @Builder.Default
-    // private AutoReplySettings autoReplySettings = new AutoReplySettings();
+    @Builder.Default
+    private List<WorktimeResponse> worktimes = new ArrayList<>();
 
     @Builder.Default
     private LeaveMsgSettings LeaveMsgSettings = new LeaveMsgSettings();
