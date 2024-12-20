@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:19:40
+ * @LastEditTime: 2024-12-20 11:49:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,8 +28,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.queue.QueueService;
-import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
@@ -59,8 +57,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
     private final RouteService routeService;
     
     private final IMessageSendService messageSendService;
-
-    private final QueueService queueService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -93,10 +89,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         }
         // 计数器，排队号
         thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
-        QueueMemberEntity memberEntity = queueService.enqueue(thread, visitorRequest);
-        log.info("Enqueued to queue {}", memberEntity.toString());
-        // thread.setSerialNumber(counter.getCurrentNumber());
-
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             // 判断是否需要转机器人

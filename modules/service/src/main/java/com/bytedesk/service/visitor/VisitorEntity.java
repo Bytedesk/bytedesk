@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 17:07:46
+ * @LastEditTime: 2024-12-20 11:46:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,17 @@
  */
 package com.bytedesk.service.visitor;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LanguageEnum;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -75,5 +81,11 @@ public class VisitorEntity extends BaseEntity {
 
 	@Builder.Default
 	private String status = VisitorStatusEnum.ONLINE.name();
+
+	// extra info，开发者自定义URL参数，使用json格式存储，便于扩展
+	@Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 	
 }

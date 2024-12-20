@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-01 21:03:58
+ * @LastEditTime: 2024-12-20 11:45:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,6 +72,9 @@ public class VisitorRequest extends BaseRequest {
 
 	@Builder.Default
 	private String status = VisitorStatusEnum.ONLINE.name();
+
+	// 自定义参数，从URL传入，使用json格式传入，例如：{"key1":"value1","key2":"value2"}
+	private String extra;
 
 	// wechat mp extra
 	private String threadExtra;
