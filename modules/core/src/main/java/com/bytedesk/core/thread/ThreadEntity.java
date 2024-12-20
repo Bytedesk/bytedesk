@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-11 10:23:19
+ * @LastEditTime: 2024-12-20 10:21:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -122,15 +122,16 @@ public class ThreadEntity extends BaseEntity {
     @Column(name = "is_folded")
     private boolean folded = false;
 
+    // 迁移到QueueMemberEntity
     // 已解决
-    @Builder.Default
-    @Column(name = "is_solved")
-    private boolean solved = false;
+    // @Builder.Default
+    // @Column(name = "is_solved")
+    // private boolean solved = false;
 
     // 已评价
-    @Builder.Default
-    @Column(name = "is_rated")
-    private boolean rated = false;
+    // @Builder.Default
+    // @Column(name = "is_rated")
+    // private boolean rated = false;
 
     // 自动关闭
     @Builder.Default
@@ -210,8 +211,8 @@ public class ThreadEntity extends BaseEntity {
     public ThreadEntity reInit() {
         this.state = ThreadStateEnum.INITIAL.name();
         this.hide = false;
-        this.solved = false;
-        this.rated = false;
+        // this.solved = false;
+        // this.rated = false;
         this.autoClose = false;
         this.robot = false;
         return this;

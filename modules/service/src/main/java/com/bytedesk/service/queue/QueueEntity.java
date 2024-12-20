@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 17:54:07
+ * @LastEditTime: 2024-12-20 10:15:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,16 +68,17 @@ public class QueueEntity extends BaseEntity {
     // 队列状态
     @Builder.Default
     @Column(nullable = false)
-    private String status = QueueStatusEnum.AVAILABLE.name();  // 队列状态
+    private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
     @Column(name = "queue_day")
     private String day;  // 队列日期(YYYY-MM-DD)
 
-    @Column(name = "thread_topic")
-    private String threadTopic;
+    // agentUid or workgroupUid
+    @Column(name = "queue_topic")
+    private String queueTopic;
 
-    @Column(name = "next_agent_uid")
-    private String nextAgentUid;  // 下一个客服
+    // @Column(name = "next_agent_uid")
+    // private String nextAgentUid;  // 下一个客服
 
     /**
      * 获取下一个排队号码
@@ -100,7 +101,7 @@ public class QueueEntity extends BaseEntity {
      * 检查是否可以加入队列
      */
     public boolean canJoin() {
-        return status.equals(QueueStatusEnum.AVAILABLE.name())
+        return status.equals(QueueStatusEnum.ACTIVE.name())
             && waitingNumber < maxWaiting;
     }
 }

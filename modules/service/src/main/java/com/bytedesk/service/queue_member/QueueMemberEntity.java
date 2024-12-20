@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 15:21:29
+ * @LastEditTime: 2024-12-20 10:21:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,17 +62,23 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(nullable = false)
     private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
-    @Column(name = "join_time", nullable = false)
-    private LocalDateTime joinTime;  // 加入时间
+    @Builder.Default
+    @Column(name = "enqueue_time", nullable = false)
+    private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
 
-    @Column(name = "start_time")
-    private LocalDateTime startTime;  // 开始服务时间
+    @Builder.Default
+    @Column(name = "accept_type")
+    private String acceptType = QueueMemberAcceptTypeEnum.AUTO.name();  // 接单方式
+
+    @Column(name = "accept_time")
+    private LocalDateTime acceptTime;  // 开始服务时间
 
     @Column(name = "first_response_time")
     private LocalDateTime firstResponseTime;  // 首次响应时间
 
+    @Builder.Default
     @Column(name = "first_response")
-    private boolean firstResponse;  // 是否首次响应
+    private boolean firstResponse = false;  // 是否首次响应
 
     @Column(name = "close_time")
     private LocalDateTime closeTime;  // 结束时间
@@ -84,13 +90,23 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "priority")
     private int priority = 0;  // 优先级(0-100)
 
+    // 已解决
+    @Builder.Default
+    @Column(name = "is_solved")
+    private boolean solved = false;
+
+    // 已评价
+    @Builder.Default
+    @Column(name = "is_rated")
+    private boolean rated = false;
+
     /**
      * 计算等待时间(秒)
      */
     public long getWaitTime() {
-        if (joinTime == null) return 0;
-        LocalDateTime endWaitTime = startTime != null ? startTime : LocalDateTime.now();
-        return Duration.between(joinTime, endWaitTime).getSeconds();
+        if (enqueueTime == null) return 0;
+        LocalDateTime endWaitTime = acceptTime != null ? acceptTime : LocalDateTime.now();
+        return Duration.between(enqueueTime, endWaitTime).getSeconds();
     }
 
     /**
@@ -101,7 +117,7 @@ public class QueueMemberEntity extends BaseEntity {
         this.agentUid = agentUid;
         
         if (QueueMemberStatusEnum.PROCESSING.name().equals(newStatus)) {
-            this.startTime = LocalDateTime.now();
+            this.acceptTime = LocalDateTime.now();
         } else if (QueueMemberStatusEnum.valueOf(newStatus).isEndStatus()) {
             this.closeTime = LocalDateTime.now();
         }
