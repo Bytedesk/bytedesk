@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-06 07:14:47
+ * @LastEditTime: 2024-12-20 07:48:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,19 +80,19 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
         return queueRepository.findByThreadTopicAndDayAndDeletedFalse(threadTopic, day);
     }
 
-    public QueueResponse getQueue(String threadTopic, String day, String orgUid) {
-        Optional<QueueEntity> queueOptional = findByThreadTopicAndDay(threadTopic, day);
-        if (queueOptional.isPresent()) {
-            return convertToResponse(queueOptional.get());
-        } else {
-            QueueRequest request = QueueRequest.builder()
-                .threadTopic(threadTopic)
-                .day(day)
-                .build();
-            request.setOrgUid(orgUid);
-            return create(request);
-        }
-    }
+    // public QueueResponse getOrCreateQueue(String threadTopic, String day, String orgUid) {
+    //     Optional<QueueEntity> queueOptional = findByThreadTopicAndDay(threadTopic, day);
+    //     if (queueOptional.isPresent()) {
+    //         return convertToResponse(queueOptional.get());
+    //     } else {
+    //         QueueRequest request = QueueRequest.builder()
+    //             .threadTopic(threadTopic)
+    //             .day(day)
+    //             .build();
+    //         request.setOrgUid(orgUid);
+    //         return create(request);
+    //     }
+    // }
 
     @Override
     public QueueResponse create(QueueRequest request) {

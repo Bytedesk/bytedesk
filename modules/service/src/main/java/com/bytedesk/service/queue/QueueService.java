@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.topic.TopicUtils;
 // import com.bytedesk.core.thread.ThreadEntity;
 // import com.bytedesk.core.thread.ThreadRepository;
 import com.bytedesk.service.agent.AgentEntity;
@@ -20,7 +22,6 @@ import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
-// import com.bytedesk.service.thread.ThreadAssignmentService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,22 +35,19 @@ public class QueueService {
     @Autowired
     private QueueMemberRepository memberRepository;
 
-    // @Autowired
-    // private ThreadRepository threadRepository;
-
     @Autowired
     private AgentService agentService;
 
-    // @Autowired
-    // private ThreadAssignmentService assignmentService;
+    @Autowired
+    public QueueRestService queueRestService;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void joinQueue(String threadTopic, String visitorUid) {
+    public void enqueue(ThreadEntity threadEntity, String visitorUid) {
         // 1. 获取或创建队列
-        QueueEntity queue = getOrCreateQueue();
+        QueueEntity queue = getOrCreateQueue(threadEntity);
         if (!queue.canJoin()) {
             throw new QueueFullException("Queue is full or not active");
         }
@@ -57,12 +55,13 @@ public class QueueService {
         // 2. 创建队列成员
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
-            .threadTopic(threadTopic)
+            .threadTopic(threadEntity.getTopic())
             .visitorUid(visitorUid)
             .queueNumber(queue.getNextNumber())
-            .joinTime(LocalDateTime.now())
+            .enqueueTime(LocalDateTime.now())
             .status(QueueMemberStatusEnum.WAITING.name())
             .build();
+        member.setOrgUid(threadEntity.getOrgUid());
         memberRepository.save(member);
         
         // 3. 更新队列统计
@@ -72,15 +71,19 @@ public class QueueService {
         eventPublisher.publishEvent(new QueueMemberJoinedEvent(member));
     }
 
-    private QueueEntity getOrCreateQueue() {
+    private QueueEntity getOrCreateQueue(ThreadEntity threadEntity) {
+        String threadTopic = threadEntity.getTopic();
+        String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(threadTopic);
         // 按照ISO 8601标准格式化日期，即yyyy-MM-dd格式
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        return queueRepository.findByDay(today)
+        return queueRestService.findByThreadTopicAndDay(threadTopic, today)
             .orElseGet(() -> {
                 QueueEntity queue = QueueEntity.builder()
                     .day(today)
-                    .status(QueueStatusEnum.AVAILABLE.name())
+                    .queueTopic(queueTopic)
+                    .status(QueueStatusEnum.ACTIVE.name())
                     .build();
+                queue.setOrgUid(threadEntity.getOrgUid());
                 return queueRepository.save(queue);
             });
     }
@@ -101,33 +104,6 @@ public class QueueService {
         Double avgWaitTime = memberRepository.calculateAverageWaitTime(queueUid);
         return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     }
-    
-    @Transactional
-    public int enqueue(String threadTopic, int priority) {
-        // 1. 获取或创建队列
-        QueueEntity queue = getOrCreateQueue();
-        if (!queue.canJoin()) {
-            throw new QueueFullException("Queue is full or not active");
-        }
-
-        // 2. 创建队列成员
-        QueueMemberEntity member = QueueMemberEntity.builder()
-            .queueUid(queue.getUid())
-            .threadTopic(threadTopic)
-            .priority(priority)
-            .queueNumber(queue.getNextNumber())
-            .joinTime(LocalDateTime.now())
-            .status(QueueMemberStatusEnum.WAITING.name())
-            .build();
-        memberRepository.save(member);
-
-        // 3. 更新队列统计
-        updateQueueStats(queue);
-
-        // 4. 返回队列位置
-        return getQueuePosition(threadTopic);
-    }
-
     
     @Transactional
     public void dequeue(String threadTopic, QueueStatusEnum status) {
@@ -208,7 +184,7 @@ public class QueueService {
         // 2. 检查超时
         LocalDateTime now = LocalDateTime.now();
         for (QueueMemberEntity member : waitingMembers) {
-            if (member.getJoinTime().plusMinutes(30).isBefore(now)) {
+            if (member.getEnqueueTime().plusMinutes(30).isBefore(now)) {
                 member.updateStatus(QueueMemberStatusEnum.TIMEOUT.name(), null);
                 memberRepository.save(member);
                 

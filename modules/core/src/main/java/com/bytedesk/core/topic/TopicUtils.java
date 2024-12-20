@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 11:09:57
+ * @LastEditTime: 2024-12-20 10:03:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,6 +40,7 @@ public class TopicUtils {
     public static final String TOPIC_ORG_WORKGROUP_PREFIX = "org/workgroup/";
     public static final String TOPIC_ORG_KB_PREFIX = "org/kb/";
     public static final String TOPIC_ORG_KBDOC_PREFIX = "org/kbdoc/";
+    public static final String TOPIC_ORG_QUEUE_PREFIX = "org/queue/";
 
     // topic格式定义：
     // 注意：开头没有 '/' ，防止stomp主题中将 '/' 替换为 '.'之后，在最前面多余一个 '.'
@@ -57,6 +58,9 @@ public class TopicUtils {
     private static final String TOPIC_GROUP_PATTERN = "group/%s";
     private static final String TOPIC_PRIVATE_PATTERN = "private/%s/%s";
     private static final String TOPIC_ROBOT_PATTERN = "robot/%s/%s";
+    // private static final String TOPIC_AGENT_PATTERN = "agent/%s";
+    // private static final String TOPIC_WORKGROUP_PATTERN = "workgroup/%s";
+    // private static final String TOPIC_QUEUE_PATTERN = "queue/%s";
 
     // 企业消息: 所有uid全平台唯一，包括不同表之间uid也唯一，所以未在企业topic中添加org_uid前缀为前缀
     // 用户默认订阅组织uid：org/{org_uid}
@@ -85,6 +89,7 @@ public class TopicUtils {
     private static final String TOPIC_ORG_WORKGROUP_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s"; // "org/workgroup/%s";
     // private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s/%s"; // "org/workgroup/%s/%s/%s";
     private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s"; // "org/workgroup/%s/%s";
+    private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
 
     //
     public static String getUserTopic(String userUid) {
@@ -115,13 +120,9 @@ public class TopicUtils {
         return String.format(TOPIC_ROBOT_PATTERN, robotUid, visitorUid);
     }
 
-    //////////////////////////////////////////////////////////////////////////
-
     public static String formatOrgDepartmentTopic(String departmentUid) {
         return String.format(TOPIC_ORG_DEPARTMENT_PATTERN, departmentUid);
     }
-
-    //////////////////////////////////////////////////////////////////////////
 
     public static Boolean isOrgMemberTopic(String topic) {
         return topic.startsWith(TOPIC_ORG_MEMBER_PREFIX);
@@ -213,4 +214,25 @@ public class TopicUtils {
     public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String visitorUid) {
         return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, visitorUid);
     }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    public static Boolean isOrgQueueTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_QUEUE_PREFIX);
+    }
+
+    public static String getOrgQueueTopic(String agentUidOrWorkgroupUid) {
+        return String.format(TOPIC_ORG_QUEUE_PATTERN, agentUidOrWorkgroupUid);
+    }
+
+    public static String getQueueTopicFromThreadTopic(String threadTopic) {
+        String[] topicArr = threadTopic.split("/");
+        if (topicArr.length != 4) {
+            throw new RuntimeException("Invalid private topic: " + threadTopic);
+        }
+        return String.format(TOPIC_ORG_QUEUE_PATTERN, topicArr[3]);
+    }
+    
+
+
 }
