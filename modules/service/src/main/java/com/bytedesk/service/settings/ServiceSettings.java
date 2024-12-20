@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 10:50:01
+ * @LastEditTime: 2024-12-20 16:56:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,12 +54,12 @@ public class ServiceSettings extends BaseServiceSettings {
     @Builder.Default
     private boolean nonWorktimeRobot = false;
 
-    // TODO: 当排队人数超过指定值时，自动分配机器人
-    // @Builder.Default
-    // private boolean queueRobot = false;
+    // 当排队人数超过指定值时，自动分配机器人
+    @Builder.Default
+    private boolean queueRobot = false;
     
-    // @Builder.Default
-    // private int queueRobotCount = 100;
+    @Builder.Default
+    private int queueRobotCount = 100;
 
     /** work time */
     @Builder.Default
