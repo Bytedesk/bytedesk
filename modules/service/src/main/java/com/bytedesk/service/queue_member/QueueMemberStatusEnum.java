@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-07 15:49:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 16:03:45
+ * @LastEditTime: 2024-12-20 14:26:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,7 @@ package com.bytedesk.service.queue_member;
 public enum QueueMemberStatusEnum {
     
     WAITING("waiting"),         // 等待中
-    PROCESSING("processing"),   // 正在服务
+    SERVING("serving"),         // 正在服务
     COMPLETED("completed"),     // 已完成
     CANCELLED("cancelled"),     // 已取消(访客取消)
     TIMEOUT("timeout"),         // 已超时

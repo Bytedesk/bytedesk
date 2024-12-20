@@ -128,7 +128,7 @@ public class QueueMemberEntity extends BaseEntity {
         this.status = newStatus;
         this.agentUid = agentUid;
         
-        if (QueueMemberStatusEnum.PROCESSING.name().equals(newStatus)) {
+        if (QueueMemberStatusEnum.SERVING.name().equals(newStatus)) {
             this.acceptTime = LocalDateTime.now();
         } else if (QueueMemberStatusEnum.valueOf(newStatus).isEndStatus()) {
             this.closeTime = LocalDateTime.now();

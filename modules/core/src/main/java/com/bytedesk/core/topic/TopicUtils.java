@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 10:03:18
+ * @LastEditTime: 2024-12-20 14:21:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -226,11 +226,12 @@ public class TopicUtils {
     }
 
     public static String getQueueTopicFromThreadTopic(String threadTopic) {
+        // org/workgroup/{workgroup_uid}/{visitor_uid}
         String[] topicArr = threadTopic.split("/");
         if (topicArr.length != 4) {
             throw new RuntimeException("Invalid private topic: " + threadTopic);
         }
-        return String.format(TOPIC_ORG_QUEUE_PATTERN, topicArr[3]);
+        return String.format(TOPIC_ORG_QUEUE_PATTERN, topicArr[2]);
     }
     
 
