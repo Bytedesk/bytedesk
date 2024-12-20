@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-09 10:40:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-09 11:32:18
+ * @LastEditTime: 2024-12-20 14:08:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
-@Table(name = "bytedesk_quality_inspection")
+@Table(name = "bytedesk_service_quality_inspection")
 @EqualsAndHashCode(callSuper = true)
 public class QualityInspectionEntity extends BaseEntity {
 
