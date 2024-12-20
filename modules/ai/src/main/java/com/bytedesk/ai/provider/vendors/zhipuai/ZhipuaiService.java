@@ -35,7 +35,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageService;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 // import com.bytedesk.core.message.MessageUtils;
@@ -80,7 +80,7 @@ public class ZhipuaiService {
 
     private final ModelMapper modelMapper;
 
-    private final MessageService messageService;
+    private final MessageRestService messageService;
 
     private final UploadVectorStore uploadVectorStore;
 

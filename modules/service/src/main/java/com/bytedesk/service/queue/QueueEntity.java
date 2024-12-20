@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:33:41
+ * @LastEditTime: 2024-12-20 12:51:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,7 +47,7 @@ public class QueueEntity extends BaseEntity {
     private int servingNumber = 0;  // 正在服务人数
 
     @Builder.Default
-    private int finishedNumber = 0;  // 已完成人数
+    private int servedNumber = 0;  // 已完成人数
 
     @Builder.Default
     private int avgWaitTime = 0;  // 平均等待时间(秒)
@@ -83,10 +83,10 @@ public class QueueEntity extends BaseEntity {
     /**
      * 更新队列统计
      */
-    public void updateStats(int waiting, int serving, int finished, int avgWait) {
+    public void updateStats(int waiting, int serving, int served, int avgWait) {
         this.waitingNumber = waiting;
         this.servingNumber = serving;
-        this.finishedNumber = finished;
+        this.servedNumber = served;
         this.avgWaitTime = avgWait;
     }
 

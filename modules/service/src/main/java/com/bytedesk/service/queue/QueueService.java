@@ -39,7 +39,7 @@ public class QueueService {
     private final UidUtils uidUtils;
 
     @Transactional
-    public QueueMemberEntity enqueue(ThreadEntity threadEntity, VisitorRequest visitorRequest) {
+    public QueueMemberEntity enqueue(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
         QueueEntity queue = getOrCreateQueue(threadEntity);
         if (!queue.canEnqueue()) {
@@ -47,7 +47,7 @@ public class QueueService {
         }
         
         // 2. 创建队列成员
-        QueueMemberEntity member = createQueueMemberEntity(threadEntity, visitorRequest, queue);
+        QueueMemberEntity member = createQueueMemberEntity(threadEntity, agentEntity, visitorRequest, queue);
         
         // 3. 更新队列统计
         updateQueueStats(queue);
@@ -74,19 +74,25 @@ public class QueueService {
             });
     }
 
-    public QueueMemberEntity createQueueMemberEntity(ThreadEntity threadEntity, VisitorRequest visitorRequest, QueueEntity queue) {
+    public QueueMemberEntity createQueueMemberEntity(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest, QueueEntity queue) {
+        // 
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
             .threadUid(threadEntity.getUid())
             .visitorUid(visitorRequest.getUid())
+            .agentUid(agentEntity.getUid())
             .queueNumber(queue.getNextNumber())
             .enqueueTime(LocalDateTime.now())
             .status(QueueMemberStatusEnum.WAITING.name())
             .build();
         member.setUid(uidUtils.getUid());
         member.setOrgUid(threadEntity.getOrgUid());
-        memberRepository.save(member);
-        return member;
+        // 
+        QueueMemberEntity savedMember = memberRepository.save(member);
+        if (savedMember == null) {
+            throw new RuntimeException("Failed to create queue member");
+        }
+        return savedMember;
     }
 
     private void updateQueueStats(QueueEntity queue) {
