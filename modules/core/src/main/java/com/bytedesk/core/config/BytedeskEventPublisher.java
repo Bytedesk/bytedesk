@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:42:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-18 13:39:21
+ * @LastEditTime: 2024-12-20 12:42:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -176,15 +176,8 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new OrganizationCreateEvent(organization));
     }
 
-    // public void publishEmailAlreadyExistsEvent(String email) {
-    // applicationEventPublisher.publishEvent(new EmailAlreadyExistsEvent(this,
-    // email));
-    // }
-
-    // public void publishCaffeineCacheGroupEvent(String groupUid, String
-    // messageJson) {
-    // applicationEventPublisher.publishEvent(new CaffeineCacheGroupEvent(this,
-    // groupUid, messageJson));
-    // }
+    public void publishEvent(Object event) {
+        applicationEventPublisher.publishEvent(event);
+    }
 
 }
