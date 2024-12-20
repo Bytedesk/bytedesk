@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 14:56:23
+ * @LastEditTime: 2024-12-20 16:53:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.kbase.service_settings;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,14 +48,16 @@ public class BaseServiceSettings implements Serializable {
     @NotBlank
     private boolean autoPop = false;
 
-    // 
+    // 顶部提示开关
     @NotBlank
     private boolean showTopTip = false;
     
-    // 公告
     @NotBlank
     private String topTip = I18Consts.I18N_TOP_TIP;
-    // TODO: 公告显示日期范围
+
+    private LocalDateTime topTipStart;
+
+    private LocalDateTime topTipEnd;
 
     // 满意度评价设置
     // show rate btn on chat toolbar

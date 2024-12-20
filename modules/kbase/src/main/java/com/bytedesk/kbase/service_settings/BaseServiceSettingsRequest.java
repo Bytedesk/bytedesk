@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-02 16:06:30
+ * @LastEditTime: 2024-12-20 16:54:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.kbase.service_settings;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,10 @@ public class BaseServiceSettingsRequest {
     private Boolean showTopTip = false;
 
     private String topTip = I18Consts.I18N_TOP_TIP;
+
+    private LocalDateTime topTipStart;
+
+    private LocalDateTime topTipEnd;
 
     // show rate btn on chat toolbar
     private Boolean showRateBtn = false;
