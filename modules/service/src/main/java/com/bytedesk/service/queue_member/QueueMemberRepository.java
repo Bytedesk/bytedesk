@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 18:41:44
+ * @LastEditTime: 2024-12-20 10:36:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,8 +49,8 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
            "AND m.status IN ('COMPLETED', 'CANCELLED', 'TIMEOUT', 'REJECTED')")
     int countByQueueUidAndEndStatusIsTrue(@Param("queueUid") String queueUid);
 
-    @Query("SELECT AVG(TIMESTAMPDIFF(SECOND, m.joinTime, " +
-           "CASE WHEN m.startTime IS NULL THEN CURRENT_TIMESTAMP ELSE m.startTime END)) " +
+    @Query("SELECT AVG(TIMESTAMPDIFF(SECOND, m.enqueueTime, " +
+           "CASE WHEN m.acceptTime IS NULL THEN CURRENT_TIMESTAMP ELSE m.acceptTime END)) " +
            "FROM QueueMemberEntity m " +
            "WHERE m.queueUid = :queueUid AND m.status = 'WAITING'")
     Double calculateAverageWaitTime(@Param("queueUid") String queueUid);
@@ -72,8 +72,8 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
            "COUNT(m) as total, " +
            "SUM(CASE WHEN m.status = 'WAITING' THEN 1 ELSE 0 END) as waiting, " +
            "SUM(CASE WHEN m.status = 'PROCESSING' THEN 1 ELSE 0 END) as processing, " +
-           "AVG(TIMESTAMPDIFF(SECOND, m.joinTime, " +
-           "CASE WHEN m.startTime IS NULL THEN CURRENT_TIMESTAMP ELSE m.startTime END)) as avgWaitTime) " +
+           "AVG(TIMESTAMPDIFF(SECOND, m.enqueueTime, " +
+           "CASE WHEN m.acceptTime IS NULL THEN CURRENT_TIMESTAMP ELSE m.acceptTime END)) as avgWaitTime) " +
            "FROM QueueMemberEntity m " +
            "WHERE m.queueUid = :queueUid")
     Map<String, Object> getQueueStats(@Param("queueUid") String queueUid);

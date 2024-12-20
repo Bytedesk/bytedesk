@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 07:48:46
+ * @LastEditTime: 2024-12-20 10:34:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,9 +75,9 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
         return queueRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue", key = "#threadTopic+#day", unless = "#result==null")
-    public Optional<QueueEntity> findByThreadTopicAndDay(String threadTopic, String day) {
-        return queueRepository.findByThreadTopicAndDayAndDeletedFalse(threadTopic, day);
+    @Cacheable(value = "queue", key = "#queueTopic+#day", unless = "#result==null")
+    public Optional<QueueEntity> findByQueueTopicAndDay(String queueTopic, String day) {
+        return queueRepository.findByQueueTopicAndDayAndDeletedFalse(queueTopic, day);
     }
 
     // public QueueResponse getOrCreateQueue(String threadTopic, String day, String orgUid) {
