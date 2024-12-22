@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 20:51:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-15 19:35:02
+ * @LastEditTime: 2024-12-22 18:03:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,9 +47,7 @@ public class KbaseConfig {
                                 null,
                                 jedisProperties.getPassword());
                 // 初始化向量库, 创建索引
-                return RedisVectorStore.builder()
-                        .jedis(jedisPooled)
-                        .embeddingModel(embeddingModel)
+                return RedisVectorStore.builder(jedisPooled, embeddingModel)
                         .indexName(properties.getIndex())
                         .prefix(properties.getPrefix())
                         .metadataFields(kbUid, fileUid)

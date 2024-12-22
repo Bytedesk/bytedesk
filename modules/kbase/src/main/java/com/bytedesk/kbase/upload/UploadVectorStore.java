@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-15 19:34:23
+ * @LastEditTime: 2024-12-22 18:05:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -213,8 +213,10 @@ public class UploadVectorStore {
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
 	public List<String> searchText(String query) {
 		// Retrieve documents similar to a query
-		SearchRequest searchRequest = SearchRequest.query(query)
-				.withTopK(2);
+		SearchRequest searchRequest = SearchRequest.builder()
+				.query(query)
+				.topK(2)
+				.build();
 		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		// TODO: 将 query, kbUid 对应的 contentList 缓存到Redis中，下次直接从Redis中取
@@ -231,8 +233,10 @@ public class UploadVectorStore {
 		Expression expression = b.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
 		log.info("expression: {}", expression.toString());
 		//
-		SearchRequest searchRequest = SearchRequest.query(query)
-				.withFilterExpression(expression);
+		SearchRequest searchRequest = SearchRequest.builder()
+				.query(query)
+				.filterExpression(expression)
+				.build();
 		// .withTopK(2);
 		// .withSimilarityThreshold(0.5)
 		// .withFilterExpression(expression);

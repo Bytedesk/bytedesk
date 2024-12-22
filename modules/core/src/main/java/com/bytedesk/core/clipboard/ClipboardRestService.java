@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 22:19:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 23:25:29
+ * @LastEditTime: 2024-12-22 17:58:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -10,7 +10,7 @@
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
  *  contact: 270580156@qq.com 
  *  联系：270580156@qq.com
- * Clipright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.clipboard;
 
@@ -51,21 +51,27 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
 
         Specification<ClipboardEntity> specification = ClipboardSpecification.search(request);
 
-        Page<ClipboardEntity> Clipboards = clipboardRepository.findAll(specification, pageable);
+        Page<ClipboardEntity> clipboardPage = clipboardRepository.findAll(specification, pageable);
 
-        return Clipboards.map(this::convertToResponse);
+        return clipboardPage.map(this::convertToResponse);
     }
 
     @Override
     public Page<ClipboardResponse> queryByUser(ClipboardRequest request) {
         
         UserEntity user = authService.getUser();
+        if (user == null) {
+            return Page.empty();
+        }
+        request.setUserUid(user.getUid());
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
 
-        Page<ClipboardEntity> page = clipboardRepository.findByUserUidAndDeleted(user.getUid(), false, pageable);
+        Specification<ClipboardEntity> specification = ClipboardSpecification.search(request);
 
-        return page.map(this::convertToResponse);
+        Page<ClipboardEntity> clipboardPage = clipboardRepository.findAll(specification, pageable);
+
+        return clipboardPage.map(this::convertToResponse);
     }
 
     @Override

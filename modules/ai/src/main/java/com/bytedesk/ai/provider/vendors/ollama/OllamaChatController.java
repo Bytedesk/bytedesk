@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-11 12:39:20
+ * @LastEditTime: 2024-12-22 18:07:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,9 +48,10 @@ public class OllamaChatController {
         ChatResponse response = ollamaChatModel.call(
         new Prompt(
             message,
-            OllamaOptions.create()
-                .withModel("qwen:0.5b")
-                .withTemperature(0.4)
+            OllamaOptions.builder()
+                .model("qwen:0.5b")
+                .temperature(0.4)
+                .build()
         ));
         // return response;
         String content = response.getResult().getOutput().getContent();
