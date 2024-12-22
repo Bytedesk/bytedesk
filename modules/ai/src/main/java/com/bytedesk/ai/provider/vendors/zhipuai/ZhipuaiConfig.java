@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-10 23:30:05
+ * @LastEditTime: 2024-12-22 18:07:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ public class ZhipuaiConfig {
     @Bean
     ZhiPuAiEmbeddingOptions ZhiPuAiEmbeddingOptions() {
         return ZhiPuAiEmbeddingOptions.builder()
-                .withModel(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
+                .model(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
                 .build();
     }
 
@@ -68,9 +68,9 @@ public class ZhipuaiConfig {
     ZhiPuAiChatModel zhipuaiChatModel() {
         return new ZhiPuAiChatModel(zhipuaiApi(), ZhiPuAiChatOptions.builder()
                 // .withModel(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
-                .withModel(zhiPuAiApiModel)
-                .withTemperature(0.4)
-                .withMaxTokens(200)
+                .model(zhiPuAiApiModel)
+                .temperature(0.4)
+                .maxTokens(200)
                 .build());
     }
 

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-08-05 22:19:27
+ * @Date: 2024-12-22 18:00:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 09:11:44
+ * @LastEditTime: 2024-12-22 18:02:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,20 +14,24 @@
  */
 package com.bytedesk.core.clipboard;
 
-import com.bytedesk.core.base.BaseRequest;
+import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostUpdate;
+import lombok.extern.slf4j.Slf4j;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class ClipboardRequest extends BaseRequest {
+@Slf4j
+@Component
+public class ClipboardEntityListener {
 
-    private String content;
-
-    private String userUid;
+    @PostPersist
+    public void postPersist(ClipboardEntity clipboard) {
+        log.info("ClipboardEntityListener: " + clipboard);
+    }
+    
+    @PostUpdate
+    public void postUpdate(ClipboardEntity clipboard) {
+        log.info("ClipboardEntityListener: " + clipboard);
+    }
+    
 }
