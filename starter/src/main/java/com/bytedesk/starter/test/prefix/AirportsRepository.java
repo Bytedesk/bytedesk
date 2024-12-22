@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-28 13:06:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-29 22:07:40
+ * @LastEditTime: 2024-12-22 19:20:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,16 +14,16 @@
  */
 package com.bytedesk.starter.test.prefix;
 
-import java.util.List;
+// import java.util.List;
 
-import com.redis.om.spring.autocomplete.Suggestion;
-import com.redis.om.spring.repository.RedisDocumentRepository;
-import com.redis.om.spring.repository.query.autocomplete.AutoCompleteOptions;
+// import com.redis.om.spring.autocomplete.Suggestion;
+// import com.redis.om.spring.repository.RedisDocumentRepository;
+// import com.redis.om.spring.repository.query.autocomplete.AutoCompleteOptions;
 
 // https://github.com/redis/redis-om-spring
 // https://github.com/redis-developer/redis-om-autocomplete-demo
-public interface AirportsRepository extends RedisDocumentRepository<Airport, String> {
-  List<Suggestion> autoCompleteName(String query);
+// public interface AirportsRepository extends RedisDocumentRepository<Airport, String> {
+//   List<Suggestion> autoCompleteName(String query);
 
-  List<Suggestion> autoCompleteNameOptions(String query, AutoCompleteOptions options);
-}
+//   List<Suggestion> autoCompleteNameOptions(String query, AutoCompleteOptions options);
+// }
