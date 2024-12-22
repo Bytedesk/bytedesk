@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 14:12:41
+ * @LastEditTime: 2024-12-22 17:43:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -169,15 +169,14 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     /** 文件助手会话：file/{user_uid} */
     public ThreadResponse createFileAssistantThread(UserEntity user) {
         //
-        String topic = TopicUtils.TOPIC_FILE_PREFIX + user.getUid();
-        //
+        String topic = TopicUtils.getFileTopic(user.getUid());
+        // 
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
-
+        // 文件助手用户信息，头像、昵称等
         UserProtobuf userSimple = UserUtils.getFileAssistantUser();
-        //
         ThreadEntity assistantThread = ThreadEntity.builder()
                 .type(ThreadTypeEnum.ASSISTANT.name())
                 .topic(topic)
@@ -187,13 +186,48 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
-        assistantThread.setUid(uidUtils.getCacheSerialUid());
+        assistantThread.setUid(uidUtils.getUid());
         if (StringUtils.hasText(user.getOrgUid())) {
             assistantThread.setOrgUid(user.getOrgUid());
         } else {
             assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
 
+        ThreadEntity updateThread = save(assistantThread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+
+        return convertToResponse(updateThread);
+    }
+
+    // 剪贴板会话：clipboard/{user_uid}
+    public ThreadResponse createClipboardAssistantThread(UserEntity user) {
+        //
+        String topic = TopicUtils.getClipboardTopic(user.getUid());
+        // 
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
+        if (threadOptional.isPresent()) {
+            return convertToResponse(threadOptional.get());
+        }
+        // 剪贴助手用户信息，头像、昵称等
+        UserProtobuf userSimple = UserUtils.getClipboardAssistantUser();
+        ThreadEntity assistantThread = ThreadEntity.builder()
+                .type(ThreadTypeEnum.ASSISTANT.name())
+                .topic(topic)
+                .unreadCount(0)
+                .state(ThreadStateEnum.STARTED.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(JSON.toJSONString(userSimple))
+                .owner(user)
+                .build();
+        assistantThread.setUid(uidUtils.getUid());
+        if (StringUtils.hasText(user.getOrgUid())) {
+            assistantThread.setOrgUid(user.getOrgUid());
+        } else {
+            assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        }
+        //
         ThreadEntity updateThread = save(assistantThread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
@@ -223,7 +257,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
-        noticeThread.setUid(uidUtils.getCacheSerialUid());
+        noticeThread.setUid(uidUtils.getUid());
         if (StringUtils.hasText(user.getOrgUid())) {
             noticeThread.setOrgUid(user.getOrgUid());
         } else {

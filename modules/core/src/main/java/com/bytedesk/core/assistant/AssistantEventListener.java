@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 11:32:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-14 09:31:45
+ * @LastEditTime: 2024-12-22 17:43:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,6 +38,8 @@ public class AssistantEventListener {
         // 
         // 每创建一个用户，自动给此用户生成一条文件助理的会话
         threadService.createFileAssistantThread(user);
+        // 每创建一个用户，自动给此用户生成一条剪贴助理的会话
+        threadService.createClipboardAssistantThread(user);
     }
     
     

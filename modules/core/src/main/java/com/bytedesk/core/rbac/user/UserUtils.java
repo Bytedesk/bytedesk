@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:20:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-16 15:20:00
+ * @LastEditTime: 2024-12-22 17:44:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,15 @@ public class UserUtils {
                 .avatar(AvatarConsts.DEFAULT_FILE_ASSISTANT_AVATAR_URL)
                 .build();
         user.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
+        return user;
+    }
+
+    public static UserProtobuf getClipboardAssistantUser() {
+        UserProtobuf user = UserProtobuf.builder()
+                .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
+                .avatar(AvatarConsts.DEFAULT_CLIPBOARD_ASSISTANT_AVATAR_URL)
+                .build();
+        user.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
         return user;
     }
 

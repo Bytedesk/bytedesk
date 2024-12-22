@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 11:12:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 11:31:56
+ * @LastEditTime: 2024-12-22 17:31:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ public class TopicCacheService {
 
     @PostConstruct
     public void init() {
-        // 初始化caffeinecache，设置缓存的最大大小、过期时间等参数
+        // 初始化caffeineCache，设置缓存的最大大小、过期时间等参数
         topicCache = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.DAYS)
             .build(new CacheLoader<String, List<String>>() {

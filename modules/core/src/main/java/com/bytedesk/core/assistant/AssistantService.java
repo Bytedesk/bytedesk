@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 13:57:13
+ * @LastEditTime: 2024-12-22 17:35:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,24 +63,5 @@ public class AssistantService {
     public AssistantResponse convertToResponse(AssistantEntity assistant) {
         return modelMapper.map(assistant, AssistantResponse.class);
     }
-
-    //
-    // public void initData() {
-
-    //     if (assistantRepository.count() > 0) {
-    //         return;
-    //     }
-
-    //     AssistantRequest assistantRequest = AssistantRequest.builder()
-    //             .topic(TopicUtils.TOPIC_FILE_ASSISTANT)
-    //             .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
-    //             .avatar(AvatarConsts.DEFAULT_FILE_ASSISTANT_AVATAR_URL)
-    //             .description(I18Consts.I18N_FILE_ASSISTANT_DESCRIPTION)
-    //             .build();
-    //     assistantRequest.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
-    //     assistantRequest.setType(TypeConsts.TYPE_SYSTEM);
-    //     // assistantRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-    //     create(assistantRequest);
-    // }
 
 }

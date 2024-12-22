@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 17:03:29
+ * @LastEditTime: 2024-12-22 17:40:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ public class TopicUtils {
     // public static final String TOPIC_PRIVATE_PREFIX = "private/";
     // public static final String TOPIC_GROUP_PREFIX = "group/";
     public static final String TOPIC_FILE_PREFIX = "file/";
+    public static final String TOPIC_CLIPBOARD_PREFIX = "clipboard/";
     public static final String TOPIC_SYSTEM_PREFIX = "system/";
     // public static final String TOPIC_ROBOT_PREFIX = "robot/";
     //
@@ -55,6 +56,7 @@ public class TopicUtils {
     // 用户私聊会话：private/{self_user_uid}/{other_user_uid}
     private static final String TOPIC_USER_PATTERN = "user/%s";
     private static final String TOPIC_FILE_PATTERN = "file/%s";
+    private static final String TOPIC_CLIPBOARD_PATTERN = "clipboard/%s";
     private static final String TOPIC_SYSTEM_PATTERN = "system/%s";
     private static final String TOPIC_GROUP_PATTERN = "group/%s";
     private static final String TOPIC_PRIVATE_PATTERN = "private/%s/%s";
@@ -92,13 +94,16 @@ public class TopicUtils {
     private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s"; // "org/workgroup/%s/%s";
     private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
 
-    //
     public static String getUserTopic(String userUid) {
         return String.format(TOPIC_USER_PATTERN, userUid);
     }
 
     public static String getFileTopic(String userUid) {
         return String.format(TOPIC_FILE_PATTERN, userUid);
+    }
+
+    public static String getClipboardTopic(String userUid) {
+        return String.format(TOPIC_CLIPBOARD_PATTERN, userUid);
     }
 
     public static String getSystemTopic(String userUid) {
