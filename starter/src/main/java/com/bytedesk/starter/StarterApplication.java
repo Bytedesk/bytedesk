@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 15:02:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-29 22:07:46
+ * @LastEditTime: 2024-12-22 22:21:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,12 +19,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import com.redis.om.spring.annotations.EnableRedisDocumentRepositories;
+// import com.redis.om.spring.annotations.EnableRedisDocumentRepositories;
 
 @EnableScheduling
 @EnableJpaAuditing
 @ComponentScan("com.bytedesk.*")
-@EnableRedisDocumentRepositories(basePackages = "com.bytedesk.*")
+// @EnableRedisDocumentRepositories(basePackages = "com.bytedesk.*")
 @SpringBootApplication
 public class StarterApplication {
 
