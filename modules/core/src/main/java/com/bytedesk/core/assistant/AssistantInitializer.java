@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 10:22:15
+ * @LastEditTime: 2024-12-22 17:07:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,17 +46,33 @@ public class AssistantInitializer implements SmartInitializingSingleton {
             return;
         }
 
-        AssistantRequest assistantRequest = AssistantRequest.builder()
+        // 文件助手
+        AssistantRequest fileAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_FILE_ASSISTANT)
                 .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
                 .avatar(AvatarConsts.DEFAULT_FILE_ASSISTANT_AVATAR_URL)
                 .description(I18Consts.I18N_FILE_ASSISTANT_DESCRIPTION)
                 .build();
-        assistantRequest.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
-        assistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        fileAssistantRequest.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
+        fileAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         // assistantRequest.setType(TypeConsts.TYPE_SYSTEM);
         // assistantRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        assistantService.create(assistantRequest);
+        assistantService.create(fileAssistantRequest);
+
+
+        // 剪贴助手
+        AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()
+                .topic(TopicUtils.TOPIC_CLIPBOARD_ASSISTANT)
+                .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
+                .avatar(AvatarConsts.DEFAULT_CLIPBOARD_ASSISTANT_AVATAR_URL)
+                .description(I18Consts.I18N_CLIPBOARD_ASSISTANT_DESCRIPTION)
+                .build();
+        clipboardAssistantRequest.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
+        clipboardAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        // assistantRequest2.setType(TypeConsts.TYPE_SYSTEM);
+        // assistantRequest2.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        assistantService.create(clipboardAssistantRequest);
+
     }
 
     
