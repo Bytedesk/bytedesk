@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 12:28:41
+ * @LastEditTime: 2024-12-23 13:37:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,78 +15,77 @@
 package com.bytedesk.kbase.service_settings;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.faq.FaqResponse;
 
-import jakarta.persistence.MappedSuperclass;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
+import lombok.NoArgsConstructor;
 @Data
-@EqualsAndHashCode(callSuper = false)
-@MappedSuperclass
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ServiceCommonSettingsResponse {
 
-    private LanguageEnum language = LanguageEnum.ZH_CN;
+    private LanguageEnum language;
 
-    private Boolean autoPop = false;
+    private Boolean autoPop;
 
-    private Boolean showTopTip = false;
+    private Boolean showTopTip;
 
-    private String topTip = I18Consts.I18N_TOP_TIP;
+    private String topTip;
 
     private LocalDateTime topTipStart;
 
     private LocalDateTime topTipEnd;
 
     // show rate btn on chat toolbar
-    private Boolean showRateBtn = false;
+    private Boolean showRateBtn;
 
     private Integer rateMsgCount;
 
-    private Boolean showPreForm = false;
+    private Boolean showPreForm;
 
     private String preForm;
 
-    private Boolean showHistory = false;
+    private Boolean showHistory;
 
-    private boolean showCaptcha = false;
+    private boolean showCaptcha;
 
-    private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
+    private String welcomeTip;
 
-    private String queueTip = I18Consts.I18N_QUEUE_TIP;
+    private String queueTip;
 
-    private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;
+    private String leavemsgTip;
 
     /** auto close time in min - 默认自动关闭时间，单位分钟 */
-    private Double autoCloseMin = Double.valueOf(25);
+    private Double autoCloseMin;
 
-    // private Boolean showQuickButtons = true;
-    // private List<QuickButtonResponse> quickButtons = new ArrayList<>();
+    // private Boolean showQuickButtons;
+    // private List<QuickButtonResponse> quickButtons;
 
-    private Boolean showFaqs = true;
-    private List<FaqResponse> faqs = new ArrayList<>();
+    private Boolean showFaqs;
+    private List<FaqResponse> faqs;
 
-    private Boolean showQuickFaqs = true;
-    private List<FaqResponse> quickFaqs = new ArrayList<>();
+    private Boolean showQuickFaqs;
+    private List<FaqResponse> quickFaqs;
 
-    private Boolean showGuessFaqs = true;
-    private List<FaqResponse> guessFaqs = new ArrayList<>();
+    private Boolean showGuessFaqs;
+    private List<FaqResponse> guessFaqs;
 
-    private Boolean showHotFaqs = true;
-    private List<FaqResponse> hotFaqs = new ArrayList<>();
+    private Boolean showHotFaqs;
+    private List<FaqResponse> hotFaqs;
 
-    private Boolean showShortcutFaqs = true;
-    private List<FaqResponse> shortcutFaqs = new ArrayList<>();
+    private Boolean showShortcutFaqs;
+    private List<FaqResponse> shortcutFaqs;
 
     // 输入联想开关
-    private Boolean showInputAssociation = true;
-    private Boolean showLogo = true;
+    private Boolean showInputAssociation;
+    private Boolean showLogo;
 
     // 有效日期
     private Date validateUntil;

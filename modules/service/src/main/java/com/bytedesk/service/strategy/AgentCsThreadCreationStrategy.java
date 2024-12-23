@@ -92,10 +92,10 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         if (!visitorRequest.getForceAgent()) {
             // 判断是否需要转机器人
             Boolean isOffline = !agent.isConnectedAndAvailable();
-            Boolean transferToRobot = agent.getServiceRobotSettings().shouldTransferToRobot(isOffline);
+            Boolean transferToRobot = agent.getRobotSettings().shouldTransferToRobot(isOffline);
             if (transferToRobot) {
                 // 转机器人
-                RobotEntity robot = agent.getServiceRobotSettings().getRobot();
+                RobotEntity robot = agent.getRobotSettings().getRobot();
                 if (robot != null) {
                     return routeService.routeRobot(visitorRequest, thread, robot);
                 } else {

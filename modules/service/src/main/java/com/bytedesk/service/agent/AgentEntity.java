@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 12:33:47
+ * @LastEditTime: 2024-12-23 13:08:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
-import com.bytedesk.service.settings.ServiceRobotSettings;
+import com.bytedesk.service.leave_msg.LeaveMsgSettings;
+import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.team.member.MemberEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -92,13 +93,18 @@ public class AgentEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
+    // 留言设置
     @Embedded
     @Builder.Default
-    private ServiceRobotSettings serviceRobotSettings = new ServiceRobotSettings();
+    private LeaveMsgSettings leaveMsgSettings = new LeaveMsgSettings();
 
     @Embedded
     @Builder.Default
-    private ServiceCommonSettings serviceCommonSettings = new ServiceCommonSettings();
+    private RobotSettings robotSettings = new RobotSettings();
+
+    @Embedded
+    @Builder.Default
+    private ServiceCommonSettings commonSettings = new ServiceCommonSettings();
 
     @Embedded
     @Builder.Default

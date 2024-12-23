@@ -28,7 +28,7 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
-import com.bytedesk.service.settings.ServiceRobotSettings;
+import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
@@ -114,12 +114,12 @@ public class ConvertServiceUtils {
     
     //
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
-            ServiceRobotSettings serviceSettings) {
+            RobotSettings serviceSettings) {
         return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 
     public static String convertToServiceSettingsResponseVisitorJSONString(
-            ServiceRobotSettings serviceSettings) {
+            RobotSettings serviceSettings) {
         return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
     }
 

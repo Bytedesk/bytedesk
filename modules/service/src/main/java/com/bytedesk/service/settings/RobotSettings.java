@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 12:31:27
+ * @LastEditTime: 2024-12-23 13:39:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,19 +14,12 @@
  */
 package com.bytedesk.service.settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.service.leave_msg.LeaveMsgSettings;
-import com.bytedesk.service.worktime.WorktimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,7 +32,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceRobotSettings {
+public class RobotSettings {
 
     // 开启机器人之后，robot字段为必填
     @Builder.Default
@@ -58,15 +51,6 @@ public class ServiceRobotSettings {
     @Builder.Default
     private int queueRobotCount = 100;
 
-    /** work time */
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<WorktimeEntity> worktimes = new ArrayList<>();
-
-    // 留言设置
-    @Embedded
-    @Builder.Default
-    private LeaveMsgSettings leaveMsgSettings = new LeaveMsgSettings();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -99,16 +83,7 @@ public class ServiceRobotSettings {
     // private int onlineAgentCount = 0;  // 在线客服数
 
     //
-    public boolean isInServiceTime() {
-        if (worktimes == null || worktimes.isEmpty()) {
-            return true;
-        }
-        return worktimes.stream()
-            .anyMatch(WorktimeEntity::isWorkTime);
-    }
-
-    //
-    public Boolean shouldTransferToRobot(Boolean isOffline) {
+    public Boolean shouldTransferToRobot(Boolean isOffline, Boolean isInServiceTime) {
 
         if (defaultRobot) {
             // 默认机器人优先接待
@@ -116,7 +91,7 @@ public class ServiceRobotSettings {
         } else if (isOffline && offlineRobot) {
             // 所有客服离线,且设置机器人离线接待
             return true;
-        } else if (nonWorktimeRobot && !isInServiceTime()) {
+        } else if (nonWorktimeRobot && !isInServiceTime) {
             // 非工作时间,且设置机器人非工作时间接待
             return true;
         }
