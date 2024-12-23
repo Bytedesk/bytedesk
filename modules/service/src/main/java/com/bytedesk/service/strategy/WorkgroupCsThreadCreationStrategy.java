@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 17:22:56
+ * @LastEditTime: 2024-12-23 13:44:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -99,10 +99,10 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             Boolean isOffline = !workgroup.isConnected();
-            Boolean transferToRobot = workgroup.getServiceRobotSettings().shouldTransferToRobot(isOffline);
+            Boolean transferToRobot = workgroup.getRobotSettings().shouldTransferToRobot(isOffline);
             if (transferToRobot) {
                 // 转机器人
-                RobotEntity robot = workgroup.getServiceRobotSettings().getRobot();
+                RobotEntity robot = workgroup.getRobotSettings().getRobot();
                 // 
                 return routeService.routeRobot(visitorRequest, thread, robot);
             }

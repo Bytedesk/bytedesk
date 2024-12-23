@@ -34,7 +34,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.settings.ServiceRobotSettings;
+import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -118,7 +118,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setRoutingMode(request.getRoutingMode());
         // workgroup.setRecent(request.getRecent());
         //
-        ServiceRobotSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
+        RobotSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
         workgroup.setServiceRobotSettings(serviceSettings);
         ServiceCommonSettings serviceCommonSettings = serviceSettingsService.formatWorkgroupServiceCommonSettings(request);
         workgroup.setServiceCommonSettings(serviceCommonSettings);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:20:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 14:43:35
+ * @LastEditTime: 2024-12-23 13:42:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -82,9 +82,9 @@ public class WorkgroupEventListener {
                 .build();
         workgroupRequest.setUid(uidUtils.getCacheSerialUid());
         workgroupRequest.setOrgUid(orgUid);
-        workgroupRequest.getServiceCommonSettings().setFaqUids(faqUids);
-        workgroupRequest.getServiceCommonSettings().setQuickFaqUids(faqUids);
-        workgroupRequest.getServiceRobotSettings().setWorktimeUids(worktimeUids);
+        workgroupRequest.getCommonSettings().setFaqUids(faqUids);
+        workgroupRequest.getCommonSettings().setQuickFaqUids(faqUids);
+        workgroupRequest.getLeaveMsgSettings().setWorktimeUids(worktimeUids);
 
         workgroupService.create(workgroupRequest);
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 18:37:47
+ * @LastEditTime: 2024-12-23 13:41:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,8 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.service_settings.ServiceCommonSettingsRequest;
-import com.bytedesk.service.settings.ServiceRobotSettingsRequest;
+import com.bytedesk.service.leave_msg.LeaveMsgSettingsRequest;
+import com.bytedesk.service.settings.RobotSettingsRequest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -52,10 +53,13 @@ public class WorkgroupRequest extends BaseRequest {
     // private Boolean recent = false;
 
     @Builder.Default
-    private ServiceRobotSettingsRequest serviceRobotSettings = new ServiceRobotSettingsRequest();
+    private LeaveMsgSettingsRequest leaveMsgSettings = new LeaveMsgSettingsRequest();
 
     @Builder.Default
-    private ServiceCommonSettingsRequest serviceCommonSettings = new ServiceCommonSettingsRequest();
+    private RobotSettingsRequest robotSettings = new RobotSettingsRequest();
+
+    @Builder.Default
+    private ServiceCommonSettingsRequest commonSettings = new ServiceCommonSettingsRequest();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
     @NotEmpty(message = "agentUids must not be empty")

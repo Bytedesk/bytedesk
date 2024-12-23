@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-17 23:33:40
+ * @Date: 2024-12-23 13:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:04:33
+ * @LastEditTime: 2024-12-23 13:38:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
  */
 package com.bytedesk.service.leave_msg;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +22,9 @@ import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.service.worktime.WorktimeEntity;
+import com.bytedesk.service.worktime.WorktimeResponse;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -36,16 +34,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveMsgSettings implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class LeaveMsgSettingsResponse {
 
     // 留言开关
     @Builder.Default
-    @Column(name = "is_leave_msg_enabled")
     private boolean leaveMsgEnabled = true;
 
     // 处理留言agent
@@ -83,15 +77,6 @@ public class LeaveMsgSettings implements Serializable {
     /** work time */
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER)
-    private List<WorktimeEntity> worktimes = new ArrayList<>();
-
-    //
-    public boolean isInServiceTime() {
-        if (worktimes == null || worktimes.isEmpty()) {
-            return true;
-        }
-        return worktimes.stream()
-            .anyMatch(WorktimeEntity::isWorkTime);
-    }
-
+    private List<WorktimeResponse> worktimes = new ArrayList<>();
+    
 }

@@ -51,7 +51,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
 import com.bytedesk.service.constant.I18ServiceConsts;
-import com.bytedesk.service.settings.ServiceRobotSettings;
+import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.team.member.MemberEntity;
@@ -202,10 +202,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
         // 
-        ServiceRobotSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
-        agent.setServiceRobotSettings(serviceSettings);
+        RobotSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
+        agent.setRobotSettings(serviceSettings);
         ServiceCommonSettings serviceCommonSettings = serviceSettingsService.formatAgentServiceCommonSettings(request);
-        agent.setServiceCommonSettings(serviceCommonSettings);
+        agent.setCommonSettings(serviceCommonSettings);
         // 自动回复
         AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
                 AutoReplySettings.class);
