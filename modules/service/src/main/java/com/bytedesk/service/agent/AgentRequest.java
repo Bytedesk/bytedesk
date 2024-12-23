@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:41:27
+ * @LastEditTime: 2024-12-23 14:48:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettingsRequest;
+import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
 import com.bytedesk.service.leave_msg.LeaveMsgSettingsRequest;
 import com.bytedesk.service.settings.RobotSettingsRequest;
 
@@ -71,7 +71,7 @@ public class AgentRequest extends BaseRequest {
     private RobotSettingsRequest robotSettings = new RobotSettingsRequest();
 
     @Builder.Default
-    private ServiceCommonSettingsRequest commonSettings = new ServiceCommonSettingsRequest();
+    private ServiceSettingsRequest commonSettings = new ServiceSettingsRequest();
 
     @Builder.Default
     private AutoReplySettings autoReplySettings = new AutoReplySettings();

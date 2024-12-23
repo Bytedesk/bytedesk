@@ -20,7 +20,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettingsRequest;
+import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
 import com.bytedesk.service.leave_msg.LeaveMsgSettingsRequest;
 import com.bytedesk.service.settings.RobotSettingsRequest;
 
@@ -59,7 +59,7 @@ public class WorkgroupRequest extends BaseRequest {
     private RobotSettingsRequest robotSettings = new RobotSettingsRequest();
 
     @Builder.Default
-    private ServiceCommonSettingsRequest commonSettings = new ServiceCommonSettingsRequest();
+    private ServiceSettingsRequest commonSettings = new ServiceSettingsRequest();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
     @NotEmpty(message = "agentUids must not be empty")

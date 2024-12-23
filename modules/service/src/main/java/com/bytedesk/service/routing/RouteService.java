@@ -92,7 +92,7 @@ public class RouteService {
             if (agent.canAcceptMore()) {
                 // 未满则接待
                 thread.setUnreadCount(1);
-                thread.setContent(agent.getCommonSettings().getWelcomeTip());
+                thread.setContent(agent.getServiceSettings().getWelcomeTip());
                 // 增加接待数量，待优化
                 agent.increaseThreadCount();
                 agentRestService.save(agent);
@@ -105,7 +105,7 @@ public class RouteService {
                 // 进入排队队列
                 thread.setQueuing();
                 thread.setUnreadCount(0);
-                thread.setContent(agent.getCommonSettings().getQueueTip());
+                thread.setContent(agent.getServiceSettings().getQueueTip());
             }
             threadService.save(thread);
             //
@@ -118,7 +118,7 @@ public class RouteService {
         } else {
             // 客服离线或小休不接待状态，则进入留言
             thread.setOffline();
-            thread.setContent(agent.getCommonSettings().getLeavemsgTip());
+            thread.setContent(agent.getServiceSettings().getLeavemsgTip());
             threadService.save(thread);
             //
             MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
@@ -149,7 +149,7 @@ public class RouteService {
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
             thread.setUnreadCount(1);
-            thread.setContent(workgroup.getCommonSettings().getWelcomeTip());
+            thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
             //
             thread.setOwner(agent.getMember().getUser());
             UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
@@ -166,7 +166,7 @@ public class RouteService {
             // 离线状态永远显示离线提示语，不显示“继续会话”
             // 客服离线 或 非接待状态
             thread.setOffline();
-            thread.setContent(workgroup.getCommonSettings().getLeavemsgTip());
+            thread.setContent(workgroup.getServiceSettings().getLeavemsgTip());
             thread.setOwner(agent.getMember().getUser());
             UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
             thread.setAgent(JSON.toJSONString(agentProtobuf));

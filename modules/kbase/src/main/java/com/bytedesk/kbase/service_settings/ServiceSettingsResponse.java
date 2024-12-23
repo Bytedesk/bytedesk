@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:37:18
+ * @LastEditTime: 2024-12-23 14:45:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.kbase.service_settings;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -25,11 +26,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceCommonSettingsResponse {
+public class ServiceSettingsResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private LanguageEnum language;
 

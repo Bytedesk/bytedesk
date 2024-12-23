@@ -53,7 +53,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
+import com.bytedesk.kbase.service_settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -242,8 +242,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setDefaultReply(request.getDefaultReply());
         robot.setKbUid(request.getKbUid());
         //
-        ServiceCommonSettings serviceSettings = modelMapper.map(
-                request.getServiceSettings(), ServiceCommonSettings.class);
+        ServiceSettings serviceSettings = modelMapper.map(
+                request.getServiceSettings(), ServiceSettings.class);
         //
         if (request.getServiceSettings().getFaqUids() != null
                 && request.getServiceSettings().getFaqUids().size() > 0) {

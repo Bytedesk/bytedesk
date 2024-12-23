@@ -23,7 +23,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 // import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
+import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 
 public class ConvertAiUtils {
@@ -51,7 +51,7 @@ public class ConvertAiUtils {
     }
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
-            ServiceCommonSettings serviceSettings) {
+            ServiceSettings serviceSettings) {
         return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 

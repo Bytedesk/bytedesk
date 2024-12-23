@@ -18,7 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettingsResponse;
+import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
 import com.bytedesk.service.leave_msg.LeaveMsgSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;
 
@@ -53,7 +53,7 @@ public class WorkgroupResponse extends BaseResponse {
 
     private RobotSettingsResponse robotSettings;
 
-    private ServiceCommonSettingsResponse commonSettings;
+    private ServiceSettingsResponse commonSettings;
     // 
     private List<UserProtobuf> agents;
 }

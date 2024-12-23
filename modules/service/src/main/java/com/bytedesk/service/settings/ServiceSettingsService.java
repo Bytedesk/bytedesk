@@ -25,7 +25,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
+import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentRequest;
 import com.bytedesk.service.leave_msg.LeaveMsgSettings;
 import com.bytedesk.service.workgroup.WorkgroupRequest;
@@ -71,7 +71,7 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
     //
-    public RobotSettings formatAgentServiceSettings(AgentRequest request) {
+    public RobotSettings formatAgentRobotSettings(AgentRequest request) {
         // 
         if (request == null || request.getRobotSettings() == null) {
             return RobotSettings.builder().build();
@@ -93,13 +93,13 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
-    public ServiceCommonSettings formatAgentServiceCommonSettings(AgentRequest request) {
+    public ServiceSettings formatAgentServiceSettings(AgentRequest request) {
         // 
         if (request == null || request.getCommonSettings() == null) {
-            return ServiceCommonSettings.builder().build();
+            return ServiceSettings.builder().build();
         }
         //
-        ServiceCommonSettings serviceSettings = modelMapper.map(request.getCommonSettings(), ServiceCommonSettings.class);
+        ServiceSettings serviceSettings = modelMapper.map(request.getCommonSettings(), ServiceSettings.class);
         //
         if (request.getCommonSettings().getFaqUids() != null
                 && request.getCommonSettings().getFaqUids().size() > 0) {
@@ -210,7 +210,7 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
-    public RobotSettings formatWorkgroupServiceSettings(WorkgroupRequest request) {
+    public RobotSettings formatWorkgroupRobotSettings(WorkgroupRequest request) {
         // 
         if (request == null || request.getRobotSettings() == null) {
             return RobotSettings.builder().build();
@@ -232,13 +232,13 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
-    public ServiceCommonSettings formatWorkgroupServiceCommonSettings(WorkgroupRequest request) {
+    public ServiceSettings formatWorkgroupServiceSettings(WorkgroupRequest request) {
         // 
         if (request == null || request.getCommonSettings() == null) {
-            return ServiceCommonSettings.builder().build();
+            return ServiceSettings.builder().build();
         }
 
-        ServiceCommonSettings serviceSettings = modelMapper.map(request.getCommonSettings(), ServiceCommonSettings.class);
+        ServiceSettings serviceSettings = modelMapper.map(request.getCommonSettings(), ServiceSettings.class);
 
         //
         if (request.getCommonSettings().getFaqUids() != null

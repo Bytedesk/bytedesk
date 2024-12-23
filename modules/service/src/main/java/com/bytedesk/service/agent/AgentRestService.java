@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:24:27
+ * @LastEditTime: 2024-12-23 14:48:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
+import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.leave_msg.LeaveMsgSettings;
 import com.bytedesk.service.settings.RobotSettings;
@@ -205,10 +205,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 
         LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatAgentLeaveMsgSettings(request);
         agent.setLeaveMsgSettings(leaveMsgSettings);
-        RobotSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
+        RobotSettings serviceSettings = serviceSettingsService.formatAgentRobotSettings(request);
         agent.setRobotSettings(serviceSettings);
-        ServiceCommonSettings serviceCommonSettings = serviceSettingsService.formatAgentServiceCommonSettings(request);
-        agent.setCommonSettings(serviceCommonSettings);
+        ServiceSettings serviceCommonSettings = serviceSettingsService.formatAgentServiceSettings(request);
+        agent.setServiceSettings(serviceCommonSettings);
         // 自动回复
         AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
                 AutoReplySettings.class);
