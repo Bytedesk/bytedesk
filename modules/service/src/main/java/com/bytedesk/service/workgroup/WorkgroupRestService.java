@@ -34,7 +34,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.leave_msg.LeaveMsgSettings;
+import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-29 13:57:24
+ * @Date: 2024-12-23 16:10:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:34:30
+ * @LastEditTime: 2024-12-23 16:15:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,43 +12,53 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.settings;
+package com.bytedesk.kbase.auto_reply.settings;
 
 import java.io.Serializable;
-import com.bytedesk.ai.robot.RobotProtobuf;
+
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.kbase.auto_reply.AutoReplyTypeEnum;
+
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
-@Builder
+@EqualsAndHashCode(callSuper = false)
 @Embeddable
+@Builder
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RobotSettingsResponse  implements Serializable {
+public class AutoReplySettingsResponse implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-    // 是否默认机器人接待
+    // 自动回复开关
     @Builder.Default
-    private Boolean defaultRobot = false;
+    private boolean autoReplyEnabled = false;
 
-    /** 无客服在线时，是否启用机器人接待 */
+    // 自动回复类型
     @Builder.Default
-    private Boolean offlineRobot = false;
+    private String autoReplyType = AutoReplyTypeEnum.FIXED.name();
 
-    /** 非工作时间段，是否启用机器人接待 */
+    // 固定回复类型所需要字段
     @Builder.Default
-    private Boolean nonWorktimeRobot = false;
-
+    private String autoReplyUid = BytedeskConsts.EMPTY_STRING;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    private RobotProtobuf robot;
+    // 自动回复内容类型
+    @Builder.Default
+    private String autoReplyContentType = MessageTypeEnum.TEXT.name();
+
+    // 自动回复内容
+    @Builder.Default
+    private String autoReplyContent = BytedeskConsts.EMPTY_STRING;
+
+    // 关键词回复类型所需要字段
+    // 大模型回复类型所需要字段
+    private String kbUid;
 
 }

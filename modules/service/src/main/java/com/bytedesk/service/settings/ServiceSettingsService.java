@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:49:44
+ * @LastEditTime: 2024-12-23 16:19:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentRequest;
-import com.bytedesk.service.leave_msg.LeaveMsgSettings;
+import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.workgroup.WorkgroupRequest;
 import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.worktime.WorktimeService;
@@ -95,15 +95,15 @@ public class ServiceSettingsService {
 
     public ServiceSettings formatAgentServiceSettings(AgentRequest request) {
         // 
-        if (request == null || request.getCommonSettings() == null) {
+        if (request == null || request.getServiceSettings() == null) {
             return ServiceSettings.builder().build();
         }
         //
-        ServiceSettings serviceSettings = modelMapper.map(request.getCommonSettings(), ServiceSettings.class);
+        ServiceSettings serviceSettings = modelMapper.map(request.getServiceSettings(), ServiceSettings.class);
         //
-        if (request.getCommonSettings().getFaqUids() != null
-                && request.getCommonSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getFaqUids().iterator();
+        if (request.getServiceSettings().getFaqUids() != null
+                && request.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
                 log.info("update faq {}", faqUid);
@@ -119,9 +119,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getCommonSettings().getQuickFaqUids() != null
-                && request.getCommonSettings().getQuickFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getQuickFaqUids().iterator();
+        if (request.getServiceSettings().getQuickFaqUids() != null
+                && request.getServiceSettings().getQuickFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
                 Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
@@ -135,9 +135,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getCommonSettings().getGuessFaqUids() != null
-                && request.getCommonSettings().getGuessFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getGuessFaqUids().iterator();
+        if (request.getServiceSettings().getGuessFaqUids() != null
+                && request.getServiceSettings().getGuessFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getGuessFaqUids().iterator();
             while (iterator.hasNext()) {
                 String guessFaqUid = iterator.next();
                 Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
@@ -151,9 +151,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getCommonSettings().getHotFaqUids() != null
-                && request.getCommonSettings().getHotFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getHotFaqUids().iterator();
+        if (request.getServiceSettings().getHotFaqUids() != null
+                && request.getServiceSettings().getHotFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getHotFaqUids().iterator();
             while (iterator.hasNext()) {
                 String hotFaqUid = iterator.next();
                 Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
@@ -167,9 +167,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getCommonSettings().getShortcutFaqUids() != null
-                && request.getCommonSettings().getShortcutFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getShortcutFaqUids().iterator();
+        if (request.getServiceSettings().getShortcutFaqUids() != null
+                && request.getServiceSettings().getShortcutFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getShortcutFaqUids().iterator();
             while (iterator.hasNext()) {
                 String shortcutFaqUid = iterator.next();
                 Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
@@ -234,16 +234,16 @@ public class ServiceSettingsService {
 
     public ServiceSettings formatWorkgroupServiceSettings(WorkgroupRequest request) {
         // 
-        if (request == null || request.getCommonSettings() == null) {
+        if (request == null || request.getServiceSettings() == null) {
             return ServiceSettings.builder().build();
         }
 
-        ServiceSettings serviceSettings = modelMapper.map(request.getCommonSettings(), ServiceSettings.class);
+        ServiceSettings serviceSettings = modelMapper.map(request.getServiceSettings(), ServiceSettings.class);
 
         //
-        if (request.getCommonSettings().getFaqUids() != null
-                && request.getCommonSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getFaqUids().iterator();
+        if (request.getServiceSettings().getFaqUids() != null
+                && request.getServiceSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
                 Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
@@ -256,9 +256,9 @@ public class ServiceSettingsService {
                 }
             }
         }
-        if (request.getCommonSettings().getQuickFaqUids() != null
-                && request.getCommonSettings().getQuickFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getQuickFaqUids().iterator();
+        if (request.getServiceSettings().getQuickFaqUids() != null
+                && request.getServiceSettings().getQuickFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
                 Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
@@ -272,9 +272,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getCommonSettings().getGuessFaqUids() != null
-                && request.getCommonSettings().getGuessFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getGuessFaqUids().iterator();
+        if (request.getServiceSettings().getGuessFaqUids() != null
+                && request.getServiceSettings().getGuessFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getGuessFaqUids().iterator();
             while (iterator.hasNext()) {
                 String guessFaqUid = iterator.next();
                 Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
@@ -288,9 +288,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getCommonSettings().getHotFaqUids() != null
-                && request.getCommonSettings().getHotFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getHotFaqUids().iterator();
+        if (request.getServiceSettings().getHotFaqUids() != null
+                && request.getServiceSettings().getHotFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getHotFaqUids().iterator();
             while (iterator.hasNext()) {
                 String hotFaqUid = iterator.next();
                 Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
@@ -304,9 +304,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getCommonSettings().getShortcutFaqUids() != null
-                && request.getCommonSettings().getShortcutFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getCommonSettings().getShortcutFaqUids().iterator();
+        if (request.getServiceSettings().getShortcutFaqUids() != null
+                && request.getServiceSettings().getShortcutFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getServiceSettings().getShortcutFaqUids().iterator();
             while (iterator.hasNext()) {
                 String shortcutFaqUid = iterator.next();
                 Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);

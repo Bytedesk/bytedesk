@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-23 13:10:03
+ * @Date: 2024-12-23 13:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:34:06
+ * @LastEditTime: 2024-12-23 16:14:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,22 +12,14 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.leave_msg.settings;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
+import com.bytedesk.service.leave_msg.LeaveMsgNotifyTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.service.worktime.WorktimeResponse;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,10 +29,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveMsgSettingsResponse  implements Serializable {
+public class LeaveMsgSettingsRequest  implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    
     // 留言开关
     @Builder.Default
     private boolean leaveMsgEnabled = true;
@@ -73,13 +65,14 @@ public class LeaveMsgSettingsResponse  implements Serializable {
 
     // 留言表单
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
     private String leaveMsgForm = BytedeskConsts.EMPTY_JSON_STRING;
 
-    /** work time */
+    // @Builder.Default
+    // @OneToMany(fetch = FetchType.EAGER)
+    // private List<WorktimeRequest> worktimes = new ArrayList<>();
+    
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<WorktimeResponse> worktimes = new ArrayList<>();
+    private List<String> worktimeUids = new ArrayList<>();
+
     
 }

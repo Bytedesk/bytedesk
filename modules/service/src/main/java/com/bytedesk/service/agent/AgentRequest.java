@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:48:05
+ * @LastEditTime: 2024-12-23 16:20:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,9 +17,9 @@ package com.bytedesk.service.agent;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.auto_reply.AutoReplySettings;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
-import com.bytedesk.service.leave_msg.LeaveMsgSettingsRequest;
+import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsRequest;
 import com.bytedesk.service.settings.RobotSettingsRequest;
 
 import jakarta.validation.constraints.Email;
@@ -59,10 +59,10 @@ public class AgentRequest extends BaseRequest {
     private String status = AgentStatusEnum.OFFLINE.name();
 
     @Builder.Default
-    private Integer maxThreadCount = 10;
+    private boolean connected = false;
 
     @Builder.Default
-    private Integer currentThreadCount = 0;
+    private Boolean enabled = true;
 
     @Builder.Default
     private LeaveMsgSettingsRequest leaveMsgSettings = new LeaveMsgSettingsRequest();
@@ -71,13 +71,17 @@ public class AgentRequest extends BaseRequest {
     private RobotSettingsRequest robotSettings = new RobotSettingsRequest();
 
     @Builder.Default
-    private ServiceSettingsRequest commonSettings = new ServiceSettingsRequest();
+    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
 
     @Builder.Default
     private AutoReplySettings autoReplySettings = new AutoReplySettings();
 
-    // @Builder.Default
-    // private Boolean enabled = true;
+    @Builder.Default
+    private Integer maxThreadCount = 10;
+
+    @Builder.Default
+    private Integer currentThreadCount = 0;
+    
     //
     @NotBlank
     private String memberUid;

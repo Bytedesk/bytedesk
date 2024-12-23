@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:41:44
+ * @LastEditTime: 2024-12-23 16:18:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,8 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
-import com.bytedesk.service.leave_msg.LeaveMsgSettingsRequest;
+import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsRequest;
+import com.bytedesk.service.queue.settings.QueueSettingsRequest;
 import com.bytedesk.service.settings.RobotSettingsRequest;
 
 import jakarta.validation.constraints.NotBlank;
@@ -49,9 +50,6 @@ public class WorkgroupRequest extends BaseRequest {
     @Builder.Default
     private String routingMode = WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
 
-    // @Builder.Default
-    // private Boolean recent = false;
-
     @Builder.Default
     private LeaveMsgSettingsRequest leaveMsgSettings = new LeaveMsgSettingsRequest();
 
@@ -59,7 +57,10 @@ public class WorkgroupRequest extends BaseRequest {
     private RobotSettingsRequest robotSettings = new RobotSettingsRequest();
 
     @Builder.Default
-    private ServiceSettingsRequest commonSettings = new ServiceSettingsRequest();
+    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
+
+    @Builder.Default
+    private QueueSettingsRequest queueSettings = new QueueSettingsRequest();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
     @NotEmpty(message = "agentUids must not be empty")
