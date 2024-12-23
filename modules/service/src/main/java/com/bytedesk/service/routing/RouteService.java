@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:40:38
+ * @LastEditTime: 2024-12-24 07:51:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,14 +65,14 @@ public class RouteService {
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         // 使用agent的serviceSettings配置
-        UserProtobuf agentProtobuf = ConvertAiUtils.convertToUserProtobuf(robot);
-        thread.setAgent(JSON.toJSONString(agentProtobuf));
+        UserProtobuf user = ConvertAiUtils.convertToUserProtobuf(robot);
+        thread.setAgent(JSON.toJSONString(user));
         //
         thread.setRobot(true);
         thread.setUnreadCount(0);
         threadService.save(thread);
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agentProtobuf, thread);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadRobotWelcomeMessage(user, thread);
         return messageProtobuf;
     }
 
@@ -85,7 +85,7 @@ public class RouteService {
         MessageProtobuf messageProtobuf = null;
         // 判断客服是否在线且接待状态
         if (agent.isConnectedAndAvailable()) {
-            UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+            // UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
             if (agent.canAcceptMore()) {
@@ -101,7 +101,7 @@ public class RouteService {
                 queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
                 queueMemberRestService.save(queueMemberEntity);
                 // 
-                messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
+                messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             } else {
                 // 进入排队队列
@@ -109,7 +109,7 @@ public class RouteService {
                 thread.setUnreadCount(0);
                 thread.setContent(agent.getQueueSettings().getQueueTip());
                 // 
-                messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(user, thread);
+                messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             }
             threadService.save(thread);
@@ -158,8 +158,8 @@ public class RouteService {
             thread.setAgent(JSON.toJSONString(agentProtobuf));
             threadService.save(thread);
             //
-            UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
+            // UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
             // 广播消息，由消息通道统一处理
             messageSendService.sendProtobufMessage(messageProtobuf);
 
