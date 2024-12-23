@@ -82,9 +82,9 @@ public class WorkgroupEventListener {
                 .build();
         workgroupRequest.setUid(uidUtils.getCacheSerialUid());
         workgroupRequest.setOrgUid(orgUid);
-        workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setWorktimeUids(worktimeUids);
+        workgroupRequest.getServiceCommonSettings().setFaqUids(faqUids);
+        workgroupRequest.getServiceCommonSettings().setQuickFaqUids(faqUids);
+        workgroupRequest.getServiceRobotSettings().setWorktimeUids(worktimeUids);
 
         workgroupService.create(workgroupRequest);
     }

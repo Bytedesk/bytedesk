@@ -14,35 +14,35 @@
  */
 package com.bytedesk.ai.settings;
 
-import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.kbase.service_settings.BaseServiceSettingsRequest;
+// import com.bytedesk.core.thread.ThreadTypeEnum;
+// import com.bytedesk.kbase.service_settings.ServiceCommonSettingsRequest;
 
-import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+// import jakarta.persistence.Embeddable;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Data;
+// import lombok.EqualsAndHashCode;
+// import lombok.NoArgsConstructor;
+// import lombok.experimental.Accessors;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Builder
-@Embeddable
-@Accessors(chain = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class RobotServiceSettingsRequest extends BaseServiceSettingsRequest {
+// @Data
+// @EqualsAndHashCode(callSuper = true)
+// @Builder
+// @Embeddable
+// @Accessors(chain = true)
+// @AllArgsConstructor
+// @NoArgsConstructor
+// public class RobotServiceSettingsRequest extends ServiceCommonSettingsRequest {
 
-    // 是否允许转人工
-    @Builder.Default
-    private boolean allowTransferToAgent = true;
+//     // 是否允许转人工
+//     @Builder.Default
+//     private boolean allowTransferToAgent = true;
 
-    // 限制仅允许：workgroup、agent
-    @Builder.Default
-    private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
+//     // 限制仅允许：workgroup、agent
+//     @Builder.Default
+//     private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
 
-    // agentUid or workgroupUid
-    private String transferToUid;
+//     // agentUid or workgroupUid
+//     private String transferToUid;
 
-}
+// }

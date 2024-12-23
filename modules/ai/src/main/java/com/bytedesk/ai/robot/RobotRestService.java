@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 17:25:00
+ * @LastEditTime: 2024-12-23 12:52:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,6 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotJson;
-import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -54,6 +53,8 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
+import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -241,8 +242,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setDefaultReply(request.getDefaultReply());
         robot.setKbUid(request.getKbUid());
         //
-        RobotServiceSettings serviceSettings = modelMapper.map(
-                request.getServiceSettings(), RobotServiceSettings.class);
+        ServiceCommonSettings serviceSettings = modelMapper.map(
+                request.getServiceSettings(), ServiceCommonSettings.class);
         //
         if (request.getServiceSettings().getFaqUids() != null
                 && request.getServiceSettings().getFaqUids().size() > 0) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 17:19:12
+ * @LastEditTime: 2024-12-23 12:37:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,10 +17,14 @@ package com.bytedesk.service.settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.kbase.service_settings.BaseServiceSettingsRequest;
+import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.kbase.service_settings.ServiceCommonSettingsResponse;
 import com.bytedesk.service.leave_msg.LeaveMsgSettings;
+import com.bytedesk.service.worktime.WorktimeResponse;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,9 +39,9 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceSettingsRequest extends BaseServiceSettingsRequest {
+public class ServiceRobotSettingsResponse extends ServiceCommonSettingsResponse {
 
-    // 默认机器人接待
+    // 是否默认机器人接待
     @Builder.Default
     private Boolean defaultRobot = false;
 
@@ -56,11 +60,12 @@ public class ServiceSettingsRequest extends BaseServiceSettingsRequest {
     private Integer queueRobotCount = 100;
 
     @Builder.Default
-    private List<String> worktimeUids = new ArrayList<>();
-    
+    private List<WorktimeResponse> worktimes = new ArrayList<>();
+
     @Builder.Default
     private LeaveMsgSettings LeaveMsgSettings = new LeaveMsgSettings();
 
-    private String robotUid;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RobotProtobuf robot;
 
 }

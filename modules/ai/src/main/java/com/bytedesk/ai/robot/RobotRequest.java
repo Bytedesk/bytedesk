@@ -14,11 +14,11 @@
  */
 package com.bytedesk.ai.robot;
 
-import com.bytedesk.ai.settings.RobotServiceSettingsRequest;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.kbase.service_settings.ServiceCommonSettingsRequest;
 
 import lombok.Builder;
 import lombok.Data;
@@ -41,7 +41,7 @@ public class RobotRequest extends BaseRequest {
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
 
     @Builder.Default
-    private RobotServiceSettingsRequest serviceSettings = new RobotServiceSettingsRequest();
+    private ServiceCommonSettingsRequest serviceSettings = new ServiceCommonSettingsRequest();
 
     @Builder.Default
     private RobotLlm llm = new RobotLlm();

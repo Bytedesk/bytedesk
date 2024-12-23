@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 16:56:57
+ * @LastEditTime: 2024-12-23 12:31:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.kbase.service_settings.BaseServiceSettings;
 import com.bytedesk.service.leave_msg.LeaveMsgSettings;
 import com.bytedesk.service.worktime.WorktimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,18 +30,16 @@ import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Builder
 @Embeddable
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceSettings extends BaseServiceSettings {
+public class ServiceRobotSettings {
 
     // 开启机器人之后，robot字段为必填
     @Builder.Default
@@ -75,6 +72,32 @@ public class ServiceSettings extends BaseServiceSettings {
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotEntity robot;
 
+    // 负载相关配置
+    // @Column(name = "max_concurrent_threads")
+    // private int maxConcurrentThreads = 1000;  // 最大并发会话数
+
+    // @Column(name = "max_waiting_threads")
+    // private int maxWaitingThreads = 100;  // 最大等待会话数
+
+    // @Column(name = "max_thread_per_agent")
+    // private int maxThreadPerAgent = 10;  // 每个客服最大会话数
+
+    // @Column(name = "max_waiting_time")
+    // private int maxWaitingTime = 300;  // 最大等待时间(秒)
+
+    // @Column(name = "alert_threshold")
+    // private double alertThreshold = 0.8;  // 负载告警阈值(0-1)
+
+    // // 统计数据
+    // @Column(name = "current_thread_count")
+    // private int currentThreadCount = 0;  // 当前会话数
+
+    // @Column(name = "waiting_thread_count")
+    // private int waitingThreadCount = 0;  // 等待会话数
+
+    // @Column(name = "online_agent_count")
+    // private int onlineAgentCount = 0;  // 在线客服数
+
     //
     public boolean isInServiceTime() {
         if (worktimes == null || worktimes.isEmpty()) {
@@ -105,28 +128,28 @@ public class ServiceSettings extends BaseServiceSettings {
      */
     public boolean isOverloaded() {
         // 1. 检查总会话数是否超限
-        if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
-            return true;
-        }
+        // if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
+        //     return true;
+        // }
 
         // 2. 检查等待队列是否超限 
-        if (getWaitingThreadCount() >= getMaxWaitingThreads()) {
-            return true;
-        }
+        // if (getWaitingThreadCount() >= getMaxWaitingThreads()) {
+        //     return true;
+        // }
 
         // 3. 检查客服平均负载是否超限
-        if (getOnlineAgentCount() > 0) {
-            double avgLoad = (double) getCurrentThreadCount() / getOnlineAgentCount();
-            if (avgLoad >= getMaxThreadPerAgent()) {
-                return true;
-            }
-        }
+        // if (getOnlineAgentCount() > 0) {
+        //     double avgLoad = (double) getCurrentThreadCount() / getOnlineAgentCount();
+        //     if (avgLoad >= getMaxThreadPerAgent()) {
+        //         return true;
+        //     }
+        // }
 
         // 4. 检查负载率是否超过告警阈值
-        double loadRate = (double) getCurrentThreadCount() / getMaxConcurrentThreads();
-        if (loadRate >= getAlertThreshold()) {
-            return true;
-        }
+        // double loadRate = (double) getCurrentThreadCount() / getMaxConcurrentThreads();
+        // if (loadRate >= getAlertThreshold()) {
+        //     return true;
+        // }
 
         return false;
     }

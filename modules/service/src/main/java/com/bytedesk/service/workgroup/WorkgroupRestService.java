@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 18:37:41
+ * @LastEditTime: 2024-12-23 12:50:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,9 +31,10 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.settings.ServiceSettings;
+import com.bytedesk.service.settings.ServiceRobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,8 +118,10 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setRoutingMode(request.getRoutingMode());
         // workgroup.setRecent(request.getRecent());
         //
-        ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
-        workgroup.setServiceSettings(serviceSettings);
+        ServiceRobotSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
+        workgroup.setServiceRobotSettings(serviceSettings);
+        ServiceCommonSettings serviceCommonSettings = serviceSettingsService.formatWorkgroupServiceCommonSettings(request);
+        workgroup.setServiceCommonSettings(serviceCommonSettings);
         //
         workgroup.getAgents().clear();
         Iterator<String> iterator = request.getAgentUids().iterator();

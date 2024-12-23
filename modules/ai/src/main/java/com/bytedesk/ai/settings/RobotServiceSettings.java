@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 17:16:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-26 06:10:52
+ * @LastEditTime: 2024-12-23 11:53:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,36 +14,36 @@
  */
 package com.bytedesk.ai.settings;
 
-import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.kbase.service_settings.BaseServiceSettings;
+// import com.bytedesk.core.thread.ThreadTypeEnum;
+// import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
 
-import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+// import jakarta.persistence.Embeddable;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Data;
+// import lombok.EqualsAndHashCode;
+// import lombok.NoArgsConstructor;
+// import lombok.experimental.Accessors;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Builder
-@Embeddable
-@Accessors(chain = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class RobotServiceSettings extends BaseServiceSettings {
+// @Data
+// @EqualsAndHashCode(callSuper = true)
+// @Builder
+// @Embeddable
+// @Accessors(chain = true)
+// @AllArgsConstructor
+// @NoArgsConstructor
+// public class RobotServiceSettings extends ServiceCommonSettings {
 
-    // 是否允许转人工
-    @Builder.Default
-    private boolean allowTransferToAgent = true;
+//     // 是否允许转人工
+//     @Builder.Default
+//     private boolean allowTransferToAgent = true;
 
-    // 限制仅允许：workgroup、agent
-    @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
-    private String transferType = ThreadTypeEnum.WORKGROUP.name();
+//     // 限制仅允许：workgroup、agent
+//     @Builder.Default
+//     // @Enumerated(EnumType.STRING)
+//     // private ThreadTypeEnum transferType = ThreadTypeEnum.WORKGROUP;
+//     private String transferType = ThreadTypeEnum.WORKGROUP.name();
 
-    // agentUid or workgroupUid
-    private String transferToUid;
-}
+//     // agentUid or workgroupUid
+//     private String transferToUid;
+// }
