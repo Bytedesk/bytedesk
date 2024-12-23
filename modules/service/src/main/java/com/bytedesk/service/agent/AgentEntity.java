@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:31:00
+ * @LastEditTime: 2024-12-23 21:30:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.service.agent;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -146,26 +142,26 @@ public class AgentEntity extends BaseEntity {
         多语言支持：按语言技能分配
         产品线划分：不同产品对应不同技能组
      */
-    @Column(length = 1000)
-    private String skills;  // 技能标签,逗号分隔,如: "java,python,database"
+    // @Column(length = 1000)
+    // private String skills;  // 技能标签,逗号分隔,如: "java,python,database"
     
-    // 将skills字符串转换为List
-    public List<String> getSkillList() {
-        if (skills == null || skills.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(skills.split(","));
-    }
+    // // 将skills字符串转换为List
+    // public List<String> getSkillList() {
+    //     if (skills == null || skills.isEmpty()) {
+    //         return new ArrayList<>();
+    //     }
+    //     return Arrays.asList(skills.split(","));
+    // }
     
-    // 检查是否具备某个技能
-    public boolean hasSkill(String skill) {
-        return getSkillList().contains(skill);
-    }
+    // // 检查是否具备某个技能
+    // public boolean hasSkill(String skill) {
+    //     return getSkillList().contains(skill);
+    // }
     
-    // 检查是否具备所有必需技能
-    public boolean hasRequiredSkills(List<String> requiredSkills) {
-        return getSkillList().containsAll(requiredSkills);
-    }
+    // // 检查是否具备所有必需技能
+    // public boolean hasRequiredSkills(List<String> requiredSkills) {
+    //     return getSkillList().containsAll(requiredSkills);
+    // }
 
     public Boolean isAvailable() {
         return this.status.equals(AgentStatusEnum.AVAILABLE.name());
