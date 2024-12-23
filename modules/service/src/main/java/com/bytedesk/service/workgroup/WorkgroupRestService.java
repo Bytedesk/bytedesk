@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:51:10
+ * @LastEditTime: 2024-12-23 17:35:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,6 +35,7 @@ import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import lombok.AllArgsConstructor;
@@ -117,7 +118,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setAvatar(request.getAvatar());
         workgroup.setDescription(request.getDescription());
         workgroup.setRoutingMode(request.getRoutingMode());
-        // workgroup.setRecent(request.getRecent());
         //
         LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatWorkgroupLeaveMsgSettings(request);
         workgroup.setLeaveMsgSettings(leaveMsgSettings);
@@ -125,6 +125,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setRobotSettings(robotSettings);
         ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
         workgroup.setServiceSettings(serviceSettings);
+        QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
+        workgroup.setQueueSettings(queueSettings);
         //
         workgroup.getAgents().clear();
         Iterator<String> iterator = request.getAgentUids().iterator();

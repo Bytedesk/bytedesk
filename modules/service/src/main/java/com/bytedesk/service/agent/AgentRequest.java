@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:20:45
+ * @LastEditTime: 2024-12-23 17:33:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsRequest;
+import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettingsRequest;
 
 import jakarta.validation.constraints.Email;
@@ -75,6 +76,9 @@ public class AgentRequest extends BaseRequest {
 
     @Builder.Default
     private AutoReplySettings autoReplySettings = new AutoReplySettings();
+
+    @Builder.Default
+    private QueueSettings queueSettings = new QueueSettings();
 
     @Builder.Default
     private Integer maxThreadCount = 10;

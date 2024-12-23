@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:19:55
+ * @LastEditTime: 2024-12-23 17:34:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,13 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentRequest;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.workgroup.WorkgroupRequest;
 import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.worktime.WorktimeService;
@@ -186,6 +188,31 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
+    public AutoReplySettings formatAgentAutoReplySettings(AgentRequest request) {
+        // 
+        if (request == null || request.getAutoReplySettings() == null) {
+            return AutoReplySettings.builder().build();
+        }
+        //
+        AutoReplySettings serviceSettings = modelMapper.map(request.getAutoReplySettings(), AutoReplySettings.class);
+        //
+        return serviceSettings;
+    }
+
+    public QueueSettings formatAgentQueueSettings(AgentRequest request) {
+        // 
+        if (request == null || request.getQueueSettings() == null) {
+            return QueueSettings.builder().build();
+        }
+        //
+        QueueSettings serviceSettings = modelMapper.map(request.getQueueSettings(), QueueSettings.class);
+        //
+        return serviceSettings;
+    }
+
+
+
+
 
     public LeaveMsgSettings formatWorkgroupLeaveMsgSettings(WorkgroupRequest request) {
         // 
@@ -319,6 +346,17 @@ public class ServiceSettingsService {
                 }
             }
         }
+        //
+        return serviceSettings;
+    }
+
+    public QueueSettings formatWorkgroupQueueSettings(WorkgroupRequest request) {
+        // 
+        if (request == null || request.getQueueSettings() == null) {
+            return QueueSettings.builder().build();
+        }
+        //
+        QueueSettings serviceSettings = modelMapper.map(request.getQueueSettings(), QueueSettings.class);
         //
         return serviceSettings;
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:50:58
+ * @LastEditTime: 2024-12-23 17:33:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,6 +52,7 @@ import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
@@ -209,10 +210,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setRobotSettings(robotSettings);
         ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
         agent.setServiceSettings(serviceSettings);
-        // 自动回复
-        AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
-                AutoReplySettings.class);
+        AutoReplySettings autoReplySettings = serviceSettingsService.formatAgentAutoReplySettings(request);
         agent.setAutoReplySettings(autoReplySettings);
+        QueueSettings queueSettings = serviceSettingsService.formatAgentQueueSettings(request);
+        agent.setQueueSettings(queueSettings);
         // 保存Agent，并检查返回值
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
