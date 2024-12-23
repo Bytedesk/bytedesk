@@ -53,7 +53,7 @@ public class LeaveMsgSettings implements Serializable {
 
     @NotBlank
     @Builder.Default
-    private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;
+    private String leaveMsgTip = I18Consts.I18N_LEAVEMSG_TIP;
 
     // 处理留言agent
     @Builder.Default
