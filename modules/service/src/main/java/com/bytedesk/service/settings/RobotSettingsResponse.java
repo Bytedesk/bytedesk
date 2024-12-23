@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:39:37
+ * @LastEditTime: 2024-12-23 14:34:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.service.settings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,9 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RobotSettingsResponse {
+public class RobotSettingsResponse  implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // 是否默认机器人接待
     @Builder.Default
