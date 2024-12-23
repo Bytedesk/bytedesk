@@ -134,7 +134,7 @@ public class VisitorThreadService
             thread.setExtra(visitorRequest.getThreadExtra());
         } else {
             String extra = ConvertServiceUtils
-                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getRobotSettings());
+                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
             thread.setExtra(extra);
         }
         //
@@ -163,7 +163,7 @@ public class VisitorThreadService
     public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
         String extra = ConvertServiceUtils
-                .convertToServiceSettingsResponseVisitorJSONString(agent.getRobotSettings());
+                .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         thread.setExtra(extra);
         // 考虑到客服信息发生变化，更新客服信息
         String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
