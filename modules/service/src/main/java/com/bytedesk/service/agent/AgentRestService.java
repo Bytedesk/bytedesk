@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:48:22
+ * @LastEditTime: 2024-12-23 14:50:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -205,10 +205,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 
         LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatAgentLeaveMsgSettings(request);
         agent.setLeaveMsgSettings(leaveMsgSettings);
-        RobotSettings serviceSettings = serviceSettingsService.formatAgentRobotSettings(request);
-        agent.setRobotSettings(serviceSettings);
-        ServiceSettings serviceCommonSettings = serviceSettingsService.formatAgentServiceSettings(request);
-        agent.setServiceSettings(serviceCommonSettings);
+        RobotSettings robotSettings = serviceSettingsService.formatAgentRobotSettings(request);
+        agent.setRobotSettings(robotSettings);
+        ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
+        agent.setServiceSettings(serviceSettings);
         // 自动回复
         AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
                 AutoReplySettings.class);

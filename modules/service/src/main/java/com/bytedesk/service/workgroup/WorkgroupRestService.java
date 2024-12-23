@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:47:57
+ * @LastEditTime: 2024-12-23 14:51:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -121,10 +121,10 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         //
         LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatWorkgroupLeaveMsgSettings(request);
         workgroup.setLeaveMsgSettings(leaveMsgSettings);
-        RobotSettings serviceSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
-        workgroup.setRobotSettings(serviceSettings);
-        ServiceSettings serviceCommonSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
-        workgroup.setServiceSettings(serviceCommonSettings);
+        RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
+        workgroup.setRobotSettings(robotSettings);
+        ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
+        workgroup.setServiceSettings(serviceSettings);
         //
         workgroup.getAgents().clear();
         Iterator<String> iterator = request.getAgentUids().iterator();
