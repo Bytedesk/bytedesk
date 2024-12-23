@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:36:11
+ * @LastEditTime: 2024-12-23 16:40:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -168,7 +168,7 @@ public class RouteService {
             // 离线状态永远显示离线提示语，不显示“继续会话”
             // 客服离线 或 非接待状态
             thread.setOffline();
-            thread.setContent(workgroup.getLeaveMsgSettings().getLeavemsgTip());
+            thread.setContent(workgroup.getLeaveMsgSettings().getLeaveMsgTip());
             thread.setOwner(agent.getMember().getUser());
             UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
             thread.setAgent(JSON.toJSONString(agentProtobuf));
