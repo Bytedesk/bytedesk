@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:34:22
+ * @LastEditTime: 2024-12-23 15:50:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,9 +73,6 @@ public class RouteService {
         threadService.save(thread);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agentProtobuf, thread);
-        // 广播消息，由消息通道统一处理
-        // messageService.notifyUser(messageProtobuf);
-        //
         return messageProtobuf;
     }
 
@@ -121,6 +118,7 @@ public class RouteService {
         } else {
             // 客服离线或小休不接待状态，则进入留言
             thread.setOffline();
+            thread.setUnreadCount(0);
             thread.setContent(agent.getLeaveMsgSettings().getLeavemsgTip());
             threadService.save(thread);
             //

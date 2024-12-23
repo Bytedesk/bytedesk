@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:18:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:42:02
+ * @LastEditTime: 2024-12-23 16:16:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,8 @@ import java.util.List;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
-import com.bytedesk.service.leave_msg.LeaveMsgSettingsResponse;
+import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsResponse;
+import com.bytedesk.service.queue.settings.QueueSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;
 
 import lombok.AllArgsConstructor;
@@ -47,13 +48,15 @@ public class WorkgroupResponse extends BaseResponse {
 
     private String routingMode;
 
-    // private boolean recent;
+    private String status;
 
     private LeaveMsgSettingsResponse leaveMsgSettings;
 
     private RobotSettingsResponse robotSettings;
 
-    private ServiceSettingsResponse commonSettings;
+    private ServiceSettingsResponse serviceSettings;
+
+    private QueueSettingsResponse queueSettings;
     // 
     private List<UserProtobuf> agents;
 }

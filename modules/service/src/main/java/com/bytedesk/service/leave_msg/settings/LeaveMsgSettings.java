@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:59:28
+ * @LastEditTime: 2024-12-23 16:12:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.leave_msg.settings;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ import org.hibernate.type.SqlTypes;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.service.leave_msg.LeaveMsgNotifyTypeEnum;
 import com.bytedesk.service.worktime.WorktimeEntity;
 
 import jakarta.persistence.Column;

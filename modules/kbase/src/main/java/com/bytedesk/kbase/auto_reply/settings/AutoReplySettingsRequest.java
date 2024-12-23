@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-17 23:34:04
+ * @Date: 2024-12-23 16:10:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-09 07:30:51
+ * @LastEditTime: 2024-12-23 16:11:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,32 +12,36 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.auto_reply;
+package com.bytedesk.kbase.auto_reply.settings;
 
 import java.io.Serializable;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.kbase.auto_reply.AutoReplyTypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@Builder
+@EqualsAndHashCode(callSuper = false)
 @Embeddable
+@Builder
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class AutoReplySettings implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class AutoReplySettingsRequest implements Serializable {
     
     // 自动回复开关
     @Builder.Default
     @Column(name = "is_autoreply_enabled")
-    private boolean autoReplEnabled = false;
+    private boolean autoReplyEnabled = false;
 
     // 自动回复类型
     @Builder.Default
