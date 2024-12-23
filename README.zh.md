@@ -104,7 +104,7 @@
 - [Jar包部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/jar)
 - [文档](https://www.weiyuai.cn/docs/zh-CN/)
 
-## 预览
+<!-- ## 预览
 
 ### 管理后台
 
@@ -120,7 +120,7 @@
 
 | 客服-AI助手 | 客服-常用语 | 客服-访客信息 |
 | :----------: | :----------: | :----------: |
-| <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> |
+| <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> | -->
 
 <!-- ## [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
 
@@ -159,14 +159,13 @@
 - [Android](https://www.weiyuai.cn/download.html)
 - [IOS](https://www.weiyuai.cn/download.html)
 
-## 技术栈
-
+<!-- ## 技术栈 -->
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->
-- [springboot-3.x for 后端](https://github.com/Bytedesk/bytedesk)
-- [python for ai](https://github.com/Bytedesk/bytedesk-ai)
-- [react for web前端](https://github.com/Bytedesk/bytedesk-react)
-- [flutter for 移动客户端(ios&android)](https://github.com/Bytedesk/bytedesk-mobile)
-- [electron for 桌面客户端(windows&mac&linux)](https://github.com/Bytedesk/bytedesk-desktop)
+<!-- - [springboot-3.x for 后端](https://github.com/Bytedesk/bytedesk) -->
+<!-- - [python for ai](https://github.com/Bytedesk/bytedesk-ai) -->
+<!-- - [react for web前端](https://github.com/Bytedesk/bytedesk-react) -->
+<!-- - [flutter for 移动客户端(ios&android)](https://github.com/Bytedesk/bytedesk-mobile) -->
+<!-- - [electron for 桌面客户端(windows&mac&linux)](https://github.com/Bytedesk/bytedesk-desktop) -->
 
 ## 联系
 

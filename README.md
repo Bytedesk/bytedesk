@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-15 21:57:42
+ * @LastEditTime: 2024-12-23 17:03:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,7 +62,7 @@ Enterprise IM Solution with AI powered live-chat, email support, Omnichannel cus
 - [Jar Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/jar)
 - [Docs](https://www.weiyuai.cn/docs/)
 
-## Preview
+<!-- ## Preview
 
 ### Admin
 
@@ -78,7 +78,7 @@ Enterprise IM Solution with AI powered live-chat, email support, Omnichannel cus
 
 | chat-ai | chat-cs | chat-userinfo |
 | :----------: | :----------: | :----------: |
-| <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> |
+| <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> | -->
 
 <!-- ## [Mobile](https://github.com/Bytedesk/bytedesk-mobile)
 
@@ -115,14 +115,13 @@ Enterprise IM Solution with AI powered live-chat, email support, Omnichannel cus
 - [Android](https://www.weiyuai.cn/download.html)
 - [IOS](https://www.weiyuai.cn/download.html)
 
-## Dev Stack
-
+<!-- ## Dev Stack -->
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
-- [springboot-3.x for im server](https://github.com/Bytedesk/bytedesk)
-- [python for ai](https://github.com/Bytedesk/bytedesk-ai)
-- [react for web](https://github.com/Bytedesk/bytedesk-react)
-- [flutter for ios&android](https://github.com/Bytedesk/bytedesk-mobile)
-- [electron for windows&mac&linux](https://github.com/Bytedesk/bytedesk-desktop)
+<!-- - [springboot-3.x for im server](https://github.com/Bytedesk/bytedesk) -->
+<!-- - [python for ai](https://github.com/Bytedesk/bytedesk-ai) -->
+<!-- - [react for web](https://github.com/Bytedesk/bytedesk-react) -->
+<!-- - [flutter for ios&android](https://github.com/Bytedesk/bytedesk-mobile) -->
+<!-- - [electron for windows&mac&linux](https://github.com/Bytedesk/bytedesk-desktop) -->
 
 ## Contact
 
