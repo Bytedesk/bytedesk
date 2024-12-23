@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 16:28:03
+ * @LastEditTime: 2024-12-23 15:14:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ public enum MessageTypeEnum {
     WELCOME,
     CONTINUE,
     SYSTEM,
+    QUEUE,
     NOTICE,
     TEXT,
     IMAGE,

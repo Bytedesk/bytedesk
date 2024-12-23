@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:43:49
+ * @LastEditTime: 2024-12-23 15:13:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,10 +83,12 @@ public class RouteService {
             @Nonnull AgentEntity agent) {
         // log.info("RouteService routeAgent: {}", agent.getUid());
         // 排队计数
-        QueueMemberEntity memberEntity = queueService.enqueue(thread, agent, visitorRequest);
-        log.info("routeAgent Enqueued to queue {}", memberEntity.toString());
+        QueueMemberEntity queueMemberEntity = queueService.enqueue(thread, agent, visitorRequest);
+        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.toString());
+        MessageProtobuf messageProtobuf = null;
         // 判断客服是否在线且接待状态
         if (agent.isConnectedAndAvailable()) {
+            UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
             if (agent.canAcceptMore()) {
@@ -97,22 +99,23 @@ public class RouteService {
                 agent.increaseThreadCount();
                 agentRestService.save(agent);
                 // 
-                memberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
-                memberEntity.setAcceptTime(LocalDateTime.now());
-                memberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
-                queueMemberRestService.save(memberEntity);
+                queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+                queueMemberEntity.setAcceptTime(LocalDateTime.now());
+                queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+                queueMemberRestService.save(queueMemberEntity);
+                // 
+                messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
+                messageSendService.sendProtobufMessage(messageProtobuf);
             } else {
                 // 进入排队队列
                 thread.setQueuing();
                 thread.setUnreadCount(0);
                 thread.setContent(agent.getServiceSettings().getQueueTip());
+                // 
+                messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(user, thread);
+                messageSendService.sendProtobufMessage(messageProtobuf);
             }
             threadService.save(thread);
-            //
-            UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(user, thread);
-            // 广播消息，由消息通道统一处理
-            messageSendService.sendProtobufMessage(messageProtobuf);
             //
             return messageProtobuf;
         } else {
@@ -121,8 +124,9 @@ public class RouteService {
             thread.setContent(agent.getLeaveMsgSettings().getLeavemsgTip());
             threadService.save(thread);
             //
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
-            messageSendService.sendProtobufMessage(messageProtobuf);
+            messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
+            // 客服离线时，不发送消息通知
+            // messageSendService.sendProtobufMessage(messageProtobuf); //  
             return messageProtobuf;
         }
     }
