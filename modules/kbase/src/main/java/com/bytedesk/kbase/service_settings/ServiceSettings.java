@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:59:16
+ * @LastEditTime: 2024-12-23 15:06:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -119,8 +119,6 @@ public class ServiceSettings implements Serializable {
     @NotBlank
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP;
-
-    
 
     /** auto close time in minutes */
     @NotBlank
