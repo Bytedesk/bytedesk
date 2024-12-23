@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 16:54:32
+ * @LastEditTime: 2024-12-23 12:28:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,9 +19,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.kbase.faq.FaqResponse;
+
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +30,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @MappedSuperclass
-public class BaseServiceSettingsRequest {
+public class ServiceCommonSettingsResponse {
 
-    // private String language = I18Consts.ZH_CN;
     private LanguageEnum language = LanguageEnum.ZH_CN;
 
     private Boolean autoPop = false;
@@ -47,11 +47,11 @@ public class BaseServiceSettingsRequest {
     // show rate btn on chat toolbar
     private Boolean showRateBtn = false;
 
-    private Integer rateMsgCount = 3;
+    private Integer rateMsgCount;
 
     private Boolean showPreForm = false;
 
-    private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
+    private String preForm;
 
     private Boolean showHistory = false;
 
@@ -67,28 +67,28 @@ public class BaseServiceSettingsRequest {
     private Double autoCloseMin = Double.valueOf(25);
 
     // private Boolean showQuickButtons = true;
-    // private List<String> quickButtonUids = new ArrayList<>();
+    // private List<QuickButtonResponse> quickButtons = new ArrayList<>();
 
     private Boolean showFaqs = true;
-    private List<String> faqUids = new ArrayList<>();
+    private List<FaqResponse> faqs = new ArrayList<>();
 
     private Boolean showQuickFaqs = true;
-    private List<String> quickFaqUids = new ArrayList<>();
+    private List<FaqResponse> quickFaqs = new ArrayList<>();
 
     private Boolean showGuessFaqs = true;
-    private List<String> guessFaqUids = new ArrayList<>();
-    
+    private List<FaqResponse> guessFaqs = new ArrayList<>();
+
     private Boolean showHotFaqs = true;
-    private List<String> hotFaqUids = new ArrayList<>();
+    private List<FaqResponse> hotFaqs = new ArrayList<>();
 
     private Boolean showShortcutFaqs = true;
-    private List<String> shortcutFaqUids = new ArrayList<>();
+    private List<FaqResponse> shortcutFaqs = new ArrayList<>();
 
     // 输入联想开关
     private Boolean showInputAssociation = true;
-    // 访客对话底部页面显示logo
     private Boolean showLogo = true;
 
     // 有效日期
     private Date validateUntil;
+
 }

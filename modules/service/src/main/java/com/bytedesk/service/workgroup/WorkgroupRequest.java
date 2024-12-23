@@ -20,7 +20,8 @@ import java.util.List;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.service.settings.ServiceSettingsRequest;
+import com.bytedesk.kbase.service_settings.ServiceCommonSettingsRequest;
+import com.bytedesk.service.settings.ServiceRobotSettingsRequest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -51,7 +52,10 @@ public class WorkgroupRequest extends BaseRequest {
     // private Boolean recent = false;
 
     @Builder.Default
-    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
+    private ServiceRobotSettingsRequest serviceRobotSettings = new ServiceRobotSettingsRequest();
+
+    @Builder.Default
+    private ServiceCommonSettingsRequest serviceCommonSettings = new ServiceCommonSettingsRequest();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
     @NotEmpty(message = "agentUids must not be empty")

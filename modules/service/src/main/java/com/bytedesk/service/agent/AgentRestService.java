@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 13:58:02
+ * @LastEditTime: 2024-12-23 12:49:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,8 +49,9 @@ import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
+import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
 import com.bytedesk.service.constant.I18ServiceConsts;
-import com.bytedesk.service.settings.ServiceSettings;
+import com.bytedesk.service.settings.ServiceRobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.team.member.MemberEntity;
@@ -201,9 +202,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
         // 
-        ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
-        //
-        agent.setServiceSettings(serviceSettings);
+        ServiceRobotSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
+        agent.setServiceRobotSettings(serviceSettings);
+        ServiceCommonSettings serviceCommonSettings = serviceSettingsService.formatAgentServiceCommonSettings(request);
+        agent.setServiceCommonSettings(serviceCommonSettings);
         // 自动回复
         AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
                 AutoReplySettings.class);

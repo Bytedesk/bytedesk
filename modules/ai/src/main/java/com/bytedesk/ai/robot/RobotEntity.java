@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 13:05:28
+ * @LastEditTime: 2024-12-23 11:42:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,11 +14,12 @@
  */
 package com.bytedesk.ai.robot;
 
-import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -65,7 +66,7 @@ public class RobotEntity extends BaseEntity {
 
     @Embedded
     @Builder.Default
-    private RobotServiceSettings serviceSettings = new RobotServiceSettings();
+    private ServiceCommonSettings serviceSettings = new ServiceCommonSettings();
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default
