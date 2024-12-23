@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-23 13:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:13:31
+ * @LastEditTime: 2024-12-23 16:35:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.leave_msg.LeaveMsgNotifyTypeEnum;
 import com.bytedesk.service.worktime.WorktimeResponse;
 
@@ -40,6 +41,9 @@ public class LeaveMsgSettingsResponse  implements Serializable {
     // 留言开关
     @Builder.Default
     private boolean leaveMsgEnabled = true;
+
+    @Builder.Default
+    private String leaveMsgTip = I18Consts.I18N_LEAVEMSG_TIP;
 
     // 处理留言agent
     @Builder.Default
