@@ -16,7 +16,7 @@ package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettingsResponse;
+import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
 import com.bytedesk.service.leave_msg.LeaveMsgSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;
 import com.bytedesk.team.member.MemberResponseSimple;
@@ -56,7 +56,7 @@ public class AgentResponse extends BaseResponse {
 
     private RobotSettingsResponse robotSettings;
 
-    private ServiceCommonSettingsResponse commonSettings;
+    private ServiceSettingsResponse commonSettings;
 
     private AutoReplySettings autoReplySettings;
 

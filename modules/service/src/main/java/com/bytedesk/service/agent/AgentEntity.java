@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:08:16
+ * @LastEditTime: 2024-12-23 14:49:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.kbase.auto_reply.AutoReplySettings;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
+import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.leave_msg.LeaveMsgSettings;
 import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.team.member.MemberEntity;
@@ -104,7 +104,7 @@ public class AgentEntity extends BaseEntity {
 
     @Embedded
     @Builder.Default
-    private ServiceCommonSettings commonSettings = new ServiceCommonSettings();
+    private ServiceSettings serviceSettings = new ServiceSettings();
 
     @Embedded
     @Builder.Default

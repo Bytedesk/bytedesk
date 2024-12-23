@@ -15,7 +15,7 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.service_settings.ServiceCommonSettingsResponse;
+import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,7 +38,7 @@ public class RobotResponse extends BaseResponse {
 
     private String type;
 
-    private ServiceCommonSettingsResponse serviceSettings;
+    private ServiceSettingsResponse serviceSettings;
 
     private RobotLlm llm;
 

@@ -15,7 +15,7 @@
 package com.bytedesk.ai.settings;
 
 // import com.bytedesk.core.thread.ThreadTypeEnum;
-// import com.bytedesk.kbase.service_settings.ServiceCommonSettingsResponse;
+// import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
 
 // import jakarta.persistence.Embeddable;
 // import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ package com.bytedesk.ai.settings;
 // @Accessors(chain = true)
 // @AllArgsConstructor
 // @NoArgsConstructor
-// public class RobotServiceSettingsResponse extends ServiceCommonSettingsResponse {
+// public class RobotServiceSettingsResponse extends ServiceSettingsResponse {
 
 //     // 是否允许转人工
 //     private boolean allowTransferToAgent;
