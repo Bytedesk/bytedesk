@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-23 15:22:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:34:01
+ * @LastEditTime: 2024-12-23 15:40:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,9 +37,15 @@ public class QueueSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int maxWaiting; // 最大等待人数
+    // 当排队人数超过指定值时，自动分配机器人
+    @Builder.Default
+    private boolean queueRobot = false;
 
-    private int maxWaitTime; // 最大等待时间(秒)
+    @Builder.Default
+    private int maxWaiting = 10000; // 最大等待人数
+
+    @Builder.Default
+    private int maxWaitTime = 24 * 60 * 60; // 最大等待时间(秒)
     
     @NotBlank
     @Builder.Default
