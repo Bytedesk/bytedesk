@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-23 13:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:47:49
+ * @LastEditTime: 2024-12-23 14:35:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.service.leave_msg;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveMsgSettingsRequest {
+public class LeaveMsgSettingsRequest  implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     
     // 留言开关
     @Builder.Default
