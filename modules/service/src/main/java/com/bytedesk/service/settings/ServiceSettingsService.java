@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 12:48:19
+ * @LastEditTime: 2024-12-23 13:49:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqService;
 import com.bytedesk.kbase.service_settings.ServiceCommonSettings;
 import com.bytedesk.service.agent.AgentRequest;
+import com.bytedesk.service.leave_msg.LeaveMsgSettings;
 import com.bytedesk.service.workgroup.WorkgroupRequest;
 import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.worktime.WorktimeService;
@@ -47,6 +48,28 @@ public class ServiceSettingsService {
 
     private final RobotRestService robotService;
 
+    public LeaveMsgSettings formatAgentLeaveMsgSettings(AgentRequest request) {
+        // 
+        if (request == null || request.getLeaveMsgSettings() == null) {
+            return LeaveMsgSettings.builder().build();
+        }
+        //
+        LeaveMsgSettings serviceSettings = modelMapper.map(request.getLeaveMsgSettings(), LeaveMsgSettings.class);
+        //
+        Iterator<String> worktimeIterator = request.getLeaveMsgSettings().getWorktimeUids().iterator();
+        while (worktimeIterator.hasNext()) {
+            String worktimeUid = worktimeIterator.next();
+            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
+            if (worktimeOptional.isPresent()) {
+                WorktimeEntity worktimeEntity = worktimeOptional.get();
+                serviceSettings.getWorktimes().add(worktimeEntity);
+            } else {
+                throw new RuntimeException(worktimeUid + " is not found.");
+            }
+        }
+        //
+        return serviceSettings;
+    }
     //
     public RobotSettings formatAgentServiceSettings(AgentRequest request) {
         // 
@@ -65,18 +88,7 @@ public class ServiceSettingsService {
                 throw new RuntimeException(request.getRobotSettings().getRobotUid() + " is not found.");
             }
         }
-        //
-        Iterator<String> worktimeIterator = request.getRobotSettings().getWorktimeUids().iterator();
-        while (worktimeIterator.hasNext()) {
-            String worktimeUid = worktimeIterator.next();
-            Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
-            if (worktimeOptional.isPresent()) {
-                WorktimeEntity worktimeEntity = worktimeOptional.get();
-                serviceSettings.getLeaveMsgSettings().getWorktimes().add(worktimeEntity);
-            } else {
-                throw new RuntimeException(worktimeUid + " is not found.");
-            }
-        }
+        
 
         return serviceSettings;
     }
@@ -174,24 +186,16 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
-    public RobotSettings formatWorkgroupServiceSettings(WorkgroupRequest request) {
+
+    public LeaveMsgSettings formatWorkgroupLeaveMsgSettings(WorkgroupRequest request) {
         // 
-        if (request == null || request.getServiceRobotSettings() == null) {
-            return RobotSettings.builder().build();
+        if (request == null || request.getLeaveMsgSettings() == null) {
+            return LeaveMsgSettings.builder().build();
         }
-
-        RobotSettings serviceSettings = modelMapper.map(request.getServiceRobotSettings(), RobotSettings.class);
-
-        if (StringUtils.hasText(request.getServiceRobotSettings().getRobotUid())) {
-            Optional<RobotEntity> robotOptional = robotService.findByUid(request.getServiceRobotSettings().getRobotUid());
-            if (robotOptional.isPresent()) {
-                RobotEntity robot = robotOptional.get();
-                serviceSettings.setRobot(robot);
-            } else {
-                throw new RuntimeException(request.getServiceRobotSettings().getRobotUid() + " is not found.");
-            }
-        }
-        Iterator<String> worktimeIterator = request.getServiceRobotSettings().getWorktimeUids().iterator();
+        //
+        LeaveMsgSettings serviceSettings = modelMapper.map(request.getLeaveMsgSettings(), LeaveMsgSettings.class);
+        //
+        Iterator<String> worktimeIterator = request.getLeaveMsgSettings().getWorktimeUids().iterator();
         while (worktimeIterator.hasNext()) {
             String worktimeUid = worktimeIterator.next();
             Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
@@ -206,18 +210,40 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
+    public RobotSettings formatWorkgroupServiceSettings(WorkgroupRequest request) {
+        // 
+        if (request == null || request.getRobotSettings() == null) {
+            return RobotSettings.builder().build();
+        }
+
+        RobotSettings serviceSettings = modelMapper.map(request.getRobotSettings(), RobotSettings.class);
+
+        if (StringUtils.hasText(request.getRobotSettings().getRobotUid())) {
+            Optional<RobotEntity> robotOptional = robotService.findByUid(request.getRobotSettings().getRobotUid());
+            if (robotOptional.isPresent()) {
+                RobotEntity robot = robotOptional.get();
+                serviceSettings.setRobot(robot);
+            } else {
+                throw new RuntimeException(request.getRobotSettings().getRobotUid() + " is not found.");
+            }
+        }
+        
+        //
+        return serviceSettings;
+    }
+
     public ServiceCommonSettings formatWorkgroupServiceCommonSettings(WorkgroupRequest request) {
         // 
-        if (request == null || request.getServiceCommonSettings() == null) {
+        if (request == null || request.getCommonSettings() == null) {
             return ServiceCommonSettings.builder().build();
         }
 
-        ServiceCommonSettings serviceSettings = modelMapper.map(request.getServiceCommonSettings(), ServiceCommonSettings.class);
+        ServiceCommonSettings serviceSettings = modelMapper.map(request.getCommonSettings(), ServiceCommonSettings.class);
 
         //
-        if (request.getServiceCommonSettings().getFaqUids() != null
-                && request.getServiceCommonSettings().getFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceCommonSettings().getFaqUids().iterator();
+        if (request.getCommonSettings().getFaqUids() != null
+                && request.getCommonSettings().getFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getCommonSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
                 Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
@@ -230,9 +256,9 @@ public class ServiceSettingsService {
                 }
             }
         }
-        if (request.getServiceCommonSettings().getQuickFaqUids() != null
-                && request.getServiceCommonSettings().getQuickFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceCommonSettings().getQuickFaqUids().iterator();
+        if (request.getCommonSettings().getQuickFaqUids() != null
+                && request.getCommonSettings().getQuickFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getCommonSettings().getQuickFaqUids().iterator();
             while (iterator.hasNext()) {
                 String quickFaqUid = iterator.next();
                 Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
@@ -246,9 +272,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getServiceCommonSettings().getGuessFaqUids() != null
-                && request.getServiceCommonSettings().getGuessFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceCommonSettings().getGuessFaqUids().iterator();
+        if (request.getCommonSettings().getGuessFaqUids() != null
+                && request.getCommonSettings().getGuessFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getCommonSettings().getGuessFaqUids().iterator();
             while (iterator.hasNext()) {
                 String guessFaqUid = iterator.next();
                 Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
@@ -262,9 +288,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getServiceCommonSettings().getHotFaqUids() != null
-                && request.getServiceCommonSettings().getHotFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceCommonSettings().getHotFaqUids().iterator();
+        if (request.getCommonSettings().getHotFaqUids() != null
+                && request.getCommonSettings().getHotFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getCommonSettings().getHotFaqUids().iterator();
             while (iterator.hasNext()) {
                 String hotFaqUid = iterator.next();
                 Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
@@ -278,9 +304,9 @@ public class ServiceSettingsService {
             }
         }
         //
-        if (request.getServiceCommonSettings().getShortcutFaqUids() != null
-                && request.getServiceCommonSettings().getShortcutFaqUids().size() > 0) {
-            Iterator<String> iterator = request.getServiceCommonSettings().getShortcutFaqUids().iterator();
+        if (request.getCommonSettings().getShortcutFaqUids() != null
+                && request.getCommonSettings().getShortcutFaqUids().size() > 0) {
+            Iterator<String> iterator = request.getCommonSettings().getShortcutFaqUids().iterator();
             while (iterator.hasNext()) {
                 String shortcutFaqUid = iterator.next();
                 Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-23 13:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:34:22
+ * @LastEditTime: 2024-12-23 13:47:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,11 +22,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.service.worktime.WorktimeRequest;
-
 import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -74,9 +70,12 @@ public class LeaveMsgSettingsRequest {
     @JdbcTypeCode(SqlTypes.JSON)
     private String leaveMsgForm = BytedeskConsts.EMPTY_JSON_STRING;
 
+    // @Builder.Default
+    // @OneToMany(fetch = FetchType.EAGER)
+    // private List<WorktimeRequest> worktimes = new ArrayList<>();
+    
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<WorktimeRequest> worktimes = new ArrayList<>();
+    private List<String> worktimeUids = new ArrayList<>();
 
     
 }

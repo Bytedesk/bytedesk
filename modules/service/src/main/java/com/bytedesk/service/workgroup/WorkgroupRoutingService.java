@@ -26,13 +26,13 @@ public class WorkgroupRoutingService {
      * 根据工作组路由模式选择客服
      */
     public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread, List<AgentEntity> availableAgents) {
-        if (!workgroup.getServiceRobotSettings().isInServiceTime()) {
+        if (!workgroup.getLeaveMsgSettings().isInServiceTime()) {
             log.info("Workgroup {} is not in service time", workgroup.getUid());
             // todo：route to robot
             return null;
         }
 
-        if (workgroup.getServiceRobotSettings().isOverloaded()) {
+        if (workgroup.getRobotSettings().isOverloaded()) {
             log.info("Workgroup {} is overloaded", workgroup.getUid());
             // todo: route to robot
             return null;
