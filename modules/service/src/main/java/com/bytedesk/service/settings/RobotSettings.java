@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:27:11
+ * @LastEditTime: 2024-12-23 15:29:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,7 +55,6 @@ public class RobotSettings  implements Serializable {
     @Builder.Default
     private int queueRobotCount = 100;
 
-
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotEntity robot;
@@ -75,32 +74,6 @@ public class RobotSettings  implements Serializable {
         }
         return false;
     }
-
-    // 负载相关配置
-    // @Column(name = "max_concurrent_threads")
-    // private int maxConcurrentThreads = 1000;  // 最大并发会话数
-
-    // @Column(name = "max_waiting_threads")
-    // private int maxWaitingThreads = 100;  // 最大等待会话数
-
-    // @Column(name = "max_thread_per_agent")
-    // private int maxThreadPerAgent = 10;  // 每个客服最大会话数
-
-    // @Column(name = "max_waiting_time")
-    // private int maxWaitingTime = 300;  // 最大等待时间(秒)
-
-    // @Column(name = "alert_threshold")
-    // private double alertThreshold = 0.8;  // 负载告警阈值(0-1)
-
-    // // 统计数据
-    // @Column(name = "current_thread_count")
-    // private int currentThreadCount = 0;  // 当前会话数
-
-    // @Column(name = "waiting_thread_count")
-    // private int waitingThreadCount = 0;  // 等待会话数
-
-    // @Column(name = "online_agent_count")
-    // private int onlineAgentCount = 0;  // 在线客服数
 
     /**
      * 检查是否超载

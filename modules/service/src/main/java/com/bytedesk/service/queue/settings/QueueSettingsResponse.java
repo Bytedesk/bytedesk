@@ -16,9 +16,19 @@ package com.bytedesk.service.queue.settings;
 
 import java.io.Serializable;
 
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
+@Builder
+@Embeddable
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class QueueSettingsResponse implements Serializable {
     
     private static final long serialVersionUID = 1L;
