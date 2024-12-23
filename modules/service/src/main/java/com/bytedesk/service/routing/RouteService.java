@@ -118,7 +118,7 @@ public class RouteService {
         } else {
             // 客服离线或小休不接待状态，则进入留言
             thread.setOffline();
-            thread.setContent(agent.getServiceSettings().getLeavemsgTip());
+            thread.setContent(agent.getLeaveMsgSettings().getLeavemsgTip());
             threadService.save(thread);
             //
             MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
@@ -166,7 +166,7 @@ public class RouteService {
             // 离线状态永远显示离线提示语，不显示“继续会话”
             // 客服离线 或 非接待状态
             thread.setOffline();
-            thread.setContent(workgroup.getServiceSettings().getLeavemsgTip());
+            thread.setContent(workgroup.getLeaveMsgSettings().getLeavemsgTip());
             thread.setOwner(agent.getMember().getUser());
             UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
             thread.setAgent(JSON.toJSONString(agentProtobuf));

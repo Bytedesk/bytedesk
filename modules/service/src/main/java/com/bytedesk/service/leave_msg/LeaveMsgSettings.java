@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 13:04:33
+ * @LastEditTime: 2024-12-23 14:59:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.service.worktime.WorktimeEntity;
 
@@ -29,6 +30,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,6 +49,10 @@ public class LeaveMsgSettings implements Serializable {
     @Builder.Default
     @Column(name = "is_leave_msg_enabled")
     private boolean leaveMsgEnabled = true;
+
+    @NotBlank
+    @Builder.Default
+    private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;
 
     // 处理留言agent
     @Builder.Default
