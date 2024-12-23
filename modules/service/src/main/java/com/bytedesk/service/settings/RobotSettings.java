@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:34:39
+ * @LastEditTime: 2024-12-23 15:27:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,6 +59,22 @@ public class RobotSettings  implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotEntity robot;
+    
+    //
+    public Boolean shouldTransferToRobot(Boolean isOffline, Boolean isInServiceTime) {
+
+        if (defaultRobot) {
+            // 默认机器人优先接待
+            return true;
+        } else if (isOffline && offlineRobot) {
+            // 所有客服离线,且设置机器人离线接待
+            return true;
+        } else if (nonWorktimeRobot && !isInServiceTime) {
+            // 非工作时间,且设置机器人非工作时间接待
+            return true;
+        }
+        return false;
+    }
 
     // 负载相关配置
     // @Column(name = "max_concurrent_threads")
@@ -85,22 +101,6 @@ public class RobotSettings  implements Serializable {
 
     // @Column(name = "online_agent_count")
     // private int onlineAgentCount = 0;  // 在线客服数
-
-    //
-    public Boolean shouldTransferToRobot(Boolean isOffline, Boolean isInServiceTime) {
-
-        if (defaultRobot) {
-            // 默认机器人优先接待
-            return true;
-        } else if (isOffline && offlineRobot) {
-            // 所有客服离线,且设置机器人离线接待
-            return true;
-        } else if (nonWorktimeRobot && !isInServiceTime) {
-            // 非工作时间,且设置机器人非工作时间接待
-            return true;
-        }
-        return false;
-    }
 
     /**
      * 检查是否超载
