@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-23 15:22:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:24:56
+ * @LastEditTime: 2024-12-23 15:34:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,13 +15,24 @@
 package com.bytedesk.service.queue.settings;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
+import com.bytedesk.core.constant.I18Consts;
+
+import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Data
 @Builder
+@Embeddable
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class QueueSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,7 +41,9 @@ public class QueueSettings implements Serializable {
 
     private int maxWaitTime; // 最大等待时间(秒)
     
-    private String queueTip; // 排队提示
+    @NotBlank
+    @Builder.Default
+    private String queueTip = I18Consts.I18N_QUEUE_TIP;
     
 }
 
