@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-18 07:21:26
+ * @Date: 2024-03-22 23:06:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-18 07:21:29
+ * @LastEditTime: 2024-07-09 10:50:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,8 +12,19 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.crm;
+package com.bytedesk.core.crm;
 
-public class CustomerEventListener {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+/**
+ * https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html
+ */
+public interface CustomerRepository extends JpaRepository<CustomerEntity, Long>, JpaSpecificationExecutor<CustomerEntity> {
+
+    // Collection<CustomerNameOnly> findByNickname(String name);
     
+    // swagger can't decide, Tweak configuration to get to unambiguous paths
+    // using a dynamic projection parameter
+    // <T> Collection<T> findByName(String name, Class<T> type);
 }

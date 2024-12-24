@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-22 23:06:35
+ * @Date: 2024-06-27 11:12:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-08 21:21:24
+ * @LastEditTime: 2024-12-24 22:01:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,33 +12,28 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.crm;
+package com.bytedesk.core.crm;
 
-import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.I18Consts;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class CustomerRequest extends BaseRequest {
-
-    private String nickname;
-
-    private String email;
-
-    private String mobile;
-
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
-
-    // private String note;
-
+public enum CustomerTypeEnum {
+    
+    NEW_VISITOR("new_visitor", "新访客"),
+    POTENTIAL("potential", "潜在客户"),
+    FORMAL("formal", "正式客户"),
+    LOST("lost", "流失客户");
+    
+    private String code;
+    private String name;
+    
+    CustomerTypeEnum(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+    
+    public String getCode() {
+        return code;
+    }
+    
+    public String getName() {
+        return name;
+    }
 }

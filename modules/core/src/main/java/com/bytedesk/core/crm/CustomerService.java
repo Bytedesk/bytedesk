@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.crm;
+package com.bytedesk.core.crm;
 
 import java.util.Optional;
 
