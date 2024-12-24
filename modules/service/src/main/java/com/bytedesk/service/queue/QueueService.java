@@ -45,13 +45,11 @@ public class QueueService {
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
-        
         // 2. 创建队列成员
         QueueMemberEntity member = createQueueMemberEntity(threadEntity, agentEntity, visitorRequest, queue);
-        
         // 3. 更新队列统计
         updateQueueStats(queue);
-
+        // 4. 返回队列成员
         return member;
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 07:51:27
+ * @LastEditTime: 2024-12-24 22:38:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,7 +85,6 @@ public class RouteService {
         MessageProtobuf messageProtobuf = null;
         // 判断客服是否在线且接待状态
         if (agent.isConnectedAndAvailable()) {
-            // UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
             if (agent.canAcceptMore()) {
