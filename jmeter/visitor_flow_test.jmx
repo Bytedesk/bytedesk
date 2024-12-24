@@ -2,15 +2,17 @@
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Visitor Flow Test Plan">
-      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
         <collectionProp name="Arguments.arguments">
           <elementProp name="HOST" elementType="Argument">
             <stringProp name="Argument.name">HOST</stringProp>
             <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="PORT" elementType="Argument">
             <stringProp name="Argument.name">PORT</stringProp>
             <stringProp name="Argument.value">9003</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
       </elementProp>
@@ -40,17 +42,18 @@
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
-                <stringProp name="Argument.value">{
-  "sid": "df_ag_uid",
-  "nickname": "Test Visitor",
-  "uid": "visitor_test_uid",
-  "orgUid": "df_org_uid",
-  "type": "0",
-  "client": "TEST",
-  "browser": {"name":"Chrome","version":"131.0.0.0","major":"131"},
-  "device": {"name":"iPhone","version":"13.5"},
-  "os": {"name":"Mac OS","version":"10.15.7"},
-  "referrer": "http://127.0.0.1:9003/dev"
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;sid&quot;: &quot;df_ag_uid&quot;,&#xd;
+  &quot;nickname&quot;: &quot;Test Visitor&quot;,&#xd;
+  &quot;uid&quot;: &quot;visitor_test_uid&quot;,&#xd;
+  &quot;orgUid&quot;: &quot;df_org_uid&quot;,&#xd;
+  &quot;type&quot;: &quot;0&quot;,&#xd;
+  &quot;client&quot;: &quot;TEST&quot;,&#xd;
+  &quot;browser&quot;: &quot;{\&quot;name\&quot;:\&quot;Chrome\&quot;,\&quot;version\&quot;:\&quot;131.0.0.0\&quot;,\&quot;major\&quot;:\&quot;131\&quot;}&quot;,&#xd;
+  &quot;device&quot;: &quot;{\&quot;name\&quot;:\&quot;iPhone\&quot;,\&quot;version\&quot;:\&quot;13.5\&quot;}&quot;,&#xd;
+  &quot;os&quot;: &quot;{\&quot;name\&quot;:\&quot;Mac OS\&quot;,\&quot;version\&quot;:\&quot;10.15.7\&quot;}&quot;,&#xd;
+  &quot;referrer&quot;: &quot;http://127.0.0.1:9003/dev&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
@@ -69,14 +72,6 @@
                 <stringProp name="Header.value">127.0.0.1</stringProp>
               </elementProp>
               <elementProp name="" elementType="Header">
-                <stringProp name="Header.name">X-Forwarded-For</stringProp>
-                <stringProp name="Header.value">127.0.0.1</stringProp>
-              </elementProp>
-              <elementProp name="" elementType="Header">
-                <stringProp name="Header.name">Referer</stringProp>
-                <stringProp name="Header.value">https://test.bytedesk.com</stringProp>
-              </elementProp>
-              <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
                 <stringProp name="Header.value">application/json</stringProp>
               </elementProp>
@@ -89,31 +84,28 @@
           <hashTree/>
           <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor">
             <stringProp name="JSONPostProcessor.referenceNames">visitorUid;visitorNickname;visitorAvatar</stringProp>
-            <stringProp name="JSONPostProcessor.jsonPathExprs">$.data.uid;$.data.nickname;$.data.avatar</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.uid;$.nickname;$.avatar</stringProp>
             <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
           </JSONPostProcessor>
           <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread">
-          <stringProp name="HTTPSampler.path">/visitor/api/v1/thread</stringProp>
+          <stringProp name="HTTPSampler.path">/visitor/api/v1/request</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
-                <stringProp name="Argument.value">{
-  "sid": "df_ag_uid",
-  "uid": "${visitorUid}",
-  "nickname": "${visitorNickname}",
-  "avatar": "${visitorAvatar}",
-  "orgUid": "df_org_uid",
-  "type": "0",
-  "client": "TEST",
-  "browser": {"name":"Chrome","version":"131.0.0.0","major":"131"},
-  "device": {"name":"iPhone","version":"13.5"},
-  "os": {"name":"Mac OS","version":"10.15.7"},
-  "referrer": "http://127.0.0.1:9003/dev"
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;sid&quot;: &quot;df_ag_uid&quot;,&#xd;
+  &quot;uid&quot;: &quot;${visitorUid}&quot;,&#xd;
+  &quot;nickname&quot;: &quot;${visitorNickname}&quot;,&#xd;
+  &quot;avatar&quot;: &quot;${visitorAvatar}&quot;,&#xd;
+  &quot;orgUid&quot;: &quot;df_org_uid&quot;,&#xd;
+  &quot;type&quot;: &quot;0&quot;,&#xd;
+  &quot;client&quot;: &quot;TEST&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
