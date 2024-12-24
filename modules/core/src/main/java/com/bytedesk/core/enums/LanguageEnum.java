@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 14:19:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 14:45:41
+ * @LastEditTime: 2024-12-24 16:12:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,6 +63,12 @@ public enum LanguageEnum {
             if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }
+        }
+        if ("zh-cn".equalsIgnoreCase(value)) {
+            return ZH_CN;
+        }
+        if ("zh-tw".equalsIgnoreCase(value)) {
+            return ZH_TW;
         }
         throw new IllegalArgumentException("No enum constant with value: " + value);
     }
