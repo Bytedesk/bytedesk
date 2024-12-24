@@ -36,49 +36,22 @@
           <stringProp name="HTTPSampler.path">/visitor/api/v1/init</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
-              <elementProp name="sid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">sid</stringProp>
-                <stringProp name="Argument.value">df_ag_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="nickname" elementType="HTTPArgument">
-                <stringProp name="Argument.name">nickname</stringProp>
-                <stringProp name="Argument.value">Test Visitor</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="uid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">uid</stringProp>
-                <stringProp name="Argument.value">visitor_test_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="orgUid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">orgUid</stringProp>
-                <stringProp name="Argument.value">df_org_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="type" elementType="HTTPArgument">
-                <stringProp name="Argument.name">type</stringProp>
-                <stringProp name="Argument.value">0</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="client" elementType="HTTPArgument">
-                <stringProp name="Argument.name">client</stringProp>
-                <stringProp name="Argument.value">TEST</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <elementProp name="" elementType="HTTPArgument">
+                <stringProp name="Argument.value">{
+  "sid": "df_ag_uid",
+  "nickname": "Test Visitor",
+  "uid": "visitor_test_uid",
+  "orgUid": "df_org_uid",
+  "type": "0",
+  "client": "TEST",
+  "browser": {"name":"Chrome","version":"131.0.0.0","major":"131"},
+  "device": {"name":"iPhone","version":"13.5"},
+  "os": {"name":"Mac OS","version":"10.15.7"},
+  "referrer": "http://127.0.0.1:9003/dev"
+}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -96,6 +69,14 @@
                 <stringProp name="Header.value">127.0.0.1</stringProp>
               </elementProp>
               <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">X-Forwarded-For</stringProp>
+                <stringProp name="Header.value">127.0.0.1</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Referer</stringProp>
+                <stringProp name="Header.value">https://test.bytedesk.com</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
                 <stringProp name="Header.value">application/json</stringProp>
               </elementProp>
@@ -106,30 +87,33 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor" enabled="true">
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor">
             <stringProp name="JSONPostProcessor.referenceNames">visitorUid;visitorNickname;visitorAvatar</stringProp>
-            <stringProp name="JSONPostProcessor.jsonPathExprs">$.uid;$.nickname;$.avatar</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.data.uid;$.data.nickname;$.data.avatar</stringProp>
             <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
           </JSONPostProcessor>
           <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread">
-          <stringProp name="HTTPSampler.path">/visitor/api/v1/request</stringProp>
+          <stringProp name="HTTPSampler.path">/visitor/api/v1/thread</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&#xd;
-  &quot;sid&quot;: &quot;df_ag_uid&quot;,&#xd;
-  &quot;uid&quot;: &quot;${visitorUid}&quot;,&#xd;
-  &quot;nickname&quot;: &quot;${visitorNickname}&quot;,&#xd;
-  &quot;avatar&quot;: &quot;${visitorAvatar}&quot;,&#xd;
-  &quot;orgUid&quot;: &quot;df_org_uid&quot;,&#xd;
-  &quot;type&quot;: &quot;0&quot;,&#xd;
-  &quot;client&quot;: &quot;TEST&quot;&#xd;
+                <stringProp name="Argument.value">{
+  "sid": "df_ag_uid",
+  "uid": "${visitorUid}",
+  "nickname": "${visitorNickname}",
+  "avatar": "${visitorAvatar}",
+  "orgUid": "df_org_uid",
+  "type": "0",
+  "client": "TEST",
+  "browser": {"name":"Chrome","version":"131.0.0.0","major":"131"},
+  "device": {"name":"iPhone","version":"13.5"},
+  "os": {"name":"Mac OS","version":"10.15.7"},
+  "referrer": "http://127.0.0.1:9003/dev"
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>

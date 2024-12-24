@@ -45,44 +45,23 @@
           <stringProp name="HTTPSampler.path">/visitor/api/v1/init</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量">
             <collectionProp name="Arguments.arguments">
-              <elementProp name="sid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">sid</stringProp>
-                <stringProp name="Argument.value">df_ag_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-              <elementProp name="nickname" elementType="HTTPArgument">
-                <stringProp name="Argument.name">nickname</stringProp>
-                <stringProp name="Argument.value">Visitor Test ${visitorNum}</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-              <elementProp name="uid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">uid</stringProp>
-                <stringProp name="Argument.value">visitor_test_uid_${visitorNum}</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-              <elementProp name="orgUid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">orgUid</stringProp>
-                <stringProp name="Argument.value">df_org_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-              <elementProp name="type" elementType="HTTPArgument">
-                <stringProp name="Argument.name">type</stringProp>
-                <stringProp name="Argument.value">0</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-              <elementProp name="client" elementType="HTTPArgument">
-                <stringProp name="Argument.name">client</stringProp>
-                <stringProp name="Argument.value">TEST</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <elementProp name="" elementType="HTTPArgument">
+                <stringProp name="Argument.value">{
+  "sid": "df_ag_uid",
+  "uid": "visitor_test_uid_${visitorNum}",
+  "nickname": "Visitor Test ${visitorNum}",
+  "orgUid": "df_org_uid",
+  "type": "0",
+  "client": "TEST",
+  "browser": {"name":"Chrome","version":"131.0.0.0","major":"131"},
+  "device": {"name":"iPhone","version":"13.5"},
+  "os": {"name":"Mac OS","version":"10.15.7"},
+  "referrer": "http://127.0.0.1:9003/dev"
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
