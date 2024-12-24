@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-24 17:43:55
+ * @Date: 2024-12-24 22:23:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 22:26:47
+ * @LastEditTime: 2024-12-24 22:24:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,28 +14,26 @@
  */
 package com.bytedesk.core.ip.white;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Data
-@Builder
-@Entity
-@Table(name = "bytedesk_core_ip_whitelist")
-@AllArgsConstructor
-@NoArgsConstructor
-public class IpWhitelistEntity {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String ip;
-    private String description;
-} 
+import jakarta.annotation.PostConstruct;
+
+@Component
+public class IpWhitelistInitializer {
+
+    @Autowired
+    private IpWhitelistRepository ipWhitelistRepository;
+
+    @PostConstruct
+    public void init() {
+        if (ipWhitelistRepository.count() > 0) {
+            return;
+        }
+        // 初始化白名单
+        IpWhitelistEntity ipWhitelist = new IpWhitelistEntity();
+        ipWhitelist.setIp("127.0.0.1");
+        ipWhitelist.setDescription("127.0.0.1");
+        ipWhitelistRepository.save(ipWhitelist);
+    }
+}
