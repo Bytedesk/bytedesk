@@ -1,4 +1,4 @@
-package com.bytedesk.service.visitor;
+package com.bytedesk.starter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -23,6 +23,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.visitor.VisitorResponse;
+import com.bytedesk.service.visitor.VisitorRestService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
