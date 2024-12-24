@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 13:04:17
+ * @LastEditTime: 2024-12-24 15:02:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,16 +52,15 @@ public class VisitorAnonymousController {
 
     private final IpService ipService;
 
-    @VisitorAnnotation(title = "visitor", action = "pre", description = "pre visit page")
-    @GetMapping("/pre")
-    public ResponseEntity<?> pre(HttpServletRequest request) {
-        //
-        return ResponseEntity.ok(JsonResult.success("pre"));
-    }
+    // @VisitorAnnotation(title = "visitor", action = "pre", description = "pre visit page")
+    // @GetMapping("/pre")
+    // public ResponseEntity<?> pre(HttpServletRequest request) {
+    //     return ResponseEntity.ok(JsonResult.success("pre"));
+    // }
 
     @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
     @ApiRateLimiter(value = 10.0, timeout = 1)
-    @GetMapping("/init")
+    @PostMapping("/init")
     public ResponseEntity<?> init(VisitorRequest visitorRequest, HttpServletRequest request) {
         //
         String ip = IpUtils.getIp(request);
@@ -78,7 +77,7 @@ public class VisitorAnonymousController {
     }
 
     @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
-    @GetMapping("/thread")
+    @PostMapping("/thread")
     public ResponseEntity<?> requestThread(VisitorRequest visitorRequest) {
         //
         MessageProtobuf messageProtobuf = visitorService.requestThread(visitorRequest);

@@ -62,7 +62,7 @@ public class VisitorAnonymousControllerIntegrationTest {
         // 然后再进行实际的测试请求
         ResponseEntity<VisitorResponse> visitorResponse = restTemplate.exchange(
                 "/visitor/api/v1/init",
-                HttpMethod.GET,
+                HttpMethod.POST,
                 requestEntity,
                 VisitorResponse.class);
 
@@ -135,7 +135,7 @@ public class VisitorAnonymousControllerIntegrationTest {
 
                     ResponseEntity<VisitorResponse> visitorResponse = restTemplate.exchange(
                             "/visitor/api/v1/init",
-                            HttpMethod.GET,
+                            HttpMethod.POST,
                             requestEntity,
                             VisitorResponse.class);
 
