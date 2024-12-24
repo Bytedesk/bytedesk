@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-09 10:49:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-09 11:33:43
+ * @LastEditTime: 2024-12-24 09:54:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,5 +93,3 @@ bytedesk:
 
 - GET /api/v1/quality/stats/agent/{id}/score - 获取客服评分
 - GET /api/v1/quality/stats/agent/{id}/distribution - 获取评分分布
-
-```
