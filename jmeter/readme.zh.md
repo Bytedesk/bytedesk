@@ -24,3 +24,10 @@
 3. 运行测试并查看结果
 
 这些测试文件完全模拟了Java测试代码中的行为，并添加了性能测试相关的配置。
+
+注意：mac上双击 bin/ApacheJMeter.jar 启动 jmeter 会报错，需要使用终端运行。
+
+```bash
+cd bin/
+./jmeter.sh
+```
