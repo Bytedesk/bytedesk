@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 09:44:11
+ * @LastEditTime: 2024-12-24 10:55:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,17 +17,19 @@ package com.bytedesk.service.visitor;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.apilimit.ApiRateLimiter;
+import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadService;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -48,6 +50,8 @@ public class VisitorAnonymousController {
 
     private final IMessageSendService messageSendService;
 
+    private final IpService ipService;
+
     @VisitorAnnotation(title = "visitor", action = "pre", description = "pre visit page")
     @GetMapping("/pre")
     public ResponseEntity<?> pre(HttpServletRequest request) {
@@ -60,16 +64,22 @@ public class VisitorAnonymousController {
     @GetMapping("/init")
     public ResponseEntity<?> init(VisitorRequest visitorRequest, HttpServletRequest request) {
         //
-        UserProtobuf visitor = visitorService.create(visitorRequest, request);
-        if (visitor == null) {
-            return ResponseEntity.ok(JsonResult.error("init visitor failed", -1));
+        String ip = IpUtils.getIp(request);
+        if (ip != null) {
+            visitorRequest.setIp(ip);
+            visitorRequest.setIpLocation(ipService.getIpLocation(ip));
         }
+        if (!StringUtils.hasText(visitorRequest.getNickname())) {
+            visitorRequest.setNickname(ipService.createVisitorNickname(request));
+        }
+        VisitorResponse visitor = visitorService.create(visitorRequest);
+ 
         return ResponseEntity.ok(JsonResult.success(visitor));
     }
 
     @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
     @GetMapping("/thread")
-    public ResponseEntity<?> requestThread(VisitorRequest visitorRequest, HttpServletRequest request) {
+    public ResponseEntity<?> requestThread(VisitorRequest visitorRequest) {
         //
         MessageProtobuf messageProtobuf = visitorService.requestThread(visitorRequest);
         //
