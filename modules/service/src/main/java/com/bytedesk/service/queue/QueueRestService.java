@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 12:38:09
+ * @LastEditTime: 2024-12-24 12:45:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -96,7 +96,6 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
 
     @Override
     public QueueResponse create(QueueRequest request) {
-
         QueueEntity entity = modelMapper.map(request, QueueEntity.class);
         entity.setUid(uidUtils.getUid());
         //
@@ -109,7 +108,6 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
 
     @Override
     public QueueResponse update(QueueRequest request) {
-
         Optional<QueueEntity> queueOptional = findByUid(request.getUid());
         if (queueOptional.isPresent()) {
             QueueEntity entity = queueOptional.get();
