@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 15:52:30
+ * @LastEditTime: 2024-12-24 12:49:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,6 +109,8 @@ public enum ClientEnum {
     SHOPIFY,         // Shopify
     LAZADA,          // 来赞达
     SHOPEE,          // 虾皮
+    // 
+    TEST,
     ;
 
     // 根据字符串查找对应的枚举常量
