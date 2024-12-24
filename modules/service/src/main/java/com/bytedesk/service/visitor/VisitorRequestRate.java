@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:23:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-15 15:49:31
+ * @LastEditTime: 2024-12-24 09:49:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,12 +14,20 @@
  */
 package com.bytedesk.service.visitor;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import com.bytedesk.core.base.BaseRequest;
 
 @Data
-@RequiredArgsConstructor
-public class VisitorRequestRate {
+@EqualsAndHashCode(callSuper = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class VisitorRequestRate extends BaseRequest {
     
     private String visitorUid;
     private String type;
