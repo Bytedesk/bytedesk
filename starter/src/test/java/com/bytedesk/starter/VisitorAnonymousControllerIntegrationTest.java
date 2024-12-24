@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,14 +35,15 @@ public class VisitorAnonymousControllerIntegrationTest {
     @Test
     public void testVisitorFlowWithRealServer() {
         // Step 1: Create visitor
-        MultiValueMap<String, String> visitorParams = new LinkedMultiValueMap<>();
-        visitorParams.add("orgUid", ORG_UID);
-        visitorParams.add("type", TYPE);
-        visitorParams.add("sid", AGENT_UID);
+        VisitorRequest initRequest = VisitorRequest.builder()
+            .sid(AGENT_UID)
+            .build();
+        initRequest.setOrgUid(ORG_UID);
+        initRequest.setType(TYPE);
 
         ResponseEntity<VisitorResponse> visitorResponse = restTemplate.postForEntity(
             "/visitor/api/v1/init",
-            visitorParams,
+            initRequest,
             VisitorResponse.class
         );
 
@@ -53,17 +55,17 @@ public class VisitorAnonymousControllerIntegrationTest {
         assertThat(visitorResponse.getBody().getAvatar()).isNotNull();
 
         // Step 2: Request thread with visitor info
-        MultiValueMap<String, String> threadParams = new LinkedMultiValueMap<>();
-        threadParams.add("orgUid", ORG_UID);
-        threadParams.add("type", TYPE);
-        threadParams.add("sid", AGENT_UID);
-        threadParams.add("uid", visitorResponse.getBody().getUid());
-        threadParams.add("nickname", visitorResponse.getBody().getNickname());
-        threadParams.add("avatar", visitorResponse.getBody().getAvatar());
-
+        VisitorRequest threadRequest = VisitorRequest.builder()
+            .sid(AGENT_UID)
+            .nickname(visitorResponse.getBody().getNickname())
+            .avatar(visitorResponse.getBody().getAvatar())
+            .build();
+        threadRequest.setUid(visitorResponse.getBody().getUid());
+        threadRequest.setOrgUid(ORG_UID);
+        threadRequest.setType(TYPE);
         ResponseEntity<String> threadResponse = restTemplate.postForEntity(
             "/visitor/api/v1/request",
-            threadParams,
+            threadRequest,
             String.class
         );
 
@@ -79,14 +81,15 @@ public class VisitorAnonymousControllerIntegrationTest {
         
         for (int i = 0; i < concurrentRequests; i++) {
             threads[i] = new Thread(() -> {
-                MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-                params.add("orgUid", ORG_UID);
-                params.add("type", TYPE);
-                params.add("sid", AGENT_UID);
+                VisitorRequest initRequest = VisitorRequest.builder()
+                    .sid(AGENT_UID)
+                    .build();
+                initRequest.setOrgUid(ORG_UID);
+                initRequest.setType(TYPE);
 
                 ResponseEntity<VisitorResponse> response = restTemplate.postForEntity(
                     "/visitor/api/v1/init",
-                    params,
+                    initRequest,
                     VisitorResponse.class
                 );
 
@@ -132,14 +135,15 @@ public class VisitorAnonymousControllerIntegrationTest {
             executorService.submit(() -> {
                 try {
                     // Step 1: Create visitor
-                    MultiValueMap<String, String> visitorParams = new LinkedMultiValueMap<>();
-                    visitorParams.add("orgUid", ORG_UID);
-                    visitorParams.add("type", TYPE);
-                    visitorParams.add("sid", AGENT_UID);
+                    VisitorRequest initRequest = VisitorRequest.builder()
+                        .sid(AGENT_UID)
+                        .build();
+                    initRequest.setOrgUid(ORG_UID);
+                    initRequest.setType(TYPE);
 
                     ResponseEntity<VisitorResponse> visitorResponse = restTemplate.postForEntity(
                         "/visitor/api/v1/init",
-                        visitorParams,
+                        initRequest,
                         VisitorResponse.class
                     );
 
@@ -149,17 +153,18 @@ public class VisitorAnonymousControllerIntegrationTest {
 
                     // Step 2: Make multiple thread requests for this visitor
                     for (int j = 0; j < requestsPerVisitor; j++) {
-                        MultiValueMap<String, String> threadParams = new LinkedMultiValueMap<>();
-                        threadParams.add("orgUid", ORG_UID);
-                        threadParams.add("type", TYPE);
-                        threadParams.add("sid", AGENT_UID);
-                        threadParams.add("uid", visitor.getUid());
-                        threadParams.add("nickname", visitor.getNickname());
-                        threadParams.add("avatar", visitor.getAvatar());
+                        VisitorRequest threadRequest = VisitorRequest.builder()
+                            .sid(AGENT_UID)
+                            .nickname(visitor.getNickname())
+                            .avatar(visitor.getAvatar())
+                            .build();
+                        threadRequest.setUid(visitor.getUid());
+                        threadRequest.setOrgUid(ORG_UID);
+                        threadRequest.setType(TYPE);
 
                         ResponseEntity<String> threadResponse = restTemplate.postForEntity(
                             "/visitor/api/v1/request",
-                            threadParams,
+                            threadRequest,
                             String.class
                         );
 

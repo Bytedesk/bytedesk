@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
@@ -59,7 +60,7 @@ public class VisitorAnonymousControllerTest {
         for (int i = 0; i < VISITOR_COUNT; i++) {
             VisitorResponse visitor = VisitorResponse.builder()
                 .nickname("Visitor " + i)
-                .avatar("https://example.com/avatar/" + i + ".jpg")
+                .avatar(AvatarConsts.DEFAULT_VISITOR_AVATAR_URL)
                 .build();
             visitor.setUid("visitor_" + i);
             visitors.add(visitor);
