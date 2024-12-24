@@ -71,7 +71,7 @@ public class VisitorAnonymousController {
     @GetMapping("/thread")
     public ResponseEntity<?> requestThread(VisitorRequest visitorRequest, HttpServletRequest request) {
         //
-        MessageProtobuf messageProtobuf = visitorService.createCsThread(visitorRequest);
+        MessageProtobuf messageProtobuf = visitorService.requestThread(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
     }
