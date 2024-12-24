@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-02-22 16:52:52
+ * @Date: 2024-03-22 23:06:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 15:04:04
+ * @LastEditTime: 2024-10-24 18:04:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,38 +12,26 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.customer;
+package com.bytedesk.service.crm;
 
-import com.bytedesk.core.base.BaseEntity;
+import java.time.LocalDateTime;
+
+import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.constant.I18Consts;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-/**
- * 客户留资，自动提取，手动添加
- * @author jackning 270580156@qq.com
- */
-@Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_service_customer")
-public class CustomerEntity extends BaseEntity {
+public class CustomerResponse extends BaseResponse {
 
-    @NotBlank(message = "name is required")
-    @Column(nullable = false)
     private String nickname;
 
     private String email;
@@ -54,16 +42,6 @@ public class CustomerEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     // private String note;
-    
-    // /**
-    //  * https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html
-    //  */
-    // @Embedded
-    // Address address;
 
-    // @Embeddable
-    // public static class Address {
-    //     String zipCode, city, street;
-    // }
-    
+    private LocalDateTime createdAt;
 }

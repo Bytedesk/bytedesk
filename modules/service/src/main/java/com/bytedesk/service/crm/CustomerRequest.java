@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-22 23:06:47
+ * @Date: 2024-03-22 23:06:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:04:33
+ * @LastEditTime: 2024-06-08 21:21:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,11 +12,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.customer;
+package com.bytedesk.service.crm;
 
-import java.time.LocalDateTime;
-
-import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
 
 import lombok.AllArgsConstructor;
@@ -30,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerResponse extends BaseResponse {
+public class CustomerRequest extends BaseRequest {
 
     private String nickname;
 
@@ -43,5 +41,4 @@ public class CustomerResponse extends BaseResponse {
 
     // private String note;
 
-    private LocalDateTime createdAt;
 }
