@@ -86,22 +86,12 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         if (!StringUtils.hasText(uid)) {
             visitorRequest.setUid(uidUtils.getUid());
         }
-        // if (!StringUtils.hasText(visitorRequest.getNickname())) {
-        //     visitorRequest.setNickname(ipService.createVisitorNickname(request));
-        // }
         if (!StringUtils.hasText(visitorRequest.getAvatar())) {
             visitorRequest.setAvatar(getAvatar(visitorRequest.getClient()));
         }
         //
-        // String ip = IpUtils.getIp(request);
-        // if (ip != null) {
-        //     visitorRequest.setIp(ip);
-        //     visitorRequest.setIpLocation(ipService.getIpLocation(ip));
-        // }
-        //
         log.info("visitorRequest {}", visitorRequest);
         visitor = modelMapper.map(visitorRequest, VisitorEntity.class);
-        // visitor.setUid(uidUtils.getCacheSerialUid());
         visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
         visitor.setOrgUid(visitorRequest.getOrgUid());
         //
