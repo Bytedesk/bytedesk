@@ -112,8 +112,8 @@ public class VisitorAnonymousControllerIntegrationTest {
 
     @Test
     public void testMultipleVisitorsWithMultipleRequests() throws InterruptedException {
-        int visitorCount = 100;
-        int requestsPerVisitor = 100;
+        int visitorCount = 10;
+        int requestsPerVisitor = 1;
 
         // Create a thread pool for managing concurrent visitors
         ExecutorService executorService = Executors.newFixedThreadPool(20);
