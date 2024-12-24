@@ -16,6 +16,8 @@
           </elementProp>
         </collectionProp>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Multiple Visitors">
@@ -29,7 +31,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Visitor Counter" enabled="true">
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Visitor Counter">
           <stringProp name="CounterConfig.start">1</stringProp>
           <stringProp name="CounterConfig.end">100</stringProp>
           <stringProp name="CounterConfig.incr">1</stringProp>
@@ -38,7 +40,7 @@
           <boolProp name="CounterConfig.per_user">false</boolProp>
         </CounterConfig>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Init Visitor" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Init Visitor">
           <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
           <stringProp name="HTTPSampler.port">${PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -46,20 +48,21 @@
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
-                <stringProp name="Argument.value">{
-  "sid": "df_ag_uid",
-  "uid": "visitor_test_uid_${visitorNum}",
-  "nickname": "Visitor Test ${visitorNum}",
-  "orgUid": "df_org_uid",
-  "type": "0",
-  "client": "TEST",
-  "browser": {"name":"Chrome","version":"131.0.0.0","major":"131"},
-  "device": {"name":"iPhone","version":"13.5"},
-  "os": {"name":"Mac OS","version":"10.15.7"},
-  "referrer": "http://127.0.0.1:9003/dev"
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;sid&quot;: &quot;df_ag_uid&quot;,&#xd;
+  &quot;uid&quot;: &quot;visitor_test_uid_${visitorNum}&quot;,&#xd;
+  &quot;nickname&quot;: &quot;Visitor Test ${visitorNum}&quot;,&#xd;
+  &quot;orgUid&quot;: &quot;df_org_uid&quot;,&#xd;
+  &quot;type&quot;: &quot;0&quot;,&#xd;
+  &quot;client&quot;: &quot;TEST&quot;,&#xd;
+  &quot;browser&quot;: {&quot;name&quot;:&quot;Chrome&quot;,&quot;version&quot;:&quot;131.0.0.0&quot;,&quot;major&quot;:&quot;131&quot;},&#xd;
+  &quot;device&quot;: {&quot;name&quot;:&quot;iPhone&quot;,&quot;version&quot;:&quot;13.5&quot;},&#xd;
+  &quot;os&quot;: {&quot;name&quot;:&quot;Mac OS&quot;,&quot;version&quot;:&quot;10.15.7&quot;},&#xd;
+  &quot;referrer&quot;: &quot;http://127.0.0.1:9003/dev&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
@@ -95,12 +98,12 @@
           </JSONPostProcessor>
           <hashTree/>
         </hashTree>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Thread Request Loop" enabled="true">
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Thread Request Loop">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">100</stringProp>
         </LoopController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread">
             <stringProp name="HTTPSampler.path">/visitor/api/v1/request</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
