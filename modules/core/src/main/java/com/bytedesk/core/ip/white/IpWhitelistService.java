@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-24 17:49:10
+ * @Date: 2024-12-24 22:18:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 17:50:43
+ * @LastEditTime: 2024-12-24 22:18:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,12 +12,11 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.ip;
+package com.bytedesk.core.ip.white;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.time.LocalDateTime;
+import org.springframework.stereotype.Service;
 
-public interface IpAccessRepository extends JpaRepository<IpAccessEntity, Long> {
+@Service
+public class IpWhitelistService {
     
-    IpAccessEntity findByIpAndEndpointAndAccessTimeAfter(String ip, String endpoint, LocalDateTime time);
-} 
+}

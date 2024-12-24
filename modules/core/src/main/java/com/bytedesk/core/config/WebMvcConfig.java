@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.bytedesk.core.ip.IpAccessInterceptor;
+import com.bytedesk.core.ip.access.IpAccessInterceptor;
 
 // import com.bytedesk.core.config.BytedeskProperties;
 

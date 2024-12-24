@@ -1,4 +1,4 @@
-package com.bytedesk.core.ip;
+package com.bytedesk.core.ip.black;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
