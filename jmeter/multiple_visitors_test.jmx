@@ -40,7 +40,7 @@
           <boolProp name="CounterConfig.per_user">false</boolProp>
         </CounterConfig>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Init Visitor" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Init Visitor">
           <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
           <stringProp name="HTTPSampler.port">${PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -103,11 +103,11 @@
           <stringProp name="LoopController.loops">10</stringProp>
         </LoopController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread">
             <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">http</stringProp>
-            <stringProp name="HTTPSampler.path">/visitor/api/v1/request</stringProp>
+            <stringProp name="HTTPSampler.path">/visitor/api/v1/thread</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
