@@ -22,7 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.message.MessageProtobuf;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +41,9 @@ public class VisitorAnonymousControllerTest {
     @MockBean
     private VisitorRestService visitorRestService;
 
+    // orgUid=df_org_uid
+    // type=0 or 1
+    // sid=df_ag_uid or df_wg_uid
     private List<String> visitorUids;
     private static final int VISITOR_COUNT = 100;
     private static final int REQUEST_PER_VISITOR = 100;
@@ -54,8 +57,8 @@ public class VisitorAnonymousControllerTest {
         }
 
         // Mock visitorService的响应
-        when(visitorRestService.create(any())).thenReturn(JsonResult.success());
-        when(visitorRestService.requestThread(any())).thenReturn(JsonResult.success());
+        when(visitorRestService.create(any())).thenReturn(VisitorResponse.builder().build());
+        when(visitorRestService.requestThread(any())).thenReturn(MessageProtobuf.builder().build());
     }
 
     @Test
@@ -112,8 +115,8 @@ public class VisitorAnonymousControllerTest {
                     try {
                         VisitorRequest request = new VisitorRequest();
                         request.setUid(visitorUid);
-                        request.setWorkGroupWid("workgroup_1");
-                        request.setRequestNo("request_" + visitorUid + "_" + requestNum);
+                        // request.setWorkGroupWid("workgroup_1");
+                        // request.setRequestNo("request_" + visitorUid + "_" + requestNum);
 
                         mockMvc.perform(post("/visitor/anonymous/requestThread")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -161,8 +164,8 @@ public class VisitorAnonymousControllerTest {
                     try {
                         VisitorRequest request = new VisitorRequest();
                         request.setUid(visitorUid);
-                        request.setWorkGroupWid("workgroup_1");
-                        request.setRequestNo("concurrent_request_" + visitorUid + "_" + requestNum);
+                        // request.setWorkGroupWid("workgroup_1");
+                        // request.setRequestNo("concurrent_request_" + visitorUid + "_" + requestNum);
 
                         mockMvc.perform(post("/visitor/anonymous/requestThread")
                                 .contentType(MediaType.APPLICATION_JSON)
