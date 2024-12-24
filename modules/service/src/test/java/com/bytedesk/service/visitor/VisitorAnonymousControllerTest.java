@@ -142,12 +142,13 @@ public class VisitorAnonymousControllerTest {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
                     // 1. 初始化访客
-                    VisitorRequest initRequest = new VisitorRequest();
-                    initRequest.setOrgUid(ORG_UID);
+                    VisitorRequest initRequest = VisitorRequest.builder()
+                        .sid(AGENT_UID)
+                        .build();
                     initRequest.setType(TYPE);
-                    initRequest.setSid(AGENT_UID);
+                    initRequest.setOrgUid(ORG_UID);
 
-                    String initResult = mockMvc.perform(post("/visitor/anonymous/init")
+                    String initResult = mockMvc.perform(post("/visitor/api/v1/init")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(initRequest)))
                             .andExpect(status().isOk())
@@ -156,20 +157,21 @@ public class VisitorAnonymousControllerTest {
                             .getContentAsString();
 
                     // 解析返回的访客信息
-                    JsonResult initResponse = objectMapper.readValue(initResult, JsonResult.class);
+                    JsonResult<?> initResponse = objectMapper.readValue(initResult, JsonResult.class);
                     VisitorResponse visitor = objectMapper.convertValue(initResponse.getData(), VisitorResponse.class);
 
                     // 2. 并发请求会话
                     for (int j = 0; j < concurrentRequests; j++) {
-                        VisitorRequest threadRequest = new VisitorRequest();
-                        threadRequest.setOrgUid(ORG_UID);
+                        VisitorRequest threadRequest = VisitorRequest.builder()
+                            .sid(AGENT_UID)
+                            .nickname(visitor.getNickname())
+                            .avatar(visitor.getAvatar())
+                            .build();
                         threadRequest.setType(TYPE);
-                        threadRequest.setSid(AGENT_UID);
+                        threadRequest.setOrgUid(ORG_UID);
                         threadRequest.setUid(visitor.getUid());
-                        threadRequest.setNickname(visitor.getNickname());
-                        threadRequest.setAvatar(visitor.getAvatar());
 
-                        mockMvc.perform(post("/visitor/anonymous/requestThread")
+                        mockMvc.perform(post("/visitor/api/v1/request")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(threadRequest)))
                                 .andExpect(status().isOk());
