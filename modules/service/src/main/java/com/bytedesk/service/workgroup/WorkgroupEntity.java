@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:15:33
+ * @LastEditTime: 2024-12-24 08:12:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,6 +109,14 @@ public class WorkgroupEntity extends BaseEntity {
     // TODO: 增加agent-currentThreadCount数量
     // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
     public AgentEntity nextAgent() {
+
+        // TODO: 所有客服都离线或小休不接待状态，则进入留言
+
+        // TODO: 所有客服都达到最大接待人数，则进入排队
+
+        // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
+
+        // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
 
         if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
             // return assignAgentByRobin();

@@ -132,13 +132,7 @@ public class RouteService {
     public MessageProtobuf routeWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
         log.info("RouteServiceImplVip routeWorkgroup: {}", workgroup.getUid());
-        // TODO: 所有客服都离线或小休不接待状态，则进入留言
-
-        // TODO: 所有客服都达到最大接待人数，则进入排队
-
-        // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
-
-        // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
+        
         if (workgroup.getAgents().isEmpty()) {
             throw new RuntimeException("No agents found in workgroup with uid " + workgroup.getUid());
         }
@@ -158,7 +152,6 @@ public class RouteService {
             thread.setAgent(JSON.toJSONString(agentProtobuf));
             threadService.save(thread);
             //
-            // UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
             MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
             // 广播消息，由消息通道统一处理
             messageSendService.sendProtobufMessage(messageProtobuf);
