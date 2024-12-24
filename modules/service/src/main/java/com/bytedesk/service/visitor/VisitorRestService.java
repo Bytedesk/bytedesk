@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 11:09:36
+ * @LastEditTime: 2024-12-24 14:15:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,7 +80,6 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         log.info("visitor init, uid: {}", uid);
         VisitorEntity visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
-            // return ConvertServiceUtils.convertToUserProtobuf(visitor);
             return convertToResponse(visitor);
         }
         if (!StringUtils.hasText(uid)) {
@@ -92,7 +91,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         //
         log.info("visitorRequest {}", visitorRequest);
         visitor = modelMapper.map(visitorRequest, VisitorEntity.class);
-        visitor.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
+        visitor.setClient(visitorRequest.getClient());
         visitor.setOrgUid(visitorRequest.getOrgUid());
         //
         VisitorDevice device = modelMapper.map(visitorRequest, VisitorDevice.class);

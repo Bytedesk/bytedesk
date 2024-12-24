@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:25:56
+ * @LastEditTime: 2024-12-24 14:14:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -116,7 +115,8 @@ public class VisitorThreadService
                 .topic(topic)
                 .state(ThreadStateEnum.INITIAL.name())
                 .type(ThreadTypeEnum.WORKGROUP.name())
-                .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
+                // .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
+                .client(visitorRequest.getClient())
                 .build();
         thread.setUid(uidUtils.getUid());
         thread.setOrgUid(workgroup.getOrgUid());
@@ -147,7 +147,8 @@ public class VisitorThreadService
                 .topic(topic)
                 .state(ThreadStateEnum.INITIAL.name())
                 .type(ThreadTypeEnum.AGENT.name())
-                .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
+                // .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
+                .client(visitorRequest.getClient())
                 .build();
         thread.setUid(uidUtils.getUid());
         //
