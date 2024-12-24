@@ -126,6 +126,7 @@
               </collectionProp>
             </HeaderManager>
             <hashTree/>
+          </hashTree>
         </HTTPSamplerProxy>
         <hashTree/>
       </hashTree>
