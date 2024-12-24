@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,8 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.visitor.VisitorRequest;
-import com.bytedesk.service.visitor.VisitorResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CountDownLatch;
@@ -64,31 +66,32 @@ public class VisitorAnonymousControllerIntegrationTest {
         HttpEntity<VisitorRequest> requestEntity = new HttpEntity<>(initRequest, headers);
 
         // 然后再进行实际的测试请求
-        ResponseEntity<VisitorResponse> visitorResponse = restTemplate.exchange(
+        ResponseEntity<JsonResult<UserProtobuf>> visitorResponse = restTemplate.exchange(
                 "/visitor/api/v1/init",
                 HttpMethod.POST,
                 requestEntity,
-                VisitorResponse.class);
+                new ParameterizedTypeReference<JsonResult<UserProtobuf>>() {});
 
         // 打印原始响应内容
         System.out.println("Response Status: " + visitorResponse.getStatusCode());
         System.out.println("Response Headers: " + visitorResponse.getHeaders());
-        System.out.println("Response Body: " + visitorResponse.getBody());
+        UserProtobuf visitor = visitorResponse.getBody().getData();
+        System.out.println("Response Body: " + visitor);
 
         // Verify visitor creation response
         assertThat(visitorResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(visitorResponse.getBody()).as("Response body should not be null").isNotNull();
-        assertThat(visitorResponse.getBody().getUid()).isNotNull();
-        assertThat(visitorResponse.getBody().getNickname()).isNotNull();
-        assertThat(visitorResponse.getBody().getAvatar()).isNotNull();
+        assertThat(visitor.getUid()).isNotNull();
+        assertThat(visitor.getNickname()).isNotNull();
+        assertThat(visitor.getAvatar()).isNotNull();
 
         // Step 2: Request thread with visitor info
         VisitorRequest threadRequest = VisitorRequest.builder()
                 .sid(AGENT_UID)
-                .nickname(visitorResponse.getBody().getNickname())
-                .avatar(visitorResponse.getBody().getAvatar())
+                .nickname(visitor.getNickname())
+                .avatar(visitor.getAvatar())
                 .build();
-        threadRequest.setUid(visitorResponse.getBody().getUid());
+        threadRequest.setUid(visitor.getUid());
         threadRequest.setOrgUid(ORG_UID);
         threadRequest.setType(TYPE);
         threadRequest.setClient(ClientEnum.TEST.name());
@@ -98,7 +101,7 @@ public class VisitorAnonymousControllerIntegrationTest {
         threadRequest.setReferrer("http://127.0.0.1:9003/dev");
 
         ResponseEntity<String> threadResponse = restTemplate.postForEntity(
-                "/visitor/api/v1/request",
+                "/visitor/api/v1/thread",
                 threadRequest,
                 String.class);
 
@@ -145,15 +148,15 @@ public class VisitorAnonymousControllerIntegrationTest {
                     // 使用HttpEntity包装请求
                     HttpEntity<VisitorRequest> requestEntity = new HttpEntity<>(initRequest, headers);
 
-                    ResponseEntity<VisitorResponse> visitorResponse = restTemplate.exchange(
+                    ResponseEntity<JsonResult<UserProtobuf>> visitorResponse = restTemplate.exchange(
                             "/visitor/api/v1/init",
                             HttpMethod.POST,
                             requestEntity,
-                            VisitorResponse.class);
+                            new ParameterizedTypeReference<JsonResult<UserProtobuf>>() {});
 
                     assertThat(visitorResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
                     assertThat(visitorResponse.getBody()).isNotNull();
-                    VisitorResponse visitor = visitorResponse.getBody();
+                    UserProtobuf visitor = visitorResponse.getBody().getData();
 
                     // Step 2: Make multiple thread requests for this visitor
                     for (int j = 0; j < requestsPerVisitor; j++) {
@@ -172,7 +175,7 @@ public class VisitorAnonymousControllerIntegrationTest {
                         threadRequest.setReferrer("http://127.0.0.1:9003/dev");
 
                         ResponseEntity<String> threadResponse = restTemplate.postForEntity(
-                                "/visitor/api/v1/request",
+                                "/visitor/api/v1/thread",
                                 threadRequest,
                                 String.class);
 
