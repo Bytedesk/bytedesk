@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:25:48
+ * @LastEditTime: 2024-12-24 12:31:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,14 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ QueueEntityListener.class })
-@Table(name = "bytedesk_service_queue")
+@Table(name = "bytedesk_service_queue", 
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {"queue_topic", "queue_day", "is_deleted"},
+            name = "uk_queue_topic_day_deleted"
+        )
+    }
+)
 public class QueueEntity extends BaseEntity {
 
     // 队列基本信息
@@ -54,17 +61,20 @@ public class QueueEntity extends BaseEntity {
 
     // 队列状态
     @Builder.Default
-    @Column(nullable = false)
+    @Column(name = "queue_status", nullable = false)
     private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
+    // 队列日期(YYYY-MM-DD)
     @Column(name = "queue_day")
-    private String day;  // 队列日期(YYYY-MM-DD)
+    private String day;  
 
     // agentUid or workgroupUid
-    private String queueTopic;
+    @Column(name = "queue_topic")
+    private String topic;
 
     @Builder.Default
-    private String queueType = ThreadTypeEnum.WORKGROUP.name();  // 队列类型，AGENT或WORKGROUP
+    @Column(name = "queue_type")
+    private String type = ThreadTypeEnum.WORKGROUP.name();  // 队列类型，AGENT或WORKGROUP
 
     /**
      * 获取下一个排队号码

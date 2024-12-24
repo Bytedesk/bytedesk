@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-09 10:29:52
+ * @LastEditTime: 2024-12-24 12:35:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-// import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import jakarta.persistence.LockModeType;
 
 public interface QueueRepository extends JpaRepository<QueueEntity, Long>, JpaSpecificationExecutor<QueueEntity> {
 
@@ -29,7 +33,10 @@ public interface QueueRepository extends JpaRepository<QueueEntity, Long>, JpaSp
     
     // Optional<QueueEntity> findByThreadUid(String threadUid);
 
-    Optional<QueueEntity> findByQueueTopicAndDayAndDeletedFalse(String queueTopic, String day);
+    Optional<QueueEntity> findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(
+        String topic, 
+        String day
+    );
     
     List<QueueEntity> findByStatus(String status);
     
@@ -46,4 +53,11 @@ public interface QueueRepository extends JpaRepository<QueueEntity, Long>, JpaSp
     // @Query("SELECT MAX(TIMESTAMPDIFF(MINUTE, q.queueTime, q.endTime)) " +
     //        "FROM QueueEntity q WHERE q.status = 'COMPLETED'")
     // Integer calculateMaxWaitTime();
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT q FROM QueueEntity q WHERE q.topic = :topic AND q.day = :day AND q.deleted = false")
+    Optional<QueueEntity> findByTopicAndDayAndDeletedFalse(
+        @Param("topic") String topic, 
+        @Param("day") String day
+    );
 }

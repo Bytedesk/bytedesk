@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 10:34:54
+ * @LastEditTime: 2024-12-24 12:38:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest, QueueResponse> {
+public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest, QueueResponse> {
 
     private final QueueRepository queueRepository;
 
@@ -45,16 +46,16 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
     private final AuthService authService;
 
     @Override
-    public Page <QueueResponse> queryByOrg (QueueRequest request) {
+    public Page<QueueResponse> queryByOrg(QueueRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
-        Specification <QueueEntity> specification = QueueSpecification.search(request);
-        Page <QueueEntity> page = queueRepository.findAll(specification, pageable);
+        Specification<QueueEntity> specification = QueueSpecification.search(request);
+        Page<QueueEntity> page = queueRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page <QueueResponse> queryByUser (QueueRequest request) {
+    public Page<QueueResponse> queryByUser(QueueRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("User not found");
@@ -63,8 +64,8 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
-        Specification <QueueEntity> specification = QueueSpecification.search(request);
-        Page <QueueEntity> page = queueRepository.findAll(specification, pageable);
+        Specification<QueueEntity> specification = QueueSpecification.search(request);
+        Page<QueueEntity> page = queueRepository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -75,27 +76,27 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
         return queueRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue", key = "#queueTopic+#day", unless = "#result==null")
-    public Optional<QueueEntity> findByQueueTopicAndDay(String queueTopic, String day) {
-        return queueRepository.findByQueueTopicAndDayAndDeletedFalse(queueTopic, day);
+    @Cacheable(value = "queue", key = "#topic+#day", unless = "#result==null")
+    public Optional<QueueEntity> findByTopicAndDay(String topic, String day) {
+        return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(topic, day);
     }
 
-    // public QueueResponse getOrCreateQueue(String threadTopic, String day, String orgUid) {
-    //     Optional<QueueEntity> queueOptional = findByThreadTopicAndDay(threadTopic, day);
-    //     if (queueOptional.isPresent()) {
-    //         return convertToResponse(queueOptional.get());
-    //     } else {
-    //         QueueRequest request = QueueRequest.builder()
-    //             .threadTopic(threadTopic)
-    //             .day(day)
-    //             .build();
-    //         request.setOrgUid(orgUid);
-    //         return create(request);
-    //     }
-    // }
+    public QueueEntity createQueue(QueueRequest request) {
+        QueueEntity queue = modelMapper.map(request, QueueEntity.class);
+        queue.setUid(uidUtils.getUid());
+        try {
+            return queueRepository.save(queue);
+        } catch (DataIntegrityViolationException e) {
+            // 如果在保存时发生唯一约束冲突，说明其他线程已创建
+            // 重新查询获取已存在的记录
+            return queueRepository.findByTopicAndDayAndDeletedFalse(request.getTopic(), request.getDay())
+                    .orElseThrow(() -> new RuntimeException("Queue creation failed"));
+        }
+    }
 
     @Override
     public QueueResponse create(QueueRequest request) {
+
         QueueEntity entity = modelMapper.map(request, QueueEntity.class);
         entity.setUid(uidUtils.getUid());
         //
@@ -107,9 +108,9 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
     }
 
     @Override
-    public QueueResponse update (QueueRequest request) {
+    public QueueResponse update(QueueRequest request) {
 
-        Optional <QueueEntity> queueOptional = findByUid(request.getUid());
+        Optional<QueueEntity> queueOptional = findByUid(request.getUid());
         if (queueOptional.isPresent()) {
             QueueEntity entity = queueOptional.get();
             // modelMapper.map(request, entity);
@@ -123,7 +124,7 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
     }
 
     @Override
-    public QueueEntity save (QueueEntity entity) {
+    public QueueEntity save(QueueEntity entity) {
         try {
             return queueRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -134,7 +135,7 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
 
     @Override
     public void deleteByUid(String uid) {
-        Optional <QueueEntity> optional = findByUid(uid);
+        Optional<QueueEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             // delete(optional.get());
             optional.get().setDeleted(true);
@@ -143,7 +144,7 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
     }
 
     @Override
-    public void delete (QueueRequest entity) {
+    public void delete(QueueRequest entity) {
         deleteByUid(entity.getUid());
     }
 
@@ -154,8 +155,12 @@ public class QueueRestService extends BaseRestService <QueueEntity, QueueRequest
     }
 
     @Override
-    public QueueResponse convertToResponse (QueueEntity entity) {
+    public QueueResponse convertToResponse(QueueEntity entity) {
         return modelMapper.map(entity, QueueResponse.class);
+    }
+
+    public Optional<QueueEntity> findLatestByQueueTopicAndDay(String queueTopic, String day) {
+        return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(queueTopic, day);
     }
 
 }
