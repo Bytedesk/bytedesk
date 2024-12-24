@@ -42,6 +42,7 @@ public class VisitorAnonymousControllerIntegrationTest {
                 .nickname("Test Visitor")
                 .build();
         initRequest.setUid("visitor_test_uid");
+        initRequest.setNickname("Visitor Test");
         initRequest.setOrgUid(ORG_UID);
         initRequest.setType(TYPE);
         initRequest.setClient(ClientEnum.TEST.name());
@@ -99,51 +100,6 @@ public class VisitorAnonymousControllerIntegrationTest {
     }
 
     @Test
-    public void testConcurrentVisitorRequests() throws InterruptedException {
-        int concurrentRequests = 10;
-        Thread[] threads = new Thread[concurrentRequests];
-
-        for (int i = 0; i < concurrentRequests; i++) {
-            final int index = i;
-            threads[i] = new Thread(() -> {
-                VisitorRequest initRequest = VisitorRequest.builder()
-                        .sid(AGENT_UID)
-                        .build();
-                initRequest.setUid("visitor_test_uid_" + index);
-                initRequest.setOrgUid(ORG_UID);
-                initRequest.setType(TYPE);
-                initRequest.setClient(ClientEnum.TEST.name());
-
-                // 创建HTTP Headers并添加必要的信息
-                HttpHeaders headers = new HttpHeaders();
-                headers.set("User-Agent", "Mozilla/5.0 (Test Browser)");
-                headers.set("X-Real-IP", "127.0.0.1");
-                headers.set("X-Forwarded-For", "127.0.0.1");
-                headers.set("Referer", "https://test.bytedesk.com");
-
-                // 使用HttpEntity包装请求
-                HttpEntity<VisitorRequest> requestEntity = new HttpEntity<>(initRequest, headers);
-
-                ResponseEntity<VisitorResponse> visitorResponse = restTemplate.exchange(
-                        "/visitor/api/v1/init",
-                        HttpMethod.GET,
-                        requestEntity,
-                        VisitorResponse.class);
-
-                assertThat(visitorResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-                assertThat(visitorResponse.getBody()).isNotNull();
-                assertThat(visitorResponse.getBody().getUid()).isNotNull();
-            });
-            threads[i].start();
-        }
-
-        // Wait for all threads to complete
-        for (Thread thread : threads) {
-            thread.join();
-        }
-    }
-
-    @Test
     public void testMultipleVisitorsWithMultipleRequests() throws InterruptedException {
         int visitorCount = 100;
         int requestsPerVisitor = 100;
@@ -162,6 +118,7 @@ public class VisitorAnonymousControllerIntegrationTest {
                             .sid(AGENT_UID)
                             .build();
                     initRequest.setUid("visitor_test_uid_" + index);
+                    initRequest.setNickname("Visitor Test " + index);
                     initRequest.setOrgUid(ORG_UID);
                     initRequest.setType(TYPE);
                     initRequest.setClient(ClientEnum.TEST.name());
