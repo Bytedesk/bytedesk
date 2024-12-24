@@ -55,23 +55,35 @@ public class QueueService {
         return member;
     }
 
+    @Transactional
     private QueueEntity getOrCreateQueue(ThreadEntity threadEntity) {
         String threadTopic = threadEntity.getTopic();
         String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(threadTopic);
-        // 按照ISO 8601标准格式化日期，即yyyy-MM-dd格式
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        return queueRestService.findByQueueTopicAndDay(queueTopic, today)
-            .orElseGet(() -> {
-                QueueEntity queue = QueueEntity.builder()
-                    .day(today)
-                    .queueTopic(queueTopic)
-                    .queueType(threadEntity.getType())
-                    .status(QueueStatusEnum.ACTIVE.name())
-                    .build();
-                queue.setUid(uidUtils.getUid());
-                queue.setOrgUid(threadEntity.getOrgUid());
-                return queueRepository.save(queue);
-            });
+        // 
+        while (true) {
+            try {
+                return queueRestService.findByTopicAndDay(queueTopic, today)
+                    .orElseGet(() -> {
+                        QueueRequest request = QueueRequest.builder()
+                            .day(today)
+                            .topic(queueTopic)
+                            .type(threadEntity.getType())
+                            .status(QueueStatusEnum.ACTIVE.name())
+                            .build();
+                        request.setOrgUid(threadEntity.getOrgUid());
+                        return queueRestService.createQueue(request);
+                    });
+            } catch (Exception e) {
+                // 如果发生任何异常，等待短暂时间后重试
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Queue operation interrupted", ie);
+                }
+            }
+        }
     }
 
     public QueueMemberEntity createQueueMemberEntity(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest, QueueEntity queue) {
