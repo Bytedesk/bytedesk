@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 10:00:21
+ * @LastEditTime: 2024-12-24 10:54:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,15 +32,13 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.ip.IpService;
-import com.bytedesk.core.ip.IpUtils;
+// import com.bytedesk.core.ip.IpService;
+// import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.strategy.CsThreadCreationContext;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,7 +53,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     private final UidUtils uidUtils;
 
-    private final IpService ipService;
+    // private final IpService ipService;
 
     private final CsThreadCreationContext csThreadCreationContext;
 
@@ -65,41 +63,41 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
                 "updatedAt");
         Specification<VisitorEntity> spec = VisitorSpecification.search(request);
         Page<VisitorEntity> page = visitorRepository.findAll(spec, pageable);
-        return page.map(ConvertServiceUtils::convertToVisitorResponse);
+        return page.map(this::convertToResponse);
     }
 
     public VisitorResponse query(VisitorRequest visitorRequest) {
-
         Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
         if (!visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
         }
-        return ConvertServiceUtils.convertToVisitorResponse(visitorOptional.get());
+        return convertToResponse(visitorOptional.get());
     }
 
-    public UserProtobuf create(VisitorRequest visitorRequest, HttpServletRequest request) {
+    public VisitorResponse create(VisitorRequest visitorRequest) {
         //
         String uid = visitorRequest.getUid();
         log.info("visitor init, uid: {}", uid);
         VisitorEntity visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
-            return ConvertServiceUtils.convertToUserProtobuf(visitor);
+            // return ConvertServiceUtils.convertToUserProtobuf(visitor);
+            return convertToResponse(visitor);
         }
         if (!StringUtils.hasText(uid)) {
-            visitorRequest.setUid(uidUtils.getCacheSerialUid());
+            visitorRequest.setUid(uidUtils.getUid());
         }
-        if (!StringUtils.hasText(visitorRequest.getNickname())) {
-            visitorRequest.setNickname(ipService.createVisitorNickname(request));
-        }
+        // if (!StringUtils.hasText(visitorRequest.getNickname())) {
+        //     visitorRequest.setNickname(ipService.createVisitorNickname(request));
+        // }
         if (!StringUtils.hasText(visitorRequest.getAvatar())) {
             visitorRequest.setAvatar(getAvatar(visitorRequest.getClient()));
         }
         //
-        String ip = IpUtils.getIp(request);
-        if (ip != null) {
-            visitorRequest.setIp(ip);
-            visitorRequest.setIpLocation(ipService.getIpLocation(ip));
-        }
+        // String ip = IpUtils.getIp(request);
+        // if (ip != null) {
+        //     visitorRequest.setIp(ip);
+        //     visitorRequest.setIpLocation(ipService.getIpLocation(ip));
+        // }
         //
         log.info("visitorRequest {}", visitorRequest);
         visitor = modelMapper.map(visitorRequest, VisitorEntity.class);
@@ -115,7 +113,8 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
             throw new RuntimeException("visitor not saved");
         }
         //
-        return ConvertServiceUtils.convertToUserProtobuf(savedVisitor);
+        // return ConvertServiceUtils.convertToUserProtobuf(savedVisitor);
+        return convertToResponse(savedVisitor);
     }
 
     /** 策略模式 */
@@ -178,11 +177,6 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Override
-    public VisitorResponse create(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
 
     @Override
     public VisitorResponse update(VisitorRequest request) {
@@ -210,8 +204,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     @Override
     public VisitorResponse convertToResponse(VisitorEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        return ConvertServiceUtils.convertToVisitorResponse(entity);
     }
 
     public String getAvatar(String client) {
