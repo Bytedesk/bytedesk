@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 15:20:04
+ * @LastEditTime: 2024-12-24 15:32:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,10 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadService;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.utils.ConvertServiceUtils;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,8 +75,9 @@ public class VisitorAnonymousController {
             visitorRequest.setNickname(ipService.createVisitorNickname(request));
         }
         VisitorResponse visitor = visitorService.create(visitorRequest);
- 
-        return ResponseEntity.ok(JsonResult.success(visitor));
+        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(visitor);
+        //
+        return ResponseEntity.ok(JsonResult.success(user));
     }
 
     @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
