@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-26 15:28:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-29 16:56:27
+ * @LastEditTime: 2024-12-24 17:57:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.bytedesk.core.ip.IpInterceptor;
+import com.bytedesk.core.ip.IpAccessInterceptor;
 
 // import com.bytedesk.core.config.BytedeskProperties;
 
@@ -41,12 +41,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
             "classpath:/public/",
     };
 
+    // @Autowired
+    // private IpInterceptor ipInterceptor;
+
     @Autowired
-    private IpInterceptor ipInterceptor;
+    private IpAccessInterceptor ipAccessInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(ipInterceptor);
+        registry
+            // .addInterceptor(ipInterceptor)
+            .addInterceptor(ipAccessInterceptor)
+            .addPathPatterns("/visitor/api/v1/init", "/visitor/api/v1/thread");
     }
 
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 12:56:48
+ * @LastEditTime: 2024-12-24 17:39:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -76,6 +76,7 @@ public class VisitorAspect {
             // 接下来的操作...
 
             // TODO: ip是否被封禁
+            
         }
 
         // TODO: 检查付费情况，是否过期，是否试用到期等
