@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-29 11:32:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 12:16:43
+ * @LastEditTime: 2024-12-24 11:25:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,8 @@ import lombok.Data;
 public class MqttProperties {
 
     public static final String CONFIG_PREFIX = "bytedesk.socket";
+
+    private Boolean enabled = true;
 
     private String host = "0.0.0.0";
 

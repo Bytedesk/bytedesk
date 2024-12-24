@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-13 22:50:48
+ * @LastEditTime: 2024-12-24 11:26:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,6 +55,13 @@ public class MqttWebSocketServer {
     @PostConstruct
     public void init() throws Exception {
 
+        if (!mqttProperties.getEnabled()) {
+            log.info("Mqtt websocket transport disabled!");
+            return;
+        } else {
+            log.info("Mqtt websocket transport enabled!");
+        }
+
         ResourceLeakDetector
                 .setLevel(ResourceLeakDetector.Level.valueOf(mqttProperties.getLeakDetectorLevel().toUpperCase()));
 
@@ -92,11 +99,14 @@ public class MqttWebSocketServer {
 
     @PreDestroy
     public void shutdown() throws InterruptedException {
-        try {
-            serverChannel.close().sync();
-        } finally {
-            childEventLoopGroup.shutdownGracefully();
-            parentEventLoopGroup.shutdownGracefully();
+        
+        if (serverChannel != null) {
+            try {
+                serverChannel.close().sync();
+            } finally {
+                childEventLoopGroup.shutdownGracefully();
+                parentEventLoopGroup.shutdownGracefully();
+            }
         }
     }
 

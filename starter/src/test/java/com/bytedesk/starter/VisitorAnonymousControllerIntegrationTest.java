@@ -12,7 +12,16 @@ import org.springframework.util.MultiValueMap;
 import com.bytedesk.service.visitor.VisitorResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+properties = {
+    "bytedesk.socket.enabled=false",  // 禁用MQTT服务器
+    "server.port=0"  // 使用随机端口
+})
 public class VisitorAnonymousControllerIntegrationTest {
 
     @Autowired
@@ -31,7 +40,7 @@ public class VisitorAnonymousControllerIntegrationTest {
         visitorParams.add("sid", AGENT_UID);
 
         ResponseEntity<VisitorResponse> visitorResponse = restTemplate.postForEntity(
-            "visitor/api/v1/init",
+            "/visitor/api/v1/init",
             visitorParams,
             VisitorResponse.class
         );
@@ -48,9 +57,9 @@ public class VisitorAnonymousControllerIntegrationTest {
         threadParams.add("orgUid", ORG_UID);
         threadParams.add("type", TYPE);
         threadParams.add("sid", AGENT_UID);
-        threadParams.add("visitorUid", visitorResponse.getBody().getUid());
-        threadParams.add("visitorNickname", visitorResponse.getBody().getNickname());
-        threadParams.add("visitorAvatar", visitorResponse.getBody().getAvatar());
+        threadParams.add("uid", visitorResponse.getBody().getUid());
+        threadParams.add("nickname", visitorResponse.getBody().getNickname());
+        threadParams.add("avatar", visitorResponse.getBody().getAvatar());
 
         ResponseEntity<String> threadResponse = restTemplate.postForEntity(
             "/visitor/api/v1/request",
@@ -108,4 +117,67 @@ public class VisitorAnonymousControllerIntegrationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
+
+    @Test
+    public void testMultipleVisitorsWithMultipleRequests() throws InterruptedException {
+        int visitorCount = 100;
+        int requestsPerVisitor = 100;
+        
+        // Create a thread pool for managing concurrent visitors
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        CountDownLatch completionLatch = new CountDownLatch(visitorCount);
+        
+        // Create visitors and their requests
+        for (int i = 0; i < visitorCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    // Step 1: Create visitor
+                    MultiValueMap<String, String> visitorParams = new LinkedMultiValueMap<>();
+                    visitorParams.add("orgUid", ORG_UID);
+                    visitorParams.add("type", TYPE);
+                    visitorParams.add("sid", AGENT_UID);
+
+                    ResponseEntity<VisitorResponse> visitorResponse = restTemplate.postForEntity(
+                        "/visitor/api/v1/init",
+                        visitorParams,
+                        VisitorResponse.class
+                    );
+
+                    assertThat(visitorResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                    assertThat(visitorResponse.getBody()).isNotNull();
+                    VisitorResponse visitor = visitorResponse.getBody();
+
+                    // Step 2: Make multiple thread requests for this visitor
+                    for (int j = 0; j < requestsPerVisitor; j++) {
+                        MultiValueMap<String, String> threadParams = new LinkedMultiValueMap<>();
+                        threadParams.add("orgUid", ORG_UID);
+                        threadParams.add("type", TYPE);
+                        threadParams.add("sid", AGENT_UID);
+                        threadParams.add("uid", visitor.getUid());
+                        threadParams.add("nickname", visitor.getNickname());
+                        threadParams.add("avatar", visitor.getAvatar());
+
+                        ResponseEntity<String> threadResponse = restTemplate.postForEntity(
+                            "/visitor/api/v1/request",
+                            threadParams,
+                            String.class
+                        );
+
+                        assertThat(threadResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                        assertThat(threadResponse.getBody()).isNotNull();
+                    }
+                } finally {
+                    completionLatch.countDown();
+                }
+            });
+        }
+
+        // Wait for all visitors to complete their requests
+        boolean completed = completionLatch.await(5, TimeUnit.MINUTES);
+        executorService.shutdown();
+        
+        assertThat(completed).isTrue()
+            .withFailMessage("Not all visitors completed their requests within the timeout period");
+    }
+
 } 
