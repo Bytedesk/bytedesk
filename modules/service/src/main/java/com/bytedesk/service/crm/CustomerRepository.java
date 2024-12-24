@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-22 23:06:35
+ * @Date: 2024-03-22 23:06:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-08 21:21:24
+ * @LastEditTime: 2024-07-09 10:50:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,33 +12,19 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.customer;
+package com.bytedesk.service.crm;
 
-import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.I18Consts;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+/**
+ * https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html
+ */
+public interface CustomerRepository extends JpaRepository<CustomerEntity, Long>, JpaSpecificationExecutor<CustomerEntity> {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class CustomerRequest extends BaseRequest {
-
-    private String nickname;
-
-    private String email;
-
-    private String mobile;
-
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
-
-    // private String note;
-
+    // Collection<CustomerNameOnly> findByNickname(String name);
+    
+    // swagger can't decide, Tweak configuration to get to unambiguous paths
+    // using a dynamic projection parameter
+    // <T> Collection<T> findByName(String name, Class<T> type);
 }
