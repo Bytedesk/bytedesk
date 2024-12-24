@@ -46,6 +46,10 @@ public class VisitorAnonymousControllerIntegrationTest {
         initRequest.setOrgUid(ORG_UID);
         initRequest.setType(TYPE);
         initRequest.setClient(ClientEnum.TEST.name());
+        initRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
+        initRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
+        initRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");
+        initRequest.setReferrer("http://127.0.0.1:9003/dev");
 
         // 创建HTTP Headers并添加必要的信息
         HttpHeaders headers = new HttpHeaders();
@@ -88,6 +92,10 @@ public class VisitorAnonymousControllerIntegrationTest {
         threadRequest.setOrgUid(ORG_UID);
         threadRequest.setType(TYPE);
         threadRequest.setClient(ClientEnum.TEST.name());
+        threadRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
+        threadRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
+        threadRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");
+        threadRequest.setReferrer("http://127.0.0.1:9003/dev");
 
         ResponseEntity<String> threadResponse = restTemplate.postForEntity(
                 "/visitor/api/v1/request",
@@ -122,6 +130,10 @@ public class VisitorAnonymousControllerIntegrationTest {
                     initRequest.setOrgUid(ORG_UID);
                     initRequest.setType(TYPE);
                     initRequest.setClient(ClientEnum.TEST.name());
+                    initRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
+                    initRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
+                    initRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");
+                    initRequest.setReferrer("http://127.0.0.1:9003/dev");
 
                     // 创建HTTP Headers并添加必要的信息
                     HttpHeaders headers = new HttpHeaders();
@@ -154,6 +166,10 @@ public class VisitorAnonymousControllerIntegrationTest {
                         threadRequest.setOrgUid(ORG_UID);
                         threadRequest.setType(TYPE);
                         threadRequest.setClient(ClientEnum.TEST.name());
+                        threadRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
+                        threadRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
+                        threadRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");
+                        threadRequest.setReferrer("http://127.0.0.1:9003/dev");
 
                         ResponseEntity<String> threadResponse = restTemplate.postForEntity(
                                 "/visitor/api/v1/request",
