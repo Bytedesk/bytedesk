@@ -164,7 +164,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">report/multiple_visitors_results.jtl</stringProp>
+          <stringProp name="filename">./report/multiple_visitors_results.jtl</stringProp>
         </ResultCollector>
         <hashTree/>
         <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
@@ -201,7 +201,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">report/multiple_visitors_aggregate.jtl</stringProp>
+          <stringProp name="filename">./report/multiple_visitors_aggregate.jtl</stringProp>
         </ResultCollector>
         <hashTree/>
         <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Graph Results" enabled="true">
@@ -238,7 +238,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">report/multiple_visitors_graph.jtl</stringProp>
+          <stringProp name="filename">./report/multiple_visitors_graph.jtl</stringProp>
         </ResultCollector>
         <hashTree/>
       </hashTree>
