@@ -23,7 +23,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -78,7 +77,8 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
             thread.setTopic(topic);
             thread.setType(ThreadTypeEnum.KB.name());
             thread.setUnreadCount(0);
-            thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
+            // thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
+            thread.setClient(visitorRequest.getClient());
             thread.setOrgUid(robot.getOrgUid());
             //
             UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);

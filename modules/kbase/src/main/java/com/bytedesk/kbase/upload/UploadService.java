@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-02 10:50:23
+ * @LastEditTime: 2024-12-24 14:13:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskProperties;
-import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.storage.UploadStorageException;
 import com.bytedesk.kbase.upload.storage.UploadStorageFileNotFoundException;
@@ -68,8 +67,10 @@ public class UploadService extends BaseRestService<UploadEntity, UploadRequest, 
 
 		UploadEntity upload = modelMapper.map(request, UploadEntity.class);
 		upload.setUid(uidUtils.getCacheSerialUid());
-		upload.setClient(ClientEnum.fromValue(request.getClient()).name());
-		upload.setType(UploadTypeEnum.fromValue(request.getType()).name());
+		// upload.setClient(ClientEnum.fromValue(request.getClient()).name());
+		upload.setClient(request.getClient());
+		// upload.setType(UploadTypeEnum.fromValue(request.getType()).name());
+		upload.setType(request.getType());
 		if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
 			upload.setStatus(UploadStatusEnum.PARSING.name());
 		} else {

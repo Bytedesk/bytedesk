@@ -19,7 +19,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -74,7 +73,8 @@ public class KbCsThreadCreationStrategy implements CsThreadCreationStrategy {
         thread.setTopic(topic);
         thread.setType(ThreadTypeEnum.KB.name());
         thread.setUnreadCount(0);
-        thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
+        // thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
+        thread.setClient(visitorRequest.getClient());
         //
         UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
