@@ -30,48 +30,27 @@
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="sid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">sid</stringProp>
                 <stringProp name="Argument.value">df_ag_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
               </elementProp>
               <elementProp name="nickname" elementType="HTTPArgument">
-                <stringProp name="Argument.name">nickname</stringProp>
                 <stringProp name="Argument.value">Test Visitor</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
               </elementProp>
               <elementProp name="uid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">uid</stringProp>
                 <stringProp name="Argument.value">visitor_test_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
               </elementProp>
               <elementProp name="orgUid" elementType="HTTPArgument">
-                <stringProp name="Argument.name">orgUid</stringProp>
                 <stringProp name="Argument.value">df_org_uid</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
               </elementProp>
               <elementProp name="type" elementType="HTTPArgument">
-                <stringProp name="Argument.name">type</stringProp>
                 <stringProp name="Argument.value">0</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
               </elementProp>
               <elementProp name="client" elementType="HTTPArgument">
-                <stringProp name="Argument.name">client</stringProp>
                 <stringProp name="Argument.value">TEST</stringProp>
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
-          <stringProp name="HTTPSampler.port">${PORT}</stringProp>
-          <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/visitor/api/v1/init</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
         </HTTPSamplerProxy>
         <hashTree>
