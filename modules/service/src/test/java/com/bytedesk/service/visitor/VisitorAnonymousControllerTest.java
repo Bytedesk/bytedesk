@@ -65,7 +65,7 @@ public class VisitorAnonymousControllerTest {
     void testMassVisitorRequests() throws Exception {
         // 1. 首先创建100个访客
         log.info("开始创建{}个访客", VISITOR_COUNT);
-        creates();
+        createVisitors();
 
         // 2. 每个访客发起100次请求
         log.info("开始模拟每个访客发起{}次请求", REQUEST_PER_VISITOR);
@@ -76,7 +76,7 @@ public class VisitorAnonymousControllerTest {
         verify(visitorRestService, times(VISITOR_COUNT * REQUEST_PER_VISITOR)).requestThread(any());
     }
 
-    private void creates() throws Exception {
+    private void createVisitors() throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(10);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
