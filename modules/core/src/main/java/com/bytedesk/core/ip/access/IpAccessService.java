@@ -1,8 +1,12 @@
-package com.bytedesk.core.ip;
+package com.bytedesk.core.ip.access;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.bytedesk.core.ip.black.IpBlacklistEntity;
+import com.bytedesk.core.ip.black.IpBlacklistRepository;
+import com.bytedesk.core.ip.white.IpWhitelistRepository;
 
 import java.time.LocalDateTime;
 

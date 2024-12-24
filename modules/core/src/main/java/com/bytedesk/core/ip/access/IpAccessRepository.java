@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-24 17:43:52
+ * @Date: 2024-12-24 17:49:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 17:47:23
+ * @LastEditTime: 2024-12-24 17:50:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,27 +12,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.ip;
+package com.bytedesk.core.ip.access;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Data;
+import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 
-@Data
-@Entity
-@Table(name = "bytedesk_core_ip_blacklist")
-public class IpBlacklistEntity {
+public interface IpAccessRepository extends JpaRepository<IpAccessEntity, Long> {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String ip;
-    private LocalDateTime blockedTime;
-    private LocalDateTime expireTime;
-    private String reason;
+    IpAccessEntity findByIpAndEndpointAndAccessTimeAfter(String ip, String endpoint, LocalDateTime time);
 } 

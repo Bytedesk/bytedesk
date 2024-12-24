@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-24 17:43:48
+ * @Date: 2024-12-24 17:43:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 17:47:08
+ * @LastEditTime: 2024-12-24 22:17:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.ip;
+package com.bytedesk.core.ip.black;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,16 +24,15 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "bytedesk_core_ip_access")
-public class IpAccessEntity {
+@Table(name = "bytedesk_core_ip_blacklist")
+public class IpBlacklistEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     private String ip;
-    private String endpoint;  // 访问的接口
-    private LocalDateTime accessTime;
-    private int accessCount; // 访问次数
-    private LocalDateTime lastAccessTime;
+    private LocalDateTime blockedTime;
+    private LocalDateTime expireTime;
+    private String reason;
 } 
