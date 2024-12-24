@@ -21,19 +21,19 @@
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Multiple Visitors">
-        <intProp name="ThreadGroup.num_threads">100</intProp>
+        <intProp name="ThreadGroup.num_threads">10</intProp>
         <intProp name="ThreadGroup.ramp_time">10</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
-          <stringProp name="LoopController.loops">100</stringProp>
+          <stringProp name="LoopController.loops">10</stringProp>
           <boolProp name="LoopController.continue_forever">false</boolProp>
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Visitor Counter">
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Visitor Counter" enabled="true">
           <stringProp name="CounterConfig.start">1</stringProp>
-          <stringProp name="CounterConfig.end">100</stringProp>
+          <stringProp name="CounterConfig.end">10</stringProp>
           <stringProp name="CounterConfig.incr">1</stringProp>
           <stringProp name="CounterConfig.name">visitorNum</stringProp>
           <stringProp name="CounterConfig.format"></stringProp>
@@ -54,14 +54,14 @@
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
   &quot;sid&quot;: &quot;df_ag_uid&quot;,&#xd;
-  &quot;uid&quot;: &quot;visitor_test_uid_${visitorNum}&quot;,&#xd;
-  &quot;nickname&quot;: &quot;Visitor Test ${visitorNum}&quot;,&#xd;
+  &quot;nickname&quot;: &quot;Test Visitor&quot;,&#xd;
+  &quot;uid&quot;: &quot;visitor_test_uid&quot;,&#xd;
   &quot;orgUid&quot;: &quot;df_org_uid&quot;,&#xd;
   &quot;type&quot;: &quot;0&quot;,&#xd;
   &quot;client&quot;: &quot;TEST&quot;,&#xd;
-  &quot;browser&quot;: {&quot;name&quot;:&quot;Chrome&quot;,&quot;version&quot;:&quot;131.0.0.0&quot;,&quot;major&quot;:&quot;131&quot;},&#xd;
-  &quot;device&quot;: {&quot;name&quot;:&quot;iPhone&quot;,&quot;version&quot;:&quot;13.5&quot;},&#xd;
-  &quot;os&quot;: {&quot;name&quot;:&quot;Mac OS&quot;,&quot;version&quot;:&quot;10.15.7&quot;},&#xd;
+  &quot;browser&quot;: &quot;{\&quot;name\&quot;:\&quot;Chrome\&quot;,\&quot;version\&quot;:\&quot;131.0.0.0\&quot;,\&quot;major\&quot;:\&quot;131\&quot;}&quot;,&#xd;
+  &quot;device&quot;: &quot;{\&quot;name\&quot;:\&quot;iPhone\&quot;,\&quot;version\&quot;:\&quot;13.5\&quot;}&quot;,&#xd;
+  &quot;os&quot;: &quot;{\&quot;name\&quot;:\&quot;Mac OS\&quot;,\&quot;version\&quot;:\&quot;10.15.7\&quot;}&quot;,&#xd;
   &quot;referrer&quot;: &quot;http://127.0.0.1:9003/dev&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
@@ -70,7 +70,7 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">User-Agent</stringProp>
@@ -91,7 +91,7 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor" enabled="true">
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor">
             <stringProp name="JSONPostProcessor.referenceNames">visitorUid;visitorNickname;visitorAvatar</stringProp>
             <stringProp name="JSONPostProcessor.jsonPathExprs">$.uid;$.nickname;$.avatar</stringProp>
             <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
@@ -100,10 +100,10 @@
         </hashTree>
         <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Thread Request Loop">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">100</stringProp>
+          <stringProp name="LoopController.loops">10</stringProp>
         </LoopController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread" enabled="true">
             <stringProp name="HTTPSampler.path">/visitor/api/v1/request</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
