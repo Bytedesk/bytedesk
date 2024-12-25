@@ -1,0 +1,3 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1735032668886,143,Init Visitor,200,OK,Single Visitor Flow 1-1,text,true,,434,605,1,1,http://127.0.0.1:9003/visitor/api/v1/init,134,0,45
+1735032669107,26,Request Thread,200,OK,Single Visitor Flow 1-1,text,true,,1404,437,1,1,http://127.0.0.1:9003/visitor/api/v1/thread,25,0,1
