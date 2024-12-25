@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 16:32:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 07:01:32
+ * @LastEditTime: 2024-12-25 13:05:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,21 +14,26 @@
  */
 package com.bytedesk.core.thread;
 
+/**
+ * 会话类型
+ */
 public enum ThreadTypeEnum {
-    AGENT(0), // 一对一客服
-    WORKGROUP(1), // 技能组客服
-    KB(2), // 机器人-知识库对话
+    AGENT(0), // 一对一客服，不支持机器人接待
+    WORKGROUP(1), // 技能组客服，支持机器人接待，支持转人工
+    ROBOT(2), // 机器人客服，不支持转人工
+    // 
     MEMBER(3), // 组织成员对话
     GROUP(4), // 群组对话
-    // LEAVEMSG(5),
-    FEEDBACK(6), // 意见反馈
+    FEEDBACK(6), // VOC-意见反馈
     ASSISTANT(7), // 助理
     CHANNEL(8),
     LOCAL(9), // 本地对话
     FRIEND(10),
     TICKET(11), // 工单对话
-    KBDOC(12), // 机器人-知识库某一个文档对话
-    LLM(14), // 机器人-直接调用大模型
+    // 
+    // KB(12), // 机器人-知识库对话
+    // KBDOC(13), // 机器人-知识库某一个文档对话
+    // LLM(14), // 机器人-直接调用大模型
     ;
 
     private final int value;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 08:12:19
+ * @LastEditTime: 2024-12-25 12:59:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,10 +40,15 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- WorkgroupEntity和skills的区别主要在于:
-组织结构 vs 能力标签
-WorkgroupEntity是组织结构层面的分组,比如"售前组"、"售后组"、"技术支持组"等
-Skills是能力标签层面的标识,比如"Java"、"Python"、"数据库"等技术能力
+ * WorkgroupEntity和skills的区别主要在于:
+ * - 组织结构 vs 能力标签
+ * - WorkgroupEntity是组织结构层面的分组,比如"售前组"、"售后组"、"技术支持组"等
+ * - Skills是能力标签层面的标识,比如"Java"、"Python"、"数据库"等技术能力
+ * 
+ * WorkgroupEntity和agent的区别主要在于:
+ * - agent：一对一人工客服，不支持机器人接待
+ * - robot：机器人客服，不支持转人工
+ * - workgroup：工作组，支持机器人接待，支持转人工
  */
 @Entity
 @Data

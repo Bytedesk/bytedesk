@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-05 12:11:04
+ * @LastEditTime: 2024-12-25 13:06:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,8 +58,7 @@ public class ThreadEventListener {
         // 创建客服会话之后，需要订阅topic
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
-                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-                || thread.getType().equals(ThreadTypeEnum.LLM.name())) {
+                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
@@ -90,8 +89,7 @@ public class ThreadEventListener {
         
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
-                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-                || thread.getType().equals(ThreadTypeEnum.LLM.name())) {
+                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())

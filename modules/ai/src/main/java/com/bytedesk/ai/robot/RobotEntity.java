@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:48:30
+ * @LastEditTime: 2024-12-25 13:00:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-// 智能体
+/**
+ * - agent：一对一人工客服，不支持机器人接待
+ * - robot：机器人客服，不支持转人工
+ * - workgroup：工作组，支持机器人接待，支持转人工
+ */
 @Entity
 @Data
 @Builder

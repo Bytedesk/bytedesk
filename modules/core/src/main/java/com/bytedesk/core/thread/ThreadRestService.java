@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 14:13:14
+ * @LastEditTime: 2024-12-25 13:06:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -382,7 +382,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // @Cacheable(value = "threadOpen")
     public List<ThreadEntity> findStateOpen() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
-                ThreadTypeEnum.KB.name() });
+                ThreadTypeEnum.ROBOT.name() });
         List<String> states = Arrays .asList(new String[] { ThreadStateEnum.CLOSED.name()});
         return threadRepository.findByTypesInAndStatesNotInAndDeleted(types, states, false);
     }

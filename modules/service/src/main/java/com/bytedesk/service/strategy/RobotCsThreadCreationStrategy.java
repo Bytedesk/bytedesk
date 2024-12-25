@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 07:53:49
+ * @LastEditTime: 2024-12-25 13:08:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,10 +35,10 @@ import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 
-// 机器人-对话大模型
-@Component("llmCsThreadStrategy")
+// 机器人对话策略器人
+@Component("robotCsThreadStrategy")
 @AllArgsConstructor
-public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
+public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final RobotRestService robotService;
 
@@ -75,7 +75,7 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
             thread = ThreadEntity.builder().build();
             thread.setUid(uidUtils.getCacheSerialUid());
             thread.setTopic(topic);
-            thread.setType(ThreadTypeEnum.KB.name());
+            thread.setType(ThreadTypeEnum.ROBOT.name());
             thread.setUnreadCount(0);
             // thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
             thread.setClient(visitorRequest.getClient());
@@ -88,8 +88,8 @@ public class LlmCsThreadCreationStrategy implements CsThreadCreationStrategy {
         thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
                 robot.getServiceSettings())));
         //
-        UserProtobuf agenProtobuf = ConvertAiUtils.convertToUserProtobuf(robot);
-        thread.setAgent(JSON.toJSONString(agenProtobuf));
+        UserProtobuf agentProtobuf = ConvertAiUtils.convertToUserProtobuf(robot);
+        thread.setAgent(JSON.toJSONString(agentProtobuf));
         //
         return thread;
     }
