@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:14:22
+ * @LastEditTime: 2024-12-25 13:16:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,6 +61,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return createAgentCsThread(visitorRequest);
     }
 
+    // 一对一人工客服，不支持机器人接待
     public MessageProtobuf createAgentCsThread(VisitorRequest visitorRequest) {
         //
         String agentUid = visitorRequest.getSid();
@@ -72,19 +73,15 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         if (threadOptional.isPresent() ) {
             thread = threadOptional.get();
             // 
-            if (thread.isRobot()) {
-                // 强制转人工，机器人接待的情况下，重新初始化会话
-                thread = threadOptional.get().reInit();
-                agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
-            } else if (thread.isStarted()) {
-                // 强制转人工，返回未关闭，或 非留言状态的会话
+            if (thread.isStarted()) {
+                // 返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing thread {}", topic);
                 return getAgentContinueMessage(visitorRequest, threadOptional.get());
             } else if (thread.isQueuing()) {
-                // 强制转人工，返回排队中的会话
+                // 返回排队中的会话
                 return getAgentQueuingMessage(visitorRequest, threadOptional.get());
             } else {
-                // 强制转人工，关闭或者离线状态，返回初始化状态的会话
+                // 关闭或者离线状态，返回初始化状态的会话
                 thread = threadOptional.get().reInit();
                 agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
             }
