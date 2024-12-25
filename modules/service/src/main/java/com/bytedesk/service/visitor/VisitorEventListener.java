@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 12:42:14
+ * @LastEditTime: 2024-12-25 11:55:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,9 +24,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+// @Slf4j
 @Component
 @AllArgsConstructor
 public class VisitorEventListener {
@@ -43,7 +43,7 @@ public class VisitorEventListener {
             // 使用Duration计算时间差
             if (Duration.between(visitor.getUpdatedAt(), LocalDateTime.now()).toMillis() > 5 * 60 * 1000) {
             // if (System.currentTimeMillis() - visitor.getUpdatedAt().getTime() > 5 * 60 * 1000) {
-                log.info("visitor: {} offline", visitor.getUid());
+                // log.info("visitor: {} offline", visitor.getUid());
                 visitorService.updateStatus(visitor.getUid(), VisitorStatusEnum.OFFLINE.name());
             }
         });
