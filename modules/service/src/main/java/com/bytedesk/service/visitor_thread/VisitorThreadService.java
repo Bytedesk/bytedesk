@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:08:07
+ * @LastEditTime: 2024-12-25 14:13:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -108,12 +108,9 @@ public class VisitorThreadService
     }
 
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
-        // TODO: 到visitor thread表中拉取
+        // 
         ThreadEntity thread = ThreadEntity.builder()
                 .topic(topic)
-                // .state(ThreadStateEnum.ROBOT.name())
-                // .type(ThreadTypeEnum.WORKGROUP.name())
-                // .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
                 .client(visitorRequest.getClient())
                 .build();
         thread.setUid(uidUtils.getUid());
@@ -140,12 +137,10 @@ public class VisitorThreadService
     }
 
     public ThreadEntity getAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
-        // TODO: 到visitor thread表中拉取
+        //
         ThreadEntity thread = ThreadEntity.builder()
                 .topic(topic)
-                // .state(ThreadStateEnum.ROBOT.name())
                 .type(ThreadTypeEnum.AGENT.name())
-                // .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
                 .client(visitorRequest.getClient())
                 .build();
         thread.setUid(uidUtils.getUid());

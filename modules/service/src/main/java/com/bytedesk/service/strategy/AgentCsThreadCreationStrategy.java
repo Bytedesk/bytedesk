@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:58:43
+ * @LastEditTime: 2024-12-25 14:15:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -103,7 +103,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 广播消息，由消息通道统一处理
-        // MessageUtils.notifyUser(messageProtobuf);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
@@ -116,7 +115,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueuingMessage(user, thread);
         // 广播消息，由消息通道统一处理
-        // MessageUtils.notifyUser(messageProtobuf);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
