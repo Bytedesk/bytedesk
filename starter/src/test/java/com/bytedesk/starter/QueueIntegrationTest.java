@@ -27,7 +27,7 @@ import java.util.Collections;
         "bytedesk.socket.enabled=false", // 禁用MQTT服务器
         "server.port=0" // 使用随机端口
 })
-public class VisitorAnonymousControllerIntegrationTest {
+public class QueueIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
