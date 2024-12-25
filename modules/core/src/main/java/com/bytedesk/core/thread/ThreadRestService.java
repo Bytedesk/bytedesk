@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 16:01:08
+ * @LastEditTime: 2024-12-25 19:39:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -337,6 +337,25 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 content);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
+        return convertToResponse(updateThread);
+    }
+
+    public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
+        //
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
+        }
+
+        ThreadEntity thread = threadOptional.get();
+        // thread.setAgentUid(threadRequest.getAgentUid());
+        // thread.setAcceptType(threadRequest.getAcceptType());
+        // thread.setQueueNumber(threadRequest.getQueueNumber());
+        //
+        ThreadEntity updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
         return convertToResponse(updateThread);
     }
 
