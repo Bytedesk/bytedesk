@@ -1,3 +1,17 @@
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-12-24 14:05:03
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-12-25 11:16:49
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+-->
 # 压力测试
 
 - [下载 jmeter](https://jmeter.apache.org/download_jmeter.cgi)
@@ -6,12 +20,14 @@
 
 这两个JMeter测试文件分别对应：
 
-1. visitor_flow_test.jmx:
+1. agent_single_visitor_test.jmx/workgroup_single_visitor_test.jmx:
+    - agent: 单客服、workgroup: 客服组
     - 模拟单个访客流程
     - 包含init和request两个请求
     - 设置了必要的请求头和参数
     - 使用JSON提取器获取响应数据
-2. multiple_visitors_test.jmx:
+2. agent_multiple_visitors_test.jmx/workgroup_multiple_visitors_test.jmx:
+    - agent: 单客服、workgroup: 客服组
     - 模拟100个并发访客
     - 每个访客发送100个请求
     - 使用计数器生成唯一访客ID
