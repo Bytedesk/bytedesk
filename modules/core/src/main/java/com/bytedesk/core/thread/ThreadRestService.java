@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 21:09:41
+ * @LastEditTime: 2024-12-25 22:30:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -318,20 +318,21 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         thread.setAutoClose(threadRequest.getAutoClose());
         thread.setState(threadRequest.getState());
+        // 发布关闭消息, 通知用户
+        String content = threadRequest.getAutoClose()
+                ? I18Consts.I18N_AUTO_CLOSED
+                : I18Consts.I18N_AGENT_CLOSED;
+        thread.setContent(content);
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-        // 
-        // bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<ThreadCloseEvent>(this, new ThreadCloseEvent(this, updateThread)));
+        // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(updateThread));
-        // 发布关闭消息, 通知用户
-        String content = threadRequest.getAutoClose()
-                ? I18Consts.I18N_AUTO_CLOSED
-                : I18Consts.I18N_AGENT_CLOSED;
+        // 发送消息
         MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED : MessageTypeEnum.AGENT_CLOSED;
-        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getCacheSerialUid(), 
+        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getUid(), 
                 updateThread,
                 messageTypeEnum,
                 content);
