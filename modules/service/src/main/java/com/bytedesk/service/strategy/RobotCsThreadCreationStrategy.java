@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:08:40
+ * @LastEditTime: 2024-12-25 13:10:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,21 +48,21 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
-        return createLlmCsThread(visitorRequest);
+        return createRobotCsThread(visitorRequest);
     }
 
-    public MessageProtobuf createLlmCsThread(VisitorRequest visitorRequest) {
+    public MessageProtobuf createRobotCsThread(VisitorRequest visitorRequest) {
         //
         String robotUid = visitorRequest.getSid();
         RobotEntity robot = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
-        ThreadEntity thread = getLlmThread(visitorRequest, robot);
+        ThreadEntity thread = getRobotThread(visitorRequest, robot);
         //
-        return getLlmMessage(visitorRequest, thread, robot);
+        return getRobotMessage(visitorRequest, thread, robot);
     }
 
-    private ThreadEntity getLlmThread(VisitorRequest visitorRequest, RobotEntity robot) {
+    private ThreadEntity getRobotThread(VisitorRequest visitorRequest, RobotEntity robot) {
         //
         String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
         // TODO: 到visitor thread表中拉取
@@ -94,7 +94,7 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return thread;
     }
 
-    private MessageProtobuf getLlmMessage(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
+    private MessageProtobuf getRobotMessage(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         //
