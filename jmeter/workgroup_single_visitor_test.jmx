@@ -29,7 +29,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Init Visitor">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Init Visitor" enabled="true">
           <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
           <stringProp name="HTTPSampler.port">${PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -42,11 +42,11 @@
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
-  &quot;sid&quot;: &quot;df_ag_uid&quot;,&#xd;
+  &quot;sid&quot;: &quot;df_wg_uid&quot;,&#xd;
   &quot;nickname&quot;: &quot;Test Visitor&quot;,&#xd;
   &quot;uid&quot;: &quot;visitor_test_uid&quot;,&#xd;
   &quot;orgUid&quot;: &quot;df_org_uid&quot;,&#xd;
-  &quot;type&quot;: &quot;0&quot;,&#xd;
+  &quot;type&quot;: &quot;1&quot;,&#xd;
   &quot;client&quot;: &quot;TEST&quot;,&#xd;
   &quot;browser&quot;: &quot;{\&quot;name\&quot;:\&quot;Chrome\&quot;,\&quot;version\&quot;:\&quot;131.0.0.0\&quot;,\&quot;major\&quot;:\&quot;131\&quot;}&quot;,&#xd;
   &quot;device&quot;: &quot;{\&quot;name\&quot;:\&quot;iPhone\&quot;,\&quot;version\&quot;:\&quot;13.5\&quot;}&quot;,&#xd;
@@ -88,7 +88,7 @@
           </JSONPostProcessor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Request Thread" enabled="true">
           <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
           <stringProp name="HTTPSampler.port">${PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -101,12 +101,12 @@
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
-    &quot;sid&quot;: &quot;df_ag_uid&quot;,&#xd;
+    &quot;sid&quot;: &quot;df_wg_uid&quot;,&#xd;
     &quot;uid&quot;: &quot;${visitorUid}&quot;,&#xd;
     &quot;nickname&quot;: &quot;${visitorNickname}&quot;,&#xd;
     &quot;avatar&quot;: &quot;${visitorAvatar}&quot;,&#xd;
     &quot;orgUid&quot;: &quot;df_org_uid&quot;,&#xd;
-    &quot;type&quot;: &quot;0&quot;,&#xd;
+    &quot;type&quot;: &quot;1&quot;,&#xd;
     &quot;client&quot;: &quot;TEST&quot;&#xd;
   }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
@@ -130,7 +130,7 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
