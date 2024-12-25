@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 14:14:40
+ * @LastEditTime: 2024-12-25 12:16:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,9 +35,7 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
-// import com.bytedesk.core.thread.back.ThreadStateService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
@@ -113,8 +111,8 @@ public class VisitorThreadService
         // TODO: 到visitor thread表中拉取
         ThreadEntity thread = ThreadEntity.builder()
                 .topic(topic)
-                .state(ThreadStateEnum.INITIAL.name())
-                .type(ThreadTypeEnum.WORKGROUP.name())
+                // .state(ThreadStateEnum.ROBOT.name())
+                // .type(ThreadTypeEnum.WORKGROUP.name())
                 // .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
                 .client(visitorRequest.getClient())
                 .build();
@@ -145,7 +143,7 @@ public class VisitorThreadService
         // TODO: 到visitor thread表中拉取
         ThreadEntity thread = ThreadEntity.builder()
                 .topic(topic)
-                .state(ThreadStateEnum.INITIAL.name())
+                // .state(ThreadStateEnum.ROBOT.name())
                 .type(ThreadTypeEnum.AGENT.name())
                 // .client(ClientEnum.fromValue(visitorRequest.getClient()).name())
                 .client(visitorRequest.getClient())

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 15:08:48
+ * @LastEditTime: 2024-12-25 12:16:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,7 +72,7 @@ public class VisitorThreadEntity extends BaseEntity {
 
     /** closed/open, agent closed/auto closed */
     @Builder.Default
-    private String state = ThreadStateEnum.INITIAL.name();
+    private String state = ThreadStateEnum.ROBOT.name();
 
     // 置顶
     @Builder.Default

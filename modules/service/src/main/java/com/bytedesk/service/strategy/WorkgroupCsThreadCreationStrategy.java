@@ -71,7 +71,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent() && !visitorRequest.getForceAgent()) {
             ThreadEntity thread = threadOptional.get();
-            if (thread.isProcessing()) {
+            if (thread.isStarted()) {
                 log.info("Already have a processing thread {}", topic);
                 return getWorkgroupProcessingMessage(visitorRequest, threadOptional.get());
             }
