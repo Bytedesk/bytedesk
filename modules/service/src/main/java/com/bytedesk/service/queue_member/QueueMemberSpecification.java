@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:01:47
+ * @LastEditTime: 2024-12-25 15:05:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class QueueMemberSpecification extends BaseSpecification {
     
-    public static Specification <QueueMemberEntity> search (QueueMemberRequest request) {
+    public static Specification <QueueMemberEntity> search(QueueMemberRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
