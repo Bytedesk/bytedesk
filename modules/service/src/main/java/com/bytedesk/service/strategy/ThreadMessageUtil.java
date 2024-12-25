@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:55:21
+ * @LastEditTime: 2024-12-25 16:06:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -104,8 +104,6 @@ public class ThreadMessageUtil {
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
         message.setThreadTopic(thread.getTopic());
-        // 
-        message.setContent(thread.getContent());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -127,8 +125,6 @@ public class ThreadMessageUtil {
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
         message.setThreadTopic(thread.getTopic());
-        // 
-        message.setContent(thread.getContent());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));

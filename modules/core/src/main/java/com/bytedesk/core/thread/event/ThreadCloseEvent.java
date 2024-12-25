@@ -27,8 +27,8 @@ public class ThreadCloseEvent extends ApplicationEvent {
 
     private ThreadEntity thread;
 
-    public ThreadCloseEvent(Object source, ThreadEntity thread) {
-        super(source);
+    public ThreadCloseEvent(ThreadEntity thread) {
+        super(thread);
         this.thread = thread;
     }
 
