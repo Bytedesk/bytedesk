@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:55:11
+ * @LastEditTime: 2024-12-25 17:52:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,8 +73,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
 
-    @Builder.Default
-    private String acceptType = QueueMemberAcceptTypeEnum.AUTO.name();  // 接单方式
+    private String acceptType;  // 接单方式, 自动、手动，不设置默认
 
     private LocalDateTime acceptTime;  // 开始服务时间
 

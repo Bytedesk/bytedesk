@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 16:22:08
+ * @LastEditTime: 2024-12-25 17:58:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,7 +83,7 @@ public class ThreadEntity extends BaseEntity {
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
     @Builder.Default
-    private int queueNumber = 1;
+    private int queueNumber = 0;
 
     @Builder.Default
     private int unreadCount = 1;
