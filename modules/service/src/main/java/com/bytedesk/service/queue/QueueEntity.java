@@ -84,6 +84,20 @@ public class QueueEntity extends BaseEntity {
     }
 
     /**
+     * 减少等待人数
+     */
+    public void decreaseWaitingNumber() {
+        this.waitingNumber--;
+    }
+
+    /**
+     * 增加等待人数
+     */
+    public void increaseWaitingNumber() {
+        this.waitingNumber++;
+    }
+
+    /**
      * 更新队列统计
      */
     public void updateStats(int waiting, int serving, int served, int avgWait) {
