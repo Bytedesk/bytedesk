@@ -33,8 +33,8 @@ public class QueueIntegrationTest {
     private TestRestTemplate restTemplate;
 
     private static final String ORG_UID = "df_org_uid";
-    private static final String AGENT_UID = "df_ag_uid";
-    private static final String TYPE = "0";
+    private static final String AGENT_UID = "df_ag_uid"; // df_ag_uid or df_wg_uid
+    private static final String TYPE = "0";// 0: agent, 1: workgroup
 
     @Test
     public void testVisitorFlowWithRealServer() {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:46:15
+ * @LastEditTime: 2024-12-25 11:41:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,11 +70,14 @@ public class VisitorEntity extends BaseEntity {
 	private VisitorDevice device;
 
 	// used for agent notation
-	private String mobile;
+	@Builder.Default
+	private String mobile = BytedeskConsts.EMPTY_STRING;
 
-	private String email;
+	@Builder.Default
+	private String email = BytedeskConsts.EMPTY_STRING;
 
-	private String note;
+	@Builder.Default
+	private String note = BytedeskConsts.EMPTY_STRING;
 
 	@Builder.Default
 	private String client = ClientEnum.WEB.name();
