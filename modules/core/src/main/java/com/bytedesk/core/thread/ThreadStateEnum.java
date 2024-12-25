@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 12:13:23
+ * @LastEditTime: 2024-12-25 14:03:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,7 @@
  */
 package com.bytedesk.core.thread;
 
-// 默认机器人接待，除非主动关闭机器人的情况下，才转人工接待。界面支持转人工
-// 如果客服不在线，则设置为OFFLINE
-// 如果客服在线，且有空闲，则设置为STARTED
-// 如果客服在线，且没有空闲，则设置为QUEUING
-// 如果客服主动关闭会话或超时，则设置为CLOSED
 public enum ThreadStateEnum {
-    ROBOT, // 机器人
     QUEUING, // 排队中
     STARTED, // 开始会话
     OFFLINE, // 客服不在线

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:06:08
+ * @LastEditTime: 2024-12-25 14:04:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,7 +83,7 @@ public class ThreadEntity extends BaseEntity {
     private String type = ThreadTypeEnum.WORKGROUP.name();
 
     @Builder.Default
-    private String state = ThreadStateEnum.ROBOT.name();
+    private String state = ThreadStateEnum.QUEUING.name();
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
     // @Builder.Default
@@ -121,17 +121,6 @@ public class ThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_folded")
     private boolean folded = false;
-
-    // 迁移到QueueMemberEntity
-    // 已解决
-    // @Builder.Default
-    // @Column(name = "is_solved")
-    // private boolean solved = false;
-
-    // 已评价
-    // @Builder.Default
-    // @Column(name = "is_rated")
-    // private boolean rated = false;
 
     // 自动关闭
     @Builder.Default
@@ -208,18 +197,28 @@ public class ThreadEntity extends BaseEntity {
         return Arrays.asList(requiredSkills.split(","));
     }
 
-    public ThreadEntity reInit() {
-        this.state = ThreadStateEnum.ROBOT.name();
+    public ThreadEntity reInitAgent() {
+        this.state = ThreadStateEnum.QUEUING.name();
         this.hide = false;
-        // this.solved = false;
-        // this.rated = false;
         this.autoClose = false;
         this.robot = false;
         return this;
     }
 
-    public Boolean isRobot() {
-        return this.state.equals(ThreadStateEnum.ROBOT.name());
+    public ThreadEntity reInitWorkgroup() {
+        this.state = ThreadStateEnum.QUEUING.name();
+        this.hide = false;
+        this.autoClose = false;
+        this.robot = false;
+        return this;
+    }
+
+    public ThreadEntity reInitRobot() {
+        this.state = ThreadStateEnum.STARTED.name();
+        this.hide = false;
+        this.autoClose = false;
+        this.robot = false;
+        return this;
     }
 
     //
