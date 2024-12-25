@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 10:40:47
+ * @LastEditTime: 2024-12-25 14:53:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,12 +89,13 @@ public class RouteService {
             // 判断是否达到最大接待人数，如果达到则进入排队
             if (agent.canAcceptMore()) {
                 // 未满则接待
+                thread.setStarted();
                 thread.setUnreadCount(1);
                 thread.setContent(agent.getServiceSettings().getWelcomeTip());
                 // 增加接待数量，待优化
                 agent.increaseThreadCount();
                 agentRestService.save(agent);
-                // 
+                // 更新排队状态，待优化
                 queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
                 queueMemberEntity.setAcceptTime(LocalDateTime.now());
                 queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
