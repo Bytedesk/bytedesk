@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-02 15:03:37
+ * @LastEditTime: 2024-12-25 14:57:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
 
 @RestController
-@RequestMapping("/api/v1/visitor/counter")
+@RequestMapping("/api/v1/queue/member")
 public class QueueMemberRestController extends BaseRestController<QueueMemberRequest> {
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)

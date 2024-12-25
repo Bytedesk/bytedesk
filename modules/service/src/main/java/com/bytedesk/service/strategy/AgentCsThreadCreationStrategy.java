@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 14:15:44
+ * @LastEditTime: 2024-12-25 14:52:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -54,7 +53,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
     // private final IRouteService routeService;
     private final RouteService routeService;
     
-    private final IMessageSendService messageSendService;
+    // private final IMessageSendService messageSendService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -102,8 +101,8 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         log.info("getAgentContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
-        // 广播消息，由消息通道统一处理
-        messageSendService.sendProtobufMessage(messageProtobuf);
+        // 重复进入，无需推送消息
+        // messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
     }
@@ -114,8 +113,8 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         log.info("getAgentQueuingMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueuingMessage(user, thread);
-        // 广播消息，由消息通道统一处理
-        messageSendService.sendProtobufMessage(messageProtobuf);
+        // 重复进入，无需推送消息
+        // messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;
     }
