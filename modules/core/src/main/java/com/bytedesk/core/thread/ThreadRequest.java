@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-02 11:20:20
+ * @LastEditTime: 2024-12-25 21:22:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ public class ThreadRequest extends BaseRequest {
     private Boolean unread = false;
 
     @Builder.Default
-    private Integer serialNumber = 1;
+    private Integer queueNumber = 0;
 
     @Builder.Default
     private Integer unreadCount = 0;
