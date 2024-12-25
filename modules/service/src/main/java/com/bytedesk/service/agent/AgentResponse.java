@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:18:14
+ * @LastEditTime: 2024-12-25 13:13:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
-import com.bytedesk.service.settings.RobotSettingsResponse;
 import com.bytedesk.team.member.MemberResponseSimple;
 
 import lombok.AllArgsConstructor;
@@ -57,7 +56,8 @@ public class AgentResponse extends BaseResponse {
 
     private LeaveMsgSettingsResponse leaveMsgSettings;
 
-    private RobotSettingsResponse robotSettings;
+    // 一对一人工客服，不支持机器人接待
+    // private RobotSettingsResponse robotSettings;
 
     private ServiceSettingsResponse serviceSettings;
 

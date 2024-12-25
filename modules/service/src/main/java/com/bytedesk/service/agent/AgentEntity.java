@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 12:59:31
+ * @LastEditTime: 2024-12-25 13:11:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
-import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.team.member.MemberEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -98,9 +97,10 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private LeaveMsgSettings leaveMsgSettings = new LeaveMsgSettings();
 
-    @Embedded
-    @Builder.Default
-    private RobotSettings robotSettings = new RobotSettings();
+    // 一对一人工客服，不支持机器人接待
+    // @Embedded
+    // @Builder.Default
+    // private RobotSettings robotSettings = new RobotSettings();
 
     @Embedded
     @Builder.Default

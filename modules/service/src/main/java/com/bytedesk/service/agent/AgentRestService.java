@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 17:33:55
+ * @LastEditTime: 2024-12-25 13:12:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,6 @@ import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
-import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.team.member.MemberEntity;
@@ -206,8 +205,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 
         LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatAgentLeaveMsgSettings(request);
         agent.setLeaveMsgSettings(leaveMsgSettings);
-        RobotSettings robotSettings = serviceSettingsService.formatAgentRobotSettings(request);
-        agent.setRobotSettings(robotSettings);
+        // 
+        // 一对一人工客服，不支持机器人接待
+        // RobotSettings robotSettings = serviceSettingsService.formatAgentRobotSettings(request);
+        // agent.setRobotSettings(robotSettings);
+        // 
         ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
         agent.setServiceSettings(serviceSettings);
         AutoReplySettings autoReplySettings = serviceSettingsService.formatAgentAutoReplySettings(request);
