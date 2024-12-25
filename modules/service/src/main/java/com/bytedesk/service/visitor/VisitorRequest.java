@@ -15,6 +15,7 @@
 package com.bytedesk.service.visitor;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -80,7 +81,8 @@ public class VisitorRequest extends BaseRequest {
 	private String status = VisitorStatusEnum.ONLINE.name();
 
 	// 自定义参数，从URL传入，使用json格式传入，例如：{"key1":"value1","key2":"value2"}
-	private String extra;
+	@Builder.Default
+	private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
 	// wechat mp extra
 	private String threadExtra;
