@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 12:34:17
+ * @LastEditTime: 2024-12-25 12:52:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,17 +73,35 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         if (threadOptional.isPresent() ) {
             thread = threadOptional.get();
             // 
-            if (thread.isRobot() && !visitorRequest.getForceAgent()) {
-                // 机器人接待，不转人工
-                return getAgentProcessingMessage(visitorRequest, thread);
-            }
-            
-            if (thread.isStarted()) {
-                // 返回未关闭，或 非留言状态的会话
+            if (!visitorRequest.getForceAgent()) {
+                // 不强制转人工
+                if (thread.isClosed() || thread.isOffline()) {
+                    // 会话已经关闭，重新初始化会话
+                    thread = threadOptional.get().reInit();
+                    agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
+                } else if (thread.isStarted()) {
+                    // 会话进行中，且不转人工
+                    return getAgentContinueMessage(visitorRequest, thread);
+                } else if (thread.isQueuing()) {
+                    // 会话排队中，且不转人工
+                    return getAgentQueuingMessage(visitorRequest, thread);
+                } else {
+                    // 机器人会话，不转人工
+                    return getAgentContinueMessage(visitorRequest, thread);
+                }
+            } else if (thread.isRobot()) {
+                // 强制转人工，机器人接待的情况下，重新初始化会话
+                thread = threadOptional.get().reInit();
+                agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
+            } else if (thread.isStarted()) {
+                // 强制转人工，返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing thread {}", topic);
-                return getAgentProcessingMessage(visitorRequest, threadOptional.get());
+                return getAgentContinueMessage(visitorRequest, threadOptional.get());
+            } else if (thread.isQueuing()) {
+                // 强制转人工，返回排队中的会话
+                return getAgentQueuingMessage(visitorRequest, threadOptional.get());
             } else {
-                // 会话已经关闭，重新初始化会话
+                // 强制转人工，关闭或者离线状态，返回初始化状态的会话
                 thread = threadOptional.get().reInit();
                 agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
             }
@@ -114,10 +132,23 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return routeService.routeAgent(visitorRequest, thread, agent);
     }
 
-    private MessageProtobuf getAgentProcessingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
+    private MessageProtobuf getAgentContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("getAgentProcessingMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        log.info("getAgentContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        //
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
+        // 广播消息，由消息通道统一处理
+        // MessageUtils.notifyUser(messageProtobuf);
+        messageSendService.sendProtobufMessage(messageProtobuf);
+
+        return messageProtobuf;
+    }
+
+    private MessageProtobuf getAgentQueuingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
+        //
+        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        log.info("getAgentQueuingMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 广播消息，由消息通道统一处理

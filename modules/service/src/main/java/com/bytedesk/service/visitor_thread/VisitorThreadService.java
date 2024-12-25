@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 12:16:37
+ * @LastEditTime: 2024-12-25 13:08:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -220,7 +220,7 @@ public class VisitorThreadService
             // diffInMinutes);
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
                     || thread.getType().equals(ThreadTypeEnum.AGENT.name())
-                    || thread.getType().equals(ThreadTypeEnum.KB.name())) {
+                    || thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
                 ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
                         ServiceSettingsResponseVisitor.class);
                 Double autoCloseMinutes = settings.getAutoCloseMin();
