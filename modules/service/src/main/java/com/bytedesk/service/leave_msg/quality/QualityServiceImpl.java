@@ -12,7 +12,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.quality;
+package com.bytedesk.service.leave_msg.quality;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.service.quality.dto.QualityInspectionDTO;
-import com.bytedesk.service.quality.dto.QualityRuleDTO;
+import com.bytedesk.service.leave_msg.quality.dto.QualityInspectionDTO;
+import com.bytedesk.service.leave_msg.quality.dto.QualityRuleDTO;
 
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;

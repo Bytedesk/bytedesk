@@ -105,11 +105,11 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 // 转机器人
                 RobotEntity robot = workgroup.getRobotSettings().getRobot();
                 // 
-                return routeService.routeRobot(visitorRequest, thread, robot);
+                return routeService.routeToRobot(visitorRequest, thread, robot);
             }
         }
         // 
-        return routeService.routeWorkgroup(visitorRequest, thread, workgroup);
+        return routeService.routeToWorkgroup(visitorRequest, thread, workgroup);
     }
 
     // Q-原样返回会话

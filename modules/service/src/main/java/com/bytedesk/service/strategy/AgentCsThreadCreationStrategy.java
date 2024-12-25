@@ -92,7 +92,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // 重新初始化会话额外信息，例如客服状态等
         thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
         // 人工客服
-        return routeService.routeAgent(visitorRequest, thread, agent);
+        return routeService.routeToAgent(visitorRequest, thread, agent);
     }
 
     private MessageProtobuf getAgentContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:36:39
+ * @LastEditTime: 2024-12-25 16:25:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -87,4 +87,34 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     int cleanupExpiredMembers(
         @Param("queueUid") String queueUid,
         @Param("beforeTime") LocalDateTime beforeTime);
+
+
+    // 统计客服的活跃会话数
+    @Query("SELECT COUNT(t) FROM QueueMemberEntity t WHERE t.agentUid = :agentUid AND t.status = 'SERVING'")
+    int countServingThreadsByAgent(@Param("agentUid") String agentUid);
+    
+    // 获取客服的活跃会话列表
+    @Query("SELECT t.uid FROM QueueMemberEntity t WHERE t.agentUid = :agentUid AND t.status = 'SERVING'")
+    List<String> findServingThreadsByAgent(@Param("agentUid") String agentUid);
+    
+    // 获取会话分配的客服
+    @Query("SELECT t.agentUid FROM QueueMemberEntity t WHERE t.uid = :threadUid")
+    String getAssignedAgent(@Param("threadUid") String threadUid);
+    
+    // 更新会话分配的客服
+    @Modifying
+    @Query("UPDATE QueueMemberEntity t SET t.agentUid = :agentUid WHERE t.uid = :threadUid")
+    void updateAssignedAgent(@Param("threadUid") String threadUid, @Param("agentUid") String agentUid);
+    
+    // 获取客服的平均响应时间
+    // @Query("SELECT AVG(t.firstResponseTime) FROM QueueMemberEntity t WHERE t.agentUid = :agentUid")
+    // Long getAverageResponseTime(@Param("agentUid") String agentUid);
+    
+    // 统计客服的总会话数
+    @Query("SELECT COUNT(t) FROM QueueMemberEntity t WHERE t.agentUid = :agentUid")
+    int countTotalThreadsByAgent(@Param("agentUid") String agentUid);
+    
+    // 统计客服的已解决会话数
+    @Query("SELECT COUNT(t) FROM QueueMemberEntity t WHERE t.agentUid = :agentUid AND t.status = 'resolved'")
+    int countResolvedThreadsByAgent(@Param("agentUid") String agentUid);
 }
