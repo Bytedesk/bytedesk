@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 17:25:22
+ * @LastEditTime: 2024-12-25 14:00:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -116,7 +116,7 @@ public class RobotEventListener {
         }
         //
         String threadTopic = threadProtobuf.getTopic();
-        if (threadProtobuf.getType().equals(ThreadTypeEnum.KB)) {
+        if (threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
             // 知识库对话
             log.info("robot kb threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // 机器人客服消息 org/robot/df_robot_uid/1420995827073219
@@ -141,7 +141,7 @@ public class RobotEventListener {
             } else {
                 log.error("robot not found");
             }
-        } else if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
+        } else if (threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
             log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // 大模型对话，无知识库
             Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
@@ -185,8 +185,7 @@ public class RobotEventListener {
             }
         } else if (threadProtobuf.getType().equals(ThreadTypeEnum.AGENT)
                 || threadProtobuf.getType().equals(ThreadTypeEnum.WORKGROUP)
-                || threadProtobuf.getType().equals(ThreadTypeEnum.KB)
-                || threadProtobuf.getType().equals(ThreadTypeEnum.KBDOC)) {
+                || threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
             log.info("robot agent/workgroup threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // TODO: 取消查库
             ThreadEntity thread = threadService.findFirstByTopic(threadTopic)

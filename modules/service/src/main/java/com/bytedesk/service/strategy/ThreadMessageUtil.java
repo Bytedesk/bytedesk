@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 07:52:27
+ * @LastEditTime: 2024-12-25 13:55:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -91,6 +91,29 @@ public class ThreadMessageUtil {
 
     public static MessageProtobuf getThreadQueueMessage(AgentEntity agent, ThreadEntity thread) {
         UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+        // ... 方法的实现保持不变 ...
+        MessageEntity message = MessageEntity.builder()
+                .content(thread.getContent())
+                .type(MessageTypeEnum.QUEUE.name())
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(JSON.toJSONString(user))
+                .build();
+        message.setUid(UidUtils.getInstance().getUid());
+        message.setOrgUid(thread.getOrgUid());
+        message.setCreatedAt(LocalDateTime.now());
+        message.setUpdatedAt(LocalDateTime.now());
+        message.setThreadTopic(thread.getTopic());
+        // 
+        message.setContent(thread.getContent());
+        //
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        message.setExtra(JSON.toJSONString(extra));
+        //
+        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+    }
+
+    public static MessageProtobuf getThreadQueuingMessage(UserProtobuf user, ThreadEntity thread) {
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .content(thread.getContent())
