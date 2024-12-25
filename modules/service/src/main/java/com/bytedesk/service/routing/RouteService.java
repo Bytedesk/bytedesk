@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 14:53:09
+ * @LastEditTime: 2024-12-25 15:08:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -144,6 +144,7 @@ public class RouteService {
         //
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
+            thread.setStarted();
             thread.setUnreadCount(1);
             thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
             //
