@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:21:59
+ * @LastEditTime: 2024-12-25 12:34:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,7 +72,13 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent() ) {
             thread = threadOptional.get();
-            if (thread.isProcessing() && !visitorRequest.getForceAgent()) {
+            // 
+            if (thread.isRobot() && !visitorRequest.getForceAgent()) {
+                // 机器人接待，不转人工
+                return getAgentProcessingMessage(visitorRequest, thread);
+            }
+            
+            if (thread.isStarted()) {
                 // 返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing thread {}", topic);
                 return getAgentProcessingMessage(visitorRequest, threadOptional.get());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:14:42
+ * @LastEditTime: 2024-12-25 12:33:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,7 +83,7 @@ public class ThreadEntity extends BaseEntity {
     private String type = ThreadTypeEnum.WORKGROUP.name();
 
     @Builder.Default
-    private String state = ThreadStateEnum.INITIAL.name();
+    private String state = ThreadStateEnum.ROBOT.name();
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
     // @Builder.Default
@@ -209,13 +209,17 @@ public class ThreadEntity extends BaseEntity {
     }
 
     public ThreadEntity reInit() {
-        this.state = ThreadStateEnum.INITIAL.name();
+        this.state = ThreadStateEnum.ROBOT.name();
         this.hide = false;
         // this.solved = false;
         // this.rated = false;
         this.autoClose = false;
         this.robot = false;
         return this;
+    }
+
+    public Boolean isRobot() {
+        return this.state.equals(ThreadStateEnum.ROBOT.name());
     }
 
     //
@@ -233,10 +237,6 @@ public class ThreadEntity extends BaseEntity {
 
     public Boolean isQueuing() {
         return this.state.equals(ThreadStateEnum.QUEUING.name());
-    }
-
-    public Boolean isProcessing() {
-        return !this.isClosed() && !this.isOffline();
     }
 
     public Boolean isCustomerService() {

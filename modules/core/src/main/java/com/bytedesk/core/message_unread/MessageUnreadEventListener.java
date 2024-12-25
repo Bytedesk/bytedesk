@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-17 16:31:29
+ * @LastEditTime: 2024-12-25 12:32:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+// TODO: 添加过期时间，过期之后，自动删除
 @Slf4j
 @Component
 @AllArgsConstructor
@@ -47,7 +48,7 @@ public class MessageUnreadEventListener {
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
-        // log.info("message unread create event: {}", message.getContent());
+        log.info("message unread create event: {} {} {}", message.getUid(), message.getType(), message.getContent());
         // 缓存未读消息
         String threadTopic = message.getThreadTopic();
         String userString = message.getUser();
@@ -62,7 +63,7 @@ public class MessageUnreadEventListener {
             }
             String agentUid = splits[2];
             String visitorUid = splits[3];
-            log.info("agentUid {}, visitorUid {}", agentUid, visitorUid);
+            // log.info("onMessageCreateEvent agentUid {}, visitorUid {}", agentUid, visitorUid);
             // 仅缓存接受者未读消息
             if (userUid.equals(agentUid)) {
                 messageUnreadService.create(message, visitorUid);
@@ -131,6 +132,7 @@ public class MessageUnreadEventListener {
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
+        log.info("message unread update event: {} {} {}", message.getUid(), message.getType(), message.getContent());
         //
         String threadTopic = message.getThreadTopic();
         MessageStatusEnum messageState = MessageStatusEnum.fromValue(message.getStatus());
@@ -147,7 +149,7 @@ public class MessageUnreadEventListener {
             }
             String agentUid = splits[2];
             String visitorUid = splits[3];
-            log.info("agentUid {}, visitorUid {}", agentUid, visitorUid);
+            log.info("onMessageUpdateEvent agentUid {}, visitorUid {}", agentUid, visitorUid);
             //
             messageUnreadService.delete(agentUid);
             messageUnreadService.delete(visitorUid);
