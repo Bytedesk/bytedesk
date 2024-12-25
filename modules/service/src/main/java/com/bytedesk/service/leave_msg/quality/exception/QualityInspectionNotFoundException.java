@@ -1,4 +1,4 @@
-package com.bytedesk.service.quality.exception;
+package com.bytedesk.service.leave_msg.quality.exception;
 
 public class QualityInspectionNotFoundException extends QualityException {
     

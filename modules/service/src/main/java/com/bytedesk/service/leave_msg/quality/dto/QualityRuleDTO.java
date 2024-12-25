@@ -1,4 +1,4 @@
-package com.bytedesk.service.quality.dto;
+package com.bytedesk.service.leave_msg.quality.dto;
 
 import lombok.Data;
 import jakarta.validation.constraints.*;

@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class QueueEntityListener {
-    
 
     @PostPersist
     public void postPersist(QueueEntity queue) {

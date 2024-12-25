@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 15:08:26
+ * @LastEditTime: 2024-12-25 16:29:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,7 +60,7 @@ public class RouteService {
 
     private final QueueMemberRestService queueMemberRestService; ;
 
-    public MessageProtobuf routeRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
+    public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
             @Nonnull RobotEntity robot) {
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
@@ -76,7 +76,7 @@ public class RouteService {
         return messageProtobuf;
     }
 
-    public MessageProtobuf routeAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread,
+    public MessageProtobuf routeToAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread,
             @Nonnull AgentEntity agent) {
         // log.info("RouteService routeAgent: {}", agent.getUid());
         // 排队计数
@@ -129,7 +129,7 @@ public class RouteService {
         }
     }
 
-    public MessageProtobuf routeWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread,
+    public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
         log.info("RouteServiceImplVip routeWorkgroup: {}", workgroup.getUid());
         
@@ -176,4 +176,5 @@ public class RouteService {
 
     }
 
+    
 }

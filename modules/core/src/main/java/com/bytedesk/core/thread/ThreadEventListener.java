@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:06:38
+ * @LastEditTime: 2024-12-25 16:28:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -79,7 +79,7 @@ public class ThreadEventListener {
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
         ThreadEntity thread = event.getThread();
         UserEntity user = thread.getOwner();
-        log.info("topic onThreadUpdateEvent: {}", thread.getUid());
+        log.info("thread onThreadUpdateEvent: {}", thread.getUid());
         // TODO: 会话关闭之后，需要取消订阅
         
         // 机器人接待的会话存在user == null的情况，不需要订阅topic
