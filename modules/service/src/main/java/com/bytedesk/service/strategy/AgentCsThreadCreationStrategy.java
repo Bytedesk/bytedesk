@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 12:52:18
+ * @LastEditTime: 2024-12-25 13:14:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -73,23 +72,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         if (threadOptional.isPresent() ) {
             thread = threadOptional.get();
             // 
-            if (!visitorRequest.getForceAgent()) {
-                // 不强制转人工
-                if (thread.isClosed() || thread.isOffline()) {
-                    // 会话已经关闭，重新初始化会话
-                    thread = threadOptional.get().reInit();
-                    agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
-                } else if (thread.isStarted()) {
-                    // 会话进行中，且不转人工
-                    return getAgentContinueMessage(visitorRequest, thread);
-                } else if (thread.isQueuing()) {
-                    // 会话排队中，且不转人工
-                    return getAgentQueuingMessage(visitorRequest, thread);
-                } else {
-                    // 机器人会话，不转人工
-                    return getAgentContinueMessage(visitorRequest, thread);
-                }
-            } else if (thread.isRobot()) {
+            if (thread.isRobot()) {
                 // 强制转人工，机器人接待的情况下，重新初始化会话
                 thread = threadOptional.get().reInit();
                 agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
@@ -112,22 +95,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         }
         // 重新初始化会话额外信息，例如客服状态等
         thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
-        // 未强制转人工的情况下，判断是否转机器人
-        if (!visitorRequest.getForceAgent()) {
-            // 判断是否需要转机器人
-            Boolean isOffline = !agent.isConnectedAndAvailable();
-            Boolean isInServiceTime = agent.getLeaveMsgSettings().isInServiceTime();
-            Boolean transferToRobot = agent.getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime);
-            if (transferToRobot) {
-                // 转机器人
-                RobotEntity robot = agent.getRobotSettings().getRobot();
-                if (robot != null) {
-                    return routeService.routeRobot(visitorRequest, thread, robot);
-                } else {
-                    throw new RuntimeException("Robot not found");
-                }
-            }
-        }
         // 人工客服
         return routeService.routeAgent(visitorRequest, thread, agent);
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 17:34:26
+ * @LastEditTime: 2024-12-25 13:13:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,27 +73,25 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
     //
-    public RobotSettings formatAgentRobotSettings(AgentRequest request) {
-        // 
-        if (request == null || request.getRobotSettings() == null) {
-            return RobotSettings.builder().build();
-        }
-        //
-        RobotSettings serviceSettings = modelMapper.map(request.getRobotSettings(), RobotSettings.class);
-        //
-        if (StringUtils.hasText(request.getRobotSettings().getRobotUid())) {
-            Optional<RobotEntity> robotOptional = robotService.findByUid(request.getRobotSettings().getRobotUid());
-            if (robotOptional.isPresent()) {
-                RobotEntity robot = robotOptional.get();
-                serviceSettings.setRobot(robot);
-            } else {
-                throw new RuntimeException(request.getRobotSettings().getRobotUid() + " is not found.");
-            }
-        }
-        
-
-        return serviceSettings;
-    }
+    // public RobotSettings formatAgentRobotSettings(AgentRequest request) {
+    //     // 
+    //     if (request == null || request.getRobotSettings() == null) {
+    //         return RobotSettings.builder().build();
+    //     }
+    //     //
+    //     RobotSettings serviceSettings = modelMapper.map(request.getRobotSettings(), RobotSettings.class);
+    //     //
+    //     if (StringUtils.hasText(request.getRobotSettings().getRobotUid())) {
+    //         Optional<RobotEntity> robotOptional = robotService.findByUid(request.getRobotSettings().getRobotUid());
+    //         if (robotOptional.isPresent()) {
+    //             RobotEntity robot = robotOptional.get();
+    //             serviceSettings.setRobot(robot);
+    //         } else {
+    //             throw new RuntimeException(request.getRobotSettings().getRobotUid() + " is not found.");
+    //         }
+    //     }
+    //     return serviceSettings;
+    // }
 
     public ServiceSettings formatAgentServiceSettings(AgentRequest request) {
         // 
