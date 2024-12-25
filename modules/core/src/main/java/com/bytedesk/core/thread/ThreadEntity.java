@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 14:48:19
+ * @LastEditTime: 2024-12-25 15:11:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.thread;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -86,10 +82,9 @@ public class ThreadEntity extends BaseEntity {
     private String state = ThreadStateEnum.QUEUING.name();
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
-    // @Builder.Default
-    // private int serialNumber = 1;
+    @Builder.Default
+    private int queueNumber = 1;
 
-    // 客户端需要此字段，暂时保留，TODO: 需要与真实未读消息数同步
     @Builder.Default
     private int unreadCount = 1;
 
@@ -187,15 +182,15 @@ public class ThreadEntity extends BaseEntity {
     // 示例4: 分级支持
     thread.setRequiredSkills("level-2,database");
      */
-    @Column(length = 500)
-    private String requiredSkills;  // 会话所需技能,逗号分隔
+    // @Column(length = 500)
+    // private String requiredSkills;  // 会话所需技能,逗号分隔
     
-    public List<String> getRequiredSkillList() {
-        if (requiredSkills == null || requiredSkills.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(requiredSkills.split(","));
-    }
+    // public List<String> getRequiredSkillList() {
+    //     if (requiredSkills == null || requiredSkills.isEmpty()) {
+    //         return new ArrayList<>();
+    //     }
+    //     return Arrays.asList(requiredSkills.split(","));
+    // }
 
     public ThreadEntity reInitAgent() {
         this.state = ThreadStateEnum.QUEUING.name();
