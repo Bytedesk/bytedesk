@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 15:31:55
+ * @LastEditTime: 2024-12-25 16:01:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -325,7 +324,8 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             throw new RuntimeException("thread save failed");
         }
         // 
-        bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<ThreadCloseEvent>(this, new ThreadCloseEvent(this, updateThread)));
+        // bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<ThreadCloseEvent>(this, new ThreadCloseEvent(this, updateThread)));
+        bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(updateThread));
         // 发布关闭消息, 通知用户
         String content = threadRequest.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED

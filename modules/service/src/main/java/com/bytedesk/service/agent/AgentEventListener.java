@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-02 15:42:35
+ * @LastEditTime: 2024-12-25 15:57:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -140,9 +140,11 @@ public class AgentEventListener {
     }
 
     @EventListener
-    public void onThreadCloseEvent(GenericApplicationEvent<ThreadCloseEvent> event) {
-        ThreadCloseEvent threadCloseEvent = (ThreadCloseEvent) event.getObject();
-        ThreadEntity thread = threadCloseEvent.getThread();
+    // public void onThreadCloseEvent(GenericApplicationEvent<ThreadCloseEvent> event) {
+        public void onThreadCloseEvent(ThreadCloseEvent event) {
+        // ThreadCloseEvent threadCloseEvent = (ThreadCloseEvent) event.getObject();
+        // ThreadEntity thread = threadCloseEvent.getThread();
+        ThreadEntity thread = event.getThread();
         log.info("agent onThreadCloseEvent: {}", thread.getAgent());
         String agentString = thread.getAgent();
         UserProtobuf agentProtobuf = JSON.parseObject(agentString, UserProtobuf.class);
@@ -151,7 +153,7 @@ public class AgentEventListener {
             AgentEntity agent = agentService.findByUid(agentProtobuf.getUid()).orElseThrow(() -> new RuntimeException("agent not found"));
             agent.decreaseThreadCount();
             agentService.save(agent);
-        }
+        } 
     }
 
 
