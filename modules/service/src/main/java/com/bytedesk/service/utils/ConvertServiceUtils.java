@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 10:53:27
+ * @LastEditTime: 2024-12-26 10:11:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -108,7 +108,8 @@ public class ConvertServiceUtils {
     }
 
     public static String convertToUserProtobufJSONString(AgentEntity agent) {
-        return JSON.toJSONString(convertToUserProtobuf(agent));
+        UserProtobuf userProtobuf = convertToUserProtobuf(agent);
+        return JSON.toJSONString(userProtobuf);
     }
 
     //

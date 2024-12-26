@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 23:40:21
+ * @LastEditTime: 2024-12-26 10:03:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,9 +18,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadUpdateEvent;
+import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
+import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.service.queue_member.event.QueueMemberCreateEvent;
 
 import lombok.AllArgsConstructor;
@@ -56,5 +57,10 @@ public class QueueMemberEventListener {
         ThreadEntity thread = event.getThread();
         log.info("queue member onThreadCloseEvent: {}", thread.getAgent());
     }
-    
+
+    @EventListener
+    public void onThreadAcceptEvent(ThreadAcceptEvent event) {
+        ThreadEntity thread = event.getThread();
+        log.info("queue member onThreadAcceptEvent: {}", thread.getAgent());
+    }
 }

@@ -26,6 +26,7 @@ import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserUpdateEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
+import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicService;

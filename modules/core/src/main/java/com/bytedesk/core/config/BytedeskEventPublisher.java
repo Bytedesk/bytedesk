@@ -46,8 +46,8 @@ import com.bytedesk.core.socket.stomp.StompDisconnectedEvent;
 import com.bytedesk.core.socket.stomp.StompSubscribeEvent;
 import com.bytedesk.core.socket.stomp.StompUnsubscribeEvent;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadUpdateEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
+import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.topic.TopicCreateEvent;
 import com.bytedesk.core.topic.TopicUpdateEvent;
 

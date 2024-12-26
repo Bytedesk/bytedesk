@@ -17,8 +17,8 @@ package com.bytedesk.service.visitor_thread;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.thread.ThreadUpdateEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
+import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 
