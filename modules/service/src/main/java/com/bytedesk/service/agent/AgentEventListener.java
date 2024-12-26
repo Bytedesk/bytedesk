@@ -47,7 +47,7 @@ import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
-import com.bytedesk.service.strategy.ThreadMessageUtil;
+import com.bytedesk.service.utils.ThreadMessageUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
