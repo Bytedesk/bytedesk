@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:10:27
+ * @LastEditTime: 2024-12-26 14:49:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,6 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
     }
 
     public MessageProtobuf createRobotCsThread(VisitorRequest visitorRequest) {
-        //
         String robotUid = visitorRequest.getSid();
         RobotEntity robot = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
@@ -98,21 +97,8 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
     private MessageProtobuf getRobotMessage(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        //
-        // boolean isReenter = true;
-        // if (thread.getState() == ThreadStateEnum.STARTED.name()) {
-        //     isReenter = false;
-        // }
-        // if thread is closed, reopen it and then create a new message
-        // if (thread.isClosed()) {
-        //     isReenter = false;
-        //     thread.setStatus(ThreadStateEnum.RESTART.name());
-        // } else {
-        //     thread.setStatus(isReenter ? ThreadStateEnum.CONTINUE.name() : ThreadStateEnum.STARTED.name());
-        // }
         threadService.save(thread);
         //
-        // UserProtobuf user = modelMapper.map(robot, UserProtobuf.class);
         UserProtobuf user = ConvertAiUtils.convertToUserProtobuf(robot);
         //
         JSONObject userExtra = new JSONObject();
