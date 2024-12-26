@@ -34,8 +34,8 @@ import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.service.strategy.ThreadMessageUtil;
 import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
