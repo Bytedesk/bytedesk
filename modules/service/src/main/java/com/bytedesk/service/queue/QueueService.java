@@ -112,6 +112,7 @@ public class QueueService {
             .visitorUid(visitorRequest.getUid())
             .agentUid(agentEntity.getUid())
             .queueNumber(queue.getNextNumber())
+            .beforeNumber(queue.getWaitingNumber())
             .enqueueTime(LocalDateTime.now())
             .status(QueueMemberStatusEnum.WAITING.name())
             .build();

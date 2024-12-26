@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 12:14:36
+ * @LastEditTime: 2024-12-26 12:49:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -106,8 +106,9 @@ public class RouteService {
                 messageSendService.sendProtobufMessage(messageProtobuf);
             } else {
                 // 已满则排队
-                String queueTip = agent.getQueueSettings().getQueueTip();
-                String content = queueTip + " 当前排队人数：" + queueMemberEntity.getQueueNumber() + " 大约等待时间：" + queueMemberEntity.getWaitTime() + " 分钟";
+                // String queueTip = agent.getQueueSettings().getQueueTip();
+                // 大约等待时间 = 前面排队人数 * 2 分钟，TODO: 需要优化
+                String content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
                 // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
                 
                 // 进入排队队列

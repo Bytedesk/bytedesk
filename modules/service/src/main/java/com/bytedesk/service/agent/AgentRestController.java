@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-18 17:12:08
+ * @LastEditTime: 2024-12-26 12:38:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,12 +48,6 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    /**
-     * query by user self
-     * 
-     * @param request
-     * @return
-     */
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
@@ -62,12 +56,15 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
 
-    /**
-     * create
-     *
-     * @param request agent
-     * @return json
-     */
+    @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
+    @PostMapping("/sync/current/thread/count")
+    public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
+
+        AgentResponse agent = agentService.syncCurrentThreadCount(request);
+        
+        return ResponseEntity.ok(JsonResult.success(agent));
+    }
+
     @ActionAnnotation(title = "agent", action = "create", description = "create agent")
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
@@ -80,12 +77,6 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    /**
-     * update
-     *
-     * @param request agent
-     * @return json
-     */
     @ActionAnnotation(title = "agent", action = "update", description = "update agent")
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
