@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 15:27:55
+ * @LastEditTime: 2024-12-26 15:34:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,11 +18,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.routing.RouteService;
@@ -86,8 +84,8 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private MessageProtobuf getRobotContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
-        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("getRobotContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        // UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        // log.info("getRobotContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
         // 
         return ThreadMessageUtil.getThreadRobotWelcomeMessage(thread);
     }
