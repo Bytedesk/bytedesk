@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 12:10:23
+ * @LastEditTime: 2024-12-26 13:02:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,13 +56,12 @@ public class ThreadMessageUtil {
         return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
     }
 
-
     // 将此方法设为静态，以便在没有实例化类的情况下调用
     public static MessageProtobuf getThreadWelcomeMessage(AgentEntity agent, ThreadEntity thread) {
         UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
-                .content(thread.getContent())
+                .content(agent.getServiceSettings().getWelcomeTip())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
@@ -72,7 +71,6 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        // 
         message.setThreadTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());

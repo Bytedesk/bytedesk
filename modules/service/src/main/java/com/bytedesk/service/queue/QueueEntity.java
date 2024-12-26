@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:06:03
+ * @LastEditTime: 2024-12-26 12:53:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,6 +109,13 @@ public class QueueEntity extends BaseEntity {
      */
     public void decreaseServingNumber() {
         this.servingNumber--;
+    }
+
+    /**
+     * 增加已完成人数
+     */
+    public void increaseServedNumber() {
+        this.servedNumber++;
     }
 
     /**
