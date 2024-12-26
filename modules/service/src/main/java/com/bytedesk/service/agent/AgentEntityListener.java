@@ -24,6 +24,7 @@ import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.service.agent.event.AgentCreateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;

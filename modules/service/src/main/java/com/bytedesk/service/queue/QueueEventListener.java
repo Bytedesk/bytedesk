@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 22:19:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:01:21
+ * @LastEditTime: 2024-12-26 11:43:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,6 @@ import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.topic.TopicUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueEventListener {
 
     private final QueueRestService queueRestService;
+    // private final IMessageSendService messageSendService;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
