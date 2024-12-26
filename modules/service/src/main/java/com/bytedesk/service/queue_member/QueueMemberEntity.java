@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:07:55
+ * @LastEditTime: 2024-12-26 14:53:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -95,6 +95,12 @@ public class QueueMemberEntity extends BaseEntity {
     private int maxResponseTime = 0;  // 最长响应时间(秒)
 
     @Builder.Default
+    private int agentMessageCount = 0;  // 客服消息数量
+
+    @Builder.Default
+    private int visitorMessageCount = 0;  // 访客消息数量
+
+    @Builder.Default
     @Column(name = "is_timeout")
     private boolean timeout = false; // 是否超时
 
@@ -116,6 +122,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_rated")
     private boolean rated = false;
+    
 
     /**
      * 计算等待时间(秒)

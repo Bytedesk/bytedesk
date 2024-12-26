@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 14:47:22
+ * @LastEditTime: 2024-12-26 15:24:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,14 +34,14 @@ import java.time.LocalDateTime;
 // 如果该方法不需要被Spring容器管理，则不需要此注解
 public class ThreadMessageUtil {
 
-    public static MessageProtobuf getThreadRobotWelcomeMessage(UserProtobuf user, ThreadEntity thread) {
+    public static MessageProtobuf getThreadRobotWelcomeMessage(ThreadEntity thread) {
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .content(thread.getContent())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(user))
+                .user(thread.getAgent())
                 .build();
         message.setUid(UidUtils.getInstance().getUid());
         message.setOrgUid(thread.getOrgUid());

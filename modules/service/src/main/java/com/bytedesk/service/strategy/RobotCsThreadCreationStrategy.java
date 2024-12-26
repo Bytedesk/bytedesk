@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 14:49:11
+ * @LastEditTime: 2024-12-26 15:27:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,24 +19,25 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.visitor_thread.VisitorThreadService;
+
+import jakarta.annotation.Nonnull;
+
 import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 // 机器人对话策略器人
+@Slf4j
 @Component("robotCsThreadStrategy")
 @AllArgsConstructor
 public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
@@ -45,68 +46,50 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final ThreadRestService threadService;
 
-    private final UidUtils uidUtils;
+    private final VisitorThreadService visitorThreadService;
+
+    private final RouteService routeService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
         return createRobotCsThread(visitorRequest);
     }
 
+    // 机器人对话，不支持转人工
     public MessageProtobuf createRobotCsThread(VisitorRequest visitorRequest) {
         String robotUid = visitorRequest.getSid();
         RobotEntity robot = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
-        //
-        ThreadEntity thread = getRobotThread(visitorRequest, robot);
-        //
-        return getRobotMessage(visitorRequest, thread, robot);
-    }
-
-    private ThreadEntity getRobotThread(VisitorRequest visitorRequest, RobotEntity robot) {
-        //
+        //  
         String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
-        // TODO: 到visitor thread表中拉取
-        ThreadEntity thread = ThreadEntity.builder().build();
+        // 
+        ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             thread = threadOptional.get();
+            // 
+            if (thread.isStarted()) {
+                // 返回未关闭，或 非留言状态的会话
+                log.info("Already have a processing robot thread {}", topic);
+                return getRobotContinueMessage(visitorRequest, threadOptional.get());
+            } else {
+                // 重新初始化
+                thread = threadOptional.get().reInitRobot();
+            }
         } else {
-            //
-            thread = ThreadEntity.builder().build();
-            thread.setUid(uidUtils.getCacheSerialUid());
-            thread.setTopic(topic);
-            thread.setType(ThreadTypeEnum.ROBOT.name());
-            thread.setUnreadCount(0);
-            // thread.setClient(ClientEnum.fromValue(visitorRequest.getClient()).name());
-            thread.setClient(visitorRequest.getClient());
-            thread.setOrgUid(robot.getOrgUid());
-            //
-            UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
-            thread.setUser(JSON.toJSONString(visitor));
+            thread = visitorThreadService.createRobotThread(visitorRequest, robot, topic);
         }
-        //
-        thread.setExtra(JSON.toJSONString(ConvertAiUtils.convertToServiceSettingsResponseVisitor(
-                robot.getServiceSettings())));
-        //
-        UserProtobuf agentProtobuf = ConvertAiUtils.convertToUserProtobuf(robot);
-        thread.setAgent(JSON.toJSONString(agentProtobuf));
-        //
-        return thread;
+        thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
+
+        return routeService.routeToRobot(visitorRequest, thread, robot);
     }
 
-    private MessageProtobuf getRobotMessage(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
+    private MessageProtobuf getRobotContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
-        thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        threadService.save(thread);
-        //
-        UserProtobuf user = ConvertAiUtils.convertToUserProtobuf(robot);
-        //
-        JSONObject userExtra = new JSONObject();
-        userExtra.put("llm", robot.getLlm().isEnabled());
-        userExtra.put("defaultReply", robot.getDefaultReply());
-        user.setExtra(JSON.toJSONString(userExtra));
-        //
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(user, thread);
+        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        log.info("getRobotContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        // 
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(thread);
     }
 
 }

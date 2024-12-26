@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 14:52:43
+ * @LastEditTime: 2024-12-26 15:19:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,11 +51,8 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final VisitorThreadService visitorThreadService;
 
-    // private final IRouteService routeService;
     private final RouteService routeService;
     
-    // private final IMessageSendService messageSendService;
-
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
         return createAgentCsThread(visitorRequest);
@@ -88,7 +85,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         } else {
             // 不存在会话，创建会话
             agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
-            thread = visitorThreadService.getAgentThread(visitorRequest, agent, topic);
+            thread = visitorThreadService.createAgentThread(visitorRequest, agent, topic);
         }
         // 重新初始化会话额外信息，例如客服状态等
         thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
@@ -101,11 +98,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("getAgentContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
-        // 重复进入，无需推送消息
-        // messageSendService.sendProtobufMessage(messageProtobuf);
-
-        return messageProtobuf;
+        return ThreadMessageUtil.getThreadContinueMessage(user, thread);
     }
 
     private MessageProtobuf getAgentQueuingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
@@ -113,11 +106,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("getAgentQueuingMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueuingMessage(user, thread);
-        // 重复进入，无需推送消息
-        // messageSendService.sendProtobufMessage(messageProtobuf);
-
-        return messageProtobuf;
+        return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
 
     
