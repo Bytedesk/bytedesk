@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:24:27
+ * @LastEditTime: 2024-12-26 12:14:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -105,10 +105,15 @@ public class RouteService {
                 messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             } else {
+                // 已满则排队
+                String queueTip = agent.getQueueSettings().getQueueTip();
+                String content = queueTip + " 当前排队人数：" + queueMemberEntity.getQueueNumber() + " 大约等待时间：" + queueMemberEntity.getWaitTime() + " 分钟";
+                // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                
                 // 进入排队队列
                 thread.setQueuing();
                 thread.setUnreadCount(0);
-                thread.setContent(agent.getQueueSettings().getQueueTip());
+                thread.setContent(content);
                 thread.setQueueNumber(queueMemberEntity.getQueueNumber());
                 // 
                 messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
@@ -177,6 +182,8 @@ public class RouteService {
         }
 
     }
+
+
 
 
 }
