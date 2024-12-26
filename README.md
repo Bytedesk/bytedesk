@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 17:03:04
+ * @LastEditTime: 2024-12-27 07:30:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -107,13 +107,14 @@ Enterprise IM Solution with AI powered live-chat, email support, Omnichannel cus
 | [UniApp](https://github.com/bytedesk/bytedesk-uniapp) | Uniapp | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp) |
 | [Vue/jQuery](https://github.com/bytedesk/bytedesk-web) | Vue/jQuery | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web) |
 
-## Download Client
+## Client
 
-- [Windows](https://www.weiyuai.cn/download.html)
-- [Mac](https://www.weiyuai.cn/download.html)
-- [Linux](https://www.weiyuai.cn/download.html)
-- [Android](https://www.weiyuai.cn/download.html)
-- [IOS](https://www.weiyuai.cn/download.html)
+- [Download](https://www.weiyuai.cn/download.html)
+<!-- - [Windows](https://www.weiyuai.cn/download.html) -->
+<!-- - [Mac](https://www.weiyuai.cn/download.html) -->
+<!-- - [Linux](https://www.weiyuai.cn/download.html) -->
+<!-- - [Android](https://www.weiyuai.cn/download.html) -->
+<!-- - [IOS](https://www.weiyuai.cn/download.html) -->
 
 <!-- ## Dev Stack -->
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
@@ -123,10 +124,10 @@ Enterprise IM Solution with AI powered live-chat, email support, Omnichannel cus
 <!-- - [flutter for ios&android](https://github.com/Bytedesk/bytedesk-mobile) -->
 <!-- - [electron for windows&mac&linux](https://github.com/Bytedesk/bytedesk-desktop) -->
 
-## Contact
+<!-- ## Contact -->
 
-- [Email](mailto:270580156@qq.com)
-- [Wechat](./images/wechat.png)
+<!-- - [Email](mailto:270580156@qq.com) -->
+<!-- - [Wechat](./images/wechat.png) -->
 <!-- - 微语技术支持群：
 - <img src="./images/wechat_group.jpg" width="200">
 - 如群二维码过期，请添加微信，备注: 微语

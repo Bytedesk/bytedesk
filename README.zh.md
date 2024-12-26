@@ -153,11 +153,12 @@
 
 ## 客户端
 
-- [Windows](https://www.weiyuai.cn/download.html)
-- [Mac](https://www.weiyuai.cn/download.html)
-- [Linux](https://www.weiyuai.cn/download.html)
-- [Android](https://www.weiyuai.cn/download.html)
-- [IOS](https://www.weiyuai.cn/download.html)
+- [下载](https://www.weiyuai.cn/download.html)
+<!-- - [Windows](https://www.weiyuai.cn/download.html) -->
+<!-- - [Mac](https://www.weiyuai.cn/download.html) -->
+<!-- - [Linux](https://www.weiyuai.cn/download.html) -->
+<!-- - [Android](https://www.weiyuai.cn/download.html) -->
+<!-- - [IOS](https://www.weiyuai.cn/download.html) -->
 
 <!-- ## 技术栈 -->
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->
@@ -169,8 +170,8 @@
 
 ## 联系
 
-- [Email](mailto:270580156@qq.com)
-- [微信](./images/wechat.png)
+<!-- - [Email](mailto:270580156@qq.com) -->
+<!-- - [微信](./images/wechat.png) -->
 - 微语技术支持群：
 - <img src="./images/wechat_group.jpg" width="200">
 <!-- - 如群二维码过期，请添加微信，备注: 微语 -->
