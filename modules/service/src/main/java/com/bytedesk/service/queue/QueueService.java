@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,6 +93,16 @@ public class QueueService {
         AgentEntity agentEntity, 
         VisitorRequest visitorRequest, 
         QueueEntity queue) {
+
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByQueueTopicAndQueueDayAndThreadUidAndStatus(
+            queue.getTopic(), 
+            queue.getDay(), 
+            threadEntity.getUid(), 
+            QueueMemberStatusEnum.WAITING.name()
+        );
+        if (memberOptional.isPresent()) {
+            return memberOptional.get();
+        }
         // 
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
@@ -127,21 +138,21 @@ public class QueueService {
         return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     }
     
-    @Transactional
-    public void dequeue(String threadTopic, QueueStatusEnum status) {
-        // 1. 查找队列成员
-        QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
-            .orElseThrow(() -> new RuntimeException("Queue member not found"));
+    // @Transactional
+    // public void dequeue(String threadTopic, QueueStatusEnum status) {
+    //     // 1. 查找队列成员
+    //     QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
+    //         .orElseThrow(() -> new RuntimeException("Queue member not found"));
 
-        // 2. 更新状态
-        member.updateStatus(status.name(), null);
-        queueMemberRepository.save(member);
+    //     // 2. 更新状态
+    //     member.updateStatus(status.name(), null);
+    //     queueMemberRepository.save(member);
 
-        // 3. 更新队列统计
-        QueueEntity queue = queueRepository.findByUid(member.getQueueUid())
-            .orElseThrow(() -> new RuntimeException("Queue not found"));
-        updateQueueStats(queue);
-    }
+    //     // 3. 更新队列统计
+    //     QueueEntity queue = queueRepository.findByUid(member.getQueueUid())
+    //         .orElseThrow(() -> new RuntimeException("Queue not found"));
+    //     updateQueueStats(queue);
+    // }
 
     
     public List<String> getQueuedThreads(QueueStatusEnum status) {
@@ -153,12 +164,12 @@ public class QueueService {
     }
 
     
-    public int getQueuePosition(String threadTopic) {
-        QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
-            .orElseThrow(() -> new RuntimeException("Queue member not found"));
-        return queueMemberRepository.countByQueueUidAndPriorityGreaterThan(
-            member.getQueueUid(), member.getPriority());
-    }
+    // public int getQueuePosition(String threadTopic) {
+    //     QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
+    //         .orElseThrow(() -> new RuntimeException("Queue member not found"));
+    //     return queueMemberRepository.countByQueueUidAndPriorityGreaterThan(
+    //         member.getQueueUid(), member.getPriority());
+    // }
 
     
     @Transactional
@@ -175,26 +186,26 @@ public class QueueService {
     }
 
     
-    public int getEstimatedWaitTime(String threadUid) {
-        QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadUid)
-            .orElseThrow(() -> new RuntimeException("Queue member not found"));
+    // public int getEstimatedWaitTime(String threadUid) {
+    //     QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadUid)
+    //         .orElseThrow(() -> new RuntimeException("Queue member not found"));
             
-        // 1. 获取前面等待数量
-        int queuePosition = queueMemberRepository.countByQueueUidAndPriorityGreaterThan(
-            member.getQueueUid(), member.getPriority());
+    //     // 1. 获取前面等待数量
+    //     int queuePosition = queueMemberRepository.countByQueueUidAndPriorityGreaterThan(
+    //         member.getQueueUid(), member.getPriority());
         
-        // 2. 获取平均会话时长(10分钟)
-        int avgThreadDuration = 10;
+    //     // 2. 获取平均会话时长(10分钟)
+    //     int avgThreadDuration = 10;
         
-        // 3. 获取在线客服数量
-        List<String> onlineAgents = agentService.getOnlineAgents();
-        if (onlineAgents.isEmpty()) {
-            return -1;
-        }
+    //     // 3. 获取在线客服数量
+    //     List<String> onlineAgents = agentService.getOnlineAgents();
+    //     if (onlineAgents.isEmpty()) {
+    //         return -1;
+    //     }
         
-        // 4. 计算预计等待时间
-        return (queuePosition * avgThreadDuration) / onlineAgents.size();
-    }
+    //     // 4. 计算预计等待时间
+    //     return (queuePosition * avgThreadDuration) / onlineAgents.size();
+    // }
 
     @Transactional
     public void checkQueueTimeout() {
