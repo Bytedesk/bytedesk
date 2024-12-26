@@ -103,7 +103,7 @@ public class QueueService {
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
-        // 
+        // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
             .queueTopic(queue.getTopic())

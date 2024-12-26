@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:01:08
+ * @LastEditTime: 2024-12-26 11:06:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,7 +78,7 @@ public class QueueMemberEventListener {
         );
         if (memberOptional.isPresent()) {
             QueueMemberEntity member = memberOptional.get();
-            member.setStatus(QueueMemberStatusEnum.SERVING.name());
+            member.acceptThread();
             queueMemberRestService.save(member);
         } else {
             log.error("queue member onThreadAcceptEvent: member not found: {}", thread.getUid());

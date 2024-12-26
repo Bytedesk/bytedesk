@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 10:40:10
+ * @LastEditTime: 2024-12-26 11:07:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -79,7 +79,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
 
-    private String acceptType;  // 接单方式, 自动、手动，不设置默认
+    private String acceptType ;  // 接单方式, 自动、手动，不设置默认
 
     private LocalDateTime acceptTime;  // 开始服务时间
 
@@ -138,5 +138,13 @@ public class QueueMemberEntity extends BaseEntity {
         } else if (QueueMemberStatusEnum.valueOf(newStatus).isEndStatus()) {
             this.closeTime = LocalDateTime.now();
         }
+    }
+
+    public void acceptThread() {
+        this.status = QueueMemberStatusEnum.SERVING.name();
+        this.acceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
+        this.acceptTime = LocalDateTime.now();
+        // 计算等待时间
+        this.waitTime = (int) Duration.between(enqueueTime, acceptTime).getSeconds();
     }
 }
