@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 11:29:57
+ * @LastEditTime: 2024-12-26 10:48:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,17 +29,14 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.queue.QueueEntity;
-
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, QueueMemberRequest, QueueMemberResponse> {
 
-    private final QueueMemberRepository visitorQueueMemberRepository;
+    private final QueueMemberRepository queueMemberRepository;
 
     private final ModelMapper modelMapper;
 
@@ -52,7 +49,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
         Specification<QueueMemberEntity> specification = QueueMemberSpecification.search(request);
-        Page<QueueMemberEntity> page = visitorQueueMemberRepository.findAll(specification, pageable);
+        Page<QueueMemberEntity> page = queueMemberRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
 
@@ -67,22 +64,18 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
         Specification<QueueMemberEntity> specification = QueueMemberSpecification.search(request);
-        Page<QueueMemberEntity> page = visitorQueueMemberRepository.findAll(specification, pageable);
+        Page<QueueMemberEntity> page = queueMemberRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
 
     @Cacheable(value = "counter", key = "#uid")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {
-        return visitorQueueMemberRepository.findByUid(uid);
+        return queueMemberRepository.findByUid(uid);
     }
 
-    public QueueMemberResponse getQueueMember(QueueEntity queueEntity, ThreadEntity threadEntity) {
-
-        
-
-
-        return null;
+    public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
+        return queueMemberRepository.findByThreadUid(threadUid);
     }
 
     @Override
@@ -106,7 +99,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     @Override
     public QueueMemberEntity save(QueueMemberEntity entity) {
         try {
-            return visitorQueueMemberRepository.save(entity);
+            return queueMemberRepository.save(entity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -126,7 +119,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     }
 
     public void deleteAll() {
-        visitorQueueMemberRepository.deleteAll();
+        queueMemberRepository.deleteAll();
     }
 
     @Override

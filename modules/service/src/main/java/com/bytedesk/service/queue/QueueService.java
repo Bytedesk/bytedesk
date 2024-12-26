@@ -17,6 +17,7 @@ import com.bytedesk.service.agent.AgentService;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 
@@ -30,7 +31,9 @@ public class QueueService {
 
     private final QueueRepository queueRepository;
     
-    private final QueueMemberRepository memberRepository;
+    private final QueueMemberRepository queueMemberRepository;
+
+    private final QueueMemberRestService queueMemberRestService;
 
     private final AgentService agentService;
 
@@ -46,7 +49,7 @@ public class QueueService {
             throw new QueueFullException("Queue is full or not active");
         }
         // 2. 创建队列成员
-        QueueMemberEntity member = createQueueMemberEntity(threadEntity, agentEntity, visitorRequest, queue);
+        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, agentEntity, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -84,10 +87,16 @@ public class QueueService {
         }
     }
 
-    public QueueMemberEntity createQueueMemberEntity(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest, QueueEntity queue) {
+    @Transactional
+    public QueueMemberEntity getOrCreateQueueMember(ThreadEntity threadEntity, 
+        AgentEntity agentEntity, 
+        VisitorRequest visitorRequest, 
+        QueueEntity queue) {
         // 
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
+            .queueTopic(queue.getTopic())
+            .queueDay(queue.getDay())
             .threadUid(threadEntity.getUid())
             .visitorUid(visitorRequest.getUid())
             .agentUid(agentEntity.getUid())
@@ -98,19 +107,15 @@ public class QueueService {
         member.setUid(uidUtils.getUid());
         member.setOrgUid(threadEntity.getOrgUid());
         // 
-        QueueMemberEntity savedMember = memberRepository.save(member);
-        if (savedMember == null) {
-            throw new RuntimeException("Failed to create queue member");
-        }
-        return savedMember;
+        return queueMemberRestService.save(member);
     }
 
     private void updateQueueStats(QueueEntity queue) {
-        int waiting = memberRepository.countByQueueUidAndStatus(
+        int waiting = queueMemberRepository.countByQueueUidAndStatus(
             queue.getUid(), QueueMemberStatusEnum.WAITING.name());
-        int serving = memberRepository.countByQueueUidAndStatus(
+        int serving = queueMemberRepository.countByQueueUidAndStatus(
             queue.getUid(), QueueMemberStatusEnum.SERVING.name());
-        int finished = memberRepository.countByQueueUidAndEndStatusIsTrue(queue.getUid());
+        int finished = queueMemberRepository.countByQueueUidAndEndStatusIsTrue(queue.getUid());
         int avgWait = calculateAverageWaitTime(queue.getUid());
         
         queue.updateStats(waiting, serving, finished, avgWait);
@@ -118,19 +123,19 @@ public class QueueService {
     }
 
     private int calculateAverageWaitTime(String queueUid) {
-        Double avgWaitTime = memberRepository.calculateAverageWaitTime(queueUid);
+        Double avgWaitTime = queueMemberRepository.calculateAverageWaitTime(queueUid);
         return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     }
     
     @Transactional
     public void dequeue(String threadTopic, QueueStatusEnum status) {
         // 1. 查找队列成员
-        QueueMemberEntity member = memberRepository.findByThreadUid(threadTopic)
+        QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
 
         // 2. 更新状态
         member.updateStatus(status.name(), null);
-        memberRepository.save(member);
+        queueMemberRepository.save(member);
 
         // 3. 更新队列统计
         QueueEntity queue = queueRepository.findByUid(member.getQueueUid())
@@ -149,9 +154,9 @@ public class QueueService {
 
     
     public int getQueuePosition(String threadTopic) {
-        QueueMemberEntity member = memberRepository.findByThreadUid(threadTopic)
+        QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
-        return memberRepository.countByQueueUidAndPriorityGreaterThan(
+        return queueMemberRepository.countByQueueUidAndPriorityGreaterThan(
             member.getQueueUid(), member.getPriority());
     }
 
@@ -171,11 +176,11 @@ public class QueueService {
 
     
     public int getEstimatedWaitTime(String threadUid) {
-        QueueMemberEntity member = memberRepository.findByThreadUid(threadUid)
+        QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadUid)
             .orElseThrow(() -> new RuntimeException("Queue member not found"));
             
         // 1. 获取前面等待数量
-        int queuePosition = memberRepository.countByQueueUidAndPriorityGreaterThan(
+        int queuePosition = queueMemberRepository.countByQueueUidAndPriorityGreaterThan(
             member.getQueueUid(), member.getPriority());
         
         // 2. 获取平均会话时长(10分钟)
@@ -195,14 +200,14 @@ public class QueueService {
     public void checkQueueTimeout() {
         // 1. 获取所有等待中的成员
         List<QueueMemberEntity> waitingMembers = 
-            memberRepository.findByStatus(QueueMemberStatusEnum.WAITING.name());
+            queueMemberRepository.findByStatus(QueueMemberStatusEnum.WAITING.name());
         
         // 2. 检查超时
         LocalDateTime now = LocalDateTime.now();
         for (QueueMemberEntity member : waitingMembers) {
             if (member.getEnqueueTime().plusMinutes(30).isBefore(now)) {
                 member.updateStatus(QueueMemberStatusEnum.TIMEOUT.name(), null);
-                memberRepository.save(member);
+                queueMemberRepository.save(member);
                 
                 // 更新队列统计
                 QueueEntity queue = queueRepository.findByUid(member.getQueueUid())
@@ -220,7 +225,7 @@ public class QueueService {
         try {
             // 1. 获取等待中的成员(按优先级排序)
             List<QueueMemberEntity> waitingMembers = 
-                memberRepository.findByStatusOrderByPriorityDesc(
+                queueMemberRepository.findByStatusOrderByPriorityDesc(
                     QueueMemberStatusEnum.WAITING.name());
             if (waitingMembers.isEmpty()) {
                 return;
@@ -244,7 +249,7 @@ public class QueueService {
                     
                     // 更新排队状态
                     member.updateStatus(QueueMemberStatusEnum.COMPLETED.name(), agent.getUid());
-                    memberRepository.save(member);
+                    queueMemberRepository.save(member);
                     
                     // 更新队列统计
                     QueueEntity queue = queueRepository.findByUid(member.getQueueUid())

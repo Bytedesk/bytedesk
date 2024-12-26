@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 17:52:53
+ * @LastEditTime: 2024-12-26 10:40:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,6 +47,12 @@ public class QueueMemberEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String queueUid;  // 关联队列
+
+    @Column(nullable = false)
+    private String queueTopic;  // 队列主题，用于查询
+
+    @Column(nullable = false)
+    private String queueDay;  // 队列日期，用于查询
 
     @Column(nullable = false)
     private String threadUid;  // 关联会话
