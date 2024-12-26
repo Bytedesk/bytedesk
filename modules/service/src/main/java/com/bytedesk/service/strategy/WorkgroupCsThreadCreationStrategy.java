@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:58:47
+ * @LastEditTime: 2024-12-26 14:49:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,12 +81,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         WorkgroupEntity workgroup = workgroupService.findByUid(workgroupUid)
                 .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
         // 
-        // String orgUid = visitorRequest.getOrgUid();
-        // String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
-        // QueueMemberResponse counter = counterService.getNumber(orgUid, topic, visitor);
-        // counterVisitorService.saveNumber(orgUid, topic, counter.getCurrentNumber(), visitor);
-        // log.info("counter topic: {}, count {}", topic, counter.getCurrentNumber());
-        //
         ThreadEntity thread = null;
         if (threadOptional.isPresent()) {
             // 存在会话，且已经关闭，重新初始化
