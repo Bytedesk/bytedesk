@@ -50,6 +50,7 @@ import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
+import com.bytedesk.service.agent.event.AgentUpdateEvent;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 16:06:57
+ * @LastEditTime: 2024-12-26 11:41:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,14 +73,6 @@ public class ThreadMessageUtil {
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
         // 
-        // if (user.getType().equals(UserTypeEnum.ROBOT.name())) {
-        //     message.setType(MessageTypeEnum.WELCOME.name());
-        //     message.setContent(thread.getContent());
-        // }
-        //
-        // if (thread.isOffline()) {
-        //     message.setType(MessageTypeEnum.LEAVE_MSG.name());
-        // }
         message.setThreadTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());

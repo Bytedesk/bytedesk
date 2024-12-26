@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:16:33
+ * @LastEditTime: 2024-12-26 11:41:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,8 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
@@ -44,6 +46,9 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
+import com.bytedesk.service.agent.event.AgentCreateEvent;
+import com.bytedesk.service.strategy.ThreadMessageUtil;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +61,7 @@ public class AgentEventListener {
     private final KnowledgebaseService knowledgebaseService;
     private final UidUtils uidUtils;
     private final MqttConnectionService mqttConnectionService;
+    private final IMessageSendService messageSendService;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
     @Order(6)
@@ -154,17 +160,24 @@ public class AgentEventListener {
         } 
     }
 
-    // 客服接待数量发生变化，增加接待数量
+    // 客服接待数量发生变化，增加接待数量，发送欢迎语
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
-        log.info("agent onThreadAcceptEvent: {}", event);
-        String agentString = event.getThread().getAgent();
+        // log.info("agent onThreadAcceptEvent: {}", event);
+        ThreadEntity thread = event.getThread();
+        String agentString = thread.getAgent();
+        log.info("agent onThreadAcceptEvent: {}", agentString);
         UserProtobuf agentProtobuf = JSON.parseObject(agentString, UserProtobuf.class);
         Optional<AgentEntity> agentOptional = agentService.findByUid(agentProtobuf.getUid());
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             agent.increaseThreadCount();
             agentService.save(agent);
+            // 发送欢迎语
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        } else {
+            log.error("agent not found");
         }
     }
 
