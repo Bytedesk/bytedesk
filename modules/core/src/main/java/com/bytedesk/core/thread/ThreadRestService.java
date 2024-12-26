@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 22:30:53
+ * @LastEditTime: 2024-12-26 10:12:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,6 +46,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
+import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -347,18 +348,17 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
         }
-
         ThreadEntity thread = threadOptional.get();
-        // thread.setAgentUid(threadRequest.getAgentUid());
+        thread.setState(ThreadStateEnum.STARTED.name());
+        thread.setAgent(threadRequest.getAgent());
         // thread.setAcceptType(threadRequest.getAcceptType());
-        // thread.setQueueNumber(threadRequest.getQueueNumber());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-
-        // TODO: 通知queue更新，queue member更新
+        // 通知queue更新，queue member更新
+        bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(updateThread));
 
         return convertToResponse(updateThread);
     }
