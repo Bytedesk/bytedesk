@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 10:13:41
+ * @LastEditTime: 2024-12-26 10:17:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -143,6 +143,7 @@ public class ThreadEntity extends BaseEntity {
      * 机器人会话中，存储访客信息
      * 群组会话中，存储群组信息
      * 注意：h2 db 不能使用 user, 所以重定义为 thread_user
+     * @{UserProtobuf}
      */
     @Builder.Default
     @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
