@@ -64,6 +64,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         return createWorkgroupCsThread(visitorRequest);
     }
 
+    // 工作组对话，默认机器人接待，支持转人工
     public MessageProtobuf createWorkgroupCsThread(VisitorRequest visitorRequest) {
         //
         String workgroupUid = visitorRequest.getSid();

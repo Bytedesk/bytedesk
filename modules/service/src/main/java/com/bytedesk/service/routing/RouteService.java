@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 13:50:23
+ * @LastEditTime: 2024-12-26 15:24:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -63,16 +62,11 @@ public class RouteService {
             @Nonnull RobotEntity robot) {
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        // 使用agent的serviceSettings配置
-        UserProtobuf user = ConvertAiUtils.convertToUserProtobuf(robot);
-        thread.setAgent(JSON.toJSONString(user));
-        //
         thread.setRobot(true);
         thread.setUnreadCount(0);
         threadService.save(thread);
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadRobotWelcomeMessage(user, thread);
-        return messageProtobuf;
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(thread);
     }
 
     public MessageProtobuf routeToAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread,

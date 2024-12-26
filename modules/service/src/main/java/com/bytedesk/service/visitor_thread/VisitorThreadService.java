@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 10:45:57
+ * @LastEditTime: 2024-12-26 15:21:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,10 +31,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
@@ -108,7 +111,7 @@ public class VisitorThreadService
     }
 
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
-        // 
+        //
         ThreadEntity thread = ThreadEntity.builder()
                 .topic(topic)
                 .client(visitorRequest.getClient())
@@ -136,7 +139,7 @@ public class VisitorThreadService
         return thread;
     }
 
-    public ThreadEntity getAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
+    public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .topic(topic)
@@ -150,7 +153,7 @@ public class VisitorThreadService
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
-        // 
+        //
         return thread;
     }
 
@@ -162,6 +165,35 @@ public class VisitorThreadService
         // 考虑到客服信息发生变化，更新客服信息
         String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
         thread.setAgent(agentString);
+        //
+        return thread;
+    }
+
+    public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
+        //
+        ThreadEntity thread = ThreadEntity.builder()
+                .topic(topic)
+                .type(ThreadTypeEnum.ROBOT.name())
+                .state(ThreadStateEnum.STARTED.name())
+                .client(visitorRequest.getClient())
+                .build();
+        thread.setUid(uidUtils.getUid());
+        thread.setOrgUid(robot.getOrgUid());
+        //
+        UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
+        thread.setUser(JSON.toJSONString(visitor));
+        //
+        return thread;
+    }
+
+    public ThreadEntity reInitRobotThreadExtra(ThreadEntity thread, RobotEntity robot) {
+        //
+        String extra = ConvertServiceUtils
+                .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
+        thread.setExtra(extra);
+        // 使用agent的serviceSettings配置
+        String robotString = ConvertAiUtils.convertToUserProtobufString(robot);
+        thread.setAgent(robotString);
         //
         return thread;
     }
