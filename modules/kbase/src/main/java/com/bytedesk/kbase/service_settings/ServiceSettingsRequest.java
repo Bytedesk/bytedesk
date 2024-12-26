@@ -29,7 +29,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 @Data
-@Builder
+I18N_QUEUE_MESSAGE_TEMPLATE
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceSettingsRequest  implements Serializable {
