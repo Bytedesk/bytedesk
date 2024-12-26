@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 22:20:22
+ * @LastEditTime: 2024-12-26 11:16:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.service.agent;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.context.event.EventListener;
@@ -35,6 +36,7 @@ import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.socket.mqtt.MqttDisconnectedEvent;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
@@ -127,13 +129,11 @@ public class AgentEventListener {
         }
     }
 
-    // TODO: 新创建会话，更新客服当前接待数量
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         // log.info("agent onThreadCreateEvent: " + event);
     }
 
-    // TODO: 会话关闭，更新客服当前接待数量
     @EventListener
     public void onThreadUpdateEvent(ThreadUpdateEvent event) {
         // log.info("agent onThreadUpdateEvent: " + event);
@@ -141,6 +141,7 @@ public class AgentEventListener {
 
     @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {
+        // log.info("agent onThreadCloseEvent: " + event);
         ThreadEntity thread = event.getThread();
         log.info("agent onThreadCloseEvent: {}", thread.getAgent());
         String agentString = thread.getAgent();
@@ -151,6 +152,20 @@ public class AgentEventListener {
             agent.decreaseThreadCount();
             agentService.save(agent);
         } 
+    }
+
+    // 客服接待数量发生变化，增加接待数量
+    @EventListener
+    public void onThreadAcceptEvent(ThreadAcceptEvent event) {
+        log.info("agent onThreadAcceptEvent: {}", event);
+        String agentString = event.getThread().getAgent();
+        UserProtobuf agentProtobuf = JSON.parseObject(agentString, UserProtobuf.class);
+        Optional<AgentEntity> agentOptional = agentService.findByUid(agentProtobuf.getUid());
+        if (agentOptional.isPresent()) {
+            AgentEntity agent = agentOptional.get();
+            agent.increaseThreadCount();
+            agentService.save(agent);
+        }
     }
 
 
