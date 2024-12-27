@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 14:16:36
+ * @LastEditTime: 2024-12-27 14:30:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -153,15 +153,15 @@ public class RobotEventListener {
                     throw new RuntimeException("thread with topic " + threadTopic + " not found");
                 }
                 ThreadEntity thread = threadOptional.get();
-                // MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+                MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
                 //
                 String agent = thread.getAgent();
-                UserProtobuf user = JSON.parseObject(agent, UserProtobuf.class);
-                // RobotProtobuf robotProtobuf = JSON.parseObject(agent, RobotProtobuf.class);
-                // UserProtobuf user = UserProtobuf.builder().build();
-                // user.setUid(robotProtobuf.getUid());
-                // user.setNickname(robotProtobuf.getNickname());
-                // user.setAvatar(robotProtobuf.getAvatar());
+                RobotProtobuf robotProtobuf = JSON.parseObject(agent, RobotProtobuf.class);
+                UserProtobuf user = UserProtobuf.builder().build();
+                user.setUid(robotProtobuf.getUid());
+                user.setNickname(robotProtobuf.getNickname());
+                user.setAvatar(robotProtobuf.getAvatar());
+                user.setType(UserTypeEnum.ROBOT.name());
                 //
                 String messageUid = uidUtils.getUid();
                 MessageProtobuf message = MessageProtobuf.builder()
@@ -170,7 +170,7 @@ public class RobotEventListener {
                         .thread(threadProtobuf)
                         .user(user)
                         .client(ClientEnum.ROBOT)
-                        .extra(messageProtobuf.getExtra())
+                        .extra(JSONObject.toJSONString(extraObject))
                         .createdAt(LocalDateTime.now())
                         .build();
                 // 返回一个输入中消息，让访客端显示输入中
@@ -188,8 +188,7 @@ public class RobotEventListener {
                     // 目前所有的模型都使用zhipu
                     zhipuaiService.sendWsMessage(query, robotProtobuf.getLlm(), message);
                 }
-                //
-                sendRobotReply(threadProtobuf, user, query, robot);
+                // sendRobotReply(threadProtobuf, user, query, robot);
             } else {
                 log.error("robot not found");
             }

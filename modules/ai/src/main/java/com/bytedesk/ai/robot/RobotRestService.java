@@ -179,7 +179,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         thread.setState(ThreadStateEnum.STARTED.name());
         //
         String user = JSON.toJSONString(request.getUser());
-        log.info("request {}, user {}", request.toString(), user);
+        // log.info("request {}, user {}", request.toString(), user);
         thread.setUser(user);
         //
         String[] splits = topic.split("/");
