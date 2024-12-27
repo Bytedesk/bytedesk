@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 14:37:18
+ * @LastEditTime: 2024-12-27 14:45:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -197,7 +197,6 @@ public class RobotEventListener {
             // 机器人客服对话
             log.info("robot agent/workgroup threadTopic {}, thread.type {}", threadTopic,
                     threadProtobuf.getType());
-            // TODO: 取消查库
             ThreadEntity thread = threadService.findFirstByTopic(threadTopic)
                     .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                             " not found"));
