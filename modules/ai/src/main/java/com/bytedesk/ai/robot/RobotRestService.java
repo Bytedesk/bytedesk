@@ -81,7 +81,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC,
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
                 "updatedAt");
         Specification<RobotEntity> specification = RobotSpecification.search(request);
         Page<RobotEntity> page = robotRepository.findAll(specification, pageable);
