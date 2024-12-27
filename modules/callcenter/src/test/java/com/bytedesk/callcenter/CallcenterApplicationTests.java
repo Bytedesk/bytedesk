@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-02 12:19:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 12:04:12
+ * @LastEditTime: 2024-12-27 09:57:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,13 +12,13 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call;
+package com.bytedesk.callcenter;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CallApplicationTests {
+class CallcenterApplicationTests {
 
 	@Test
 	void contextLoads() {
