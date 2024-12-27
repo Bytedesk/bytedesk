@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 12:00:59
+ * @LastEditTime: 2024-12-27 12:13:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,7 @@ public class RobotLlm {
     // 不起用llm的情况，默认使用关键词匹配
     @Builder.Default
     @Column(name = "is_llm_enabled")
-    private boolean enabled = false;
+    private boolean enabled = true;
 
     @Builder.Default
     @Column(name = "llm_top_k")
