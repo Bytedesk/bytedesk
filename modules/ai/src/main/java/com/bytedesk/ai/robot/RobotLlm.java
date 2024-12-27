@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 12:13:44
+ * @LastEditTime: 2024-12-27 12:18:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,8 +32,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RobotLlm {
 
-    // 默认不起用llm问答，需要管理后台手动启动
-    // 不起用llm的情况，默认使用关键词匹配
+    // 默认启用llm问答
     @Builder.Default
     @Column(name = "is_llm_enabled")
     private boolean enabled = true;
