@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 11:04:04
+ * @LastEditTime: 2024-12-27 11:47:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -417,7 +417,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 .nickname(I18Consts.I18N_ROBOT_AGENT_ASSISTANT_NICKNAME)
                 .build();
         robotRequest.setUid(uid);
-        robotRequest.setType(RobotTypeEnum.KB.name());
+        robotRequest.setType(RobotTypeEnum.LLM.name());
         robotRequest.setOrgUid(orgUid);
         //
         return create(robotRequest);
