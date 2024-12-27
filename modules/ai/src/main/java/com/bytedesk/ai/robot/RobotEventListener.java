@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 14:30:05
+ * @LastEditTime: 2024-12-27 14:37:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -157,11 +157,12 @@ public class RobotEventListener {
                 //
                 String agent = thread.getAgent();
                 RobotProtobuf robotProtobuf = JSON.parseObject(agent, RobotProtobuf.class);
-                UserProtobuf user = UserProtobuf.builder().build();
+                UserProtobuf user = UserProtobuf.builder()
+                        .nickname(robotProtobuf.getNickname())
+                        .avatar(robotProtobuf.getAvatar())
+                        .type(UserTypeEnum.ROBOT.name())
+                    .build();
                 user.setUid(robotProtobuf.getUid());
-                user.setNickname(robotProtobuf.getNickname());
-                user.setAvatar(robotProtobuf.getAvatar());
-                user.setType(UserTypeEnum.ROBOT.name());
                 //
                 String messageUid = uidUtils.getUid();
                 MessageProtobuf message = MessageProtobuf.builder()

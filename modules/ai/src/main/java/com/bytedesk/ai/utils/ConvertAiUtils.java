@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 15:23:18
+ * @LastEditTime: 2024-12-27 14:34:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,6 +38,11 @@ public class ConvertAiUtils {
 
     public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
         return modelMapper.map(entity, RobotProtobuf.class);
+    }
+
+    public static String convertToRobotProtobufString(RobotEntity entity) {
+        RobotProtobuf robotProtobuf = convertToRobotProtobuf(entity);
+        return JSON.toJSONString(robotProtobuf);
     }
 
     public static UserProtobuf convertToUserProtobuf(RobotEntity entity) {
