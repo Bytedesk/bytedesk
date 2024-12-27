@@ -1,5 +1,13 @@
 [
   {
+    "uid": "1",
+    "nickname": "空白智能体 - void agent",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "",
+    "description": ""
+  },
+  {
     "uid": "3",
     "nickname": "社群运营 - Community Operations",
     "type": "LLM",
