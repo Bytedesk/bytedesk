@@ -18,14 +18,14 @@ public enum MessageStatusEnum {
     SENDING, // sending
     TIMEOUT, // network send failed
     BLOCKED, // in black list
-    NOTFRIEND, // not friend
+    STRANGER, // not friend
     ERROR, // other send error
     SUCCESS, // send success
     RECALL, // recall back
     DELIVERED, // send to the other client
     READ, // read by the other client
     DESTROYED, // destroyed after read
-    UNPRECESSED, // leave message unprocessed
+    UNPROCESSED, // leave message unprocessed
     PROCESSED, // leave message processed
     LEAVE_MSG_SUBMIT, // 提交留言
     RATE_SUBMIT, // 提交会话评价
