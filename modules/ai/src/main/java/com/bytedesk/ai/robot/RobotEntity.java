@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:00:23
+ * @LastEditTime: 2024-12-27 11:37:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,9 +60,15 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
 
+    @Builder.Default
+    private boolean isLlmEnabled = false;
+
     @Embedded
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
+
+    @Builder.Default
+    private boolean isFlowEnabled = false;
 
     @Embedded
     @Builder.Default
@@ -81,7 +87,6 @@ public class RobotEntity extends BaseEntity {
     @Column(name = "robot_type", nullable = false)
     private String type = RobotTypeEnum.SERVICE.name();
 
-    // private、team、public
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
 
@@ -93,9 +98,8 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private boolean published = false;
 
-    // @Builder.Default
-    // @Column(name = "is_private")
-    // private boolean isPrivate = false;
+    @Builder.Default
+    private boolean isKbEnabled = false;
 
     private String kbUid; // 对应知识库
 
