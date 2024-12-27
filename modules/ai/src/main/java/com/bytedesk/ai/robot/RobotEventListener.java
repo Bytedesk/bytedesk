@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 11:46:13
+ * @LastEditTime: 2024-12-27 12:02:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -132,7 +132,7 @@ public class RobotEventListener {
             if (robotOptional.isPresent()) {
                 RobotEntity robot = robotOptional.get();
 
-                if (robot.isLlmEnabled()) {
+                if (robot.getLlm().isEnabled()) {
                     // 调用大模型
                     if (robot.isKbEnabled()) {
                         // 搜索知识库
@@ -140,7 +140,7 @@ public class RobotEventListener {
 
                     // 调用大模型
 
-                } else if (robot.isFlowEnabled()) {
+                } else if (robot.getFlow().isEnabled()) {
                     // 调用流程引擎
                 } else if (robot.isKbEnabled()) {
                     // 搜索知识库

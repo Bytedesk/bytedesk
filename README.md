@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 07:30:39
+ * @LastEditTime: 2024-12-27 12:04:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,10 +12,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 -->
-# Bytedesk
+# Bytedesk - Chat as a Service
 
-Enterprise IM Solution with AI powered live-chat, email support, Omnichannel customer service，alternative to slack + zendesk/intercom
-<!-- Chat as a Service -->
+AI powered live-chat, email support, Omnichannel customer service，alternative to zendesk/intercom
 
 ## Language
 
