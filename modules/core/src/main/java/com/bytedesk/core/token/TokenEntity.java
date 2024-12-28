@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 11:12:26
+ * @LastEditTime: 2024-12-28 12:25:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,16 +12,13 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.token;
+package com.bytedesk.core.token;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.utils.StringSetConverter;
-
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -63,11 +60,11 @@ public class TokenEntity extends BaseEntity {
     @Column(name = "token_type")
     private String type;
 
-    private Long expireTime;
+    private LocalDateTime expiresAt;
 
     @Builder.Default
-    @Column(name = "is_valid")
-    private boolean valid = true;
+    @Column(name = "is_revoked")
+    private boolean revoked = false;
 
     // user, no need map, just uid
     @NotBlank
@@ -86,7 +83,8 @@ public class TokenEntity extends BaseEntity {
 
     // 验证token是否有效
     public boolean isValid() {
-        return !revoked && expiresAt.after(new Date());
+        // return !revoked && expiresAt.after(LocalDateTime.now());
+        return !revoked && expiresAt.isAfter(LocalDateTime.now());
     }
 
     // 撤销token
@@ -95,7 +93,7 @@ public class TokenEntity extends BaseEntity {
     }
 
     // 刷新token过期时间
-    public void refresh(Date newExpiresAt) {
+    public void refresh(LocalDateTime newExpiresAt) {
         this.expiresAt = newExpiresAt;
     }
 

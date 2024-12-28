@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 11:24:29
+ * @LastEditTime: 2024-12-28 12:29:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.team.group;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -98,29 +97,33 @@ public class GroupEntity extends BaseEntity {
     private UserEntity creator;
 
     // 群组设置
+    @Builder.Default
     private Integer maxMembers = 500;  // 最大成员数
+    @Builder.Default
     private Boolean needApproval = true; // 是否需要审批
+    @Builder.Default
     private Boolean allowInvite = true;  // 是否允许邀请
+    @Builder.Default
     private Boolean muteAll = false;     // 是否全员禁言
 
     // 邀请用户加入群组
     public void inviteMembers(List<UserEntity> users) {
-        if (!allowInvite) {
-            throw new GroupOperationException("Group does not allow invitations");
-        }
+        // if (!allowInvite) {
+        //     throw new GroupOperationException("Group does not allow invitations");
+        // }
 
-        if (members.size() + users.size() > maxMembers) {
-            throw new GroupOperationException("Group member limit exceeded");
-        }
+        // if (members.size() + users.size() > maxMembers) {
+        //     throw new GroupOperationException("Group member limit exceeded");
+        // }
 
-        for (UserEntity user : users) {
-            MemberEntity member = MemberEntity.builder()
-                .user(user)
-                .group(this)
-                .joinTime(LocalDateTime.now())
-                .build();
-            members.add(member);
-        }
+        // for (UserEntity user : users) {
+        //     MemberEntity member = MemberEntity.builder()
+        //         .user(user)
+        //         .group(this)
+        //         .joinTime(LocalDateTime.now())
+        //         .build();
+        //     members.add(member);
+        // }
     }
 
     // 移除群成员
@@ -177,26 +180,26 @@ public class GroupEntity extends BaseEntity {
 
     // 处理邀请
     public void handleInvite(GroupInviteEntity invite, boolean accept) {
-        if (invite.getStatus() != GroupInviteStatus.PENDING) {
-            throw new GroupOperationException("Invite is not pending");
-        }
+        // if (invite.getStatus() != GroupInviteStatus.PENDING) {
+        //     throw new GroupOperationException("Invite is not pending");
+        // }
 
-        if (accept) {
-            // 接受邀请
-            if (members.size() >= maxMembers) {
-                throw new GroupOperationException("Group is full");
-            }
+        // if (accept) {
+        //     // 接受邀请
+        //     if (members.size() >= maxMembers) {
+        //         throw new GroupOperationException("Group is full");
+        //     }
             
-            MemberEntity member = MemberEntity.builder()
-                .user(invite.getInvitee())
-                .group(this)
-                .joinTime(LocalDateTime.now())
-                .build();
-            members.add(member);
-            invite.setStatus(GroupInviteStatus.ACCEPTED);
-        } else {
-            // 拒绝邀请
-            invite.setStatus(GroupInviteStatus.REJECTED);
-        }
+        //     MemberEntity member = MemberEntity.builder()
+        //         .user(invite.getInvitee())
+        //         .group(this)
+        //         .joinTime(LocalDateTime.now())
+        //         .build();
+        //     members.add(member);
+        //     invite.setStatus(GroupInviteStatus.ACCEPTED);
+        // } else {
+        //     // 拒绝邀请
+        //     invite.setStatus(GroupInviteStatus.REJECTED);
+        // }
     }
 }
