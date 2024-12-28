@@ -76,6 +76,10 @@ public class UserEntity extends BaseEntityNoOrg {
 	// @Column(unique = true) // email + platform unique
 	private String email;
 
+	// 国家
+	@Builder.Default
+	private String country = "86";
+
 	// @Digits(message = "phone length error", fraction = 0, integer = 11)
 	// @Column(unique = true) // mobile + platform unique
     // only support chinese mobile number, 
