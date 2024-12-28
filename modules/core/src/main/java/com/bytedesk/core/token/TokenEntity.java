@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 11:00:16
+ * @LastEditTime: 2024-12-28 11:12:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,5 +78,25 @@ public class TokenEntity extends BaseEntity {
     // @Builder.Default
     // @Convert(converter = StringSetConverter.class)
     // private Set<String> clientIds = new HashSet<>();
+
+    // 生成token
+    public String generateToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    // 验证token是否有效
+    public boolean isValid() {
+        return !revoked && expiresAt.after(new Date());
+    }
+
+    // 撤销token
+    public void revoke() {
+        this.revoked = true;
+    }
+
+    // 刷新token过期时间
+    public void refresh(Date newExpiresAt) {
+        this.expiresAt = newExpiresAt;
+    }
 
 }
