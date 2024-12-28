@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 15:56:57
+ * @LastEditTime: 2024-12-28 11:47:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -74,7 +74,8 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
-    // only support chinese mobile number, TODO: support other country mobile number using libphonenumber library
+    // only support chinese mobile number, 
+    // TODO: support other country mobile number using libphonenumber library
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = I18Consts.I18N_MOBILE_FORMAT_ERROR)
     private String mobile;
 
