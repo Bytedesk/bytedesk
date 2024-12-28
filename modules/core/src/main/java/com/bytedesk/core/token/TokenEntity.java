@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 23:04:02
+ * @LastEditTime: 2024-12-28 11:00:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,6 +52,10 @@ public class TokenEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    private String name;
+
+    private String description;
+
     private String accessToken;
 
     private String refreshToken;
@@ -71,8 +75,8 @@ public class TokenEntity extends BaseEntity {
     private String userUid;
 
     // current auth clientIds
-    @Builder.Default
-    @Convert(converter = StringSetConverter.class)
-    private Set<String> clientIds = new HashSet<>();
+    // @Builder.Default
+    // @Convert(converter = StringSetConverter.class)
+    // private Set<String> clientIds = new HashSet<>();
 
 }
