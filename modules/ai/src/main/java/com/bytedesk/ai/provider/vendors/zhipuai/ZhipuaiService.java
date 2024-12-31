@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 17:01:19
+ * @LastEditTime: 2024-12-31 17:48:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -297,8 +297,7 @@ public class ZhipuaiService {
     public void sendWsKbMessage(String query, String kbUid, RobotEntity robot, MessageProtobuf messageProtobuf) {
         //
         String prompt = robot.getLlm().getPrompt();
-        if (robot.getType().equals(RobotTypeEnum.SERVICE.name())
-                || robot.getType().equals(RobotTypeEnum.LLM.name())) {
+        if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
             List<String> contentList = uploadVectorStore.searchText(query, kbUid);
             String context = String.join("\n", contentList);
             prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
