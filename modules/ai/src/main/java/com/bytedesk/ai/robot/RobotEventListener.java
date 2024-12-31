@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 16:27:51
+ * @LastEditTime: 2024-12-31 16:59:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -118,7 +118,7 @@ public class RobotEventListener {
         String threadTopic = threadProtobuf.getTopic();
         if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
             // 内部大模型对话
-            log.info("robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+            log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // 机器人消息 org/robot/df_robot_uid/1420995827073219
             String[] splits = threadTopic.split("/");
             if (splits.length < 4) {
@@ -161,7 +161,7 @@ public class RobotEventListener {
                         .nickname(robotProtobuf.getNickname())
                         .avatar(robotProtobuf.getAvatar())
                         .type(UserTypeEnum.ROBOT.name())
-                    .build();
+                        .build();
                 user.setUid(robotProtobuf.getUid());
                 //
                 String messageUid = uidUtils.getUid();
@@ -189,13 +189,12 @@ public class RobotEventListener {
                     // 目前所有的模型都使用zhipu
                     zhipuaiService.sendWsMessage(query, robotProtobuf.getLlm(), message);
                 }
-                // sendRobotReply(threadProtobuf, user, query, robot);
             } else {
                 log.error("robot not found");
             }
         } else if (threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
             // 机器人客服对话
-            log.info("robot threadTopic {}, thread.type {}", threadTopic,
+            log.info("robot robot threadTopic {}, thread.type {}", threadTopic,
                     threadProtobuf.getType());
             ThreadEntity thread = threadService.findFirstByTopic(threadTopic)
                     .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
@@ -209,140 +208,42 @@ public class RobotEventListener {
                 RobotEntity robot = robotService.findByUid(agent.getUid())
                         .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
                 //
-                sendRobotReply(threadProtobuf, agent, query, robot);
+                MessageExtra extra = MessageUtils.getMessageExtra(robot.getOrgUid());
+                String messageUid = uidUtils.getUid();
+                MessageProtobuf message = MessageProtobuf.builder()
+                        .uid(messageUid)
+                        .status(MessageStatusEnum.SUCCESS)
+                        .thread(threadProtobuf)
+                        .user(agent)
+                        .client(ClientEnum.ROBOT)
+                        .extra(JSONObject.toJSONString(extra))
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+                // 返回一个输入中消息，让访客端显示输入中
+                MessageProtobuf clonedMessage = SerializationUtils.clone(message);
+                clonedMessage.setUid(uidUtils.getUid());
+                clonedMessage.setType(MessageTypeEnum.PROCESSING);
+                // MessageUtils.notifyUser(clonedMessage);
+                messageSendService.sendProtobufMessage(clonedMessage);
+                // 知识库
+                if (bytedeskProperties.getJavaAi()) {
+                    log.info("robot java ai kb");
+                    zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);
+                }
+                // 通知python ai模块处理回答
+                if (bytedeskProperties.getPythonAi()) {
+                    log.info("robot python");
+                    messageCache.put(messageUid, message);
+                    redisPubsubService.sendQuestionMessage(messageUid, threadTopic, robot.getKbUid(),
+                            query);
+                }
+                // sendRobotReply(threadProtobuf, agent, query, robot);
             }
         }
-
-        // 迁移到 robot type 字段
-        // if (threadProtobuf.getType().equals(ThreadTypeEnum.KB)) {
-        // // 知识库对话
-        // log.info("robot kb threadTopic {}, thread.type {}", threadTopic,
-        // threadProtobuf.getType());
-        // // 机器人客服消息 org/robot/df_robot_uid/1420995827073219
-        // String[] splits = threadTopic.split("/");
-        // if (splits.length < 4) {
-        // throw new RuntimeException("robot topic format error");
-        // }
-        // String robotUid = splits[2];
-        // if (!StringUtils.hasText(robotUid)) {
-        // throw new RuntimeException("robotUid is null");
-        // }
-        // Optional<RobotEntity> robotOptional = robotService.findByUid(robotUid);
-        // if (robotOptional.isPresent()) {
-        // RobotEntity robot = robotOptional.get();
-        // //
-        // UserProtobuf user = UserProtobuf.builder().build();
-        // user.setUid(robotUid);
-        // user.setNickname(robot.getNickname());
-        // user.setAvatar(robot.getAvatar());
-        // //
-        // sendRobotReply(threadProtobuf, user, query, robot);
-        // } else {
-        // log.error("robot not found");
-        // }
-        // } else if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
-        // log.info("robot llm threadTopic {}, thread.type {}", threadTopic,
-        // threadProtobuf.getType());
-        // // 大模型对话，无知识库
-        // Optional<ThreadEntity> threadOptional =
-        // threadService.findFirstByTopic(threadTopic);
-        // if (!threadOptional.isPresent()) {
-        // throw new RuntimeException("thread with topic " + threadTopic + " not
-        // found");
-        // }
-        // ThreadEntity thread = threadOptional.get();
-        // MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(),
-        // MessageExtra.class);
-        // //
-        // String agent = thread.getAgent();
-        // RobotProtobuf robotProtobuf = JSON.parseObject(agent, RobotProtobuf.class);
-        // UserProtobuf user = UserProtobuf.builder().build();
-        // user.setUid(robotProtobuf.getUid());
-        // user.setNickname(robotProtobuf.getNickname());
-        // user.setAvatar(robotProtobuf.getAvatar());
-        // //
-        // String messageUid = uidUtils.getUid();
-        // MessageProtobuf message = MessageProtobuf.builder()
-        // .uid(messageUid)
-        // .status(MessageStatusEnum.SUCCESS)
-        // .thread(threadProtobuf)
-        // .user(user)
-        // .client(ClientEnum.AUTO_REPLY)
-        // .extra(JSONObject.toJSONString(extraObject))
-        // .createdAt(LocalDateTime.now())
-        // .build();
-        // // 返回一个输入中消息，让访客端显示输入中
-        // MessageProtobuf clonedMessage = SerializationUtils.clone(message);
-        // clonedMessage.setUid(uidUtils.getUid());
-        // clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        // messageSendService.sendProtobufMessage(clonedMessage);
-        // // TODO: 获取大模型配置
-        // // robotProtobuf.getLlm().getProvider()
-        // // robotProtobuf.getLlm().getModel()
-        // //
-        // if (robotProtobuf.getLlm().getProvider().equals("ollama")) {
-        // ollamaService.sendWsMessage(query, robotProtobuf.getLlm(), message);
-        // } else {
-        // // 目前所有的模型都使用zhipu
-        // zhipuaiService.sendWsMessage(query, robotProtobuf.getLlm(), message);
-        // }
-        // }
-        // else if (threadProtobuf.getType().equals(ThreadTypeEnum.AGENT)
-        // || threadProtobuf.getType().equals(ThreadTypeEnum.WORKGROUP)
-        // || threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-        // log.info("robot agent/workgroup threadTopic {}, thread.type {}", threadTopic,
-        // threadProtobuf.getType());
-        // // TODO: 取消查库
-        // ThreadEntity thread = threadService.findFirstByTopic(threadTopic)
-        // .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
-        // " not found"));
-        // UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        // // 当前会话为机器人接待，而且是访客发送的消息
-        // if (agent.getType().equals(UserTypeEnum.ROBOT.name())
-        // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())) {
-        // // 机器人回复
-        // log.info("robot thread reply");
-        // RobotEntity robot = robotService.findByUid(agent.getUid())
-        // .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not
-        // found"));
-        // //
-        // sendRobotReply(threadProtobuf, agent, query, robot);
-        // }
-        // }
     }
 
-    private void sendRobotReply(ThreadProtobuf threadProtobuf, UserProtobuf user, String query, RobotEntity robot) {
-        //
-        String threadTopic = threadProtobuf.getTopic();
-        MessageExtra extra = MessageUtils.getMessageExtra(robot.getOrgUid());
-        //
-        String messageUid = uidUtils.getUid();
-        MessageProtobuf message = MessageProtobuf.builder()
-                .uid(messageUid)
-                .status(MessageStatusEnum.SUCCESS)
-                .thread(threadProtobuf)
-                .user(user)
-                .client(ClientEnum.AUTO_REPLY)
-                .extra(JSONObject.toJSONString(extra))
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        // 返回一个输入中消息，让访客端显示输入中
-        MessageProtobuf clonedMessage = SerializationUtils.clone(message);
-        clonedMessage.setUid(uidUtils.getUid());
-        clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        // MessageUtils.notifyUser(clonedMessage);
-        messageSendService.sendProtobufMessage(clonedMessage);
-        // 知识库
-        if (bytedeskProperties.getJavaAi()) {
-            zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);
-        }
-        // 通知python ai模块处理回答
-        if (bytedeskProperties.getPythonAi()) {
-            messageCache.put(messageUid, message);
-            redisPubsubService.sendQuestionMessage(messageUid, threadTopic, robot.getKbUid(),
-                    query);
-        }
-    }
+    // private void sendRobotReply(ThreadProtobuf threadProtobuf, UserProtobuf user, String query, RobotEntity robot) {
+    // }
 
 }
