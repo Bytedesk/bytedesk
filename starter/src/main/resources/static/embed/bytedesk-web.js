@@ -1,16 +1,113 @@
-var BytedeskWeb=function(){"use strict";var y=Object.defineProperty;var x=(p,m,e)=>m in p?y(p,m,{enumerable:!0,configurable:!0,writable:!0,value:e}):p[m]=e;var d=(p,m,e)=>x(p,typeof m!="symbol"?m+"":m,e);class p{constructor(e){d(this,"config");d(this,"bubble",null);d(this,"window",null);d(this,"isVisible",!1);d(this,"isDragging",!1);d(this,"dragStartX",0);d(this,"dragStartY",0);d(this,"initialX",0);d(this,"initialY",0);d(this,"windowState","normal");this.config={...this.getDefaultConfig(),...e}}getDefaultConfig(){return{theme:{preset:"blue",primaryColor:"#2e88ff",secondaryColor:"#ffffff",textColor:"#333333",backgroundColor:"#ffffff",position:"right",marginBottom:20,marginRight:20,navbar:{backgroundColor:"#ffffff",textColor:"#333333"}},window:{title:"在线客服",width:380,height:640,position:"right",marginBottom:20,marginRight:20},text:{bubbleMessage:{show:!0,icon:"👋",title:"需要帮助吗？",subtitle:"点击开始对话"},tabLabels:{home:"首页",messages:"消息",help:"帮助",news:"新闻"}},tabs:{home:!1,messages:!0,help:!1,news:!1},showSupport:!0}}init(){this.createBubble(),this.setupMessageListener()}createBubble(){var h,o,l,a,c,f,w,g;console.log("createBubble"),this.bubble=document.createElement("div");const e=this.bubble.style;e.position="fixed",e.zIndex="9999",e.display="inline-flex",e.flexDirection="column",e.alignItems="flex-end",e.bottom=`${((h=this.config.theme)==null?void 0:h.marginBottom)||30}px`,((o=this.config.theme)==null?void 0:o.position)==="left"?e.left=`${((l=this.config.theme)==null?void 0:l.marginLeft)||30}px`:e.right=`${((a=this.config.theme)==null?void 0:a.marginRight)||30}px`;const t=document.createElement("button");t.style.width="48px",t.style.height="48px",t.style.borderRadius="50%",t.style.backgroundColor=((c=this.config.theme)==null?void 0:c.primaryColor)||"#2e88ff",t.style.color=((f=this.config.theme)==null?void 0:f.secondaryColor)||"#ffffff",t.style.border="none",t.style.cursor="pointer",t.style.display="flex",t.style.alignItems="center",t.style.justifyContent="center",t.style.boxShadow="0 2px 6px rgba(0,0,0,0.2)",t.style.transition="transform 0.2s",t.style.outline="none",t.setAttribute("aria-label","打开聊天");const n=i=>{console.log("Button clicked - handleClick"),i.preventDefault(),i.stopPropagation(),this.window||this.createChatWindow(),this.window&&(this.window.style.display="flex",this.window.style.opacity="1",this.window.style.transform="translateY(0)",this.isVisible=!0,this.windowState="normal",this.bubble&&(this.bubble.style.display="none"))};if(t.onclick=n,t.innerHTML=`
-      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+var BytedeskWeb=function(){"use strict";var C=Object.defineProperty;var v=(g,c,t)=>c in g?C(g,c,{enumerable:!0,configurable:!0,writable:!0,value:t}):g[c]=t;var f=(g,c,t)=>v(g,typeof c!="symbol"?c+"":c,t);class g{constructor(t){f(this,"config");f(this,"bubble",null);f(this,"window",null);f(this,"isVisible",!1);f(this,"isDragging",!1);f(this,"windowState","normal");this.config={...this.getDefaultConfig(),...t}}getDefaultConfig(){return{baseUrl:"http://127.0.0.1:9006",placement:"bottom-right",marginBottom:20,marginSide:20,tabsConfig:{home:!1,messages:!0,help:!1,news:!1},bubbleConfig:{show:!0,icon:"👋",title:"需要帮助吗？",subtitle:"点击开始对话"},showSupport:!0,chatParams:{org:"df_org_uid",t:"2",sid:"df_rt_uid"},animation:{enabled:!0,duration:300,type:"ease"},theme:{mode:"system",textColor:"#ffffff",backgroundColor:"#0066FF"},window:{width:380,height:640},draggable:!1,locale:"zh-CN"}}init(){this.createBubble(),this.setupMessageListener(),this.setupResizeListener()}createBubble(){var s,o,r,m,b;const t=document.createElement("div");t.style.cssText=`
+      position: fixed;
+      ${this.config.placement==="bottom-left"?"left":"right"}: ${this.config.marginSide}px;
+      bottom: ${this.config.marginBottom}px;
+      display: flex;
+      flex-direction: column;
+      align-items: ${this.config.placement==="bottom-left"?"flex-start":"flex-end"};
+      gap: 10px;
+      z-index: 9999;
+    `;let e=null;if((s=this.config.bubbleConfig)!=null&&s.show){e=document.createElement("div"),e.style.cssText=`
+        background: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        max-width: 220px;
+        margin-bottom: 8px;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        position: relative;
+      `;const a=document.createElement("div");a.style.cssText=`
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      `;const l=document.createElement("span");l.textContent=((o=this.config.bubbleConfig)==null?void 0:o.icon)||"",l.style.fontSize="20px",a.appendChild(l);const d=document.createElement("div"),h=document.createElement("div");h.textContent=((r=this.config.bubbleConfig)==null?void 0:r.title)||"",h.style.fontWeight="bold",h.style.marginBottom="4px",d.appendChild(h);const i=document.createElement("div");i.textContent=((m=this.config.bubbleConfig)==null?void 0:m.subtitle)||"",i.style.fontSize="0.9em",i.style.opacity="0.8",d.appendChild(i),a.appendChild(d),e.appendChild(a);const p=document.createElement("div");p.style.cssText=`
+        position: absolute;
+        bottom: -6px;
+        ${this.config.placement==="bottom-left"?"left: 24px":"right: 24px"};
+        width: 12px;
+        height: 12px;
+        background: white;
+        transform: rotate(45deg);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      `;const w=document.createElement("div");w.style.cssText=`
+        position: absolute;
+        bottom: 0;
+        ${this.config.placement==="bottom-left"?"left: 18px":"right: 18px"};
+        width: 24px;
+        height: 12px;
+        background: white;
+      `,e.appendChild(p),e.appendChild(w),t.appendChild(e),setTimeout(()=>{e&&(e.style.opacity="1",e.style.transform="translateY(0)")},500)}this.bubble=document.createElement("button"),this.bubble.style.cssText=`
+      background-color: ${(b=this.config.theme)==null?void 0:b.backgroundColor};
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      border: none;
+      cursor: ${this.config.draggable?"move":"pointer"};
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transition: all 0.3s ease;
+      outline: none;
+      position: relative;
+      user-select: none;
+    `;const n=document.createElement("div");if(n.innerHTML=`
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z" 
+              fill="white"/>
       </svg>
-    `,t.addEventListener("mouseover",()=>{t.style.transform="scale(1.1)"}),t.addEventListener("mouseout",()=>{t.style.transform="scale(1)"}),this.bubble.appendChild(t),this.bubble.onclick=n,console.log("Bubble created"),(g=(w=this.config.text)==null?void 0:w.bubbleMessage)!=null&&g.show){const i=document.createElement("div");i.style.backgroundColor="#ffffff",i.style.boxShadow="0 2px 12px rgba(0,0,0,0.15)",i.style.borderRadius="8px",i.style.padding="12px",i.style.marginBottom="8px",i.style.maxWidth="280px",i.style.position="relative",i.style.animation="fadeInUp 0.3s ease",i.style.cursor="pointer";const u=document.createElement("style");u.textContent=`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `,document.head.appendChild(u);const b=document.createElement("div");if(b.style.position="absolute",b.style.bottom="-6px",b.style.right="20px",b.style.width="12px",b.style.height="12px",b.style.backgroundColor="#ffffff",b.style.transform="rotate(45deg)",b.style.boxShadow="4px 4px 8px rgba(0,0,0,0.1)",i.appendChild(b),this.config.text.bubbleMessage.icon){const s=document.createElement("div");s.style.marginBottom="8px",s.style.fontSize="24px",s.textContent=this.config.text.bubbleMessage.icon,i.appendChild(s)}if(this.config.text.bubbleMessage.title){const s=document.createElement("div");s.style.fontWeight="600",s.style.fontSize="14px",s.style.color="#333333",s.style.marginBottom="4px",s.textContent=this.config.text.bubbleMessage.title,i.appendChild(s)}if(this.config.text.bubbleMessage.subtitle){const s=document.createElement("div");s.style.fontSize="12px",s.style.color="#666666",s.textContent=this.config.text.bubbleMessage.subtitle,i.appendChild(s)}const r=document.createElement("button");r.style.position="absolute",r.style.top="8px",r.style.right="8px",r.style.background="transparent",r.style.border="none",r.style.color="#999999",r.style.cursor="pointer",r.style.fontSize="16px",r.style.padding="4px",r.style.lineHeight="1",r.innerHTML="×",r.onclick=s=>{s.stopPropagation(),i.style.display="none",console.log("Bubble message closed")},i.appendChild(r),i.addEventListener("click",s=>{s.preventDefault(),s.stopPropagation(),this.showChat()}),this.bubble.insertBefore(i,t)}document.body.appendChild(this.bubble),this.isVisible&&this.window&&(this.bubble.style.display="none"),window.matchMedia("(max-width: 768px)").matches||(this.bubble.style.cursor="move",this.addDragListeners(this.bubble))}addDragListeners(e){const t=o=>{this.isDragging=!0,this.dragStartX=o.clientX,this.dragStartY=o.clientY;const l=e.getBoundingClientRect();this.initialX=l.left,this.initialY=l.top,document.addEventListener("mousemove",n),document.addEventListener("mouseup",h)},n=o=>{if(!this.isDragging)return;o.preventDefault();const l=o.clientX-this.dragStartX,a=o.clientY-this.dragStartY,c=this.initialX+l,f=this.initialY+a,w=window.innerWidth-e.offsetWidth,g=window.innerHeight-e.offsetHeight,i=Math.max(0,Math.min(w,c)),u=Math.max(0,Math.min(g,f));e.style.left=`${i}px`,e.style.top=`${u}px`,e.style.right="auto",e.style.bottom="auto"},h=()=>{this.isDragging=!1,document.removeEventListener("mousemove",n),document.removeEventListener("mouseup",h);const o=e.getBoundingClientRect(),a=o.left+o.width/2>window.innerWidth/2;this.config.theme&&(this.config.theme.position=a?"right":"left",this.config.theme.marginRight=a?window.innerWidth-o.right:void 0,this.config.theme.marginLeft=a?void 0:o.left,this.config.theme.marginBottom=window.innerHeight-o.bottom),this.createBubble()};e.addEventListener("mousedown",t)}createChatWindow(){var h,o,l,a,c;this.window&&(document.body.removeChild(this.window),this.window=null);const e=window.innerWidth<=768;this.window=document.createElement("div"),this.window.id="bytedesk-chat-window";const t=this.window.style;if(t.position="fixed",t.zIndex="10000",t.backgroundColor=((h=this.config.theme)==null?void 0:h.backgroundColor)||"#ffffff",t.boxShadow="0 4px 12px rgba(0,0,0,0.15)",t.borderRadius=e?"16px 16px 0 0":"16px",t.overflow="hidden",t.transition="all 0.3s ease",t.display="flex",t.flexDirection="column",e)t.width="100vw",t.height="100vh",t.left="0",t.bottom="0";else{const{width:f=380,height:w=640}=this.config.window||{};t.width=`${f}px`,t.height=`${w}px`,t.maxWidth="calc(100vw - 40px)",t.maxHeight="80vh";const g=((o=this.config.theme)==null?void 0:o.marginBottom)||20,i=((l=this.config.theme)==null?void 0:l.marginRight)||20,u=((a=this.config.theme)==null?void 0:a.marginLeft)||20;t.bottom=`${g}px`,((c=this.config.theme)==null?void 0:c.position)==="left"?(t.left=`${u}px`,t.right="auto"):(t.right=`${i}px`,t.left="auto")}const n=document.createElement("iframe");n.style.width="100%",n.style.height="100%",n.style.border="none",n.src=this.generateChatUrl("messages"),n.title="chat window",n.allow="microphone; camera",this.window.appendChild(n),document.body.appendChild(this.window),console.log("Chat window created and added to DOM")}generateChatUrl(e="messages"){var l,a,c,f,w,g;const t="http://127.0.0.1:9006/chat/",h={...{org:"df_org_uid",t:2,sid:"df_rt_uid",tab:e,navbarBg:((a=(l=this.config.theme)==null?void 0:l.navbar)==null?void 0:a.backgroundColor)||((c=this.config.theme)==null?void 0:c.primaryColor),navbarText:((w=(f=this.config.theme)==null?void 0:f.navbar)==null?void 0:w.textColor)||((g=this.config.theme)==null?void 0:g.secondaryColor)},...this.config.chatParams},o=new URLSearchParams(Object.entries(h).map(([i,u])=>[i,String(u)])).toString();return`${t}?${o}`}showChat(){try{this.window||this.createChatWindow(),this.window&&(this.window.style.display="flex",this.window.style.opacity="1",this.window.style.transform="translateY(0)",this.isVisible=!0,this.windowState="normal",this.bubble&&(this.bubble.style.display="none"))}catch(e){console.error("Error in showChat:",e)}}hideChat(){this.window&&(this.window.style.transform="translateY(20px)",this.window.style.opacity="0",setTimeout(()=>{this.window&&(this.window.style.display="none")},300),this.isVisible=!1,this.bubble&&(this.bubble.style.display="inline-flex"))}destroy(){this.bubble&&(document.body.removeChild(this.bubble),this.bubble=null),this.window&&(document.body.removeChild(this.window),this.window=null)}handleTabChange(e){if(!this.window)return;const t=this.window.querySelector("iframe");t&&(t.src=this.generateChatUrl(e))}setupMessageListener(){window.addEventListener("message",e=>{switch(e.data.type){case"CLOSE_CHAT_WINDOW":this.hideChat();break;case"CHANGE_TAB":this.handleTabChange(e.data.tab);break;case"MAXIMIZE_WINDOW":this.toggleMaximize();break;case"MINIMIZE_WINDOW":this.minimizeWindow();break}})}minimizeWindow(){this.window&&(this.windowState="minimized",this.window.style.transform="translateY(100%)",this.window.style.opacity="0",setTimeout(()=>{this.window&&(this.window.style.display="none")},300))}toggleMaximize(){var t,n;if(!(!this.window||window.innerWidth<=768))if(this.windowState==="maximized"){this.windowState="normal";const{width:h=380,height:o=640}=this.config.window||{};this.window.style.width=`min(${h}px, 100vw - 40px)`,this.window.style.height=`min(${o}px, 80vh)`,this.window.style.top="",this.window.style.left="",this.window.style.right=((t=this.config.window)==null?void 0:t.position)==="left"?"":"20px",this.window.style.bottom=`${((n=this.config.window)==null?void 0:n.marginBottom)||80}px`}else this.windowState="maximized",this.window.style.width="100vw",this.window.style.height="100vh",this.window.style.top="0",this.window.style.left="0",this.window.style.right="0",this.window.style.bottom="0"}}return p}();
+    `,n.style.cssText=`
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `,this.bubble.appendChild(n),this.bubble.addEventListener("mouseenter",()=>{this.bubble.style.transform="scale(1.1)"}),this.bubble.addEventListener("mouseleave",()=>{this.bubble.style.transform="scale(1)"}),t.appendChild(this.bubble),this.config.draggable){let a=0,l=0,d=0,h=0;this.bubble.addEventListener("mousedown",i=>{i.button===0&&(this.isDragging=!0,a=i.clientX,l=i.clientY,d=t.offsetLeft,h=t.offsetTop,t.style.transition="none")}),document.addEventListener("mousemove",i=>{if(!this.isDragging)return;i.preventDefault();const p=i.clientX-a,w=i.clientY-l,u=d+p,x=h+w,y=window.innerHeight-t.offsetHeight;u<=window.innerWidth/2?(t.style.left=`${Math.max(0,u)}px`,t.style.right="auto",this.config.placement="bottom-left"):(t.style.right=`${Math.max(0,window.innerWidth-u-t.offsetWidth)}px`,t.style.left="auto",this.config.placement="bottom-right"),t.style.bottom=`${Math.min(Math.max(0,window.innerHeight-x-t.offsetHeight),y)}px`}),document.addEventListener("mouseup",()=>{this.isDragging&&(this.isDragging=!1,t.style.transition="all 0.3s ease",this.config.marginSide=parseInt(this.config.placement==="bottom-left"?t.style.left:t.style.right)||20,this.config.marginBottom=parseInt(t.style.bottom||"20"))})}this.bubble.addEventListener("mousedown",()=>{}),this.bubble.addEventListener("mousemove",()=>{}),this.bubble.addEventListener("click",()=>{this.isDragging||this.showChat()}),this.bubble.messageElement=e,document.body.appendChild(t)}getSupportText(){const t=this.config.locale||"zh-CN",e={"zh-CN":"微语技术支持","en-US":"Powered by Weiyuai","ja-JP":"Weiyuaiによる技術支援","ko-KR":"Weiyuai 기술 지원"};return e[t]||e["zh-CN"]}createChatWindow(){var m,b,a,l,d,h;this.window=document.createElement("div");const t=window.innerWidth<=768,e=window.innerWidth,n=window.innerHeight,s=Math.min(((m=this.config.window)==null?void 0:m.width)||e*.9,e*.9),o=Math.min(((b=this.config.window)==null?void 0:b.height)||n*.9,n*.9);t?this.window.style.cssText=`
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 90vh;
+        display: none;
+        z-index: 10000;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        overflow: hidden;
+        transition: all ${(a=this.config.animation)==null?void 0:a.duration}ms ${(l=this.config.animation)==null?void 0:l.type};
+      `:this.window.style.cssText=`
+        position: fixed;
+        ${this.config.placement==="bottom-right"?"right":"left"}: ${this.config.marginSide}px;
+        bottom: ${this.config.marginBottom}px;
+        width: ${s}px;
+        height: ${o}px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+        display: none;
+        overflow: hidden;
+        z-index: 10000;
+        transition: all ${(d=this.config.animation)==null?void 0:d.duration}ms ${(h=this.config.animation)==null?void 0:h.type};
+      `;const r=document.createElement("iframe");if(r.style.cssText=`
+      width: 100%;
+      height: ${this.config.showSupport?"calc(100% - 30px)":"100%"};
+      border: none;
+    `,r.src=this.generateChatUrl(),this.window.appendChild(r),this.config.showSupport){const i=document.createElement("div");i.style.cssText=`
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 12px;
+        line-height: 30px;
+      `,i.innerHTML=`
+        <a href="https://ai.bytedesk.com" 
+           target="_blank" 
+           style="
+             color: #666;
+             text-decoration: none;
+             display: flex;
+             align-items: center;
+             height: 100%;
+           ">
+          ${this.getSupportText()}
+        </a>
+      `,this.window.appendChild(i)}document.body.appendChild(this.window)}generateChatUrl(t="messages"){console.log("this.config: ",this.config,t);const e=new URLSearchParams;Object.entries(this.config.theme||{}).forEach(([s,o])=>{e.append(s,String(o))}),Object.entries(this.config.chatParams||{}).forEach(([s,o])=>{e.append(s,String(o))});let n=`${this.config.baseUrl}?${e.toString()}`;return console.log("chatUrl: ",n),n}setupMessageListener(){window.addEventListener("message",t=>{switch(t.data.type){case"CLOSE_CHAT_WINDOW":this.hideChat();break;case"MAXIMIZE_WINDOW":this.toggleMaximize();break;case"MINIMIZE_WINDOW":this.minimizeWindow();break}})}showChat(){if(this.window||this.createChatWindow(),this.window){const t=window.innerWidth<=768;if(this.window.style.display="block",this.setupResizeListener(),t&&this.window&&(this.window.style.transform="translateY(100%)",requestAnimationFrame(()=>{this.window&&(this.window.style.transform="translateY(0)")})),this.isVisible=!0,this.bubble){this.bubble.style.display="none";const e=this.bubble.messageElement;e instanceof HTMLElement&&(e.style.display="none")}}}hideChat(){var t;if(this.window&&(window.innerWidth<=768?(this.window.style.transform="translateY(100%)",setTimeout(()=>{this.window&&(this.window.style.display="none")},((t=this.config.animation)==null?void 0:t.duration)||300)):this.window.style.display="none",this.isVisible=!1,this.bubble)){this.bubble.style.display="inline-flex";const n=this.bubble.messageElement;n instanceof HTMLElement&&(n.style.display="block")}}minimizeWindow(){this.window&&(this.windowState="minimized",this.window.style.display="none")}toggleMaximize(){!this.window||window.innerWidth<=768||(this.windowState=this.windowState==="maximized"?"normal":"maximized",this.setupResizeListener())}setupResizeListener(){const t=()=>{var r,m;if(!this.window||!this.isVisible)return;const n=window.innerWidth<=768,s=window.innerWidth,o=window.innerHeight;if(n)Object.assign(this.window.style,{left:"0",bottom:"0",width:"100%",height:"90vh",borderTopLeftRadius:"12px",borderTopRightRadius:"12px",borderBottomLeftRadius:"0",borderBottomRightRadius:"0"});else{let b=this.windowState==="maximized"?s:Math.min(((r=this.config.window)==null?void 0:r.width)||s*.9,s*.9),a=this.windowState==="maximized"?o:Math.min(((m=this.config.window)==null?void 0:m.height)||o*.9,o*.9);const l=this.config.placement==="bottom-right"?this.config.marginSide:void 0,d=this.config.placement==="bottom-left"?this.config.marginSide:void 0;Object.assign(this.window.style,{width:`${b}px`,height:`${a}px`,right:l?`${l}px`:"auto",left:d?`${d}px`:"auto",bottom:`${this.config.marginBottom}px`,borderRadius:this.windowState==="maximized"?"0":"12px"})}};let e;window.addEventListener("resize",()=>{clearTimeout(e),e=window.setTimeout(t,100)}),t()}destroy(){var e;const t=(e=this.bubble)==null?void 0:e.parentElement;t&&document.body.contains(t)&&(document.body.removeChild(t),this.bubble=null),this.window&&document.body.contains(this.window)&&(document.body.removeChild(this.window),this.window=null),window.removeEventListener("resize",this.setupResizeListener.bind(this))}}return g}();
