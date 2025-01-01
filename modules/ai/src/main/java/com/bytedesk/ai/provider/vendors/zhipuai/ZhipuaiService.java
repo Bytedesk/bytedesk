@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 17:48:02
+ * @LastEditTime: 2025-01-01 12:34:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,6 +93,20 @@ public class ZhipuaiService {
             {query}
             当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
             """;
+
+    // RAG智能客服提示模板
+    private final String PROMPT_TEMPLATE = """
+      任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。
+
+      用户查询: {query}
+
+      历史聊天记录: {history}
+      
+      搜索结果: {context}
+      
+      请根据以上信息生成一个简单明了的回答，确保信息准确且易于理解。
+      当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
+    """;
     /**
      * sse调用
      */
@@ -300,7 +314,8 @@ public class ZhipuaiService {
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
             List<String> contentList = uploadVectorStore.searchText(query, kbUid);
             String context = String.join("\n", contentList);
-            prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
+            String history = ""; // TODO: 历史对话上下文，此处暂不使用
+            prompt = PROMPT_TEMPLATE.replace("{context}", context).replace("{query}", query).replace("{history}", history);
             log.info("sendWsRobotMessage prompt 1 {}", prompt);
         } else {
             prompt = prompt + "\n" + query;
