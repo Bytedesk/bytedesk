@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 18:05:57
+ * @LastEditTime: 2025-01-01 12:16:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -186,12 +186,12 @@ public class UploadVectorStore {
 
 	// 存储到vector store
 	private void storeDocuments(List<Document> docList, UploadEntity upload) {
-		// log.info("Parsing document, this will take a while.");
+		log.info("Parsing document, this will take a while. docList.size={}", docList.size());
 		List<String> docIdList = new ArrayList<>();
 		Iterator<Document> iterator = docList.iterator();
 		while (iterator.hasNext()) {
 			Document doc = iterator.next();
-			// log.info("doc id: {}", doc.getId());
+			log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 文件file_uid, 知识库kb_uid
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, upload.getUid());
@@ -227,7 +227,7 @@ public class UploadVectorStore {
 	// FIXME: kb_uid 没有起到过滤作用？
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	public List<String> searchText(String query, String kbUid) {
-		// log.info("searchText kbUid {}, query: {}", kbUid, query);
+		log.info("searchText kbUid {}, query: {}", kbUid, query);
 		// Retrieve documents similar to a query
 		FilterExpressionBuilder b = new FilterExpressionBuilder();
 		Expression expression = b.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
