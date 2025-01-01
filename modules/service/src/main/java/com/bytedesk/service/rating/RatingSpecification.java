@@ -34,8 +34,8 @@ public class RatingSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             //
-            if (request.getRating() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("rating"), request.getRating()));
+            if (request.getScore() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("score"), request.getScore()));
             }
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));

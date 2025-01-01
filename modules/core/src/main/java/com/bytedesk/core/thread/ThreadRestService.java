@@ -50,6 +50,7 @@ import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import io.jsonwebtoken.lang.Arrays;
 import lombok.AllArgsConstructor;
@@ -440,12 +441,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public ThreadResponse convertToResponse(ThreadEntity thread) {
-        ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
-        //
-        UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
-        threadResponse.setUser(user);
-
-        return threadResponse;
+        return ConvertUtils.convertToThreadResponse(thread);
     }
 
     @Override

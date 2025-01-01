@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:49:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 17:50:43
+ * @LastEditTime: 2025-01-01 14:57:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,5 +19,5 @@ import java.time.LocalDateTime;
 
 public interface IpAccessRepository extends JpaRepository<IpAccessEntity, Long> {
     
-    IpAccessEntity findByIpAndEndpointAndAccessTimeAfter(String ip, String endpoint, LocalDateTime time);
+    IpAccessEntity findFirstByIpAndEndpointAndAccessTimeAfter(String ip, String endpoint, LocalDateTime time);
 } 

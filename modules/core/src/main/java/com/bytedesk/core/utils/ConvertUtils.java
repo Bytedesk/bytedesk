@@ -36,6 +36,7 @@ import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.thread.ThreadResponse;
 
 public class ConvertUtils {
 
@@ -90,6 +91,15 @@ public class ConvertUtils {
         threadProtobuf.setUser(user);
         //
         return threadProtobuf;
+    }
+
+    public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
+        ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
+        //
+        UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
+        threadResponse.setUser(user);
+
+        return threadResponse;
     }
 
     public static RoleResponse convertToRoleResponse(RoleEntity entity) {
