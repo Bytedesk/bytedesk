@@ -57,4 +57,6 @@ public class PushResponse extends BaseResponse {
     private PlatformEnum platform;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }
