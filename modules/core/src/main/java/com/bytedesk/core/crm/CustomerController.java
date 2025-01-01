@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.crm;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,15 +33,18 @@ public class CustomerController extends BaseRestController<CustomerRequest> {
 
     @Override
     public ResponseEntity<?> queryByOrg(CustomerRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
-    }
+        
+        Page<CustomerResponse> response = customerService.queryByOrg(request);
 
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
 
     @Override
     public ResponseEntity<?> queryByUser(CustomerRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+        
+        Page<CustomerResponse> response = customerService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override

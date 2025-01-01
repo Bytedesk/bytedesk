@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:26:27
+ * @LastEditTime: 2025-01-01 20:47:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,14 +53,18 @@ public class CustomerService extends BaseRestService<CustomerEntity, CustomerReq
 
     @Override
     public Page<CustomerResponse> queryByUser(CustomerRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        // 
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "updatedAt");
+        Specification<CustomerEntity> spec = CustomerSpecification.search(request);
+        Page<CustomerEntity> page = customerRepository.findAll(spec, pageable);
+        
+        return page.map(this::convertToResponse);
     }
 
     @Override
     public Optional<CustomerEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return customerRepository.findByUid(uid);
     }
 
     @Override
