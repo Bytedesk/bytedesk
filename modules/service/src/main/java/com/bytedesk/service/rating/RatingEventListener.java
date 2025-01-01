@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 13:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 12:39:17
+ * @LastEditTime: 2025-01-01 15:02:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ public class RatingEventListener {
             RatingMessageExtra extra = JSON.parseObject(message.getContent(), RatingMessageExtra.class);
             //
             RatingRequest request = RatingRequest.builder()
-                    .rating(extra.getScore())
+                    .score(extra.getScore())
                     .comment(extra.getContent())
                     .threadTopic(message.getThreadTopic())
                     .user(message.getUser())

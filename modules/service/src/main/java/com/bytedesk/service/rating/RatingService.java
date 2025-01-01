@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:01:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:26:47
+ * @LastEditTime: 2025-01-01 15:23:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,10 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -38,6 +41,8 @@ public class RatingService extends BaseRestService<RatingEntity, RatingRequest, 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final ThreadRestService threadRestService;
 
     @Override
     public Page<RatingResponse> queryByOrg(RatingRequest request) {
@@ -65,7 +70,14 @@ public class RatingService extends BaseRestService<RatingEntity, RatingRequest, 
     public RatingResponse create(RatingRequest request) {
         
         RatingEntity rate = modelMapper.map(request, RatingEntity.class);
-        rate.setUid(uidUtils.getCacheSerialUid());
+        rate.setUid(uidUtils.getUid());
+        // 
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getThreadTopic());
+        if (threadOptional.isPresent()) {
+            rate.setThread(threadOptional.get());
+        } else {
+            throw new RuntimeException("找不到对应的主题");
+        }
 
         RatingEntity savedRating = save(rate);
         if (savedRating == null) {
@@ -87,7 +99,7 @@ public class RatingService extends BaseRestService<RatingEntity, RatingRequest, 
         try {
             return rateRepository.save(entity);
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
         return null;
     }
@@ -112,7 +124,9 @@ public class RatingService extends BaseRestService<RatingEntity, RatingRequest, 
 
     @Override
     public RatingResponse convertToResponse(RatingEntity entity) {
-        return modelMapper.map(entity, RatingResponse.class);
+        RatingResponse ratingResponse = modelMapper.map(entity, RatingResponse.class);
+        ratingResponse.setThread(ConvertUtils.convertToThreadResponse(entity.getThread()));
+        return ratingResponse;
     }
 
 }

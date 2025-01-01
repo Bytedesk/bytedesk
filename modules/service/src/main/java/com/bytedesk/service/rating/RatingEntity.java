@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-07 11:37:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 12:38:27
+ * @LastEditTime: 2025-01-01 15:01:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -42,28 +43,29 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class RatingEntity extends BaseEntity {
 
-    @Column(name = "thread_uid", nullable = false)
-    private String threadUid;
+    // @Column(name = "thread_uid", nullable = false)
+    // private String threadUid;
     
-    @Column(name = "agent_uid", nullable = false)
-    private String agentUid;
+    // @Column(name = "agent_uid", nullable = false)
+    // private String agentUid;
     
-    @Column(name = "visitor_uid", nullable = false)
-    private String visitorUid;
+    // @Column(name = "visitor_uid", nullable = false)
+    // private String visitorUid;
     
+    @Builder.Default
     @Column(nullable = false)
-    private Integer rating;  // 1-5星评分
+    private int score = 5;  // 1-5星评分
     
     private String comment;  // 评价内容
     
-    @Column(name = "response_time_rating")
-    private Integer responseTimeRating;  // 响应时间评分
+    // @Column(name = "response_time_rating")
+    // private Integer responseTimeRating;  // 响应时间评分
     
-    @Column(name = "solution_rating")
-    private Integer solutionRating;  // 解决方案评分
+    // @Column(name = "solution_rating")
+    // private Integer solutionRating;  // 解决方案评分
     
-    @Column(name = "attitude_rating")
-    private Integer attitudeRating;  // 服务态度评分
+    // @Column(name = "attitude_rating")
+    // private Integer attitudeRating;  // 服务态度评分
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
@@ -90,7 +92,10 @@ public class RatingEntity extends BaseEntity {
 
     // rate thread
     // many rates to one thread
-    private String threadTopic;
+    // private String threadTopic;
+    @JsonIgnore
+    @ManyToOne
+    private ThreadEntity thread;
 
     @Builder.Default
     @Column(name = "rate_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
