@@ -17,6 +17,7 @@ package com.bytedesk.core.message;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -85,7 +86,7 @@ public class MessagePersistService {
     }
 
     // 处理消息通知，已处理的消息返回true，未处理的消息返回false
-    private boolean dealWithMessageNotification(MessageTypeEnum type, MessageProtobuf messageProtobuf) {
+    private boolean dealWithMessageNotification(@NonNull MessageTypeEnum type, MessageProtobuf messageProtobuf) {
         // String content = messageProtobuf.getContent();
         // log.info("dealWithMessageNotification: {}, {}", type, content);
 
