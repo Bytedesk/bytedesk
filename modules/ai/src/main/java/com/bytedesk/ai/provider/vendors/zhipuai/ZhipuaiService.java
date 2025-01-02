@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-02 11:56:26
+ * @LastEditTime: 2025-01-02 12:15:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -96,25 +96,192 @@ public class ZhipuaiService {
 
     // RAG智能客服提示模板
     private final String PROMPT_TEMPLATE = """
-      任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。
+              任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。
 
-      用户查询: {query}
+              用户查询: {query}
 
-      历史聊天记录: {history}
-      
-      搜索结果: {context}
-      
-      请根据以上信息生成一个简单明了的回答，确保信息准确且易于理解。
-      当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
-      另外，请提供更多相关的问答对，并以JSON格式输出，格式如下：
-      {
-        "answer": "回答内容",
-        "additional_qa_pairs": [
-            {"question": "相关问题1", "answer": "相关答案1"},
-            {"question": "相关问题2", "answer": "相关答案2"}
-        ]
-      }
-    """;
+              历史聊天记录: {history}
+
+              搜索结果: {context}
+
+              请根据以上信息生成一个简单明了的回答，确保信息准确且易于理解。
+              当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
+              另外，请提供更多相关的问答对。
+              回答内容请以JSON格式输出，格式如下：
+              {
+                "answer": "回答内容",
+                "additional_qa_pairs": [
+                    {"question": "相关问题1", "answer": "相关答案1"},
+                    {"question": "相关问题2", "answer": "相关答案2"}
+                ]
+              }
+            """;
+
+    // 知识库问答
+    public void sendWsKbMessage(String query, String kbUid, RobotEntity robot, MessageProtobuf messageProtobuf) {
+        //
+        String prompt = robot.getLlm().getPrompt();
+        if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
+            List<String> contentList = uploadVectorStore.searchText(query, kbUid);
+            String context = String.join("\n", contentList);
+            String history = ""; // TODO: 历史对话上下文，此处暂不使用
+            prompt = PROMPT_TEMPLATE.replace("{context}", context).replace("{query}", query).replace("{history}",
+                    history);
+            log.info("sendWsRobotMessage prompt 1 {}", prompt);
+        } else {
+            prompt = prompt + "\n" + query;
+            log.info("sendWsRobotMessage prompt 2 {}", prompt);
+        }
+        //
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
+        messages.add(chatMessage);
+        //
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                // 模型名称
+                .model(zhipuaiConfig.zhiPuAiApiModel)
+                // .model(Constants.ModelChatGLM3TURBO)
+                // .model(robotSimple.getLlm().getModel())
+                // .temperature(robotSimple.getLlm().getTemperature())
+                // .topP(robotSimple.getLlm().getTopP())
+                .stream(Boolean.TRUE)
+                .messages(messages)
+                .requestId(messageProtobuf.getUid())
+                .build();
+        //
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        if (sseModelApiResp.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            List<Choice> choices = new ArrayList<>();
+            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                log.info("answer start: ");
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
+                                log.info("tool_calls: " + jsonString);
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
+                                String answerContent = accumulator.getDelta().getContent();
+                                log.info("answerContent {}", answerContent);
+                                if (StringUtils.hasText(answerContent)) {
+                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                    messageProtobuf.setContent(answerContent);
+                                    //
+                                    // MessageUtils.notifyUser(messageProtobuf);
+                                    messageSendService.sendProtobufMessage(messageProtobuf);
+                                }
+                            }
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        log.info("answer end");
+                    })
+                    .lastElement()
+                    .blockingGet();
+
+            ModelData data = new ModelData();
+            data.setChoices(choices);
+            data.setUsage(chatMessageAccumulator.getUsage());
+            data.setId(chatMessageAccumulator.getId());
+            data.setCreated(chatMessageAccumulator.getCreated());
+            data.setRequestId(chatCompletionRequest.getRequestId());
+            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setData(data);
+            // 存储到数据库
+            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
+            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
+            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
+            // 后处理步骤：生成更多的问答对
+            // List<String> additionalQAPairs = generateAdditionalQAPairs(question,
+            // robotMessage.getAnswer());
+            // additionalQAPairs.forEach(qaPair -> {
+            // log.info("Additional QA Pair: {}", qaPair);
+            // // 这里可以将更多的问答对存储到数据库或发送给客户端
+            // });
+        }
+
+        String result = JSON.toJSONString(sseModelApiResp);
+        log.info("websocket output:" + result);
+    }
+
+    public void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
+        //
+        List<String> contentList = uploadVectorStore.searchText(query, kbUid);
+        String context = String.join("\n", contentList);
+        String prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
+        log.info("sendWsAutoReply prompt {}", prompt);
+        //
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
+        messages.add(chatMessage);
+        //
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                // 模型名称
+                .model(zhipuaiConfig.zhiPuAiApiModel)
+                // .model(Constants.ModelChatGLM3TURBO)
+                // .model(robotSimple.getLlm().getModel())
+                // .temperature(robotSimple.getLlm().getTemperature())
+                // .topP(robotSimple.getLlm().getTopP())
+                .stream(Boolean.TRUE)
+                .messages(messages)
+                .requestId(messageProtobuf.getUid())
+                .build();
+        //
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        if (sseModelApiResp.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            List<Choice> choices = new ArrayList<>();
+            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                log.info("answer start: ");
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
+                                log.info("tool_calls: " + jsonString);
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
+                                String answerContent = accumulator.getDelta().getContent();
+                                log.info("answerContent {}", answerContent);
+                                if (StringUtils.hasText(answerContent)) {
+                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                    messageProtobuf.setContent(answerContent);
+                                    //
+                                    // MessageUtils.notifyUser(messageProtobuf);
+                                    messageSendService.sendProtobufMessage(messageProtobuf);
+                                }
+                            }
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        log.info("answer end");
+                    })
+                    .lastElement()
+                    .blockingGet();
+
+            ModelData data = new ModelData();
+            data.setChoices(choices);
+            data.setUsage(chatMessageAccumulator.getUsage());
+            data.setId(chatMessageAccumulator.getId());
+            data.setCreated(chatMessageAccumulator.getCreated());
+            data.setRequestId(chatCompletionRequest.getRequestId());
+            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setData(data);
+            // 存储到数据库
+            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
+            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
+            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
+        }
+
+        String result = JSON.toJSONString(sseModelApiResp);
+        log.info("websocket output:" + result);
+
+    }
+
     /**
      * sse调用
      */
@@ -315,169 +482,6 @@ public class ZhipuaiService {
         log.info("websocket output:" + result);
     }
 
-    // 知识库问答
-    public void sendWsKbMessage(String query, String kbUid, RobotEntity robot, MessageProtobuf messageProtobuf) {
-        //
-        String prompt = robot.getLlm().getPrompt();
-        if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = uploadVectorStore.searchText(query, kbUid);
-            String context = String.join("\n", contentList);
-            String history = ""; // TODO: 历史对话上下文，此处暂不使用
-            prompt = PROMPT_TEMPLATE.replace("{context}", context).replace("{query}", query).replace("{history}", history);
-            log.info("sendWsRobotMessage prompt 1 {}", prompt);
-        } else {
-            prompt = prompt + "\n" + query;
-            log.info("sendWsRobotMessage prompt 2 {}", prompt);
-        }
-        //
-        List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
-        messages.add(chatMessage);
-        //
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                // 模型名称
-                .model(zhipuaiConfig.zhiPuAiApiModel)
-                // .model(Constants.ModelChatGLM3TURBO)
-                // .model(robotSimple.getLlm().getModel())
-                // .temperature(robotSimple.getLlm().getTemperature())
-                // .topP(robotSimple.getLlm().getTopP())
-                .stream(Boolean.TRUE)
-                .messages(messages)
-                .requestId(messageProtobuf.getUid())
-                .build();
-        //
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        if (sseModelApiResp.isSuccess()) {
-            AtomicBoolean isFirst = new AtomicBoolean(true);
-            List<Choice> choices = new ArrayList<>();
-            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
-                    .doOnNext(accumulator -> {
-                        {
-                            if (isFirst.getAndSet(false)) {
-                                log.info("answer start: ");
-                            }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
-                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
-                                log.info("tool_calls: " + jsonString);
-                            }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                                String answerContent = accumulator.getDelta().getContent();
-                                log.info("answerContent {}", answerContent);
-                                if (StringUtils.hasText(answerContent)) {
-                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
-                                    messageProtobuf.setContent(answerContent);
-                                    //
-                                    // MessageUtils.notifyUser(messageProtobuf);
-                                    messageSendService.sendProtobufMessage(messageProtobuf);
-                                }
-                            }
-                        }
-                    })
-                    .doOnComplete(() -> {
-                        log.info("answer end");
-                    })
-                    .lastElement()
-                    .blockingGet();
-
-            ModelData data = new ModelData();
-            data.setChoices(choices);
-            data.setUsage(chatMessageAccumulator.getUsage());
-            data.setId(chatMessageAccumulator.getId());
-            data.setCreated(chatMessageAccumulator.getCreated());
-            data.setRequestId(chatCompletionRequest.getRequestId());
-            sseModelApiResp.setFlowable(null);// 打印前置空
-            sseModelApiResp.setData(data);
-            // 存储到数据库
-            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
-            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
-            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
-            // 后处理步骤：生成更多的问答对
-            // List<String> additionalQAPairs = generateAdditionalQAPairs(question, robotMessage.getAnswer());
-            // additionalQAPairs.forEach(qaPair -> {
-            //     log.info("Additional QA Pair: {}", qaPair);
-            //     // 这里可以将更多的问答对存储到数据库或发送给客户端
-            // });
-        }
-
-        String result = JSON.toJSONString(sseModelApiResp);
-        log.info("websocket output:" + result);
-    }
-
-    public void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
-        //
-        List<String> contentList = uploadVectorStore.searchText(query, kbUid);
-        String context = String.join("\n", contentList);
-        String prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
-        log.info("sendWsAutoReply prompt {}", prompt);
-        //
-        List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
-        messages.add(chatMessage);
-        //
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                // 模型名称
-                .model(zhipuaiConfig.zhiPuAiApiModel)
-                // .model(Constants.ModelChatGLM3TURBO)
-                // .model(robotSimple.getLlm().getModel())
-                // .temperature(robotSimple.getLlm().getTemperature())
-                // .topP(robotSimple.getLlm().getTopP())
-                .stream(Boolean.TRUE)
-                .messages(messages)
-                .requestId(messageProtobuf.getUid())
-                .build();
-        //
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        if (sseModelApiResp.isSuccess()) {
-            AtomicBoolean isFirst = new AtomicBoolean(true);
-            List<Choice> choices = new ArrayList<>();
-            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
-                    .doOnNext(accumulator -> {
-                        {
-                            if (isFirst.getAndSet(false)) {
-                                log.info("answer start: ");
-                            }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
-                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
-                                log.info("tool_calls: " + jsonString);
-                            }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                                String answerContent = accumulator.getDelta().getContent();
-                                log.info("answerContent {}", answerContent);
-                                if (StringUtils.hasText(answerContent)) {
-                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
-                                    messageProtobuf.setContent(answerContent);
-                                    //
-                                    // MessageUtils.notifyUser(messageProtobuf);
-                                    messageSendService.sendProtobufMessage(messageProtobuf);
-                                }
-                            }
-                        }
-                    })
-                    .doOnComplete(() -> {
-                        log.info("answer end");
-                    })
-                    .lastElement()
-                    .blockingGet();
-
-            ModelData data = new ModelData();
-            data.setChoices(choices);
-            data.setUsage(chatMessageAccumulator.getUsage());
-            data.setId(chatMessageAccumulator.getId());
-            data.setCreated(chatMessageAccumulator.getCreated());
-            data.setRequestId(chatCompletionRequest.getRequestId());
-            sseModelApiResp.setFlowable(null);// 打印前置空
-            sseModelApiResp.setData(data);
-            // 存储到数据库
-            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
-            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
-            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
-        }
-
-        String result = JSON.toJSONString(sseModelApiResp);
-        log.info("websocket output:" + result);
-
-    }
-
     public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
         return flowable.map(chunk -> {
             return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null, chunk.getChoices().get(0),
@@ -485,13 +489,15 @@ public class ZhipuaiService {
         });
     }
 
-    private List<String> generateAdditionalQAPairs(String question, String answer) {
-        // 这里可以实现生成更多问答对的逻辑
-        // 例如，可以基于现有的问答对生成相关的问答对
-        List<String> additionalQAPairs = new ArrayList<>();
-        additionalQAPairs.add("Q: " + question + " A: " + answer);
-        additionalQAPairs.add("Q: 相关问题1 A: 相关答案1");
-        additionalQAPairs.add("Q: 相关问题2 A: 相关答案2");
-        return additionalQAPairs;
-    }
+    // private List<String> generateAdditionalQAPairs(String question, String answer) {
+    //     // 这里可以实现生成更多问答对的逻辑
+    //     // 例如，可以基于现有的问答对生成相关的问答对
+    //     List<String> additionalQAPairs = new ArrayList<>();
+    //     additionalQAPairs.add("Q: " + question + " A: " + answer);
+    //     additionalQAPairs.add("Q: 相关问题1 A: 相关答案1");
+    //     additionalQAPairs.add("Q: 相关问题2 A: 相关答案2");
+    //     return additionalQAPairs;
+    // }
+
+
 }
