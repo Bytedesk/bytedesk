@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 12:34:32
+ * @LastEditTime: 2025-01-02 11:56:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -106,6 +106,14 @@ public class ZhipuaiService {
       
       请根据以上信息生成一个简单明了的回答，确保信息准确且易于理解。
       当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
+      另外，请提供更多相关的问答对，并以JSON格式输出，格式如下：
+      {
+        "answer": "回答内容",
+        "additional_qa_pairs": [
+            {"question": "相关问题1", "answer": "相关答案1"},
+            {"question": "相关问题2", "answer": "相关答案2"}
+        ]
+      }
     """;
     /**
      * sse调用
@@ -383,6 +391,12 @@ public class ZhipuaiService {
             // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
             // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
             // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
+            // 后处理步骤：生成更多的问答对
+            // List<String> additionalQAPairs = generateAdditionalQAPairs(question, robotMessage.getAnswer());
+            // additionalQAPairs.forEach(qaPair -> {
+            //     log.info("Additional QA Pair: {}", qaPair);
+            //     // 这里可以将更多的问答对存储到数据库或发送给客户端
+            // });
         }
 
         String result = JSON.toJSONString(sseModelApiResp);
@@ -471,4 +485,13 @@ public class ZhipuaiService {
         });
     }
 
+    private List<String> generateAdditionalQAPairs(String question, String answer) {
+        // 这里可以实现生成更多问答对的逻辑
+        // 例如，可以基于现有的问答对生成相关的问答对
+        List<String> additionalQAPairs = new ArrayList<>();
+        additionalQAPairs.add("Q: " + question + " A: " + answer);
+        additionalQAPairs.add("Q: 相关问题1 A: 相关答案1");
+        additionalQAPairs.add("Q: 相关问题2 A: 相关答案2");
+        return additionalQAPairs;
+    }
 }
