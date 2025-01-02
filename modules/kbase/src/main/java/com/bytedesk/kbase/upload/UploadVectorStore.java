@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 12:16:13
+ * @LastEditTime: 2025-01-02 15:38:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,6 +47,42 @@ public class UploadVectorStore {
 	private final RedisVectorStore vectorStore;
 
 	private final UploadService uploadService;
+
+	public final String PROMPT_QA = """
+				基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
+
+				1. 问题部分：
+				- 为同一个主题创建尽可能多的（如K个）不同表述的问题，确保问题的多样性。
+				- 每个问题应考虑用户可能的多种问法，例如：
+				- 直接询问（如“什么是...？”）
+				- 请求确认（如“是否可以说...？”）
+				- 寻求解释（如“请解释一下...的含义。”）
+				- 假设性问题（如“如果...会怎样？”）
+				- 例子请求（如“能否举个例子说明...？”）
+				- 问题应涵盖文本中的关键信息、主要概念和细节，确保不遗漏重要内容。
+
+				2. 答案部分：
+				- 提供一个全面、信息丰富的答案，涵盖问题的所有可能角度，确保逻辑连贯。
+				- 答案应直接基于给定文本，确保准确性和一致性。
+				- 包含相关的细节，如日期、名称、职位等具体信息，必要时提供背景信息以增强理解。
+
+				3. 格式：
+				- 使用 "Q:" 标记问题集合的开始，所有问题应在一个段落内，问题之间用空格分隔。
+				- 使用 "A:" 标记答案的开始，答案应清晰分段，便于阅读。
+				- 问答对之间用两个空行分隔，以提高可读性。
+
+				4. 内容要求：
+				- 确保问答对紧密围绕文本主题，避免偏离主题。
+				- 避免添加文本中未提及的信息，确保信息的真实性。
+				- 如果文本信息不足以回答某个方面，可以在答案中说明 "根据给定信息无法确定"，并尽量提供相关的上下文。
+
+				5. 示例结构（仅供参考，实际内容应基于给定文本）：
+
+			给定文本：
+			{chunk}
+
+			请基于这个文本生成问答对
+			""";
 
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html

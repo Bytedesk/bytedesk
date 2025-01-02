@@ -48,9 +48,7 @@ public class FaqEntity extends BaseEntity {
     private String content;
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
     @Column(name = "faq_type", nullable = false)
-    // private MessageTypeEnum type = MessageTypeEnum.TEXT;
     private String type = MessageTypeEnum.TEXT.name();
 
     // 被点击查看次数
