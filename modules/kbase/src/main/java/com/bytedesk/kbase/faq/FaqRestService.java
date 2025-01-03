@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 13:02:49
+ * @LastEditTime: 2025-01-03 13:25:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -229,9 +229,28 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         }
 
         try {
+            // Clean up the JSON string
+            String cleanJson = qaPairs;
+            int jsonStart = qaPairs.indexOf("```json");
+            if (jsonStart != -1) {
+                // Find the start of the actual JSON after ```json
+                int contentStart = qaPairs.indexOf("{", jsonStart);
+                int contentEnd = qaPairs.lastIndexOf("}");
+                if (contentStart != -1 && contentEnd != -1) {
+                    cleanJson = qaPairs.substring(contentStart, contentEnd + 1);
+                }
+            } else {
+                // If no ```json marker, try to find JSON directly
+                int contentStart = qaPairs.indexOf("{");
+                int contentEnd = qaPairs.lastIndexOf("}");
+                if (contentStart != -1 && contentEnd != -1) {
+                    cleanJson = qaPairs.substring(contentStart, contentEnd + 1);
+                }
+            }
+            
             // Parse JSON array of QA pairs
-            JSONObject jsonObject = JSON.parseObject(qaPairs);
-            List<JSONObject> qaList = jsonObject.getList("qa_pairs", JSONObject.class);
+            JSONObject jsonObject = JSON.parseObject(cleanJson);
+            List<JSONObject> qaList = jsonObject.getList("qaPairs", JSONObject.class);
             if (qaList == null || qaList.isEmpty()) {
                 log.warn("No QA pairs found in response");
                 return;
@@ -240,7 +259,6 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             for (JSONObject qa : qaList) {
                 String question = qa.getString("question");
                 String answer = qa.getString("answer");
-                String description = qa.getString("description"); 
                 String tags = qa.getString("tags");
                 
                 if (StringUtils.hasText(question) && StringUtils.hasText(answer)) {
@@ -248,7 +266,6 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                         .question(question)
                         .answer(answer)
                         .type(MessageTypeEnum.TEXT.name())
-                        .description(description)
                         .tags(tags)
                         .kbUid(kbUid)
                         .docUid(docUid)
@@ -260,7 +277,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 }
             }
         } catch (Exception e) {
-            log.error("Error parsing and saving QA pairs: {}", e.getMessage());
+            log.error("Error parsing and saving QA pairs: {} \nContent: {}", e.getMessage(), qaPairs);
             throw new RuntimeException("Failed to save QA pairs", e);
         }
     }
