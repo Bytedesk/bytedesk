@@ -110,10 +110,10 @@ public class I18Consts {
     public static final String I18N_FAQ_CATEGORY_DEMO_1 = I18N_PREFIX + "faq.category.demo.1";
     public static final String I18N_FAQ_CATEGORY_DEMO_2 = I18N_PREFIX + "faq.category.demo.2";
     //
-    public static final String I18N_FAQ_DEMO_TITLE_1 = I18N_PREFIX + "faq.demo.title.1";
-    public static final String I18N_FAQ_DEMO_CONTENT_1 = I18N_PREFIX + "faq.demo.content.1";
-    public static final String I18N_FAQ_DEMO_TITLE_2 = I18N_PREFIX + "faq.demo.title.2";
-    public static final String I18N_FAQ_DEMO_CONTENT_2 = I18N_PREFIX + "faq.demo.content.2";
+    public static final String I18N_FAQ_DEMO_QUESTION_1 = I18N_PREFIX + "faq.demo.title.1";
+    public static final String I18N_FAQ_DEMO_ANSWER_1 = I18N_PREFIX + "faq.demo.content.1";
+    public static final String I18N_FAQ_DEMO_QUESTION_2 = I18N_PREFIX + "faq.demo.title.2";
+    public static final String I18N_FAQ_DEMO_ANSWER_2 = I18N_PREFIX + "faq.demo.content.2";
     //
     public static final String I18N_QUICK_BUTTON_DEMO_TITLE_1 = I18N_PREFIX + "quick.button.demo.title.1";
     public static final String I18N_QUICK_BUTTON_DEMO_CONTENT_1 = I18N_PREFIX + "quick.button.demo.content.1";

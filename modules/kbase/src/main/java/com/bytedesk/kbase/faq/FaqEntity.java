@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 16:04:54
+ * @LastEditTime: 2025-01-03 08:23:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,10 +42,10 @@ public class FaqEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private String title;
+    private String question;
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String content;
+    private String answer;
 
     @Builder.Default
     @Column(name = "faq_type", nullable = false)
@@ -70,6 +70,11 @@ public class FaqEntity extends BaseEntity {
     private String categoryUid; // 分类
 
     private String kbUid; // 对应知识库
+
+    // used for auto-generate faq
+    private String docUid; // 对应文档
+
+    private String fileUid; // 对应文件
 
     public void up() {
         this.setUpCount(this.upCount + 1);
