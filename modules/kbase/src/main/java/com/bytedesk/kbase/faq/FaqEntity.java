@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:50:13
+ * @LastEditTime: 2025-01-03 13:25:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.kbase.faq;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import jakarta.persistence.Column;
@@ -51,10 +50,6 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "faq_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
-
-    // 描述
-    @Builder.Default
-    private String description = BytedeskConsts.EMPTY_STRING;
 
     //  "tags": ["人事考评办公室", "培训机构"]
     @Builder.Default
