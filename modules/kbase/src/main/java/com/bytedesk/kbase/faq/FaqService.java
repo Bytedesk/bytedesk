@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 22:38:24
+ * @LastEditTime: 2025-01-03 08:25:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -104,8 +104,8 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
             // modelMapper.map(request, entity);
-            entity.setTitle(request.getTitle());
-            entity.setContent(request.getContent());
+            entity.setQuestion(request.getQuestion());
+            entity.setAnswer(request.getAnswer());
             entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
 
             // category
@@ -190,8 +190,8 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
         // return modelMapper.map(excel, Faq.class); // String categoryUid,
         FaqEntity faq = FaqEntity.builder().build();
         faq.setUid(uidUtils.getCacheSerialUid());
-        faq.setTitle(excel.getTitle());
-        faq.setContent(excel.getContent());
+        faq.setQuestion(excel.getQuestion());
+        faq.setAnswer(excel.getAnswer());
         // 
         // faq.setType(MessageTypeEnum.TEXT);
         faq.setType(MessageTypeEnum.fromValue(excel.getType()).name());

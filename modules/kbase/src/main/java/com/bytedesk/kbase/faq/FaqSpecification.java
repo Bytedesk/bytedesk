@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 14:46:34
+ * @LastEditTime: 2025-01-03 08:26:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,11 +33,11 @@ public class FaqSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             //
-            if (StringUtils.hasText(request.getTitle())) {
-                predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
+            if (StringUtils.hasText(request.getQuestion())) {
+                predicates.add(criteriaBuilder.like(root.get("question"), "%" + request.getQuestion() + "%"));
             }
-            if (StringUtils.hasText(request.getContent())) {
-                predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
+            if (StringUtils.hasText(request.getAnswer())) {
+                predicates.add(criteriaBuilder.like(root.get("answer"), "%" + request.getAnswer() + "%"));
             }
             if (StringUtils.hasText(request.getCategoryUid())) {
                 // predicates.add(criteriaBuilder.equal(root.get("category").get("uid"), request.getCategoryUid()));

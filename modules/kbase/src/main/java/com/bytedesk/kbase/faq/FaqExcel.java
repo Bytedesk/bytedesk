@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-24 07:54:32
+ * @LastEditTime: 2025-01-03 08:25:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,10 +34,10 @@ public class FaqExcel {
 
     @ExcelProperty(index = 2, value = "问题")
     @ColumnWidth(20)
-    private String title;
+    private String question;
 
     @ExcelProperty(index = 3, value = "答案")
     @ColumnWidth(20)
-    private String content;
+    private String answer;
 
 }

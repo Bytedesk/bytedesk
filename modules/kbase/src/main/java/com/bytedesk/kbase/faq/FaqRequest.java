@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 14:45:53
+ * @LastEditTime: 2025-01-03 08:23:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,13 +29,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FaqRequest extends BaseRequest {
 
-    private String title;
+    private String question;
 
-    private String content;
+    private String answer;
 
     private String type;
 
     private String categoryUid;
 
     private String kbUid; // 对应知识库
+
+    private String fileUid; // 对应文件
+
+    private String docUid; // 对应文档
 }
