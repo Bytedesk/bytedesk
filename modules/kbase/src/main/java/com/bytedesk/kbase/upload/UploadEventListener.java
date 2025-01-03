@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 17:37:14
+ * @LastEditTime: 2025-01-03 15:18:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -77,6 +77,8 @@ public class UploadEventListener {
 
     private final IMessageSendService messageSendService;
 
+    private final UploadVectorStore uploadVectorStore;
+
     @EventListener
     public void onUploadCreateEvent(GenericApplicationEvent<UploadCreateEvent> event) throws IOException {
         UploadEntity upload = event.getObject().getUpload();
@@ -84,11 +86,11 @@ public class UploadEventListener {
         // etl分块处理
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
             // 通知python ai模块处理
-            // uploadVectorStore.readSplitWriteToVectorStore(upload);
-            redisPubsubService.sendParseFileMessage(
-                    upload.getUid(),
-                    upload.getFileUrl(),
-                    upload.getKbUid());
+            uploadVectorStore.readSplitWriteToVectorStore(upload);
+            // redisPubsubService.sendParseFileMessage(
+            //         upload.getUid(),
+            //         upload.getFileUrl(),
+            //         upload.getKbUid());
             return;
         }
         // 导入Excel文件

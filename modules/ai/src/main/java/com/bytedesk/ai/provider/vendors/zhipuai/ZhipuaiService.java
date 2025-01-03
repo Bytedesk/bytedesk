@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 13:26:09
+ * @LastEditTime: 2025-01-03 15:26:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -357,7 +357,7 @@ public class ZhipuaiService {
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                                 String answerContent = accumulator.getDelta().getContent();
-                                log.info("answerContent {}", answerContent);
+                                // log.info("answerContent {}", answerContent);
                                 if (StringUtils.hasText(answerContent)) {
                                     answer.append(answerContent);
                                 }
