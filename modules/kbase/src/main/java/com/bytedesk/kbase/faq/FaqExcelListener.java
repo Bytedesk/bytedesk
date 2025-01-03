@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FaqExcelListener implements ReadListener<FaqExcel> {
 
-    private final FaqService faqService;
+    private final FaqRestService faqService;
 
     // private final String categoryUid;
 

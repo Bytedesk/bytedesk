@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FaqInitializer implements SmartInitializingSingleton {
 
-    private final FaqService faqService;
+    private final FaqRestService faqService;
 
     private final AuthorityService authorityService;
 

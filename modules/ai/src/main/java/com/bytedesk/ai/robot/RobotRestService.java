@@ -52,7 +52,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqService;
+import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
@@ -67,7 +67,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final AuthService authService;
 
-    private final FaqService faqService;
+    private final FaqRestService faqService;
 
     private final ModelMapper modelMapper;
 

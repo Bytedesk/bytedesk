@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FaqRestController extends BaseRestController<FaqRequest> {
 
-    private final FaqService faqService;
+    private final FaqRestService faqService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override

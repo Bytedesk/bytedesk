@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:25:39
+ * @LastEditTime: 2025-01-03 12:41:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,6 +51,7 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.event.UploadSplitEvent;
+import com.bytedesk.kbase.faq.FaqRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,8 @@ public class RobotEventListener {
     private final MessageCache messageCache;
 
     private final IMessageSendService messageSendService;
+
+    private final FaqRestService faqRestService;
 
     @Order(5)
     @EventListener
@@ -251,11 +254,14 @@ public class RobotEventListener {
     public void onUploadSplitEvent(UploadSplitEvent event) {
         log.info("robot onUploadSplitEvent: {}", event.getDocuments().size());
         List<Document> documents = event.getDocuments();
+        
         for (Document document : documents) {
-            // log.info("document id: {}", document.getId());
-            // log.info("document content: {}", document.getText());
             // 调用模型生成问答对
-            zhipuaiService.generateQaPairsAsync(document.getText());
+            String qaPairs = zhipuaiService.generateQaPairsAsync(document.getText());
+            log.info("generateQaPairsAsync qaPairs {}", qaPairs);
+            
+            // Save QA pairs to database
+            faqRestService.saveQaPairs(qaPairs, event.getKbUid(), event.getOrgUid(), document.getId());
         }
     }
 
