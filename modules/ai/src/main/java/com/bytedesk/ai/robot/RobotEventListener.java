@@ -243,7 +243,4 @@ public class RobotEventListener {
         }
     }
 
-    // private void sendRobotReply(ThreadProtobuf threadProtobuf, UserProtobuf user, String query, RobotEntity robot) {
-    // }
-
 }

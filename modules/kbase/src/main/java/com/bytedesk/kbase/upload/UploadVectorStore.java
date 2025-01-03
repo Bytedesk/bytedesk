@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 10:10:11
+ * @LastEditTime: 2025-01-03 10:20:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,11 +30,13 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.kbase.config.KbaseConst;
+import com.bytedesk.kbase.upload.event.UploadSplitEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +49,8 @@ public class UploadVectorStore {
 	private final RedisVectorStore vectorStore;
 
 	private final UploadService uploadService;
+
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 	public final String PROMPT_QA = """
 				基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
@@ -242,7 +246,8 @@ public class UploadVectorStore {
 		// log.info("Parsing document, this will take a while.");
 		vectorStore.write(docList);
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
-		// TODO: 通知相关组件，文件处理成功
+		// 通知相关组件，文件处理成功
+		applicationEventPublisher.publishEvent(new UploadSplitEvent(docList));
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
