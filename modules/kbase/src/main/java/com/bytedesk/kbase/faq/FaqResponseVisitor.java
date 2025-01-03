@@ -27,9 +27,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FaqResponseVisitor extends BaseResponse {
 
-    private String title;
+    private String question;
 
-    private String content;
+    private String answer;
 
     private String type;
 
