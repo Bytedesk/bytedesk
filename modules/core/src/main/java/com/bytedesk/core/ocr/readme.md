@@ -14,5 +14,7 @@
 -->
 # OCR-图片文字识别
 
+提取图片中的文字，并进行向量化存储，用于知识库检索
+
 - [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 - [PaddleOCR](https://paddlepaddle.github.io/PaddleOCR/latest/#_2)
