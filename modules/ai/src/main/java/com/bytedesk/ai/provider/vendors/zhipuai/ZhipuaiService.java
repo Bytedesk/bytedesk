@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 11:31:35
+ * @LastEditTime: 2025-01-03 12:24:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -325,7 +325,72 @@ public class ZhipuaiService {
 
     }
 
-    public void generateQaPairs(String chunk) {
+    public void generateQaPairsAsync(String chunk) {
+        String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
+        log.info("generateQaPairs prompt {}", prompt);
+        //
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
+        messages.add(chatMessage);
+        //
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                // 模型名称
+                .model(zhipuaiConfig.zhiPuAiApiModel)
+                .stream(Boolean.TRUE)
+                .messages(messages)
+                .requestId(uidUtils.getUid())
+                .build();
+        //
+        StringBuilder answer = new StringBuilder();
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        if (sseModelApiResp.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            List<Choice> choices = new ArrayList<>();
+            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                log.info("answer start: ");
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
+                                log.info("tool_calls: " + jsonString);
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
+                                String answerContent = accumulator.getDelta().getContent();
+                                log.info("answerContent {}", answerContent);
+                                if (StringUtils.hasText(answerContent)) {
+                                    answer.append(answerContent);
+                                }
+                            }
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        log.info("answer end");
+                    })
+                    .lastElement()
+                    .blockingGet();
+
+            ModelData data = new ModelData();
+            data.setChoices(choices);
+            data.setUsage(chatMessageAccumulator.getUsage());
+            data.setId(chatMessageAccumulator.getId());
+            data.setCreated(chatMessageAccumulator.getCreated());
+            data.setRequestId(chatCompletionRequest.getRequestId());
+            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setData(data);
+            // 存储到数据库
+            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
+            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
+            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
+        }
+
+        log.info("generateQaPairsAsync result {}", JSON.toJSONString(sseModelApiResp));
+        log.info("generateQaPairsAsync answer {}", answer.toString());
+    }
+
+    // FIXME: Caused by: java.net.SocketTimeoutException: timeout
+    public void generateQaPairsSync(String chunk) {
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
         log.info("generateQaPairs prompt {}", prompt);
         
@@ -374,7 +439,6 @@ public class ZhipuaiService {
             }
         }
     }
-
 
     /**
      * sse调用
