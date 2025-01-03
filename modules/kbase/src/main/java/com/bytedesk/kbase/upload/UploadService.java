@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 14:13:35
+ * @LastEditTime: 2025-01-03 15:14:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -153,9 +153,6 @@ public class UploadService extends BaseRestService<UploadEntity, UploadRequest, 
 			}
 
 			// 返回包含日期文件夹的文件名路径
-			// return currentDateFolder + "/" + fileName;
-			// return destinationFile.toString();
-			// String uploadPath = destinationFile.toString();
 			String uploadPath = currentDateFolder + "/" + fileName;
 			String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
 			return fileUrl;
