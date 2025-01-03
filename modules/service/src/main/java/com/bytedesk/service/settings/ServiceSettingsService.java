@@ -25,7 +25,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqService;
+import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentRequest;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
@@ -44,7 +44,7 @@ public class ServiceSettingsService {
 
     private final ModelMapper modelMapper;
 
-    private final FaqService faqService;
+    private final FaqRestService faqService;
 
     private final WorktimeService worktimeService;
 

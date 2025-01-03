@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 11:13:20
+ * @LastEditTime: 2025-01-03 12:53:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -211,7 +211,7 @@ public class UploadVectorStore {
 		vectorStore.write(docList);
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
 		// 通知相关组件，文件处理成功
-		bytedeskEventPublisher.publishEvent(new UploadSplitEvent(docList));
+		bytedeskEventPublisher.publishEvent(new UploadSplitEvent(docList, upload.getKbUid(), upload.getOrgUid()));
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html

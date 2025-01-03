@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-03 10:18:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 10:19:49
+ * @LastEditTime: 2025-01-03 12:52:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,8 +30,16 @@ public class UploadSplitEvent extends ApplicationEvent {
 
     private final List<Document> documents;
 
-    public UploadSplitEvent(List<Document> documents) {
+    // 知识库uid
+    private final String kbUid; 
+
+    // 企业uid
+    private final String orgUid;
+
+    public UploadSplitEvent(List<Document> documents, String kbUid, String orgUid) {
         super(documents);
         this.documents = documents;
+        this.kbUid = kbUid;
+        this.orgUid = orgUid;
     }
 }

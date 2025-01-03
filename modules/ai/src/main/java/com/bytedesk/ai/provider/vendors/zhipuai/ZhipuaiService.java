@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:24:17
+ * @LastEditTime: 2025-01-03 12:51:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -155,7 +155,7 @@ public class ZhipuaiService {
                   "id": "1",
                   "question": "问题描述",
                   "answer": "答案内容",
-                  "type": "概念解释/操作指导/原理分析等",
+                  "description": "概念解释/操作指导/原理分析等",
                   "tags": ["标签1", "标签2"]
                 }
               ]
@@ -325,7 +325,7 @@ public class ZhipuaiService {
 
     }
 
-    public void generateQaPairsAsync(String chunk) {
+    public String generateQaPairsAsync(String chunk) {
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
         log.info("generateQaPairs prompt {}", prompt);
         //
@@ -385,8 +385,40 @@ public class ZhipuaiService {
             // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
         }
 
+        // {"code":200,"data":{"array":false,"bigDecimal":false,"bigInteger":false,"binary":false,"boolean":false,"choices":[],"containerNode":true,"created":1735878897,"double":false,"empty":false,"float":false,"floatingPointNumber":false,"id":"202501031234572bc205aee4ee42d2","int":false,"integralNumber":false,"long":false,"missingNode":false,"nodeType":"OBJECT","null":false,"number":false,"object":true,"pojo":false,"request_id":"1554299146469504","short":false,"textual":false,"usage":{"completion_tokens":401,"prompt_tokens":493,"total_tokens":894},"valueNode":false},"msg":"成功","success":true}
         log.info("generateQaPairsAsync result {}", JSON.toJSONString(sseModelApiResp));
-        log.info("generateQaPairsAsync answer {}", answer.toString());
+        /** 
+         {
+            "qaPairs": [
+                {
+                    "question": "什么是北京市人事考评办公室的监督举报渠道？",
+                    "answer": "北京市人事考评办公室的监督举报渠道是纪检监察监督举报，可以通过访问网站https://beijing.12388.gov.cn/进行举报。",
+                    "type": "概念解释",
+                    "tags": ["监督举报", "人事考评办公室"]
+                },
+                {
+                    "question": "北京市人事考评办公室是否与任何培训机构有合作关系？",
+                    "answer": "不是，北京市人事考评办公室不指定任何培训，并且与任何培训机构无合作关系。",
+                    "type": "确认信息",
+                    "tags": ["人事考评办公室", "培训机构"]
+                },
+                {
+                    "question": "北京市人事考评办公室的文件是由哪个部门印发的？",
+                    "answer": "北京市人事考评办公室的文件是由其自身于2023年9月19日印发。",
+                    "type": "信息查询",
+                    "tags": ["文件印发", "人事考评办公室"]
+                },
+                {
+                    "question": "北京市人事考评办公室的文件抄送给了哪些部门？",
+                    "answer": "北京市人事考评办公室的文件抄送给了市人力资源和社会保障局办公室、事业单位人事管理处。",
+                    "type": "信息查询",
+                    "tags": ["文件抄送", "政府部门"]
+                }
+            ]
+        }
+        */
+        // log.info("generateQaPairsAsync answer {}", answer.toString());
+        return answer.toString();
     }
 
     // FIXME: Caused by: java.net.SocketTimeoutException: timeout

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 08:25:18
+ * @LastEditTime: 2025-01-03 12:52:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -38,10 +40,12 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
-public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqResponse> {
+public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqResponse> {
 
     private final FaqRepository faqRepository;
 
@@ -167,8 +171,7 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
 
     @Override
     public void delete(FaqRequest entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(entity.getUid());
     }
 
     @Override
@@ -182,6 +185,8 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
         return modelMapper.map(entity, FaqResponse.class);
     }
 
+    
+
     public FaqExcel convertToExcel(FaqResponse faq) {
         return modelMapper.map(faq, FaqExcel.class);
     }
@@ -189,7 +194,7 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
     public FaqEntity convertExcelToFaq(FaqExcel excel,String kbUid, String orgUid) {
         // return modelMapper.map(excel, Faq.class); // String categoryUid,
         FaqEntity faq = FaqEntity.builder().build();
-        faq.setUid(uidUtils.getCacheSerialUid());
+        faq.setUid(uidUtils.getUid());
         faq.setQuestion(excel.getQuestion());
         faq.setAnswer(excel.getAnswer());
         // 
@@ -216,6 +221,43 @@ public class FaqService extends BaseRestService<FaqEntity, FaqRequest, FaqRespon
         faq.setOrgUid(orgUid);
         // 
         return faq;
+    }
+
+    public void saveQaPairs(String qaPairs, String kbUid, String orgUid, String docUid) {
+        if (!StringUtils.hasText(qaPairs)) {
+            return;
+        }
+
+        try {
+            // Parse JSON array of QA pairs
+            List<JSONObject> qaList = JSON.parseArray(qaPairs, JSONObject.class);
+            
+            for (JSONObject qa : qaList) {
+                String question = qa.getString("question");
+                String answer = qa.getString("answer");
+                String description = qa.getString("description");
+                String tags = qa.getString("tags");
+                
+                if (StringUtils.hasText(question) && StringUtils.hasText(answer)) {
+                    FaqEntity faq = FaqEntity.builder()
+                        .question(question)
+                        .answer(answer)
+                        .type(MessageTypeEnum.TEXT.name())
+                        .description(description)
+                        .tags(tags)
+                        .kbUid(kbUid)
+                        .docUid(docUid)
+                        .build();
+                    
+                    faq.setUid(uidUtils.getUid());
+                    faq.setOrgUid(orgUid);
+                    faqRepository.save(faq);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error parsing and saving QA pairs: {}", e.getMessage());
+            throw new RuntimeException("Failed to save QA pairs", e);
+        }
     }
 
 }
