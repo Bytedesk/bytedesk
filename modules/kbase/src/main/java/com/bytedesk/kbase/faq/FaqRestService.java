@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:52:43
+ * @LastEditTime: 2025-01-03 13:02:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -230,12 +230,17 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
 
         try {
             // Parse JSON array of QA pairs
-            List<JSONObject> qaList = JSON.parseArray(qaPairs, JSONObject.class);
+            JSONObject jsonObject = JSON.parseObject(qaPairs);
+            List<JSONObject> qaList = jsonObject.getList("qa_pairs", JSONObject.class);
+            if (qaList == null || qaList.isEmpty()) {
+                log.warn("No QA pairs found in response");
+                return;
+            }
             
             for (JSONObject qa : qaList) {
                 String question = qa.getString("question");
                 String answer = qa.getString("answer");
-                String description = qa.getString("description");
+                String description = qa.getString("description"); 
                 String tags = qa.getString("tags");
                 
                 if (StringUtils.hasText(question) && StringUtils.hasText(answer)) {
