@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-02 15:38:19
+ * @LastEditTime: 2025-01-03 10:10:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -260,7 +260,6 @@ public class UploadVectorStore {
 		return contentList;
 	}
 
-	// FIXME: kb_uid 没有起到过滤作用？
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	public List<String> searchText(String query, String kbUid) {
 		log.info("searchText kbUid {}, query: {}", kbUid, query);

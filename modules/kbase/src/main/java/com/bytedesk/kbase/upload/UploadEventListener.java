@@ -48,6 +48,8 @@ import com.bytedesk.kbase.quick_reply.QuickReplyService;
 import com.bytedesk.kbase.taboo.TabooExcel;
 import com.bytedesk.kbase.taboo.TabooExcelListener;
 import com.bytedesk.kbase.taboo.TabooService;
+import com.bytedesk.kbase.upload.event.UploadCreateEvent;
+import com.bytedesk.kbase.upload.event.UploadUpdateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
