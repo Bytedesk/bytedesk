@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 16:59:58
+ * @LastEditTime: 2025-01-03 10:25:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,8 +15,10 @@
 package com.bytedesk.ai.robot;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.ai.document.Document;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -48,6 +50,8 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.upload.event.UploadSplitEvent;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -240,6 +244,16 @@ public class RobotEventListener {
                 }
                 // sendRobotReply(threadProtobuf, agent, query, robot);
             }
+        }
+    }
+
+
+    @EventListener
+    public void onUploadSplitEvent(UploadSplitEvent event) {
+        log.info("robot onUploadSplitEvent: {}", event.getDocuments().size());
+        List<Document> documents = event.getDocuments();
+        for (Document document : documents) {
+            log.info("document id: {}", document.getId());
         }
     }
 
