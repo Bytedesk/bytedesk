@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 10:26:35
+ * @LastEditTime: 2025-01-03 10:36:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -255,6 +255,8 @@ public class RobotEventListener {
         for (Document document : documents) {
             log.info("document id: {}", document.getId());
             log.info("document content: {}", document.getText());
+            // 调用模型生成问答对
+            zhipuaiService.generateQaPairs(document.getText());
         }
     }
 

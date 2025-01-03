@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 10:27:34
+ * @LastEditTime: 2025-01-03 10:37:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -118,30 +118,48 @@ public class ZhipuaiService {
             """;
 
     private final String PROMPT_QA_TEMPLATE = """
-            	基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
+            基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
 
-            	1. 问题部分：
-            	- 为同一个主题创建尽可能多的（如K个）不同表述的问题，确保问题的多样性。
-            	- 每个问题应考虑用户可能的多种问法，例如：
-            	- 直接询问（如“什么是...？”）
-            	- 请求确认（如“是否可以说...？”）
-            	- 寻求解释（如“请解释一下...的含义。”）
-            	- 假设性问题（如“如果...会怎样？”）
-            	- 例子请求（如“能否举个例子说明...？”）
-            	- 问题应涵盖文本中的关键信息、主要概念和细节，确保不遗漏重要内容。
+            1. 问题部分：
+            - 为同一个主题创建多个不同表述的问题，确保问题的多样性
+            - 每个问题应考虑用户可能的多种问法，例如：
+              - 直接询问（如"什么是...？"）
+              - 请求确认（如"是否可以说...？"）
+              - 如何做（如"如何实现...？"）
+              - 为什么（如"为什么需要...？"）
+              - 比较类（如"...和...有什么区别？"）
 
-            	2. 答案部分：
-            	- 提供一个全面、信息丰富的答案，涵盖问题的所有可能角度，确保逻辑连贯。
-            	- 答案应直接基于给定文本，确保准确性和一致性。
+            2. 答案部分：
+            - 答案应该准确、完整且易于理解
+            - 使用简洁清晰的语言
+            - 适当添加示例说明
+            - 可以包含关键步骤或要点
+            - 必要时提供相关概念解释
 
-            	3. 格式：
+            3. 格式要求：
+            - 以JSON数组形式输出
+            - 每个问答对包含question和answer字段
+            - 可选添加type字段标识问题类型
+            - 可选添加tags字段标识相关标签
 
-            	4. 内容要求：
-            	- 确保问答对紧密围绕文本主题，避免偏离主题。
-            	- 避免添加文本中未提及的信息，确保信息的真实性。
-            	- 如果文本信息不足以回答某个方面，可以在答案中说明 "根据给定信息无法确定"，并尽量提供相关的上下文。
+            4. 质量控制：
+            - 确保问答对之间不重复
+            - 问题应该有实际意义和价值
+            - 答案需要准确且有帮助
+            - 覆盖文本中的重要信息点
 
-            	5. 示例结构（仅供参考，实际内容应基于给定文本）：
+            5. 示例格式：
+            {
+              "qaPairs": [
+                {
+                  "id": "1",
+                  "question": "问题描述",
+                  "answer": "答案内容",
+                  "type": "概念解释/操作指导/原理分析等",
+                  "tags": ["标签1", "标签2"]
+                }
+              ]
+            }
 
             给定文本：
             {chunk}
@@ -313,6 +331,78 @@ public class ZhipuaiService {
         log.info("websocket output:" + result);
 
     }
+
+    public void generateQaPairs(String chunk) {
+        String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
+        log.info("generateQaPairs prompt {}", prompt);
+        //
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
+        messages.add(chatMessage);
+        //
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                // 模型名称
+                .model(zhipuaiConfig.zhiPuAiApiModel)
+                .stream(Boolean.TRUE)
+                .messages(messages)
+                .requestId(uidUtils.getUid())
+                .build();
+        //
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        if (sseModelApiResp.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            List<Choice> choices = new ArrayList<>();
+            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                log.info("generateQaPairs answer start: ");
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
+                                log.info("generateQaPairs tool_calls: " + jsonString);
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
+                                String answerContent = accumulator.getDelta().getContent();
+                                log.info("generateQaPairs answerContent {}", answerContent);
+                                if (StringUtils.hasText(answerContent)) {
+                                    
+                                }
+                            }
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        log.info("generateQaPairs answer end");
+                    })
+                    .lastElement()
+                    .blockingGet();
+
+            ModelData data = new ModelData();
+            data.setChoices(choices);
+            data.setUsage(chatMessageAccumulator.getUsage());
+            data.setId(chatMessageAccumulator.getId());
+            data.setCreated(chatMessageAccumulator.getCreated());
+            data.setRequestId(chatCompletionRequest.getRequestId());
+            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setData(data);
+            // 存储到数据库
+            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
+            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
+            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
+            // 后处理步骤：生成更多的问答对
+            // List<String> additionalQAPairs = generateAdditionalQAPairs(question,
+            // robotMessage.getAnswer());
+            // additionalQAPairs.forEach(qaPair -> {
+            // log.info("Additional QA Pair: {}", qaPair);
+            // // 这里可以将更多的问答对存储到数据库或发送给客户端
+            // });
+        }
+
+        String result = JSON.toJSONString(sseModelApiResp);
+        log.info("websocket output:" + result);
+
+    }
+
 
     /**
      * sse调用
