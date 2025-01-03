@@ -251,7 +251,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                     
                     faq.setUid(uidUtils.getUid());
                     faq.setOrgUid(orgUid);
-                    faqRepository.save(faq);
+                    save(faq);
                 }
             }
         } catch (Exception e) {
