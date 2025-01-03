@@ -77,10 +77,11 @@
 
 		<!-- https://open.bigmodel.cn/dev/api#sdk_install -->
 		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
+		<!-- https://central.sonatype.com/artifact/cn.bigmodel.openapi/oapi-java-sdk/release-V4-2.3.1 -->
 		<dependency>
 			<groupId>cn.bigmodel.openapi</groupId>
 			<artifactId>oapi-java-sdk</artifactId>
-			<version>release-V4-2.3.0</version>
+			<version>release-V4-2.3.1</version>
 		</dependency>
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 10:37:21
+ * @LastEditTime: 2025-01-03 11:31:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JsonResultCodeEnum;
 import com.bytedesk.kbase.upload.UploadVectorStore;
 import com.zhipu.oapi.ClientV4;
-// import com.zhipu.oapi.Constants;
+import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
 import com.zhipu.oapi.service.v4.model.ChatMessage;
 import com.zhipu.oapi.service.v4.model.ChatMessageAccumulator;
@@ -244,13 +244,6 @@ public class ZhipuaiService {
             // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
             // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
             // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
-            // 后处理步骤：生成更多的问答对
-            // List<String> additionalQAPairs = generateAdditionalQAPairs(question,
-            // robotMessage.getAnswer());
-            // additionalQAPairs.forEach(qaPair -> {
-            // log.info("Additional QA Pair: {}", qaPair);
-            // // 这里可以将更多的问答对存储到数据库或发送给客户端
-            // });
         }
 
         String result = JSON.toJSONString(sseModelApiResp);
@@ -335,72 +328,51 @@ public class ZhipuaiService {
     public void generateQaPairs(String chunk) {
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
         log.info("generateQaPairs prompt {}", prompt);
-        //
+        
+        // 构建消息
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
         messages.add(chatMessage);
-        //
+        
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                // 模型名称
                 .model(zhipuaiConfig.zhiPuAiApiModel)
-                .stream(Boolean.TRUE)
+                .stream(Boolean.FALSE)
+                .invokeMethod(Constants.invokeMethod)
                 .messages(messages)
                 .requestId(uidUtils.getUid())
                 .build();
-        //
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        if (sseModelApiResp.isSuccess()) {
-            AtomicBoolean isFirst = new AtomicBoolean(true);
-            List<Choice> choices = new ArrayList<>();
-            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
-                    .doOnNext(accumulator -> {
-                        {
-                            if (isFirst.getAndSet(false)) {
-                                log.info("generateQaPairs answer start: ");
-                            }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
-                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
-                                log.info("generateQaPairs tool_calls: " + jsonString);
-                            }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                                String answerContent = accumulator.getDelta().getContent();
-                                log.info("generateQaPairs answerContent {}", answerContent);
-                                if (StringUtils.hasText(answerContent)) {
-                                    
-                                }
-                            }
-                        }
-                    })
-                    .doOnComplete(() -> {
-                        log.info("generateQaPairs answer end");
-                    })
-                    .lastElement()
-                    .blockingGet();
 
-            ModelData data = new ModelData();
-            data.setChoices(choices);
-            data.setUsage(chatMessageAccumulator.getUsage());
-            data.setId(chatMessageAccumulator.getId());
-            data.setCreated(chatMessageAccumulator.getCreated());
-            data.setRequestId(chatCompletionRequest.getRequestId());
-            sseModelApiResp.setFlowable(null);// 打印前置空
-            sseModelApiResp.setData(data);
-            // 存储到数据库
-            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
-            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
-            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
-            // 后处理步骤：生成更多的问答对
-            // List<String> additionalQAPairs = generateAdditionalQAPairs(question,
-            // robotMessage.getAnswer());
-            // additionalQAPairs.forEach(qaPair -> {
-            // log.info("Additional QA Pair: {}", qaPair);
-            // // 这里可以将更多的问答对存储到数据库或发送给客户端
-            // });
+        // 添加重试逻辑
+        int maxRetries = 3;
+        int retryCount = 0;
+        int retryDelay = 1000; // 初始延迟1秒
+
+        while (retryCount < maxRetries) {
+            try {
+                ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+                log.info("model output: {}", JSON.toJSONString(invokeModelApiResp));
+                return; // 成功则返回
+                
+            } catch (Exception e) {
+                retryCount++;
+                if (retryCount == maxRetries) {
+                    log.error("Failed to generate QA pairs after {} retries", maxRetries, e);
+                    throw new RuntimeException("Failed to generate QA pairs: " + e.getMessage(), e);
+                }
+                
+                // 指数退避重试
+                int delay = retryDelay * (1 << (retryCount - 1));
+                log.warn("Retry {}/{} after {}ms due to: {}", 
+                        retryCount, maxRetries, delay, e.getMessage());
+                
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted while retrying", ie);
+                }
+            }
         }
-
-        String result = JSON.toJSONString(sseModelApiResp);
-        log.info("websocket output:" + result);
-
     }
 
 
