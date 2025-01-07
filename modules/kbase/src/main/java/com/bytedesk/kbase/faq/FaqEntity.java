@@ -46,6 +46,11 @@ public class FaqEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String answer;
 
+    // TODO：支持一问多答，根据访客不同身份，显示不同答案
+
+    // TODO: 支持设置关联问题
+
+
     @Builder.Default
     @Column(name = "faq_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
