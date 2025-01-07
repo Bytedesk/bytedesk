@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 14:41:44
+ * @LastEditTime: 2025-01-07 17:38:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,7 @@
 -->
 # 微语
 
-企业级即时通讯解决方案，支持企业IM、在线客服、知识库、帮助中心、工单系统、AI助手等。
+企业级即时通讯解决方案
 <!-- 一款聊天软件 -->
 <!-- 可编排AI知识库问答 + 对接自有业务系统 + 转人工客服。 -->
 <!-- 不仅仅是一款 **企业IM** -->
@@ -38,6 +38,14 @@
 - 自定义通知，如：接收运维报警、股票实时报价等
 - 更利于企业内部员工之间协作
 
+### 全渠道客服
+
+- 大模型AI智能客服
+- 实现人工客服兜底
+- 提供转人工客服接口，
+- 可为第三方AI知识库问答系统提供转人工解决方案
+- 支持多渠道
+
 ### 知识库AI对话
 
 - 可编排AI知识库问答
@@ -47,13 +55,6 @@
 - 可对接调用第三方知识库问答系统接口
 - 实时调用自有业务系统Api
 - 实现系统解耦，更利于扩展
-
-### 智能客服 + 人工客服
-
-- 智能客服
-- 实现人工客服兜底
-- 提供转人工客服接口，可为第三方AI知识库问答系统提供转人工解决方案
-- 支持多渠道
 
 <!-- ### 社交IM
 
@@ -204,13 +205,13 @@ docker run -d \
 <!-- - [Android](https://www.weiyuai.cn/download.html) -->
 <!-- - [IOS](https://www.weiyuai.cn/download.html) -->
 
-<!-- ## 技术栈 -->
+## 技术栈
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->
-<!-- - [springboot-3.x for 后端](https://github.com/Bytedesk/bytedesk) -->
+- [springboot-3.x for 后端](https://github.com/Bytedesk/bytedesk)
+- [react for web前端](https://github.com/Bytedesk/bytedesk-web)
+- [flutter for 移动客户端(ios&android)](https://github.com/Bytedesk/bytedesk-mobile)
+- [electron for 桌面客户端(windows&mac&linux)](https://github.com/Bytedesk/bytedesk-desktop)
 <!-- - [python for ai](https://github.com/Bytedesk/bytedesk-ai) -->
-<!-- - [react for web前端](https://github.com/Bytedesk/bytedesk-react) -->
-<!-- - [flutter for 移动客户端(ios&android)](https://github.com/Bytedesk/bytedesk-mobile) -->
-<!-- - [electron for 桌面客户端(windows&mac&linux)](https://github.com/Bytedesk/bytedesk-desktop) -->
 
 ## 联系
 
