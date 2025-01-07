@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-07 17:38:16
+ * @LastEditTime: 2025-01-07 18:07:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,7 @@
 -->
 # 微语
 
-企业级即时通讯解决方案
+企业级多租户即时通讯解决方案
 <!-- 一款聊天软件 -->
 <!-- 可编排AI知识库问答 + 对接自有业务系统 + 转人工客服。 -->
 <!-- 不仅仅是一款 **企业IM** -->
