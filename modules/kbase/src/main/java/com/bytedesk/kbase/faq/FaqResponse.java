@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 08:23:59
+ * @LastEditTime: 2025-01-07 18:19:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,10 @@ public class FaqResponse extends BaseResponse {
     private Integer upCount;
 
     private Integer downCount;
+
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 
     // private CategoryResponse category;
 

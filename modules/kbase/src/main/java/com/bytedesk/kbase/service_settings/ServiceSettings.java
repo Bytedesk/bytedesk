@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:33:50
+ * @LastEditTime: 2025-01-07 18:22:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -127,7 +127,14 @@ public class ServiceSettings implements Serializable {
     // TODO: 一条消息最大长度，超过此长度，则自动截断成多条消息发送
     // @Builder.Default
     // private int msgMaxLength = 1024;
-    // 
+
+    // 桌面版聊天窗口右侧iframe
+    @Builder.Default
+    private boolean showIframe = false;
+
+    // 桌面版聊天窗口右侧iframe地址
+    private String iframeUrl;
+
     // 常见问题
     @Builder.Default
     private boolean showFaqs = false;
