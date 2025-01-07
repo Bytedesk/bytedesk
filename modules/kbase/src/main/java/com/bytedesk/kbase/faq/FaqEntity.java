@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-07 18:18:55
+ * @LastEditTime: 2025-01-07 22:04:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,9 +61,13 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private String tags = "[]";
 
-    // 被点击查看次数
+    // 被浏览次数
     @Builder.Default
     private int viewCount = 0;
+
+    // 被点击次数
+    @Builder.Default
+    private int clickCount = 0;
 
     // 点赞次数
     @Builder.Default
