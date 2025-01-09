@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 20:24:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 15:37:50
+ * @LastEditTime: 2025-01-09 23:20:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.upload.cloud;
 
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
