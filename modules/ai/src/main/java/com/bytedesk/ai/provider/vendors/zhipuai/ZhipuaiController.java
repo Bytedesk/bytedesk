@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 11:00:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 18:08:03
+ * @LastEditTime: 2025-01-09 22:32:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,6 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/zhipuai")
 @AllArgsConstructor
+@Tag(name = "ZhipuaiController", description = "智谱AI接口")
 public class ZhipuaiController {
 
     private final ZhiPuAiChatModel chatModel;
@@ -60,12 +62,12 @@ public class ZhipuaiController {
 
     private final ZhipuaiService zhipuaiService;
 
-    // http://127.0.0.1:9003/zhipuai/chat
+    // http://127.0.0.1:9003/zhipuai/chat?q=讲个笑话
     @GetMapping("/chat")
-    public ResponseEntity<?> generation() {
+    public ResponseEntity<?> generation(@RequestParam(value = "q", defaultValue = "讲个笑话") String question) {
         ChatResponse response = chatModel.call(
                 new Prompt(
-                        "Generate the names of 5 famous pirates.",
+                        question,
                         ZhiPuAiChatOptions.builder()
                                 .model(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
                                 .temperature(0.5)
