@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 15:18:42
+ * @LastEditTime: 2025-01-09 22:57:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -79,8 +78,8 @@ public class UploadEventListener {
     private final UploadVectorStore uploadVectorStore;
 
     @EventListener
-    public void onUploadCreateEvent(GenericApplicationEvent<UploadCreateEvent> event) throws IOException {
-        UploadEntity upload = event.getObject().getUpload();
+    public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
+        UploadEntity upload = event.getUpload();
         log.info("UploadEventListener create: {}", upload.toString());
         // etl分块处理
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
@@ -146,8 +145,8 @@ public class UploadEventListener {
     }
 
     @EventListener
-    public void onUploadUpdateEvent(GenericApplicationEvent<UploadUpdateEvent> event) {
-        UploadEntity upload = event.getObject().getUpload();
+    public void onUploadUpdateEvent(UploadUpdateEvent event) {
+        UploadEntity upload = event.getUpload();
         log.info("UploadEventListener update: {}", upload.toString());
         // 后台删除文件记录
         if (upload.isDeleted()) {
@@ -159,8 +158,8 @@ public class UploadEventListener {
     }
 
     @EventListener
-    public void onRedisPubsubParseFileSuccessEvent(GenericApplicationEvent<RedisPubsubParseFileSuccessEvent> event) {
-        RedisPubsubMessageFile messageFile = event.getObject().getMessageFile();
+    public void onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {
+        RedisPubsubMessageFile messageFile = event.getMessageFile();
         log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
         //
         UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
@@ -182,8 +181,8 @@ public class UploadEventListener {
     }
 
     @EventListener
-    public void onRedisPubsubParseFileErrorEvent(GenericApplicationEvent<RedisPubsubParseFileErrorEvent> event) {
-        RedisPubsubMessageFile messageFile = event.getObject().getMessageFile();
+    public void onRedisPubsubParseFileErrorEvent(RedisPubsubParseFileErrorEvent event) {
+        RedisPubsubMessageFile messageFile = event.getMessageFile();
         log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
         UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
                 .orElseThrow(() -> new RuntimeException("upload not found by uid: " + messageFile.getFileUid()));

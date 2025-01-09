@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 17:42:56
+ * @LastEditTime: 2025-01-09 22:55:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import java.util.Set;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -95,9 +94,9 @@ public class TopicEventListener {
     }
 
     @EventListener
-    public void onUserLogoutEvent(GenericApplicationEvent<UserLogoutEvent> event) {
-        UserLogoutEvent userLogoutEvent = event.getObject();
-        UserEntity user = userLogoutEvent.getUser();
+    public void onUserLogoutEvent(UserLogoutEvent event) {
+        // UserLogoutEvent userLogoutEvent = event.getObject();
+        UserEntity user = event.getUser();
         log.info("topic onUserLogoutEvent: {}", user.getUsername());
         // TODO: user logout event, remove user from topic
     }

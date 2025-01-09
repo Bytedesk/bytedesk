@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 15:52:06
+ * @LastEditTime: 2025-01-09 23:00:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.excel.EasyExcel;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
@@ -107,11 +106,11 @@ public class MemberEventListener {
     }
 
     @EventListener
-    public void onMemberCreateEvent(GenericApplicationEvent<MemberCreateEvent> event) {
-        MemberCreateEvent memberCreateEvent = (MemberCreateEvent) event.getObject();
-        MemberEntity member = memberCreateEvent.getMember();
+    public void onMemberCreateEvent(MemberCreateEvent event) {
+        // MemberCreateEvent memberCreateEvent = (MemberCreateEvent) event.getObject();
+        MemberEntity member = event.getMember();
         UserEntity user = member.getUser();
-        log.info("member created: {}", memberCreateEvent);
+        log.info("member created: {}", event);
         // 默认订阅成员主题
         TopicRequest request = TopicRequest.builder()
                 .topic(TopicUtils.formatOrgMemberTopic(member.getUid()))
@@ -121,9 +120,9 @@ public class MemberEventListener {
     }
 
     @EventListener
-    public void onMemberUpdateEvent(GenericApplicationEvent<MemberUpdateEvent> event) {
-        MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent) event.getObject();
-        log.info("member updated: {}", memberUpdateEvent);
+    public void onMemberUpdateEvent(MemberUpdateEvent event) {
+        // MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent) event.getObject();
+        log.info("member updated: {}", event);
         // TODO: 删除旧的部门主题
     }
 
@@ -142,8 +141,8 @@ public class MemberEventListener {
     // }
 
      @EventListener
-    public void onUploadCreateEvent(GenericApplicationEvent<UploadCreateEvent> event) throws IOException {
-        UploadEntity upload = event.getObject().getUpload();
+    public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
+        UploadEntity upload = event.getUpload();
         log.info("UploadEventListener create: {}", upload.toString());
 
         // 导入Excel文件

@@ -1,9 +1,20 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-11-07 16:27:34
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-01-09 22:54:05
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.core.rbac.role;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import com.bytedesk.core.config.GenericApplicationEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,16 +24,15 @@ public class RoleEventListener {
     
 
     @EventListener
-    public void onRoleCreateEvent(GenericApplicationEvent<RoleCreateEvent> event) {
-        RoleCreateEvent roleCreateEvent = event.getObject();
-        RoleEntity roleEntity = roleCreateEvent.getRoleEntity();
+    public void onRoleCreateEvent(RoleCreateEvent event) {
+        // RoleCreateEvent roleCreateEvent = event.getObject();
+        RoleEntity roleEntity = event.getRoleEntity();
         log.info("onRoleCreateEvent: {}", roleEntity.toString());
     }
 
     // @EventListener
-    // public void onRoleUpdateEvent(GenericApplicationEvent<RoleUpdateEvent> event) {
-    //     RoleUpdateEvent roleUpdateEvent = event.getObject();
-    //     RoleEntity roleEntity = roleUpdateEvent.getRoleEntity();
+    // public void onRoleUpdateEvent(RoleUpdateEvent> event) {
+    //     RoleEntity roleEntity = event.getRoleEntity();
     //     log.info("onRoleUpdateEvent: {}", roleEntity.toString());
     // }
 

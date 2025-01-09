@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 17:30:22
+ * @LastEditTime: 2025-01-09 22:56:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
@@ -34,7 +33,7 @@ public class KnowledgebaseEntityListener {
         KnowledgebaseEntity clonedKnowledgebase = SerializationUtils.clone(knowledgebase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishGenericApplicationEvent(new GenericApplicationEvent<KnowledgebaseCreateEvent>(this, new KnowledgebaseCreateEvent(this, clonedKnowledgebase)));
+        publisher.publishEvent(new KnowledgebaseCreateEvent(this, clonedKnowledgebase));
     }
 
     // 
@@ -44,7 +43,7 @@ public class KnowledgebaseEntityListener {
         KnowledgebaseEntity clonedKnowledgebase = SerializationUtils.clone(knowledgebase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishGenericApplicationEvent(new GenericApplicationEvent<KnowledgebaseUpdateEvent>(this, new KnowledgebaseUpdateEvent(this, clonedKnowledgebase)));
+        publisher.publishEvent(new KnowledgebaseUpdateEvent(this, clonedKnowledgebase));
     }
 
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 12:30:19
+ * @LastEditTime: 2025-01-09 22:59:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,7 +41,6 @@ import com.bytedesk.core.action.ActionRestService;
 import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
@@ -243,9 +242,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         if (updatedAgent == null) {
             throw new RuntimeException("Failed to save agent.");
         }
-        bytedeskEventPublisher.publishGenericApplicationEvent(
-                new GenericApplicationEvent<AgentUpdateEvent>(this, new AgentUpdateEvent(this, updatedAgent,
-                        AgentUpdateTypeEnum.STATUS.name())));
+        bytedeskEventPublisher.publishEvent(new AgentUpdateEvent(this, updatedAgent, AgentUpdateTypeEnum.STATUS.name()));
 
         return convertToResponse(updatedAgent);
     }
