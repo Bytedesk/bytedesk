@@ -1,22 +1,22 @@
 import { defineComponent as l, onMounted as n, onUnmounted as r, h as m } from "vue";
 import { createI18n as a } from "vue-i18n";
 import s from "../core/BytedeskWeb/index.js";
-import { messages as d } from "../locales/index/index.js";
-const i = a({
-  locale: "zh-CN",
-  messages: d
+import { messages as c } from "../locales/index/index.js";
+const d = a({
+  locale: "zh-cn",
+  messages: c
 }), f = l({
   name: "BytedeskVue",
   props: {
     locale: {
       type: String,
-      default: "zh-CN"
+      default: "zh-cn"
     }
   },
   setup(o, { attrs: t }) {
     let e = null;
     return n(() => {
-      i.global.locale = o.locale, e = new s({
+      d.global.locale = o.locale, e = new s({
         ...t,
         locale: o.locale
       }), e.init();
