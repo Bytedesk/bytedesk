@@ -19,7 +19,7 @@ import java.util.Set;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;

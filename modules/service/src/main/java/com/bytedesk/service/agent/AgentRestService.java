@@ -41,7 +41,7 @@ import com.bytedesk.core.action.ActionRestService;
 import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;

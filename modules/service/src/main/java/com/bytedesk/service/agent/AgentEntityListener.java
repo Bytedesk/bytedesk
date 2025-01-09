@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;

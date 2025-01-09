@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 13:01:36
+ * @LastEditTime: 2025-01-09 16:41:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,21 +46,14 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private String lang = LanguageEnum.ZH_CN.name();
 
-	// location info
-	@Builder.Default
-	private String ip = "127.0.0.1";
-
-	@Builder.Default
-	private String ipLocation = "localhost";
-
+	
 	// device info
 	private String browser;
 
 	private String os;
 
 	private String device;
-
-	private String referrer;
+	
 
 	// used for agent notation
 	private String mobile;
@@ -82,6 +75,20 @@ public class VisitorRequest extends BaseRequest {
 	// 自定义参数，从URL传入，使用json格式传入，例如：{"key1":"value1","key2":"value2"}
 	@Builder.Default
 	private String extra = BytedeskConsts.EMPTY_JSON_STRING;
+
+	// 浏览信息
+	// 来源
+	private String referrer;
+	// 浏览的URL
+	private String url;
+	// 浏览的标题
+	private String title;
+	// 浏览的IP
+	@Builder.Default
+	private String ip = "127.0.0.1";
+	// 浏览的IP位置
+	@Builder.Default
+	private String ipLocation = "localhost";
 
 	// wechat mp extra
 	private String threadExtra;

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.action.ActionEntity;
 import com.bytedesk.core.action.ActionCreateEvent;
-import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzDay8Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;

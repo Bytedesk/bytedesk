@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageCache;
 import com.bytedesk.core.message.MessageProtobuf;

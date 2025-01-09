@@ -25,8 +25,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.excel.EasyExcel;
+import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;

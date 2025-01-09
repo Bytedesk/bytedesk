@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.ai.provider.LlmProviderCreateEvent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
+import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.event.GenericApplicationEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package com.bytedesk.core.rbac.role;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.event.GenericApplicationEvent;
+import com.bytedesk.core.config.GenericApplicationEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
