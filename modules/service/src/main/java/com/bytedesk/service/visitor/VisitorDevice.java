@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-26 09:39:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-10 10:20:40
+ * @LastEditTime: 2025-01-09 16:31:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,9 +21,9 @@ import lombok.Data;
 public class VisitorDevice {
 
     // location info
-    private String ip;
+    // private String ip;
 
-    private String ipLocation;
+    // private String ipLocation;
 
     // device info
     private String browser;
@@ -32,6 +32,6 @@ public class VisitorDevice {
 
     private String device;
 
-    private String referrer;
+    // private String referrer;
     
 }

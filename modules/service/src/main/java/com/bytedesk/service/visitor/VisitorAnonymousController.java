@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 15:32:27
+ * @LastEditTime: 2025-01-09 16:39:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.apilimit.ApiRateLimiter;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.IMessageSendService;
@@ -32,6 +33,7 @@ import com.bytedesk.core.message_unread.MessageUnreadService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -54,6 +56,8 @@ public class VisitorAnonymousController {
 
     private final IpService ipService;
 
+    private final BytedeskEventPublisher bytedeskEventPublisher;
+
     // @VisitorAnnotation(title = "visitor", action = "pre", description = "pre visit page")
     // @GetMapping("/pre")
     // public ResponseEntity<?> pre(HttpServletRequest request) {
@@ -63,15 +67,15 @@ public class VisitorAnonymousController {
     @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
     @ApiRateLimiter(value = 10.0, timeout = 1)
     @PostMapping("/init")
-    public ResponseEntity<?> init(@RequestBody VisitorRequest visitorRequest, HttpServletRequest request) {
+    public ResponseEntity<?> init(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
         //
-        String ip = IpUtils.getIp(request);
+        String ip = IpUtils.getIp(httpRequest);
         if (ip != null) {
             visitorRequest.setIp(ip);
             visitorRequest.setIpLocation(ipService.getIpLocation(ip));
         }
         if (!StringUtils.hasText(visitorRequest.getNickname())) {
-            visitorRequest.setNickname(ipService.createVisitorNickname(request));
+            visitorRequest.setNickname(ipService.createVisitorNickname(httpRequest));
         }
         VisitorResponse visitor = visitorService.create(visitorRequest);
         UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(visitor);
@@ -86,6 +90,21 @@ public class VisitorAnonymousController {
         MessageProtobuf messageProtobuf = visitorService.requestThread(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
+    }
+
+    @VisitorAnnotation(title = "visitor", action = "browse", description = "visitor browse")
+    @PostMapping("/browse")
+    public ResponseEntity<?> browse(VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
+        //
+        String ip = IpUtils.getIp(httpRequest);
+        if (ip != null) {
+            visitorRequest.setIp(ip);
+            visitorRequest.setIpLocation(ipService.getIpLocation(ip));
+        }
+        //
+        bytedeskEventPublisher.publishEvent(new VisitorBrowseEvent(this, visitorRequest));
+        //
+        return ResponseEntity.ok(JsonResult.success("browse success"));
     }
 
     @VisitorAnnotation(title = "visitor", action = "ping", description = "ping")

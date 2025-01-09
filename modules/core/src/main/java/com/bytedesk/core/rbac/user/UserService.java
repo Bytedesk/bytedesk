@@ -29,10 +29,10 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.event.GenericApplicationEvent;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.UsernameExistsException;
