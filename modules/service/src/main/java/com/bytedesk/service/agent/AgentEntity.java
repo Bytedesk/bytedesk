@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 11:47:31
+ * @LastEditTime: 2025-01-09 23:12:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,6 @@ import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.team.member.MemberEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -131,7 +130,6 @@ public class AgentEntity extends BaseEntity {
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     // org member
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
 

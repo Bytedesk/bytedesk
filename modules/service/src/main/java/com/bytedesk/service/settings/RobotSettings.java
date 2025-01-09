@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 15:40:07
+ * @LastEditTime: 2025-01-09 23:13:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.service.settings;
 import java.io.Serializable;
 
 import com.bytedesk.ai.robot.RobotEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
@@ -47,7 +46,7 @@ public class RobotSettings  implements Serializable {
     @Builder.Default
     private boolean nonWorktimeRobot = false;
 
-    @JsonIgnore
+    
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotEntity robot;
     

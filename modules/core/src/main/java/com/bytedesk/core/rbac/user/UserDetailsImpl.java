@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-09 12:23:38
+ * @LastEditTime: 2025-01-09 23:11:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,6 @@ public class UserDetailsImpl implements UserDetails {
     private String avatar;
     private String mobile;
     private String email;
-    @JsonIgnore
     private String password;
     private String description;
     // 

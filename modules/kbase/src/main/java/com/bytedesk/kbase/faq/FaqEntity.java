@@ -77,7 +77,6 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private int downCount = 0;
 
-    // @JsonIgnore
     // @ManyToOne
     // private Category category;
 

@@ -18,7 +18,6 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.role.RoleEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -69,7 +68,6 @@ public class UserEntity extends BaseEntityNoOrg {
 
 	private String nickname;
 
-	@JsonIgnore
 	private String password;
 
 	@Email(message = "email format error")
@@ -116,7 +114,6 @@ public class UserEntity extends BaseEntityNoOrg {
 	private String platform = PlatformEnum.BYTEDESK.name();
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
-	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	private OrganizationEntity currentOrganization;
 
