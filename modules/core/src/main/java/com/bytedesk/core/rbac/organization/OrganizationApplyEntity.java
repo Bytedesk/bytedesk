@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 12:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:15:04
+ * @LastEditTime: 2025-01-09 23:10:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.core.rbac.organization;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,12 +41,10 @@ public class OrganizationApplyEntity extends BaseEntity {
     private String note;
 
     // apply user
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 
     // apply organization
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private OrganizationEntity organization;
 

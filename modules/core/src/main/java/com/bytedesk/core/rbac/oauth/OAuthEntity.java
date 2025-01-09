@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 23:20:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:13:38
+ * @LastEditTime: 2025-01-09 23:10:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.core.rbac.oauth;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -57,7 +56,6 @@ public class OAuthEntity extends BaseEntity {
     // private String tokenType;
     // private Integer expiresIn;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 }

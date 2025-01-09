@@ -29,7 +29,7 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -94,7 +94,7 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private QueueSettings queueSettings = new QueueSettings();
 
-    @JsonIgnore
+    
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list

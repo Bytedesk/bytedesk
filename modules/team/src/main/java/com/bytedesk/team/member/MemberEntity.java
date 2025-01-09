@@ -81,7 +81,7 @@ public class MemberEntity extends BaseEntity {
 	private Set<String> roleUids = new HashSet<>(); 
 
     // 一个人只能属于一个部门，一个部门可以有多个成员
-    // @JsonIgnore
+    // 
     // // 关联多个Department
     // @Builder.Default
     // @ManyToMany(fetch = FetchType.LAZY)

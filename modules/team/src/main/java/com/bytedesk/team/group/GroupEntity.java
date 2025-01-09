@@ -23,7 +23,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -78,7 +78,7 @@ public class GroupEntity extends BaseEntity {
     private String status = GroupStatusEnum.NORMAL.name();
 
     // 群成员关系
-    @JsonIgnore
+    
     @Builder.Default
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<MemberEntity> members = new ArrayList<>();
@@ -91,7 +91,7 @@ public class GroupEntity extends BaseEntity {
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<RobotEntity> robots = new ArrayList<>();
 
-    @JsonIgnore
+    
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity creator;
 

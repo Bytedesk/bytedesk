@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-07 11:37:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 15:01:02
+ * @LastEditTime: 2025-01-09 23:12:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -85,14 +84,12 @@ public class RatingEntity extends BaseEntity {
     private String result = RatingResultEnum.UP.name();
 
     // rate (robot) message
-    @JsonIgnore
     @OneToOne
     private MessageEntity message;
 
     // rate thread
     // many rates to one thread
     // private String threadTopic;
-    @JsonIgnore
     @ManyToOne
     private ThreadEntity thread;
 

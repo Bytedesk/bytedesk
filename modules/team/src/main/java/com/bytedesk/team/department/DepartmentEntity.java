@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,7 +46,7 @@ public class DepartmentEntity extends BaseEntity {
     private String description;
 
     // 关联上级部门
-    @JsonIgnore
+    
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private DepartmentEntity parent;
@@ -57,7 +57,7 @@ public class DepartmentEntity extends BaseEntity {
     private Set<DepartmentEntity> children = new HashSet<>();
 
     // 使用Set防止重复加入
-    // @JsonIgnore
+    // 
     // @Builder.Default
     // @ManyToMany(mappedBy = "departments", fetch = FetchType.LAZY)
     // private Set<Member> members = new HashSet<>();
