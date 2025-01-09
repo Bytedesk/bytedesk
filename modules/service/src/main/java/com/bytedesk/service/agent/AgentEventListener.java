@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:41:02
+ * @LastEditTime: 2025-01-09 22:59:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -79,9 +78,9 @@ public class AgentEventListener {
     // 新创建客服，创建默认知识库
     // 因为依赖关系的原因，无法将该方法放到kbase事件监听中，所以放在此处
     @EventListener
-    public void onAgentCreateEvent(GenericApplicationEvent<AgentCreateEvent> event) {
-        AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
-        AgentEntity agent = agentCreateEvent.getAgent();
+    public void onAgentCreateEvent(AgentCreateEvent event) {
+        // AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
+        AgentEntity agent = event.getAgent();
         log.info("agent onAgentCreateEvent: {}", agent.getUid());
         // 创建快捷回复知识库
         KnowledgebaseRequest kownledgebaseRequestQuickReply = KnowledgebaseRequest.builder()

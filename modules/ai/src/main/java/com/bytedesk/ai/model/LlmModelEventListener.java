@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-12 22:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 17:44:25
+ * @LastEditTime: 2025-01-09 22:48:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.ai.provider.LlmProviderCreateEvent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.enums.LevelEnum;
 
 import lombok.AllArgsConstructor;
@@ -38,9 +37,9 @@ public class LlmModelEventListener {
     private final LlmProviderRestService llmProviderRestService;
 
     @EventListener
-    public void onLlmProviderCreateEvent(GenericApplicationEvent<LlmProviderCreateEvent> event) {
-        LlmProviderCreateEvent lpm = event.getObject();
-        LlmProviderEntity lpmEntity = lpm.getLlmProvider();
+    public void onLlmProviderCreateEvent(LlmProviderCreateEvent event) {
+        // LlmProviderCreateEvent lpm = event.getObject();
+        LlmProviderEntity lpmEntity = event.getLlmProvider();
         if (lpmEntity.getLevel().equals(LevelEnum.PLATFORM.name())) {
             return;
         }

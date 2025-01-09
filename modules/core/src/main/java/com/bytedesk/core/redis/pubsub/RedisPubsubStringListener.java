@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 17:13:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 17:18:30
+ * @LastEditTime: 2025-01-09 22:55:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageCache;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -61,8 +60,7 @@ public class RedisPubsubStringListener implements MessageListener {
                     RedisPubsubMessageFile.class);
             log.info("fileUid {}, docIds {}", messageFile.getFileUid(), messageFile.getDocIds());
             //
-            eventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<RedisPubsubParseFileSuccessEvent>(
-                    this, new RedisPubsubParseFileSuccessEvent(this, messageFile)));
+            eventPublisher.publishEvent(new RedisPubsubParseFileSuccessEvent(this, messageFile));
 
         } else if (redisPubsubMessage.getType().equals(RedisPubsubMessageType.PARSE_FILE_ERROR.name())) {
             // 解析失败
@@ -70,9 +68,8 @@ public class RedisPubsubStringListener implements MessageListener {
             RedisPubsubMessageFile messageFile = JSON.parseObject(redisPubsubMessage.getContent(),
                     RedisPubsubMessageFile.class);
             log.info("fileUid {}", messageFile.getFileUid());
-            //
-            eventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<RedisPubsubParseFileErrorEvent>(
-                    this, new RedisPubsubParseFileErrorEvent(this, messageFile)));
+            // 发送事件，通知前端更新文件状态
+            eventPublisher.publishEvent(new RedisPubsubParseFileErrorEvent(this, messageFile));
 
         } else if (redisPubsubMessage.getType().equals(RedisPubsubMessageType.DELETE_FILE_SUCCESS.name())) {
             // TODO: 删除成功

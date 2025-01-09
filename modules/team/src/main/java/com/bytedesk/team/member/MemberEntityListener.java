@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:46:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 11:21:32
+ * @LastEditTime: 2025-01-09 23:00:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import jakarta.persistence.PostPersist;
@@ -43,7 +42,7 @@ public class MemberEntityListener {
         log.info("postPersist member {}, user {}", clonedMember.getUid(), user.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<MemberCreateEvent>(this, new MemberCreateEvent(this, clonedMember)));
+        bytedeskEventPublisher.publishEvent(new MemberCreateEvent(this, clonedMember));
         // 默认订阅成员主题
         // bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getMemberTopic(clonedMember.getUid()), user.getUid());
         // // 
@@ -70,7 +69,7 @@ public class MemberEntityListener {
         log.info("postUpdate member {}, user {}", clonedMember.getUid(), user.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishGenericApplicationEvent(new GenericApplicationEvent<MemberUpdateEvent>(this, new MemberUpdateEvent(this, clonedMember)));
+        bytedeskEventPublisher.publishEvent(new MemberUpdateEvent(this, clonedMember));
 
         // TODO: 删除旧的部门主题
         // BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);

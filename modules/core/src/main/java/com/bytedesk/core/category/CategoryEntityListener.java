@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-30 07:07:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 10:44:45
+ * @LastEditTime: 2025-01-09 22:51:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.config.GenericApplicationEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
@@ -34,7 +33,7 @@ public class CategoryEntityListener {
         CategoryEntity clonedEntity = SerializationUtils.clone(category);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishGenericApplicationEvent(new GenericApplicationEvent<CategoryCreateEvent>(this, new CategoryCreateEvent(this, clonedEntity)));
+        publisher.publishEvent(new CategoryCreateEvent(this, clonedEntity));
     }
 
     @PostUpdate
@@ -43,7 +42,7 @@ public class CategoryEntityListener {
         CategoryEntity clonedEntity = SerializationUtils.clone(category);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishGenericApplicationEvent(new GenericApplicationEvent<CategoryUpdateEvent>(this, new CategoryUpdateEvent(this, clonedEntity)));
+        publisher.publishEvent(new CategoryUpdateEvent(this, clonedEntity));
     }
     
 }
