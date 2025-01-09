@@ -1,17 +1,17 @@
 var y = Object.defineProperty;
-var v = (g, t, e) => t in g ? y(g, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : g[t] = e;
-var p = (g, t, e) => v(g, typeof t != "symbol" ? t + "" : t, e);
+var v = (p, t, e) => t in p ? y(p, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : p[t] = e;
+var g = (p, t, e) => v(p, typeof t != "symbol" ? t + "" : t, e);
 class E {
   constructor(t) {
-    p(this, "config");
-    p(this, "bubble", null);
-    p(this, "window", null);
-    p(this, "inviteDialog", null);
-    p(this, "isVisible", !1);
-    p(this, "isDragging", !1);
-    p(this, "windowState", "normal");
-    p(this, "loopCount", 0);
-    p(this, "loopTimer", null);
+    g(this, "config");
+    g(this, "bubble", null);
+    g(this, "window", null);
+    g(this, "inviteDialog", null);
+    g(this, "isVisible", !1);
+    g(this, "isDragging", !1);
+    g(this, "windowState", "normal");
+    g(this, "loopCount", 0);
+    g(this, "loopTimer", null);
     this.config = {
       ...this.getDefaultConfig(),
       ...t
@@ -308,6 +308,7 @@ class E {
         e instanceof HTMLElement && (e.style.display = "none");
       }
     }
+    this.hideInviteDialog();
   }
   hideChat() {
     var t;
