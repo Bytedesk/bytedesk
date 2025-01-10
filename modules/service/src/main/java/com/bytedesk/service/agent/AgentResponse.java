@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:13:00
+ * @LastEditTime: 2025-01-10 15:22:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
+import com.bytedesk.kbase.service_settings.InviteParams;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
@@ -63,6 +64,8 @@ public class AgentResponse extends BaseResponse {
     private AutoReplySettings autoReplySettings;
 
     private QueueSettingsResponse queueSettings;
+
+    private InviteParams inviteParams;
 
     private Integer maxThreadCount;
 

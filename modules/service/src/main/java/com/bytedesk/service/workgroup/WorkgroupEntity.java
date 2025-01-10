@@ -24,6 +24,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.kbase.service_settings.InviteParams;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
@@ -93,6 +94,10 @@ public class WorkgroupEntity extends BaseEntity {
     @Embedded
     @Builder.Default
     private QueueSettings queueSettings = new QueueSettings();
+
+    @Embedded
+    @Builder.Default
+    private InviteParams inviteParams = new InviteParams();
 
     
     @Builder.Default
