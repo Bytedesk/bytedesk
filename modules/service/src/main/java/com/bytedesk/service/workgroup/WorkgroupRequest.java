@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:18:38
+ * @LastEditTime: 2025-01-10 12:54:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,6 +49,9 @@ public class WorkgroupRequest extends BaseRequest {
     @Builder.Default
     private String routingMode = WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
 
+    @Builder.Default
+    private String status = WorkgroupStateEnum.AVAILABLE.name();
+    
     @Builder.Default
     private LeaveMsgSettingsRequest leaveMsgSettings = new LeaveMsgSettingsRequest();
 
