@@ -13,42 +13,42 @@
  */
 package com.bytedesk.starter.test.prefix;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+// import org.springframework.boot.CommandLineRunner;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
 
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Configuration
-public class AirportConfig {
+// @Slf4j
+// @Configuration
+// public class AirportConfig {
 
-    // @Autowired
-    // private BytedeskProperties bytedeskProperties;
+//     // @Autowired
+//     // private BytedeskProperties bytedeskProperties;
 
-    @Bean
-    public CommandLineRunner loadData(AirportsRepository repository) {
-        return args -> {
-            // log.info("Loading airports...");
-            // if (!bytedeskProperties.getDebug()) {
-            //     return;
-            // }
-            // 仅用于测试
-            // repository.deleteAll();
-            // try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test/airport_codes.csv");
-            //      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+//     @Bean
+//     public CommandLineRunner loadData(AirportsRepository repository) {
+//         return args -> {
+//             // log.info("Loading airports...");
+//             // if (!bytedeskProperties.getDebug()) {
+//             //     return;
+//             // }
+//             // 仅用于测试
+//             // repository.deleteAll();
+//             // try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test/airport_codes.csv");
+//             //      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 
-            //     String line;
-            //     List<Airport> data = new ArrayList<>();
-            //     while ((line = reader.readLine()) != null) {
-            //         String[] parts = line.split(",");
-            //         data.add(Airport.of(parts[0], parts[1], parts[2]));
-            //     }
-            //     repository.saveAll(data);
-            // } catch (IOException e) {
-            //     log.error("Error loading airports", e);
-            // }
-        };
-    }
+//             //     String line;
+//             //     List<Airport> data = new ArrayList<>();
+//             //     while ((line = reader.readLine()) != null) {
+//             //         String[] parts = line.split(",");
+//             //         data.add(Airport.of(parts[0], parts[1], parts[2]));
+//             //     }
+//             //     repository.saveAll(data);
+//             // } catch (IOException e) {
+//             //     log.error("Error loading airports", e);
+//             // }
+//         };
+//     }
 
-}
+// }
