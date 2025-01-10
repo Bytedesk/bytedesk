@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 13:13:37
+ * @LastEditTime: 2025-01-10 15:44:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
+import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentRequest;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
@@ -207,7 +208,16 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
-
+    public InviteSettings formatAgentInviteSettings(AgentRequest request) {
+        // 
+        if (request == null || request.getInviteSettings() == null) {
+            return InviteSettings.builder().build();
+        }
+        //
+        InviteSettings serviceSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
+        //
+        return serviceSettings;
+    }
 
 
 
@@ -354,6 +364,17 @@ public class ServiceSettingsService {
         }
         //
         QueueSettings serviceSettings = modelMapper.map(request.getQueueSettings(), QueueSettings.class);
+        //
+        return serviceSettings;
+    }
+
+    public InviteSettings formatWorkgroupInviteSettings(WorkgroupRequest request) {
+        // 
+        if (request == null || request.getInviteSettings() == null) {
+            return InviteSettings.builder().build();
+        }
+        //
+        InviteSettings serviceSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
         //
         return serviceSettings;
     }

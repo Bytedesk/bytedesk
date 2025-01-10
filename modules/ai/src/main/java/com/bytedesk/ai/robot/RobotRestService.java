@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 14:34:35
+ * @LastEditTime: 2025-01-10 15:48:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,6 +52,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
+import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
@@ -327,6 +328,13 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         //
         robot.setServiceSettings(serviceSettings);
+        // 
+        if (request == null || request.getInviteSettings() == null) {
+            robot.setInviteSettings(InviteSettings.builder().build());
+        } else {
+            InviteSettings inviteSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
+            robot.setInviteSettings(inviteSettings);
+        }
         //
         robot.setLlm(request.getLlm());
         //
