@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-07 18:22:01
+ * @LastEditTime: 2025-01-10 10:30:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -130,10 +130,10 @@ public class ServiceSettings implements Serializable {
 
     // 桌面版聊天窗口右侧iframe
     @Builder.Default
-    private boolean showIframe = false;
+    private boolean showRightIframe = false;
 
     // 桌面版聊天窗口右侧iframe地址
-    private String iframeUrl;
+    private String rightIframeUrl;
 
     // 常见问题
     @Builder.Default
