@@ -372,12 +372,12 @@
         <!-- https://redis.io/docs/latest/integrate/redisom-for-java/ -->
         <!-- https://github.com/redis/redis-om-spring?tab=readme-ov-file -->
         <!-- https://mvnrepository.com/artifact/com.redis.om/redis-om-spring -->
-        <dependency>
+        <!-- <dependency>
             <groupId>com.redis.om</groupId>
             <artifactId>redis-om-spring</artifactId>
             <version>0.9.7</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency> -->
 
         <!-- jedis pool config -->
         <dependency>
