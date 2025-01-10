@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 10:59:07
+ * @LastEditTime: 2025-01-10 15:20:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ public class ServiceSettingsResponse implements Serializable {
 
     private LanguageEnum language;
 
-    private Boolean autoPop;
+    private Boolean autoPopup;
 
     private Boolean showTopTip;
 
@@ -77,9 +77,6 @@ public class ServiceSettingsResponse implements Serializable {
 
     // 桌面版聊天窗口右侧iframe地址
     private String rightIframeUrl;
-
-    // private Boolean showQuickButtons;
-    // private List<QuickButtonResponse> quickButtons;
 
     private Boolean showFaqs;
     private List<FaqResponse> faqs;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 10:30:10
+ * @LastEditTime: 2025-01-10 15:19:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,7 +57,7 @@ public class ServiceSettings implements Serializable {
 
     @NotBlank
     @Builder.Default
-    private boolean autoPop = false;
+    private boolean autoPopup = false;
 
     // 顶部提示开关
     @NotBlank
@@ -115,10 +115,6 @@ public class ServiceSettings implements Serializable {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
 
-    // @NotBlank
-    // @Builder.Default
-    // private String queueTip = I18Consts.I18N_QUEUE_TIP;
-
     /** auto close time in minutes */
     @NotBlank
     @Builder.Default
@@ -175,12 +171,11 @@ public class ServiceSettings implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
-    /**
-     * 是否显示logo
-     */
     @NotBlank
     @Builder.Default
     private boolean showLogo = true;
+
+    // 
 
     // validate until date, when expire the service will be disabled
     private Date validateUntil;
