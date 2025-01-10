@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-28 13:06:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 19:19:31
+ * @LastEditTime: 2025-01-10 17:04:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.redis.om.spring.autocomplete.Suggestion;
+import com.redis.om.spring.repository.query.autocomplete.AutoCompleteOptions;
 
 // https://github.com/redis/redis-om-spring
 // https://github.com/redis-developer/redis-om-autocomplete-demo
@@ -37,15 +45,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/airports")
 public class AirportsController {
 
-  // @Autowired
-  // private AirportsRepository repository;
+  @Autowired
+  private AirportsRepository repository;
 
   // http://localhost:9003/airports/search/b
-  // @GetMapping("/search/{q}")
-  // public List<Suggestion> query(@PathVariable("q") String query) {
-  //   List<Suggestion> suggestions = repository //
-  //       .autoCompleteNameOptions(query, AutoCompleteOptions.get().withPayload());
-  //   return suggestions;
-  // }
+  @GetMapping("/search/{q}")
+  public List<Suggestion> query(@PathVariable("q") String query) {
+    List<Suggestion> suggestions = repository //
+        .autoCompleteNameOptions(query, AutoCompleteOptions.get().withPayload());
+    return suggestions;
+  }
 
 }

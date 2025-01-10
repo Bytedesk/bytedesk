@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-01 13:21:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-07 21:45:52
+ * @LastEditTime: 2025-01-10 16:46:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,10 @@
 - 响应时限和解决时限监控
 - 工作时间设置
 - 超时提醒和升级
+- SLA规则配置
+- 响应时间和解决时间监控
+- 自动升级处理
+- 违规提醒
 
 ## 统计和报表
 
@@ -47,10 +51,13 @@
 - 解决时间统计
 - 满意度统计
 - 客服绩效统计
+- 导出Excel/PDF报表
 
 ## 自动化功能
 
-- 自动分配工单
+- 多种分配策略(轮询、最少活跃、负载均衡、技能匹配等)
+- 自定义分配规则
+- 考虑在线状态和工作负载
 - 自动分类
 - 自动提醒
 - 工单升级规则
