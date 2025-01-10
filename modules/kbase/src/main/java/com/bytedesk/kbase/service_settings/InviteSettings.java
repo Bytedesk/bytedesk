@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-10 14:59:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:17:13
+ * @LastEditTime: 2025-01-10 15:25:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class InviteParams {
+public class InviteSettings {
 
     /**
      * 是否显示邀请

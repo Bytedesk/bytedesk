@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:19:52
+ * @LastEditTime: 2025-01-10 15:26:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.service_settings.InviteParams;
+import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
@@ -117,7 +117,7 @@ public class AgentEntity extends BaseEntity {
 
     @Embedded
     @Builder.Default
-    private InviteParams inviteParams = new InviteParams();
+    private InviteSettings inviteSettings = new InviteSettings();
 
     // current thread count
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:22:19
+ * @LastEditTime: 2025-01-10 15:27:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.kbase.service_settings.InviteParams;
+import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
 
 import lombok.Builder;
@@ -44,7 +44,7 @@ public class RobotRequest extends BaseRequest {
     private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
 
     @Builder.Default
-    private InviteParams inviteParams = new InviteParams();
+    private InviteSettings inviteSettings = new InviteSettings();
 
     @Builder.Default
     private RobotLlm llm = new RobotLlm();

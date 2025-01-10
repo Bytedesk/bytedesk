@@ -64,9 +64,9 @@ class E {
     var t;
     this.createBubble(), this.createInviteDialog(), this.setupMessageListener(), this.setupResizeListener(), this.preload(), this.config.autoPopup && setTimeout(() => {
       this.showChat();
-    }, this.config.autoPopupDelay || 1e3), (t = this.config.inviteParams) != null && t.show && setTimeout(() => {
+    }, this.config.autoPopupDelay || 1e3), (t = this.config.inviteSettings) != null && t.show && setTimeout(() => {
       this.showInviteDialog();
-    }, this.config.inviteParams.delay || 3e3);
+    }, this.config.inviteSettings.delay || 3e3);
   }
   createBubble() {
     var o, s, r, n, d;
@@ -367,7 +367,7 @@ class E {
   }
   createInviteDialog() {
     var s, r;
-    if (!((s = this.config.inviteParams) != null && s.show)) return;
+    if (!((s = this.config.inviteSettings) != null && s.show)) return;
     if (this.inviteDialog = document.createElement("div"), this.inviteDialog.style.cssText = `
       position: fixed;
       top: 50%;
@@ -381,18 +381,18 @@ class E {
       display: none;
       max-width: 300px;
       text-align: center;
-    `, this.config.inviteParams.icon) {
+    `, this.config.inviteSettings.icon) {
       const n = document.createElement("div");
       n.style.cssText = `
         font-size: 32px;
         margin-bottom: 12px;
-      `, n.textContent = this.config.inviteParams.icon, this.inviteDialog.appendChild(n);
+      `, n.textContent = this.config.inviteSettings.icon, this.inviteDialog.appendChild(n);
     }
     const t = document.createElement("div");
     t.style.cssText = `
       margin-bottom: 16px;
       color: #333;
-    `, t.textContent = this.config.inviteParams.text || "需要帮助吗？点击开始对话", this.inviteDialog.appendChild(t);
+    `, t.textContent = this.config.inviteSettings.text || "需要帮助吗？点击开始对话", this.inviteDialog.appendChild(t);
     const e = document.createElement("div");
     e.style.cssText = `
       display: flex;
@@ -409,7 +409,7 @@ class E {
       cursor: pointer;
     `, i.onclick = () => {
       var n, d;
-      this.hideInviteDialog(), this.showChat(), (d = (n = this.config.inviteParams) == null ? void 0 : n.onAccept) == null || d.call(n);
+      this.hideInviteDialog(), this.showChat(), (d = (n = this.config.inviteSettings) == null ? void 0 : n.onAccept) == null || d.call(n);
     };
     const o = document.createElement("button");
     o.textContent = "稍后再说", o.style.cssText = `
@@ -421,22 +421,22 @@ class E {
       cursor: pointer;
     `, o.onclick = () => {
       var n, d;
-      this.hideInviteDialog(), (d = (n = this.config.inviteParams) == null ? void 0 : n.onReject) == null || d.call(n), this.handleInviteLoop();
+      this.hideInviteDialog(), (d = (n = this.config.inviteSettings) == null ? void 0 : n.onReject) == null || d.call(n), this.handleInviteLoop();
     }, e.appendChild(i), e.appendChild(o), this.inviteDialog.appendChild(e), document.body.appendChild(this.inviteDialog);
   }
   handleInviteLoop() {
-    const { loop: t, loopDelay: e = 3e3, loopCount: i = 1 / 0 } = this.config.inviteParams || {};
+    const { loop: t, loopDelay: e = 3e3, loopCount: i = 1 / 0 } = this.config.inviteSettings || {};
     !t || this.loopCount >= i - 1 || (this.loopTimer && window.clearTimeout(this.loopTimer), this.loopTimer = window.setTimeout(() => {
       this.loopCount++, this.showInviteDialog();
     }, e));
   }
   showInviteDialog() {
     var t, e;
-    this.inviteDialog && (this.inviteDialog.style.display = "block", (e = (t = this.config.inviteParams) == null ? void 0 : t.onOpen) == null || e.call(t));
+    this.inviteDialog && (this.inviteDialog.style.display = "block", (e = (t = this.config.inviteSettings) == null ? void 0 : t.onOpen) == null || e.call(t));
   }
   hideInviteDialog() {
     var t, e;
-    this.inviteDialog && (this.inviteDialog.style.display = "none", (e = (t = this.config.inviteParams) == null ? void 0 : t.onClose) == null || e.call(t));
+    this.inviteDialog && (this.inviteDialog.style.display = "none", (e = (t = this.config.inviteSettings) == null ? void 0 : t.onClose) == null || e.call(t));
   }
 }
 export {
