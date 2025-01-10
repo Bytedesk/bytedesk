@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-10 14:59:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:25:13
+ * @LastEditTime: 2025-01-10 16:06:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ public class InviteSettings {
      */
     @Builder.Default
     @Column(name = "is_invite_show")
-    private Boolean show = true;
+    private Boolean show = false;
     
     /**
      * 邀请文本
