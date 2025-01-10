@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:22:12
+ * @LastEditTime: 2025-01-10 15:26:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.service_settings.InviteParams;
+import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsRequest;
 import com.bytedesk.service.queue.settings.QueueSettingsRequest;
@@ -66,7 +66,7 @@ public class WorkgroupRequest extends BaseRequest {
     private QueueSettingsRequest queueSettings = new QueueSettingsRequest();
 
     @Builder.Default
-    private InviteParams inviteParams = new InviteParams();
+    private InviteSettings inviteSettings = new InviteSettings();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
     @NotEmpty(message = "agentUids must not be empty")

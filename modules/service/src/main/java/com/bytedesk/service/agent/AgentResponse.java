@@ -15,7 +15,7 @@ package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.service_settings.InviteParams;
+import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
@@ -65,7 +65,7 @@ public class AgentResponse extends BaseResponse {
 
     private QueueSettingsResponse queueSettings;
 
-    private InviteParams inviteParams;
+    private InviteSettings inviteSettings;
 
     private Integer maxThreadCount;
 
