@@ -27,6 +27,10 @@
         <module>voc</module>
     </modules>
 
+    <properties>
+        <jackson.version>2.18.2</jackson.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -133,10 +137,10 @@
         </dependency>
 
         <dependency>
-			<groupId>org.springframework.retry</groupId>
-			<artifactId>spring-retry</artifactId>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
             <scope>provided</scope>
-		</dependency>
+        </dependency>
 
 
         <!-- querydsl crud增强-->
@@ -160,22 +164,37 @@
             <version>2.0.53</version>
             <scope>provided</scope>
         </dependency>
-        <!-- for transforming LocalDateTime -->
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.18.2</version>
-            <scope>provided</scope>
-		</dependency>
 
+        <!-- for transforming LocalDateTime -->
+        <!--
+        https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-        <!-- <dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.18.2</version>
+            <version>${jackson.version}</version>
             <scope>provided</scope>
-        </dependency> -->
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- http://127.0.0.1:9003/swagger-ui/index.html -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
@@ -334,12 +353,12 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.15.1</version>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.1</version>
             <scope>provided</scope>
-		</dependency>
+        </dependency>
 
         <!-- redis search https://github.com/redis/lettucemod -->
         <!-- https://mvnrepository.com/artifact/com.redis/lettucemod-spring -->
@@ -386,7 +405,8 @@
             <version>1.235</version>
             <scope>provided</scope>
         </dependency>
-        <!-- geocoder：用于获取手机号的归属地。通过初始化PhoneNumberOfflineGeocoder ，调用getDescriptionForNumber方法可获取手机归属地 -->
+        <!-- geocoder：用于获取手机号的归属地。通过初始化PhoneNumberOfflineGeocoder
+        ，调用getDescriptionForNumber方法可获取手机归属地 -->
         <!-- https://mvnrepository.com/artifact/com.googlecode.libphonenumber/geocoder -->
         <dependency>
             <groupId>com.googlecode.libphonenumber</groupId>

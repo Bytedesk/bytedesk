@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 17:35:04
+ * @LastEditTime: 2025-01-10 12:57:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -117,6 +117,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setAvatar(request.getAvatar());
         workgroup.setDescription(request.getDescription());
         workgroup.setRoutingMode(request.getRoutingMode());
+        workgroup.setStatus(request.getStatus());
         //
         LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatWorkgroupLeaveMsgSettings(request);
         workgroup.setLeaveMsgSettings(leaveMsgSettings);
