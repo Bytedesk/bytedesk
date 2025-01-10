@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 10:31:52
+ * @LastEditTime: 2025-01-10 11:01:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,6 +65,10 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     @Builder.Default
     private Boolean showHistory = false;
 
+    // 输入联想开关
+    @Builder.Default
+    private Boolean showInputAssociation = false;
+
     @Builder.Default
     private boolean showCaptcha = false;
 
@@ -112,10 +116,6 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     // 快捷功能
     @Builder.Default
     private List<FaqResponseVisitor> shortcutFaqs = new ArrayList<>();
-
-    // 输入联想开关
-    @Builder.Default
-    private boolean showInputAssociation = true;
 
     @Builder.Default
     private Boolean showLogo = true;
