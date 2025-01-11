@@ -19,6 +19,8 @@ class E {
   }
   getDefaultConfig() {
     return {
+      isDebug: !1,
+      isPreload: !1,
       baseUrl: "https://www.weiyuai.cn/chat",
       placement: "bottom-right",
       marginBottom: 20,
@@ -64,12 +66,12 @@ class E {
     var t;
     this.createBubble(), this.createInviteDialog(), this.setupMessageListener(), this.setupResizeListener(), this.preload(), this.config.autoPopup && setTimeout(() => {
       this.showChat();
-    }, this.config.autoPopupDelay || 1e3), (t = this.config.inviteSettings) != null && t.show && setTimeout(() => {
+    }, this.config.autoPopupDelay || 1e3), (t = this.config.inviteParams) != null && t.show && setTimeout(() => {
       this.showInviteDialog();
-    }, this.config.inviteSettings.delay || 3e3);
+    }, this.config.inviteParams.delay || 3e3);
   }
   createBubble() {
-    var o, s, r, n, d;
+    var n, s, h, o, d;
     const t = document.createElement("div");
     t.style.cssText = `
       position: fixed;
@@ -82,7 +84,7 @@ class E {
       z-index: 9999;
     `;
     let e = null;
-    if ((o = this.config.bubbleConfig) != null && o.show) {
+    if ((n = this.config.bubbleConfig) != null && n.show) {
       e = document.createElement("div"), e.style.cssText = `
         background: white;
         padding: 12px 16px;
@@ -101,12 +103,12 @@ class E {
         align-items: center;
         gap: 8px;
       `;
-      const h = document.createElement("span");
-      h.textContent = ((s = this.config.bubbleConfig) == null ? void 0 : s.icon) || "", h.style.fontSize = "20px", l.appendChild(h);
+      const r = document.createElement("span");
+      r.textContent = ((s = this.config.bubbleConfig) == null ? void 0 : s.icon) || "", r.style.fontSize = "20px", l.appendChild(r);
       const c = document.createElement("div"), g = document.createElement("div");
-      g.textContent = ((r = this.config.bubbleConfig) == null ? void 0 : r.title) || "", g.style.fontWeight = "bold", g.style.marginBottom = "4px", c.appendChild(g);
+      g.textContent = ((h = this.config.bubbleConfig) == null ? void 0 : h.title) || "", g.style.fontWeight = "bold", g.style.marginBottom = "4px", c.appendChild(g);
       const a = document.createElement("div");
-      a.textContent = ((n = this.config.bubbleConfig) == null ? void 0 : n.subtitle) || "", a.style.fontSize = "0.9em", a.style.opacity = "0.8", c.appendChild(a), l.appendChild(c), e.appendChild(l);
+      a.textContent = ((o = this.config.bubbleConfig) == null ? void 0 : o.subtitle) || "", a.style.fontSize = "0.9em", a.style.opacity = "0.8", c.appendChild(a), l.appendChild(c), e.appendChild(l);
       const f = document.createElement("div");
       f.style.cssText = `
         position: absolute;
@@ -161,13 +163,13 @@ class E {
     }), this.bubble.addEventListener("mouseleave", () => {
       this.bubble.style.transform = "scale(1)";
     }), t.appendChild(this.bubble), this.config.draggable) {
-      let l = 0, h = 0, c = 0, g = 0;
+      let l = 0, r = 0, c = 0, g = 0;
       this.bubble.addEventListener("mousedown", (a) => {
-        a.button === 0 && (this.isDragging = !0, l = a.clientX, h = a.clientY, c = t.offsetLeft, g = t.offsetTop, t.style.transition = "none");
+        a.button === 0 && (this.isDragging = !0, l = a.clientX, r = a.clientY, c = t.offsetLeft, g = t.offsetTop, t.style.transition = "none");
       }), document.addEventListener("mousemove", (a) => {
         if (!this.isDragging) return;
         a.preventDefault();
-        const f = a.clientX - l, b = a.clientY - h, u = c + f, w = g + b, x = window.innerHeight - t.offsetHeight;
+        const f = a.clientX - l, b = a.clientY - r, u = c + f, w = g + b, x = window.innerHeight - t.offsetHeight;
         u <= window.innerWidth / 2 ? (t.style.left = `${Math.max(0, u)}px`, t.style.right = "auto", this.config.placement = "bottom-left") : (t.style.right = `${Math.max(0, window.innerWidth - u - t.offsetWidth)}px`, t.style.left = "auto", this.config.placement = "bottom-right"), t.style.bottom = `${Math.min(Math.max(0, window.innerHeight - w - t.offsetHeight), x)}px`;
       }), document.addEventListener("mouseup", () => {
         this.isDragging && (this.isDragging = !1, t.style.transition = "all 0.3s ease", this.config.marginSide = parseInt(
@@ -193,9 +195,9 @@ class E {
     return e[t] || e["zh-cn"];
   }
   createChatWindow() {
-    var n, d, l, h, c, g;
+    var o, d, l, r, c, g;
     this.window = document.createElement("div");
-    const t = window.innerWidth <= 768, e = window.innerWidth, i = window.innerHeight, o = Math.min(((n = this.config.window) == null ? void 0 : n.width) || e * 0.9, e * 0.9), s = Math.min(((d = this.config.window) == null ? void 0 : d.height) || i * 0.9, i * 0.9);
+    const t = window.innerWidth <= 768, e = window.innerWidth, i = window.innerHeight, n = Math.min(((o = this.config.window) == null ? void 0 : o.width) || e * 0.9, e * 0.9), s = Math.min(((d = this.config.window) == null ? void 0 : d.height) || i * 0.9, i * 0.9);
     t ? this.window.style.cssText = `
         position: fixed;
         left: 0;
@@ -207,12 +209,12 @@ class E {
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
-        transition: all ${(l = this.config.animation) == null ? void 0 : l.duration}ms ${(h = this.config.animation) == null ? void 0 : h.type};
+        transition: all ${(l = this.config.animation) == null ? void 0 : l.duration}ms ${(r = this.config.animation) == null ? void 0 : r.type};
       ` : this.window.style.cssText = `
         position: fixed;
         ${this.config.placement === "bottom-right" ? "right" : "left"}: ${this.config.marginSide}px;
         bottom: ${this.config.marginBottom}px;
-        width: ${o}px;
+        width: ${n}px;
         height: ${s}px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
@@ -221,12 +223,12 @@ class E {
         z-index: 10000;
         transition: all ${(c = this.config.animation) == null ? void 0 : c.duration}ms ${(g = this.config.animation) == null ? void 0 : g.type};
       `;
-    const r = document.createElement("iframe");
-    if (r.style.cssText = `
+    const h = document.createElement("iframe");
+    if (h.style.cssText = `
       width: 100%;
       height: ${this.config.showSupport ? "calc(100% - 30px)" : "100%"};
       border: none;
-    `, r.src = this.generateChatUrl(), console.log("iframe.src: ", r.src), this.window.appendChild(r), this.config.showSupport) {
+    `, h.src = this.generateChatUrl(), console.log("iframe.src: ", h.src), this.window.appendChild(h), this.config.showSupport) {
       const a = document.createElement("div");
       a.style.cssText = `
         height: 20px;
@@ -255,12 +257,12 @@ class E {
   generateChatUrl(t = !1, e = "messages") {
     console.log("this.config: ", this.config, e);
     const i = new URLSearchParams();
-    return Object.entries(this.config.chatParams || {}).forEach(([o, s]) => {
-      i.append(o, String(s));
-    }), Object.entries(this.config.browseParams || {}).forEach(([o, s]) => {
-      i.append(o, String(s));
-    }), Object.entries(this.config.theme || {}).forEach(([o, s]) => {
-      i.append(o, String(s));
+    return Object.entries(this.config.chatParams || {}).forEach(([n, s]) => {
+      i.append(n, String(s));
+    }), Object.entries(this.config.browseParams || {}).forEach(([n, s]) => {
+      i.append(n, String(s));
+    }), Object.entries(this.config.theme || {}).forEach(([n, s]) => {
+      i.append(n, String(s));
     }), i.append("lang", this.config.locale || "zh-cn"), t && i.append("preload", "1"), `${this.config.baseUrl}?${i.toString()}`;
   }
   setupMessageListener() {
@@ -291,46 +293,51 @@ class E {
     });
   }
   preload() {
-    console.log("preload");
-    const t = this.generateChatUrl(!0);
-    console.log("preLoadUrl: ", t);
-    const e = document.createElement("iframe");
-    e.src = t, e.style.display = "none", document.body.appendChild(e);
+    if (console.log("preload"), this.config.isPreload) {
+      const t = this.generateChatUrl(!0);
+      console.log("preLoadUrl: ", t);
+      const e = document.createElement("iframe");
+      e.src = t, e.style.display = "none", document.body.appendChild(e);
+    }
   }
   showChat() {
+    var t, e;
     if (this.window || this.createChatWindow(), this.window) {
-      const t = window.innerWidth <= 768;
-      if (this.window.style.display = "block", this.setupResizeListener(), t && this.window && (this.window.style.transform = "translateY(100%)", requestAnimationFrame(() => {
+      const i = window.innerWidth <= 768;
+      if (this.window.style.display = "block", this.setupResizeListener(), i && this.window && (this.window.style.transform = "translateY(100%)", requestAnimationFrame(() => {
         this.window && (this.window.style.transform = "translateY(0)");
       })), this.isVisible = !0, this.bubble) {
         this.bubble.style.display = "none";
-        const e = this.bubble.messageElement;
-        e instanceof HTMLElement && (e.style.display = "none");
+        const n = this.bubble.messageElement;
+        n instanceof HTMLElement && (n.style.display = "none");
       }
     }
-    this.hideInviteDialog();
+    this.hideInviteDialog(), (e = (t = this.config).onShowChat) == null || e.call(t);
   }
   hideChat() {
-    var t;
-    if (this.window && (window.innerWidth <= 768 ? (this.window.style.transform = "translateY(100%)", setTimeout(() => {
-      this.window && (this.window.style.display = "none");
-    }, ((t = this.config.animation) == null ? void 0 : t.duration) || 300)) : this.window.style.display = "none", this.isVisible = !1, this.bubble)) {
-      this.bubble.style.display = "inline-flex";
-      const i = this.bubble.messageElement;
-      i instanceof HTMLElement && (i.style.display = "block");
+    var t, e, i;
+    if (this.window) {
+      if (window.innerWidth <= 768 ? (this.window.style.transform = "translateY(100%)", setTimeout(() => {
+        this.window && (this.window.style.display = "none");
+      }, ((t = this.config.animation) == null ? void 0 : t.duration) || 300)) : this.window.style.display = "none", this.isVisible = !1, this.bubble) {
+        this.bubble.style.display = "inline-flex";
+        const s = this.bubble.messageElement;
+        s instanceof HTMLElement && (s.style.display = "block");
+      }
+      (i = (e = this.config).onHideChat) == null || i.call(e);
     }
   }
   minimizeWindow() {
-    this.window && (this.windowState = "minimized", this.window.style.display = "none");
+    this.window && (this.windowState = "minimized", this.window.style.display = "none", this.hideChat());
   }
   toggleMaximize() {
     this.window && window.open(this.generateChatUrl(), "_blank");
   }
   setupResizeListener() {
     const t = () => {
-      var r, n;
+      var h, o;
       if (!this.window || !this.isVisible) return;
-      const i = window.innerWidth <= 768, o = window.innerWidth, s = window.innerHeight;
+      const i = window.innerWidth <= 768, n = window.innerWidth, s = window.innerHeight;
       if (i)
         Object.assign(this.window.style, {
           left: "0",
@@ -343,12 +350,12 @@ class E {
           borderBottomRightRadius: "0"
         });
       else {
-        let d = this.windowState === "maximized" ? o : Math.min(((r = this.config.window) == null ? void 0 : r.width) || o * 0.9, o * 0.9), l = this.windowState === "maximized" ? s : Math.min(((n = this.config.window) == null ? void 0 : n.height) || s * 0.9, s * 0.9);
-        const h = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, c = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
+        let d = this.windowState === "maximized" ? n : Math.min(((h = this.config.window) == null ? void 0 : h.width) || n * 0.9, n * 0.9), l = this.windowState === "maximized" ? s : Math.min(((o = this.config.window) == null ? void 0 : o.height) || s * 0.9, s * 0.9);
+        const r = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, c = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
         Object.assign(this.window.style, {
           width: `${d}px`,
           height: `${l}px`,
-          right: h ? `${h}px` : "auto",
+          right: r ? `${r}px` : "auto",
           left: c ? `${c}px` : "auto",
           bottom: `${this.config.marginBottom}px`,
           borderRadius: this.windowState === "maximized" ? "0" : "12px"
@@ -366,8 +373,8 @@ class E {
     t && document.body.contains(t) && (document.body.removeChild(t), this.bubble = null), this.window && document.body.contains(this.window) && (document.body.removeChild(this.window), this.window = null), window.removeEventListener("resize", this.setupResizeListener.bind(this)), this.loopTimer && (window.clearTimeout(this.loopTimer), this.loopTimer = null), this.inviteDialog && document.body.contains(this.inviteDialog) && (document.body.removeChild(this.inviteDialog), this.inviteDialog = null);
   }
   createInviteDialog() {
-    var s, r;
-    if (!((s = this.config.inviteSettings) != null && s.show)) return;
+    var s, h;
+    if (!((s = this.config.inviteParams) != null && s.show)) return;
     if (this.inviteDialog = document.createElement("div"), this.inviteDialog.style.cssText = `
       position: fixed;
       top: 50%;
@@ -381,18 +388,18 @@ class E {
       display: none;
       max-width: 300px;
       text-align: center;
-    `, this.config.inviteSettings.icon) {
-      const n = document.createElement("div");
-      n.style.cssText = `
+    `, this.config.inviteParams.icon) {
+      const o = document.createElement("div");
+      o.style.cssText = `
         font-size: 32px;
         margin-bottom: 12px;
-      `, n.textContent = this.config.inviteSettings.icon, this.inviteDialog.appendChild(n);
+      `, o.textContent = this.config.inviteParams.icon, this.inviteDialog.appendChild(o);
     }
     const t = document.createElement("div");
     t.style.cssText = `
       margin-bottom: 16px;
       color: #333;
-    `, t.textContent = this.config.inviteSettings.text || "需要帮助吗？点击开始对话", this.inviteDialog.appendChild(t);
+    `, t.textContent = this.config.inviteParams.text || "需要帮助吗？点击开始对话", this.inviteDialog.appendChild(t);
     const e = document.createElement("div");
     e.style.cssText = `
       display: flex;
@@ -402,41 +409,41 @@ class E {
     const i = document.createElement("button");
     i.textContent = "开始对话", i.style.cssText = `
       padding: 8px 16px;
-      background: ${((r = this.config.theme) == null ? void 0 : r.backgroundColor) || "#0066FF"};
+      background: ${((h = this.config.theme) == null ? void 0 : h.backgroundColor) || "#0066FF"};
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     `, i.onclick = () => {
-      var n, d;
-      this.hideInviteDialog(), this.showChat(), (d = (n = this.config.inviteSettings) == null ? void 0 : n.onAccept) == null || d.call(n);
+      var o, d;
+      this.hideInviteDialog(), this.showChat(), (d = (o = this.config.inviteParams) == null ? void 0 : o.onAccept) == null || d.call(o);
     };
-    const o = document.createElement("button");
-    o.textContent = "稍后再说", o.style.cssText = `
+    const n = document.createElement("button");
+    n.textContent = "稍后再说", n.style.cssText = `
       padding: 8px 16px;
       background: #f5f5f5;
       color: #666;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-    `, o.onclick = () => {
-      var n, d;
-      this.hideInviteDialog(), (d = (n = this.config.inviteSettings) == null ? void 0 : n.onReject) == null || d.call(n), this.handleInviteLoop();
-    }, e.appendChild(i), e.appendChild(o), this.inviteDialog.appendChild(e), document.body.appendChild(this.inviteDialog);
+    `, n.onclick = () => {
+      var o, d;
+      this.hideInviteDialog(), (d = (o = this.config.inviteParams) == null ? void 0 : o.onReject) == null || d.call(o), this.handleInviteLoop();
+    }, e.appendChild(i), e.appendChild(n), this.inviteDialog.appendChild(e), document.body.appendChild(this.inviteDialog);
   }
   handleInviteLoop() {
-    const { loop: t, loopDelay: e = 3e3, loopCount: i = 1 / 0 } = this.config.inviteSettings || {};
+    const { loop: t, loopDelay: e = 3e3, loopCount: i = 1 / 0 } = this.config.inviteParams || {};
     !t || this.loopCount >= i - 1 || (this.loopTimer && window.clearTimeout(this.loopTimer), this.loopTimer = window.setTimeout(() => {
       this.loopCount++, this.showInviteDialog();
     }, e));
   }
   showInviteDialog() {
     var t, e;
-    this.inviteDialog && (this.inviteDialog.style.display = "block", (e = (t = this.config.inviteSettings) == null ? void 0 : t.onOpen) == null || e.call(t));
+    this.inviteDialog && (this.inviteDialog.style.display = "block", (e = (t = this.config.inviteParams) == null ? void 0 : t.onOpen) == null || e.call(t));
   }
   hideInviteDialog() {
     var t, e;
-    this.inviteDialog && (this.inviteDialog.style.display = "none", (e = (t = this.config.inviteSettings) == null ? void 0 : t.onClose) == null || e.call(t));
+    this.inviteDialog && (this.inviteDialog.style.display = "none", (e = (t = this.config.inviteParams) == null ? void 0 : t.onClose) == null || e.call(t));
   }
 }
 export {

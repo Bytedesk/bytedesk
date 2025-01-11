@@ -13,6 +13,11 @@ chatUrl: 'https://www.weiyuai.cn/chat?org=df_org_uid&t=1&sid=df_wg_uid&',
 <script>
     const config = {
     placement: 'bottom-right',
+    autoPopup: false,
+    inviteParams: {
+        show: false,
+        text: '您好,请问有什么可以帮您?',
+    },
     bubbleConfig: {
         show: true,
         icon: '👋',
@@ -20,8 +25,12 @@ chatUrl: 'https://www.weiyuai.cn/chat?org=df_org_uid&t=1&sid=df_wg_uid&',
         subtitle: '点击我，与我对话'
     },
     theme: {
+        theme: 'system',
         backgroundColor: '#0066FF',
         textColor: '#ffffff'
+    },
+    window: {
+        width: '380'
     },
     chatParams: {
         org: 'df_org_uid',
