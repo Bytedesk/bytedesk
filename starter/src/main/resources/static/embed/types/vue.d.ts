@@ -8,19 +8,19 @@ import { RendererNode } from 'vue';
 import { VNode } from 'vue';
 
 export declare const BytedeskVue: DefineComponent<ExtractPropTypes<    {
-    locale: {
-        type: StringConstructor;
-        default: string;
-    };
+locale: {
+type: StringConstructor;
+default: string;
+};
 }>, () => VNode<RendererNode, RendererElement, {
-    [key: string]: any;
+[key: string]: any;
 }>, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<ExtractPropTypes<    {
-    locale: {
-        type: StringConstructor;
-        default: string;
-    };
+locale: {
+type: StringConstructor;
+default: string;
+};
 }>> & Readonly<{}>, {
-    locale: string;
+locale: string;
 }, {}, {}, {}, string, ComponentProvideOptions, true, {}, any>;
 
 export { }
