@@ -1,6 +1,7 @@
 # https://spring.io/guides/topicals/spring-boot-docker
 # https://hub.docker.com/r/jackning/bytedesk
 # maven
+# https://hub.docker.com/_/eclipse-temurin
 FROM eclipse-temurin:17-jdk
 # maintainer
 LABEL maintainer="270580156@qq.com"
