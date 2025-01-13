@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:26:07
+ * @LastEditTime: 2025-01-13 16:11:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,8 @@ package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -115,28 +117,37 @@ public class WorkgroupEntity extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
+
+    /**
+     * 获取可用客服
+     * @return 可用客服列表
+     */
+    public List<AgentEntity> getAvailableAgents() {
+        return this.agents.stream().filter(agent -> agent.isConnectedAndAvailable()).collect(Collectors.toList());
+    }
+
     // TODO: 根据算法选择一个agent
     // TODO: 增加agent-currentThreadCount数量
     // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
-    public AgentEntity nextAgent() {
+    // public AgentEntity nextAgent() {
 
-        // TODO: 所有客服都离线或小休不接待状态，则进入留言
+    //     // TODO: 所有客服都离线或小休不接待状态，则进入留言
 
-        // TODO: 所有客服都达到最大接待人数，则进入排队
+    //     // TODO: 所有客服都达到最大接待人数，则进入排队
 
-        // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
+    //     // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
 
-        // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
+    //     // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
 
-        if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
-            // return assignAgentByRobin();
+    //     if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
+    //         // return assignAgentByRobin();
 
-        } else if (routingMode.equals(WorkgroupRoutingModeEnum.LEAST_ACTIVE.name())) {
+    //     } else if (routingMode.equals(WorkgroupRoutingModeEnum.LEAST_ACTIVE.name())) {
 
-        }
+    //     }
 
-        return getAgents().iterator().next();
-    }
+    //     return getAgents().iterator().next();
+    // }
 
     /**
      * 路由队列，用于分配客服

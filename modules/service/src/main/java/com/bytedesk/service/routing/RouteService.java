@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 10:15:05
+ * @LastEditTime: 2025-01-13 16:12:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,6 +38,7 @@ import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -60,6 +61,8 @@ public class RouteService {
     private final QueueMemberRestService queueMemberRestService; ;
 
     private final MessageRestService messageRestService;
+
+    private final WorkgroupRoutingService workgroupRoutingService;
 
     public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
             @Nonnull RobotEntity robot) {
@@ -143,7 +146,8 @@ public class RouteService {
             throw new RuntimeException("No agents found in workgroup with uid " + workgroup.getUid());
         }
         // 下面人工接待
-        AgentEntity agent = workgroup.nextAgent();
+        // AgentEntity agent = workgroup.nextAgent();
+        AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agent == null) {
             throw new RuntimeException("No available agent found in workgroup with uid " + workgroup.getUid());
         }
