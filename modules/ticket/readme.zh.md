@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-01 13:21:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 16:46:34
+ * @LastEditTime: 2025-01-13 22:06:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,15 @@
 
 这个工单系统具有以下主要功能：
 
+## 通知
+
+- 钉钉
+- 企业微信
+- 飞书
+- 邮件
+- 短信
+- 微信公众号
+
 ## 工单管理
 
 - 创建、查看、更新、删除工单
@@ -25,6 +34,15 @@
 - 工单分配和转派
 - 工单截止日期设置
 - 工单附件上传和管理
+- 工单导出Excel
+- 工单分类
+- 工单标签
+- 工单模板
+- 工单打印
+- 工单统计
+- 工单报表
+- 工单自动回复
+- LDAP登录
 
 ## 评论系统
 
