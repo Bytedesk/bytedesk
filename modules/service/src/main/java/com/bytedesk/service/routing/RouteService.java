@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 16:22:30
+ * @LastEditTime: 2025-01-13 16:34:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -141,7 +141,6 @@ public class RouteService {
     public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
         log.info("RouteServiceImplVip routeWorkgroup: {}", workgroup.getUid());
-        
         if (workgroup.getAgents().isEmpty()) {
             throw new RuntimeException("No agents found in workgroup with uid " + workgroup.getUid());
         }
@@ -150,21 +149,52 @@ public class RouteService {
         if (agent == null) {
             throw new RuntimeException("No available agent found in workgroup with uid " + workgroup.getUid());
         }
+        // 排队计数
+        QueueMemberEntity queueMemberEntity = queueService.enqueue(thread, agent, visitorRequest);
+        MessageProtobuf messageProtobuf = null;
+        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.toString());
         //
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
-            thread.setStarted();
-            thread.setUnreadCount(1);
-            thread.setContent(workgroup.getServiceSettings().getWelcomeTip());
-            //
-            thread.setOwner(agent.getMember().getUser());
-            UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
-            thread.setAgent(JSON.toJSONString(agentProtobuf));
+            if (agent.canAcceptMore()) {
+                // 未满则接待
+                thread.setStarted();
+                thread.setUnreadCount(1);
+                thread.setContent(agent.getServiceSettings().getWelcomeTip());
+                thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+                // 增加接待数量，待优化
+                agent.increaseThreadCount();
+                agentRestService.save(agent);
+                // 更新排队状态，待优化
+                queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+                queueMemberEntity.setAcceptTime(LocalDateTime.now());
+                queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+                queueMemberRestService.save(queueMemberEntity);
+                // 
+                thread.setOwner(agent.getMember().getUser());
+                UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
+                thread.setAgent(JSON.toJSONString(agentProtobuf));
+                // 
+                messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            } else {
+                // 排队，已满则排队
+                // String queueTip = agent.getQueueSettings().getQueueTip();
+                // 大约等待时间 = 前面排队人数 * 2 分钟，TODO: 需要优化
+                String content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
+                // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                
+                // 进入排队队列
+                thread.setQueuing();
+                thread.setUnreadCount(0);
+                thread.setContent(content);
+                thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+                // 
+                messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            }
+            // 
             threadService.save(thread);
-            //
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
-            // 广播消息，由消息通道统一处理
-            messageSendService.sendProtobufMessage(messageProtobuf);
 
             return messageProtobuf;
         } else {
