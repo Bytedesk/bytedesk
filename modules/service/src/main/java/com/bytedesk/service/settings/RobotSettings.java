@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:13:02
+ * @LastEditTime: 2025-01-13 16:19:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,11 +45,10 @@ public class RobotSettings  implements Serializable {
 
     @Builder.Default
     private boolean nonWorktimeRobot = false;
-
     
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotEntity robot;
-    
+
     //
     public Boolean shouldTransferToRobot(Boolean isOffline, Boolean isInServiceTime) {
 
@@ -66,35 +65,6 @@ public class RobotSettings  implements Serializable {
         return false;
     }
 
-    /**
-     * 检查是否超载
-     */
-    public boolean isOverloaded() {
-        // 1. 检查总会话数是否超限
-        // if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
-        //     return true;
-        // }
-
-        // 2. 检查等待队列是否超限 
-        // if (getWaitingThreadCount() >= getMaxWaitingThreads()) {
-        //     return true;
-        // }
-
-        // 3. 检查客服平均负载是否超限
-        // if (getOnlineAgentCount() > 0) {
-        //     double avgLoad = (double) getCurrentThreadCount() / getOnlineAgentCount();
-        //     if (avgLoad >= getMaxThreadPerAgent()) {
-        //         return true;
-        //     }
-        // }
-
-        // 4. 检查负载率是否超过告警阈值
-        // double loadRate = (double) getCurrentThreadCount() / getMaxConcurrentThreads();
-        // if (loadRate >= getAlertThreshold()) {
-        //     return true;
-        // }
-
-        return false;
-    }
+    
 
 }
