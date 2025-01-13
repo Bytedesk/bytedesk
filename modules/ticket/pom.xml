@@ -59,6 +59,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-service</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<!-- Excel导出 -->
