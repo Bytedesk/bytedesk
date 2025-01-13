@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 16:34:49
+ * @LastEditTime: 2025-01-13 17:02:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,9 +106,15 @@ public class RouteService {
             } else {
                 // 已满则排队
                 // String queueTip = agent.getQueueSettings().getQueueTip();
-                // 大约等待时间 = 前面排队人数 * 2 分钟，TODO: 需要优化
-                String content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
-                // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                String content = "";
+                if (queueMemberEntity.getBeforeNumber() == 0) {
+                    // 客服接待刚满员，下一个就是他，
+                    content = "请稍后，下一个就是您";
+                    // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                } else {
+                    // 前面有排队人数
+                    content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
+                }
                 
                 // 进入排队队列
                 thread.setQueuing();
@@ -180,9 +186,15 @@ public class RouteService {
             } else {
                 // 排队，已满则排队
                 // String queueTip = agent.getQueueSettings().getQueueTip();
-                // 大约等待时间 = 前面排队人数 * 2 分钟，TODO: 需要优化
-                String content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
-                // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                String content = "";
+                if (queueMemberEntity.getBeforeNumber() == 0) {
+                    // 客服接待刚满员，下一个就是他，
+                    content = "请稍后，下一个就是您";
+                    // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                } else {
+                    // 前面有排队人数
+                    content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
+                }
                 
                 // 进入排队队列
                 thread.setQueuing();
