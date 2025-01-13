@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 15:21:13
+ * @LastEditTime: 2025-01-13 15:54:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -134,7 +134,7 @@ public class VisitorThreadService
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
             thread.setExtra(extra);
         }
-        //
+        // 
         return thread;
     }
 
