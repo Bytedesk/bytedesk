@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 15:24:59
+ * @LastEditTime: 2025-01-13 10:15:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -56,6 +58,8 @@ public class RouteService {
     private final QueueService queueService;
 
     private final QueueMemberRestService queueMemberRestService; ;
+
+    private final MessageRestService messageRestService;
 
     public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
             @Nonnull RobotEntity robot) {
@@ -123,9 +127,11 @@ public class RouteService {
             thread.setQueueNumber(queueMemberEntity.getQueueNumber());
             threadService.save(thread);
             //
-            messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
-            // 客服离线时，不发送消息通知
-            return messageProtobuf;
+            MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
+            // 保存留言消息
+            messageRestService.save(message);
+            // 返回留言消息
+            return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
         }
     }
 
@@ -168,10 +174,11 @@ public class RouteService {
             thread.setAgent(JSON.toJSONString(agentProtobuf));
             threadService.save(thread);
             //
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
-            // 广播消息，由消息通道统一处理
-            messageSendService.sendProtobufMessage(messageProtobuf);
-            return messageProtobuf;
+            MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
+            // 保存留言消息
+            messageRestService.save(message);
+            // 返回留言消息
+            return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
         }
 
     }
