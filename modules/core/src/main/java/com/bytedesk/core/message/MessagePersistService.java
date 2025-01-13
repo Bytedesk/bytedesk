@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 14:54:52
+ * @LastEditTime: 2025-01-13 10:03:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -212,7 +212,7 @@ public class MessagePersistService {
     }
 
     private void dealWithLeaveMsg(MessageTypeEnum type, MessageProtobuf message) {
-        // log.info("dealWithLeaveMsg");
+        log.info("dealWithLeaveMsg");
         Optional<MessageEntity> messageOpt = messageService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
