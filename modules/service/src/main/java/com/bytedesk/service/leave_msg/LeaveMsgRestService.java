@@ -79,7 +79,7 @@ public class LeaveMsgRestService extends BaseRestService<LeaveMsgEntity, LeaveMs
         log.info("request {}", request);
 
         LeaveMsgEntity leaveMsg = modelMapper.map(request, LeaveMsgEntity.class);
-        leaveMsg.setUid(uidUtils.getCacheSerialUid());
+        leaveMsg.setUid(uidUtils.getUid());
         leaveMsg.setStatus(LeaveMsgStatusEnum.UNREAD.name());
         //
 
