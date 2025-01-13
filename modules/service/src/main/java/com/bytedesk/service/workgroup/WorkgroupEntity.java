@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 16:11:58
+ * @LastEditTime: 2025-01-13 16:19:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -126,18 +126,49 @@ public class WorkgroupEntity extends BaseEntity {
         return this.agents.stream().filter(agent -> agent.isConnectedAndAvailable()).collect(Collectors.toList());
     }
 
+    /**
+     * 检查是否超载
+     */
+    public boolean isOverloaded() {
+        // 1. 检查总会话数是否超限
+        // if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
+        //     return true;
+        // }
+
+        // 2. 检查等待队列是否超限 
+        // if (getWaitingThreadCount() >= getMaxWaitingThreads()) {
+        //     return true;
+        // }
+
+        // 3. 检查客服平均负载是否超限
+        // if (getOnlineAgentCount() > 0) {
+        //     double avgLoad = (double) getCurrentThreadCount() / getOnlineAgentCount();
+        //     if (avgLoad >= getMaxThreadPerAgent()) {
+        //         return true;
+        //     }
+        // }
+
+        // 4. 检查负载率是否超过告警阈值
+        // double loadRate = (double) getCurrentThreadCount() / getMaxConcurrentThreads();
+        // if (loadRate >= getAlertThreshold()) {
+        //     return true;
+        // }
+
+        return false;
+    }
+
     // TODO: 根据算法选择一个agent
     // TODO: 增加agent-currentThreadCount数量
     // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
     // public AgentEntity nextAgent() {
 
-    //     // TODO: 所有客服都离线或小休不接待状态，则进入留言
+        // TODO: 所有客服都离线或小休不接待状态，则进入留言
 
-    //     // TODO: 所有客服都达到最大接待人数，则进入排队
+        // TODO:  所有客服都达到最大接待人数，则进入排队
 
-    //     // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
+        // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
 
-    //     // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
+        // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
 
     //     if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
     //         // return assignAgentByRobin();

@@ -11,6 +11,11 @@ import com.bytedesk.service.agent.AgentEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 工作组路由服务
+ * 根据工作组路由模式选择客服
+ * todo: 需要完善各个路由算法
+ */
 @Slf4j
 @Component
 @AllArgsConstructor
@@ -20,28 +25,11 @@ public class WorkgroupRoutingService {
 
     private static final String COUNTER_KEY_PREFIX = RedisConsts.BYTEDESK_REDIS_PREFIX + "roundRobinCounter:";
 
-    // 轮询计数器
-    // private final Map<String, AtomicInteger> roundRobinCounters = new ConcurrentHashMap<>();
-    
-    // 最近分配时间记录
-    // private final Map<String, LocalDateTime> lastAssignmentTime = new ConcurrentHashMap<>();
-
     /**
      * 根据工作组路由模式选择客服
      */
     public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread, List<AgentEntity> availableAgents) {
-        if (!workgroup.getLeaveMsgSettings().isInServiceTime()) {
-            log.info("Workgroup {} is not in service time", workgroup.getUid());
-            // todo：route to robot
-            return null;
-        }
-
-        if (workgroup.getRobotSettings().isOverloaded()) {
-            log.info("Workgroup {} is overloaded", workgroup.getUid());
-            // todo: route to robot
-            return null;
-        }
-
+        // 
         switch (workgroup.getRoutingMode()) {
             case "ROUND_ROBIN":
                 return selectByRoundRobin(workgroup.getUid(), availableAgents);
@@ -56,7 +44,7 @@ public class WorkgroupRoutingService {
             case "FASTEST_RESPONSE":
                 return selectByFastestResponse(availableAgents);
             default:
-                return selectByLeastActive(availableAgents); // 默认使用最小活动数
+                return selectByRoundRobin(workgroup.getUid(), availableAgents); // 默认使用轮询
         }
     }
 
@@ -71,10 +59,6 @@ public class WorkgroupRoutingService {
         // 计算索引
         int index = Math.toIntExact(counter % agents.size());
         return agents.get(index);
-        
-        // AtomicInteger counter = roundRobinCounters.computeIfAbsent(workgroupUid, k -> new AtomicInteger(0));
-        // int index = Math.abs(counter.getAndIncrement() % agents.size());
-        // return agents.get(index);
     }
 
     /**
