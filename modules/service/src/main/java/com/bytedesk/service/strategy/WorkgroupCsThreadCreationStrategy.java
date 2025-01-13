@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 14:24:19
+ * @LastEditTime: 2025-01-13 15:57:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,28 +68,33 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         String workgroupUid = visitorRequest.getSid();
         String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroupUid, visitorRequest.getUid());
         // 是否已经存在会话
+        ThreadEntity thread = null;
+        WorkgroupEntity workgroup = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent() && !visitorRequest.getForceAgent()) {
-            ThreadEntity thread = threadOptional.get();
+            thread = threadOptional.get();
+            // 
             if (thread.isStarted()) {
                 log.info("Already have a processing thread {}", topic);
-                return getWorkgroupProcessingMessage(visitorRequest, threadOptional.get());
+                return getWorkgroupProcessingMessage(visitorRequest, thread);
+            } else if (thread.isQueuing()) {
+                // 返回排队中的会话
+                return getWorkgroupQueuingMessage(visitorRequest, thread);
+            } else {
+                // 关闭或者离线状态，返回初始化状态的会话
+                thread = threadOptional.get().reInitWorkgroup();
+                workgroup = workgroupService.findByUid(workgroupUid)
+                        .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
             }
-        }
-        //
-        WorkgroupEntity workgroup = workgroupService.findByUid(workgroupUid)
-                .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
-        // 
-        ThreadEntity thread = null;
-        if (threadOptional.isPresent()) {
-            // 存在会话，且已经关闭，重新初始化
-            thread = threadOptional.get().reInitWorkgroup();
         } else {
             // 不存在会话，创建会话
+            workgroup = workgroupService.findByUid(workgroupUid)
+                    .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
         }
+        //
         thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
-        // thread.setSerialNumber(counter.getCurrentNumber());
+
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             Boolean isOffline = !workgroup.isConnected();
@@ -98,8 +103,11 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             if (transferToRobot) {
                 // 转机器人
                 RobotEntity robot = workgroup.getRobotSettings().getRobot();
-                // 
-                return routeService.routeToRobot(visitorRequest, thread, robot);
+                if (robot != null) {
+                    return routeService.routeToRobot(visitorRequest, thread, robot);
+                } else {
+                    throw new RuntimeException("Workgroup robot not found");
+                }
             }
         }
         // 
@@ -120,6 +128,14 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         }
         // 
         return messageProtobuf;
+    }
+
+    private MessageProtobuf getWorkgroupQueuingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
+        //
+        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        log.info("getWorkgroupQueuingMessage: user: {}, agent {}", user.toString(), thread.getAgent());
+        //
+        return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
 
 

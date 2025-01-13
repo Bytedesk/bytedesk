@@ -93,7 +93,8 @@ public class VisitorRequest extends BaseRequest {
 	// wechat mp extra
 	private String threadExtra;
 	public Boolean isWeChat() {
-		return this.client.contains(ClientEnum.WECHAT.name());
+		// 忽略大小写
+		return this.client.toLowerCase().contains(ClientEnum.WECHAT.name().toLowerCase());
 	}
 
 	public ThreadTypeEnum formatType() {
