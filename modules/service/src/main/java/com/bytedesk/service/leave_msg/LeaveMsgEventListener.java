@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class LeaveMsgEventListener {
 
-    private final LeaveMsgService LeaveMsgService;
+    private final LeaveMsgRestService LeaveMsgService;
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {

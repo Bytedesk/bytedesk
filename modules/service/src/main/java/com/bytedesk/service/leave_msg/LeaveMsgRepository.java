@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 21:31:17
+ * @LastEditTime: 2025-01-13 08:24:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,12 @@
  */
 package com.bytedesk.service.leave_msg;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface LeaveMsgRepository extends JpaRepository<LeaveMsgEntity, Long>, JpaSpecificationExecutor<LeaveMsgEntity> {
 
+    Optional<LeaveMsgEntity> findByUid(String uid);
 }

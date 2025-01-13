@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class LeaveMsgRestController extends BaseRestController<LeaveMsgRequest> {
 
-    private final LeaveMsgService LeaveMsgService;
+    private final LeaveMsgRestService LeaveMsgService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override

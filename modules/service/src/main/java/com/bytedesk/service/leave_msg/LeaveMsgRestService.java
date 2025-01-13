@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 12:09:25
+ * @LastEditTime: 2025-01-13 08:27:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.leave_msg;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgRequest, LeaveMsgResponse> {
+public class LeaveMsgRestService extends BaseRestService<LeaveMsgEntity, LeaveMsgRequest, LeaveMsgResponse> {
 
     private final LeaveMsgRepository LeaveMsgRepository;
 
@@ -67,10 +68,10 @@ public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgReq
         return page.map(this::convertToResponse);
     }
 
+    @Cacheable(value = "leaveMsg", key = "#uid")
     @Override
     public Optional<LeaveMsgEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return LeaveMsgRepository.findByUid(uid);
     }
 
     @Override
@@ -80,7 +81,6 @@ public class LeaveMsgService extends BaseRestService<LeaveMsgEntity, LeaveMsgReq
         LeaveMsgEntity leaveMsg = modelMapper.map(request, LeaveMsgEntity.class);
         leaveMsg.setUid(uidUtils.getCacheSerialUid());
         leaveMsg.setStatus(LeaveMsgStatusEnum.UNREAD.name());
-        
         //
 
         // 保存留言
