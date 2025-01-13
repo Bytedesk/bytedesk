@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 15:24:23
+ * @LastEditTime: 2025-01-13 10:31:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -142,7 +142,7 @@ public class ThreadMessageUtil {
     }
 
 
-    public static MessageProtobuf getThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
+    public static MessageEntity getThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
 
         UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
@@ -153,7 +153,7 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
                 .build();
-        message.setUid(thread.getUid()); // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
+        message.setUid(UidUtils.getInstance().getUid());
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
@@ -162,7 +162,8 @@ public class ThreadMessageUtil {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
         //
-        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        // return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        return message;
     }
 
     
