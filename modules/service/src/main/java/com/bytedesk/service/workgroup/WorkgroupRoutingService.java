@@ -1,23 +1,27 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.redis.RedisConsts;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.service.agent.AgentEntity;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class WorkgroupRoutingService {
 
+    private final StringRedisTemplate redisTemplate;
+
+    private static final String COUNTER_KEY_PREFIX = RedisConsts.BYTEDESK_REDIS_PREFIX + "roundRobinCounter:";
+
     // 轮询计数器
-    private final Map<String, AtomicInteger> roundRobinCounters = new ConcurrentHashMap<>();
+    // private final Map<String, AtomicInteger> roundRobinCounters = new ConcurrentHashMap<>();
     
     // 最近分配时间记录
     // private final Map<String, LocalDateTime> lastAssignmentTime = new ConcurrentHashMap<>();
@@ -61,9 +65,16 @@ public class WorkgroupRoutingService {
      * 按顺序将请求分配给每个客服
      */
     private AgentEntity selectByRoundRobin(String workgroupUid, List<AgentEntity> agents) {
-        AtomicInteger counter = roundRobinCounters.computeIfAbsent(workgroupUid, k -> new AtomicInteger(0));
-        int index = Math.abs(counter.getAndIncrement() % agents.size());
+        // 获取当前计数器值
+        String counterKey = COUNTER_KEY_PREFIX + workgroupUid;
+        Long counter = redisTemplate.opsForValue().increment(counterKey, 1);
+        // 计算索引
+        int index = Math.toIntExact(counter % agents.size());
         return agents.get(index);
+        
+        // AtomicInteger counter = roundRobinCounters.computeIfAbsent(workgroupUid, k -> new AtomicInteger(0));
+        // int index = Math.abs(counter.getAndIncrement() % agents.size());
+        // return agents.get(index);
     }
 
     /**
