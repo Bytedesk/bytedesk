@@ -36,9 +36,11 @@
         <sofa.boot.version>4.2.0</sofa.boot.version>
         <querydsl.version>5.1.0</querydsl.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <binarywang.weixin.version>4.7.0</binarywang.weixin.version>
         <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 		<jackson.version>2.18.2</jackson.version>
-        <revision>0.5.3</revision>
+        <flowable.version>7.1.0</flowable.version>
+        <revision>0.5.8</revision>
     </properties>
 
     <dependencies>
