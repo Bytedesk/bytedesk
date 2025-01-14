@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-07 22:20:12
+ * @LastEditTime: 2025-01-14 16:42:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -227,10 +227,11 @@ docker run -d \
 - <img src="./images/wechatai_mp.jpg" width="100">
 
 <!-- ## [写在前面](https://www.weiyuai.cn/) -->
-<!-- - 在保留原有商标logo等信息前提下，支持免费商用。如需移除，需要获得授权 -->
-<!-- - 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权。 -->
-<!-- - 代理合作：您负责销售，我方负责售后，维护等 ，五五分成。联系[微信](./images/wechat.png) -->
+- 此为开源社区版，支持免费商用
 <!-- - 此软件可能存在bug或不完善的地方，如造成损失，需自行负责 -->
-<!-- - 此为开源社区版，在保留商标Logo等版权信息前提下，支持免费商用 -->
 <!-- - 请联系[微信](./images/wechat.png) -->
 <!-- - 严禁用于含有木马、病毒、色情、赌博、诈骗等违法违规业务 -->
+
+## 版权
+
+- [MIT](./LICENSE)
