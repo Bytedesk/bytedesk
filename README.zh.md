@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-14 16:42:41
+ * @LastEditTime: 2025-01-14 17:37:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,67 +35,28 @@
 - 局域网即时通讯
 - 企业成员管理
 - 聊天记录监控
-- 自定义通知，如：接收运维报警、股票实时报价等
-- 更利于企业内部员工之间协作
+- ...
 
 ### 全渠道客服
 
 - 大模型AI智能客服
 - 实现人工客服兜底
-- 提供转人工客服接口，
-- 可为第三方AI知识库问答系统提供转人工解决方案
 - 支持多渠道
+- ...
 
 ### 知识库AI对话
 
 - 可编排AI知识库问答
 - 对接知识库
-- 大模型对话
-- 拖拽式配置
-- 可对接调用第三方知识库问答系统接口
-- 实时调用自有业务系统Api
 - 实现系统解耦，更利于扩展
+- ...
 
-<!-- ### 社交IM
+### 工单系统
 
-- 加好友
-- 群聊/讨论组 -->
-
-<!-- ### 企业/团队IM
-
-- 多层组织架构
-- 角色管理
-- 权限管理
-- 聊天记录管理
-- 同事对话
-- 群组/讨论组 -->
-
-<!-- ### AI助手
-
-- 大模型对话LLM
-- 知识库对话RAG
-- 更适合团队使用，一人配置，多人使用。 -->
-
-<!-- ### 在线客服：跟客户聊
-
-- 支持多渠道：
-  - 平台渠道：Web/H5/React/Android/iOS/Uniapp/Flutter、
-  - 社交渠道：微信公众号/小程序/企业微信/小红书/抖音/快手/百度/微博/知乎、
-  - 电商渠道：淘宝/天猫/京东/千牛/抖店
-  - 海外渠道：Facebook/Instagram//Whatsapp/Line
-- 多种路由策略、
-- 详细考核指标
-- 坐席工作台、
-- 工单系统、
-- 坐席管理、
-- 数据看板、
-- 人工知识库、
-- 技能组管理、
-- 实时监控、
-- 公告、
-- 敏感词、
-- CRM、
-- 报表功能， -->
+- 工单管理
+- 工单SLA管理
+- 工单统计和报表
+- ...
 
 ## Docker
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-14 16:43:35
+ * @LastEditTime: 2025-01-14 17:35:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,23 +34,22 @@ Team Cooperation with AI powered Omnichannel customer service
 
 - Chat with LLM
 - Chat with Knowledge base(RAG)
+- ...
 
 ### Customer Service
 
 - Support multiple channels
 - multiple routing strategies, and detailed assessment indicators
 - Seating workbench
-- Work order system
 - Seat management
-- Data dashboard
-- manual knowledge base
-- Skill group management
-- Real-time monitoring
-- Announcements
-- sensitive words
-- CRM
-- Report function,
-- Provide customers with integrated customer service workbench services
+- ...
+
+### Ticket
+
+- Ticket management
+- Ticket SLA management
+- Ticket statistics and reports
+- ...
 
 ## Docker
 
