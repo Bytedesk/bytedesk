@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 14:18:55
+ * @LastEditTime: 2025-01-15 15:58:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.bytedesk.core.ip.IpUtils;
+
 @Component
 public class IpAccessInterceptor implements HandlerInterceptor {
     
@@ -27,7 +29,7 @@ public class IpAccessInterceptor implements HandlerInterceptor {
     
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String ip = getClientIp(request);
+        String ip = IpUtils.getClientIp(request);
         String endpoint = request.getRequestURI();
         
         // 检查是否被封禁
@@ -42,17 +44,17 @@ public class IpAccessInterceptor implements HandlerInterceptor {
         return true;
     }
     
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
-    }
+    // private String getClientIp(HttpServletRequest request) {
+    //     String ip = request.getHeader("X-Forwarded-For");
+    //     if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+    //         ip = request.getHeader("Proxy-Client-IP");
+    //     }
+    //     if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+    //         ip = request.getHeader("WL-Proxy-Client-IP");
+    //     }
+    //     if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+    //         ip = request.getRemoteAddr();
+    //     }
+    //     return ip;
+    // }
 } 

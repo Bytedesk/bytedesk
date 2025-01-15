@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 10:31:28
+ * @LastEditTime: 2025-01-15 15:36:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import java.time.LocalDateTime;
 
@@ -145,6 +146,30 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
 
         UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+        // ... 方法的实现保持不变 ...
+        MessageEntity message = MessageEntity.builder()
+                .content(thread.getContent())
+                .type(MessageTypeEnum.LEAVE_MSG.name())
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(JSON.toJSONString(user))
+                .build();
+        message.setUid(UidUtils.getInstance().getUid());
+        message.setOrgUid(thread.getOrgUid());
+        message.setCreatedAt(LocalDateTime.now());
+        message.setUpdatedAt(LocalDateTime.now());
+        message.setThreadTopic(thread.getTopic());
+        //
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        message.setExtra(JSON.toJSONString(extra));
+        //
+        // return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        return message;
+    }
+
+    public static MessageEntity getThreadOfflineMessage(WorkgroupEntity workgroup, ThreadEntity thread) {
+
+        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(workgroup);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .content(thread.getContent())

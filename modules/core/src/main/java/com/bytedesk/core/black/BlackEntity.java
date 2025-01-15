@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-28 22:02:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 17:44:29
+ * @LastEditTime: 2025-01-15 15:51:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.black;
+
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -45,13 +47,24 @@ import lombok.experimental.Accessors;
 @Table(name = "bytedesk_core_black")
 public class BlackEntity extends BaseEntity {
 
+    // 黑名单类型
+    @Builder.Default
+    private String type = BlackTypeEnum.SERVICE.name();
+
     private String reason;
 
-    // 访客 or 用户，json，类型在json中定义
+    // 黑名单用户
     @Builder.Default
     @Column(name = "black_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String blackUser = BytedeskConsts.EMPTY_JSON_STRING;
 
+    // 执行拉黑的用户uid
     private String userUid;
+
+    // 开始时间
+    private LocalDateTime startTime;
+
+    // 结束时间
+    private LocalDateTime endTime;
 }

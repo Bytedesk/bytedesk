@@ -22,5 +22,6 @@ public enum UserTypeEnum {
     ASSISTANT,
     CHANNEL,
     USER,
-    MONITOR
+    MONITOR,
+    WORKGROUP
 }
