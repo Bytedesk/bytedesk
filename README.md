@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 13:51:23
+ * @LastEditTime: 2025-01-15 17:15:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,46 +52,17 @@ Team Cooperation with AI powered Omnichannel customer service
 ## Docker
 
 ```bash
-# 1. create network
-docker network create bytedesk-network
-
-# 2. start mysql
-docker run -d \
-  --name mysql-bytedesk \
-  --network bytedesk-network \
-  -e MYSQL_DATABASE=bytedesk_im \
-  -e MYSQL_ROOT_PASSWORD=r8FqfdbWUaN3 \
-  -p 3306:3306 \
-  -v mysql_data:/var/lib/mysql \
-  mysql:latest
-
-# 3. start Redis
-docker run -d \
-  --name redis-bytedesk \
-  --network bytedesk-network \
-  -p 6379:6379 \
-  -v redis_data:/data \
-  redis/redis-stack-server:latest \
-  /bin/sh -c "redis-server --requirepass qfRxz3tVT8Nh"
-
-# 4. start Bytedesk
-docker run -d \
-  --name bytedesk \
-  --network bytedesk-network \
-  -p 9003:9003 \
-  -p 9885:9885 \
-  -v upload_data:/app/uploads \
-  -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql-bytedesk:3306/bytedesk_im \
-  -e SPRING_DATASOURCE_USERNAME=root \
-  -e SPRING_DATASOURCE_PASSWORD=r8FqfdbWUaN3 \
-  -e SPRING_DATA_REDIS_HOST=redis-bytedesk \
-  -e SPRING_DATA_REDIS_PASSWORD=qfRxz3tVT8Nh \
-  registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
-
-# stop and remove
-# docker stop bytedesk redis-bytedesk mysql-bytedesk
-# docker rm bytedesk redis-bytedesk mysql-bytedesk
-# docker network rm bytedesk-network
+# start docker container
+cd deploy/docker
+# https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker
+# pull image from aliyun
+docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
+# or pull image from docker hub
+docker pull bytedesk/bytedesk:latest
+# start docker compose container, -f flag to specify file path, -d flag to start container in background mode
+docker compose -f docker-compose.yaml up -d
+# stop container
+docker compose -f docker-compose.yaml stop
 ```
 
 ## Getting Started
