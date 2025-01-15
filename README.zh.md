@@ -61,46 +61,15 @@
 ## Docker
 
 ```bash
-# 1. 创建网络
-docker network create bytedesk-network
-
-# 2. 启动 MySQL
-docker run -d \
-  --name mysql-bytedesk \
-  --network bytedesk-network \
-  -e MYSQL_DATABASE=bytedesk_im \
-  -e MYSQL_ROOT_PASSWORD=r8FqfdbWUaN3 \
-  -p 3306:3306 \
-  -v mysql_data:/var/lib/mysql \
-  mysql:latest
-
-# 3. 启动 Redis
-docker run -d \
-  --name redis-bytedesk \
-  --network bytedesk-network \
-  -p 6379:6379 \
-  -v redis_data:/data \
-  redis/redis-stack-server:latest \
-  /bin/sh -c "redis-server --requirepass qfRxz3tVT8Nh"
-
-# 4. 启动 Bytedesk
-docker run -d \
-  --name bytedesk \
-  --network bytedesk-network \
-  -p 9003:9003 \
-  -p 9885:9885 \
-  -v upload_data:/app/uploads \
-  -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql-bytedesk:3306/bytedesk_im \
-  -e SPRING_DATASOURCE_USERNAME=root \
-  -e SPRING_DATASOURCE_PASSWORD=r8FqfdbWUaN3 \
-  -e SPRING_DATA_REDIS_HOST=redis-bytedesk \
-  -e SPRING_DATA_REDIS_PASSWORD=qfRxz3tVT8Nh \
-  registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
-
-# 停止和删除命令
-# docker stop bytedesk redis-bytedesk mysql-bytedesk
-# docker rm bytedesk redis-bytedesk mysql-bytedesk
-# docker network rm bytedesk-network
+# https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker
+# 拉取阿里云镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
+# 或拉取docker hub镜像
+docker pull bytedesk/bytedesk:latest
+# 启动docker compose容器, -f标志来指定文件路径, -d标志表示在后台模式下启动容器
+docker compose -f docker-compose.yaml up -d
+# stop container
+docker compose -f docker-compose.yaml stop
 ```
 
 ## 快速开始
