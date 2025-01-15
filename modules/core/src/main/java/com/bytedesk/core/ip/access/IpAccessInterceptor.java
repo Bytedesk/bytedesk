@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 17:55:33
+ * @LastEditTime: 2025-01-15 14:18:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,7 @@ public class IpAccessInterceptor implements HandlerInterceptor {
         }
         
         // 记录访问
-        ipAccessService.recordAccess(ip, endpoint);
+        ipAccessService.recordAccess(ip, endpoint, request.getQueryString());
         return true;
     }
     

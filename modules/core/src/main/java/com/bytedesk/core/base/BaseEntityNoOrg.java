@@ -55,7 +55,7 @@ public abstract class BaseEntityNoOrg implements Serializable {
     // private static final String timezone = "GMT+8";
 
     @Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // @NotBlank 在应用层（业务逻辑或表单验证）确保uid字段在提交时必须是非空且去除空格后有实际内容的。

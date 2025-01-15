@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 11:34:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-27 11:34:22
+ * @LastEditTime: 2025-01-15 14:30:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,14 +13,14 @@
  */
 package com.bytedesk.core.ip;
 
-import java.util.Optional;
+// import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface IpRepository extends JpaRepository<IpEntity, Long>, JpaSpecificationExecutor<IpEntity> {
+// public interface IpRepository extends JpaRepository<IpEntity, Long>, JpaSpecificationExecutor<IpEntity> {
 
-    Optional<IpEntity> findByUid(String uid);
+//     Optional<IpEntity> findByUid(String uid);
 
-    Optional<IpEntity> findFirstByOrgUid(String orgUid);
-}
+//     Optional<IpEntity> findFirstByOrgUid(String orgUid);
+// }
