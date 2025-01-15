@@ -1,5 +1,5 @@
 services:
-  bytedesk-db:
+  bytedesk-mysql:
     image: mysql:latest
     container_name: mysql-bytedesk
     environment:
@@ -28,7 +28,7 @@ services:
     # mage: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest # aliyun community
     container_name: bytedesk
     depends_on:
-      - bytedesk-db
+      - bytedesk-mysql
       - bytedesk-redis
     environment:
       # db config
@@ -87,9 +87,9 @@ services:
       # Cluster config
       BYTEDESK_CLUSTER_ENABLED: false
       # Push config
-      BYTEDESK_PUSH_APNS_BUNDLE_ID: com.kefux.im
-      BYTEDESK_PUSH_APNS_P12_URL: 123.p12
-      BYTEDESK_PUSH_APNS_P12_PASSWORD: 123456
+      # BYTEDESK_PUSH_APNS_BUNDLE_ID: com.kefux.im
+      # BYTEDESK_PUSH_APNS_P12_URL: 123.p12
+      # BYTEDESK_PUSH_APNS_P12_PASSWORD: 123456
     ports:
       - 9003:9003
       - 9885:9885  # Add websocket port mapping
