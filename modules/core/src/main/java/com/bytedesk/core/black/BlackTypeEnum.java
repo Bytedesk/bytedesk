@@ -14,5 +14,7 @@
 package com.bytedesk.core.black;
 
 public enum BlackTypeEnum {
-    
+    SERVICE,
+    FRIEND,
+    GROUP
 }
