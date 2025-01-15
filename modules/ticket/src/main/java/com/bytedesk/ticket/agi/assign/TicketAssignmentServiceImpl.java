@@ -5,11 +5,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.ticket.agi.event.TicketEventService;
+import com.bytedesk.ticket.agi.skill.AgentSkillEntity;
+import com.bytedesk.ticket.agi.skill.AgentSkillService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketService;
-import com.bytedesk.ticket.agi.event.TicketEventService;
-import com.bytedesk.ticket.skill.AgentSkillEntity;
-import com.bytedesk.ticket.skill.AgentSkillService;
 
 import java.util.*;
 import java.util.stream.Collectors;

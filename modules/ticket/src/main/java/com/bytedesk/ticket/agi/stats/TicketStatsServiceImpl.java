@@ -1,10 +1,10 @@
-package com.bytedesk.ticket.stats;
+package com.bytedesk.ticket.agi.stats;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.ticket.ticket.TicketRepository;
 import com.bytedesk.ticket.ticket.TicketEntity;
+import com.bytedesk.ticket.ticket.TicketRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

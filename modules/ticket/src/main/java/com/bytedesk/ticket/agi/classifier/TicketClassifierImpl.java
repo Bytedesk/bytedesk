@@ -1,6 +1,7 @@
 package com.bytedesk.ticket.agi.classifier;
 
 import org.springframework.stereotype.Service;
+
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import lombok.extern.slf4j.Slf4j;

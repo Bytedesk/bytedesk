@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.bytedesk.ticket.agi.comment.TicketCommentService;
 import com.bytedesk.ticket.ticket.TicketService;
-import com.bytedesk.ticket.comment.TicketCommentService;
 
 import java.util.List;
 

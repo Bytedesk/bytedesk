@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.ticket.agi.attachment.exception.AttachmentException;
-import com.bytedesk.ticket.comment.config.CommentConfig;
+import com.bytedesk.ticket.agi.comment.config.CommentConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;

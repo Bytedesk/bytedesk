@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.stats;
+package com.bytedesk.ticket.agi.stats;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.worktime;
+package com.bytedesk.ticket.agi.worktime;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

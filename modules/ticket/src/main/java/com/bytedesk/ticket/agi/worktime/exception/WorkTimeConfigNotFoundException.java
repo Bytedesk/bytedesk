@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.worktime.exception;
+package com.bytedesk.ticket.agi.worktime.exception;
 
 public class WorkTimeConfigNotFoundException extends RuntimeException {
     public WorkTimeConfigNotFoundException(Long configId) {

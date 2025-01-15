@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.comment;
+package com.bytedesk.ticket.agi.comment;
 
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.*;

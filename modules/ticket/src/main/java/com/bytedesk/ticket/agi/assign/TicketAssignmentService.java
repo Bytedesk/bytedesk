@@ -1,7 +1,8 @@
 package com.bytedesk.ticket.agi.assign;
 
-import com.bytedesk.ticket.ticket.TicketEntity;
 import java.util.List;
+
+import com.bytedesk.ticket.ticket.TicketEntity;
 
 public interface TicketAssignmentService {
     

@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.comment.dto;
+package com.bytedesk.ticket.agi.comment.dto;
 
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;

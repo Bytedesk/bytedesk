@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.worktime;
+package com.bytedesk.ticket.agi.worktime;
 
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.worktime.dto;
+package com.bytedesk.ticket.agi.worktime.dto;
 
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;

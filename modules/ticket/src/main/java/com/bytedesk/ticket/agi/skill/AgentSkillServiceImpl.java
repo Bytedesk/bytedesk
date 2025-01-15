@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.skill;
+package com.bytedesk.ticket.agi.skill;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
