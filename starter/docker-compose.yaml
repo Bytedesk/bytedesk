@@ -13,11 +13,10 @@ services:
   bytedesk-redis:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
-    command: /bin/sh -c "redis-server --requirepass $$REDIS_HOST_PASSWORD"
-    env_file:
-      - docker.env
     ports:
       - "6379:6379"
+    environment:
+      - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
     volumes:
       - redis_data:/data
 
@@ -92,12 +91,11 @@ services:
       # BYTEDESK_PUSH_APNS_P12_PASSWORD: 123456
     ports:
       - 9003:9003
-      - 9885:9885  # Add websocket port mapping
+      - 9885:9885
     volumes:
-      # upload data volume
       - upload_data:/app/uploads
 
 volumes:
   mysql_data:
   redis_data:
-  upload_data:  # Add upload data volume
+  upload_data:
