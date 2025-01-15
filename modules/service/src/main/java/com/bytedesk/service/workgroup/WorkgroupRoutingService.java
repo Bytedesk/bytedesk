@@ -53,6 +53,8 @@ public class WorkgroupRoutingService {
      * 按顺序将请求分配给每个客服
      */
     private AgentEntity selectByRoundRobin(String workgroupUid, List<AgentEntity> agents) {
+        // 判断agents.size()是否大于0
+        if (agents.isEmpty()) return null;
         // 获取当前计数器值
         String counterKey = COUNTER_KEY_PREFIX + workgroupUid;
         Long counter = redisTemplate.opsForValue().increment(counterKey, 1);

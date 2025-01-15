@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 17:02:49
+ * @LastEditTime: 2025-01-15 15:38:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -153,7 +153,7 @@ public class RouteService {
         // 下面人工接待
         AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agent == null) {
-            throw new RuntimeException("No available agent found in workgroup with uid " + workgroup.getUid());
+            return getOfflineMessage(visitorRequest, thread, workgroup);
         }
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueue(thread, agent, visitorRequest);
@@ -212,22 +212,22 @@ public class RouteService {
         } else {
             // 离线状态永远显示离线提示语，不显示“继续会话”
             // 客服离线 或 非接待状态
-            thread.setOffline();
-            thread.setContent(workgroup.getLeaveMsgSettings().getLeaveMsgTip());
-            thread.setOwner(agent.getMember().getUser());
-            UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
-            thread.setAgent(JSON.toJSONString(agentProtobuf));
-            threadService.save(thread);
-            //
-            MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(agent, thread);
-            // 保存留言消息
-            messageRestService.save(message);
-            // 返回留言消息
-            return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+            return getOfflineMessage(visitorRequest, thread, workgroup);
         }
-
     }
 
+    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
+        thread.setOffline();
+        thread.setContent(workgroup.getLeaveMsgSettings().getLeaveMsgTip());
+        threadService.save(thread);
+        //
+        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(workgroup, thread);
+        // 保存留言消息
+        messageRestService.save(message);
+            // 返回留言消息
+            return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+    }
 
 
 

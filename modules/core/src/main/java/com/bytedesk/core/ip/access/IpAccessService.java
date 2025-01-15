@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 14:33:05
+ * @LastEditTime: 2025-01-15 16:00:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,13 +56,19 @@ public class IpAccessService {
         return false;
     }
     
+    /**
+     * 记录访问
+     * @param ip 访问ip
+     * @param endpoint 访问端点
+     * @param params 访问参数
+     */
     public void recordAccess(String ip, String endpoint, String params) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneMinuteAgo = now.minusMinutes(1);
         
         // 获取最近一分钟的访问记录
         IpAccessEntity access = ipAccessRepository.findFirstByIpAndEndpointAndAccessTimeAfter(ip, endpoint, oneMinuteAgo);
-        
+        // 如果访问记录不存在，则创建新的访问记录
         if (access == null) {
             access = new IpAccessEntity();
             access.setIp(ip);
@@ -75,9 +81,8 @@ public class IpAccessService {
             access.setAccessCount(access.getAccessCount() + 1);
         }
         access.setLastAccessTime(now);
-        
+        // 保存访问记录
         ipAccessRepository.save(access);
-        
         // 检查是否需要加入黑名单
         if (access.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
             addToBlacklist(ip);
