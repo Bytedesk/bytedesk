@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-14 17:35:33
+ * @LastEditTime: 2025-01-15 13:51:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,8 +27,7 @@ Team Cooperation with AI powered Omnichannel customer service
 - Multi-level organizational structure
 - Role management
 - Permission management
-- Chat record management
-- Group chat
+- ...
 
 ### AI Chat
 
@@ -41,7 +40,6 @@ Team Cooperation with AI powered Omnichannel customer service
 - Support multiple channels
 - multiple routing strategies, and detailed assessment indicators
 - Seating workbench
-- Seat management
 - ...
 
 ### Ticket

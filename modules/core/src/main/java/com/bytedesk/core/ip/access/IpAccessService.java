@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 14:57:09
+ * @LastEditTime: 2025-01-15 14:33:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,31 +13,33 @@
  */
 package com.bytedesk.core.ip.access;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.ip.black.IpBlacklistEntity;
 import com.bytedesk.core.ip.black.IpBlacklistRepository;
 import com.bytedesk.core.ip.white.IpWhitelistRepository;
+import com.bytedesk.core.uid.UidUtils;
+
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Service
 @Transactional
+@AllArgsConstructor
 public class IpAccessService {
     
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
     private static final int BLOCK_HOURS = 24;
     
-    @Autowired
-    private IpAccessRepository ipAccessRepository;
+    private final IpAccessRepository ipAccessRepository;
     
-    @Autowired
-    private IpBlacklistRepository blacklistRepository;
+    private final IpBlacklistRepository blacklistRepository;
     
-    @Autowired
-    private IpWhitelistRepository whitelistRepository;
+    private final IpWhitelistRepository whitelistRepository;
+
+    private final UidUtils uidUtils;
     
     public boolean isIpBlocked(String ip) {
         // 检查是否在白名单中
@@ -54,7 +56,7 @@ public class IpAccessService {
         return false;
     }
     
-    public void recordAccess(String ip, String endpoint) {
+    public void recordAccess(String ip, String endpoint, String params) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneMinuteAgo = now.minusMinutes(1);
         
@@ -64,7 +66,9 @@ public class IpAccessService {
         if (access == null) {
             access = new IpAccessEntity();
             access.setIp(ip);
+            access.setUid(uidUtils.getUid());
             access.setEndpoint(endpoint);
+            access.setParams(params);
             access.setAccessTime(now);
             access.setAccessCount(1);
         } else {
@@ -83,6 +87,7 @@ public class IpAccessService {
     private void addToBlacklist(String ip) {
         IpBlacklistEntity blacklist = new IpBlacklistEntity();
         blacklist.setIp(ip);
+        blacklist.setUid(uidUtils.getUid());
         blacklist.setBlockedTime(LocalDateTime.now());
         blacklist.setExpireTime(LocalDateTime.now().plusHours(BLOCK_HOURS));
         blacklist.setReason("Exceeded maximum request rate");

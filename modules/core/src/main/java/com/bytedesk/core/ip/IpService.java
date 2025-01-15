@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 21:51:24
+ * @LastEditTime: 2025-01-15 14:30:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,18 +16,10 @@ package com.bytedesk.core.ip;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.Optional;
-
 import org.lionsoul.ip2region.xdb.Searcher;
-import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.DateUtils;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class IpService {
 
-    private final IpRepository ipRepository;
+    // private final IpRepository ipRepository;
 
-    private final ModelMapper modelMapper;
+    // private final ModelMapper modelMapper;
 
     private final Searcher searcher;
 
@@ -77,65 +69,65 @@ public class IpService {
     }
 
     // 封禁IP, TODO: cache区分org
-    @CachePut(value = "ip", key = "#ipRequest.ip")
-    public IpResponse blockIp(IpRequest ipRequest) {
-        //
-        Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
-        if (ipOptional.isPresent()) {
-            // 更新
-            if (StringUtils.hasText(ipRequest.getIp())) {
-                ipOptional.get().getIps().add(ipRequest.getIp());
-            }
-            ipOptional.get().setIpRangeStart(ipRequest.getIpRangeStart());
-            ipOptional.get().setIpRangeEnd(ipRequest.getIpRangeEnd());
-            ipOptional.get().setType(IpTypeEnum.fromValue(ipRequest.getType()).name());
-            ipOptional.get().setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
-            ipOptional.get().setReason(ipRequest.getReason());
+    // @CachePut(value = "ip", key = "#ipRequest.ip")
+    // public IpResponse blockIp(IpRequest ipRequest) {
+    //     //
+    //     Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
+    //     if (ipOptional.isPresent()) {
+    //         // 更新
+    //         if (StringUtils.hasText(ipRequest.getIp())) {
+    //             ipOptional.get().getIps().add(ipRequest.getIp());
+    //         }
+    //         ipOptional.get().setIpRangeStart(ipRequest.getIpRangeStart());
+    //         ipOptional.get().setIpRangeEnd(ipRequest.getIpRangeEnd());
+    //         ipOptional.get().setType(IpTypeEnum.fromValue(ipRequest.getType()).name());
+    //         ipOptional.get().setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
+    //         ipOptional.get().setReason(ipRequest.getReason());
 
-            IpEntity savedIp = save(ipOptional.get());
-            if (savedIp == null) {
-                throw new RuntimeException("failed to update ip");
-            }
+    //         IpEntity savedIp = save(ipOptional.get());
+    //         if (savedIp == null) {
+    //             throw new RuntimeException("failed to update ip");
+    //         }
 
-            return convertToResponse(ipOptional.get());
-        }
-        //
-        IpEntity ip = modelMapper.map(ipRequest, IpEntity.class);
-        ip.setUid(uidUtils.getCacheSerialUid());
-        if (StringUtils.hasText(ipRequest.getIp())) {
-            ip.getIps().add(ipRequest.getIp());
-        }
-        ip.setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
-        //
-        IpEntity savedIp = save(ip);
-        if (savedIp == null) {
-            throw new RuntimeException("failed to save ip");
-        }
-        //
-        return convertToResponse(ip);
-    }
+    //         return convertToResponse(ipOptional.get());
+    //     }
+    //     //
+    //     IpEntity ip = modelMapper.map(ipRequest, IpEntity.class);
+    //     ip.setUid(uidUtils.getCacheSerialUid());
+    //     if (StringUtils.hasText(ipRequest.getIp())) {
+    //         ip.getIps().add(ipRequest.getIp());
+    //     }
+    //     ip.setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
+    //     //
+    //     IpEntity savedIp = save(ip);
+    //     if (savedIp == null) {
+    //         throw new RuntimeException("failed to save ip");
+    //     }
+    //     //
+    //     return convertToResponse(ip);
+    // }
 
-    public IpResponse unblockIp(IpRequest ipRequest) {
+    // public IpResponse unblockIp(IpRequest ipRequest) {
 
-        Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
-        if (ipOptional.isPresent()) {
-            ipOptional.get().getIps().remove(ipRequest.getIp());
+    //     Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
+    //     if (ipOptional.isPresent()) {
+    //         ipOptional.get().getIps().remove(ipRequest.getIp());
 
-            IpEntity savedIp = save(ipOptional.get());
-            if (savedIp == null) {
-                throw new RuntimeException("failed to unblock ip");
-            }
+    //         IpEntity savedIp = save(ipOptional.get());
+    //         if (savedIp == null) {
+    //             throw new RuntimeException("failed to unblock ip");
+    //         }
 
-            return convertToResponse(ipOptional.get());
-        }
+    //         return convertToResponse(ipOptional.get());
+    //     }
 
-        throw new RuntimeException("failed to unblock ip");
-    }
+    //     throw new RuntimeException("failed to unblock ip");
+    // }
 
-    public Boolean isBlocked(HttpServletRequest request) {
-        String ip = IpUtils.getIp(request);
-        return isBlocked(ip, "");
-    }
+    // public Boolean isBlocked(HttpServletRequest request) {
+    //     String ip = IpUtils.getIp(request);
+    //     return isBlocked(ip, "");
+    // }
 
     // TODO: cache区分org
     @Cacheable(value = "ip", key = "#ip-#orgUid")
@@ -205,26 +197,26 @@ public class IpService {
         return "Visitor";
     }
 
-    Optional<IpEntity> findByUid(String uid) {
-        return ipRepository.findByUid(uid);
-    }
+    // Optional<IpEntity> findByUid(String uid) {
+    //     return ipRepository.findByUid(uid);
+    // }
 
-    Optional<IpEntity> findByOrgUid(String orgUid) {
-        return ipRepository.findFirstByOrgUid(orgUid);
-    }
+    // Optional<IpEntity> findByOrgUid(String orgUid) {
+    //     return ipRepository.findFirstByOrgUid(orgUid);
+    // }
 
-    private IpEntity save(IpEntity ip) {
-        try {
-            return ipRepository.save(ip);
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
-        }
-        return null;
-    }
+    // private IpEntity save(IpEntity ip) {
+    //     try {
+    //         return ipRepository.save(ip);
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //         e.printStackTrace();
+    //     }
+    //     return null;
+    // }
 
-    public IpResponse convertToResponse(IpEntity ip) {
-        return modelMapper.map(ip, IpResponse.class);
-    }
+    // public IpResponse convertToResponse(IpEntity ip) {
+    //     return modelMapper.map(ip, IpResponse.class);
+    // }
 
 }
