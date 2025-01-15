@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:17:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-23 10:48:04
+ * @LastEditTime: 2025-01-15 16:26:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,7 +73,7 @@ public class IpUtils {
         String ipv6 = "0:0:0:0:0:0:0:1";
 
         try {
-            ipAddress = request.getHeader("x-forwarded-for");
+            ipAddress = request.getHeader("X-Forwarded-For");
             if (ipAddress == null || ipAddress.length() == 0 || unknown.equalsIgnoreCase(ipAddress)) {
                 ipAddress = request.getHeader("Proxy-Client-IP");
             }
@@ -115,6 +115,20 @@ public class IpUtils {
 
         return ipAddress.equals(ipv6) ? localhost : ipAddress;
     }
+
+    // private String getClientIp(HttpServletRequest request) {
+    //     String ip = request.getHeader("X-Forwarded-For");
+    //     if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+    //         ip = request.getHeader("Proxy-Client-IP");
+    //     }
+    //     if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+    //         ip = request.getHeader("WL-Proxy-Client-IP");
+    //     }
+    //     if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+    //         ip = request.getRemoteAddr();
+    //     }
+    //     return ip;
+    // }
 
     /**
      * 获取本机hostname
