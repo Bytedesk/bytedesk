@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.ticket.attachment.TicketAttachmentService;
+import com.bytedesk.ticket.agi.attachment.TicketAttachmentService;
 import com.bytedesk.ticket.ticket.dto.*;
 import com.bytedesk.ticket.ticket.exception.*;
 import com.bytedesk.ticket.ticket.search.TicketSearchSpecification;
