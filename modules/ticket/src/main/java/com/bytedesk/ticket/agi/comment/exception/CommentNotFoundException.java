@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.comment.exception;
+package com.bytedesk.ticket.agi.comment.exception;
 
 public class CommentNotFoundException extends RuntimeException {
     public CommentNotFoundException(Long commentId) {

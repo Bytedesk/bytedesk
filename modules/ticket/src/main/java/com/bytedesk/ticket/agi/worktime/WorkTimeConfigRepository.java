@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.worktime;
+package com.bytedesk.ticket.agi.worktime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

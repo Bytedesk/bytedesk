@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.comment;
+package com.bytedesk.ticket.agi.comment;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,7 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bytedesk.ticket.comment.dto.CommentRequest;
+import com.bytedesk.ticket.agi.comment.dto.CommentRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 

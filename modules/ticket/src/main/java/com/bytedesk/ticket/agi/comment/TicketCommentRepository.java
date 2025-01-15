@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.comment;
+package com.bytedesk.ticket.agi.comment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

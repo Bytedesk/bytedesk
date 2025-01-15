@@ -1,8 +1,10 @@
 package com.bytedesk.ticket.ticket.search;
 
+import org.springframework.data.jpa.domain.Specification;
+
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.dto.TicketSearchRequest;
-import org.springframework.data.jpa.domain.Specification;
+
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.CriteriaBuilder;

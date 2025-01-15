@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.util;
+package com.bytedesk.ticket.agi.util;
 
 public class TicketUtils {
 

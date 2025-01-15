@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.skill;
+package com.bytedesk.ticket.agi.skill;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

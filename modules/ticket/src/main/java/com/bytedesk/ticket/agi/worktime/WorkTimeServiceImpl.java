@@ -1,10 +1,10 @@
-package com.bytedesk.ticket.worktime;
+package com.bytedesk.ticket.agi.worktime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.ticket.worktime.exception.WorkTimeConfigNotFoundException;
+import com.bytedesk.ticket.agi.worktime.exception.WorkTimeConfigNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 

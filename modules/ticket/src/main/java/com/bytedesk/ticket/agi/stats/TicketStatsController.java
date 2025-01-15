@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.stats;
+package com.bytedesk.ticket.agi.stats;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;

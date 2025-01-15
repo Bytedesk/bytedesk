@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.sla;
+package com.bytedesk.ticket.agi.sla;
 
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.*;
