@@ -30,7 +30,7 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.ticket.dto.CommentRequest;
 
 @RestController
-@RequestMapping("/api/tickets")
+@RequestMapping("/api/v1/ticket")
 @AllArgsConstructor
 public class TicketController extends BaseRestController<TicketRequest> {
     
