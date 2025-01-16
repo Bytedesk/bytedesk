@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-14 17:37:31
+ * @LastEditTime: 2025-01-16 08:43:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,14 +61,18 @@
 ## Docker
 
 ```bash
+# 克隆bytedesk
+git clone https://github.com/Bytedesk/bytedesk.git
+# 切换到docker目录
+cd deploy/docker
 # https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker
-# 拉取阿里云镜像
+# 从阿里云拉取镜像
 docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
-# 或拉取docker hub镜像
+# 或从docker hub拉取镜像
 docker pull bytedesk/bytedesk:latest
 # 启动docker compose容器, -f标志来指定文件路径, -d标志表示在后台模式下启动容器
 docker compose -f docker-compose.yaml up -d
-# stop container
+# 停止容器
 docker compose -f docker-compose.yaml stop
 ```
 
