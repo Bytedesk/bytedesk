@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:flowable="http://flowable.org/bpmn"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    targetNamespace="BytedeskTicket">
+
+    <process id="ticketProcess" name="工单处理流程" isExecutable="true">
+        <documentation>工单处理流程</documentation>
+        
+        <!-- 开始 -->
+        <startEvent id="start" name="创建工单"/>
+
+        <!-- 优先级评估 -->
+        <sequenceFlow sourceRef="start" targetRef="evaluatePriority"/>
+        <serviceTask id="evaluatePriority" name="优先级评估"
+            flowable:class="com.bytedesk.flowable.ticket.delegate.EvaluatePriorityDelegate"/>
+        
+        <!-- 紧急工单处理 -->
+        <sequenceFlow sourceRef="evaluatePriority" targetRef="priorityGateway"/>
+        <exclusiveGateway id="priorityGateway" name="优先级判断"/>
+        
+        <sequenceFlow sourceRef="priorityGateway" targetRef="escalateTicket">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${priority == 'URGENT'}
+            </conditionExpression>
+        </sequenceFlow>
+        
+        <serviceTask id="escalateTicket" name="升级工单"
+            flowable:class="com.bytedesk.flowable.ticket.delegate.EscalateTicketDelegate"/>
+        
+        <!-- 分配处理人 -->
+        <sequenceFlow sourceRef="priorityGateway" targetRef="assignTicket">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${priority != 'URGENT'}
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="escalateTicket" targetRef="assignTicket"/>
+        
+        <userTask id="assignTicket" name="分配工单" 
+            flowable:candidateGroups="managers">
+            <documentation>分配工单给合适的处理人</documentation>
+        </userTask>
+        
+        <!-- 工单处理 -->
+        <sequenceFlow sourceRef="assignTicket" targetRef="handleTicket"/>
+        <userTask id="handleTicket" name="处理工单" 
+            flowable:assignee="${assignee}">
+            <documentation>处理工单并更新状态</documentation>
+        </userTask>
+        
+        <!-- SLA监控 -->
+        <boundaryEvent id="slaTimer" attachedToRef="handleTicket">
+            <timerEventDefinition>
+                <timeDuration>PT4H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow sourceRef="slaTimer" targetRef="slaBreachNotification"/>
+        <serviceTask id="slaBreachNotification" name="SLA违规通知"
+            flowable:class="com.bytedesk.flowable.ticket.delegate.SLABreachNotificationDelegate"/>
+        <sequenceFlow sourceRef="slaBreachNotification" targetRef="handleTicket"/>
+        
+        <!-- 客户验证 -->
+        <sequenceFlow sourceRef="handleTicket" targetRef="customerVerify"/>
+        <userTask id="customerVerify" name="客户验证" 
+            flowable:assignee="${reporter}">
+            <documentation>客户验证问题是否解决</documentation>
+        </userTask>
+        
+        <!-- 验证结果判断 -->
+        <sequenceFlow sourceRef="customerVerify" targetRef="verifyGateway"/>
+        <exclusiveGateway id="verifyGateway" name="验证结果"/>
+        
+        <!-- 客户满意，进入评价环节 -->
+        <sequenceFlow sourceRef="verifyGateway" targetRef="satisfactionSurvey">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${approved}
+            </conditionExpression>
+        </sequenceFlow>
+        
+        <!-- 客户不满意，转主管审核 -->
+        <sequenceFlow sourceRef="verifyGateway" targetRef="supervisorReview">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${!approved}
+            </conditionExpression>
+        </sequenceFlow>
+        
+        <!-- 主管审核 -->
+        <userTask id="supervisorReview" name="主管审核" 
+            flowable:candidateGroups="supervisors">
+            <documentation>主管审核处理结果并决定后续处理方案</documentation>
+        </userTask>
+        
+        <!-- 主管决策 -->
+        <sequenceFlow sourceRef="supervisorReview" targetRef="supervisorDecision"/>
+        <exclusiveGateway id="supervisorDecision" name="主管决策"/>
+        
+        <!-- 重新分配处理 -->
+        <sequenceFlow sourceRef="supervisorDecision" targetRef="assignTicket">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${reassign}
+            </conditionExpression>
+        </sequenceFlow>
+        
+        <!-- 继续处理 -->
+        <sequenceFlow sourceRef="supervisorDecision" targetRef="handleTicket">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${!reassign}
+            </conditionExpression>
+        </sequenceFlow>
+        
+        <!-- 满意度评价 -->
+        <userTask id="satisfactionSurvey" name="满意度评价"
+            flowable:assignee="${reporter}">
+            <documentation>对服务进行评价</documentation>
+        </userTask>
+        
+        <!-- 评价超时处理 -->
+        <boundaryEvent id="surveyTimer" attachedToRef="satisfactionSurvey">
+            <timerEventDefinition>
+                <timeDuration>P1D</timeDuration>  <!-- 24小时 -->
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow sourceRef="surveyTimer" targetRef="autoCloseTicket"/>
+        <serviceTask id="autoCloseTicket" name="自动关闭工单"
+            flowable:class="com.bytedesk.flowable.ticket.delegate.AutoCloseTicketDelegate"/>
+        <sequenceFlow sourceRef="autoCloseTicket" targetRef="end"/>
+        
+        <!-- 正常关闭工单 -->
+        <sequenceFlow sourceRef="satisfactionSurvey" targetRef="closeTicket"/>
+        <serviceTask id="closeTicket" name="关闭工单"
+            flowable:class="com.bytedesk.flowable.ticket.delegate.CloseTicketDelegate"/>
+        <sequenceFlow sourceRef="closeTicket" targetRef="end"/>
+        
+        <endEvent id="end" name="工单结束"/>
+    </process>
+</definitions> 
