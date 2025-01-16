@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-16 09:58:17
+ * @LastEditTime: 2025-01-16 11:37:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,7 +58,7 @@
 - 工单统计和报表
 - ...
 
-## Docker
+## Docker 快速开始
 
 ```bash
 # 克隆bytedesk
@@ -76,12 +76,8 @@ docker compose -f docker-compose.yaml up -d
 docker compose -f docker-compose.yaml stop
 ```
 
-## 快速开始
+## 文档
 
-- [注册体验](https://www.weiyuai.cn/admin/)
-- [源码部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
-- [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
-- [Jar包部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/jar)
 - [文档](https://www.weiyuai.cn/docs/zh-CN/)
 
 <!-- ## 预览
