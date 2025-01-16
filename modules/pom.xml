@@ -142,6 +142,15 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+        <!-- https://mvnrepository.com/artifact/org.flowable/flowable-spring-boot-starter -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter</artifactId>
+			<version>${flowable.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
         <!-- querydsl crud增强-->
         <!-- http://querydsl.com/ -->
