@@ -52,6 +52,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-ticket</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 
