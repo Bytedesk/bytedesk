@@ -5,7 +5,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     targetNamespace="BytedeskTicket">
 
-    <process id="ticketProcessSimple" name="工单处理流程" isExecutable="true">
+    <process id="ticketProcessSimple" name="工单处理流程简版" isExecutable="true">
+        <documentation>工单处理流程简版</documentation>
         <startEvent id="start" name="创建工单"/>
         
         <sequenceFlow sourceRef="start" targetRef="assignTicket"/>
