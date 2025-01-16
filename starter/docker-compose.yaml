@@ -3,12 +3,14 @@ services:
     image: mysql:latest
     container_name: mysql-bytedesk
     environment:
-      MYSQL_DATABASE: "bytedesk_im"
-      MYSQL_ROOT_PASSWORD: "r8FqfdbWUaN3"
+      MYSQL_DATABASE: bytedesk_im
+      MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - bytedesk-network
 
   bytedesk-redis:
     image: redis/redis-stack-server:latest
@@ -19,6 +21,8 @@ services:
       - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
     volumes:
       - redis_data:/data
+    networks:
+      - bytedesk-network
 
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
@@ -94,8 +98,15 @@ services:
       - 9885:9885
     volumes:
       - upload_data:/app/uploads
+    networks:
+      - bytedesk-network
 
 volumes:
   mysql_data:
   redis_data:
   upload_data:
+
+# 定义网络
+networks:
+  bytedesk-network:
+    driver: bridge
