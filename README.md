@@ -56,7 +56,6 @@ Team Cooperation with AI powered Omnichannel customer service
 git clone https://github.com/Bytedesk/bytedesk.git
 # cd to docker directory
 cd bytedesk/deploy/docker
-# https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker
 # pull image from aliyun
 docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
 # or pull image from docker hub

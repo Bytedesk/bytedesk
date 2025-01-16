@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 17:07:10
+ * @LastEditTime: 2025-01-16 13:16:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,10 +15,12 @@
 
 ## docker compose
 
-build and run locally
-
 ```bash
 # https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker
+# 克隆项目
+git clone https://github.com/Bytedesk/bytedesk.git
+# 进入docker目录
+cd bytedesk/deploy/docker
 # 拉取阿里云镜像
 docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
 # 或拉取docker hub镜像
