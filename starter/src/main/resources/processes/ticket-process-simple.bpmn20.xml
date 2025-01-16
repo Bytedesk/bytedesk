@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:flowable="http://flowable.org/bpmn"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    targetNamespace="BytedeskTicket">
+
+    <process id="ticketProcessSimple" name="工单处理流程" isExecutable="true">
+        <startEvent id="start" name="创建工单"/>
+        
+        <sequenceFlow sourceRef="start" targetRef="assignTicket"/>
+        
+        <userTask id="assignTicket" name="分配工单" 
+            flowable:candidateGroups="managers">
+            <documentation>分配工单给合适的处理人</documentation>
+        </userTask>
+        
+        <sequenceFlow sourceRef="assignTicket" targetRef="handleTicket"/>
+        
+        <userTask id="handleTicket" name="处理工单" 
+            flowable:assignee="${assignee}">
+            <documentation>处理工单并更新状态</documentation>
+        </userTask>
+        
+        <sequenceFlow sourceRef="handleTicket" targetRef="verifyTicket"/>
+        
+        <userTask id="verifyTicket" name="验证工单" 
+            flowable:assignee="${reporter}">
+            <documentation>验证工单是否解决</documentation>
+        </userTask>
+        
+        <sequenceFlow sourceRef="verifyTicket" targetRef="decision"/>
+        
+        <exclusiveGateway id="decision"/>
+        
+        <sequenceFlow sourceRef="decision" targetRef="closeTicket">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${approved}
+            </conditionExpression>
+        </sequenceFlow>
+        
+        <sequenceFlow sourceRef="decision" targetRef="handleTicket">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${!approved}
+            </conditionExpression>
+        </sequenceFlow>
+        
+        <serviceTask id="closeTicket" name="关闭工单"
+            flowable:class="com.bytedesk.flowable.ticket.delegate.CloseTicketDelegate"/>
+            
+        <sequenceFlow sourceRef="closeTicket" targetRef="end"/>
+        
+        <endEvent id="end" name="工单结束"/>
+    </process>
+</definitions> 
