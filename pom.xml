@@ -26,6 +26,7 @@
 
     <modules>
         <module>modules</module>
+        <module>plugins</module>
         <module>starter</module>
     </modules>
 
