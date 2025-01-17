@@ -106,7 +106,6 @@ volumes:
   redis_data:
   upload_data:
 
-# 定义网络
 networks:
   bytedesk-network:
     driver: bridge

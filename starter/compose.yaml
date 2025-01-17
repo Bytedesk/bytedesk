@@ -3,15 +3,14 @@ services:
     image: mysql:latest
     container_name: mysql-bytedesk
     environment:
-      MYSQL_DATABASE: "bytedesk_im"
-      MYSQL_ROOT_PASSWORD: "r8FqfdbWUaN3"
+      MYSQL_DATABASE: bytedesk_im
+      MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
     ports:
       - "3306:3306"
   bytedesk-redis:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
-    command: /bin/sh -c "redis-server --requirepass $$REDIS_HOST_PASSWORD"
-    env_file:
-      - docker.env
+    environment:
+      - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
     ports:
       - "6379:6379"

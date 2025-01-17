@@ -57,16 +57,6 @@ Team Cooperation with AI powered Omnichannel customer service
 git clone https://github.com/Bytedesk/bytedesk.git
 # enter docker directory
 cd bytedesk/deploy/docker
-# pull aliyun image
-# community free version
-docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest
-# enterprise paid version, under development, not yet officially commercialized
-docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
-# or pull from docker hub:
-# community free version
-docker pull bytedesk/bytedesk-ce:latest
-# enterprise paid version, under development, not yet officially commercialized
-docker pull bytedesk/bytedesk:latest
 # start docker compose container, -f flag to specify file path, -d flag to start container in background mode
 docker compose -f docker-compose.yaml up -d
 # stop container

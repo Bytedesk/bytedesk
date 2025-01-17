@@ -2,14 +2,14 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-30 10:34:40
+ * @LastEditTime: 2025-01-17 12:59:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
  *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.starter.controller;
 
@@ -80,13 +80,15 @@ public class PageRouteController {
 	 */
 	@GetMapping({"/chat", "/chat/", "/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|config}"})
 	public String handleChatRoutes(@PathVariable(required = false) String type) {
-		return "/chat/index.html";
+		// return "/chat/index.html";
+		return "forward:/chat/index.html";
 	}
 
 	// http://127.0.0.1:9003/iframe
 	@GetMapping("/iframe")
 	public String iframe() {
-		return "chat/iframe.html";
+		// return "chat/iframe.html";
+		return "forward:/chat/iframe.html";
 	}
 
 	/**
