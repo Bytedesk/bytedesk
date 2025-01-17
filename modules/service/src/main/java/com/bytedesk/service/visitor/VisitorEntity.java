@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 12:59:46
+ * @LastEditTime: 2025-01-17 12:25:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,5 +86,11 @@ public class VisitorEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
+
+	// 方便后续扩展，比如用户被拉黑的时候，暂存于此
+	// 浏览的IP
+	private String ip;
+	// 浏览的IP地址
+	private String ipLocation;
 	
 }

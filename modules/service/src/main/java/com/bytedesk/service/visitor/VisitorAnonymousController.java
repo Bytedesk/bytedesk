@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 14:09:06
+ * @LastEditTime: 2025-01-17 12:11:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,6 +82,7 @@ public class VisitorAnonymousController {
             visitorRequest.setIp(ip);
             visitorRequest.setIpLocation(ipService.getIpLocation(ip));
         }
+        // 
         if (!StringUtils.hasText(visitorRequest.getNickname())) {
             visitorRequest.setNickname(ipService.createVisitorNickname(httpRequest));
         }
@@ -93,7 +94,13 @@ public class VisitorAnonymousController {
 
     @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
     @PostMapping("/thread")
-    public ResponseEntity<?> requestThread(@RequestBody VisitorRequest visitorRequest) {
+    public ResponseEntity<?> requestThread(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
+        //
+        String ip = IpUtils.getIp(httpRequest);
+        if (ip != null) {
+            visitorRequest.setIp(ip);
+            visitorRequest.setIpLocation(ipService.getIpLocation(ip));
+        }
         //
         MessageProtobuf messageProtobuf = visitorService.requestThread(visitorRequest);
         //
