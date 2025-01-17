@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 21:28:07
+ * @LastEditTime: 2025-01-17 16:52:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 
@@ -28,7 +29,18 @@ public class BlackSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            //
+            // blackNickname
+            if (StringUtils.hasText(request.getBlackNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("blackNickname"), "%" + request.getBlackNickname() + "%"));
+            }
+            // reason
+            if (StringUtils.hasText(request.getReason())) {
+                predicates.add(criteriaBuilder.like(root.get("reason"), "%" + request.getReason() + "%"));
+            }
+            // userNickname
+            if (StringUtils.hasText(request.getUserNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("userNickname"), "%" + request.getUserNickname() + "%"));
+            }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
