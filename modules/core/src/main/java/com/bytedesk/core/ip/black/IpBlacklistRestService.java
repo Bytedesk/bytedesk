@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:44:42
+ * @LastEditTime: 2025-01-17 17:08:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,12 +75,13 @@ public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, I
         return ipBlacklistPage.map(this::convertToResponse);
     }
 
+    @Cacheable(value = "ipBlacklist", key = "#uid", unless = "#result == null")
     @Override
     public Optional<IpBlacklistEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return ipBlacklistRepository.findByUid(uid);
     }
 
+    @Cacheable(value = "ipBlacklist", key = "#ip", unless = "#result == null")
     public Optional<IpBlacklistEntity> findByIp(String ip) {
         return ipBlacklistRepository.findByIp(ip);
     }

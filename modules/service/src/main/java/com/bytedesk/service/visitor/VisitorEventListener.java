@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 16:41:49
+ * @LastEditTime: 2025-01-17 17:11:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.black.BlackEntity;
 import com.bytedesk.core.black.event.BlackCreateEvent;
+import com.bytedesk.core.black.event.BlackDeleteEvent;
 import com.bytedesk.core.black.event.BlackUpdateEvent;
 import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
@@ -68,6 +69,13 @@ public class VisitorEventListener {
     @EventListener
     public void onBlackUpdateEvent(BlackUpdateEvent event) {
         log.info("VisitorEventListener onBlackUpdateEvent");
+    }
+
+    @EventListener
+    public void onBlackDeleteEvent(BlackDeleteEvent event) {
+        log.info("VisitorEventListener onBlackDeleteEvent");
+        // 更新访客状态
+        visitorService.updateStatus(event.getBlackEntity().getBlackUid(), VisitorStatusEnum.OFFLINE.name());
     }
 
     // 更新访客在线状态：检测updatedAt时间戳，如果超过五分钟则更新为离线状态
