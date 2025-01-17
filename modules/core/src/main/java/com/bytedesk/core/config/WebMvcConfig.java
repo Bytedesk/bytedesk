@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-26 15:28:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 14:13:05
+ * @LastEditTime: 2025-01-17 15:58:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,11 +55,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册IP访问拦截器
         registry.addInterceptor(ipAccessInterceptor)
-                .addPathPatterns("/**");
+                .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
                 
         // 注册Visitor访问拦截器，只拦截visitor相关接口
         registry.addInterceptor(visitorAccessInterceptor)
-                .addPathPatterns("/visitor/**");
+                .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
     }
 
     /**
