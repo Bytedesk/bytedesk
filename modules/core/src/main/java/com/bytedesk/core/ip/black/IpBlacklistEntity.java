@@ -53,5 +53,8 @@ public class IpBlacklistEntity extends BaseEntity {
     
     // 
     private String blackUid;
+    private String blackNickname;
+
     private String userUid;
+    private String userNickname;
 } 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:10:30
+ * @LastEditTime: 2025-01-17 16:41:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,9 @@ public class VisitorEventListener {
                     blackEntity.getEndTime(), 
                     blackEntity.getReason(),
                     blackEntity.getBlackUid(),
+                    blackEntity.getBlackNickname(), 
                     blackEntity.getUserUid(),
+                    blackEntity.getUserNickname(),
                     blackEntity.getOrgUid()
                 );
                 // 更新访客状态
