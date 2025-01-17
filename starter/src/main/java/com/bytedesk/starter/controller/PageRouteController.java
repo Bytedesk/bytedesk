@@ -48,11 +48,11 @@ public class PageRouteController {
 	 */
 	@GetMapping({"/admin", "/admin/", "/admin/{path:[^\\.]*}", "/admin/{path:[^\\.]*}/{path2:[^\\.]*}"}) 
 	public String admin(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
-		if (path != null && path2 != null) {
-			log.info("admin path: {}, {}", path, path2);
-		} else if (path != null) {
-			log.info("admin path: {}", path);
-		}
+		// if (path != null && path2 != null) {
+		// 	log.info("admin path: {}, {}", path, path2);
+		// } else if (path != null) {
+		// 	log.info("admin path: {}", path);
+		// }
 		return "forward:/admin/index.html"; // 默认路径
 	}
 
@@ -63,11 +63,11 @@ public class PageRouteController {
 	 */
 	@GetMapping({"/agent", "/agent/", "/agent/{path:[^\\.]*}", "/agent/{path:[^\\.]*}/{path2:[^\\.]*}"})
 	public String agent(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
-		if (path != null && path2 != null) {
-			log.info("agent path: {}, {}", path, path2);
-		} else if (path != null) {
-			log.info("agent path: {}", path);
-		}
+		// if (path != null && path2 != null) {
+		// 	log.info("agent path: {}, {}", path, path2);
+		// } else if (path != null) {
+		// 	log.info("agent path: {}", path);
+		// }
 		return "forward:/agent/index.html"; // 默认路径
 	}
 
@@ -78,14 +78,12 @@ public class PageRouteController {
 	 */
 	@GetMapping({"/chat", "/chat/", "/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|config}"})
 	public String chat(@PathVariable(required = false) String type) {
-		// return "/chat/index.html";
 		return "forward:/chat/index.html";
 	}
 
 	// http://127.0.0.1:9003/iframe
 	@GetMapping("/iframe")
 	public String iframe() {
-		// return "chat/iframe.html";
 		return "forward:/chat/iframe.html";
 	}
 
