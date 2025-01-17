@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 15:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:36:04
+ * @LastEditTime: 2025-01-17 15:40:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,8 +53,6 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
         ipBlacklistRestService.delete(request);
         return ResponseEntity.ok(JsonResult.success());
     }
-    
-    
 
 
 }

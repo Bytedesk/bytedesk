@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:20:55
+ * @LastEditTime: 2025-01-17 15:44:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,11 +19,17 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -42,16 +48,30 @@ public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, I
 
     private static final int BLOCK_HOURS = 24;
 
+    private final AuthService authService;
+
     @Override
     public Page<IpBlacklistResponse> queryByOrg(IpBlacklistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "id");
+        Specification<IpBlacklistEntity> spec = IpBlacklistSpecification.search(request);
+        Page<IpBlacklistEntity> ipBlacklistPage = ipBlacklistRepository.findAll(spec, pageable);
+        return ipBlacklistPage.map(this::convertToResponse);
     }
 
     @Override
     public Page<IpBlacklistResponse> queryByUser(IpBlacklistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        //
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "id");
+        Specification<IpBlacklistEntity> spec = IpBlacklistSpecification.search(request);
+        Page<IpBlacklistEntity> ipBlacklistPage = ipBlacklistRepository.findAll(spec, pageable);
+        return ipBlacklistPage.map(this::convertToResponse);
     }
 
     @Override
