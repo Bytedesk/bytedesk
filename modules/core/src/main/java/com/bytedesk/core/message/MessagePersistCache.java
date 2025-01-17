@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 11:09:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 17:14:03
+ * @LastEditTime: 2025-01-17 21:42:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,10 +21,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.redis.RedisConsts;
-
-// import com.github.benmanes.caffeine.cache.Cache;
-// import com.github.benmanes.caffeine.cache.CacheLoader;
-// import com.github.benmanes.caffeine.cache.Caffeine;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;

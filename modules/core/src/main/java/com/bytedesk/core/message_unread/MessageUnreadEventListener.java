@@ -24,7 +24,7 @@ import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.message.event.MessageUpdateEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.socket.mqtt.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.stomp.StompConnectedEvent;
 // import com.bytedesk.core.topic.Topic;
 // import com.bytedesk.core.topic.TopicService;
