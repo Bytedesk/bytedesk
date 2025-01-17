@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 16:00:48
+ * @LastEditTime: 2025-01-17 10:53:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.ip.black.IpBlacklistEntity;
 import com.bytedesk.core.ip.black.IpBlacklistRepository;
+import com.bytedesk.core.ip.black.IpBlacklistService;
 import com.bytedesk.core.ip.white.IpWhitelistRepository;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -31,13 +32,14 @@ import java.time.LocalDateTime;
 public class IpAccessService {
     
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
-    private static final int BLOCK_HOURS = 24;
     
     private final IpAccessRepository ipAccessRepository;
     
     private final IpBlacklistRepository blacklistRepository;
     
     private final IpWhitelistRepository whitelistRepository;
+
+    private final IpBlacklistService ipBlacklistService;
 
     private final UidUtils uidUtils;
     
@@ -49,7 +51,7 @@ public class IpAccessService {
         
         // 检查是否在黑名单中且未过期
         IpBlacklistEntity blacklist = blacklistRepository.findByIp(ip);
-        if (blacklist != null && blacklist.getExpireTime().isAfter(LocalDateTime.now())) {
+        if (blacklist != null && blacklist.getEndTime().isAfter(LocalDateTime.now())) {
             return true;
         }
         
@@ -85,18 +87,9 @@ public class IpAccessService {
         ipAccessRepository.save(access);
         // 检查是否需要加入黑名单
         if (access.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
-            addToBlacklist(ip);
+            ipBlacklistService.addToBlacklist(ip);
         }
     }
     
-    private void addToBlacklist(String ip) {
-        IpBlacklistEntity blacklist = new IpBlacklistEntity();
-        blacklist.setIp(ip);
-        blacklist.setUid(uidUtils.getUid());
-        blacklist.setBlockedTime(LocalDateTime.now());
-        blacklist.setExpireTime(LocalDateTime.now().plusHours(BLOCK_HOURS));
-        blacklist.setReason("Exceeded maximum request rate");
-        
-        blacklistRepository.save(blacklist);
-    }
+    
 } 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 10:24:48
+ * @LastEditTime: 2025-01-17 11:15:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,10 @@ public class BlackRequest extends BaseRequest {
 
     // 黑名单用户头像
     private String blackAvatar;
+
+    // 是否封禁ip
+    @Builder.Default
+    private Boolean blockIp = false;
 
     // 执行拉黑的用户uid
     private String userUid;

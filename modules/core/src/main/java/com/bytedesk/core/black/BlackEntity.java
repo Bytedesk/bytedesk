@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-28 22:02:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 10:25:23
+ * @LastEditTime: 2025-01-17 11:14:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({BlackEntityListener.class})
 @Table(name = "bytedesk_core_black")
 public class BlackEntity extends BaseEntity {
 
@@ -56,6 +58,10 @@ public class BlackEntity extends BaseEntity {
 
     // 黑名单用户头像
     private String blackAvatar;
+
+    // 是否封禁ip
+    @Builder.Default
+    private boolean blockIp = false;
 
     // 执行拉黑的用户uid
     @Column(nullable = false)

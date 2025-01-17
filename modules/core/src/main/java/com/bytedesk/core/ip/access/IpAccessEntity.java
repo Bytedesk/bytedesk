@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:43:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 14:18:27
+ * @LastEditTime: 2025-01-17 10:51:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,13 +26,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+import com.bytedesk.core.base.BaseEntity;
+
+import lombok.EqualsAndHashCode;
+
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @Entity
 @Table(name = "bytedesk_core_ip_access")
 @AllArgsConstructor
 @NoArgsConstructor
-public class IpAccessEntity {
+public class IpAccessEntity extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +48,7 @@ public class IpAccessEntity {
 	private String uid;
     
     private String ip;
+    private String ipLocation;
     private String endpoint;  // 访问的接口
     private String params; // 访问的参数
 

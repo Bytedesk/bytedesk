@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:21:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-27 12:21:13
+ * @LastEditTime: 2025-01-17 10:47:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,4 +21,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface BlackRepository extends JpaRepository<BlackEntity, String>, JpaSpecificationExecutor<BlackEntity> {
 
     Optional<BlackEntity> findByUid(String uid);
+
+    Optional<BlackEntity> findByBlackUid(String blackUid);
 }
