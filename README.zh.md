@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 12:39:06
+ * @LastEditTime: 2025-01-17 17:41:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,16 +39,16 @@
 
 ### 全渠道客服
 
-- 大模型AI智能客服
-- 实现人工客服兜底
-- 支持多渠道
+- 多渠道接入
+- 人工客服
+- 统计报表
 - ...
 
 ### 知识库AI对话
 
-- 可编排AI知识库问答
-- 对接知识库
-- 实现系统解耦，更利于扩展
+- 对接大模型LLM
+- 自定义知识库
+- 多轮对话
 - ...
 
 ### 工单系统
