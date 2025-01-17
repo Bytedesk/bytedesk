@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-16 11:37:22
+ * @LastEditTime: 2025-01-17 12:39:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,13 +52,20 @@ Team Cooperation with AI powered Omnichannel customer service
 ## Docker Quick Start
 
 ```bash
-# clone bytedesk
+# https://www.weiyuai.cn/docs/docs/deploy/docker
+# clone project
 git clone https://github.com/Bytedesk/bytedesk.git
-# cd to docker directory
+# enter docker directory
 cd bytedesk/deploy/docker
-# pull image from aliyun
+# pull aliyun image
+# community free version
+docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest
+# enterprise paid version, under development, not yet officially commercialized
 docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
-# or pull image from docker hub
+# or pull from docker hub:
+# community free version
+docker pull bytedesk/bytedesk-ce:latest
+# enterprise paid version, under development, not yet officially commercialized
 docker pull bytedesk/bytedesk:latest
 # start docker compose container, -f flag to specify file path, -d flag to start container in background mode
 docker compose -f docker-compose.yaml up -d
