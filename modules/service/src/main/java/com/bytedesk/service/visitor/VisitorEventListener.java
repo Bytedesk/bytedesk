@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 11:23:21
+ * @LastEditTime: 2025-01-17 13:54:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.visitor;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.black.BlackEntity;
 import com.bytedesk.core.black.event.BlackCreateEvent;
 import com.bytedesk.core.black.event.BlackUpdateEvent;
+import com.bytedesk.core.ip.black.IpBlacklistService;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 
 import lombok.AllArgsConstructor;
@@ -35,23 +37,24 @@ public class VisitorEventListener {
 
     private final VisitorRestService visitorService;
 
+    private final IpBlacklistService ipBlacklistService;
+
     @EventListener
     public void onBlackCreateEvent(BlackCreateEvent event) {
         log.info("IpBlacklistEventListener onBlackCreateEvent: " + event);
         BlackEntity blackEntity = event.getBlackEntity();
         if (blackEntity.isBlockIp()) {
-
-            
-            // IpBlacklistRequest ipBlacklistRequest = IpBlacklistRequest.builder()
-            //     .ip(blackEntity.getIp())
-            //     .ipLocation(blackEntity.getIpLocation())
-            //     .startTime(blackEntity.getStartTime())
-            //     .endTime(blackEntity.getEndTime())
-            //     .reason(blackEntity.getReason())
-            //     .build();
-            // ipBlacklistService.createIpBlacklist(ipBlacklistRequest);
+            Optional<VisitorEntity> visitorEntity = visitorService.findByUid(blackEntity.getUid()); 
+            if (visitorEntity.isPresent()) {
+                // 添加到黑名单
+                ipBlacklistService.addToBlacklist(
+                    visitorEntity.get().getIp(), 
+                    visitorEntity.get().getIpLocation(), 
+                    blackEntity.getEndTime(), 
+                    blackEntity.getReason()
+                );
+            }
         }
-
     }
 
     @EventListener
