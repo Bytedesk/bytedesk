@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-28 22:02:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 11:14:51
+ * @LastEditTime: 2025-01-17 14:17:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,8 @@ package com.bytedesk.core.black;
 import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -73,11 +75,15 @@ public class BlackEntity extends BaseEntity {
     // 执行拉黑的用户头像
     private String userAvatar;
 
-    // 开始时间
-    private LocalDateTime startTime;
+     // 开始时间
+    @Builder.Default
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startTime = LocalDateTime.now();
 
     // 结束时间
-    private LocalDateTime endTime;
+    @Builder.Default
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime endTime = LocalDateTime.now().plusHours(24);
 
     // 会话主题
     private String threadTopic;

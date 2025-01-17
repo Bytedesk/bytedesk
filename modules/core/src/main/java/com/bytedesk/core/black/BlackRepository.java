@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.black;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +25,6 @@ public interface BlackRepository extends JpaRepository<BlackEntity, String>, Jpa
     Optional<BlackEntity> findByUid(String uid);
 
     Optional<BlackEntity> findByBlackUid(String blackUid);
+
+    List<BlackEntity> findByEndTimeBefore(LocalDateTime endTime);
 }
