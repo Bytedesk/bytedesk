@@ -104,14 +104,24 @@ public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, I
         create(request);
     }
 
-    public void addToBlacklist(String ip, String ipLocation, LocalDateTime endTime, String reason, String blackUid, String userUid, String orgUid) {
+    public void addToBlacklist(String ip, 
+        String ipLocation, 
+        LocalDateTime endTime, 
+        String reason, 
+        String blackUid, 
+        String blackNickname,
+        String userUid, 
+        String userNickname,
+        String orgUid) {
         IpBlacklistRequest request = IpBlacklistRequest.builder()
                 .ip(ip)
                 .ipLocation(ipLocation)
                 .endTime(endTime)
                 .reason(reason)
                 .blackUid(blackUid)
+                .blackNickname(blackNickname)
                 .userUid(userUid)
+                .userNickname(userNickname)
                 .build();
         request.setOrgUid(orgUid);
         create(request);
