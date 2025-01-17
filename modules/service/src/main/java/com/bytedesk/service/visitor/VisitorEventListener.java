@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.black.BlackEntity;
 import com.bytedesk.core.black.event.BlackCreateEvent;
 import com.bytedesk.core.black.event.BlackUpdateEvent;
-import com.bytedesk.core.ip.black.IpBlacklistService;
+import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 
@@ -38,7 +38,7 @@ public class VisitorEventListener {
 
     private final VisitorRestService visitorService;
 
-    private final IpBlacklistService ipBlacklistService;
+    private final IpBlacklistRestService ipBlacklistService;
 
     @EventListener
     public void onBlackCreateEvent(BlackCreateEvent event) {

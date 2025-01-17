@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:10:48
+ * @LastEditTime: 2025-01-17 15:20:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class IpBlacklistService extends BaseRestService<IpBlacklistEntity, IpBlacklistRequest, IpBlacklistResponse> {
+public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, IpBlacklistRequest, IpBlacklistResponse> {
 
     private final IpBlacklistRepository ipBlacklistRepository;
 

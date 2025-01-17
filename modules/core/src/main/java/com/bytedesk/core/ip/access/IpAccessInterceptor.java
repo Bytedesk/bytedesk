@@ -25,7 +25,7 @@ import com.bytedesk.core.ip.IpUtils;
 public class IpAccessInterceptor implements HandlerInterceptor {
     
     @Autowired
-    private IpAccessService ipAccessService;
+    private IpAccessRestService ipAccessService;
     
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
