@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.bytedesk.core.black.access.VisitorAccessInterceptor;
+import com.bytedesk.core.black.BlackAccessInterceptor;
 import com.bytedesk.core.ip.access.IpAccessInterceptor;
 
 // import com.bytedesk.core.config.BytedeskProperties;
@@ -46,7 +46,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private IpAccessInterceptor ipAccessInterceptor;
 
     @Autowired
-    private VisitorAccessInterceptor visitorAccessInterceptor;
+    private BlackAccessInterceptor visitorAccessInterceptor;
 
     /**
      * @{VisitorAnonymousController}
