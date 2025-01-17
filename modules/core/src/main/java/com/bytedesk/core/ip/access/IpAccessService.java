@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 13:58:07
+ * @LastEditTime: 2025-01-17 14:57:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.core.ip.access;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.black.IpBlacklistEntity;
 import com.bytedesk.core.ip.black.IpBlacklistService;
 import com.bytedesk.core.ip.white.IpWhitelistRepository;
@@ -33,7 +32,6 @@ import java.util.Optional;
 public class IpAccessService {
     
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
-    private static final int BLOCK_HOURS = 24;
     
     private final IpAccessRepository ipAccessRepository;
         
@@ -41,7 +39,7 @@ public class IpAccessService {
 
     private final IpBlacklistService ipBlacklistService;
 
-    private final IpService ipService;
+    
 
     private final UidUtils uidUtils;
     
@@ -90,9 +88,7 @@ public class IpAccessService {
         // 检查是否需要加入黑名单
         if (access.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
             // 
-            String ipLocation = ipService.getIpLocation(ip);
-            LocalDateTime endTime = LocalDateTime.now().plusHours(BLOCK_HOURS);
-            ipBlacklistService.addToBlacklist(ip, ipLocation, endTime, "Exceeded maximum request rate", "System");
+            ipBlacklistService.addToBlacklistSystem(ip);
         }
     }
     
