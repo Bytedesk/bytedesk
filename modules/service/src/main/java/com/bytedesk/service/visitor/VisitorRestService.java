@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 11:47:16
+ * @LastEditTime: 2025-01-17 12:14:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,6 +78,14 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         log.info("visitor init, uid: {}", uid);
         VisitorEntity visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
+            // 对比ip是否有变化
+            if (visitor.getIp() == null || !visitor.getIp().equals(visitorRequest.getIp())) {
+                // 更新浏览信息
+                visitor.setIp(visitorRequest.getIp());
+                visitor.setIpLocation(visitorRequest.getIpLocation());
+                save(visitor);
+            }
+            // 
             return convertToResponse(visitor);
         }
         if (!StringUtils.hasText(uid)) {
