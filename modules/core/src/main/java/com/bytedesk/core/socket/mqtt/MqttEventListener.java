@@ -17,6 +17,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 import com.bytedesk.core.topic.TopicService;
 
 import lombok.AllArgsConstructor;

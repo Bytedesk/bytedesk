@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 17:30:50
+ * @LastEditTime: 2025-01-17 21:40:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,20 +47,7 @@ public class MessageEventListener {
         //
         String messageJson = event.getJson();
         //
-        messageJson = processMessage(messageJson);
-        messageSocketService.sendJsonMessage(messageJson);
-        //
-        try {
-            MessageProto.Message message = MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(),
-                    messageJson);
-            messageSocketService.sendProtoMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String processMessage(String messageJson) {
-        // log.info("processMessage {}", messageJson);
+        // messageJson = processMessage(messageJson);
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
@@ -73,19 +60,52 @@ public class MessageEventListener {
         // 替换掉客户端时间戳，统一各个客户端时间戳，防止出现因为客户端时间戳不一致导致的消息乱序
         messageProtobuf.setCreatedAt(LocalDateTime.now());
 
-        // 1. 拦截黑名单用户消息
-        // 2. 过滤敏感词，将敏感词替换为*
+        // TODO: 1. 拦截黑名单用户消息
+        
+        
+        // TODO: 2. 过滤敏感词，将敏感词替换为*
         // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-        // 3. 自动回复
-        // 4. 关键词回复
-        // 5. 大模型回复
 
-        String msgJson = JSON.toJSONString(messageProtobuf);
+        messageJson = JSON.toJSONString(messageProtobuf);
         // 缓存消息，用于定期持久化到数据库
-        messagePersistCache.pushForPersist(msgJson);
-        //
-        return msgJson;
+        messagePersistCache.pushForPersist(messageJson);
+        // 发送给Stomp客户端    
+        messageSocketService.sendJsonMessage(messageJson);
+        // 发送给mqtt客户端
+        try {
+            MessageProto.Message message = MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(),
+                    messageJson);
+            messageSocketService.sendProtoMessage(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    // private String processMessage(String messageJson) {
+    //     // log.info("processMessage {}", messageJson);
+    //     MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+    //     if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
+    //         messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
+    //     }
+    //     //
+    //     ThreadProtobuf thread = messageProtobuf.getThread();
+    //     if (thread == null) {
+    //         throw new RuntimeException("thread is null");
+    //     }
+    //     // 替换掉客户端时间戳，统一各个客户端时间戳，防止出现因为客户端时间戳不一致导致的消息乱序
+    //     messageProtobuf.setCreatedAt(LocalDateTime.now());
+
+    //     // TODO:
+    //     // 1. 拦截黑名单用户消息
+    //     // 2. 过滤敏感词，将敏感词替换为*
+    //     // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
+
+    //     String msgJson = JSON.toJSONString(messageProtobuf);
+    //     // 缓存消息，用于定期持久化到数据库
+    //     messagePersistCache.pushForPersist(msgJson);
+    //     //
+    //     return msgJson;
+    // }
 
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {

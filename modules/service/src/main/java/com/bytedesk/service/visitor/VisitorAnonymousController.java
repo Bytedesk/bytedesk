@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 17:53:09
+ * @LastEditTime: 2025-01-17 21:22:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.apilimit.ApiRateLimiter;
@@ -138,14 +137,8 @@ public class VisitorAnonymousController {
 
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
-    public ResponseEntity<?> sendRestMessage(@RequestHeader(value = "X-Visitor-ID", required = true) String visitorId,
-                                           @RequestBody Map<String, String> map) {
-        // 检查访问权限
-        // if (!visitorAccessService.isAllowed(visitorId)) {
-        //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-        //             .body(JsonResult.error("Access denied for visitor: " + visitorId));
-        // }
-        
+    public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
+        // 
         String json = (String) map.get("json");
         log.debug("json {}", json);
         messageSendService.sendJsonMessage(json);
