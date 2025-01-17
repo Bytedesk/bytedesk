@@ -66,16 +66,6 @@
 git clone https://github.com/Bytedesk/bytedesk.git
 # 进入docker目录
 cd bytedesk/deploy/docker
-# 拉取阿里云镜像
-# 社区免费版
-docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest
-# 企业付费版-完善中，暂未正式商业化
-docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
-# 或从 docker hub拉取镜像：
-# 社区免费版
-docker pull bytedesk/bytedesk-ce:latest
-# 企业付费版-完善中，暂未正式商业化
-docker pull bytedesk/bytedesk:latest
 # 启动docker compose容器, -f标志来指定文件路径, -d标志表示在后台模式下启动容器
 docker compose -f docker-compose.yaml up -d
 # stop container
