@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-28 22:02:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 15:51:03
+ * @LastEditTime: 2025-01-17 10:17:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,6 +58,15 @@ public class BlackEntity extends BaseEntity {
     @Column(name = "black_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String blackUser = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 黑名单用户uid
+    private String blackUid;
+
+    // 黑名单用户昵称
+    private String blackNickname;
+
+    // 黑名单用户头像
+    private String blackAvatar;
 
     // 执行拉黑的用户uid
     private String userUid;

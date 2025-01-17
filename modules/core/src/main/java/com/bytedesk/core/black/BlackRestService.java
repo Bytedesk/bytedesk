@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:12:13
+ * @LastEditTime: 2025-01-17 10:15:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class BlackService extends BaseRestService<BlackEntity, BlackRequest, BlackResponse> {
+public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest, BlackResponse> {
 
     private final BlackRepository repository;
 
@@ -59,8 +59,21 @@ public class BlackService extends BaseRestService<BlackEntity, BlackRequest, Bla
 
     @Override
     public Page<BlackResponse> queryByUser(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "createdAt");
+
+        Specification<BlackEntity> specification = BlackSpecification.search(request);
+
+        Page<BlackEntity> blacks = repository.findAll(specification, pageable);
+
+        return blacks.map(this::convertToResponse);
     }
 
     @Cacheable(value = "black", key = "#uid", unless = "#result == null")
@@ -86,8 +99,15 @@ public class BlackService extends BaseRestService<BlackEntity, BlackRequest, Bla
 
     @Override
     public BlackResponse update(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
+        Optional<BlackEntity> black = findByUid(request.getUid());
+        if (black.isPresent()) {
+            BlackEntity entity = black.get();
+            modelMapper.map(request, entity);
+            return convertToResponse(save(entity));
+        } else {
+            throw new RuntimeException("Black not found");
+        }
     }
 
     @Override
@@ -102,14 +122,20 @@ public class BlackService extends BaseRestService<BlackEntity, BlackRequest, Bla
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<BlackEntity> black = findByUid(uid);
+        if (black.isPresent()) {
+            BlackEntity entity = black.get();
+            entity.setDeleted(true);
+            // 
+            save(entity);
+        } else {
+            throw new RuntimeException("Black not found");
+        }
     }
 
     @Override
     public void delete(BlackRequest entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(entity.getUid());
     }
 
     @Override

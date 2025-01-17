@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BlackRestController extends BaseRestController<BlackRequest> {
 
-    private final BlackService blackService;
+    private final BlackRestService blackService;
 
     @Override
     public ResponseEntity<?> queryByOrg(BlackRequest request) {
