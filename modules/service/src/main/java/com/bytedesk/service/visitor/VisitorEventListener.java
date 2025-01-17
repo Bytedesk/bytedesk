@@ -40,6 +40,8 @@ public class VisitorEventListener {
         log.info("IpBlacklistEventListener onBlackCreateEvent: " + event);
         BlackEntity blackEntity = event.getBlackEntity();
         if (blackEntity.isBlockIp()) {
+
+            
             // IpBlacklistRequest ipBlacklistRequest = IpBlacklistRequest.builder()
             //     .ip(blackEntity.getIp())
             //     .ipLocation(blackEntity.getIpLocation())
