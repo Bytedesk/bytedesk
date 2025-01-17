@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 07:01:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 07:02:01
+ * @LastEditTime: 2025-01-17 11:08:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,44 @@
  */
 package com.bytedesk.core.black;
 
-// import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.SerializationUtils;
+import org.springframework.stereotype.Component;
 
-// @Component
+import com.bytedesk.core.black.event.BlackCreateEvent;
+import com.bytedesk.core.black.event.BlackUpdateEvent;
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.utils.ApplicationContextHolder;
+
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostRemove;
+import jakarta.persistence.PostUpdate;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
 public class BlackEntityListener {
-    
+
+    @PostPersist
+    public void onPostPersist(BlackEntity blackEntity) {
+        log.info("BlackEntityListener onPostPersist: " + blackEntity);
+        BlackEntity clonedBlackEntity = SerializationUtils.clone(blackEntity);
+
+        // 发布黑名单创建事件
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishEvent(new BlackCreateEvent(this, clonedBlackEntity));
+    }
+
+    @PostUpdate
+    public void onPostUpdate(BlackEntity blackEntity) {
+        log.info("BlackEntityListener onPostUpdate: " + blackEntity);
+        BlackEntity clonedBlackEntity = SerializationUtils.clone(blackEntity);
+        // 发布黑名单更新事件
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishEvent(new BlackUpdateEvent(this, clonedBlackEntity));
+    }
+
+    @PostRemove
+    public void onPostRemove(BlackEntity blackEntity) {
+        log.info("BlackEntityListener onPostRemove: " + blackEntity);
+    }
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 10:15:23
+ * @LastEditTime: 2025-01-17 10:48:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,13 +82,24 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         return repository.findByUid(uid);
     }
 
+    // 根据黑名单用户uid查询
+    @Cacheable(value = "black", key = "#blackUid", unless = "#result == null")
+    public Optional<BlackEntity> findByBlackUid(String blackUid) {
+        return repository.findByBlackUid(blackUid);
+    }
+
     @Override
     public BlackResponse create(BlackRequest request) {
         UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
         // 
         BlackEntity entity = modelMapper.map(request, BlackEntity.class);
         entity.setUid(uidUtils.getUid());
         entity.setUserUid(user.getUid());
+        entity.setUserNickname(user.getNickname());
+        entity.setUserAvatar(user.getAvatar());
         // 
         BlackEntity savedBlack = save(entity);
         if (savedBlack == null) {

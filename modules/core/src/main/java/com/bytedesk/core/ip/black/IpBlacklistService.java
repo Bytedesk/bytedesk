@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 22:19:12
+ * @LastEditTime: 2025-01-17 10:52:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,40 @@
  */
 package com.bytedesk.core.ip.black;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.uid.UidUtils;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class IpBlacklistService {
-    
+
+    private final IpBlacklistRepository ipBlacklistRepository;
+
+    private final UidUtils uidUtils;
+
+    private static final int BLOCK_HOURS = 24;
+
+    public IpBlacklistEntity findByIp(String ip) {
+        return ipBlacklistRepository.findByIp(ip);
+    }
+
+    public void addToBlacklist(String ip) {
+        IpBlacklistEntity blacklist = new IpBlacklistEntity();
+        blacklist.setIp(ip);
+        blacklist.setUid(uidUtils.getUid());
+        blacklist.setStartTime(LocalDateTime.now());
+        blacklist.setEndTime(LocalDateTime.now().plusHours(BLOCK_HOURS));
+        blacklist.setReason("Exceeded maximum request rate");
+        
+        save(blacklist);
+    }
+
+    public void save(IpBlacklistEntity blacklist) {
+        ipBlacklistRepository.save(blacklist);
+    }
 }
