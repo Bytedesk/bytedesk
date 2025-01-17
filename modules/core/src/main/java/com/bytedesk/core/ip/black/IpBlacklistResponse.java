@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 11:09:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 13:57:45
+ * @LastEditTime: 2025-01-17 15:10:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,5 +32,6 @@ public class IpBlacklistResponse extends BaseResponse {
     private LocalDateTime endTime;
     private String reason;
     // 
+    private String blackUid;
     private String userUid;
 }

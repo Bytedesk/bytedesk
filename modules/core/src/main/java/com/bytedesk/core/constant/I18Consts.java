@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 12:13:45
+ * @LastEditTime: 2025-01-17 14:44:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,6 +69,8 @@ public class I18Consts {
     //
     public static final String I18N_USER_NICKNAME = I18N_PREFIX + "user.nickname";
     public static final String I18N_USER_DESCRIPTION = I18N_PREFIX + "user.description";
+    public static final String I18N_USER_NOT_FOUND = I18N_PREFIX + "user.not.found";
+    public static final String I18N_CREATE_FAILED = I18N_PREFIX + "create.failed";
     //
     public static final String I18N_DESCRIPTION = I18N_PREFIX + "description";
     public static final String I18N_TODO = I18N_PREFIX + "todo";
@@ -137,6 +139,8 @@ public class I18Consts {
     public static final String I18N_AGENT_CLOSED = I18N_PREFIX + "agent.closed";
     public static final String I18N_AGENT_TRANSFER = I18N_PREFIX + "agent.transfer";
     // 
+    public static final String I18N_BLACK_USER_ALREADY_EXISTS = I18N_PREFIX + "black.user.already.exists";
+
     
     
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 14:34:09
+ * @LastEditTime: 2025-01-17 15:10:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,9 @@ public class VisitorEventListener {
                     visitorEntity.get().getIpLocation(), 
                     blackEntity.getEndTime(), 
                     blackEntity.getReason(),
-                    blackEntity.getUserUid()
+                    blackEntity.getBlackUid(),
+                    blackEntity.getUserUid(),
+                    blackEntity.getOrgUid()
                 );
                 // 更新访客状态
                 visitorService.updateStatus(visitorEntity.get().getUid(), VisitorStatusEnum.BLOCKED.name());
@@ -80,7 +82,6 @@ public class VisitorEventListener {
                 visitorService.updateStatus(visitor.getUid(), VisitorStatusEnum.OFFLINE.name());
             }
         });
-
     }
 
 
@@ -89,6 +90,9 @@ public class VisitorEventListener {
         log.info("visitor quartz day 0 event");
         // 每天0点，检查到期的黑名单，并清理
         ipBlacklistService.findByEndTimeBefore(LocalDateTime.now()).forEach(ipBlacklist -> {
+            // 修改访客状态
+            visitorService.updateStatus(ipBlacklist.getBlackUid(), VisitorStatusEnum.OFFLINE.name());
+            // 删除黑名单
             ipBlacklistService.deleteByUid(ipBlacklist.getUid());
         });
     }

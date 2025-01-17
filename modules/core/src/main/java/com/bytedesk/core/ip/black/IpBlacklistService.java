@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 14:36:18
+ * @LastEditTime: 2025-01-17 15:10:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -37,27 +38,9 @@ public class IpBlacklistService extends BaseRestService<IpBlacklistEntity, IpBla
 
     private final UidUtils uidUtils;
 
-    public Optional<IpBlacklistEntity> findByIp(String ip) {
-        return ipBlacklistRepository.findByIp(ip);
-    }
+    private final IpService ipService;
 
-    public void addToBlacklist(String ip, String ipLocation, LocalDateTime endTime, String reason, String userUid) {
-        IpBlacklistEntity blacklist = new IpBlacklistEntity();
-        blacklist.setIp(ip);
-        blacklist.setUid(uidUtils.getUid());
-        blacklist.setStartTime(LocalDateTime.now());
-        blacklist.setEndTime(endTime);
-        blacklist.setReason(reason);
-        blacklist.setIpLocation(ipLocation);
-        blacklist.setUserUid(userUid);
-        save(blacklist);
-    }
-
-
-
-    public List<IpBlacklistEntity> findByEndTimeBefore(LocalDateTime dateTime) {
-        return ipBlacklistRepository.findByEndTimeBefore(dateTime);
-    }
+    private static final int BLOCK_HOURS = 24;
 
     @Override
     public Page<IpBlacklistResponse> queryByOrg(IpBlacklistRequest request) {
@@ -77,16 +60,76 @@ public class IpBlacklistService extends BaseRestService<IpBlacklistEntity, IpBla
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
 
+    public Optional<IpBlacklistEntity> findByIp(String ip) {
+        return ipBlacklistRepository.findByIp(ip);
+    }
+
+    public List<IpBlacklistEntity> findByEndTimeBefore(LocalDateTime dateTime) {
+        return ipBlacklistRepository.findByEndTimeBefore(dateTime);
+    }
+
+
+    public void addToBlacklistSystem(String ip) {
+        //
+        String ipLocation = ipService.getIpLocation(ip);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(BLOCK_HOURS);
+        // 
+        IpBlacklistRequest request = IpBlacklistRequest.builder()
+                .ip(ip)
+                .ipLocation(ipLocation)
+                .endTime(endTime)
+                .reason("Exceeded maximum request rate")
+                .userUid("system")
+                .build();
+        create(request);
+    }
+
+    public void addToBlacklist(String ip, String ipLocation, LocalDateTime endTime, String reason, String blackUid, String userUid, String orgUid) {
+        IpBlacklistRequest request = IpBlacklistRequest.builder()
+                .ip(ip)
+                .ipLocation(ipLocation)
+                .endTime(endTime)
+                .reason(reason)
+                .blackUid(blackUid)
+                .userUid(userUid)
+                .build();
+        request.setOrgUid(orgUid);
+        create(request);
+    }
+
     @Override
     public IpBlacklistResponse create(IpBlacklistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        // 判断ip是否在黑名单中
+        Optional<IpBlacklistEntity> ipBlacklist = findByIp(request.getIp());
+        if (ipBlacklist.isPresent()) {
+            return convertToResponse(ipBlacklist.get());
+        }
+        //
+        IpBlacklistEntity entity = modelMapper.map(request, IpBlacklistEntity.class);
+        entity.setUid(uidUtils.getUid());
+        //
+        IpBlacklistEntity savedBlacklist = save(entity);
+        if (savedBlacklist == null) {
+            throw new RuntimeException("Create ip blacklist failed");
+        }
+        return convertToResponse(savedBlacklist);
     }
 
     @Override
     public IpBlacklistResponse update(IpBlacklistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        if (request.getUid() == null) {
+            throw new RuntimeException("Ip blacklist uid is required");
+        }
+        //
+        Optional<IpBlacklistEntity> ipBlacklist = findByUid(request.getUid());
+        if (ipBlacklist.isPresent()) {
+            IpBlacklistEntity entity = ipBlacklist.get();
+            modelMapper.map(request, entity);
+            // 
+            return convertToResponse(save(entity));
+        } else {
+            throw new RuntimeException("Ip blacklist not found");
+        }
     }
 
     @Override
@@ -123,5 +166,4 @@ public class IpBlacklistService extends BaseRestService<IpBlacklistEntity, IpBla
         return modelMapper.map(entity, IpBlacklistResponse.class);
     }
 
-    
 }

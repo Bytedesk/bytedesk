@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 14:26:25
+ * @LastEditTime: 2025-01-17 14:44:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -91,14 +92,20 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     // 根据黑名单用户uid查询
     @Cacheable(value = "black", key = "#blackUid", unless = "#result == null")
     public Optional<BlackEntity> findByBlackUid(String blackUid) {
-        return repository.findByBlackUid(blackUid);
+        return repository.findFirstByBlackUid(blackUid);
     }
 
     @Override
     public BlackResponse create(BlackRequest request) {
+        // 判断是否已经存在黑名单用户uid
+        Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
+        if (black.isPresent()) {
+            throw new RuntimeException(I18Consts.I18N_BLACK_USER_ALREADY_EXISTS);
+        }
+
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
         //
         BlackEntity entity = modelMapper.map(request, BlackEntity.class);
@@ -109,7 +116,7 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         //
         BlackEntity savedBlack = save(entity);
         if (savedBlack == null) {
-            throw new RuntimeException("Create black failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedBlack);
     }
