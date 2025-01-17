@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 14:44:26
+ * @LastEditTime: 2025-01-17 16:25:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,9 +100,9 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         // 判断是否已经存在黑名单用户uid
         Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
         if (black.isPresent()) {
-            throw new RuntimeException(I18Consts.I18N_BLACK_USER_ALREADY_EXISTS);
+            return convertToResponse(black.get());
         }
-
+        // 
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:38:58
+ * @LastEditTime: 2025-01-17 16:24:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.black.IpBlacklistEntity;
 import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.ip.white.IpWhitelistRepository;
@@ -40,6 +41,8 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
     private final IpWhitelistRepository whitelistRepository;
 
     private final IpBlacklistRestService ipBlacklistService;
+
+    private final IpService ipService;
 
     private final UidUtils uidUtils;
     
@@ -66,8 +69,11 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
         IpAccessEntity access = ipAccessRepository.findFirstByIpAndEndpointAndAccessTimeAfter(ip, endpoint, oneMinuteAgo);
         // 如果访问记录不存在，则创建新的访问记录
         if (access == null) {
+            String ipLocation = ipService.getIpLocation(ip);
+            // 
             access = new IpAccessEntity();
             access.setIp(ip);
+            access.setIpLocation(ipLocation);
             access.setUid(uidUtils.getUid());
             access.setEndpoint(endpoint);
             access.setParams(params);
