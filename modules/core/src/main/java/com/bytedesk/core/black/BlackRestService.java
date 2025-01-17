@@ -170,4 +170,9 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         return modelMapper.map(entity, BlackResponse.class);
     }
 
+    @Cacheable(value = "blacks", key = "#visitorUid + '_' + #orgUid")
+    public Optional<BlackEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
+        return repository.findByBlackUidAndOrgUidAndDeletedFalse(visitorUid, orgUid);
+    }
+
 }
