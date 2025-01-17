@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 14:57:27
+ * @LastEditTime: 2025-01-17 15:38:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,23 +13,25 @@
  */
 package com.bytedesk.core.ip.access;
 
+import org.springframework.data.domain.Page;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.ip.black.IpBlacklistEntity;
-import com.bytedesk.core.ip.black.IpBlacklistService;
+import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.ip.white.IpWhitelistRepository;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.base.BaseRestService;
 
 import lombok.AllArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 @Transactional
 @AllArgsConstructor
-public class IpAccessService {
+public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAccessRequest, IpAccessResponse> {
     
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
     
@@ -37,9 +39,7 @@ public class IpAccessService {
         
     private final IpWhitelistRepository whitelistRepository;
 
-    private final IpBlacklistService ipBlacklistService;
-
-    
+    private final IpBlacklistRestService ipBlacklistService;
 
     private final UidUtils uidUtils;
     
@@ -58,12 +58,6 @@ public class IpAccessService {
         return false;
     }
     
-    /**
-     * 记录访问
-     * @param ip 访问ip
-     * @param endpoint 访问端点
-     * @param params 访问参数
-     */
     public void recordAccess(String ip, String endpoint, String params) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneMinuteAgo = now.minusMinutes(1);
@@ -91,6 +85,70 @@ public class IpAccessService {
             ipBlacklistService.addToBlacklistSystem(ip);
         }
     }
+
+    @Override
+    public Page<IpAccessResponse> queryByOrg(IpAccessRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public Page<IpAccessResponse> queryByUser(IpAccessRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public Optional<IpAccessEntity> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+    }
+
+    @Override
+    public IpAccessResponse create(IpAccessRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public IpAccessResponse update(IpAccessRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public IpAccessEntity save(IpAccessEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    }
+
+    @Override
+    public void delete(IpAccessRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            IpAccessEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    @Override
+    public IpAccessResponse convertToResponse(IpAccessEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+    }
+    
+
+    
     
     
 } 
