@@ -33,6 +33,10 @@ public class IpBlacklistSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getIp())) {
                 predicates.add(criteriaBuilder.like(root.get("ip"), "%" + request.getIp() + "%"));
             }
+            // blackNickname
+            if (StringUtils.hasText(request.getBlackNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("blackNickname"), "%" + request.getBlackNickname() + "%"));
+            }
             // reason
             if (StringUtils.hasText(request.getReason())) {
                 predicates.add(criteriaBuilder.like(root.get("reason"), "%" + request.getReason() + "%"));
