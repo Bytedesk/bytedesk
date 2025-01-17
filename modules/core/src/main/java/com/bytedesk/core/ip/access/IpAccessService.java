@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 12:20:00
+ * @LastEditTime: 2025-01-17 13:53:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,8 +16,8 @@ package com.bytedesk.core.ip.access;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.black.IpBlacklistEntity;
-import com.bytedesk.core.ip.black.IpBlacklistRepository;
 import com.bytedesk.core.ip.black.IpBlacklistService;
 import com.bytedesk.core.ip.white.IpWhitelistRepository;
 import com.bytedesk.core.uid.UidUtils;
@@ -25,6 +25,7 @@ import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -32,14 +33,15 @@ import java.time.LocalDateTime;
 public class IpAccessService {
     
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
+    private static final int BLOCK_HOURS = 24;
     
     private final IpAccessRepository ipAccessRepository;
-    
-    private final IpBlacklistRepository blacklistRepository;
-    
+        
     private final IpWhitelistRepository whitelistRepository;
 
     private final IpBlacklistService ipBlacklistService;
+
+    private final IpService ipService;
 
     private final UidUtils uidUtils;
     
@@ -50,8 +52,8 @@ public class IpAccessService {
         }
         
         // 检查是否在黑名单中且未过期
-        IpBlacklistEntity blacklist = blacklistRepository.findByIp(ip);
-        if (blacklist != null && blacklist.getEndTime().isAfter(LocalDateTime.now())) {
+        Optional<IpBlacklistEntity> blacklist = ipBlacklistService.findByIp(ip);
+        if (blacklist.isPresent() && blacklist.get().getEndTime().isAfter(LocalDateTime.now())) {
             return true;
         }
         
@@ -87,7 +89,10 @@ public class IpAccessService {
         ipAccessRepository.save(access);
         // 检查是否需要加入黑名单
         if (access.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
-            ipBlacklistService.addToBlacklist(ip);
+            // 
+            String ipLocation = ipService.getIpLocation(ip);
+            LocalDateTime endTime = LocalDateTime.now().plusHours(BLOCK_HOURS);
+            ipBlacklistService.addToBlacklist(ip, ipLocation, endTime, "Exceeded maximum request rate");
         }
     }
     

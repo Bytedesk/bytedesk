@@ -4,40 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.ico">
-    <title>微语</title>
+    <title>ByteDesk</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 2rem;
         }
 
-        a {
-            color: #337ab7;
-            text-decoration: none;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         }
 
         h3 {
-            color: #333;
-            margin-top: 20px;
+            color: #2c3e50;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+            font-weight: 600;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
         }
 
         .section-title {
-            color: #666;
-            font-weight: bold;
+            font-size: 1.25rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .link-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .link-list a {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .link-list a:before {
+            content: "→";
+            margin-right: 0.5rem;
+            color: #95a5a6;
         }
     </style>
 </head>
 <body>
-    <!--  -->
-    <a href="/" target="_blank">网站</a><br/>
-    <h3 class="section-title">演示</h3>
-    <a href="/admin" target="_blank">管理后台</a><br/>
-    <a href="/agent/chat" target="_blank">客户端</a><br/>
-    <a href="/chat/demo" target="_blank">访客端</a><br/>
-    <h3 class="section-title">开发</h3>
-    <a href="/swagger-ui/index.html" target="_blank">api</a><br/>
-    <a href="/actuator" target="_blank">监控</a><br/>
-    <a href="/flux/chat" target="_blank">流式输出测试</a><br/>
-    <a href="/druid" target="_blank">Druid数据库监控(默认账号:admin@email.com，密码:admin)</a><br/>
-</body> 
+    <div class="container">
+        <div class="section">
+            <a href="/" target="_blank">ByteDesk Website</a>
+        </div>
+
+        <div class="section">
+            <h3>Demo</h3>
+            <ul class="link-list">
+                <li><a href="/admin" target="_blank">Admin Dashboard</a></li>
+                <li><a href="/agent/chat" target="_blank">Agent Client</a></li>
+                <li><a href="/chat/demo" target="_blank">Visitor Client</a></li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Development</h3>
+            <ul class="link-list">
+                <li><a href="/swagger-ui/index.html" target="_blank">API Documentation</a></li>
+                <li><a href="/actuator" target="_blank">Monitoring</a></li>
+                <li><a href="/flux/chat" target="_blank">Stream Output Test</a></li>
+                <li><a href="/druid" target="_blank">Druid(Default account: admin@email.com, password: admin)</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
 </html>
