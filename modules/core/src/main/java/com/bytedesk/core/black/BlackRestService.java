@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 10:48:07
+ * @LastEditTime: 2025-01-17 14:26:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.black;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -65,7 +67,7 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
             throw new RuntimeException("User not found");
         }
         request.setUserUid(user.getUid());
-        
+
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "createdAt");
 
@@ -82,6 +84,10 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         return repository.findByUid(uid);
     }
 
+    public List<BlackEntity> findByEndTimeBefore(LocalDateTime endTime) {
+        return repository.findByEndTimeBefore(endTime);
+    }
+
     // 根据黑名单用户uid查询
     @Cacheable(value = "black", key = "#blackUid", unless = "#result == null")
     public Optional<BlackEntity> findByBlackUid(String blackUid) {
@@ -94,13 +100,13 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         if (user == null) {
             throw new RuntimeException("User not found");
         }
-        // 
+        //
         BlackEntity entity = modelMapper.map(request, BlackEntity.class);
         entity.setUid(uidUtils.getUid());
         entity.setUserUid(user.getUid());
         entity.setUserNickname(user.getNickname());
         entity.setUserAvatar(user.getAvatar());
-        // 
+        //
         BlackEntity savedBlack = save(entity);
         if (savedBlack == null) {
             throw new RuntimeException("Create black failed");
@@ -110,7 +116,7 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
 
     @Override
     public BlackResponse update(BlackRequest request) {
-        
+
         Optional<BlackEntity> black = findByUid(request.getUid());
         if (black.isPresent()) {
             BlackEntity entity = black.get();
@@ -126,7 +132,7 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         try {
             return repository.save(entity);
         } catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
         return null;
     }
@@ -135,10 +141,7 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     public void deleteByUid(String uid) {
         Optional<BlackEntity> black = findByUid(uid);
         if (black.isPresent()) {
-            BlackEntity entity = black.get();
-            entity.setDeleted(true);
-            // 
-            save(entity);
+            repository.delete(black.get());
         } else {
             throw new RuntimeException("Black not found");
         }

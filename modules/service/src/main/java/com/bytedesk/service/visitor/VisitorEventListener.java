@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 13:54:12
+ * @LastEditTime: 2025-01-17 14:34:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import com.bytedesk.core.black.BlackEntity;
 import com.bytedesk.core.black.event.BlackCreateEvent;
 import com.bytedesk.core.black.event.BlackUpdateEvent;
 import com.bytedesk.core.ip.black.IpBlacklistService;
+import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 
 import lombok.AllArgsConstructor;
@@ -41,25 +42,28 @@ public class VisitorEventListener {
 
     @EventListener
     public void onBlackCreateEvent(BlackCreateEvent event) {
-        log.info("IpBlacklistEventListener onBlackCreateEvent: " + event);
+        log.info("VisitorEventListener onBlackCreateEvent: " + event);
         BlackEntity blackEntity = event.getBlackEntity();
         if (blackEntity.isBlockIp()) {
-            Optional<VisitorEntity> visitorEntity = visitorService.findByUid(blackEntity.getUid()); 
+            Optional<VisitorEntity> visitorEntity = visitorService.findByUid(blackEntity.getBlackUid()); 
             if (visitorEntity.isPresent()) {
                 // 添加到黑名单
                 ipBlacklistService.addToBlacklist(
                     visitorEntity.get().getIp(), 
                     visitorEntity.get().getIpLocation(), 
                     blackEntity.getEndTime(), 
-                    blackEntity.getReason()
+                    blackEntity.getReason(),
+                    blackEntity.getUserUid()
                 );
+                // 更新访客状态
+                visitorService.updateStatus(visitorEntity.get().getUid(), VisitorStatusEnum.BLOCKED.name());
             }
         }
     }
 
     @EventListener
     public void onBlackUpdateEvent(BlackUpdateEvent event) {
-        log.info("IpBlacklistEventListener onBlackUpdateEvent");
+        log.info("VisitorEventListener onBlackUpdateEvent");
     }
 
     // 更新访客在线状态：检测updatedAt时间戳，如果超过五分钟则更新为离线状态
@@ -78,5 +82,18 @@ public class VisitorEventListener {
         });
 
     }
+
+
+    @EventListener
+    public void onQuartzDay0Event(QuartzDay0Event event) {
+        log.info("visitor quartz day 0 event");
+        // 每天0点，检查到期的黑名单，并清理
+        ipBlacklistService.findByEndTimeBefore(LocalDateTime.now()).forEach(ipBlacklist -> {
+            ipBlacklistService.deleteByUid(ipBlacklist.getUid());
+        });
+    }
+
+
+    
     
 }

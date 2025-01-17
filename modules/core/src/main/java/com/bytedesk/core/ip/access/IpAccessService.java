@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 13:53:41
+ * @LastEditTime: 2025-01-17 13:58:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,7 +92,7 @@ public class IpAccessService {
             // 
             String ipLocation = ipService.getIpLocation(ip);
             LocalDateTime endTime = LocalDateTime.now().plusHours(BLOCK_HOURS);
-            ipBlacklistService.addToBlacklist(ip, ipLocation, endTime, "Exceeded maximum request rate");
+            ipBlacklistService.addToBlacklist(ip, ipLocation, endTime, "Exceeded maximum request rate", "System");
         }
     }
     
