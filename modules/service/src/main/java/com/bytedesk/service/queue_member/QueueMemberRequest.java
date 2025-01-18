@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 11:01:33
+ * @LastEditTime: 2025-01-18 14:30:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,9 +31,23 @@ public class QueueMemberRequest extends BaseRequest {
 
     private String queueUid;  // 关联队列
 
+    private String queueTopic;  // 队列主题，用于查询
+
+    private String queueDay;  // 队列日期，用于查询
+
     private String threadUid;  // 关联会话
 
     private String visitorUid;  // 访客ID
+
+    private String visitorNickname;  // 访客昵称
+
+    private String visitorAvatar;  // 访客头像
+
+    private String agentUid;  // 服务客服ID
+
+    private String agentNickname;  // 客服昵称
+
+    private String agentAvatar;  // 客服头像
 
     @Builder.Default
     private int beforeNumber = 0;  // 前面排队人数
@@ -61,8 +75,6 @@ public class QueueMemberRequest extends BaseRequest {
     private boolean firstResponse = false;  // 是否首次响应
 
     private LocalDateTime closeTime;  // 结束时间
-
-    private String agentUid;  // 服务客服
 
     @Builder.Default
     private int priority = 0;  // 优先级(0-100)
