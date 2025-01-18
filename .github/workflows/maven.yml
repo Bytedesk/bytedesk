@@ -17,14 +17,10 @@
 name: cicd
 on:
   push:
-    branches: main
-    # 打标签的时候触发
     tags:
       - 'v*' # 在推送的标签以"v"开头时执行
 jobs:
   build:
-    # 取消自动构建, 只在开源库执行，私有库不执行，开源库设置为 true
-    if: false
     runs-on: ubuntu-latest # 运行环境
     steps:
       - name: checkout code
