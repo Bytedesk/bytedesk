@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:26:24
+ * @LastEditTime: 2025-01-18 17:03:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,6 +81,9 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
 
+    @Builder.Default
+    private int currentThreadCount = 0;
+
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_REPLY;
@@ -114,4 +117,17 @@ public class RobotEntity extends BaseEntity {
 
     // only used when created by user, not by org
     // private String userUid; // 创建用户
+
+    public void increaseThreadCount() {
+        this.currentThreadCount++;
+    }
+    public void decreaseThreadCount() {
+        if (this.currentThreadCount > 0) {
+            this.currentThreadCount--;
+        }
+    }
+
+    public void resetThreadCount() {
+        this.currentThreadCount = 0;
+    }
 }

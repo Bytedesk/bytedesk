@@ -10,6 +10,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -44,14 +46,41 @@ public class QueueService {
     private final UidUtils uidUtils;
 
     @Transactional
+    public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, RobotEntity robotEntity, VisitorRequest visitorRequest) {
+        // 1. 获取或创建队列
+        QueueEntity queue = getOrCreateQueue(threadEntity, robotEntity.getNickname());
+        if (!queue.canEnqueue()) {
+            throw new QueueFullException("Queue is full or not active");
+        }
+        // 
+        UserProtobuf userProtobuf = UserProtobuf.builder()
+            .nickname(robotEntity.getNickname())
+            .avatar(robotEntity.getAvatar())
+            .build();
+        userProtobuf.setUid(robotEntity.getUid());
+        // 2. 创建队列成员
+        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
+        // 3. 更新队列统计
+        updateQueueStats(queue);
+        // 4. 返回队列成员
+        return member;
+    }
+
+    @Transactional
     public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
         QueueEntity queue = getOrCreateQueue(threadEntity, agentEntity.getNickname());
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
+        // 
+        UserProtobuf userProtobuf = UserProtobuf.builder()
+            .nickname(agentEntity.getNickname())
+            .avatar(agentEntity.getAvatar())
+            .build();
+        userProtobuf.setUid(agentEntity.getUid());
         // 2. 创建队列成员
-        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, agentEntity, visitorRequest, queue);
+        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -65,8 +94,14 @@ public class QueueService {
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
+        // 
+        UserProtobuf userProtobuf = UserProtobuf.builder()
+            .nickname(agentEntity.getNickname())
+            .avatar(agentEntity.getAvatar())
+            .build();
+        userProtobuf.setUid(agentEntity.getUid());
         // 2. 创建队列成员
-        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, agentEntity, visitorRequest, queue);
+        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -107,7 +142,7 @@ public class QueueService {
 
     @Transactional
     public QueueMemberEntity getOrCreateQueueMember(ThreadEntity threadEntity, 
-        AgentEntity agentEntity, 
+        UserProtobuf userProtobuf, 
         VisitorRequest visitorRequest, 
         QueueEntity queue) {
 
@@ -130,9 +165,9 @@ public class QueueService {
             .visitorUid(visitorRequest.getUid())
             .visitorNickname(visitorRequest.getNickname())
             .visitorAvatar(visitorRequest.getAvatar())
-            .agentUid(agentEntity.getUid())
-            .agentNickname(agentEntity.getNickname())
-            .agentAvatar(agentEntity.getAvatar())
+            .agentUid(userProtobuf.getUid())
+            .agentNickname(userProtobuf.getNickname())
+            .agentAvatar(userProtobuf.getAvatar())
             .queueNumber(queue.getNextNumber())
             .beforeNumber(queue.getWaitingNumber())
             .enqueueTime(LocalDateTime.now())

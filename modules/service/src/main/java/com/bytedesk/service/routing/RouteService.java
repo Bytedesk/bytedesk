@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 15:38:19
+ * @LastEditTime: 2025-01-18 17:03:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -64,13 +65,26 @@ public class RouteService {
 
     private final WorkgroupRoutingService workgroupRoutingService;
 
+    private final RobotRestService robotRestService;
+
     public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
             @Nonnull RobotEntity robot) {
+        // 排队计数
+        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
+        log.info("routeRobot Enqueued to queue {}", queueMemberEntity.toString());
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         thread.setRobot(true);
         thread.setUnreadCount(0);
         threadService.save(thread);
+        // 增加接待数量，待优化
+        robot.increaseThreadCount();
+        robotRestService.save(robot);
+        // 更新排队状态，待优化
+        queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+        queueMemberEntity.setAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberRestService.save(queueMemberEntity);
         //
         return ThreadMessageUtil.getThreadRobotWelcomeMessage(thread);
     }
