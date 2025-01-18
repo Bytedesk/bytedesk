@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 15:38:25
+ * @LastEditTime: 2025-01-18 15:43:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,23 +30,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QueueResponse extends BaseResponse {
 
-    private Integer currentNumber;
+    private String nickname;
 
-    private Integer waitingNumber;
-
-    private Integer waitSeconds;
-    
-    private Integer servingNumber;
-
-    private Integer finishedNumber;
-
-    private String status;
+    private String type;
 
     private String topic;
 
     private String day;
 
-    private String type;
+    private String status;
+
+    private Integer currentNumber;  // 当前排队号码
+
+    private Integer waitingNumber;  // 等待人数
+
+    private Integer servingNumber;  // 正在服务人数
+
+    private Integer servedNumber;  // 已完成人数
+
+    private Integer avgWaitTime;  // 平均等待时间(秒)
+
+    private Integer avgSolveTime;  // 平均解决时间(秒)
 
     private LocalDateTime createdAt;
 
