@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 23:45:00
+ * @LastEditTime: 2025-01-18 23:54:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,23 +76,23 @@ public class QueueMemberResponse extends BaseResponse {
     private LocalDateTime firstResponseTime;  // 首次响应时间
 
     @Builder.Default
-    private boolean firstResponse = false;  // 是否首次响应
+    private Boolean firstResponse = false;  // 是否首次响应
 
     @Builder.Default
-    private int avgResponseTime = 0;  // 平均响应时间(秒)
+    private Integer avgResponseTime = 0;  // 平均响应时间(秒)
     
     @Builder.Default
-    private int maxResponseTime = 0;  // 最长响应时间(秒)
+    private Integer maxResponseTime = 0;  // 最长响应时间(秒)
 
     @Builder.Default
-    private int agentMessageCount = 0;  // 客服消息数量
+    private Integer agentMessageCount = 0;  // 客服消息数量
 
     @Builder.Default
-    private int visitorMessageCount = 0;  // 访客消息数量
+    private Integer visitorMessageCount = 0;  // 访客消息数量
 
     @Builder.Default
     @Column(name = "is_timeout")
-    private boolean timeout = false; // 是否超时
+    private Boolean timeout = false; // 是否超时
 
     private LocalDateTime lastResponseTime;  // 最后响应时间
 
@@ -101,17 +101,15 @@ public class QueueMemberResponse extends BaseResponse {
     private LocalDateTime closeTime;  // 结束时间
 
     @Builder.Default
-    private int priority = 0;  // 优先级(0-100)
+    private Integer priority = 0;  // 优先级(0-100)
 
-    // 已解决
     @Builder.Default
-    private boolean solved = false;
+    private Boolean solved = false;  // 已解决
 
-    // 已评价
     @Builder.Default
-    private boolean rated = false;
+    private Boolean rated = false;  // 已评价
 
-    private String client;
+    private String client;  // 客户端类型
 
     private LocalDateTime createdAt;
 
