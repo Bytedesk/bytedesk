@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 15:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:40:00
+ * @LastEditTime: 2025-01-18 18:38:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/ip/blacklist")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/ip/black")
+@AllArgsConstructor
 public class IpBlacklistRestController extends BaseRestController<IpBlacklistRequest> {
 
     private final IpBlacklistRestService ipBlacklistRestService;

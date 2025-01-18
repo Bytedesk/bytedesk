@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 15:18:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:38:02
+ * @LastEditTime: 2025-01-18 18:37:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/ip/whitelist")
+@RequestMapping("/api/v1/ip/white")
 @RequiredArgsConstructor
 public class IpWhitelistRestController extends BaseRestController<IpWhitelistRequest> {
     
