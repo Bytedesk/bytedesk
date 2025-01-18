@@ -79,7 +79,7 @@ public class RouteService {
             @Nonnull AgentEntity agent) {
         // log.info("RouteService routeAgent: {}", agent.getUid());
         // 排队计数
-        QueueMemberEntity queueMemberEntity = queueService.enqueue(thread, agent, visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
         log.info("routeAgent Enqueued to queue {}", queueMemberEntity.toString());
         MessageProtobuf messageProtobuf = null;
         // 判断客服是否在线且接待状态
@@ -156,7 +156,7 @@ public class RouteService {
             return getOfflineMessage(visitorRequest, thread, workgroup);
         }
         // 排队计数
-        QueueMemberEntity queueMemberEntity = queueService.enqueue(thread, agent, visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
         MessageProtobuf messageProtobuf = null;
         log.info("routeAgent Enqueued to queue {}", queueMemberEntity.toString());
         //
