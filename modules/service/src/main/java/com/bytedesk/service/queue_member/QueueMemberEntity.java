@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 14:53:48
+ * @LastEditTime: 2025-01-18 14:28:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,7 +59,15 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(nullable = false)
     private String visitorUid;  // 访客ID
 
-    private String agentUid;  // 服务客服
+    private String visitorNickname;  // 访客昵称
+
+    private String visitorAvatar;  // 访客头像
+
+    private String agentUid;  // 服务客服ID
+
+    private String agentNickname;  // 客服昵称
+
+    private String agentAvatar;  // 客服头像
 
     @Builder.Default
     private int beforeNumber = 0;  // 前面排队人数
@@ -121,7 +129,6 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_rated")
     private boolean rated = false;
-    
 
     /**
      * 计算等待时间(秒)
