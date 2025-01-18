@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 17:41:03
+ * @LastEditTime: 2025-01-18 15:27:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,20 @@ cd bytedesk/deploy/docker
 docker compose -f docker-compose.yaml up -d
 # stop container
 docker compose -f docker-compose.yaml stop
+```
+
+## 演示
+
+```bash
+web: http://127.0.0.1:9003/
+开发者入口: http://127.0.0.1:9003/dev
+管理后台: http://127.0.0.1:9003/admin, 用户名: admin@email.com, 密码: admin
+客户端: http://127.0.0.1:9003/agent/chat, 用户名: admin@email.com, 密码: admin
+访客端: http://127.0.0.1:9003/chat?org=df_org_uid&t=0&sid=df_ag_uid&
+api文档: http://127.0.0.1:9003/swagger-ui/index.html
+数据库监控: http://127.0.0.1:9003/druid，用户名: admin@email.com, 密码: admin
+actuator: http://127.0.0.1:9003/actuator
+docker: https://hub.docker.com/r/bytedesk/bytedesk
 ```
 
 ## 文档

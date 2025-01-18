@@ -110,11 +110,16 @@ public class QueueService {
             .queueDay(queue.getDay())
             .threadUid(threadEntity.getUid())
             .visitorUid(visitorRequest.getUid())
+            .visitorNickname(visitorRequest.getNickname())
+            .visitorAvatar(visitorRequest.getAvatar())
             .agentUid(agentEntity.getUid())
+            .agentNickname(agentEntity.getNickname())
+            .agentAvatar(agentEntity.getAvatar())
             .queueNumber(queue.getNextNumber())
             .beforeNumber(queue.getWaitingNumber())
             .enqueueTime(LocalDateTime.now())
             .status(QueueMemberStatusEnum.WAITING.name())
+            .client(visitorRequest.getClient())
             .build();
         member.setUid(uidUtils.getUid());
         member.setOrgUid(threadEntity.getOrgUid());
