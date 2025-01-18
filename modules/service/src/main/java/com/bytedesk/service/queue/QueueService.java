@@ -123,6 +123,7 @@ public class QueueService {
         // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
             .queueUid(queue.getUid())
+            .queueNickname(queue.getNickname())
             .queueTopic(queue.getTopic())
             .queueDay(queue.getDay())
             .threadUid(threadEntity.getUid())
