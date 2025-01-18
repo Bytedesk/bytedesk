@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 12:53:12
+ * @LastEditTime: 2025-01-18 15:42:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,28 @@ import lombok.experimental.Accessors;
 )
 public class QueueEntity extends BaseEntity {
 
-    // 队列基本信息
+    // 队列名称
+    @Column(name = "queue_nickname")
+    private String nickname;
+
+    @Builder.Default
+    @Column(name = "queue_type")
+    private String type = ThreadTypeEnum.WORKGROUP.name();  // 队列类型，AGENT或WORKGROUP
+
+    // agentUid or workgroupUid
+    @Column(name = "queue_topic")
+    private String topic;
+
+    // 队列日期(YYYY-MM-DD)
+    @Column(name = "queue_day")
+    private String day;  
+
+    // 队列状态
+    @Builder.Default
+    @Column(name = "queue_status", nullable = false)
+    private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
+
+
     @Builder.Default
     private int currentNumber = 0;  // 当前排队号码
 
@@ -58,22 +79,8 @@ public class QueueEntity extends BaseEntity {
     @Builder.Default
     private int avgWaitTime = 0;  // 平均等待时间(秒)
 
-    // 队列状态
     @Builder.Default
-    @Column(name = "queue_status", nullable = false)
-    private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
-
-    // 队列日期(YYYY-MM-DD)
-    @Column(name = "queue_day")
-    private String day;  
-
-    // agentUid or workgroupUid
-    @Column(name = "queue_topic")
-    private String topic;
-
-    @Builder.Default
-    @Column(name = "queue_type")
-    private String type = ThreadTypeEnum.WORKGROUP.name();  // 队列类型，AGENT或WORKGROUP
+    private int avgSolveTime = 0;  // 平均解决时间(秒)
 
     /**
      * 获取下一个排队号码
