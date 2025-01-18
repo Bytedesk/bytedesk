@@ -84,6 +84,7 @@ public class QueueService {
                 return queueRestService.findByTopicAndDay(queueTopic, today)
                     .orElseGet(() -> {
                         QueueRequest request = QueueRequest.builder()
+                            .nickname(queueNickname)
                             .day(today)
                             .topic(queueTopic)
                             .type(threadEntity.getType())
