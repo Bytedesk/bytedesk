@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 16:16:44
+ * @LastEditTime: 2025-01-18 16:18:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,13 +37,13 @@ public class QueueMemberSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("visitorNickname"), "%" + request.getVisitorNickname() + "%"));
             }
             // 根据agentNickname查询
-            // if (StringUtils.hasText(request.getAgentNickname())) {
-            //     predicates.add(criteriaBuilder.like(root.get("agentNickname"), "%" + request.getAgentNickname() + "%"));
-            // }
+            if (StringUtils.hasText(request.getAgentNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("agentNickname"), "%" + request.getAgentNickname() + "%"));
+            }
             // 根据client查询
-            // if (StringUtils.hasText(request.getClient())) {
-            //     predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getClient() + "%"));
-            // }
+            if (StringUtils.hasText(request.getClient())) {
+                predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getClient() + "%"));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
