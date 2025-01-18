@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 15:25:06
+ * @LastEditTime: 2025-01-18 16:00:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,7 +76,7 @@ public class QueueMemberEntity extends BaseEntity {
     private int waitTime = 0;  // 等待时间(秒)
 
     @Builder.Default
-    private int queueNumber = 1;  // 排队号码
+    private int queueNumber = 0;  // 排队号码
 
     @Builder.Default
     @Column(nullable = false)

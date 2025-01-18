@@ -21,6 +21,7 @@ import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +44,9 @@ public class QueueService {
     private final UidUtils uidUtils;
 
     @Transactional
-    public QueueMemberEntity enqueue(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
+    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
-        QueueEntity queue = getOrCreateQueue(threadEntity);
+        QueueEntity queue = getOrCreateQueue(threadEntity, agentEntity.getNickname());
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
@@ -58,7 +59,22 @@ public class QueueService {
     }
 
     @Transactional
-    private QueueEntity getOrCreateQueue(ThreadEntity threadEntity) {
+    public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, AgentEntity agentEntity, WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+        // 1. 获取或创建队列
+        QueueEntity queue = getOrCreateQueue(threadEntity, workgroupEntity.getNickname());
+        if (!queue.canEnqueue()) {
+            throw new QueueFullException("Queue is full or not active");
+        }
+        // 2. 创建队列成员
+        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, agentEntity, visitorRequest, queue);
+        // 3. 更新队列统计
+        updateQueueStats(queue);
+        // 4. 返回队列成员
+        return member;
+    }
+
+    @Transactional
+    private QueueEntity getOrCreateQueue(ThreadEntity threadEntity, String queueNickname) {
         String threadTopic = threadEntity.getTopic();
         String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(threadTopic);
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
