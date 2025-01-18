@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 15:02:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 11:09:38
+ * @LastEditTime: 2025-01-18 20:44:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @EnableJpaAuditing
-@ComponentScan("com.bytedesk.*")
+@ComponentScan("com.bytedesk.**")
 // @EnableRedisDocumentRepositories(basePackages = "com.bytedesk.*")
 @EnableRetry
 @SpringBootApplication
