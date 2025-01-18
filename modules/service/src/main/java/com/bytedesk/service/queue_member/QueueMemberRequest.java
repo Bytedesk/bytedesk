@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 14:30:08
+ * @LastEditTime: 2025-01-18 15:25:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,4 +86,6 @@ public class QueueMemberRequest extends BaseRequest {
     // 已评价
     @Builder.Default
     private boolean rated = false;
+
+    private String client;  // 客户端类型
 }

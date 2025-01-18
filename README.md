@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 12:39:24
+ * @LastEditTime: 2025-01-18 15:27:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,6 +61,20 @@ cd bytedesk/deploy/docker
 docker compose -f docker-compose.yaml up -d
 # stop container
 docker compose -f docker-compose.yaml stop
+```
+
+## Preview
+
+```bash
+web: http://127.0.0.1:9003/
+developer: http://127.0.0.1:9003/dev
+admin: http://127.0.0.1:9003/admin, username: admin@email.com, password: admin
+agent: http://127.0.0.1:9003/agent/chat, username: admin@email.com, password: admin
+visitor: http://127.0.0.1:9003/chat?org=df_org_uid&t=0&sid=df_ag_uid&
+api: http://127.0.0.1:9003/swagger-ui/index.html
+monitor: http://127.0.0.1:9003/druid, username: admin@email.com, password: admin
+actuator: http://127.0.0.1:9003/actuator
+docker: https://hub.docker.com/r/bytedesk/bytedesk
 ```
 
 ## Docs

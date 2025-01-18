@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 14:28:24
+ * @LastEditTime: 2025-01-18 15:25:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -129,6 +129,8 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_rated")
     private boolean rated = false;
+
+    private String client;  // 客户端类型
 
     /**
      * 计算等待时间(秒)
