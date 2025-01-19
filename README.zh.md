@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-19 10:15:10
+ * @LastEditTime: 2025-01-19 10:17:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,10 +14,6 @@
 # 微语
 
 企业级多租户即时通讯解决方案
-<!-- 一款聊天软件 -->
-<!-- 可编排AI知识库问答 + 对接自有业务系统 + 转人工客服。 -->
-<!-- 不仅仅是一款 **企业IM** -->
-<!-- 致力于实现企业管理软件一站式解决方案。 -->
 
 :::tip
 微语仍处于早期的快速迭代阶段，文档可能落后于开发，导致功能描述可能不符，以最新发布的软件版本为准
@@ -79,46 +75,6 @@ url: http://127.0.0.1:9003/dev
 username: admin@email.com, password: admin
 ```
 
-## 文档
-
-- [文档](https://www.weiyuai.cn/docs/zh-CN/)
-
-<!-- ## 预览
-
-### 管理后台
-
-| 组织 | 客服 | ai |
-| :----------: | :----------: | :----------: |
-| <img src="./images/admin/team.png" width="250"> | <img src="./images/admin/service.png" width="250"> | <img src="./images/admin/ai.png" width="250"> |
-
-## [桌面客户端](https://github.com/Bytedesk/bytedesk-desktop)
-
-| 登录 | 对话 | 通讯录 | 设置 |
-| :----------: | :----------: | :----------: | :----------: |
-| <img src="./images/pc/login2.png" width="100"><img src="./images/pc/switch.png" width="100"> | <img src="./images/pc/chat.png" width="250"> | <img src="./images/pc/contact.png" width="250"> | <img src="./images/pc/setting.png" width="250"> |
-
-| 客服-AI助手 | 客服-常用语 | 客服-访客信息 |
-| :----------: | :----------: | :----------: |
-| <img src="./images/pc/chat-ai.png" width="250">| <img src="./images/pc/chat-cs.png" width="250"> | <img src="./images/pc/chat-userinfo.png" width="250"> | -->
-
-<!-- ## [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
-
-- [gitee](https://gitee.com/270580156/bytedesk-mobile)
-- [github](https://github.com/Bytedesk/bytedesk-mobile) -->
-
-<!-- ## [网页版](https://github.com/bytedesk/bytedesk-react)
-
- [gitee](https://gitee.com/270580156/bytedesk-react)
-- [github](https://github.com/Bytedesk/bytedesk-react) -->
-
-<!-- | 自定义按钮颜色 |  按钮放在窗口左下角 | 自定义按钮边距 | 自定义聊天窗口边距 |
-| :----------: | :----------: | :----------:  | :----------: |
-| <img src="./images/visitor-web/button-color.png" width="250"> | <img src="./images/visitor-web/button-left.png" width="250"> | <img src="./images/visitor-web/button-margin.png" width="250"> | <img src="./images/visitor-web/iframe-margin.png" width="250"> |
-
-| 自定义聊天窗口宽度 |  全屏聊天窗口 | iframe聊天窗口 | 嵌入式聊天窗口 |
-| :----------: | :----------: | :----------:  | :----------: |
-| <img src="./images/visitor-web/iframe-width.png" width="250"> | <img src="./images/visitor-web/chat-full.png" width="250"> | <img src="./images/visitor-web/chat-iframe.png" width="250"> | <img src="./images/visitor-web/chat-embed.png" width="250"> | -->
-
 ## 对话SDK
 
 | Project     | Description           | Forks          | Stars             |
@@ -129,14 +85,10 @@ username: admin@email.com, password: admin
 | [UniApp](https://github.com/bytedesk/bytedesk-uniapp) | Uniapp | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp) |
 | [Web](https://github.com/bytedesk/bytedesk-web) | Web | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web) |
 
-## 客户端
+## 链接
 
 - [下载](https://www.weiyuai.cn/download.html)
-<!-- - [Windows](https://www.weiyuai.cn/download.html) -->
-<!-- - [Mac](https://www.weiyuai.cn/download.html) -->
-<!-- - [Linux](https://www.weiyuai.cn/download.html) -->
-<!-- - [Android](https://www.weiyuai.cn/download.html) -->
-<!-- - [IOS](https://www.weiyuai.cn/download.html) -->
+- [文档](https://www.weiyuai.cn/docs/zh-CN/)
 
 ## 技术栈
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->
@@ -152,18 +104,12 @@ username: admin@email.com, password: admin
 <!-- - [微信](./images/wechat.png) -->
 - 微语技术支持群：
 - <img src="./images/wechat_group.jpg" width="200">
-<!-- - 如群二维码过期，请添加微信，备注: 微语 -->
-<!-- - <img src="./images/wechat.png" width="100"> -->
 - 服务号
 - <img src="./images/wechat_mp.jpg" width="100">
 - 订阅号
 - <img src="./images/wechatai_mp.jpg" width="100">
 
-<!-- ## [写在前面](https://www.weiyuai.cn/) -->
 - 此为开源社区版，支持免费商用
-<!-- - 此软件可能存在bug或不完善的地方，如造成损失，需自行负责 -->
-<!-- - 请联系[微信](./images/wechat.png) -->
-<!-- - 严禁用于含有木马、病毒、色情、赌博、诈骗等违法违规业务 -->
 
 ## 版权
 
