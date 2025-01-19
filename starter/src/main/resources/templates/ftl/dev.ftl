@@ -84,6 +84,9 @@
     <div class="container">
         <div class="section">
             <a href="/" target="_blank">ByteDesk Website</a>
+            <p>
+                username: admin@email.com, password: admin
+            </p>
         </div>
 
         <div class="section">
@@ -100,8 +103,8 @@
             <ul class="link-list">
                 <li><a href="/swagger-ui/index.html" target="_blank">API Documentation</a></li>
                 <li><a href="/actuator" target="_blank">Monitoring</a></li>
-                <li><a href="/flux/chat" target="_blank">Stream Output Test</a></li>
-                <li><a href="/druid" target="_blank">Druid(Default account: admin@email.com, password: admin)</a></li>
+                <#--  <li><a href="/flux/chat" target="_blank">Stream Output Test</a></li>  -->
+                <li><a href="/druid" target="_blank">Druid</a></li>
             </ul>
         </div>
     </div>
