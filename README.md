@@ -52,6 +52,7 @@ Team Cooperation with AI powered Omnichannel customer service
 ## Docker Quick Start
 
 ```bash
+# clone project and start docker compose container
 git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose.yaml up -d
 ```
 
