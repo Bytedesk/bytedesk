@@ -31,7 +31,7 @@ import com.bytedesk.ticket.comment.TicketComment;
 @AllArgsConstructor
 public class TicketRestController extends BaseRestController<TicketRequest> {
     
-    private final TicketService ticketService;
+    private final TicketRestService ticketService;
 
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {
