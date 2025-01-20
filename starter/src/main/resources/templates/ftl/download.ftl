@@ -53,7 +53,7 @@ Listed course START -->
 						<img src="assets/images/element/data-science.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-x64.exe" class="stretched-link" target="_blank">Windows客户端</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu.exe" class="stretched-link" target="_blank">Windows客户端</a></h5>
 					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
