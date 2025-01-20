@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 13:13:01
+ * @LastEditTime: 2025-01-20 12:23:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -76,7 +76,7 @@ public class PageRouteController {
 	 * 访客对话窗口
 	 * http://127.0.0.1:9003/chat
 	 */
-	@GetMapping({"/chat", "/chat/", "/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|config}"})
+	@GetMapping({"/chat", "/chat/", "/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|server|config}"})
 	public String chat(@PathVariable(required = false) String type) {
 		return "forward:/chat/index.html";
 	}
