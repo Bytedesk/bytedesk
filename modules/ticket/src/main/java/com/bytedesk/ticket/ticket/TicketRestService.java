@@ -28,6 +28,7 @@ import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.CommentRequest;
 import com.bytedesk.ticket.comment.TicketComment;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
+import com.bytedesk.ticket.statistic.TicketStatistics;
 
 import lombok.AllArgsConstructor;
 

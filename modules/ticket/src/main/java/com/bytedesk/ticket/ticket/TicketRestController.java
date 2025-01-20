@@ -25,6 +25,7 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.attachment.TicketAttachment;
 import com.bytedesk.ticket.comment.CommentRequest;
 import com.bytedesk.ticket.comment.TicketComment;
+import com.bytedesk.ticket.statistic.TicketStatistics;
 
 @RestController
 @RequestMapping("/api/v1/ticket")
