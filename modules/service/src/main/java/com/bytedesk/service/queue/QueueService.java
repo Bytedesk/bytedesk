@@ -196,6 +196,9 @@ public class QueueService {
         Double avgWaitTime = queueMemberRepository.calculateAverageWaitTime(queueUid);
         return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     }
+
+
+    
     
     // @Transactional
     // public void dequeue(String threadTopic, QueueStatusEnum status) {
