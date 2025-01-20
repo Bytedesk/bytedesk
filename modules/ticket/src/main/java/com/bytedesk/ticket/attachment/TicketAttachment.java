@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-16 15:24:13
+ * @LastEditTime: 2025-01-20 17:01:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,9 +11,10 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.model;
+package com.bytedesk.ticket.attachment;
 import java.time.LocalDateTime;
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.ticket.ticket.TicketEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;

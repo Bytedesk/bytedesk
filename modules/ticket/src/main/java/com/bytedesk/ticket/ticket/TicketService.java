@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.service;
+package com.bytedesk.ticket.ticket;
 
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -9,23 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bytedesk.ticket.model.TicketEntity;
-import com.bytedesk.ticket.dto.TicketRequest;
-import com.bytedesk.ticket.dto.TicketResponse;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
-import com.bytedesk.ticket.repository.TicketRepository;
-import com.bytedesk.ticket.model.TicketComment;
+
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.ticket.dto.CommentRequest;
-import com.bytedesk.ticket.repository.TicketCommentRepository;
-import com.bytedesk.ticket.model.TicketAttachment;
-import com.bytedesk.ticket.repository.TicketAttachmentRepository;
-import com.bytedesk.ticket.model.TicketStatistics;
+import com.bytedesk.ticket.attachment.TicketAttachment;
+import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
+import com.bytedesk.ticket.comment.CommentRequest;
+import com.bytedesk.ticket.comment.TicketComment;
+import com.bytedesk.ticket.comment.TicketCommentRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -44,6 +39,65 @@ public class TicketService extends BaseRestService<TicketEntity, TicketRequest, 
     private final TicketAttachmentRepository attachmentRepository;
 
     private final ModelMapper modelMapper;
+
+    @Override
+    public Page<TicketResponse> queryByOrg(TicketRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public Page<TicketResponse> queryByUser(TicketRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public TicketResponse create(TicketRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public TicketResponse update(TicketRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+
+    @Override
+    public TicketEntity save(TicketEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    
+
+    @Override
+    public void delete(TicketRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    }
+
+    @Override
+    public Optional<TicketEntity> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TicketEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
     
     @Transactional
     public TicketEntity createTicket(TicketRequest ticketDTO) {
@@ -148,58 +202,5 @@ public class TicketService extends BaseRestService<TicketEntity, TicketRequest, 
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 
-    @Override
-    public TicketResponse create(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-    @Override
-    public void delete(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
-    }
-
-    @Override
-    public Optional<TicketEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    @Override
-    public Page<TicketResponse> queryByOrg(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
-    }
-
-    @Override
-    public Page<TicketResponse> queryByUser(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public TicketEntity save(TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
-
-    @Override
-    public TicketResponse update(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
+    
 }   

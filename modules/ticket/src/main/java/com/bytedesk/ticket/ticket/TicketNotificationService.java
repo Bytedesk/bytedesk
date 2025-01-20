@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-16 16:40:20
+ * @LastEditTime: 2025-01-20 17:03:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,12 +11,11 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.service;
+package com.bytedesk.ticket.ticket;
 
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.ticket.model.TicketEntity;
-import com.bytedesk.ticket.model.TicketComment;
+import com.bytedesk.ticket.comment.TicketComment;
 
 @Service
 public class TicketNotificationService {
