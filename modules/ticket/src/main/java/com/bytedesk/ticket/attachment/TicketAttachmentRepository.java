@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-16 14:58:38
+ * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-16 16:27:06
+ * @LastEditTime: 2025-01-20 17:02:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,21 +11,9 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.dto;
+package com.bytedesk.ticket.attachment;
 
-import com.bytedesk.core.base.BaseResponse;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class TicketResponse extends BaseResponse {
-
-    private String title;
-    private String description;
-    private String priority;
-    private String category;
-    private String reporter;
-    
+public interface TicketAttachmentRepository extends JpaRepository<TicketAttachment, Long> {
 } 
