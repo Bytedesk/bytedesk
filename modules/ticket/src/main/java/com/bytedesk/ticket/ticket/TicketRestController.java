@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-21 10:01:42
+ * @LastEditTime: 2025-01-21 10:03:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,40 +44,37 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
 
     @Override
     public ResponseEntity<?> queryByUser(TicketRequest request) {
+
         Page<TicketResponse> page = ticketService.queryByUser(request);
+        
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
 
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
+
         TicketEntity entity = ticketService.createTicket(request);
+
         return ResponseEntity.ok(JsonResult.success(entity));
     }
 
 
     @Override
     public ResponseEntity<?> update(TicketRequest request) {
+
         TicketResponse response = ticketService.update(request);
+
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
     public ResponseEntity<?> delete(TicketRequest request) {
+
         ticketService.delete(request);
+        
         return ResponseEntity.ok(JsonResult.success());
     }
-
-
-    // @PostMapping
-    // public TicketEntity createTicket(@RequestBody TicketRequest ticket) {
-    //     return ticketService.createTicket(ticket);
-    // }
-    
-    // @PutMapping("/{id}")
-    // public TicketEntity updateTicket(@PathVariable Long id, @RequestBody TicketRequest ticket) {
-    //     return ticketService.updateTicket(id, ticket);
-    // }
     
     @PostMapping("/{id}/comments")
     public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
