@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-21 10:43:46
+ * @LastEditTime: 2025-01-21 10:43:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.article;
+package com.bytedesk.kbase.notebase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 帮助文档
+ * 内部知识库，个人笔记
  */
 @Entity
 @Data
@@ -50,9 +50,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ ArticleEntityListener.class })
-@Table(name = "bytedesk_kbase_article")
-public class ArticleEntity extends BaseEntity {
+@EntityListeners({ NotebaseEntityListener.class })
+@Table(name = "bytedesk_kbase_notebase")
+public class NotebaseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class ArticleEntity extends BaseEntity {
     private String contentHtml;
 
     @Builder.Default
-    @Column(name = "article_type", nullable = false)
+    @Column(name = "Notebase_type", nullable = false)
     private String type = KnowledgebaseTypeEnum.HELPCENTER.name();
 
     // @Builder.Default
@@ -77,7 +77,7 @@ public class ArticleEntity extends BaseEntity {
 
     @Builder.Default
     @ElementCollection
-    @CollectionTable(name = "bytedesk_kbase_article_tags")
+    @CollectionTable(name = "bytedesk_kbase_Notebase_tags")
     private List<String> tags = new ArrayList<>();
 
     @Builder.Default
@@ -105,9 +105,9 @@ public class ArticleEntity extends BaseEntity {
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     //
-    public Document toDocument(@NonNull ArticleEntity article) {
-        return new Document(article.getTitle() + article.getContentMarkdown(),
-                Map.of("categoryUid", article.getCategoryUid(), "kbUid", article.getKbUid()));
+    public Document toDocument(@NonNull NotebaseEntity Notebase) {
+        return new Document(Notebase.getTitle() + Notebase.getContentMarkdown(),
+                Map.of("categoryUid", Notebase.getCategoryUid(), "kbUid", Notebase.getKbUid()));
     }
 
 }
