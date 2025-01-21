@@ -25,6 +25,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>channels</module>
         <module>modules</module>
         <module>plugins</module>
         <module>starter</module>
