@@ -23,10 +23,10 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.ticket.attachment.TicketAttachment;
+import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
-import com.bytedesk.ticket.comment.CommentRequest;
-import com.bytedesk.ticket.comment.TicketComment;
+import com.bytedesk.ticket.comment.TicketCommentRequest;
+import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
 import com.bytedesk.ticket.statistic.TicketStatistics;
 
@@ -186,10 +186,10 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     }
     
     @Transactional
-    public TicketComment addComment(Long ticketId, CommentRequest commentDTO) {
+    public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentDTO) {
         TicketEntity ticket = findTicketById(ticketId);
         
-        TicketComment comment = new TicketComment();
+        TicketCommentEntity comment = new TicketCommentEntity();
         comment.setTicket(ticket);
         comment.setContent(commentDTO.getContent());
         comment.setAuthor(commentDTO.getAuthor());
@@ -199,10 +199,10 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     }
     
     @Transactional
-    public TicketAttachment uploadAttachment(Long ticketId, MultipartFile file) {
+    public TicketAttachmentEntity uploadAttachment(Long ticketId, MultipartFile file) {
         TicketEntity ticket = findTicketById(ticketId);
         
-        TicketAttachment attachment = new TicketAttachment();
+        TicketAttachmentEntity attachment = new TicketAttachmentEntity();
         attachment.setTicket(ticket);
         attachment.setFileName(file.getOriginalFilename());
         attachment.setFileType(file.getContentType());

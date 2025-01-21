@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-16 18:50:22
+ * @Date: 2025-01-16 14:58:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-21 10:01:12
+ * @LastEditTime: 2025-01-21 10:00:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,14 @@
  */
 package com.bytedesk.ticket.comment;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.bytedesk.core.base.BaseResponse;
 
-public interface TicketCommentRepository extends JpaRepository<TicketCommentEntity, Long> {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class TicketCommentResponse extends BaseResponse {
+    private String content;
+    private String author;
 } 

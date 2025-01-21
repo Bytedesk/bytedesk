@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-20 17:03:18
+ * @LastEditTime: 2025-01-21 10:01:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@ package com.bytedesk.ticket.ticket;
 
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.ticket.comment.TicketComment;
+import com.bytedesk.ticket.comment.TicketCommentEntity;
 
 @Service
 public class TicketNotificationService {
@@ -28,7 +28,7 @@ public class TicketNotificationService {
         // 工单分配通知
     }
     
-    public void notifyTicketComment(TicketComment comment) {
+    public void notifyTicketComment(TicketCommentEntity comment) {
         // 工单评论通知
     }
     

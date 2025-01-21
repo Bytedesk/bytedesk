@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-20 17:02:12
+ * @LastEditTime: 2025-01-21 10:01:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,5 +15,5 @@ package com.bytedesk.ticket.attachment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TicketAttachmentRepository extends JpaRepository<TicketAttachment, Long> {
+public interface TicketAttachmentRepository extends JpaRepository<TicketAttachmentEntity, Long> {
 } 
