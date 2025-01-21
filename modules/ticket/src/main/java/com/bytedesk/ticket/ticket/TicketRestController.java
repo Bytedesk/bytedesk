@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-20 17:04:15
+ * @LastEditTime: 2025-01-21 10:01:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,9 +22,9 @@ import lombok.AllArgsConstructor;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.ticket.attachment.TicketAttachment;
-import com.bytedesk.ticket.comment.CommentRequest;
-import com.bytedesk.ticket.comment.TicketComment;
+import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
+import com.bytedesk.ticket.comment.TicketCommentRequest;
+import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.statistic.TicketStatistics;
 
 @RestController
@@ -80,12 +80,12 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // }
     
     @PostMapping("/{id}/comments")
-    public TicketComment addComment(@PathVariable Long id, @RequestBody CommentRequest comment) {
+    public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
         return ticketService.addComment(id, comment);
     }
     
     @PostMapping("/{id}/attachments")
-    public TicketAttachment uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
+    public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
         return ticketService.uploadAttachment(id, file);
     }
     
