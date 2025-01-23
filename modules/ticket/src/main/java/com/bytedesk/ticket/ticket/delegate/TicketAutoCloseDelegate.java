@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:40:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-20 17:03:53
+ * @LastEditTime: 2025-01-23 14:18:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import com.bytedesk.ticket.ticket.TicketEntity;
 import java.time.LocalDateTime;
 
 @Component
-public class AutoCloseTicketDelegate implements JavaDelegate {
+public class TicketAutoCloseDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) {

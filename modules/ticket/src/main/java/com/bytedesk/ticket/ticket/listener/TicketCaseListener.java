@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 13:06:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 13:51:49
+ * @LastEditTime: 2025-01-23 14:17:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.service.TicketSLAService;
-import com.bytedesk.ticket.ticket.service.TicketService;
+import com.bytedesk.ticket.ticket.service.TicketRestService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketCaseListener implements CaseInstanceLifecycleListener {
     
     @Autowired
-    private TicketService ticketService;
+    private TicketRestService ticketService;
     
     @Autowired
     private TicketSLAService slaService;
