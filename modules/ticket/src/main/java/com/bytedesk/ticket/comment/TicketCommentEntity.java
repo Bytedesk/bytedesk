@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 15:54:46
+ * @LastEditTime: 2025-01-23 16:04:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,7 +54,6 @@ public class TicketCommentEntity extends BaseEntity {
     private AgentEntity author;          // 评论人
 
     // 评论附件
-    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TicketAttachmentEntity> attachments;
-
 } 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:33:11
+ * @LastEditTime: 2025-01-23 16:43:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,4 +55,7 @@ public class CategoryRequest extends BaseRequest {
 
     // knowledge base uid
     private String kbUid;
+
+    // 用户uid
+    private String userUid;
 }
