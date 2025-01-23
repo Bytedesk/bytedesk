@@ -32,6 +32,7 @@ import com.bytedesk.ticket.ticket.TicketRepository;
 import com.bytedesk.ticket.ticket.TicketRequest;
 import com.bytedesk.ticket.ticket.TicketResponse;
 import com.bytedesk.ticket.ticket.TicketSpecification;
+import com.bytedesk.ticket.ticket.TicketStatusEnum;
 
 import lombok.AllArgsConstructor;
 
@@ -82,6 +83,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     public TicketResponse create(TicketRequest request) {
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
+        ticket.setStatus(TicketStatusEnum.NEW.name());
 
         // 
         TicketEntity savedTicket = save(ticket);
@@ -99,7 +101,17 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             throw new RuntimeException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
-        ticket = updateTicket(ticket.getId(), request);
+        // ticket = updateTicket(ticket.getId(), request);
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        ticket.setPriority(request.getPriority());
+        ticket.setCategoryUid(request.getCategoryUid());
+        ticket.setUpdatedAt(LocalDateTime.now());
+        ticket.setStatus(request.getStatus());
+        // ticket.setAssignee(request.getAssigneeUid());
+        // ticket.setReporter(request.getReporterUid());
+        // ticket.setUpdatedAt(LocalDateTime.now());
+
         return convertToResponse(ticket);
     }
 
@@ -120,16 +132,16 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             Map.of("approved", approved));
     }
     
-    @Transactional
-    public TicketEntity updateTicket(Long id, TicketRequest ticketDTO) {
-        TicketEntity ticket = findTicketById(id);
-        ticket.setTitle(ticketDTO.getTitle());
-        ticket.setDescription(ticketDTO.getDescription());
-        ticket.setPriority(ticketDTO.getPriority());
-        ticket.setCategoryUid(ticketDTO.getCategoryUid());
-        ticket.setUpdatedAt(LocalDateTime.now());
-        return ticketRepository.save(ticket);
-    }
+    // @Transactional
+    // public TicketEntity updateTicket(Long id, TicketRequest ticketDTO) {
+    //     TicketEntity ticket = findTicketById(id);
+    //     ticket.setTitle(ticketDTO.getTitle());
+    //     ticket.setDescription(ticketDTO.getDescription());
+    //     ticket.setPriority(ticketDTO.getPriority());
+    //     ticket.setCategoryUid(ticketDTO.getCategoryUid());
+    //     ticket.setUpdatedAt(LocalDateTime.now());
+    //     return ticketRepository.save(ticket);
+    // }
     
     @Transactional
     public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentDTO) {

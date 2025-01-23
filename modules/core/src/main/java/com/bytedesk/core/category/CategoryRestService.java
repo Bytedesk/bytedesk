@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 16:03:22
+ * @LastEditTime: 2025-01-23 16:43:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,8 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -46,6 +48,8 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final AuthService authService;
 
     public List<CategoryResponse> findByNullParent(String platform) {
         // 一级分类
@@ -77,8 +81,17 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     @Override
     public Page<CategoryResponse> queryByUser(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(authUser.getUid());
+        // 
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "updatedAt");
+        Specification<CategoryEntity> specs = CategorySpecification.search(request);
+        Page<CategoryEntity> page = categoryRepository.findAll(specs, pageable);
+        return page.map(this::convertToResponse);
     }
 
     @Override

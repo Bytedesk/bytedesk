@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:49:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-25 15:08:02
+ * @LastEditTime: 2025-01-23 16:43:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,9 @@ public class CategorySpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getKbUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+            }
+            if (StringUtils.hasText(request.getUserUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
             if (StringUtils.hasText(request.getLevel())) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
