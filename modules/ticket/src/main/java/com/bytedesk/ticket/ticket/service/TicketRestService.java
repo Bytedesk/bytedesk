@@ -138,7 +138,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         TicketCommentEntity comment = new TicketCommentEntity();
         comment.setTicket(ticket);
         comment.setContent(commentDTO.getContent());
-        comment.setAuthor(commentDTO.getAuthor());
+        // comment.setAuthor(commentDTO.getAuthor());
         comment.setCreatedAt(LocalDateTime.now());
         
         return commentRepository.save(comment);
