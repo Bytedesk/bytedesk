@@ -257,8 +257,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     @Override
     public TicketResponse convertToResponse(TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        return modelMapper.map(entity, TicketResponse.class);
     }
 
     
