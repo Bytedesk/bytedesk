@@ -20,6 +20,7 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
@@ -103,7 +104,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     }
 
     @Transactional
-    public void assignTicket(Long ticketId, String assignee) {
+    public void assignTicket(Long ticketId, AgentEntity assignee) {
         TicketEntity ticket = findTicketById(ticketId);
         ticket.setAssignee(assignee);
         ticket.setStatus("处理中");
@@ -125,7 +126,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setTitle(ticketDTO.getTitle());
         ticket.setDescription(ticketDTO.getDescription());
         ticket.setPriority(ticketDTO.getPriority());
-        ticket.setCategory(ticketDTO.getCategory());
+        ticket.setCategoryUid(ticketDTO.getCategoryUid());
         ticket.setUpdatedAt(LocalDateTime.now());
         return ticketRepository.save(ticket);
     }
