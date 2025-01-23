@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101"
+             xmlns:flowable="http://flowable.org/dmn"
+             id="ticketSLA"
+             name="工单SLA规则"
+             namespace="http://flowable.org/dmn">
+    
+    <decision id="determineSLA" name="确定SLA">
+        <decisionTable id="slaRules" hitPolicy="FIRST">
+            <input id="category">
+                <inputExpression id="categoryExpression" typeRef="string">
+                    <text>category</text>
+                </inputExpression>
+            </input>
+            <input id="priority">
+                <inputExpression id="priorityExpression" typeRef="string">
+                    <text>priority</text>
+                </inputExpression>
+            </input>
+            
+            <output id="responseTime" name="响应时间(分钟)" typeRef="number"/>
+            <output id="resolutionTime" name="解决时间(小时)" typeRef="number"/>
+            <output id="escalationGroup" name="升级组" typeRef="string"/>
+            
+            <rule>
+                <inputEntry><text>"TECHNICAL"</text></inputEntry>
+                <inputEntry><text>"URGENT"</text></inputEntry>
+                <outputEntry><text>15</text></outputEntry>
+                <outputEntry><text>2</text></outputEntry>
+                <outputEntry><text>"tech-managers"</text></outputEntry>
+            </rule>
+            
+            <rule>
+                <inputEntry><text>"BILLING"</text></inputEntry>
+                <inputEntry><text>"HIGH"</text></inputEntry>
+                <outputEntry><text>30</text></outputEntry>
+                <outputEntry><text>4</text></outputEntry>
+                <outputEntry><text>"finance-managers"</text></outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions> 

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+             xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="complexTicket" name="复杂工单处理">
+        <casePlanModel id="casePlanModel" name="复杂工单计划">
+            <planItem id="PI_createTicket" definitionRef="createTicket"/>
+            <planItem id="PI_analyzeTicket" definitionRef="analyzeTicket"/>
+            <planItem id="PI_customerVerify" definitionRef="customerVerify"/>
+            
+            <stage id="createTicket" name="创建工单">
+                <planItem id="PI_recordDetails" definitionRef="recordTicketDetails"/>
+                <planItem id="PI_setPriority" definitionRef="setPriority"/>
+            </stage>
+            
+            <stage id="analyzeTicket" name="技术分析">
+                <planItem id="PI_investigate" definitionRef="investigate"/>
+            </stage>
+
+            <stage id="customerVerify" name="客户验证">
+                <planItem id="PI_verify" definitionRef="verify"/>
+                <planItem id="PI_satisfaction" definitionRef="satisfaction"/>
+            </stage>
+
+            <humanTask id="recordTicketDetails" name="记录工单详情"/>
+            <humanTask id="setPriority" name="设置优先级"/>
+            <humanTask id="investigate" name="调查问题"/>
+            <humanTask id="verify" name="验证问题"/>
+            <humanTask id="satisfaction" name="满意度评价"/>
+
+            <criterion id="analyzeNeeded" sentryRef="analyzeSentry"/>
+            <sentry id="analyzeSentry">
+                <planItemOnPart sourceRef="PI_createTicket">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <criterion id="verifyNeeded" sentryRef="verifySentry"/>
+            <sentry id="verifySentry">
+                <planItemOnPart sourceRef="PI_analyzeTicket">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+        </casePlanModel>
+    </case>
+
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_complexTicket">
+            <cmmndi:Size width="1000" height="1000"/>
+            
+            <cmmndi:CMMNShape id="CasePlanModel_1_di" cmmnElementRef="casePlanModel">
+                <dc:Bounds x="40" y="40" width="800" height="600"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNShape id="CreateTicket_di" cmmnElementRef="PI_createTicket">
+                <dc:Bounds x="100" y="100" width="300" height="200"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNShape id="RecordDetails_di" cmmnElementRef="PI_recordDetails">
+                <dc:Bounds x="120" y="130" width="100" height="60"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNShape id="SetPriority_di" cmmnElementRef="PI_setPriority">
+                <dc:Bounds x="120" y="210" width="100" height="60"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNShape id="AnalyzeTicket_di" cmmnElementRef="PI_analyzeTicket">
+                <dc:Bounds x="450" y="100" width="300" height="200"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNShape id="Investigate_di" cmmnElementRef="PI_investigate">
+                <dc:Bounds x="500" y="150" width="100" height="80"/>
+            </cmmndi:CMMNShape>
+
+            <cmmndi:CMMNShape id="CustomerVerify_di" cmmnElementRef="PI_customerVerify">
+                <dc:Bounds x="800" y="100" width="300" height="200"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNShape id="Verify_di" cmmnElementRef="PI_verify">
+                <dc:Bounds x="820" y="130" width="100" height="60"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNShape id="Satisfaction_di" cmmnElementRef="PI_satisfaction">
+                <dc:Bounds x="820" y="210" width="100" height="60"/>
+            </cmmndi:CMMNShape>
+
+            <cmmndi:CMMNShape id="EntryCriterion_1_di" cmmnElementRef="analyzeNeeded">
+                <dc:Bounds x="440" y="185" width="20" height="28"/>
+            </cmmndi:CMMNShape>
+
+            <cmmndi:CMMNShape id="EntryCriterion_2_di" cmmnElementRef="verifyNeeded">
+                <dc:Bounds x="790" y="185" width="20" height="28"/>
+            </cmmndi:CMMNShape>
+            
+            <cmmndi:CMMNEdge id="PlanItemOnPart_1_di" cmmnElementRef="PI_createTicket" targetCMMNElementRef="analyzeNeeded">
+                <di:waypoint x="400" y="200"/>
+                <di:waypoint x="440" y="200"/>
+            </cmmndi:CMMNEdge>
+
+            <cmmndi:CMMNEdge id="Connection_1_di" targetCMMNElementRef="PI_analyzeTicket" sourceCMMNElementRef="PI_createTicket">
+                <di:waypoint x="400" y="200"/>
+                <di:waypoint x="450" y="200"/>
+            </cmmndi:CMMNEdge>
+
+            <cmmndi:CMMNEdge id="Connection_2_di" targetCMMNElementRef="PI_customerVerify" sourceCMMNElementRef="PI_analyzeTicket">
+                <di:waypoint x="750" y="200"/>
+                <di:waypoint x="800" y="200"/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions> 
