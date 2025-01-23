@@ -1,6 +1,5 @@
 package com.bytedesk.ticket.ticket.service;
 
-import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
@@ -39,8 +37,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class TicketRestService extends BaseRestService<TicketEntity, TicketRequest, TicketResponse> {
-
-    private final RuntimeService runtimeService;
     
     private final TaskService taskService;
     
@@ -86,14 +82,13 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
 
-        // 启动工单流程
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("ticket", ticket);
-        variables.put("reporter", ticket.getReporter());
-        
-        runtimeService.startProcessInstanceByKey("ticketProcess", ticket.getId().toString(), variables);
-        
-        return convertToResponse(ticket);
+        // 
+        TicketEntity savedTicket = save(ticket);
+        if (savedTicket == null) {
+            throw new RuntimeException("create ticket failed");
+        }
+
+        return convertToResponse(savedTicket);
     }
 
     @Override
