@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 15:32:00
+ * @LastEditTime: 2025-01-23 15:56:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,14 +13,21 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
+import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.ticket.listener.TicketEntityListener;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,7 +39,9 @@ import lombok.EqualsAndHashCode;
 @Entity(name = "bytedesk_ticket")
 public class TicketEntity extends BaseEntity {
     
+    @Column(nullable = false)
     private String title;           // 工单标题(必填)
+    
     private String description;     // 工单描述
 
     @Builder.Default
@@ -45,13 +54,17 @@ public class TicketEntity extends BaseEntity {
 
     // 一个工单一个处理人，一个处理人可以处理多个工单
     @ManyToOne
-    @JoinColumn(name = "assignee_uid")
     private AgentEntity assignee;        // 处理人
 
     // 一个工单一个报告人，一个报告人可以报告多个工单
     @ManyToOne
-    @JoinColumn(name = "reporter_uid")
     private AgentEntity reporter;        // 报告人
 
-    private String comment;        // 工单备注
+    // 工单评论
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TicketCommentEntity> comments;
+
+    // 工单附件
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TicketAttachmentEntity> attachments;
 } 
