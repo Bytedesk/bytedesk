@@ -54,6 +54,8 @@ public class TicketEntity extends BaseEntity {
     @Builder.Default
     private String priority = TicketPriorityEnum.LOW.name();        // 优先级(低/中/高/紧急)
 
+    private String threadTopic; // 工单会话主题
+
     private String categoryUid;        // 分类
 
     // 一个工单一个处理人，一个处理人可以处理多个工单

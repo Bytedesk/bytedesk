@@ -33,6 +33,7 @@ public class TicketResponse extends BaseResponse {
     private String status;
     private String priority;
     // 
+    private String threadTopic;
     private String categoryUid;
     // 
     private AgentResponse assignee;
