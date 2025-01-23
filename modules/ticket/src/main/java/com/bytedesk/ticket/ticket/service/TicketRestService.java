@@ -21,12 +21,12 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
-import com.bytedesk.ticket.statistic.TicketStatistics;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRepository;
 import com.bytedesk.ticket.ticket.TicketRequest;
@@ -53,6 +53,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     private final AuthService authService;
 
     private final UidUtils uidUtils;
+
+    private final AgentRestService agentRestService;
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
@@ -84,7 +86,15 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
-
+        // 
+        Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
+        if (assigneeOptional.isPresent()) {
+            ticket.setAssignee(assigneeOptional.get());
+        }
+        Optional<AgentEntity> reporterOptional = agentRestService.findByUid(request.getReporterUid());
+        if (reporterOptional.isPresent()) {
+            ticket.setReporter(reporterOptional.get());
+        }
         // 
         TicketEntity savedTicket = save(ticket);
         if (savedTicket == null) {
@@ -106,12 +116,12 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
         ticket.setCategoryUid(request.getCategoryUid());
-        ticket.setUpdatedAt(LocalDateTime.now());
         ticket.setStatus(request.getStatus());
-        // ticket.setAssignee(request.getAssigneeUid());
-        // ticket.setReporter(request.getReporterUid());
-        // ticket.setUpdatedAt(LocalDateTime.now());
-
+        // 
+        Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
+        if (assigneeOptional.isPresent()) {
+            ticket.setAssignee(assigneeOptional.get());
+        }
         return convertToResponse(ticket);
     }
 
@@ -131,17 +141,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         taskService.complete(getTaskIdByTicketId(ticketId),
             Map.of("approved", approved));
     }
-    
-    // @Transactional
-    // public TicketEntity updateTicket(Long id, TicketRequest ticketDTO) {
-    //     TicketEntity ticket = findTicketById(id);
-    //     ticket.setTitle(ticketDTO.getTitle());
-    //     ticket.setDescription(ticketDTO.getDescription());
-    //     ticket.setPriority(ticketDTO.getPriority());
-    //     ticket.setCategoryUid(ticketDTO.getCategoryUid());
-    //     ticket.setUpdatedAt(LocalDateTime.now());
-    //     return ticketRepository.save(ticket);
-    // }
     
     @Transactional
     public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentDTO) {
@@ -227,33 +226,15 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
-
     
-    // @Transactional
-    // public TicketEntity createTicket(TicketRequest ticketDTO) {
-    //     // 创建工单实体
-    //     TicketEntity ticket = modelMapper.map(ticketDTO, TicketEntity.class);
-    //     ticket.setUid(Utils.getUid());
-    //     ticket.setStatus("新建");
-        
-    //     // 启动工单流程
-    //     Map<String, Object> variables = new HashMap<>();
-    //     variables.put("ticket", ticket);
-    //     variables.put("reporter", ticket.getReporter());
-        
-    //     runtimeService.startProcessInstanceByKey("ticketProcess", ticket.getId().toString(), variables);
-        
-    //     return ticket;
+    // public TicketStatistics getStatistics() {
+    //     TicketStatistics stats = new TicketStatistics();
+    //     stats.setTotalTickets(ticketRepository.count());
+    //     stats.setOpenTickets(ticketRepository.countByStatusNot("已关闭"));
+    //     stats.setClosedTickets(ticketRepository.countByStatus("已关闭"));
+    //     // TODO: 计算平均解决时间和SLA违规数
+    //     return stats;
     // }
-    
-    public TicketStatistics getStatistics() {
-        TicketStatistics stats = new TicketStatistics();
-        stats.setTotalTickets(ticketRepository.count());
-        stats.setOpenTickets(ticketRepository.countByStatusNot("已关闭"));
-        stats.setClosedTickets(ticketRepository.countByStatus("已关闭"));
-        // TODO: 计算平均解决时间和SLA违规数
-        return stats;
-    }
 
     @Override
     public TicketResponse convertToResponse(TicketEntity entity) {

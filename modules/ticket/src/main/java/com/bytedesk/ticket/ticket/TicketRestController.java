@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 14:43:23
+ * @LastEditTime: 2025-01-23 17:11:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,6 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
-import com.bytedesk.ticket.statistic.TicketStatistics;
 import com.bytedesk.ticket.ticket.service.TicketRestService;
 
 @RestController
@@ -84,11 +83,6 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @PostMapping("/{id}/attachments")
     public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
         return ticketService.uploadAttachment(id, file);
-    }
-    
-    @GetMapping("/statistics")
-    public TicketStatistics getStatistics() {
-        return ticketService.getStatistics();
     }
 
     
