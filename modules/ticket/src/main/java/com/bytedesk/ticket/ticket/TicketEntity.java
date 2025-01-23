@@ -14,13 +14,16 @@
 package com.bytedesk.ticket.ticket;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.ticket.ticket.listener.TicketEntityListener;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@EntityListeners({TicketEntityListener.class})
 @Entity(name = "bytedesk_ticket")
 public class TicketEntity extends BaseEntity {
     
