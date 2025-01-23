@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-21 10:03:20
+ * @LastEditTime: 2025-01-23 14:43:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,11 +55,10 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
 
-        TicketEntity entity = ticketService.createTicket(request);
+        TicketResponse response = ticketService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(entity));
+        return ResponseEntity.ok(JsonResult.success(response));
     }
-
 
     @Override
     public ResponseEntity<?> update(TicketRequest request) {

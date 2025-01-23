@@ -22,7 +22,6 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
@@ -81,11 +80,19 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         return ticketPage.map(this::convertToResponse);
     }
 
+    @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
 
+        // 启动工单流程
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("ticket", ticket);
+        variables.put("reporter", ticket.getReporter());
+        
+        runtimeService.startProcessInstanceByKey("ticketProcess", ticket.getId().toString(), variables);
+        
         return convertToResponse(ticket);
     }
 
@@ -100,67 +107,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         return convertToResponse(ticket);
     }
 
-
-    @Override
-    public TicketEntity save(TicketEntity entity) {
-        try {
-            TicketEntity ticket = ticketRepository.save(entity);
-            // 
-            if (ticket == null) {
-                throw new RuntimeException("update ticket failed");
-            }
-            return ticket;
-        } catch (Exception e) {
-            throw new RuntimeException("update ticket failed");
-        }
-    }
-    
-    @Override
-    public void delete(TicketRequest request) {
-        deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void deleteByUid(String uid) {
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(uid);
-        if (!ticketOptional.isPresent()) {
-            throw new RuntimeException("ticket not found");
-        }
-        TicketEntity ticket = ticketOptional.get();
-        ticket.setDeleted(true);
-        save(ticket);
-    }
-
-    @Override
-    public Optional<TicketEntity> findByUid(String uid) {
-        return ticketRepository.findByUid(uid);
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    
-    @Transactional
-    public TicketEntity createTicket(TicketRequest ticketDTO) {
-        // 创建工单实体
-        TicketEntity ticket = modelMapper.map(ticketDTO, TicketEntity.class);
-        ticket.setUid(Utils.getUid());
-        ticket.setStatus("新建");
-        
-        // 启动工单流程
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("ticket", ticket);
-        variables.put("reporter", ticket.getReporter());
-        
-        runtimeService.startProcessInstanceByKey("ticketProcess", ticket.getId().toString(), variables);
-        
-        return ticket;
-    }
-    
     @Transactional
     public void assignTicket(Long ticketId, String assignee) {
         TicketEntity ticket = findTicketById(ticketId);
@@ -169,8 +115,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setUpdatedAt(LocalDateTime.now());
         
         // 更新流程变量
-        taskService.complete(getTaskIdByTicketId(ticketId), 
-            Map.of("assignee", assignee));
+        taskService.complete(getTaskIdByTicketId(ticketId), Map.of("assignee", assignee));
     }
     
     @Transactional
@@ -231,6 +176,67 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         return ticketRepository.findById(ticketId)
             .orElseThrow(() -> new RuntimeException("Ticket not found: " + ticketId));
     }
+
+
+    @Override
+    public TicketEntity save(TicketEntity entity) {
+        try {
+            TicketEntity ticket = ticketRepository.save(entity);
+            // 
+            if (ticket == null) {
+                throw new RuntimeException("update ticket failed");
+            }
+            return ticket;
+        } catch (Exception e) {
+            throw new RuntimeException("update ticket failed");
+        }
+    }
+    
+    @Override
+    public void delete(TicketRequest request) {
+        deleteByUid(request.getUid());
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(uid);
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("ticket not found");
+        }
+        TicketEntity ticket = ticketOptional.get();
+        ticket.setDeleted(true);
+        save(ticket);
+    }
+
+    @Override
+    public Optional<TicketEntity> findByUid(String uid) {
+        return ticketRepository.findByUid(uid);
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TicketEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    
+    // @Transactional
+    // public TicketEntity createTicket(TicketRequest ticketDTO) {
+    //     // 创建工单实体
+    //     TicketEntity ticket = modelMapper.map(ticketDTO, TicketEntity.class);
+    //     ticket.setUid(Utils.getUid());
+    //     ticket.setStatus("新建");
+        
+    //     // 启动工单流程
+    //     Map<String, Object> variables = new HashMap<>();
+    //     variables.put("ticket", ticket);
+    //     variables.put("reporter", ticket.getReporter());
+        
+    //     runtimeService.startProcessInstanceByKey("ticketProcess", ticket.getId().toString(), variables);
+        
+    //     return ticket;
+    // }
     
     public TicketStatistics getStatistics() {
         TicketStatistics stats = new TicketStatistics();
