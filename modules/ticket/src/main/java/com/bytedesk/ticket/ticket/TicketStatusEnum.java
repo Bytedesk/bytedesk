@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-16 14:58:38
+ * @Date: 2025-01-23 15:21:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 15:30:37
+ * @LastEditTime: 2025-01-23 15:21:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,24 +13,10 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import com.bytedesk.core.base.BaseRequest;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class TicketRequest extends BaseRequest {
-
-    private String title;
-    private String description;
-    // 
-    private String status;
-    private String priority;
-    // 
-    private String categoryUid;
-    // 
-    private String assigneeUid;
-    private String reporterUid;
-    
-} 
+// 工单状态
+public enum TicketStatusEnum {
+    NEW,
+    IN_PROGRESS,
+    RESOLVED,
+    CLOSED;
+}

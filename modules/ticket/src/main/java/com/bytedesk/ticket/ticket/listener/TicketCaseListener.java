@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 13:06:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 14:17:10
+ * @LastEditTime: 2025-01-23 15:31:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,7 +85,7 @@ public class TicketCaseListener implements CaseInstanceLifecycleListener {
         // 通知相关人员工单被终止
         ticketService.findByUid(caseInstance.getId()).ifPresent(ticket -> {
             notificationService.notifyManager(
-                ticket.getAssignee(),
+                ticket.getAssignee().getUid(),
                 String.format("工单 #%d 已被终止", ticket.getId())
             );
         });

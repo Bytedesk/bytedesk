@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 13:06:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 13:51:28
+ * @LastEditTime: 2025-01-23 15:31:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,7 +54,7 @@ public class TicketSLAService {
      * 检查工单是否违反 SLA
      */
     public boolean isSLABreached(TicketEntity ticket) {
-        Map<String, Object> sla = determineSLA(ticket.getCategory(), ticket.getPriority());
+        Map<String, Object> sla = determineSLA(ticket.getCategoryUid(), ticket.getPriority());
         
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime createdAt = ticket.getCreatedAt();
@@ -111,6 +111,6 @@ public class TicketSLAService {
             ticket.getId(),
             ticket.getCreatedAt()
         );
-        notificationService.notifyManager(ticket.getAssignee(), message);
+        notificationService.notifyManager(ticket.getAssignee().getUid(), message);
     }
 } 
