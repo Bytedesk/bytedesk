@@ -1,0 +1,27 @@
+{
+    "key": "handleTicketForm",
+    "name": "处理工单",
+    "fields": [
+        {
+            "id": "solution",
+            "name": "解决方案",
+            "type": "multi-line-text",
+            "required": true
+        },
+        {
+            "id": "timeSpent",
+            "name": "处理时长(分钟)",
+            "type": "number"
+        },
+        {
+            "id": "status",
+            "name": "状态",
+            "type": "dropdown",
+            "options": [
+                {"id": "IN_PROGRESS", "name": "处理中"},
+                {"id": "RESOLVED", "name": "已解决"},
+                {"id": "PENDING", "name": "等待客户"}
+            ]
+        }
+    ]
+} 

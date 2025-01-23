@@ -1,0 +1,38 @@
+{
+    "key": "createTicketForm",
+    "name": "创建工单",
+    "fields": [
+        {
+            "id": "title",
+            "name": "标题",
+            "type": "text",
+            "required": true
+        },
+        {
+            "id": "description",
+            "name": "描述",
+            "type": "multi-line-text"
+        },
+        {
+            "id": "priority",
+            "name": "优先级",
+            "type": "dropdown",
+            "options": [
+                {"id": "LOW", "name": "低"},
+                {"id": "MEDIUM", "name": "中"},
+                {"id": "HIGH", "name": "高"},
+                {"id": "URGENT", "name": "紧急"}
+            ]
+        },
+        {
+            "id": "category",
+            "name": "分类",
+            "type": "dropdown",
+            "options": [
+                {"id": "TECHNICAL", "name": "技术支持"},
+                {"id": "BILLING", "name": "账单问题"},
+                {"id": "GENERAL", "name": "一般咨询"}
+            ]
+        }
+    ]
+} 

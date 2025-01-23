@@ -1,0 +1,16 @@
+{
+    "key": "verifyTicketForm",
+    "name": "验证工单",
+    "fields": [
+        {
+            "id": "approved",
+            "name": "是否解决",
+            "type": "boolean"
+        },
+        {
+            "id": "feedback",
+            "name": "反馈意见",
+            "type": "multi-line-text"
+        }
+    ]
+} 
