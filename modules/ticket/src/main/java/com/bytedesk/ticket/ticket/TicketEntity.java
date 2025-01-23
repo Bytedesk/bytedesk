@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 15:56:55
+ * @LastEditTime: 2025-01-23 17:00:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,12 +31,16 @@ import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
 @EntityListeners({TicketEntityListener.class})
 @Entity(name = "bytedesk_ticket")
+@NoArgsConstructor
+@AllArgsConstructor
 public class TicketEntity extends BaseEntity {
     
     @Column(nullable = false)
