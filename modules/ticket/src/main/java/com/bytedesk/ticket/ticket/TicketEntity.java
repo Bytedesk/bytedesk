@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 17:00:53
+ * @LastEditTime: 2025-01-24 12:58:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ticket.ticket;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
@@ -64,7 +65,7 @@ public class TicketEntity extends BaseEntity {
 
     // 一个工单一个报告人，一个报告人可以报告多个工单
     @ManyToOne
-    private AgentEntity reporter;        // 报告人
+    private UserEntity reporter;        // 报告人
 
     // 工单评论
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
