@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-31 17:52:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 19:08:57
+ * @LastEditTime: 2025-01-24 22:54:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,11 +27,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Controller for "/notebase".
+ * Controller for "/nbase"，避免跟 pageRouteController 冲突, 不能使用 /notebase
  */
 @Slf4j
 @Controller
-@RequestMapping("/notebase")
+@RequestMapping("/nbase")
 @RequiredArgsConstructor
 public class NotebaseRouteController {
 

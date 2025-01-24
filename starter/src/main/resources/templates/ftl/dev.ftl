@@ -90,11 +90,13 @@
         </div>
 
         <div class="section">
-            <h3>Demo</h3>
+            <h3>Entrance</h3>
             <ul class="link-list">
                 <li><a href="/admin" target="_blank">Admin Dashboard</a></li>
                 <li><a href="/agent/chat" target="_blank">Agent Client</a></li>
                 <li><a href="/chat/demo" target="_blank">Visitor Client</a></li>
+                <li><a href="/formflow" target="_blank">Formflow</a></li>
+                <li><a href="/notebase/spaces" target="_blank">Notebase Spaces</a></li>
             </ul>
         </div>
 
@@ -102,7 +104,7 @@
             <h3>Development</h3>
             <ul class="link-list">
                 <li><a href="/swagger-ui/index.html" target="_blank">API Documentation</a></li>
-                <li><a href="/actuator" target="_blank">Monitoring</a></li>
+                <#--  <li><a href="/actuator" target="_blank">Monitoring</a></li>  -->
                 <#--  <li><a href="/flux/chat" target="_blank">Stream Output Test</a></li>  -->
                 <li><a href="/druid" target="_blank">Druid</a></li>
             </ul>
