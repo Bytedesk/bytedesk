@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-24 13:30:02
+ * @LastEditTime: 2025-01-24 14:06:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,6 +38,24 @@ public class TicketSpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+            if (StringUtils.hasText(request.getPriority())) {
+                predicates.add(criteriaBuilder.equal(root.get("priority"), request.getPriority()));
+            }
+            if (StringUtils.hasText(request.getCategoryUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
+            }
+            if (StringUtils.hasText(request.getThreadTopic())) {
+                predicates.add(criteriaBuilder.equal(root.get("threadTopic"), request.getThreadTopic()));
+            }
+            if (StringUtils.hasText(request.getAssigneeUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("assigneeUid"), request.getAssigneeUid()));
+            }
+            if (StringUtils.hasText(request.getReporterUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("reporterUid"), request.getReporterUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

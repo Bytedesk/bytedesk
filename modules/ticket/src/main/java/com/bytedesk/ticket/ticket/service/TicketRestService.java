@@ -125,6 +125,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (assigneeOptional.isPresent()) {
             ticket.setAssignee(assigneeOptional.get());
         }
+        // 
         return convertToResponse(ticket);
     }
 
