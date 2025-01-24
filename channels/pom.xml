@@ -19,8 +19,8 @@
         <!-- <module>android</module> -->
         <!-- <module>apple</module> -->
         <!-- <module>baidu</module> -->
-        <module>difyai</module>
-        <module>dingtalk</module>
+        <!-- <module>difyai</module> -->
+        <!-- <module>dingtalk</module> -->
         <!-- <module>douyin</module> -->
         <!-- <module>ebay</module> -->
         <!-- <module>email</module> -->
@@ -185,54 +185,6 @@
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency> -->
-
-        <!--
-		//////////////////////////////////付费模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
-
-		<!-- core - admin -->
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-vip-core</artifactId>
-			<version>${revision}</version>
-            <scope>provided</scope>
-		</dependency>
-
-		<!-- kbase - 知识库 -->
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-vip-kbase</artifactId>
-			<version>${revision}</version>
-            <scope>provided</scope>
-		</dependency>
-
-		<!-- service - 客服付费模块 -->
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-vip-service</artifactId>
-			<version>${revision}</version>
-            <scope>provided</scope>
-		</dependency>
-
-		<!-- flow - 流程引擎 -->
-		<!-- <dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-vip-flowbot</artifactId>
-			<version>${revision}</version>
-		</dependency> -->
-
-		<!-- team - 团队付费模块 -->
-		<!-- <dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-vip-team</artifactId>
-			<version>${revision}</version>
-		</dependency> -->
-
-		<!-- ticket - 工单 -->
-		<!-- <dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-vip-ticket</artifactId>
-			<version>${revision}</version>
-		</dependency> -->
 
         <!-- ///////////////////////////////////////////////////////////////////////////// -->
 
