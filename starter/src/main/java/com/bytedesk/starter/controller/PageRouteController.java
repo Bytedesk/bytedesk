@@ -87,6 +87,18 @@ public class PageRouteController {
 		return "forward:/chat/iframe.html";
 	}
 
+	// formflow
+	@GetMapping({"/formflow", "/formflow/", "/formflow/{path:[^\\.]*}", "/formflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	public String formflow(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
+		return "forward:/formflow/index.html"; // 默认路径
+	}
+
+	// notebase
+	@GetMapping({"/notebase", "/notebase/", "/notebase/{path:[^\\.]*}", "/notebase/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	public String notebase(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
+		return "forward:/notebase/index.html"; // 默认路径
+	}
+
 	/**
 	 * http://127.0.0.1:9003/download
 	 */
