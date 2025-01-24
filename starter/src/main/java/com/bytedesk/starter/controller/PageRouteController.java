@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-20 12:23:20
+ * @LastEditTime: 2025-01-24 20:44:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -87,13 +87,13 @@ public class PageRouteController {
 		return "forward:/chat/iframe.html";
 	}
 
-	// formflow
+	// http://127.0.0.1:9003/formflow
 	@GetMapping({"/formflow", "/formflow/", "/formflow/{path:[^\\.]*}", "/formflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
 	public String formflow(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
 		return "forward:/formflow/index.html"; // 默认路径
 	}
 
-	// notebase
+	// http://127.0.0.1:9003/notebase
 	@GetMapping({"/notebase", "/notebase/", "/notebase/{path:[^\\.]*}", "/notebase/{path:[^\\.]*}/{path2:[^\\.]*}"})
 	public String notebase(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
 		return "forward:/notebase/index.html"; // 默认路径
