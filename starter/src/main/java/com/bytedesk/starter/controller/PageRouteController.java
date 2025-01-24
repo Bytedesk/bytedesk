@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-24 20:44:55
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-01-24 23:12:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.starter.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,9 +30,9 @@ public class PageRouteController {
 	/**
 	 * http://127.0.0.1:9003
 	 */
-	@GetMapping("/index")
+	@GetMapping("/")
 	public String index() {
-		return "index";
+		return "dev";
 	}
 	
 	@GetMapping("/en")
@@ -46,13 +45,13 @@ public class PageRouteController {
 	 * 管理后台
 	 * http://127.0.0.1:9003/admin
 	 */
-	@GetMapping({"/admin", "/admin/", "/admin/{path:[^\\.]*}", "/admin/{path:[^\\.]*}/{path2:[^\\.]*}"}) 
-	public String admin(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
-		// if (path != null && path2 != null) {
-		// 	log.info("admin path: {}, {}", path, path2);
-		// } else if (path != null) {
-		// 	log.info("admin path: {}", path);
-		// }
+	@GetMapping({
+		"/admin", 
+		"/admin/", 
+		"/admin/{path:[^\\.]*}", 
+		"/admin/{path:[^\\.]*}/{path2:[^\\.]*}"}) 
+	public String admin(@PathVariable(required = false) String path, 
+						@PathVariable(required = false) String path2) {
 		return "forward:/admin/index.html"; // 默认路径
 	}
 
@@ -61,13 +60,13 @@ public class PageRouteController {
 	 * web聊天/客服端
 	 * http://127.0.0.1:9003/agent
 	 */
-	@GetMapping({"/agent", "/agent/", "/agent/{path:[^\\.]*}", "/agent/{path:[^\\.]*}/{path2:[^\\.]*}"})
-	public String agent(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
-		// if (path != null && path2 != null) {
-		// 	log.info("agent path: {}, {}", path, path2);
-		// } else if (path != null) {
-		// 	log.info("agent path: {}", path);
-		// }
+	@GetMapping({
+		"/agent", 
+		"/agent/", 
+		"/agent/{path:[^\\.]*}", 
+		"/agent/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	public String agent(@PathVariable(required = false) String path, 
+						@PathVariable(required = false) String path2) {
 		return "forward:/agent/index.html"; // 默认路径
 	}
 
@@ -76,7 +75,10 @@ public class PageRouteController {
 	 * 访客对话窗口
 	 * http://127.0.0.1:9003/chat
 	 */
-	@GetMapping({"/chat", "/chat/", "/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|server|config}"})
+	@GetMapping({
+		"/chat", 
+		"/chat/", 
+		"/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|server|config}"})
 	public String chat(@PathVariable(required = false) String type) {
 		return "forward:/chat/index.html";
 	}
@@ -88,15 +90,33 @@ public class PageRouteController {
 	}
 
 	// http://127.0.0.1:9003/formflow
-	@GetMapping({"/formflow", "/formflow/", "/formflow/{path:[^\\.]*}", "/formflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
-	public String formflow(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
+	@GetMapping({
+		"/formflow", 
+		"/formflow/", 
+		"/formflow/{path:[^\\.]*}", 
+		"/formflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	public String formflow(@PathVariable(required = false) String path, 
+							@PathVariable(required = false) String path2) {
 		return "forward:/formflow/index.html"; // 默认路径
 	}
 
-	// http://127.0.0.1:9003/notebase
-	@GetMapping({"/notebase", "/notebase/", "/notebase/{path:[^\\.]*}", "/notebase/{path:[^\\.]*}/{path2:[^\\.]*}"})
-	public String notebase(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
-		return "forward:/notebase/index.html"; // 默认路径
+	/**
+	 * notebase - React SPA
+	 * http://127.0.0.1:9003/notebase/spaces
+	 * 
+	 * 注意：
+	 * 1. 静态资源请求（包含.的路径）会被 Spring 的资源处理器处理
+	 * 2. 其他所有路径都转发到 index.html，由 React Router 处理
+	 */
+	@GetMapping({
+		"/notebase",
+		"/notebase/",
+		"/notebase/{path:[^\\.]*}",
+		"/notebase/{path:[^\\.]*}/{path2:[^\\.]*}"
+	})
+	public String notebase(@PathVariable(required = false) String path,
+						 @PathVariable(required = false) String path2) {
+		return "forward:/notebase/index.html";
 	}
 
 	/**
