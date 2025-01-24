@@ -125,8 +125,12 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (assigneeOptional.isPresent()) {
             ticket.setAssignee(assigneeOptional.get());
         }
+        TicketEntity savedTicket = save(ticket);
+        if (savedTicket == null) {
+            throw new RuntimeException("update ticket failed");
+        }
         // 
-        return convertToResponse(ticket);
+        return convertToResponse(savedTicket);
     }
 
     @Transactional
