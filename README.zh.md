@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-24 13:47:44
+ * @LastEditTime: 2025-01-24 15:50:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,6 +62,8 @@
 
 ```bash
 git clone https://gitee.com/270580156/weiyu.im.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose.yaml up -d
+# 访问地址
+http://127.0.0.1:9003/dev
 ```
 
 ### 停止容器
@@ -73,7 +75,7 @@ docker compose -p bytedesk -f docker-compose.yaml stop
 ## 演示
 
 ```bash
-http://127.0.0.1:9003/dev
+https://www.weiyuai.cn/admin/
 ```
 
 ## 开源 SDK
