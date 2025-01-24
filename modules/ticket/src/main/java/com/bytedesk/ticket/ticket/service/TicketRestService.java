@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -51,6 +52,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     private final ModelMapper modelMapper;
 
     private final AuthService authService;
+
+    private final UserRestService userRestService;
 
     private final UidUtils uidUtils;
 
@@ -91,7 +94,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (assigneeOptional.isPresent()) {
             ticket.setAssignee(assigneeOptional.get());
         }
-        Optional<AgentEntity> reporterOptional = agentRestService.findByUid(request.getReporterUid());
+        Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
         if (reporterOptional.isPresent()) {
             ticket.setReporter(reporterOptional.get());
         }
