@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-24 15:51:56
+ * @LastEditTime: 2025-01-24 16:00:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,8 +57,6 @@ Team Cooperation with AI powered Omnichannel customer service
 
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose.yaml up -d
-# access address
-http://127.0.0.1:9003/dev
 ```
 
 ### stop container
@@ -69,9 +67,8 @@ docker compose -p bytedesk -f docker-compose.yaml stop
 
 ## Preview
 
-```bash
-https://www.weiyuai.cn/admin/
-```
+- [local preview](http://127.0.0.1:9003/dev)
+- [online preview](https://www.weiyuai.cn/admin/)
 
 ## Open Source SDK
 
