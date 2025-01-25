@@ -83,7 +83,7 @@
 <body>
     <div class="container">
         <div class="section">
-            <a href="/" target="_blank">ByteDesk Website</a>
+            <a href="/" target="_blank">ByteDesk</a>
             <p>
                 username: admin@email.com, password: admin
             </p>
@@ -94,7 +94,7 @@
             <ul class="link-list">
                 <li><a href="/admin" target="_blank">Admin Dashboard</a></li>
                 <li><a href="/agent/chat" target="_blank">Agent Client</a></li>
-                <li><a href="/chat/demo" target="_blank">Visitor Client</a></li>
+                <li><a href="/chat/demo" target="_blank">Visitor Chat</a></li>
                 <li><a href="/formflow" target="_blank">Form Flow</a></li>
                 <li><a href="/notebase/spaces" target="_blank">Knowledge Base</a></li>
             </ul>
