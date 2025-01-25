@@ -105,7 +105,6 @@
             <ul class="link-list">
                 <li><a href="/swagger-ui/index.html" target="_blank">API Documentation</a></li>
                 <#--  <li><a href="/actuator" target="_blank">Monitoring</a></li>  -->
-                <#--  <li><a href="/flux/chat" target="_blank">Stream Output Test</a></li>  -->
                 <li><a href="/druid" target="_blank">Druid</a></li>
             </ul>
         </div>
