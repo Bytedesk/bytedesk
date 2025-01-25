@@ -16,7 +16,6 @@ package com.bytedesk.starter.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.ui.Model;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,9 +31,8 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003
 	 */
 	@GetMapping("/")
-	public String index(Model model) {
-		// 添加一些必要的属性到模型中（如果需要）
-		return "dev";  // 返回模板名称
+	public String index() {
+		return "dev";
 	}
 	
 	@GetMapping("/en")
