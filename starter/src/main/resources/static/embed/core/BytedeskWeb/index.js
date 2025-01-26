@@ -79,7 +79,7 @@ class M {
     }, this.config.inviteConfig.delay || 3e3);
   }
   createBubble() {
-    var a, s, h, p, c, g, x, b, E, T, I, D;
+    var a, o, h, p, c, g, x, b, E, T, I, D;
     const t = document.createElement("div");
     t.style.cssText = `
       position: fixed;
@@ -94,7 +94,7 @@ class M {
     let e = null;
     if ((a = this.config.bubbleConfig) != null && a.show) {
       e = document.createElement("div"), e.style.cssText = `
-        background: ${((s = this.config.theme) == null ? void 0 : s.mode) === "dark" ? "#1f2937" : "white"};
+        background: ${((o = this.config.theme) == null ? void 0 : o.mode) === "dark" ? "#1f2937" : "white"};
         color: ${((h = this.config.theme) == null ? void 0 : h.mode) === "dark" ? "#e5e7eb" : "#1f2937"};
         padding: 12px 16px;
         border-radius: 8px;
@@ -159,15 +159,15 @@ class M {
       position: relative;
       user-select: none;
     `;
-    const o = document.createElement("div");
-    if (o.style.cssText = `
+    const s = document.createElement("div");
+    if (s.style.cssText = `
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     `, i.icon) {
       const l = document.createElement("span");
-      l.textContent = i.icon, l.style.fontSize = `${n * 0.4}px`, o.appendChild(l);
+      l.textContent = i.icon, l.style.fontSize = `${n * 0.4}px`, s.appendChild(l);
     } else {
       const l = document.createElement("div");
       l.innerHTML = `
@@ -175,7 +175,7 @@ class M {
           <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z" 
                 fill="white"/>
         </svg>
-      `, o.appendChild(l);
+      `, s.appendChild(l);
     }
     if (i.text) {
       const l = document.createElement("span");
@@ -183,9 +183,9 @@ class M {
         color: ${((D = this.config.theme) == null ? void 0 : D.textColor) || "#ffffff"};
         font-size: ${n * 0.25}px;
         white-space: nowrap;
-      `, o.appendChild(l);
+      `, s.appendChild(l);
     }
-    if (this.bubble.appendChild(o), this.bubble.addEventListener("mouseenter", () => {
+    if (this.bubble.appendChild(s), this.bubble.addEventListener("mouseenter", () => {
       this.bubble.style.transform = "scale(1.1)";
     }), this.bubble.addEventListener("mouseleave", () => {
       this.bubble.style.transform = "scale(1)";
@@ -222,9 +222,9 @@ class M {
     return e[t] || e["zh-cn"];
   }
   createChatWindow() {
-    var s, h, p, c, g, x;
+    var o, h, p, c, g, x;
     this.window = document.createElement("div");
-    const t = window.innerWidth <= 768, e = window.innerWidth, i = window.innerHeight, n = Math.min(((s = this.config.window) == null ? void 0 : s.width) || e * 0.9, e * 0.9), o = Math.min(((h = this.config.window) == null ? void 0 : h.height) || i * 0.9, i * 0.9);
+    const t = window.innerWidth <= 768, e = window.innerWidth, i = window.innerHeight, n = Math.min(((o = this.config.window) == null ? void 0 : o.width) || e * 0.9, e * 0.9), s = Math.min(((h = this.config.window) == null ? void 0 : h.height) || i * 0.9, i * 0.9);
     t ? this.window.style.cssText = `
         position: fixed;
         left: 0;
@@ -242,7 +242,7 @@ class M {
         ${this.config.placement === "bottom-right" ? "right" : "left"}: ${this.config.marginSide}px;
         bottom: ${this.config.marginBottom}px;
         width: ${n}px;
-        height: ${o}px;
+        height: ${s}px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
         display: none;
@@ -284,12 +284,12 @@ class M {
   generateChatUrl(t = !1, e = "messages") {
     console.log("this.config: ", this.config, e);
     const i = new URLSearchParams();
-    return Object.entries(this.config.chatConfig || {}).forEach(([n, o]) => {
-      i.append(n, String(o));
-    }), Object.entries(this.config.browseConfig || {}).forEach(([n, o]) => {
-      i.append(n, String(o));
-    }), Object.entries(this.config.theme || {}).forEach(([n, o]) => {
-      i.append(n, String(o));
+    return Object.entries(this.config.chatConfig || {}).forEach(([n, s]) => {
+      i.append(n, String(s));
+    }), Object.entries(this.config.browseConfig || {}).forEach(([n, s]) => {
+      i.append(n, String(s));
+    }), Object.entries(this.config.theme || {}).forEach(([n, s]) => {
+      i.append(n, String(s));
     }), i.append("lang", this.config.locale || "zh-cn"), t && i.append("preload", "1"), `${this.config.baseUrl}?${i.toString()}`;
   }
   setupMessageListener() {
@@ -342,16 +342,16 @@ class M {
     this.hideInviteDialog(), (e = (t = this.config).onShowChat) == null || e.call(t);
   }
   hideChat() {
-    var t, e, i;
+    var t, e, i, n, s;
     if (this.window) {
       if (window.innerWidth <= 768 ? (this.window.style.transform = "translateY(100%)", setTimeout(() => {
         this.window && (this.window.style.display = "none");
       }, ((t = this.config.animation) == null ? void 0 : t.duration) || 300)) : this.window.style.display = "none", this.isVisible = !1, this.bubble) {
-        this.bubble.style.display = "inline-flex";
+        this.bubble.style.display = ((e = this.config.buttonConfig) == null ? void 0 : e.show) === !1 ? "none" : "inline-flex";
         const o = this.bubble.messageElement;
-        o instanceof HTMLElement && (o.style.display = "block");
+        o instanceof HTMLElement && (o.style.display = ((i = this.config.bubbleConfig) == null ? void 0 : i.show) === !1 ? "none" : "block");
       }
-      (i = (e = this.config).onHideChat) == null || i.call(e);
+      (s = (n = this.config).onHideChat) == null || s.call(n);
     }
   }
   minimizeWindow() {
@@ -362,9 +362,9 @@ class M {
   }
   setupResizeListener() {
     const t = () => {
-      var a, s;
+      var a, o;
       if (!this.window || !this.isVisible) return;
-      const i = window.innerWidth <= 768, n = window.innerWidth, o = window.innerHeight;
+      const i = window.innerWidth <= 768, n = window.innerWidth, s = window.innerHeight;
       if (i)
         Object.assign(this.window.style, {
           left: "0",
@@ -377,7 +377,7 @@ class M {
           borderBottomRightRadius: "0"
         });
       else {
-        let h = this.windowState === "maximized" ? n : Math.min(((a = this.config.window) == null ? void 0 : a.width) || n * 0.9, n * 0.9), p = this.windowState === "maximized" ? o : Math.min(((s = this.config.window) == null ? void 0 : s.height) || o * 0.9, o * 0.9);
+        let h = this.windowState === "maximized" ? n : Math.min(((a = this.config.window) == null ? void 0 : a.width) || n * 0.9, n * 0.9), p = this.windowState === "maximized" ? s : Math.min(((o = this.config.window) == null ? void 0 : o.height) || s * 0.9, s * 0.9);
         const c = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, g = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
         Object.assign(this.window.style, {
           width: `${h}px`,
@@ -400,8 +400,8 @@ class M {
     t && document.body.contains(t) && (document.body.removeChild(t), this.bubble = null), this.window && document.body.contains(this.window) && (document.body.removeChild(this.window), this.window = null), window.removeEventListener("resize", this.setupResizeListener.bind(this)), this.loopTimer && (window.clearTimeout(this.loopTimer), this.loopTimer = null), this.inviteDialog && document.body.contains(this.inviteDialog) && (document.body.removeChild(this.inviteDialog), this.inviteDialog = null);
   }
   createInviteDialog() {
-    var o, a;
-    if (!((o = this.config.inviteConfig) != null && o.show)) return;
+    var s, a;
+    if (!((s = this.config.inviteConfig) != null && s.show)) return;
     if (this.inviteDialog = document.createElement("div"), this.inviteDialog.style.cssText = `
       position: fixed;
       top: 50%;
@@ -416,11 +416,11 @@ class M {
       max-width: 300px;
       text-align: center;
     `, this.config.inviteConfig.icon) {
-      const s = document.createElement("div");
-      s.style.cssText = `
+      const o = document.createElement("div");
+      o.style.cssText = `
         font-size: 32px;
         margin-bottom: 12px;
-      `, s.textContent = this.config.inviteConfig.icon, this.inviteDialog.appendChild(s);
+      `, o.textContent = this.config.inviteConfig.icon, this.inviteDialog.appendChild(o);
     }
     const t = document.createElement("div");
     t.style.cssText = `
@@ -442,8 +442,8 @@ class M {
       border-radius: 4px;
       cursor: pointer;
     `, i.onclick = () => {
-      var s, h;
-      this.hideInviteDialog(), this.showChat(), (h = (s = this.config.inviteConfig) == null ? void 0 : s.onAccept) == null || h.call(s);
+      var o, h;
+      this.hideInviteDialog(), this.showChat(), (h = (o = this.config.inviteConfig) == null ? void 0 : o.onAccept) == null || h.call(o);
     };
     const n = document.createElement("button");
     n.textContent = "稍后再说", n.style.cssText = `
@@ -454,8 +454,8 @@ class M {
       border-radius: 4px;
       cursor: pointer;
     `, n.onclick = () => {
-      var s, h;
-      this.hideInviteDialog(), (h = (s = this.config.inviteConfig) == null ? void 0 : s.onReject) == null || h.call(s), this.handleInviteLoop();
+      var o, h;
+      this.hideInviteDialog(), (h = (o = this.config.inviteConfig) == null ? void 0 : o.onReject) == null || h.call(o), this.handleInviteLoop();
     }, e.appendChild(i), e.appendChild(n), this.inviteDialog.appendChild(e), document.body.appendChild(this.inviteDialog);
   }
   showInviteDialog() {
