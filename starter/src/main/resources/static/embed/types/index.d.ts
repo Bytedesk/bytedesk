@@ -4,7 +4,7 @@ declare interface Animation_2 {
     type?: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
 }
 
-declare interface BrowseParams {
+declare interface BrowseConfig {
     referrer?: string;
     url?: string;
     title?: string;
@@ -18,6 +18,14 @@ declare interface BubbleConfig {
     subtitle?: string;
 }
 
+declare interface ButtonConfig {
+    show?: boolean;
+    icon?: string;
+    text?: string;
+    size?: number;
+    onClick?: () => void;
+}
+
 export declare interface BytedeskConfig {
     isDebug?: boolean;
     isPreload?: boolean;
@@ -27,12 +35,13 @@ export declare interface BytedeskConfig {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
-    inviteParams?: InviteParams;
+    inviteConfig?: InviteConfig;
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
+    buttonConfig?: ButtonConfig;
     showSupport?: boolean;
-    chatParams?: ChatParams;
-    browseParams?: BrowseParams;
+    chatConfig?: ChatConfig;
+    browseConfig?: BrowseConfig;
     animation?: Animation_2;
     window?: WindowConfig;
     theme?: Theme;
@@ -80,14 +89,14 @@ declare class BytedeskWeb {
 }
 export default BytedeskWeb;
 
-declare interface ChatParams {
+declare interface ChatConfig {
     org: string;
     t: string;
     sid: string;
     [key: string]: string | number | undefined;
 }
 
-declare interface InviteParams {
+declare interface InviteConfig {
     show?: boolean;
     text?: string;
     icon?: string;
