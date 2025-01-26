@@ -1,6 +1,6 @@
 var D = Object.defineProperty;
-var S = (f, t, e) => t in f ? D(f, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : f[t] = e;
-var r = (f, t, e) => S(f, typeof t != "symbol" ? t + "" : t, e);
+var k = (f, t, e) => t in f ? D(f, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : f[t] = e;
+var r = (f, t, e) => k(f, typeof t != "symbol" ? t + "" : t, e);
 class $ {
   constructor(t) {
     r(this, "config");
@@ -71,7 +71,7 @@ class $ {
     }, this.config.inviteParams.delay || 3e3);
   }
   createBubble() {
-    var n, s, a, o, l, p, c, g, x, b, E;
+    var n, s, a, o, l, p, c, m, x, b, E;
     const t = document.createElement("div");
     t.style.cssText = `
       position: fixed;
@@ -106,10 +106,10 @@ class $ {
       `;
       const u = document.createElement("span");
       u.textContent = ((o = this.config.bubbleConfig) == null ? void 0 : o.icon) || "", u.style.fontSize = "20px", d.appendChild(u);
-      const w = document.createElement("div"), m = document.createElement("div");
-      m.textContent = ((l = this.config.bubbleConfig) == null ? void 0 : l.title) || "", m.style.fontWeight = "bold", m.style.color = ((p = this.config.theme) == null ? void 0 : p.mode) === "dark" ? "#e5e7eb" : "#1f2937", m.style.marginBottom = "4px", w.appendChild(m);
+      const w = document.createElement("div"), g = document.createElement("div");
+      g.textContent = ((l = this.config.bubbleConfig) == null ? void 0 : l.title) || "", g.style.fontWeight = "bold", g.style.color = ((p = this.config.theme) == null ? void 0 : p.mode) === "dark" ? "#e5e7eb" : "#1f2937", g.style.marginBottom = "4px", w.appendChild(g);
       const h = document.createElement("div");
-      h.textContent = ((c = this.config.bubbleConfig) == null ? void 0 : c.subtitle) || "", h.style.fontSize = "0.9em", h.style.color = ((g = this.config.theme) == null ? void 0 : g.mode) === "dark" ? "#9ca3af" : "#4b5563", w.appendChild(h), d.appendChild(w), e.appendChild(d);
+      h.textContent = ((c = this.config.bubbleConfig) == null ? void 0 : c.subtitle) || "", h.style.fontSize = "0.9em", h.style.color = ((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#9ca3af" : "#4b5563", w.appendChild(h), d.appendChild(w), e.appendChild(d);
       const y = document.createElement("div");
       y.style.cssText = `
         position: absolute;
@@ -164,13 +164,13 @@ class $ {
     }), this.bubble.addEventListener("mouseleave", () => {
       this.bubble.style.transform = "scale(1)";
     }), t.appendChild(this.bubble), this.config.draggable) {
-      let d = 0, u = 0, w = 0, m = 0;
+      let d = 0, u = 0, w = 0, g = 0;
       this.bubble.addEventListener("mousedown", (h) => {
-        h.button === 0 && (this.isDragging = !0, d = h.clientX, u = h.clientY, w = t.offsetLeft, m = t.offsetTop, t.style.transition = "none");
+        h.button === 0 && (this.isDragging = !0, d = h.clientX, u = h.clientY, w = t.offsetLeft, g = t.offsetTop, t.style.transition = "none");
       }), document.addEventListener("mousemove", (h) => {
         if (!this.isDragging) return;
         h.preventDefault();
-        const y = h.clientX - d, v = h.clientY - u, C = w + y, T = m + v, I = window.innerHeight - t.offsetHeight;
+        const y = h.clientX - d, v = h.clientY - u, C = w + y, T = g + v, I = window.innerHeight - t.offsetHeight;
         C <= window.innerWidth / 2 ? (t.style.left = `${Math.max(0, C)}px`, t.style.right = "auto", this.config.placement = "bottom-left") : (t.style.right = `${Math.max(0, window.innerWidth - C - t.offsetWidth)}px`, t.style.left = "auto", this.config.placement = "bottom-right"), t.style.bottom = `${Math.min(Math.max(0, window.innerHeight - T - t.offsetHeight), I)}px`;
       }), document.addEventListener("mouseup", () => {
         this.isDragging && (this.isDragging = !1, t.style.transition = "all 0.3s ease", this.config.marginSide = parseInt(
@@ -196,7 +196,7 @@ class $ {
     return e[t] || e["zh-cn"];
   }
   createChatWindow() {
-    var o, l, p, c, g, x;
+    var o, l, p, c, m, x;
     this.window = document.createElement("div");
     const t = window.innerWidth <= 768, e = window.innerWidth, i = window.innerHeight, n = Math.min(((o = this.config.window) == null ? void 0 : o.width) || e * 0.9, e * 0.9), s = Math.min(((l = this.config.window) == null ? void 0 : l.height) || i * 0.9, i * 0.9);
     t ? this.window.style.cssText = `
@@ -222,7 +222,7 @@ class $ {
         display: none;
         overflow: hidden;
         z-index: 10000;
-        transition: all ${(g = this.config.animation) == null ? void 0 : g.duration}ms ${(x = this.config.animation) == null ? void 0 : x.type};
+        transition: all ${(m = this.config.animation) == null ? void 0 : m.duration}ms ${(x = this.config.animation) == null ? void 0 : x.type};
       `;
     const a = document.createElement("iframe");
     if (a.style.cssText = `
@@ -352,12 +352,12 @@ class $ {
         });
       else {
         let l = this.windowState === "maximized" ? n : Math.min(((a = this.config.window) == null ? void 0 : a.width) || n * 0.9, n * 0.9), p = this.windowState === "maximized" ? s : Math.min(((o = this.config.window) == null ? void 0 : o.height) || s * 0.9, s * 0.9);
-        const c = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, g = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
+        const c = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, m = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
         Object.assign(this.window.style, {
           width: `${l}px`,
           height: `${p}px`,
           right: c ? `${c}px` : "auto",
-          left: g ? `${g}px` : "auto",
+          left: m ? `${m}px` : "auto",
           bottom: `${this.config.marginBottom}px`,
           borderRadius: this.windowState === "maximized" ? "0" : "12px"
         });
@@ -432,12 +432,6 @@ class $ {
       this.hideInviteDialog(), (l = (o = this.config.inviteParams) == null ? void 0 : o.onReject) == null || l.call(o), this.handleInviteLoop();
     }, e.appendChild(i), e.appendChild(n), this.inviteDialog.appendChild(e), document.body.appendChild(this.inviteDialog);
   }
-  handleInviteLoop() {
-    const { loop: t, loopDelay: e = 3e3, loopCount: i = 1 / 0 } = this.config.inviteParams || {};
-    !t || this.loopCount >= i - 1 || (this.loopTimer && window.clearTimeout(this.loopTimer), this.loopTimer = window.setTimeout(() => {
-      this.loopCount++, this.showInviteDialog();
-    }, e));
-  }
   showInviteDialog() {
     var t, e;
     this.inviteDialog && (this.inviteDialog.style.display = "block", (e = (t = this.config.inviteParams) == null ? void 0 : t.onOpen) == null || e.call(t));
@@ -445,6 +439,34 @@ class $ {
   hideInviteDialog() {
     var t, e;
     this.inviteDialog && (this.inviteDialog.style.display = "none", (e = (t = this.config.inviteParams) == null ? void 0 : t.onClose) == null || e.call(t));
+  }
+  handleInviteLoop() {
+    const { loop: t, loopDelay: e = 3e3, loopCount: i = 1 / 0 } = this.config.inviteParams || {};
+    !t || this.loopCount >= i - 1 || (this.loopTimer && window.clearTimeout(this.loopTimer), this.loopTimer = window.setTimeout(() => {
+      this.loopCount++, this.showInviteDialog();
+    }, e));
+  }
+  showButton() {
+    this.bubble && (this.bubble.style.display = "inline-flex");
+  }
+  hideButton() {
+    this.bubble && (this.bubble.style.display = "none");
+  }
+  showBubble() {
+    if (this.bubble) {
+      const t = this.bubble.messageElement;
+      t instanceof HTMLElement && (t.style.display = "block", setTimeout(() => {
+        t.style.opacity = "1", t.style.transform = "translateY(0)";
+      }, 100));
+    }
+  }
+  hideBubble() {
+    if (this.bubble) {
+      const t = this.bubble.messageElement;
+      t instanceof HTMLElement && (t.style.opacity = "0", t.style.transform = "translateY(10px)", setTimeout(() => {
+        t.style.display = "none";
+      }, 300));
+    }
   }
 }
 export {

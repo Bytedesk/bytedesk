@@ -70,9 +70,13 @@ declare class BytedeskWeb {
     private setupResizeListener;
     destroy(): void;
     private createInviteDialog;
-    private handleInviteLoop;
-    private showInviteDialog;
-    private hideInviteDialog;
+    showInviteDialog(): void;
+    hideInviteDialog(): void;
+    handleInviteLoop(): void;
+    showButton(): void;
+    hideButton(): void;
+    showBubble(): void;
+    hideBubble(): void;
 }
 export default BytedeskWeb;
 
