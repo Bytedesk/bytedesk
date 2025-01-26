@@ -1,6 +1,6 @@
 var k = Object.defineProperty;
-var z = (p, t, e) => t in p ? k(p, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : p[t] = e;
-var r = (p, t, e) => z(p, typeof t != "symbol" ? t + "" : t, e);
+var z = (m, t, e) => t in m ? k(m, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : m[t] = e;
+var r = (m, t, e) => z(m, typeof t != "symbol" ? t + "" : t, e);
 class M {
   constructor(t) {
     r(this, "config");
@@ -47,7 +47,7 @@ class M {
         }
       },
       showSupport: !0,
-      chatParams: {
+      chatConfig: {
         org: "df_org_uid",
         t: "2",
         sid: "df_rt_uid"
@@ -79,7 +79,7 @@ class M {
     }, this.config.inviteConfig.delay || 3e3);
   }
   createBubble() {
-    var a, s, h, m, c, g, x, b, E, T, I, D;
+    var a, s, h, p, c, g, x, b, E, T, I, D;
     const t = document.createElement("div");
     t.style.cssText = `
       position: fixed;
@@ -113,7 +113,7 @@ class M {
         gap: 8px;
       `;
       const u = document.createElement("span");
-      u.textContent = ((m = this.config.bubbleConfig) == null ? void 0 : m.icon) || "", u.style.fontSize = "20px", l.appendChild(u);
+      u.textContent = ((p = this.config.bubbleConfig) == null ? void 0 : p.icon) || "", u.style.fontSize = "20px", l.appendChild(u);
       const w = document.createElement("div"), f = document.createElement("div");
       f.textContent = ((c = this.config.bubbleConfig) == null ? void 0 : c.title) || "", f.style.fontWeight = "bold", f.style.color = ((g = this.config.theme) == null ? void 0 : g.mode) === "dark" ? "#e5e7eb" : "#1f2937", f.style.marginBottom = "4px", w.appendChild(f);
       const d = document.createElement("div");
@@ -222,7 +222,7 @@ class M {
     return e[t] || e["zh-cn"];
   }
   createChatWindow() {
-    var s, h, m, c, g, x;
+    var s, h, p, c, g, x;
     this.window = document.createElement("div");
     const t = window.innerWidth <= 768, e = window.innerWidth, i = window.innerHeight, n = Math.min(((s = this.config.window) == null ? void 0 : s.width) || e * 0.9, e * 0.9), o = Math.min(((h = this.config.window) == null ? void 0 : h.height) || i * 0.9, i * 0.9);
     t ? this.window.style.cssText = `
@@ -236,7 +236,7 @@ class M {
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
-        transition: all ${(m = this.config.animation) == null ? void 0 : m.duration}ms ${(c = this.config.animation) == null ? void 0 : c.type};
+        transition: all ${(p = this.config.animation) == null ? void 0 : p.duration}ms ${(c = this.config.animation) == null ? void 0 : c.type};
       ` : this.window.style.cssText = `
         position: fixed;
         ${this.config.placement === "bottom-right" ? "right" : "left"}: ${this.config.marginSide}px;
@@ -377,11 +377,11 @@ class M {
           borderBottomRightRadius: "0"
         });
       else {
-        let h = this.windowState === "maximized" ? n : Math.min(((a = this.config.window) == null ? void 0 : a.width) || n * 0.9, n * 0.9), m = this.windowState === "maximized" ? o : Math.min(((s = this.config.window) == null ? void 0 : s.height) || o * 0.9, o * 0.9);
+        let h = this.windowState === "maximized" ? n : Math.min(((a = this.config.window) == null ? void 0 : a.width) || n * 0.9, n * 0.9), p = this.windowState === "maximized" ? o : Math.min(((s = this.config.window) == null ? void 0 : s.height) || o * 0.9, o * 0.9);
         const c = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, g = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
         Object.assign(this.window.style, {
           width: `${h}px`,
-          height: `${m}px`,
+          height: `${p}px`,
           right: c ? `${c}px` : "auto",
           left: g ? `${g}px` : "auto",
           bottom: `${this.config.marginBottom}px`,
