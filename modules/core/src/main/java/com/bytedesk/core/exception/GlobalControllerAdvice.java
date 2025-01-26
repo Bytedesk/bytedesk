@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 16:19:32
+ * @LastEditTime: 2025-01-26 09:43:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,9 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+// import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -35,7 +36,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@ControllerAdvice
+// @ControllerAdvice
+@RestControllerAdvice
 public class GlobalControllerAdvice {
 
     // @Autowired
@@ -93,9 +95,8 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException e) {
-        // 
-        if (e.getMessage().contains("/vip/") 
-            || e.getMessage().contains("/wechat/")) {
+        // || e.getMessage().contains("/wechat/")
+        if (e.getMessage().contains("/vip/") ) {
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
         }
         // 

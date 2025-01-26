@@ -89,15 +89,15 @@ public class PageRouteController {
 		return "forward:/chat/iframe.html";
 	}
 
-	// http://127.0.0.1:9003/formflow
+	// http://127.0.0.1:9003/agentflow
 	@GetMapping({
-		"/formflow", 
-		"/formflow/", 
-		"/formflow/{path:[^\\.]*}", 
-		"/formflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
-	public String formflow(@PathVariable(required = false) String path, 
+		"/agentflow", 
+		"/agentflow/", 
+		"/agentflow/{path:[^\\.]*}", 
+		"/agentflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	public String agentflow(@PathVariable(required = false) String path, 
 							@PathVariable(required = false) String path2) {
-		return "forward:/formflow/index.html"; // 默认路径
+		return "forward:/agentflow/index.html"; // 默认路径
 	}
 
 	/**
