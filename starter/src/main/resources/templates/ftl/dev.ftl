@@ -95,7 +95,7 @@
                 <li><a href="/admin" target="_blank">Admin Dashboard</a></li>
                 <li><a href="/agent/chat" target="_blank">Agent Client</a></li>
                 <li><a href="/chat/demo" target="_blank">Visitor Chat</a></li>
-                <li><a href="/formflow" target="_blank">Form Flow</a></li>
+                <li><a href="/formflow" target="_blank">Work Flow</a></li>
                 <li><a href="/notebase/spaces" target="_blank">Knowledge Base</a></li>
             </ul>
         </div>

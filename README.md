@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-25 09:34:30
+ * @LastEditTime: 2025-01-26 09:00:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,12 +32,6 @@ Team Cooperation with AI powered Omnichannel customer service
 - Permission management
 - ...
 
-### AI Chat
-
-- Chat with LLM
-- Chat with Knowledge base(RAG)
-- ...
-
 ### Customer Service
 
 - Support multiple channels
@@ -45,11 +39,23 @@ Team Cooperation with AI powered Omnichannel customer service
 - Seating workbench
 - ...
 
+### Knowledge Base
+
+- Internal Docs
+- HelpCenter
+- ...
+
 ### Ticket
 
 - Ticket management
 - Ticket SLA management
 - Ticket statistics and reports
+- ...
+
+### AI Chat
+
+- Chat with LLM
+- Chat with Knowledge base(RAG)
 - ...
 
 ## Docker Quick Start
