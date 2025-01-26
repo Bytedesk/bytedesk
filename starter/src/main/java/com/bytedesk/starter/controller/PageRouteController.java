@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-01-24 23:12:50
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-01-26 10:29:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,15 +89,15 @@ public class PageRouteController {
 		return "forward:/chat/iframe.html";
 	}
 
-	// http://127.0.0.1:9003/agentflow
+	// http://127.0.0.1:9003/agenticflow
 	@GetMapping({
-		"/agentflow", 
-		"/agentflow/", 
-		"/agentflow/{path:[^\\.]*}", 
-		"/agentflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
-	public String agentflow(@PathVariable(required = false) String path, 
+		"/agenticflow", 
+		"/agenticflow/", 
+		"/agenticflow/{path:[^\\.]*}", 
+		"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
+	public String agenticflow(@PathVariable(required = false) String path, 
 							@PathVariable(required = false) String path2) {
-		return "forward:/agentflow/index.html"; // 默认路径
+		return "forward:/agenticflow/index.html"; // 默认路径
 	}
 
 	/**
