@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-28 10:24:06
+ * @LastEditTime: 2025-01-28 10:51:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,9 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.RuntimeService;
-import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEventListener;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -34,51 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TicketEventListener implements FlowableEventListener {
+public class TicketEventListener {
 
     private final RuntimeService runtimeService;
-
-    @Override
-    public void onEvent(FlowableEvent event) {
-        String eventType = event.getType().name();
-        log.info("Flowable event received: {}", eventType);
-
-        if (event.getType() == FlowableEngineEventType.PROCESS_STARTED) {
-            handleProcessStarted(event);
-        } else if (event.getType() == FlowableEngineEventType.PROCESS_COMPLETED) {
-            handleProcessCompleted(event);
-        } else if (event.getType() == FlowableEngineEventType.TASK_CREATED) {
-            handleTaskCreated(event);
-        }
-        // 可以添加更多事件类型的处理
-    }
-
-    private void handleProcessStarted(FlowableEvent event) {
-        log.info("Process started event: {}", event);
-        // TODO: 处理流程启动事件
-    }
-
-    private void handleProcessCompleted(FlowableEvent event) {
-        log.info("Process completed event: {}", event);
-        // TODO: 处理流程完成事件
-    }
-
-    private void handleTaskCreated(FlowableEvent event) {
-        log.info("Task created event: {}", event);
-        // TODO: 处理任务创建事件
-    }
-
-    @Override
-    public boolean isFailOnException() {
-        // 发生异常时是否终止流程
-        return false;
-    }
-
-    @Override
-    public boolean isFireOnTransactionEnabled() {
-        // 是否在事务中触发
-        return false;
-    }
 
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
@@ -100,5 +55,6 @@ public class TicketEventListener implements FlowableEventListener {
     public void handleTicketUpdateEvent(TicketUpdateEvent event) {
         log.info("TicketEventListener handleTicketUpdateEvent: {}", event);
     }
+    
 }
 
