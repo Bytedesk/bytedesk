@@ -14,7 +14,7 @@
         <!-- 优先级评估 -->
         <sequenceFlow sourceRef="start" targetRef="evaluatePriority"/>
         <serviceTask id="evaluatePriority" name="优先级评估"
-            flowable:class="com.bytedesk.flowable.ticket.delegate.EvaluatePriorityDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.EvaluatePriorityDelegate"/>
         
         <!-- 紧急工单处理 -->
         <sequenceFlow sourceRef="evaluatePriority" targetRef="priorityGateway"/>
@@ -27,7 +27,7 @@
         </sequenceFlow>
         
         <serviceTask id="escalateTicket" name="升级工单"
-            flowable:class="com.bytedesk.flowable.ticket.delegate.EscalateTicketDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.EscalateTicketDelegate"/>
         
         <!-- 分配处理人 -->
         <sequenceFlow sourceRef="priorityGateway" targetRef="assignTicket">
@@ -57,7 +57,7 @@
         </boundaryEvent>
         <sequenceFlow sourceRef="slaTimer" targetRef="slaBreachNotification"/>
         <serviceTask id="slaBreachNotification" name="SLA违规通知"
-            flowable:class="com.bytedesk.flowable.ticket.delegate.SLABreachNotificationDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.SLABreachNotificationDelegate"/>
         <sequenceFlow sourceRef="slaBreachNotification" targetRef="handleTicket"/>
         
         <!-- 客户验证 -->
@@ -123,13 +123,13 @@
         </boundaryEvent>
         <sequenceFlow sourceRef="surveyTimer" targetRef="autoCloseTicket"/>
         <serviceTask id="autoCloseTicket" name="自动关闭工单"
-            flowable:class="com.bytedesk.flowable.ticket.delegate.AutoCloseTicketDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.AutoCloseTicketDelegate"/>
         <sequenceFlow sourceRef="autoCloseTicket" targetRef="end"/>
         
         <!-- 正常关闭工单 -->
         <sequenceFlow sourceRef="satisfactionSurvey" targetRef="closeTicket"/>
         <serviceTask id="closeTicket" name="关闭工单"
-            flowable:class="com.bytedesk.flowable.ticket.delegate.CloseTicketDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.CloseTicketDelegate"/>
         <sequenceFlow sourceRef="closeTicket" targetRef="end"/>
         
         <endEvent id="end" name="工单结束"/>
