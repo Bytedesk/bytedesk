@@ -35,7 +35,7 @@ services:
       - bytedesk-redis
     environment:
       # db config
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-bytedesk:3306/bytedesk_im
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-bytedesk:3306/bytedesk_im?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: r8FqfdbWUaN3
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
