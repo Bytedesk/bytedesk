@@ -90,7 +90,7 @@
         </div>
 
         <div class="section">
-            <h3>Entrance</h3>
+            <h3>System Entrance</h3>
             <ul class="link-list">
                 <li><a href="/admin/" target="_blank">Admin Dashboard</a></li>
                 <li><a href="/agent/chat" target="_blank">Agent Client</a></li>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="section">
-            <h3>Development</h3>
+            <h3>System Development</h3>
             <ul class="link-list">
                 <li><a href="/swagger-ui/index.html" target="_blank">API Documentation</a></li>
                 <#--  <li><a href="/actuator" target="_blank">Monitoring</a></li>  -->
