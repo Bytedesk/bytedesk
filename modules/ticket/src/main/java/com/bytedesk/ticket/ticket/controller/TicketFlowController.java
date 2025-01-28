@@ -112,4 +112,40 @@ public class TicketFlowController {
         ticketFlowService.activateTicketProcess(processInstanceId);
         return ResponseEntity.ok(JsonResult.success());
     }
+
+    @PutMapping("/task/{taskId}/verify")
+    @Operation(summary = "客户验证工单处理结果")
+    public ResponseEntity<JsonResult<Boolean>> verifyTicket(
+            @PathVariable String taskId,
+            @RequestParam boolean approved) {
+        ticketFlowService.verifyTicket(taskId, approved);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @PutMapping("/task/{taskId}/survey")
+    @Operation(summary = "提交满意度评价")
+    public ResponseEntity<JsonResult<Boolean>> submitSurvey(
+            @PathVariable String taskId,
+            @RequestParam int rating,
+            @RequestParam String comment) {
+        ticketFlowService.submitSatisfactionSurvey(taskId, rating, comment);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @PutMapping("/task/{taskId}/review")
+    @Operation(summary = "主管审核")
+    public ResponseEntity<JsonResult<Boolean>> supervisorReview(
+            @PathVariable String taskId,
+            @RequestParam boolean reassign) {
+        ticketFlowService.supervisorReview(taskId, reassign);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @GetMapping("/tasks/group/{groupId}")
+    @Operation(summary = "查询组任务")
+    public ResponseEntity<JsonResult<List<Task>>> getGroupTasks(
+            @PathVariable String groupId) {
+        List<Task> tasks = ticketFlowService.queryGroupTasks(groupId);
+        return ResponseEntity.ok(JsonResult.success(tasks));
+    }
 } 
