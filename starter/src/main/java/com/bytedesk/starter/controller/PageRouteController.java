@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-27 12:19:54
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-01-28 23:52:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ui.Model;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Controller for "/".
@@ -31,13 +34,75 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003
 	 */
 	@GetMapping("/")
-	public String index() {
-		return "dev";
-	}
-	
-	@GetMapping("/en")
-	public String indexEn() {
-		return "en/index";
+	public String index(Model model) {
+		try {
+			// 添加语言选项
+			Map<String, String> languages = new HashMap<>();
+			languages.put("en", "English");
+			languages.put("zh", "简体中文");
+			languages.put("zh-TW", "繁體中文");
+			model.addAttribute("languages", languages);
+			
+			// 添加多语言文本
+			Map<String, Map<String, String>> i18n = new HashMap<>();
+			
+			// 英文
+			Map<String, String> en = new HashMap<>();
+			en.put("title", "ByteDesk");
+			en.put("systemEntrance", "System Entrance");
+			en.put("systemDevelopment", "System Development");
+			en.put("adminDashboard", "Admin Dashboard");
+			en.put("agentClient", "Agent Client");
+			en.put("visitorChat", "Visitor Chat");
+			en.put("workFlow", "Work Flow");
+			en.put("knowledgeBase", "Knowledge Base");
+			en.put("helpCenter", "Help Center");
+			en.put("apiDoc", "API Documentation");
+			en.put("monitoring", "Monitoring");
+			
+			// 简体中文
+			Map<String, String> zh = new HashMap<>();
+			zh.put("title", "微语");
+			zh.put("systemEntrance", "系统入口");
+			zh.put("systemDevelopment", "开发工具");
+			zh.put("adminDashboard", "管理后台");
+			zh.put("agentClient", "客服工作台");
+			zh.put("visitorChat", "访客对话");
+			zh.put("workFlow", "工单系统");
+			zh.put("knowledgeBase", "知识库");
+			zh.put("helpCenter", "帮助中心");
+			zh.put("apiDoc", "API 文档");
+			zh.put("monitoring", "系统监控");
+			
+			// 繁体中文
+			Map<String, String> zhTW = new HashMap<>();
+			zhTW.put("title", "微语");
+			zhTW.put("systemEntrance", "系統入口");
+			zhTW.put("systemDevelopment", "開發工具");
+			zhTW.put("adminDashboard", "管理後台");
+			zhTW.put("agentClient", "客服工作台");
+			zhTW.put("visitorChat", "訪客對話");
+			zhTW.put("workFlow", "工單系統");
+			zhTW.put("knowledgeBase", "知識庫");
+			zhTW.put("helpCenter", "幫助中心");
+			zhTW.put("apiDoc", "API 文檔");
+			zhTW.put("monitoring", "系統監控");
+			
+			i18n.put("en", en);
+			i18n.put("zh", zh);
+			i18n.put("zh-TW", zhTW);
+			
+			model.addAttribute("i18n", i18n);
+
+			// 添加调试信息
+			log.info("Languages: {}", languages);
+			log.info("I18n: {}", i18n);
+
+			return "dev";
+		} catch (Exception e) {
+			log.error("Error rendering index page", e);
+			throw e;
+		}
 	}
 
 	/**

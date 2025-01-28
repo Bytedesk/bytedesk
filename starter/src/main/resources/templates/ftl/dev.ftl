@@ -1,114 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.ico">
-    <title>ByteDesk</title>
+    <title>微语</title>
     <style>
+        :root {
+            /* 浅色主题变量 */
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --link-color: #3498db;
+            --link-hover-color: #2980b9;
+            --border-color: #eeeeee;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --heading-color: #2c3e50;
+            --arrow-color: #95a5a6;
+        }
+
+        [data-theme="dark"] {
+            /* 深色主题变量 */
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --link-color: #61dafb;
+            --link-hover-color: #4fa9d6;
+            --border-color: #404040;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --heading-color: #e0e0e0;
+            --arrow-color: #808080;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
             padding: 2rem;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
+            background: var(--container-bg);
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 15px var(--shadow-color);
+            transition: background-color 0.3s;
         }
 
-        h3 {
-            color: #2c3e50;
+        .theme-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            background: var(--container-bg);
+            padding: 0.5rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .theme-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            background: var(--link-color);
+            color: var(--container-bg);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .theme-btn:hover {
+            background: var(--link-hover-color);
+        }
+
+        .theme-btn.active {
+            background: var(--heading-color);
+        }
+
+        h1, h2 {
+            color: var(--heading-color);
             margin: 1.5rem 0 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid #eee;
-            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
         }
 
         a {
-            color: #3498db;
+            color: var(--link-color);
             text-decoration: none;
-            padding: 0.5rem 0;
-            display: inline-block;
             transition: color 0.2s;
         }
 
         a:hover {
-            color: #2980b9;
+            color: var(--link-hover-color);
             text-decoration: underline;
         }
 
-        .section {
-            margin-bottom: 2rem;
-        }
-
-        .section:last-child {
-            margin-bottom: 0;
-        }
-
-        .section-title {
-            font-size: 1.25rem;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-
-        .link-list {
+        ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
 
-        .link-list li {
-            margin-bottom: 0.5rem;
+        li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
         }
 
-        .link-list a {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .link-list a:before {
+        li::before {
             content: "→";
-            margin-right: 0.5rem;
-            color: #95a5a6;
+            position: absolute;
+            left: 0;
+            color: var(--arrow-color);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="section">
-            <a href="/" target="_blank">ByteDesk</a>
-            <p>
-                username: admin@email.com, password: admin
-            </p>
-        </div>
-
-        <div class="section">
-            <h3>System Entrance</h3>
-            <ul class="link-list">
-                <li><a href="/admin/" target="_blank">Admin Dashboard</a></li>
-                <li><a href="/agent/chat" target="_blank">Agent Client</a></li>
-                <li><a href="/chat/demo" target="_blank">Visitor Chat</a></li>
-                <li><a href="/agenticflow/" target="_blank">Work Flow</a></li>
-                <li><a href="/notebase/spaces" target="_blank">Knowledge Base</a></li>
-                <li><a href="/kbase/" target="_blank">Help Center</a></li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h3>System Development</h3>
-            <ul class="link-list">
-                <li><a href="/swagger-ui/index.html" target="_blank">API Documentation</a></li>
-                <#--  <li><a href="/actuator" target="_blank">Monitoring</a></li>  -->
-                <li><a href="/druid" target="_blank">Druid</a></li>
-            </ul>
-        </div>
+    <div class="theme-switcher">
+        <button class="theme-btn" onclick="setTheme('light')" title="浅色主题">🌞</button>
+        <button class="theme-btn" onclick="setTheme('dark')" title="深色主题">🌙</button>
+        <button class="theme-btn" onclick="setTheme('system')" title="跟随系统">💻</button>
     </div>
+
+    <div class="container">
+        <h1>微语</h1>
+        <p>
+            username: admin@email.com<br>
+            password: admin
+        </p>
+
+        <h2>系统入口</h2>
+        <ul>
+            <li><a href="/admin/" target="_blank">管理后台</a></li>
+            <li><a href="/agent/chat" target="_blank">客服工作台</a></li>
+            <li><a href="/chat/demo" target="_blank">访客对话</a></li>
+            <li><a href="/agenticflow/" target="_blank">工单系统</a></li>
+            <li><a href="/notebase/spaces" target="_blank">知识库</a></li>
+            <li><a href="/kbase/" target="_blank">帮助中心</a></li>
+        </ul>
+
+        <h2>开发工具</h2>
+        <ul>
+            <li><a href="/swagger-ui/index.html" target="_blank">API 文档</a></li>
+            <li><a href="/druid" target="_blank">Druid</a></li>
+        </ul>
+    </div>
+
+    <script>
+        function setTheme(theme) {
+            if (theme === 'system') {
+                document.documentElement.removeAttribute('data-theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            localStorage.setItem('preferred-theme', theme);
+            updateThemeButtons(theme);
+        }
+
+        function updateThemeButtons(activeTheme) {
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.theme-btn[onclick*="' + activeTheme + '"]').classList.add('active');
+        }
+
+        // 初始化主题
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('preferred-theme') || 'system';
+            setTheme(savedTheme);
+
+            // 监听系统主题变化
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (localStorage.getItem('preferred-theme') === 'system') {
+                    document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+
+        // 初始化
+        initializeTheme();
+    </script>
 </body>
 </html>
