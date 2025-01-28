@@ -141,4 +141,55 @@ public class TicketFlowService {
         log.info("activate process: {}", processInstanceId);
         runtimeService.activateProcessInstanceById(processInstanceId);
     }
+
+    /**
+     * 客户验证工单处理结果
+     */
+    public void verifyTicket(String taskId, boolean approved) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", approved);
+        taskService.complete(taskId, variables);
+    }
+
+    /**
+     * 提交满意度评价
+     */
+    public void submitSatisfactionSurvey(String taskId, int rating, String comment) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("satisfaction", rating);
+        variables.put("comment", comment);
+        taskService.complete(taskId, variables);
+    }
+
+    /**
+     * 主管审核
+     */
+    public void supervisorReview(String taskId, boolean reassign) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("reassign", reassign);
+        taskService.complete(taskId, variables);
+    }
+
+    /**
+     * 查询待处理的工单任务
+     */
+    public List<Task> queryPendingTasks(String processInstanceId) {
+        return taskService.createTaskQuery()
+            .processInstanceId(processInstanceId)
+            .active()
+            .orderByTaskCreateTime()
+            .desc()
+            .list();
+    }
+
+    /**
+     * 查询组任务（如经理组的任务）
+     */
+    public List<Task> queryGroupTasks(String groupId) {
+        return taskService.createTaskQuery()
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
+            .taskCandidateGroup(groupId)
+            .active()
+            .list();
+    }
 } 
