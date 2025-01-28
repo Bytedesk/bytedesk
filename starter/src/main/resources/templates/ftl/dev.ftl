@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.ico">
-    <title>微语</title>
+    <title>${i18n['en']["title"]}</title>
     <style>
         :root {
             /* 浅色主题变量 */
@@ -17,6 +17,8 @@
             --shadow-color: rgba(0, 0, 0, 0.1);
             --heading-color: #2c3e50;
             --arrow-color: #95a5a6;
+            --button-bg: #3498db;
+            --button-active: #2c3e50;
         }
 
         [data-theme="dark"] {
@@ -30,6 +32,8 @@
             --shadow-color: rgba(0, 0, 0, 0.3);
             --heading-color: #e0e0e0;
             --arrow-color: #808080;
+            --button-bg: #4a4a4a;
+            --button-active: #61dafb;
         }
 
         body {
@@ -51,10 +55,15 @@
             transition: background-color 0.3s;
         }
 
-        .theme-switcher {
+        .switchers {
             position: fixed;
             top: 1rem;
             right: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .language-switcher, .theme-switcher {
             display: flex;
             gap: 0.5rem;
             background: var(--container-bg);
@@ -63,22 +72,22 @@
             box-shadow: 0 2px 10px var(--shadow-color);
         }
 
-        .theme-btn {
-            padding: 0.5rem;
+        button {
+            padding: 0.5rem 1rem;
             border: none;
             border-radius: 4px;
-            background: var(--link-color);
-            color: var(--container-bg);
+            background: var(--button-bg);
+            color: white;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
-        .theme-btn:hover {
+        button:hover {
             background: var(--link-hover-color);
         }
 
-        .theme-btn.active {
-            background: var(--heading-color);
+        button.active {
+            background: var(--button-active);
         }
 
         h1, h2 {
@@ -117,74 +126,115 @@
             left: 0;
             color: var(--arrow-color);
         }
+
+        [lang] {
+            display: none;
+        }
+
+        [lang].active {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div class="theme-switcher">
-        <button class="theme-btn" onclick="setTheme('light')" title="浅色主题">🌞</button>
-        <button class="theme-btn" onclick="setTheme('dark')" title="深色主题">🌙</button>
-        <button class="theme-btn" onclick="setTheme('system')" title="跟随系统">💻</button>
+    <div class="switchers">
+        <div class="language-switcher">
+            <#list languages?keys as lang>
+                <button onclick="setLanguage('${lang}')">${languages[lang]}</button>
+            </#list>
+        </div>
+        <div class="theme-switcher">
+            <button onclick="setTheme('light')" title="浅色主题">🌞</button>
+            <button onclick="setTheme('dark')" title="深色主题">🌙</button>
+            <button onclick="setTheme('system')" title="跟随系统">💻</button>
+        </div>
     </div>
 
-    <div class="container">
-        <h1>微语</h1>
-        <p>
-            username: admin@email.com<br>
-            password: admin
-        </p>
+    <#list languages?keys as lang>
+        <div class="container" lang="${lang}">
+            <h1>${i18n[lang]["title"]}</h1>
+            <p>
+                username: admin@email.com<br>
+                password: admin
+            </p>
 
-        <h2>系统入口</h2>
-        <ul>
-            <li><a href="/admin/" target="_blank">管理后台</a></li>
-            <li><a href="/agent/chat" target="_blank">客服工作台</a></li>
-            <li><a href="/chat/demo" target="_blank">访客对话</a></li>
-            <li><a href="/agenticflow/" target="_blank">工单系统</a></li>
-            <li><a href="/notebase/spaces" target="_blank">知识库</a></li>
-            <li><a href="/kbase/" target="_blank">帮助中心</a></li>
-        </ul>
+            <h2>${i18n[lang]["systemEntrance"]}</h2>
+            <ul>
+                <li><a href="/admin/" target="_blank">${i18n[lang]["adminDashboard"]}</a></li>
+                <li><a href="/agent/chat" target="_blank">${i18n[lang]["agentClient"]}</a></li>
+                <li><a href="/chat/demo" target="_blank">${i18n[lang]["visitorChat"]}</a></li>
+                <li><a href="/agenticflow/" target="_blank">${i18n[lang]["workFlow"]}</a></li>
+                <li><a href="/notebase/spaces" target="_blank">${i18n[lang]["knowledgeBase"]}</a></li>
+                <li><a href="/kbase/" target="_blank">${i18n[lang]["helpCenter"]}</a></li>
+            </ul>
 
-        <h2>开发工具</h2>
-        <ul>
-            <li><a href="/swagger-ui/index.html" target="_blank">API 文档</a></li>
-            <li><a href="/druid" target="_blank">Druid</a></li>
-        </ul>
-    </div>
+            <h2>${i18n[lang]["systemDevelopment"]}</h2>
+            <ul>
+                <li><a href="/swagger-ui/index.html" target="_blank">${i18n[lang]["apiDoc"]}</a></li>
+                <li><a href="/druid" target="_blank">Druid</a></li>
+            </ul>
+        </div>
+    </#list>
 
     <script>
+        // 默认显示英文并高亮英文按钮
+        document.querySelector('[lang="en"]').style.display = 'block';
+        document.querySelector('button[onclick*="en"]').classList.add('active');
+
+        function setLanguage(lang) {
+            // 隐藏所有语言
+            document.querySelectorAll('[lang]').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // 显示选中的语言
+            document.querySelector('[lang="' + lang + '"]').style.display = 'block';
+
+            // 更新按钮状态
+            document.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // 修改按钮选择器以确保准确匹配
+            document.querySelector('button[onclick="setLanguage(\'' + lang + '\')"]').classList.add('active');
+
+            // 保存语言偏好
+            localStorage.setItem('preferred-language', lang);
+        }
+
+        // 恢复保存的语言偏好
+        const savedLang = localStorage.getItem('preferred-language');
+        if (savedLang) {
+            setLanguage(savedLang);
+        }
+
         function setTheme(theme) {
             if (theme === 'system') {
-                document.documentElement.removeAttribute('data-theme');
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
             } else {
                 document.documentElement.setAttribute('data-theme', theme);
             }
-            localStorage.setItem('preferred-theme', theme);
-            updateThemeButtons(theme);
-        }
-
-        function updateThemeButtons(activeTheme) {
-            document.querySelectorAll('.theme-btn').forEach(btn => {
+            
+            // 更新按钮状态
+            document.querySelectorAll('.theme-switcher button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector('.theme-btn[onclick*="' + activeTheme + '"]').classList.add('active');
+            document.querySelector('.theme-switcher button[onclick*="' + theme + '"]').classList.add('active');
+
+            // 保存主题偏好
+            localStorage.setItem('preferred-theme', theme);
         }
+
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (localStorage.getItem('preferred-theme') === 'system') {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+            }
+        });
 
         // 初始化主题
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('preferred-theme') || 'system';
-            setTheme(savedTheme);
-
-            // 监听系统主题变化
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                if (localStorage.getItem('preferred-theme') === 'system') {
-                    document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-                }
-            });
-        }
-
-        // 初始化
-        initializeTheme();
+        const savedTheme = localStorage.getItem('preferred-theme') || 'system';
+        setTheme(savedTheme);
     </script>
 </body>
 </html>
