@@ -65,56 +65,49 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 
-        <!-- https://mvnrepository.com/artifact/org.flowable/flowable-spring-boot-starter -->
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-spring-boot-starter</artifactId>
-            <version>${flowable.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.flowable/flowable-engine -->
+		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-spring-boot-starter -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-engine -->
         <!-- <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency> -->
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-engine-common -->
         <!-- <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine-common</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency> -->
-        <!-- https://mvnrepository.com/artifact/org.flowable/flowable-ldap-configurator -->
+		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-ldap-configurator -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ldap-configurator</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-dmn-engine -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-engine</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-dmn-spring -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-spring</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-dmn-api -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-api</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- DMN Engine -->
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-dmn-engine-configurator -->
@@ -122,7 +115,6 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-engine-configurator</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- CMMN Engine -->
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-cmmn-engine -->
@@ -130,17 +122,13 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-cmmn-engine</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-cmmn-api -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-cmmn-api</artifactId>
             <version>${flowable.version}</version>
-            <scope>provided</scope>
         </dependency>
-
-        
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
