@@ -5,6 +5,12 @@ services:
     environment:
       MYSQL_DATABASE: bytedesk_im
       MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+8:00
     ports:
       - "3306:3306"
   bytedesk-redis:

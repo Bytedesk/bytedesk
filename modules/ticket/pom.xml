@@ -74,17 +74,17 @@
 			<version>${flowable.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-engine -->
-        <!-- <dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>
             <version>${flowable.version}</version>
-        </dependency> -->
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-engine-common -->
-        <!-- <dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine-common</artifactId>
             <version>${flowable.version}</version>
-        </dependency> -->
+        </dependency>
 		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-ldap-configurator -->
         <dependency>
             <groupId>org.flowable</groupId>
