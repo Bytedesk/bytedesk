@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-28 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-28 10:21:04
+ * @LastEditTime: 2025-01-28 11:17:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
+// 使用 TaskListener 处理任务相关事件
 @Slf4j
 @Component
 public class TicketTaskListener implements TaskListener {
