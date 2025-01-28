@@ -176,6 +176,8 @@
         </div>
     </#list>
 
+
+    <script src="https://www.weiyuai.cn/embed/bytedesk-web.js"></script>
     <script>
         // 默认显示英文并高亮英文按钮
         document.querySelector('[lang="en"]').style.display = 'block';
@@ -199,6 +201,9 @@
 
             // 保存语言偏好
             localStorage.setItem('preferred-language', lang);
+
+            // 更新客服配置
+            updateChatConfig(lang);
         }
 
         // 恢复保存的语言偏好
@@ -235,6 +240,76 @@
         // 初始化主题
         const savedTheme = localStorage.getItem('preferred-theme') || 'system';
         setTheme(savedTheme);
+
+        // 客服配置
+        function updateChatConfig(lang) {
+            const i18nConfig = {
+                'en': {
+                    inviteText: 'Hello, how can I help you?',
+                    bubbleTitle: 'Need Help?',
+                    bubbleSubtitle: 'Click to chat with me'
+                },
+                'zh': {
+                    inviteText: '您好，请问有什么可以帮您？',
+                    bubbleTitle: '需要帮助么',
+                    bubbleSubtitle: '点击我，与我对话'
+                },
+                'zh-TW': {
+                    inviteText: '您好，請問有什麼可以幫您？',
+                    bubbleTitle: '需要幫助嗎',
+                    bubbleSubtitle: '點擊我，與我對話'
+                }
+            };
+
+            const texts = i18nConfig[lang] || i18nConfig['en'];
+
+            const config = {
+                placement: 'bottom-right',
+                autoPopup: false,
+                inviteParams: {
+                    show: false,
+                    text: texts.inviteText,
+                },
+                bubbleConfig: {
+                    show: true,
+                    icon: '👋',
+                    title: texts.bubbleTitle,
+                    subtitle: texts.bubbleSubtitle
+                },
+                theme: {
+                    mode: 'system',
+                    backgroundColor: '#0066FF',
+                    textColor: '#ffffff'
+                },
+                window: {
+                    width: 380
+                },
+                chatParams: {
+                    org: 'df_org_uid',
+                    t: '2',
+                    sid: 'df_rt_uid'
+                }
+            };
+
+            // 如果已存在实例，先销毁
+            if (window.bytedesk) {
+                // 假设有销毁方法
+                window.bytedesk.hideBubble();
+                window.bytedesk.hideButton();
+                window.bytedesk.hideChat();
+            }
+
+            // 创建新实例
+            window.bytedesk = new BytedeskWeb(config);
+            window.bytedesk.init();
+        }
+
+        // 初始化时也要设置客服配置
+        const initialLang = localStorage.getItem('preferred-language') || 'en';
+        updateChatConfig(initialLang);
     </script>
+
+    
+
 </body>
 </html>
