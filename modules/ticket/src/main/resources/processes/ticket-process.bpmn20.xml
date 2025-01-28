@@ -123,13 +123,13 @@
         </boundaryEvent>
         <sequenceFlow sourceRef="surveyTimer" targetRef="autoCloseTicket"/>
         <serviceTask id="autoCloseTicket" name="自动关闭工单"
-            flowable:class="com.bytedesk.ticket.delegate.AutoCloseTicketDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.TicketAutoCloseDelegate"/>
         <sequenceFlow sourceRef="autoCloseTicket" targetRef="end"/>
         
         <!-- 正常关闭工单 -->
         <sequenceFlow sourceRef="satisfactionSurvey" targetRef="closeTicket"/>
         <serviceTask id="closeTicket" name="关闭工单"
-            flowable:class="com.bytedesk.ticket.delegate.CloseTicketDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.TicketCloseDelegate"/>
         <sequenceFlow sourceRef="closeTicket" targetRef="end"/>
         
         <endEvent id="end" name="工单结束"/>
