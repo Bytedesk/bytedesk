@@ -1,5 +1,6 @@
 package com.bytedesk.ticket.ticket.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,5 +192,43 @@ public class TicketFlowService {
             .taskCandidateGroup(groupId)
             .active()
             .list();
+    }
+
+    /**
+     * 处理SLA超时
+     */
+    public void handleSLABreach(String processInstanceId) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("slaBreached", true);
+        runtimeService.setVariables(processInstanceId, variables);
+    }
+
+    /**
+     * 查询超时的工单任务
+     */
+    public List<Task> queryOverdueTasks() {
+        return taskService.createTaskQuery()
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
+            .taskDueBefore(new Date())
+            .active()
+            .list();
+    }
+
+    /**
+     * 查询主管审核任务
+     */
+    public List<Task> querySupervisorTasks() {
+        return taskService.createTaskQuery()
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
+            .taskCandidateGroup("supervisors")
+            .active()
+            .list();
+    }
+
+    /**
+     * 设置任务到期时间
+     */
+    public void setTaskDueDate(String taskId, Date dueDate) {
+        taskService.setDueDate(taskId, dueDate);
     }
 } 
