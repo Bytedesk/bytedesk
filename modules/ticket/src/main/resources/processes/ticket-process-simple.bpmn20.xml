@@ -47,7 +47,7 @@
         </sequenceFlow>
         
         <serviceTask id="closeTicket" name="关闭工单"
-            flowable:class="com.bytedesk.ticket.delegate.CloseTicketDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.TicketCloseDelegate"/>
             
         <sequenceFlow sourceRef="closeTicket" targetRef="end"/>
         
