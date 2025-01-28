@@ -97,6 +97,7 @@
                 <li><a href="/chat/demo" target="_blank">Visitor Chat</a></li>
                 <li><a href="/agenticflow/" target="_blank">Work Flow</a></li>
                 <li><a href="/notebase/spaces" target="_blank">Knowledge Base</a></li>
+                <li><a href="/kbase/" target="_blank">Help Center</a></li>
             </ul>
         </div>
 
