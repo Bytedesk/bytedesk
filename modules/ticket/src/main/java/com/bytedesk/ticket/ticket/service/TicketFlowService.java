@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.consts.TicketConsts;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +28,9 @@ public class TicketFlowService {
     private final TaskService taskService;
     private final RepositoryService repositoryService;
     private final HistoryService historyService;
+    private final TicketAssignmentService assignmentService;
+    // private final AgentRestService agentService;
+    // private final WorkgroupRestService workgroupService;
 
     /**
      * 启动工单流程
@@ -230,5 +232,53 @@ public class TicketFlowService {
      */
     public void setTaskDueDate(String taskId, Date dueDate) {
         taskService.setDueDate(taskId, dueDate);
+    }
+
+    /**
+     * 分配工单给工作组
+     */
+    public void assignTicketToWorkgroup(String taskId, String workgroupId) {
+        // 添加工作组作为候选组
+        assignmentService.addCandidateGroup(taskId, workgroupId);
+        
+        // 获取工作组成员作为候选人
+        List<String> workgroupMembers = assignmentService.getWorkgroupUsers(workgroupId);
+        for (String userId : workgroupMembers) {
+            assignmentService.addCandidateUser(taskId, userId);
+        }
+    }
+
+    /**
+     * 查询用户可处理的所有任务（包括个人任务和组任务）
+     */
+    public List<Task> queryUserAvailableTasks(String userId) {
+        // 获取用户所在的工作组
+        List<String> userWorkgroups = assignmentService.getUserWorkgroups(userId);
+        
+        return taskService.createTaskQuery()
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
+            .or()
+                .taskAssignee(userId)
+                .taskCandidateUser(userId)
+                .taskCandidateGroupIn(userWorkgroups)
+            .endOr()
+            .active()
+            .orderByTaskCreateTime()
+            .desc()
+            .list();
+    }
+
+    /**
+     * 认领任务
+     */
+    public void claimTask(String taskId, String userId) {
+        taskService.claim(taskId, userId);
+    }
+
+    /**
+     * 取消认领任务
+     */
+    public void unclaimTask(String taskId) {
+        taskService.unclaim(taskId);
     }
 } 
