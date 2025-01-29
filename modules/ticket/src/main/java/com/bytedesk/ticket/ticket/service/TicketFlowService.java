@@ -12,6 +12,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.task.api.Task;
+import org.flowable.engine.task.Comment;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.ticket.ticket.TicketEntity;
@@ -29,6 +30,7 @@ public class TicketFlowService {
     private final RepositoryService repositoryService;
     private final HistoryService historyService;
     private final TicketAssignmentService assignmentService;
+    private final TicketCommentService commentService;
     // private final AgentRestService agentService;
     // private final WorkgroupRestService workgroupService;
 
@@ -70,10 +72,24 @@ public class TicketFlowService {
 
     /**
      * 添加工单评论
+     * ACT_HI_COMMENT - 历史评论表，存储所有的任务评论
      */
-    public void addTicketComment(String taskId, String message) {
-        log.info("add comment to task: {}", taskId);
-        taskService.addComment(taskId, null, message);
+    public void addTicketComment(String taskId, String message, String userId) {
+        commentService.addComment(taskId, message, userId);
+    }
+
+    /**
+     * 获取工单评论列表
+     */
+    public List<Comment> getTicketComments(String taskId) {
+        return commentService.getTaskComments(taskId);
+    }
+
+    /**
+     * 获取工单所有历史评论
+     */
+    public List<Comment> getProcessInstanceComments(String processInstanceId) {
+        return commentService.getProcessInstanceComments(processInstanceId);
     }
 
     /**

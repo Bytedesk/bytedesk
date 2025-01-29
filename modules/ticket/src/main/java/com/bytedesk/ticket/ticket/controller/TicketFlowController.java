@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.service.TicketFlowService;
+import com.bytedesk.ticket.ticket.service.TicketCommentService;
+import org.flowable.engine.task.Comment;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketFlowController {
 
     private final TicketFlowService ticketFlowService;
+    private final TicketCommentService commentService;
 
     @PostMapping("/start")
     @Operation(summary = "启动工单流程")
@@ -57,8 +60,9 @@ public class TicketFlowController {
     @Operation(summary = "添加工单评论")
     public ResponseEntity<JsonResult<Boolean>> addComment(
             @PathVariable String taskId,
-            @RequestParam String message) {
-        ticketFlowService.addTicketComment(taskId, message);
+            @RequestParam String message,
+            @RequestParam String userId) {
+        commentService.addComment(taskId, message, userId);
         return ResponseEntity.ok(JsonResult.success());
     }
 
@@ -147,5 +151,21 @@ public class TicketFlowController {
             @PathVariable String groupId) {
         List<Task> tasks = ticketFlowService.queryGroupTasks(groupId);
         return ResponseEntity.ok(JsonResult.success(tasks));
+    }
+
+    @GetMapping("/task/{taskId}/comments")
+    @Operation(summary = "获取任务评论列表")
+    public ResponseEntity<JsonResult<List<Comment>>> getTaskComments(
+            @PathVariable String taskId) {
+        List<Comment> comments = commentService.getTaskComments(taskId);
+        return ResponseEntity.ok(JsonResult.success(comments));
+    }
+
+    @GetMapping("/process/{processInstanceId}/comments")
+    @Operation(summary = "获取流程实例评论列表")
+    public ResponseEntity<JsonResult<List<Comment>>> getProcessComments(
+            @PathVariable String processInstanceId) {
+        List<Comment> comments = commentService.getProcessInstanceComments(processInstanceId);
+        return ResponseEntity.ok(JsonResult.success(comments));
     }
 } 
