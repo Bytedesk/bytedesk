@@ -16,7 +16,7 @@ package com.bytedesk.ticket.config;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ticket.ticket.service.TicketIdentityService;
+import com.bytedesk.ticket.service.TicketIdentityService;
 
 import lombok.RequiredArgsConstructor;
 

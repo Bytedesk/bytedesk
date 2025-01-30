@@ -20,7 +20,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
-import com.bytedesk.ticket.ticket.listener.TicketEntityListener;
+import com.bytedesk.ticket.listener.TicketEntityListener;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.ticket.consts;
+package com.bytedesk.ticket.consts;
 
 public class TicketConsts {
     

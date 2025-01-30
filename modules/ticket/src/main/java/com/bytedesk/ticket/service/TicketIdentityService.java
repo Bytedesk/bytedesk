@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.ticket.service;
+package com.bytedesk.ticket.service;
 
 import java.util.List;
 import java.util.ArrayList;
