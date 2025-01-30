@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket.controller;
+package com.bytedesk.ticket.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +24,10 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
+import com.bytedesk.ticket.service.TicketRestService;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.ticket.TicketRequest;
 import com.bytedesk.ticket.ticket.TicketResponse;
-import com.bytedesk.ticket.ticket.service.TicketRestService;
 
 @RestController
 @RequestMapping("/api/v1/ticket")

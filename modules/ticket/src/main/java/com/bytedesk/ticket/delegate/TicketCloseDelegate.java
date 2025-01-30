@@ -18,8 +18,8 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
-import com.bytedesk.ticket.ticket.service.TicketNotificationService;
 
 import java.time.LocalDateTime;
 

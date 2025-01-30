@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket.controller;
+package com.bytedesk.ticket.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.ticket.ticket.service.TicketFormService;
+import com.bytedesk.ticket.service.TicketFormService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

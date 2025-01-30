@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket.listener;
+package com.bytedesk.ticket.listener;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -22,7 +22,7 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.event.AgentUpdateEvent;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
-import com.bytedesk.ticket.ticket.service.TicketIdentityService;
+import com.bytedesk.ticket.service.TicketIdentityService;
 
 @Slf4j
 @Component

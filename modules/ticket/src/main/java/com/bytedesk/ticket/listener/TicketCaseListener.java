@@ -11,16 +11,16 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket.listener;
+package com.bytedesk.ticket.listener;
 
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ticket.ticket.service.TicketNotificationService;
-import com.bytedesk.ticket.ticket.service.TicketSLAService;
-import com.bytedesk.ticket.ticket.service.TicketRestService;
+import com.bytedesk.ticket.service.TicketNotificationService;
+import com.bytedesk.ticket.service.TicketRestService;
+import com.bytedesk.ticket.service.TicketSLAService;
 
 import lombok.extern.slf4j.Slf4j;
 
