@@ -29,7 +29,7 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleResponse;
-import com.bytedesk.kbase.article.ArticleService;
+import com.bytedesk.kbase.article.ArticleRestService;
 // import com.bytedesk.vip_kbase.knowledge_base.KnowledgebaseStaticService;
 
 import lombok.AllArgsConstructor;
@@ -45,7 +45,7 @@ public class KnowledgebaseController {
 
     private final CategoryRestService categoryService;
 
-    private final ArticleService articleService;
+    private final ArticleRestService articleService;
 
     private final KnowledgebaseProperties kbaseProperties;
 

@@ -36,7 +36,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.article.ArticleRequest;
 import com.bytedesk.kbase.article.ArticleResponse;
-import com.bytedesk.kbase.article.ArticleService;
+import com.bytedesk.kbase.article.ArticleRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -52,7 +52,7 @@ public class KnowledgebaseService extends BaseRestService<KnowledgebaseEntity, K
 
     private final CategoryRestService categoryService;
 
-    private final ArticleService articleService;
+    private final ArticleRestService articleService;
 
     @Override
     public Page<KnowledgebaseResponse> queryByOrg(KnowledgebaseRequest request) {

@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ArticleRouteController {
 
-    private final ArticleService articleService;
+    private final ArticleRestService articleService;
 
     private final KnowledgebaseService knowledgebaseService;
 
