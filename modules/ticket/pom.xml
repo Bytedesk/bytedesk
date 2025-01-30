@@ -74,11 +74,11 @@
 			<version>${flowable.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-spring-boot-starter-rest -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-spring-boot-starter-rest</artifactId>
 			<version>${flowable.version}</version>
-		</dependency>
+		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-engine -->
         <dependency>
             <groupId>org.flowable</groupId>
