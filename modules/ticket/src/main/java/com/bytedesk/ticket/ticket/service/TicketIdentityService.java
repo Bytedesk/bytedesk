@@ -1,10 +1,15 @@
 package com.bytedesk.ticket.ticket.service;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
+import org.flowable.idm.api.Privilege;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.service.agent.AgentEntity;
@@ -166,5 +171,118 @@ public class TicketIdentityService {
     public void deleteMembership(String userId, String groupId) {
         identityService.deleteMembership(userId, groupId);
         log.info("Deleted membership: {} -> {}", userId, groupId);
+    }
+
+    /**
+     * 检查用户认证状态
+     */
+    public boolean checkAuthentication(String userId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return false;
+        }
+        return auth.getName().equals(userId);
+    }
+
+    /**
+     * 为用户添加权限
+     */
+    public void addUserPrivilege(String userId, String privilegeName) {
+        // 创建权限(如果不存在)
+        Privilege privilege = identityService.createPrivilegeQuery()
+            .privilegeName(privilegeName)
+            .singleResult();
+            
+        if (privilege == null) {
+            privilege = identityService.createPrivilege(privilegeName);
+        }
+        
+        // 为用户添加权限
+        identityService.addUserPrivilegeMapping(privilege.getId(), userId);
+        log.info("Added privilege {} to user {}", privilegeName, userId);
+    }
+
+    /**
+     * 为组添加权限
+     */
+    public void addGroupPrivilege(String groupId, String privilegeName) {
+        Privilege privilege = identityService.createPrivilegeQuery()
+            .privilegeName(privilegeName)
+            .singleResult();
+            
+        if (privilege == null) {
+            privilege = identityService.createPrivilege(privilegeName);
+        }
+        
+        identityService.addGroupPrivilegeMapping(privilege.getId(), groupId);
+        log.info("Added privilege {} to group {}", privilegeName, groupId);
+    }
+
+    /**
+     * 获取用户的所有权限
+     */
+    public List<Privilege> getUserPrivileges(String userId) {
+        return identityService.createPrivilegeQuery()
+            .userId(userId)
+            .list();
+    }
+
+    /**
+     * 检查用户是否有指定权限
+     */
+    public boolean hasPrivilege(String userId, String privilegeName) {
+        return identityService.createPrivilegeQuery()
+            .userId(userId)
+            .privilegeName(privilegeName)
+            .count() > 0;
+    }
+
+    /**
+     * 删除用户权限
+     */
+    public void removeUserPrivilege(String userId, String privilegeName) {
+        Privilege privilege = identityService.createPrivilegeQuery()
+            .privilegeName(privilegeName)
+            .singleResult();
+            
+        if (privilege != null) {
+            identityService.deleteUserPrivilegeMapping(privilege.getId(), userId);
+            log.info("Removed privilege {} from user {}", privilegeName, userId);
+        }
+    }
+
+    /**
+     * 删除组权限
+     */
+    public void removeGroupPrivilege(String groupId, String privilegeName) {
+        Privilege privilege = identityService.createPrivilegeQuery()
+            .privilegeName(privilegeName)
+            .singleResult();
+            
+        if (privilege != null) {
+            identityService.deleteGroupPrivilegeMapping(privilege.getId(), groupId);
+            log.info("Removed privilege {} from group {}", privilegeName, groupId);
+        }
+    }
+
+    /**
+     * 获取用户的Spring Security权限
+     */
+    public List<SimpleGrantedAuthority> getUserAuthorities(String userId) {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        
+        // 添加用户直接权限
+        List<Privilege> userPrivileges = getUserPrivileges(userId);
+        for (Privilege privilege : userPrivileges) {
+            authorities.add(new SimpleGrantedAuthority(privilege.getName()));
+        }
+        
+        // 添加用户组权限
+        List<Group> userGroups = getUserGroups(userId);
+        for (Group group : userGroups) {
+            authorities.add(new SimpleGrantedAuthority("GROUP_" + group.getId()));
+        }
+        
+        return authorities;
     }
 } 
