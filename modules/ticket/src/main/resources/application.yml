@@ -10,3 +10,23 @@ spring:
           auth: true
           starttls:
             enable: true 
+
+flowable:
+  idm:
+    ldap:
+      enabled: true
+      server: ldap://ldap.bytedesk.com:389
+      base-dn: dc=bytedesk,dc=com
+      user-base-dn: ou=users
+      group-base-dn: ou=groups
+      user-search-filter: (uid={0})
+      group-search-filter: (member={0})
+      user-id-attribute: uid
+      user-first-name-attribute: givenName
+      user-last-name-attribute: sn
+      user-email-attribute: mail
+      group-id-attribute: cn
+      group-name-attribute: cn
+      authentication: simple
+      security-principal: cn=admin,dc=bytedesk,dc=com
+      security-credentials: admin_password 

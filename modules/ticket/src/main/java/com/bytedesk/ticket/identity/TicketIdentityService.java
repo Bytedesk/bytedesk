@@ -46,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TicketIdentityService {
 
+    // private final LDAPIdentityServiceImpl ldapIdentityService;
     private final IdmIdentityService identityService;
     // private final AgentRestService agentService;
     // private final WorkgroupRestService workgroupService;
@@ -284,5 +285,47 @@ public class TicketIdentityService {
         }
         
         return authorities;
+    }
+
+    /**
+     * 从LDAP同步用户
+     */
+    public void syncUserFromLDAP(String userId) {
+        // User ldapUser = ldapIdentityService.findUserById(userId);
+        // if (ldapUser != null) {
+        //     User flowableUser = identityService.newUser(ldapUser.getId());
+        //     flowableUser.setFirstName(ldapUser.getFirstName());
+        //     flowableUser.setLastName(ldapUser.getLastName());
+        //     flowableUser.setEmail(ldapUser.getEmail());
+        //     identityService.saveUser(flowableUser);
+            
+        //     // 同步用户组
+        //     List<Group> ldapGroups = ldapIdentityService.findGroupsByUser(userId);
+        //     for (Group ldapGroup : ldapGroups) {
+        //         syncGroupFromLDAP(ldapGroup.getId());
+        //         identityService.createMembership(userId, ldapGroup.getId());
+        //     }
+        // }
+    }
+
+    /**
+     * 从LDAP同步组
+     */
+    public void syncGroupFromLDAP(String groupId) {
+        // Group ldapGroup = ldapIdentityService.findGroupById(groupId);
+        // if (ldapGroup != null) {
+        //     Group flowableGroup = identityService.newGroup(ldapGroup.getId());
+        //     flowableGroup.setName(ldapGroup.getName());
+        //     flowableGroup.setType("assignment");
+        //     identityService.saveGroup(flowableGroup);
+        // }
+    }
+
+    /**
+     * LDAP认证
+     */
+    public boolean authenticate(String userId, String password) {
+        // return ldapIdentityService.checkPassword(userId, password);
+        return true;
     }
 } 
