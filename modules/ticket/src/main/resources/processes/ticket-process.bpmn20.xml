@@ -47,6 +47,18 @@
         <userTask id="handleTicket" name="处理工单" 
             flowable:assignee="${assignee}">
             <documentation>处理工单并更新状态</documentation>
+            <extensionElements>
+                <!-- 内置表单 -->
+                <flowable:formProperty id="comment" name="处理意见" type="string" required="true"/>
+                <flowable:formProperty id="result" name="处理结果" type="enum">
+                    <flowable:value id="resolved" name="已解决"/>
+                    <flowable:value id="pending" name="待处理"/>
+                    <flowable:value id="rejected" name="已拒绝"/>
+                </flowable:formProperty>
+                
+                <!-- 或者使用外部表单Key -->
+                <flowable:formKey>ticketHandleForm</flowable:formKey>
+            </extensionElements>
         </userTask>
         
         <!-- SLA监控 -->
@@ -55,7 +67,7 @@
                 <timeDuration>PT4H</timeDuration>
             </timerEventDefinition>
         </boundaryEvent>
-        <sequenceFlow sourceRef="slaTimer" targetRef="slaBreachNotification"/>
+        <sequenceFlow sourceRef="slaTimer" targetRef="slaBreachNotification"/> V 
         <serviceTask id="slaBreachNotification" name="SLA违规通知"
             flowable:class="com.bytedesk.ticket.delegate.TicketSLABreachNotificationDelegate"/>
         <sequenceFlow sourceRef="slaBreachNotification" targetRef="handleTicket"/>
