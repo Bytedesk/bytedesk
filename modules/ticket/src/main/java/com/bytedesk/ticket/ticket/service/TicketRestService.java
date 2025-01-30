@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,6 +60,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final AgentRestService agentRestService;
 
+    private final TicketIdentityService identityService;
+
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
@@ -86,6 +89,16 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        String userId = user.getUid();
+        // 检查用户是否有创建工单的权限
+        if (!identityService.hasPrivilege(userId, "TICKET_CREATE")) {
+            throw new AccessDeniedException("No permission to create ticket");
+        }
+        // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
@@ -135,6 +148,16 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     @Transactional
     public void assignTicket(Long ticketId, AgentEntity assignee) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        String userId = user.getUid();
+        // 检查用户是否是主管
+        if (!identityService.isUserInGroup(userId, "supervisors")) {
+            throw new AccessDeniedException("Only supervisors can assign tickets");
+        }
+        // 分配工单...
         TicketEntity ticket = findTicketById(ticketId);
         ticket.setAssignee(assignee);
         ticket.setStatus("处理中");
