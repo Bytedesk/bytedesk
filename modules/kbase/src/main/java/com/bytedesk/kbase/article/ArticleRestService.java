@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 22:43:47
+ * @LastEditTime: 2025-01-30 14:37:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,9 +37,9 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class ArticleService extends BaseRestService<ArticleEntity, ArticleRequest, ArticleResponse> {
+public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRequest, ArticleResponse> {
 
-    private final ArticleRepository FaqRepository;
+    private final ArticleRepository articleRepository;
 
     private final ModelMapper modelMapper;
 
@@ -55,7 +55,7 @@ public class ArticleService extends BaseRestService<ArticleEntity, ArticleReques
 
         Specification<ArticleEntity> spec = ArticleSpecification.search(request);
 
-        Page<ArticleEntity> page = FaqRepository.findAll(spec, pageable);
+        Page<ArticleEntity> page = articleRepository.findAll(spec, pageable);
 
         return page.map(this::convertToResponse);
     }
@@ -69,7 +69,7 @@ public class ArticleService extends BaseRestService<ArticleEntity, ArticleReques
     @Cacheable(value = "article", key="#uid", unless = "#result == null")
     @Override
     public Optional<ArticleEntity> findByUid(String uid) {
-        return FaqRepository.findByUid(uid);
+        return articleRepository.findByUid(uid);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ArticleService extends BaseRestService<ArticleEntity, ArticleReques
     @Override
     public ArticleEntity save(ArticleEntity entity) {
         try {
-            return FaqRepository.save(entity);
+            return articleRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
         }

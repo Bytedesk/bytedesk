@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ArticleRestControllerVisitor {
 
-    private final ArticleService articleService;
+    private final ArticleRestService articleService;
 
     @RequestMapping("/search")
     public ResponseEntity<?> searchKb(ArticleRequest request) {

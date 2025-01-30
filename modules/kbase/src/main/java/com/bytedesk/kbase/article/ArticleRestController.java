@@ -31,7 +31,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ArticleRestController extends BaseRestController<ArticleRequest> {
 
-    private final ArticleService articleService;
+    private final ArticleRestService articleService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
