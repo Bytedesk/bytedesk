@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.service;
+package com.bytedesk.ticket.flow;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +15,9 @@ import org.flowable.task.api.Task;
 import org.flowable.engine.task.Comment;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.ticket.comment.TicketCommentService;
 import com.bytedesk.ticket.consts.TicketConsts;
+import com.bytedesk.ticket.service.TicketAssignmentService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import lombok.RequiredArgsConstructor;

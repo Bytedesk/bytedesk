@@ -27,6 +27,7 @@ import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
+import com.bytedesk.ticket.identity.TicketIdentityService;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
 import com.bytedesk.ticket.ticket.TicketEntity;
