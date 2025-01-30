@@ -23,15 +23,17 @@ import lombok.extern.slf4j.Slf4j;
  * 同步业务系统用户到 Flowable
  * 管理用户信息和状态
  * 用户认证和授权
+ * 
  * 组管理：
  * 同步业务系统组织架构
  * 管理工作组和角色
- * 
  * 权限分配
+ * 
  * 关系管理：
  * 维护用户和组的关系
  * 支持多组织架构
- * 灵活的权限控制   
+ * 灵活的权限控制
+ * 
  * 这样就能将业务系统的用户和组织架构与 Flowable 的工作流权限体系完美对接。
  */
 @Slf4j
@@ -94,6 +96,24 @@ public class TicketIdentityService {
         // 添加用户到组
         identityService.createMembership(userId, groupId);
         log.info("Synced membership: {} -> {}", userId, groupId);
+    }
+
+    /**
+     * 获取用户
+     */
+    public User getUser(String userId) {
+        return identityService.createUserQuery()
+            .userId(userId)
+            .singleResult();
+    }
+    
+    /**
+     * 获取组
+     */
+    public Group getGroup(String groupId) {
+        return identityService.createGroupQuery()
+            .groupId(groupId)
+            .singleResult();
     }
 
     /**
