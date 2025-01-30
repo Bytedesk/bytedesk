@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.controller;
+package com.bytedesk.ticket.flow;
 
 import java.util.List;
 import java.util.Map;
@@ -10,8 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.ticket.service.TicketCommentService;
-import com.bytedesk.ticket.service.TicketFlowService;
+import com.bytedesk.ticket.comment.TicketCommentService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import org.flowable.engine.task.Comment;

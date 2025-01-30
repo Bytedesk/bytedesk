@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.service;
+package com.bytedesk.ticket.comment;
 
 import java.util.List;
 
