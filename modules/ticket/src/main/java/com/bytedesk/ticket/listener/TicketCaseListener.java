@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.service.TicketRestService;
-import com.bytedesk.ticket.service.TicketSLAService;
+import com.bytedesk.ticket.sla.TicketSLAService;
 
 import lombok.extern.slf4j.Slf4j;
 
