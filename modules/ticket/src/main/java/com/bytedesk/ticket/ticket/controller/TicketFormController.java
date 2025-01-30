@@ -28,6 +28,23 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 工单表单管理接口
+ * 
+ * 主要功能：
+ * 支持内置表单和外部表单
+ * 表单属性类型支持：string、long、enum、date等
+ * 支持必填校验
+ * 支持表单数据的保存和提交
+ * 支持动态获取表单定义
+ * 支持表单历史数据查询
+* 
+ * 使用表单的好处：
+ * 规范数据录入
+ * 方便数据验证
+ * 提供统一的表单处理机制
+ * 支持表单数据历史记录
+ */
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "工单表单管理接口")
