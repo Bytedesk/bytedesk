@@ -135,6 +135,13 @@
             <artifactId>flowable-cmmn-api</artifactId>
             <version>${flowable.version}</version>
         </dependency>
+		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-jmx -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-jmx</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
+
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
