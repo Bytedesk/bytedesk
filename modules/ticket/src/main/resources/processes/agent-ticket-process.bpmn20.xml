@@ -4,76 +4,76 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     targetNamespace="BytedeskTicket">
 
-    <process id="agentTicketProcess" name="个人工单流程" isExecutable="true">
-        <startEvent id="start" name="创建工单"/>
+    <process id="agentTicketProcess" name="Agent Ticket Process" isExecutable="true">
+        <startEvent id="start" name="Create Ticket"/>
         
-        <!-- 优先级评估 -->
+        <!-- Priority Evaluation -->
         <sequenceFlow sourceRef="start" targetRef="evaluatePriority"/>
-        <businessRuleTask id="evaluatePriority" name="优先级评估"
+        <businessRuleTask id="evaluatePriority" name="Evaluate Priority"
             flowable:decisionRef="ticketPriorityRules"/>
             
-        <!-- 分配给个人 -->
+        <!-- Assign to Agent -->
         <sequenceFlow sourceRef="evaluatePriority" targetRef="assignToAgent"/>
-        <userTask id="assignToAgent" name="客服处理" flowable:assignee="${agentUid}">
-            <documentation>指定客服处理工单</documentation>
+        <userTask id="assignToAgent" name="Agent Handle" flowable:assignee="${agentUid}">
+            <documentation>Assigned agent handles the ticket</documentation>
             <extensionElements>
-                <flowable:formProperty id="solution" name="解决方案" type="string" required="true"/>
-                <flowable:formProperty id="status" name="处理状态" type="enum">
-                    <flowable:value id="resolved" name="已解决"/>
-                    <flowable:value id="pending" name="待处理"/>
-                    <flowable:value id="escalated" name="需升级"/>
+                <flowable:formProperty id="solution" name="Solution" type="string" required="true"/>
+                <flowable:formProperty id="status" name="Status" type="enum">
+                    <flowable:value id="resolved" name="Resolved"/>
+                    <flowable:value id="pending" name="Pending"/>
+                    <flowable:value id="escalated" name="Escalated"/>
                 </flowable:formProperty>
             </extensionElements>
         </userTask>
         
-        <!-- SLA监控 -->
+        <!-- SLA Monitor -->
         <boundaryEvent id="slaTimer" attachedToRef="assignToAgent">
             <timerEventDefinition>
                 <timeDuration>${slaTime}</timeDuration>
             </timerEventDefinition>
         </boundaryEvent>
         <sequenceFlow sourceRef="slaTimer" targetRef="slaNotification"/>
-        <serviceTask id="slaNotification" name="SLA超时通知"
+        <serviceTask id="slaNotification" name="SLA Timeout Notification"
             flowable:class="com.bytedesk.ticket.delegate.SLANotificationDelegate"/>
         <sequenceFlow sourceRef="slaNotification" targetRef="escalateTicket"/>
         
-        <!-- 工单升级 -->
-        <serviceTask id="escalateTicket" name="升级工单"
+        <!-- Ticket Escalation -->
+        <serviceTask id="escalateTicket" name="Escalate Ticket"
             flowable:class="com.bytedesk.ticket.delegate.TicketEscalationDelegate"/>
         <sequenceFlow sourceRef="escalateTicket" targetRef="supervisorHandle"/>
         
-        <!-- 主管处理 -->
-        <userTask id="supervisorHandle" name="主管处理" flowable:candidateGroups="supervisors">
-            <documentation>主管处理升级的工单</documentation>
+        <!-- Supervisor Handle -->
+        <userTask id="supervisorHandle" name="Supervisor Handle" flowable:candidateGroups="supervisors">
+            <documentation>Supervisor handles escalated ticket</documentation>
         </userTask>
         <sequenceFlow sourceRef="supervisorHandle" targetRef="assignToAgent"/>
         
-        <!-- 客户确认 -->
+        <!-- Customer Verification -->
         <sequenceFlow sourceRef="assignToAgent" targetRef="customerVerify"/>
-        <userTask id="customerVerify" name="客户确认" flowable:assignee="${creator}">
-            <documentation>客户确认问题是否解决</documentation>
+        <userTask id="customerVerify" name="Customer Verify" flowable:assignee="${creator}">
+            <documentation>Customer verifies if the issue is resolved</documentation>
             <extensionElements>
-                <flowable:formProperty id="satisfied" name="是否满意" type="boolean" required="true"/>
-                <flowable:formProperty id="comment" name="反馈意见" type="string"/>
+                <flowable:formProperty id="satisfied" name="Satisfied" type="boolean" required="true"/>
+                <flowable:formProperty id="comment" name="Comment" type="string"/>
             </extensionElements>
         </userTask>
         
-        <!-- 满意度评价 -->
+        <!-- Satisfaction Survey -->
         <sequenceFlow sourceRef="customerVerify" targetRef="satisfactionSurvey"/>
-        <userTask id="satisfactionSurvey" name="满意度评价" flowable:assignee="${creator}">
+        <userTask id="satisfactionSurvey" name="Satisfaction Survey" flowable:assignee="${creator}">
             <extensionElements>
-                <flowable:formProperty id="rating" name="评分" type="enum">
-                    <flowable:value id="5" name="非常满意"/>
-                    <flowable:value id="4" name="满意"/>
-                    <flowable:value id="3" name="一般"/>
-                    <flowable:value id="2" name="不满意"/>
-                    <flowable:value id="1" name="非常不满意"/>
+                <flowable:formProperty id="rating" name="Rating" type="enum">
+                    <flowable:value id="5" name="Very Satisfied"/>
+                    <flowable:value id="4" name="Satisfied"/>
+                    <flowable:value id="3" name="Neutral"/>
+                    <flowable:value id="2" name="Dissatisfied"/>
+                    <flowable:value id="1" name="Very Dissatisfied"/>
                 </flowable:formProperty>
-                <flowable:formProperty id="feedback" name="评价内容" type="string"/>
+                <flowable:formProperty id="feedback" name="Feedback" type="string"/>
             </extensionElements>
         </userTask>
         
         <sequenceFlow sourceRef="satisfactionSurvey" targetRef="end"/>
-        <endEvent id="end" name="工单结束"/>
+        <endEvent id="end" name="End Ticket"/>
     </process>
 </definitions> 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101" 
     xmlns:flowable="http://flowable.org/dmn"
-    id="ticketPriority" name="工单优先级决策" namespace="BytedeskTicket">
+    id="ticketPriority" name="Ticket Priority Decision" namespace="BytedeskTicket">
     
-    <decision id="ticketPriorityRules" name="工单优先级规则">
+    <decision id="ticketPriorityRules" name="Ticket Priority Rules">
         <decisionTable id="ticketPriorityTable" hitPolicy="FIRST">
-            <!-- 输入条件 -->
-            <input id="customerLevel" label="客户等级">
+            <!-- Input Conditions -->
+            <input id="customerLevel" label="Customer Level">
                 <inputExpression id="customerLevelExpression" typeRef="string">
                     <text>customerLevel</text>
                 </inputExpression>
@@ -15,7 +15,7 @@
                 </inputValues>
             </input>
             
-            <input id="issueType" label="问题类型">
+            <input id="issueType" label="Issue Type">
                 <inputExpression id="issueTypeExpression" typeRef="string">
                     <text>issueType</text>
                 </inputExpression>
@@ -24,7 +24,7 @@
                 </inputValues>
             </input>
             
-            <input id="impactLevel" label="影响程度">
+            <input id="impactLevel" label="Impact Level">
                 <inputExpression id="impactLevelExpression" typeRef="string">
                     <text>impactLevel</text>
                 </inputExpression>
@@ -33,15 +33,15 @@
                 </inputValues>
             </input>
             
-            <!-- 输出结果 -->
-            <output id="priority" label="优先级" name="priority" typeRef="string">
+            <!-- Output Results -->
+            <output id="priority" label="Priority" name="priority" typeRef="string">
                 <outputValues>
                     <text>"URGENT", "HIGH", "MEDIUM", "LOW"</text>
                 </outputValues>
             </output>
-            <output id="slaTime" label="SLA时间" name="slaTime" typeRef="string"/>
+            <output id="slaTime" label="SLA Time" name="slaTime" typeRef="string"/>
             
-            <!-- 规则定义 -->
+            <!-- Rule Definitions -->
             <rule>
                 <inputEntry id="r1c1"><text>"VIP"</text></inputEntry>
                 <inputEntry id="r1c2"><text>"SYSTEM_ERROR"</text></inputEntry>
