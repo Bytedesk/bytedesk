@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-02 12:18:41
+ * @LastEditTime: 2025-02-02 12:26:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -136,8 +136,7 @@ http://127.0.0.1:9003/dev
 - 订阅号
 - <img src="./images/wechatai_mp.jpg" width="100">
 
-- 此为开源社区版，支持免费商用
-
 ## 版权
 
 - [Apache License 2.0](./LICENSE.txt)
+- 此为开源社区版，支持免费商用
