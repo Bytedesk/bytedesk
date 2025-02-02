@@ -34,7 +34,7 @@
     </sequenceFlow>
     <sequenceFlow id="startFlow" sourceRef="start" name="流程开始" targetRef="apply"></sequenceFlow>
     <sequenceFlow id="applyFlow" sourceRef="apply" name="申请流程" targetRef="teacherPass"></sequenceFlow>
-    <sequenceFlow id="judgeLess" name="小于2天" sourceRef="judgeTask" targetRef="end">
+    <sequenceFlow id="judgeLess" name="小于等于2天" sourceRef="judgeTask" targetRef="end">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${day <= 2}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="judgeMore" name="大于2天" sourceRef="judgeTask" targetRef="principalPass">
