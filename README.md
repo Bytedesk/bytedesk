@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-01 18:48:35
+ * @LastEditTime: 2025-02-02 10:08:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,12 @@ docker compose -p bytedesk -f docker-compose.yaml stop
 
 ## Preview
 
-- [local preview](http://127.0.0.1:9003/dev)
+local preview
+
+```bash
+http://127.0.0.1:9003/dev
+```
+
 - [online preview](https://www.weiyuai.cn/admin/)
 
 ## Client
