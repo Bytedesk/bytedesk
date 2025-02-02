@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-02 11:21:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-02 12:28:09
+ * @LastEditTime: 2025-02-02 17:01:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,6 +61,7 @@ public class FlowableTests {
 
     @Test
     public void testStudentLeaveFlow() {
+        
         // 发起请假
         Map<String, Object> map = new HashMap<>();
         map.put("day", 5);
