@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" 
+    xmlns:flowable="http://flowable.org/dmn"
+    id="ticketPriority" name="工单优先级决策" namespace="BytedeskTicket">
+    
+    <decision id="ticketPriorityRules" name="工单优先级规则">
+        <decisionTable id="ticketPriorityTable" hitPolicy="FIRST">
+            <!-- 输入条件 -->
+            <input id="customerLevel" label="客户等级">
+                <inputExpression id="customerLevelExpression" typeRef="string">
+                    <text>customerLevel</text>
+                </inputExpression>
+                <inputValues>
+                    <text>"VIP", "REGULAR", "TRIAL"</text>
+                </inputValues>
+            </input>
+            
+            <input id="issueType" label="问题类型">
+                <inputExpression id="issueTypeExpression" typeRef="string">
+                    <text>issueType</text>
+                </inputExpression>
+                <inputValues>
+                    <text>"SYSTEM_ERROR", "FUNCTION", "CONSULT", "COMPLAINT"</text>
+                </inputValues>
+            </input>
+            
+            <input id="impactLevel" label="影响程度">
+                <inputExpression id="impactLevelExpression" typeRef="string">
+                    <text>impactLevel</text>
+                </inputExpression>
+                <inputValues>
+                    <text>"HIGH", "MEDIUM", "LOW"</text>
+                </inputValues>
+            </input>
+            
+            <!-- 输出结果 -->
+            <output id="priority" label="优先级" name="priority" typeRef="string">
+                <outputValues>
+                    <text>"URGENT", "HIGH", "MEDIUM", "LOW"</text>
+                </outputValues>
+            </output>
+            <output id="slaTime" label="SLA时间" name="slaTime" typeRef="string"/>
+            
+            <!-- 规则定义 -->
+            <rule>
+                <inputEntry id="r1c1"><text>"VIP"</text></inputEntry>
+                <inputEntry id="r1c2"><text>"SYSTEM_ERROR"</text></inputEntry>
+                <inputEntry id="r1c3"><text>"HIGH"</text></inputEntry>
+                <outputEntry id="r1o1"><text>"URGENT"</text></outputEntry>
+                <outputEntry id="r1o2"><text>"PT1H"</text></outputEntry>
+            </rule>
+            
+            <rule>
+                <inputEntry id="r2c1"><text>"VIP"</text></inputEntry>
+                <inputEntry id="r2c2"><text>"COMPLAINT"</text></inputEntry>
+                <inputEntry id="r2c3"><text>-</text></inputEntry>
+                <outputEntry id="r2o1"><text>"HIGH"</text></outputEntry>
+                <outputEntry id="r2o2"><text>"PT2H"</text></outputEntry>
+            </rule>
+            
+            <rule>
+                <inputEntry id="r3c1"><text>"REGULAR"</text></inputEntry>
+                <inputEntry id="r3c2"><text>"SYSTEM_ERROR"</text></inputEntry>
+                <inputEntry id="r3c3"><text>"HIGH"</text></inputEntry>
+                <outputEntry id="r3o1"><text>"HIGH"</text></outputEntry>
+                <outputEntry id="r3o2"><text>"PT4H"</text></outputEntry>
+            </rule>
+            
+            <rule>
+                <inputEntry id="r4c1"><text>-</text></inputEntry>
+                <inputEntry id="r4c2"><text>"FUNCTION"</text></inputEntry>
+                <inputEntry id="r4c3"><text>-</text></inputEntry>
+                <outputEntry id="r4o1"><text>"MEDIUM"</text></outputEntry>
+                <outputEntry id="r4o2"><text>"PT8H"</text></outputEntry>
+            </rule>
+            
+            <rule>
+                <inputEntry id="r5c1"><text>-</text></inputEntry>
+                <inputEntry id="r5c2"><text>"CONSULT"</text></inputEntry>
+                <inputEntry id="r5c3"><text>-</text></inputEntry>
+                <outputEntry id="r5o1"><text>"LOW"</text></outputEntry>
+                <outputEntry id="r5o2"><text>"P1D"</text></outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions> 
