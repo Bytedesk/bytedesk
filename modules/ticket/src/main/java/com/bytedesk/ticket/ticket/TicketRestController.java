@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 17:11:55
+ * @LastEditTime: 2025-02-02 21:21:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.controller;
+package com.bytedesk.ticket.ticket;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +24,7 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
-import com.bytedesk.ticket.service.TicketRestService;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
-import com.bytedesk.ticket.ticket.TicketRequest;
-import com.bytedesk.ticket.ticket.TicketResponse;
 
 @RestController
 @RequestMapping("/api/v1/ticket")

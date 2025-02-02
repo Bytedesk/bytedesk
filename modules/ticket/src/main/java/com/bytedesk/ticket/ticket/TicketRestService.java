@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.service;
+package com.bytedesk.ticket.ticket;
 
 import org.flowable.engine.TaskService;
 import org.modelmapper.ModelMapper;
@@ -28,12 +28,6 @@ import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
-import com.bytedesk.ticket.ticket.TicketEntity;
-import com.bytedesk.ticket.ticket.TicketRepository;
-import com.bytedesk.ticket.ticket.TicketRequest;
-import com.bytedesk.ticket.ticket.TicketResponse;
-import com.bytedesk.ticket.ticket.TicketSpecification;
-import com.bytedesk.ticket.ticket.TicketStatusEnum;
 
 import lombok.AllArgsConstructor;
 
