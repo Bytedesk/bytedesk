@@ -14,7 +14,7 @@
             
         <!-- 分配给个人 -->
         <sequenceFlow sourceRef="evaluatePriority" targetRef="assignToAgent"/>
-        <userTask id="assignToAgent" name="客服处理" flowable:assignee="${agentId}">
+        <userTask id="assignToAgent" name="客服处理" flowable:assignee="${agentUid}">
             <documentation>指定客服处理工单</documentation>
             <extensionElements>
                 <flowable:formProperty id="solution" name="解决方案" type="string" required="true"/>
