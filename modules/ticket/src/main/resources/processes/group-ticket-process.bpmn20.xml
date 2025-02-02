@@ -14,7 +14,7 @@
             
         <!-- 分配给技能组 -->
         <sequenceFlow sourceRef="evaluatePriority" targetRef="assignToGroup"/>
-        <userTask id="assignToGroup" name="技能组处理" flowable:candidateGroups="${workgroupId}">
+        <userTask id="assignToGroup" name="技能组处理" flowable:candidateGroups="${workgroupUid}">
             <documentation>技能组成员处理工单</documentation>
             <extensionElements>
                 <flowable:formProperty id="solution" name="解决方案" type="string" required="true"/>
