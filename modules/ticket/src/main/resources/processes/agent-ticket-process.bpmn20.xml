@@ -34,7 +34,7 @@
         </boundaryEvent>
         <sequenceFlow sourceRef="slaTimer" targetRef="slaNotification"/>
         <serviceTask id="slaNotification" name="SLA Timeout Notification"
-            flowable:class="com.bytedesk.ticket.delegate.SLANotificationDelegate"/>
+            flowable:class="com.bytedesk.ticket.delegate.TicketSLATimeoutNotificationDelegate"/>
         <sequenceFlow sourceRef="slaNotification" targetRef="escalateTicket"/>
         
         <!-- Ticket Escalation -->
