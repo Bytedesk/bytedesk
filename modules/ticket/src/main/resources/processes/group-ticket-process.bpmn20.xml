@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:flowable="http://flowable.org/bpmn"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    targetNamespace="BytedeskTicket">
+
+    <process id="groupTicketProcess" name="技能组工单流程" isExecutable="true">
+        <startEvent id="start" name="创建工单"/>
+        
+        <!-- 优先级评估 -->
+        <sequenceFlow sourceRef="start" targetRef="evaluatePriority"/>
+        <businessRuleTask id="evaluatePriority" name="优先级评估"
+            flowable:decisionRef="ticketPriorityRules"/>
+            
+        <!-- 分配给技能组 -->
+        <sequenceFlow sourceRef="evaluatePriority" targetRef="assignToGroup"/>
+        <userTask id="assignToGroup" name="技能组处理" flowable:candidateGroups="${workgroupId}">
+            <documentation>技能组成员处理工单</documentation>
+            <extensionElements>
+                <flowable:formProperty id="solution" name="解决方案" type="string" required="true"/>
+                <flowable:formProperty id="status" name="处理状态" type="enum">
+                    <flowable:value id="resolved" name="已解决"/>
+                    <flowable:value id="pending" name="待处理"/>
+                    <flowable:value id="escalated" name="需升级"/>
+                </flowable:formProperty>
+            </extensionElements>
+        </userTask>
+        
+        <!-- SLA监控 -->
+        <boundaryEvent id="slaTimer" attachedToRef="assignToGroup">
+            <timerEventDefinition>
+                <timeDuration>${slaTime}</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow sourceRef="slaTimer" targetRef="slaNotification"/>
+        <serviceTask id="slaNotification" name="SLA超时通知"
+            flowable:class="com.bytedesk.ticket.delegate.SLANotificationDelegate"/>
+        <sequenceFlow sourceRef="slaNotification" targetRef="assignToGroup"/>
+        
+        <!-- 客户确认 -->
+        <sequenceFlow sourceRef="assignToGroup" targetRef="customerVerify"/>
+        <userTask id="customerVerify" name="客户确认" flowable:assignee="${creator}">
+            <documentation>客户确认问题是否解决</documentation>
+            <extensionElements>
+                <flowable:formProperty id="satisfied" name="是否满意" type="boolean" required="true"/>
+                <flowable:formProperty id="comment" name="反馈意见" type="string"/>
+            </extensionElements>
+        </userTask>
+        
+        <!-- 满意度评价 -->
+        <sequenceFlow sourceRef="customerVerify" targetRef="satisfactionSurvey"/>
+        <userTask id="satisfactionSurvey" name="满意度评价" flowable:assignee="${creator}">
+            <extensionElements>
+                <flowable:formProperty id="rating" name="评分" type="enum">
+                    <flowable:value id="5" name="非常满意"/>
+                    <flowable:value id="4" name="满意"/>
+                    <flowable:value id="3" name="一般"/>
+                    <flowable:value id="2" name="不满意"/>
+                    <flowable:value id="1" name="非常不满意"/>
+                </flowable:formProperty>
+                <flowable:formProperty id="feedback" name="评价内容" type="string"/>
+            </extensionElements>
+        </userTask>
+        
+        <sequenceFlow sourceRef="satisfactionSurvey" targetRef="end"/>
+        <endEvent id="end" name="工单结束"/>
+    </process>
+</definitions> 
