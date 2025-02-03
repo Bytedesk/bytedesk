@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:42:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 13:54:56
+ * @LastEditTime: 2025-02-03 22:21:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,65 +18,64 @@ import com.bytedesk.core.constant.I18Consts;
 public class TicketCategories {
 
     /**
-     * Category structure:
-     * 1. Technical Support
-     *   - System Error
-     *   - Software Issue
-     *   - Hardware Issue
-     *   - Network Issue
-     *   - Account & Permission
-     * 2. Service Request
-     *   - New Account
-     *   - Permission Change
-     *   - Device Request
-     *   - Environment Setup
-     *   - Data Recovery
-     * 3. Consultation
-     *   - Product Usage
-     *   - Technical Solution
-     *   - Business Process
-     * 4. Complaint & Suggestion
-     *   - Service Quality
-     *   - System Improvement
-     *   - Process Optimization
-     * 5. Operation & Maintenance
-     *   - System Maintenance
-     *   - Data Backup
-     *   - Monitoring Alert
-     *   - Security Issue
-     *   - Performance Optimization
+     * Technical Support Categories
+     * 技术支持类
      */
-    public static final String[] CATEGORIES = {
-        I18Consts.I18N_PREFIX + "ticket.category.1.technical_support",              // parent
-        I18Consts.I18N_PREFIX + "ticket.category.1.1.system_error",                // child
-        I18Consts.I18N_PREFIX + "ticket.category.1.2.software_issue",
-        I18Consts.I18N_PREFIX + "ticket.category.1.3.hardware_issue",
-        I18Consts.I18N_PREFIX + "ticket.category.1.4.network_issue",
-        I18Consts.I18N_PREFIX + "ticket.category.1.5.account_permission",
-        
-        I18Consts.I18N_PREFIX + "ticket.category.2.service_request",               // parent
-        I18Consts.I18N_PREFIX + "ticket.category.2.1.new_account",                 // child
-        I18Consts.I18N_PREFIX + "ticket.category.2.2.permission_change",
-        I18Consts.I18N_PREFIX + "ticket.category.2.3.device_request",
-        I18Consts.I18N_PREFIX + "ticket.category.2.4.environment_setup",
-        I18Consts.I18N_PREFIX + "ticket.category.2.5.data_recovery",
-        
-        I18Consts.I18N_PREFIX + "ticket.category.3.consultation",                  // parent
-        I18Consts.I18N_PREFIX + "ticket.category.3.1.product_usage",               // child
-        I18Consts.I18N_PREFIX + "ticket.category.3.2.technical_solution",
-        I18Consts.I18N_PREFIX + "ticket.category.3.3.business_process",
-        
-        I18Consts.I18N_PREFIX + "ticket.category.4.complaint_suggestion",          // parent
-        I18Consts.I18N_PREFIX + "ticket.category.4.1.service_quality",             // child
-        I18Consts.I18N_PREFIX + "ticket.category.4.2.system_improvement",
-        I18Consts.I18N_PREFIX + "ticket.category.4.3.process_optimization",
-        
-        I18Consts.I18N_PREFIX + "ticket.category.5.operation_maintenance",         // parent
-        I18Consts.I18N_PREFIX + "ticket.category.5.1.system_maintenance",          // child
-        I18Consts.I18N_PREFIX + "ticket.category.5.2.data_backup",
-        I18Consts.I18N_PREFIX + "ticket.category.5.3.monitoring_alert",
-        I18Consts.I18N_PREFIX + "ticket.category.5.4.security_issue",
-        I18Consts.I18N_PREFIX + "ticket.category.5.5.performance_optimization"
+    public static final String[] TECHNICAL_SUPPORT = {
+        I18Consts.I18N_PREFIX + "ticket.category.technical_support",              // parent
+        I18Consts.I18N_PREFIX + "ticket.category.technical.system_error",         // children
+        I18Consts.I18N_PREFIX + "ticket.category.technical.software_issue",
+        I18Consts.I18N_PREFIX + "ticket.category.technical.hardware_issue",
+        I18Consts.I18N_PREFIX + "ticket.category.technical.network_issue",
+        I18Consts.I18N_PREFIX + "ticket.category.technical.account_permission"
+    };
+
+    /**
+     * Service Request Categories
+     * 服务请求类
+     */
+    public static final String[] SERVICE_REQUEST = {
+        I18Consts.I18N_PREFIX + "ticket.category.service_request",               // parent
+        I18Consts.I18N_PREFIX + "ticket.category.service.new_account",          // children
+        I18Consts.I18N_PREFIX + "ticket.category.service.permission_change",
+        I18Consts.I18N_PREFIX + "ticket.category.service.device_request",
+        I18Consts.I18N_PREFIX + "ticket.category.service.environment_setup",
+        I18Consts.I18N_PREFIX + "ticket.category.service.data_recovery"
+    };
+
+    /**
+     * Consultation Categories
+     * 咨询类
+     */
+    public static final String[] CONSULTATION = {
+        I18Consts.I18N_PREFIX + "ticket.category.consultation",                  // parent
+        I18Consts.I18N_PREFIX + "ticket.category.consult.product_usage",        // children
+        I18Consts.I18N_PREFIX + "ticket.category.consult.technical_solution",
+        I18Consts.I18N_PREFIX + "ticket.category.consult.business_process"
+    };
+
+    /**
+     * Complaint & Suggestion Categories
+     * 投诉与建议类
+     */
+    public static final String[] COMPLAINT_SUGGESTION = {
+        I18Consts.I18N_PREFIX + "ticket.category.complaint_suggestion",          // parent
+        I18Consts.I18N_PREFIX + "ticket.category.complaint.service_quality",     // children
+        I18Consts.I18N_PREFIX + "ticket.category.complaint.system_improvement",
+        I18Consts.I18N_PREFIX + "ticket.category.complaint.process_optimization"
+    };
+
+    /**
+     * Operation & Maintenance Categories
+     * 运维类
+     */
+    public static final String[] OPERATION_MAINTENANCE = {
+        I18Consts.I18N_PREFIX + "ticket.category.operation_maintenance",         // parent
+        I18Consts.I18N_PREFIX + "ticket.category.operation.system_maintenance",  // children
+        I18Consts.I18N_PREFIX + "ticket.category.operation.data_backup",
+        I18Consts.I18N_PREFIX + "ticket.category.operation.monitoring_alert",
+        I18Consts.I18N_PREFIX + "ticket.category.operation.security_issue",
+        I18Consts.I18N_PREFIX + "ticket.category.operation.performance_optimization"
     };
 
     /**
@@ -85,7 +84,7 @@ public class TicketCategories {
      * @return true if it's a parent category
      */
     public static boolean isParentCategory(String category) {
-        return category.matches("i18n\\.ticket\\.category\\.[1-5]\\.[a-z_]+$");
+        return !category.contains(".");
     }
 
     /**
@@ -97,9 +96,36 @@ public class TicketCategories {
         if (isParentCategory(childCategory)) {
             return null;
         }
-        // Extract the first number from the category key (e.g., "1" from "1.1")
-        String parentNumber = childCategory.split("\\.")[2];
-        return "i18n.ticket.category." + parentNumber + "." + 
-               childCategory.split(parentNumber + "\\.[0-9]\\.", 2)[1].split("_")[0];
+        String[] parts = childCategory.split("\\.");
+        return I18Consts.I18N_PREFIX + "ticket.category." + parts[2];
+    }
+
+    /**
+     * Get all categories as a single array
+     * @return Array containing all categories
+     */
+    public static String[] getAllCategories() {
+        int totalLength = TECHNICAL_SUPPORT.length + SERVICE_REQUEST.length + 
+                         CONSULTATION.length + COMPLAINT_SUGGESTION.length + 
+                         OPERATION_MAINTENANCE.length;
+        
+        String[] allCategories = new String[totalLength];
+        int index = 0;
+        
+        System.arraycopy(TECHNICAL_SUPPORT, 0, allCategories, index, TECHNICAL_SUPPORT.length);
+        index += TECHNICAL_SUPPORT.length;
+        
+        System.arraycopy(SERVICE_REQUEST, 0, allCategories, index, SERVICE_REQUEST.length);
+        index += SERVICE_REQUEST.length;
+        
+        System.arraycopy(CONSULTATION, 0, allCategories, index, CONSULTATION.length);
+        index += CONSULTATION.length;
+        
+        System.arraycopy(COMPLAINT_SUGGESTION, 0, allCategories, index, COMPLAINT_SUGGESTION.length);
+        index += COMPLAINT_SUGGESTION.length;
+        
+        System.arraycopy(OPERATION_MAINTENANCE, 0, allCategories, index, OPERATION_MAINTENANCE.length);
+        
+        return allCategories;
     }
 }
