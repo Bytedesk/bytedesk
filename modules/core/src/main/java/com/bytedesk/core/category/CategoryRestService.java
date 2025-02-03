@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 14:00:38
+ * @LastEditTime: 2025-02-03 22:09:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -94,6 +95,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         return page.map(this::convertToResponse);
     }
 
+    @Cacheable(value = "category", key = "#uid", unless = "#result == null")
     @Override
     public Optional<CategoryEntity> findByUid(String uid) {
         return categoryRepository.findByUid(uid);
@@ -134,9 +136,12 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         }
         //
         CategoryEntity category = modelMapper.map(request, CategoryEntity.class);
+
+        // 生成uid
         if (!StringUtils.hasText(request.getUid())) {
             category.setUid(uidUtils.getUid());
         }
+        // 平台
         if (StringUtils.hasText(request.getPlatform())) {
             category.setPlatform(request.getPlatform());
         }
@@ -144,7 +149,12 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         if (StringUtils.hasText(request.getParentUid())) {
             Optional<CategoryEntity> parentCategory = findByUid(request.getParentUid());
             if (parentCategory.isPresent()) {
-                category.setParent(parentCategory.get());
+                CategoryEntity parent = parentCategory.get();
+                parent.getChildren().add(category);
+                if (parent.getId() == null) {
+                    save(parent);
+                }
+                category.setParent(parent);
             }
         }
         //
@@ -180,6 +190,14 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     @Override
     public CategoryEntity save(CategoryEntity entity) {
         try {
+            // 保存父级
+            if (entity.getParent() != null) {
+                CategoryEntity parent = entity.getParent();
+                if (parent.getId() == null) {
+                    CategoryEntity newParent = categoryRepository.save(parent);
+                    entity.setParent(newParent);
+                }
+            }
             return categoryRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
