@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 06:21:42
+ * @LastEditTime: 2025-02-03 10:25:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,7 @@ import lombok.Data;
 @Data
 public class MemberExcel {
 
-    @ExcelProperty(index = 0, value = "昵称")
+    @ExcelProperty(index = 0, value = "Nickname")
     @ColumnWidth(20)
     private String nickname;
 
@@ -31,23 +31,23 @@ public class MemberExcel {
     @ColumnWidth(20)
     private String email;
 
-    @ExcelProperty(index = 2, value = "手机")
+    @ExcelProperty(index = 2, value = "Mobile")
     @ColumnWidth(20)
     private String mobile;
 
-    @ExcelProperty(index = 3, value = "工号")
+    @ExcelProperty(index = 3, value = "Job No")
     @ColumnWidth(20)
     private String jobNo;
 
-    @ExcelProperty(index = 4, value = "职位")
+    @ExcelProperty(index = 4, value = "Job Title")
     @ColumnWidth(20)
     private String jobTitle;
 
-    @ExcelProperty(index = 5, value = "座位号")
+    @ExcelProperty(index = 5, value = "Seat No")
     @ColumnWidth(20)
     private String seatNo;
 
-    @ExcelProperty(index = 6, value = "座机")
+    @ExcelProperty(index = 6, value = "Telephone")
     @ColumnWidth(20)
     private String telephone;
     
