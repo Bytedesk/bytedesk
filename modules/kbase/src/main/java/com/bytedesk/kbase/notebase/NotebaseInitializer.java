@@ -36,7 +36,7 @@ public class NotebaseInitializer implements SmartInitializingSingleton {
 
     private void init() {
         for (PermissionEnum permission : PermissionEnum.values()) {
-            String permissionValue = NotebasePermissions.Notebase_PREFIX + permission.name();
+            String permissionValue = NotebasePermissions.NOTEBASE_PREFIX + permission.name();
             if (authorityService.existsByValue(permissionValue)) {
                 continue;
             }
