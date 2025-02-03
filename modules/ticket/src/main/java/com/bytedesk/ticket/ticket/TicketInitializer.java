@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:34:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 13:37:25
+ * @LastEditTime: 2025-02-03 13:59:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,12 @@ package com.bytedesk.ticket.ticket;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRequest;
 import com.bytedesk.core.rbac.authority.AuthorityService;
@@ -31,11 +36,12 @@ public class TicketInitializer implements SmartInitializingSingleton {
 
     private final AuthorityService authorityService;
 
+    private final CategoryRestService categoryService;
+
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
         initTicketCategory();
-        initTicket();
     }
 
     private void initAuthority() {
@@ -57,10 +63,37 @@ public class TicketInitializer implements SmartInitializingSingleton {
 
     private void initTicketCategory() {
         log.info("initTicketCategory");
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        for (String category : TicketCategories.CATEGORIES) {
+            log.info("initTicketCategory: {}", category);
+
+            if (TicketCategories.isParentCategory(category)) {  // 父类
+                CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(category)
+                    .orderNo(0)
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .build();
+                categoryRequest.setType(CategoryTypeEnum.TICKET.name());
+                categoryRequest.setUid(orgUid + category);
+                categoryRequest.setOrgUid(orgUid);
+                categoryService.create(categoryRequest);
+            } else {  // 子类
+                String parentCategory = TicketCategories.getParentCategory(category);
+                CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .parentUid(orgUid + parentCategory)
+                    .name(category)
+                    .orderNo(0)
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .build();
+                categoryRequest.setType(CategoryTypeEnum.TICKET.name());
+                categoryRequest.setUid(orgUid + category);
+                categoryRequest.setOrgUid(orgUid);
+                categoryService.create(categoryRequest);
+            }
+        }
     }
 
-    private void initTicket() {
-        log.info("initTicket");
-    }
 
 }

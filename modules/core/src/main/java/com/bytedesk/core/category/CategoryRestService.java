@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 16:43:23
+ * @LastEditTime: 2025-02-03 14:00:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -99,37 +99,6 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         return categoryRepository.findByUid(uid);
     }
 
-    public Boolean existsByUid(String uid) {
-        return categoryRepository.existsByUid(uid);
-    }
-
-    public Boolean existsByNameAndOrgUidAndDeletedFalse(String name, String orgUid) {
-        return categoryRepository.existsByNameAndOrgUidAndDeletedFalse(name, orgUid);
-    }
-
-    @Override
-    public CategoryResponse create(CategoryRequest request) {
-
-        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-            return null;
-        }
-
-        CategoryEntity category = modelMapper.map(request, CategoryEntity.class);
-        if (!StringUtils.hasText(request.getUid())) {
-            category.setUid(uidUtils.getUid());
-        }
-        if (StringUtils.hasText(request.getPlatform())) {
-            category.setPlatform(request.getPlatform());
-        }
-        //
-        CategoryEntity newCategory = save(category);
-        if (newCategory == null) {
-            throw new RuntimeException("category save error");
-        }
-        // 
-        return convertToResponse(newCategory);
-    }
-
     public Optional<CategoryEntity> findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(String name, String type, String orgUid,
            String level, String platform) {
         return categoryRepository.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeletedFalse(name, type, orgUid, level, platform);
@@ -146,6 +115,45 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     public List<CategoryEntity> findByKbUid(String kbUid) {
         return categoryRepository.findByKbUidAndDeletedFalse(kbUid);
+    }
+
+
+    public Boolean existsByUid(String uid) {
+        return categoryRepository.existsByUid(uid);
+    }
+
+    public Boolean existsByNameAndOrgUidAndDeletedFalse(String name, String orgUid) {
+        return categoryRepository.existsByNameAndOrgUidAndDeletedFalse(name, orgUid);
+    }
+
+    @Override
+    public CategoryResponse create(CategoryRequest request) {
+
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return null;
+        }
+        //
+        CategoryEntity category = modelMapper.map(request, CategoryEntity.class);
+        if (!StringUtils.hasText(request.getUid())) {
+            category.setUid(uidUtils.getUid());
+        }
+        if (StringUtils.hasText(request.getPlatform())) {
+            category.setPlatform(request.getPlatform());
+        }
+        // 父类
+        if (StringUtils.hasText(request.getParentUid())) {
+            Optional<CategoryEntity> parentCategory = findByUid(request.getParentUid());
+            if (parentCategory.isPresent()) {
+                category.setParent(parentCategory.get());
+            }
+        }
+        //
+        CategoryEntity newCategory = save(category);
+        if (newCategory == null) {
+            throw new RuntimeException("category save error");
+        }
+        // 
+        return convertToResponse(newCategory);
     }
 
     @Override
