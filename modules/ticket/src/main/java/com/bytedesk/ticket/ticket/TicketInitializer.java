@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:34:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 22:11:22
+ * @LastEditTime: 2025-02-03 22:20:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,7 +64,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
     private void initTicketCategory() {
         log.info("initTicketCategory");
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        for (String category : TicketCategories.CATEGORIES) {
+        for (String category : TicketCategories.getAllCategories()) {
             log.info("initTicketCategory: {}", category);
 
             if (TicketCategories.isParentCategory(category)) {  // 父类
