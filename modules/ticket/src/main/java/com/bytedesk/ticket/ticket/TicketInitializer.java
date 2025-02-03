@@ -17,7 +17,7 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.category.CategoryRequest;
-import com.bytedesk.core.category.CategoryRestService;
+// import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -36,7 +36,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
 
     private final AuthorityService authorityService;
 
-    private final CategoryRestService categoryService;
+    // private final CategoryRestService categoryService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -77,7 +77,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
                 categoryRequest.setType(CategoryTypeEnum.TICKET.name());
                 categoryRequest.setUid(orgUid + category);
                 categoryRequest.setOrgUid(orgUid);
-                categoryService.create(categoryRequest);
+                // categoryService.create(categoryRequest);
             } else {  // 子类
                 String parentCategory = TicketCategories.getParentCategory(category);
                 CategoryRequest categoryRequest = CategoryRequest.builder()
@@ -90,7 +90,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
                 categoryRequest.setType(CategoryTypeEnum.TICKET.name());
                 categoryRequest.setUid(orgUid + category);
                 categoryRequest.setOrgUid(orgUid);
-                categoryService.create(categoryRequest);
+                // categoryService.create(categoryRequest);
             }
         }
     }
