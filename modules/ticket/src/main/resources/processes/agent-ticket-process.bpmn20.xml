@@ -8,7 +8,7 @@
     typeLanguage="http://www.w3.org/2001/XMLSchema"
     expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="BytedeskTicket"
     exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
-    <process id="agentTicketProcess" name="Agent Ticket Process" isExecutable="true">
+    <process id="agentTicketProcess" name="Agent Ticket Process" isExecutable="true" flowable:tenantId="${tenantId}">
         <startEvent id="start" name="Create Ticket" flowable:formFieldValidation="true"></startEvent>
         <sequenceFlow id="sequenceFlow-6b9988a7-7304-40b8-b71a-9676e0060923" sourceRef="start"
             targetRef="evaluatePriority"></sequenceFlow>
