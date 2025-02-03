@@ -99,6 +99,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
         if (assigneeOptional.isPresent()) {
             ticket.setAssignee(assigneeOptional.get());
+            ticket.setType(TicketTypeEnum.AGENT.name());
+        } else {
+            ticket.setType(TicketTypeEnum.GROUP.name());
         }
         Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
         if (reporterOptional.isPresent()) {
