@@ -70,7 +70,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (user == null) {
             throw new RuntimeException("user not found");
         }
-        // request.setUserUid(user.getUid());
+        request.setReporterUid(user.getUid());
         
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "id");
@@ -86,7 +86,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // if (user == null) {
         //     throw new RuntimeException("user not found");
         // }
-        // String userId = user.getUid();
+        // String userUid = user.getUid();
         // 检查用户是否有创建工单的权限
         // if (!identityService.hasPrivilege(userId, "TICKET_CREATE")) {
         //     throw new AccessDeniedException("No permission to create ticket");
