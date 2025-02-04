@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-03 11:35:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 11:35:39
+ * @LastEditTime: 2025-02-04 14:42:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,16 @@
 -->
 # 前端
 
-- 管理后台
-- 客户端
-- 访客端
-- 移动端：安卓、iOS
+- [客户端](https://github.com/Bytedesk/bytedesk-desktop)
+- [访客端](https://github.com/Bytedesk/bytedesk-web)
+- [移动端](https://github.com/Bytedesk/bytedesk-mobile)
+
+## 管理后台
+
+![statistics](../images/admin/statistics_zh.png)
+![chat](../images/admin/chat_zh.png)
+
+## 客户端
+
+![chat](../images/desktop/chat_zh.png)
+![ticket](../images/desktop/ticket_zh.png)
