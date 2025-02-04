@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-03 11:35:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 11:36:27
+ * @LastEditTime: 2025-02-04 14:55:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,16 @@
 -->
 # frontend
 
-- admin
-- desktop
-- visitor
-- mobile: android, ios
+- [desktop](https://github.com/Bytedesk/bytedesk-desktop)
+- [visitor](https://github.com/Bytedesk/bytedesk-web)
+- [mobile](https://github.com/Bytedesk/bytedesk-mobile)
+
+## Admin
+
+![admin statistics](../images/admin/statistics.png)
+![admin chat](../images/admin/chat.png)
+
+## Desktop
+
+![desktop chat](../images/desktop/chat.png)
+![desktop ticket](../images/desktop/ticket.png)
