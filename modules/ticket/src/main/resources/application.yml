@@ -29,4 +29,7 @@ flowable:
       group-name-attribute: cn
       authentication: simple
       security-principal: cn=admin,dc=bytedesk,dc=com
-      security-credentials: admin_password 
+      security-credentials: admin_password
+  dmn:
+    enabled: true
+    deploy-resources: true 
