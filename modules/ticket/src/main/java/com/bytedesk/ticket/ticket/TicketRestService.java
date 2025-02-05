@@ -2,6 +2,7 @@ package com.bytedesk.ticket.ticket;
 
 import org.flowable.engine.TaskService;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -80,6 +81,13 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
         return ticketPage.map(this::convertToResponse);
     }
+
+    @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
+    @Override
+    public Optional<TicketEntity> findByUid(String uid) {
+        return ticketRepository.findByUid(uid);
+    }
+
 
     @Transactional
     @Override
@@ -251,11 +259,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         save(ticket);
     }
 
-    @Override
-    public Optional<TicketEntity> findByUid(String uid) {
-        return ticketRepository.findByUid(uid);
-    }
-
+    
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             TicketEntity entity) {
