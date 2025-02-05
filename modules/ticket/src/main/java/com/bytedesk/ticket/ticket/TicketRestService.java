@@ -18,9 +18,13 @@ import java.util.Optional;
 import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRestService;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -57,6 +61,10 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     private final AgentRestService agentRestService;
 
     private final WorkgroupRestService workgroupRestService;
+
+    private final ThreadRestService threadRestService;
+
+    private final CategoryRestService categoryRestService;
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
@@ -106,6 +114,16 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
         // 
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getThreadTopic());
+        if (threadOptional.isPresent()) {
+            ticket.setThread(threadOptional.get());
+        }
+        // 
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
+        if (categoryOptional.isPresent()) {
+            ticket.setCategory(categoryOptional.get());
+        }
+        // 
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
         if (workgroupOptional.isPresent()) {
             ticket.setWorkgroup(workgroupOptional.get());
@@ -146,13 +164,29 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
-        ticket.setCategoryUid(request.getCategoryUid());
+        // ticket.setCategoryUid(request.getCategoryUid());
         ticket.setStatus(request.getStatus());
+        // 
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getThreadTopic());
+        if (threadOptional.isPresent()) {
+            ticket.setThread(threadOptional.get());
+        }
+        // 
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
+        if (categoryOptional.isPresent()) {
+            ticket.setCategory(categoryOptional.get());
+        }
         // 
         Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
         if (assigneeOptional.isPresent()) {
             ticket.setAssignee(assigneeOptional.get());
         }
+        // 
+        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
+        if (workgroupOptional.isPresent()) {
+            ticket.setWorkgroup(workgroupOptional.get());
+        }
+        // 
         TicketEntity savedTicket = save(ticket);
         if (savedTicket == null) {
             throw new RuntimeException("update ticket failed");
