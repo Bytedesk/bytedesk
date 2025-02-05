@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:flowable="http://flowable.org/bpmn"
     xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
     xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
     xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
     typeLanguage="http://www.w3.org/2001/XMLSchema"
-    expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="BytedeskTicket"
-    exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
+    expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="BytedeskTicket"
+    exporter="Flowable Open Source Modeler"
+    exporterVersion="6.8.0">
     <!--  flowable:tenantId="${orgUid}" -->
     <process id="groupTicketProcess" name="Group Ticket Process" isExecutable="true">
         <startEvent id="start" name="Create Ticket" flowable:formFieldValidation="true"></startEvent>
         <sequenceFlow id="sequenceFlow-bc10ee85-13ff-41cb-9801-e3312a63a5c9" sourceRef="start"
             targetRef="evaluatePriority"></sequenceFlow>
-        <businessRuleTask id="evaluatePriority" name="Evaluate Priority"></businessRuleTask>
+        <!-- <businessRuleTask id="evaluatePriority" name="Evaluate Priority" 
+            flowable:decisionRef="ticketPriorityRules"
+            flowable:decisionRefBinding="latest"
+            flowable:resultVariable="priorityResult"></businessRuleTask> -->
+        <serviceTask id="evaluatePriority" name="Evaluate Priority"
+            flowable:class="com.bytedesk.ticket.delegate.TicketEvaluatePriorityDelegate"/>
         <sequenceFlow id="sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b"
             sourceRef="evaluatePriority" targetRef="assignToGroup"></sequenceFlow>
         <userTask id="assignToGroup" name="Group Handle" flowable:candidateGroups="${workgroupUid}"

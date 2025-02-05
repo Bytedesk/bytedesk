@@ -3,7 +3,8 @@
     xmlns:flowable="http://flowable.org/dmn"
     id="ticketPriority" name="Ticket Priority Decision" namespace="BytedeskTicket">
     
-    <decision id="ticketPriorityRules" name="Ticket Priority Rules" flowable:tenantId="${tenantId}">
+    <!--  flowable:tenantId="${tenantId}" -->
+    <decision id="ticketPriorityRules" name="Ticket Priority Rules">
         <decisionTable id="ticketPriorityTable" hitPolicy="FIRST">
             <!-- Input Conditions -->
             <input id="customerLevel" label="Customer Level">

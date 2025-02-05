@@ -32,4 +32,9 @@ flowable:
       security-credentials: admin_password
   dmn:
     enabled: true
-    deploy-resources: true 
+    deploy-resources: true
+    resource-location: classpath*:/dmn/*.dmn
+    history-enabled: true
+  process:
+    definition-cache-limit: 1
+    async-executor-activate: true 
