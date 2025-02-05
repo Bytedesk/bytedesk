@@ -23,6 +23,8 @@ import com.bytedesk.core.rbac.user.UserRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
@@ -53,7 +55,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final AgentRestService agentRestService;
 
-    // private final TicketIdentityService identityService;
+    private final WorkgroupRestService workgroupRestService;
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
@@ -71,7 +73,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             throw new RuntimeException("user not found");
         }
         request.setReporterUid(user.getUid());
-        
+        // 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "id");
         Specification<TicketEntity> spec = TicketSpecification.search(request);
@@ -95,6 +97,13 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
+        // 
+        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
+        if (workgroupOptional.isPresent()) {
+            ticket.setWorkgroup(workgroupOptional.get());
+        } else {
+            throw new RuntimeException("workgroup not found");
+        }
         // 
         Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
         if (assigneeOptional.isPresent()) {

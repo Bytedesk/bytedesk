@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 08:55:26
+ * @LastEditTime: 2025-02-05 10:28:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.listener.TicketEntityListener;
@@ -61,6 +62,10 @@ public class TicketEntity extends BaseEntity {
     private String threadTopic; // 工单会话主题
 
     private String categoryUid;        // 分类
+
+    // 一个工单一个工作组，一个工作组可以有多个工单
+    @ManyToOne
+    private WorkgroupEntity workgroup;
 
     // 一个工单一个处理人，一个处理人可以处理多个工单
     @ManyToOne
