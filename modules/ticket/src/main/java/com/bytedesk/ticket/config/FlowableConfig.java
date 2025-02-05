@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-15 21:33:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 08:28:53
+ * @LastEditTime: 2025-02-05 11:23:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FlowableConfig {
 
+    // @Autowired
+    // private RepositoryService repositoryService;
+    
     @Bean
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> engineConfigurationConfigurer() {
         return engineConfiguration -> {
@@ -28,6 +31,16 @@ public class FlowableConfig {
             engineConfiguration.setDatabaseSchemaUpdate("true");
         };
     }
+
+    // @PostConstruct
+    // public void deployProcessDefinitions() {
+    //     // 部署流程定义和规则文件
+    //     repositoryService.createDeployment()
+    //         .addClasspathResource("processes/agent-ticket-process.bpmn20.xml")
+    //         .addClasspathResource("processes/group-ticket-process.bpmn20.xml")
+    //         .addClasspathResource("dmn/ticket-priority-rules.dmn")  // 添加规则文件
+    //         .deploy();
+    // }
     
     // 可选：实现多租户数据源
     // private MultiTenantDataSource createMultiTenantDataSource() {
