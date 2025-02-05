@@ -68,8 +68,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "id");
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
+                "updatedAt");
         Specification<TicketEntity> spec = TicketSpecification.search(request);
         Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
         return ticketPage.map(this::convertToResponse);
