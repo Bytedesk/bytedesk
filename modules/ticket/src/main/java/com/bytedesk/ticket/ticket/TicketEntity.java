@@ -16,7 +16,9 @@ package com.bytedesk.ticket.ticket;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
@@ -59,9 +61,13 @@ public class TicketEntity extends BaseEntity {
     @Builder.Default
     private String type = TicketTypeEnum.AGENT.name();        // 类型(agent/group)
 
-    private String threadTopic; // 工单会话主题
+    // private String threadTopic; // 工单会话主题
+    @ManyToOne
+    private ThreadEntity thread;
 
-    private String categoryUid;        // 分类
+    // private String categoryUid;        // 分类
+    @ManyToOne
+    private CategoryEntity category;
 
     // 一个工单一个工作组，一个工作组可以有多个工单
     @ManyToOne
