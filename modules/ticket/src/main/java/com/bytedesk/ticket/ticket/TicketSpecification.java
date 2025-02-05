@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-05 13:03:15
+ * @LastEditTime: 2025-02-05 14:07:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,6 +63,12 @@ public class TicketSpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getReporterUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()));
+            }
+            if (StringUtils.hasText(request.getStartDate())) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), request.getStartDate()));
+            }
+            if (StringUtils.hasText(request.getEndDate())) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), request.getEndDate()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
