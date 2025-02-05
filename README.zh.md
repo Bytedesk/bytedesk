@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-04 14:50:51
+ * @LastEditTime: 2025-02-05 15:36:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,13 +80,13 @@
 ### 克隆项目并启动docker compose容器
 
 ```bash
-git clone https://gitee.com/270580156/weiyu.im.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose.yaml up -d
+git clone https://gitee.com/270580156/weiyu.im.git && cd weiyu.im/deploy/docker && docker compose -p weiyu -f docker-compose.yaml up -d
 ```
 
 ### 停止容器
 
 ```bash
-docker compose -p bytedesk -f docker-compose.yaml stop
+docker compose -p weiyu -f docker-compose.yaml stop
 ```
 
 ## 演示
