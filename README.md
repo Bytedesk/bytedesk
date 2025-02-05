@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-05 10:53:04
+ * @LastEditTime: 2025-02-05 12:01:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,16 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 
 - [English](./README.md)
 - [中文](./README.zh.md)
+- [日本語](./README.ja.md)
+- [한국어](./README.ko.md)
+- [Español](./README.es.md)
+- [Français](./README.fr.md)
+- [Deutsch](./README.de.md)
+- [Italiano](./README.it.md)
+- [Português](./README.pt.md)
+- [Русский](./README.ru.md)
+- [العربية](./README.ar.md)
+- [हिन्दी](./README.hi.md)
 
 ![statistics](./images/admin/statistics.png)
 ![chat](./images/admin/chat.png)
