@@ -21,7 +21,7 @@
             flowable:decisionRefBinding="latest"
             flowable:resultVariable="priorityResult"></businessRuleTask> -->
         <serviceTask id="evaluatePriority" name="Evaluate Priority"
-            flowable:class="com.bytedesk.ticket.delegate.TicketEvaluatePriorityDelegate"/>
+            flowable:delegateExpression="${ticketEvaluatePriorityDelegate}"/>
         <sequenceFlow id="sequenceFlow-a275b096-0da9-42a2-b28a-df7147204665"
             sourceRef="evaluatePriority" targetRef="assignToAgent"></sequenceFlow>
         <userTask id="assignToAgent" name="Agent Handle" flowable:assignee="${agentUid}"

@@ -1,40 +1,48 @@
-spring:
-  mail:
-    host: smtp.example.com
-    port: 587
-    username: noreply@bytedesk.com
-    password: your-password
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true 
+# spring:
+#   mail:
+#     host: smtp.example.com
+#     port: 587
+#     username: noreply@bytedesk.com
+#     password: your-password
+#     properties:
+#       mail:
+#         smtp:
+#           auth: true
+#           starttls:
+#             enable: true 
 
-flowable:
-  idm:
-    ldap:
-      enabled: true
-      server: ldap://ldap.bytedesk.com:389
-      base-dn: dc=bytedesk,dc=com
-      user-base-dn: ou=users
-      group-base-dn: ou=groups
-      user-search-filter: (uid={0})
-      group-search-filter: (member={0})
-      user-id-attribute: uid
-      user-first-name-attribute: givenName
-      user-last-name-attribute: sn
-      user-email-attribute: mail
-      group-id-attribute: cn
-      group-name-attribute: cn
-      authentication: simple
-      security-principal: cn=admin,dc=bytedesk,dc=com
-      security-credentials: admin_password
-  dmn:
-    enabled: true
-    deploy-resources: true
-    resource-location: classpath*:/dmn/*.dmn
-    history-enabled: true
-  process:
-    definition-cache-limit: 1
-    async-executor-activate: true 
+# flowable:
+#   idm:
+#     ldap:
+#       enabled: true
+#       server: ldap://ldap.bytedesk.com:389
+#       base-dn: dc=bytedesk,dc=com
+#       user-base-dn: ou=users
+#       group-base-dn: ou=groups
+#       user-search-filter: (uid={0})
+#       group-search-filter: (member={0})
+#       user-id-attribute: uid
+#       user-first-name-attribute: givenName
+#       user-last-name-attribute: sn
+#       user-email-attribute: mail
+#       group-id-attribute: cn
+#       group-name-attribute: cn
+#       authentication: simple
+#       security-principal: cn=admin,dc=bytedesk,dc=com
+#       security-credentials: admin_password
+#   dmn:
+#     enabled: true
+#     deploy-resources: true
+#     resource-location: classpath*:/dmn/
+#     resource-suffixes: **.dmn
+#   process:
+#     definition-location-prefix: classpath*:/processes/
+#     definition-location-suffixes: **.bpmn20.xml
+#   database-schema-update: true
+#   async-executor-activate: true
+#   common:
+#     app:
+#       idm-url: http://localhost:8080/flowable-idm
+#       idm-admin:
+#         user: admin
+#         password: test 
