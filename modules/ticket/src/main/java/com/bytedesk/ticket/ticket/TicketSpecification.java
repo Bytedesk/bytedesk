@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-24 14:06:31
+ * @LastEditTime: 2025-02-05 13:03:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,6 +39,10 @@ public class TicketSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
+            if (StringUtils.hasText(request.getSearchText())) {
+                predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getSearchText() + "%"));
+                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getSearchText() + "%"));
+            }
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
@@ -51,11 +55,14 @@ public class TicketSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getThreadTopic())) {
                 predicates.add(criteriaBuilder.equal(root.get("threadTopic"), request.getThreadTopic()));
             }
+            if (StringUtils.hasText(request.getWorkgroupUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("workgroup").get("uid"), request.getWorkgroupUid()));
+            }
             if (StringUtils.hasText(request.getAssigneeUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("assigneeUid"), request.getAssigneeUid()));
+                predicates.add(criteriaBuilder.equal(root.get("assigneeUid").get("uid"), request.getAssigneeUid()));
             }
             if (StringUtils.hasText(request.getReporterUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("reporterUid"), request.getReporterUid()));
+                predicates.add(criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
