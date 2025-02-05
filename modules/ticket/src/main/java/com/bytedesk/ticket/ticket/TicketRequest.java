@@ -39,6 +39,8 @@ public class TicketRequest extends BaseRequest {
     private String categoryUid;
     // 
     private String workgroupUid;
+    // 
+    private Boolean assignmentAll;
     private String assigneeUid;
     private String reporterUid;
     // 
