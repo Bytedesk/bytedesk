@@ -17,7 +17,15 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        service
+        service module is under construction...
+        <br>
+        多渠道接入
+        <br>
+        人工客服
+        <br>
+        统计报表
+        <br>
+        消息撤回
         
         <script src="" async defer></script>
     </body>

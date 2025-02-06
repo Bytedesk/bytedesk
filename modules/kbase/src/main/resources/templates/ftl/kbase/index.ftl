@@ -18,6 +18,22 @@
         <![endif]-->
 
         kbase help center is under construction
+        <br>
+        对接大模型L
+        <br>
+        自定义知识库
+        <br>
+        AI对话
+        <br>
+        内部知识库
+        <br>
+        外部知识库
+        <br>
+        知识库分类
+        <br>
+        知识库标签
+        <br>
+        知识库搜索
         
         <script src="" async defer></script>
     </body>
