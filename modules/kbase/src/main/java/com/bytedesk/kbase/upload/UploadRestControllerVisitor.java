@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 19:21:06
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-06 11:40:38
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-06 12:04:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class UploadRestControllerVisitor {
                 file, fileName, fileType, kbType, client,
                 orgUid, visitorProtobuf, null, null);
         
-        return ResponseEntity.ok(JsonResult.success("upload success", response.getFileUrl()));
+        return ResponseEntity.ok(JsonResult.success("upload success", response));
     }
     
 }
