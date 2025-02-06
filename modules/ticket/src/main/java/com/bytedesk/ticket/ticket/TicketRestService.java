@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
@@ -26,6 +28,8 @@ import com.bytedesk.core.rbac.user.UserRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.upload.UploadEntity;
+import com.bytedesk.kbase.upload.UploadRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -65,6 +69,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     private final ThreadRestService threadRestService;
 
     private final CategoryRestService categoryRestService;
+
+    private final UploadRestService uploadRestService;
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
@@ -145,7 +151,22 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ticket.setReporter(reporterOptional.get());
         }
         // 
-        
+        List<TicketAttachmentEntity> attachments = new ArrayList<>();
+        if (request.getUploadUids() != null) {
+            for (String uploadUid : request.getUploadUids()) {
+                Optional<UploadEntity> uploadOptional = uploadRestService.findByUid(uploadUid);
+                if (uploadOptional.isPresent()) {
+                    TicketAttachmentEntity attachment = new TicketAttachmentEntity();
+                    attachment.setUid(uidUtils.getUid());
+                    attachment.setTicket(ticket);
+                    attachment.setUpload(uploadOptional.get());
+                    attachmentRepository.save(attachment);
+                    // 
+                    attachments.add(attachment);
+                }
+            }
+        }
+        ticket.setAttachments(attachments);
         // 
         TicketEntity savedTicket = save(ticket);
         if (savedTicket == null) {
@@ -188,6 +209,23 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (workgroupOptional.isPresent()) {
             ticket.setWorkgroup(workgroupOptional.get());
         }
+        // 
+        List<TicketAttachmentEntity> attachments = new ArrayList<>();
+        if (request.getUploadUids() != null) {
+            for (String uploadUid : request.getUploadUids()) {
+                Optional<UploadEntity> uploadOptional = uploadRestService.findByUid(uploadUid);
+                if (uploadOptional.isPresent()) {
+                    TicketAttachmentEntity attachment = new TicketAttachmentEntity();
+                    attachment.setUid(uidUtils.getUid());
+                    attachment.setTicket(ticket);
+                    attachment.setUpload(uploadOptional.get());
+                    attachmentRepository.save(attachment);
+                    // 
+                    attachments.add(attachment);
+                }
+            }
+        }
+        ticket.setAttachments(attachments);
         // 
         TicketEntity savedTicket = save(ticket);
         if (savedTicket == null) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-21 10:43:46
+ * @LastEditTime: 2025-02-06 15:24:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,6 +95,24 @@ public class ArticleEntity extends BaseEntity {
     @Builder.Default
     private int readCount = 0;
 
+    // 是否需要审核
+    @Builder.Default
+    @Column(name = "is_audit")
+    private boolean isAudit = false;
+
+    // 审核状态
+    @Builder.Default
+    @Column(name = "audit_status")
+    private String auditStatus = ArticleAuditStatusEnum.PENDING.name();
+
+    // 是否需要密码访问
+    @Builder.Default
+    @Column(name = "is_password_protected")
+    private boolean isPasswordProtected = false;
+
+    private String password;
+
+    // 
     private String categoryUid; // 文章分类。生成页面时，先查询分类，后通过分类查询相关文章。
 
     private String kbUid; // 对应知识库
