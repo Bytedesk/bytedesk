@@ -177,12 +177,12 @@
 
             <h2>${i18n[lang]["moduleDevelopment"]}</h2>
             <ul>
-                <li><a href="/ticket/" target="_blank">${i18n[lang]["ticket"]}</a></li>
                 <li><a href="/team/" target="_blank">${i18n[lang]["team"]}</a></li>
                 <li><a href="/service/" target="_blank">${i18n[lang]["service"]}</a></li>
-                <#--  <li><a href="/social/" target="_blank">${i18n[lang]["social"]}</a></li>  -->
                 <li><a href="/kbase/" target="_blank">${i18n[lang]["kbase"]}</a></li>
                 <li><a href="/ai/" target="_blank">${i18n[lang]["ai"]}</a></li>
+                <li><a href="/ticket/" target="_blank">${i18n[lang]["ticket"]}</a></li>
+                <#--  <li><a href="/social/" target="_blank">${i18n[lang]["social"]}</a></li>  -->                
                 <#--  <li><a href="/voc/" target="_blank">${i18n[lang]["voiceOfCustomer"]}</a></li>  -->
                 <#--  <li><a href="/forum/" target="_blank">${i18n[lang]["forum"]}</a></li>  -->
             </ul>

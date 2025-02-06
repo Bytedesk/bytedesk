@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>工单管理系统 - 微语</title>
     <meta name="description" content="微语工单管理系统是一个功能强大的客服工单解决方案">
-    <link href="/assets/vendor/bootstrap4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/vendor/bootstrap5/css/bootstrap.min.css" rel="stylesheet">
     <#--  <link href="/css/ticket/index.css" rel="stylesheet">  -->
     <style>
         .feature-icon {
@@ -136,12 +136,12 @@
     <footer class="bg-light py-4 mt-5">
         <div class="container text-center">
             <p class="mb-0">© 2025 微语. All rights reserved.</p>
-            <p class="text-muted">北京微语天下科技有限公司 - 让客户服务更简单</p>
+            <p class="text-muted">北京微语天下科技有限公司</p>
         </div>
     </footer>
 
     <script src="/assets/vendor/jquery-3.7.1.min.js"></script>
-    <script src="/assets/vendor/bootstrap4/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
     <#--  <script src="/js/ticket/index.js"></script>  -->
 </body>
 </html>

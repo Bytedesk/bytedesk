@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 17:17:13
+ * @LastEditTime: 2025-02-06 18:05:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,8 +85,8 @@ public class PageRouteController {
 			zh.put("moduleDevelopment", "模块简介");
 			zh.put("forum", "用户社区");
 			zh.put("ticket", "工单模块");
-			zh.put("team", "团队模块");
-			zh.put("service", "服务模块");
+			zh.put("team", "企业IM模块");
+			zh.put("service", "客服模块");
 			zh.put("kbase", "知识库模块");
 			zh.put("ai", "AI模块");
 			
@@ -107,8 +107,8 @@ public class PageRouteController {
 			zhTW.put("moduleDevelopment", "模組簡介");
 			zhTW.put("forum", "用戶社區");
 			zhTW.put("ticket", "工單模組");
-			zhTW.put("team", "團隊模組");
-			zhTW.put("service", "服務模組");
+			zhTW.put("team", "企業IM模組");
+			zhTW.put("service", "客服模組");
 			zhTW.put("kbase", "知識庫模組");
 			zhTW.put("ai", "AI模組");
 			
