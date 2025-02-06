@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 15:56:17
+ * @LastEditTime: 2025-02-06 11:17:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,8 +12,8 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ticket.attachment;
-import java.time.LocalDateTime;
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
@@ -35,20 +35,11 @@ import lombok.AllArgsConstructor;
 public class TicketAttachmentEntity extends BaseEntity {
     
     @ManyToOne
-    private TicketEntity ticket;         // 关联的工单
+    private TicketEntity ticket; 
 
     @ManyToOne
     private TicketCommentEntity comment;
 
-    // 
-    private String fileName;        // 文件名
-    // 
-    private String fileType;        // 文件类型
-    // 
-    private String filePath;        // 文件路径
-    // 
-    private Long fileSize;         // 文件大小
-    // 
-    @Builder.Default
-    private LocalDateTime uploadTime = LocalDateTime.now();       // 上传时间
+    @ManyToOne
+    private UploadEntity upload;
 } 

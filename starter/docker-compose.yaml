@@ -6,7 +6,7 @@ services:
       MYSQL_DATABASE: bytedesk_im
       MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
     ports:
-      - "3306:3306"
+      - "13306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -16,7 +16,7 @@ services:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
     ports:
-      - "6379:6379"
+      - "16379:6379"
     environment:
       - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
     volumes:

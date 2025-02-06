@@ -12,7 +12,6 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ticket.comment;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
@@ -41,10 +40,6 @@ public class TicketCommentEntity extends BaseEntity {
     
     @ManyToOne
     private TicketEntity ticket;         // 关联的工单
-
-    // 评论时间
-    @Builder.Default
-    private LocalDateTime commentTime = LocalDateTime.now();      // 评论时间
 
     // 评论内容
     private String content;         // 评论内容

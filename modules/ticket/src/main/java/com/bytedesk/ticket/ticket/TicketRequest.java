@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseRequest;
 
 import lombok.Data;
@@ -46,4 +48,6 @@ public class TicketRequest extends BaseRequest {
     // 
     private String startDate;
     private String endDate;
+    // 
+    private List<String> uploadUids;
 } 

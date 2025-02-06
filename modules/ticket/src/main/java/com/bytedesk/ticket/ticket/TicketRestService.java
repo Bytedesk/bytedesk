@@ -230,7 +230,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         comment.setTicket(ticket);
         comment.setContent(commentDTO.getContent());
         // comment.setAuthor(commentDTO.getAuthor());
-        comment.setCreatedAt(LocalDateTime.now());
         
         return commentRepository.save(comment);
     }
@@ -241,13 +240,10 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         
         TicketAttachmentEntity attachment = new TicketAttachmentEntity();
         attachment.setTicket(ticket);
-        attachment.setFileName(file.getOriginalFilename());
-        attachment.setFileType(file.getContentType());
-        attachment.setFileSize(file.getSize());
-        attachment.setUploadTime(LocalDateTime.now());
-        
-        // TODO: 实现文件存储逻辑
-        attachment.setFilePath("/uploads/" + file.getOriginalFilename());
+        // attachment.setFileName(file.getOriginalFilename());
+        // attachment.setFileType(file.getContentType());
+        // attachment.setFileSize(file.getSize());
+        // attachment.setFilePath("/uploads/" + file.getOriginalFilename());
         
         return attachmentRepository.save(attachment);
     }
