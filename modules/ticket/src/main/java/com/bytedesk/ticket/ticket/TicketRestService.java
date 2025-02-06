@@ -27,6 +27,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadRestService;
@@ -123,6 +124,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getThreadTopic());
         if (threadOptional.isPresent()) {
             ticket.setThread(threadOptional.get());
+        } else {
+            // TODO: 创建工单会话
+
         }
         // 
         Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
@@ -237,6 +241,21 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // 
         return convertToResponse(savedTicket);
     }
+
+    // 创建工单会话
+    public ThreadEntity createTicketThread(UserEntity user) {
+        //
+        String topic = "";// TopicUtils.getTicketTopic(user.getUid());
+        //
+        ThreadEntity thread = new ThreadEntity();
+        thread.setUid(uidUtils.getUid());
+        thread.setType(ThreadTypeEnum.TICKET.name());
+        thread.setTopic(topic);
+        thread.setOwner(user);
+        thread.setOrgUid(user.getOrgUid());
+        return threadRestService.save(thread);
+    }
+    
 
     @Transactional
     public void assignTicket(Long ticketId, AgentEntity assignee) {
