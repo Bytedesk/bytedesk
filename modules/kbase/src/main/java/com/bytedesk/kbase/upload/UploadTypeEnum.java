@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 22:19:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 15:38:55
+ * @LastEditTime: 2025-02-06 14:19:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,8 +25,8 @@ public enum UploadTypeEnum {
     EMAIL, // 邮件
     TABOO, // 敏感词
     MEMBER, // 导入成员
-    // IMPORT, // 导入Excel
     CHAT, // 聊天对话
+    TICKET, // 工单
     ATTACHMENT; // 附件
 
     // 根据字符串查找对应的枚举常量
