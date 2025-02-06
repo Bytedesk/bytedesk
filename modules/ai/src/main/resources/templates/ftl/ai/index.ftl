@@ -17,7 +17,15 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        ai
+        ai module is under construction...
+        <br>
+        Ollama/智谱/OpenAI/文心...
+        <br>
+        客服AI助手
+        <br>
+        智能体
+        <br>
+        工作流
         
         <script src="" async defer></script>
     </body>
