@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-16 14:56:17
+ * @Date: 2025-02-06 12:20:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 12:11:09
+ * @LastEditTime: 2025-02-06 12:20:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,34 +12,26 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ticket.attachment;
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.kbase.upload.UploadEntity;
-import com.bytedesk.ticket.comment.TicketCommentEntity;
-import com.bytedesk.ticket.ticket.TicketEntity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.kbase.upload.UploadResponse;
+import com.bytedesk.ticket.comment.TicketCommentResponse;
+import com.bytedesk.ticket.ticket.TicketResponse;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Data
-@Builder
 @EqualsAndHashCode(callSuper = true)
-@Entity(name = "bytedesk_ticket_attachment")
 @NoArgsConstructor
 @AllArgsConstructor
-public class TicketAttachmentEntity extends BaseEntity {
+public class TicketAttachmentResponse extends BaseResponse {
+
+    private TicketResponse ticket;
+
+    private TicketCommentResponse comment;
     
-    @ManyToOne
-    private TicketEntity ticket; 
-
-    @ManyToOne
-    private TicketCommentEntity comment;
-
-    @ManyToOne
-    private UploadEntity upload;
-} 
+    private UploadResponse upload;
+}
