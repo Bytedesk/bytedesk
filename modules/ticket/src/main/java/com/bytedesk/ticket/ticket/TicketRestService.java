@@ -253,6 +253,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         thread.setTopic(topic);
         thread.setOwner(user);
         thread.setOrgUid(user.getOrgUid());
+        // 
         return threadRestService.save(thread);
     }
     

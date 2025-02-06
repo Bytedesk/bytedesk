@@ -136,6 +136,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="switchers">
         <div class="language-switcher">
