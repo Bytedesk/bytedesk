@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 10:25:12
+ * @LastEditTime: 2025-02-06 10:28:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,21 +46,9 @@ public class TicketSpecification extends BaseSpecification {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static Specification<TicketEntity> search(TicketRequest request) {
-        log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
-            // 确保结果唯一
             query.distinct(true);
             
-            // 添加必要的 join
-            if (Boolean.TRUE.equals(request.getAssignmentAll())) {
-                if (StringUtils.hasText(request.getReporterUid())) {
-                    root.join("reporter", JoinType.LEFT);
-                }
-                if (StringUtils.hasText(request.getAssigneeUid())) {
-                    root.join("assignee", JoinType.LEFT);
-                }
-            }
-
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             
@@ -94,34 +82,33 @@ public class TicketSpecification extends BaseSpecification {
             // 处理 ALL 查询 - 我创建的或待我处理的
             if (StringUtils.hasText(request.getReporterUid()) || StringUtils.hasText(request.getAssigneeUid())) {
                 if (Boolean.TRUE.equals(request.getAssignmentAll())) {
-                    // 使用 OR 条件组合，并处理 NULL 的情况
-                    List<Predicate> assignmentPredicates = new ArrayList<>();
+                    List<Predicate> orPredicates = new ArrayList<>();
+                    
+                    // 处理 reporter 条件
                     if (StringUtils.hasText(request.getReporterUid())) {
-                        assignmentPredicates.add(
-                            criteriaBuilder.or(
-                                criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()),
-                                criteriaBuilder.isNull(root.get("reporter"))
-                            )
-                        );
+                        var reporterJoin = root.join("reporter", JoinType.LEFT);
+                        orPredicates.add(criteriaBuilder.equal(reporterJoin.get("uid"), request.getReporterUid()));
                     }
+                    
+                    // 处理 assignee 条件
                     if (StringUtils.hasText(request.getAssigneeUid())) {
-                        assignmentPredicates.add(
-                            criteriaBuilder.or(
-                                criteriaBuilder.equal(root.get("assignee").get("uid"), request.getAssigneeUid()),
-                                criteriaBuilder.isNull(root.get("assignee"))
-                            )
-                        );
+                        var assigneeJoin = root.join("assignee", JoinType.LEFT);
+                        orPredicates.add(criteriaBuilder.equal(assigneeJoin.get("uid"), request.getAssigneeUid()));
                     }
-                    if (!assignmentPredicates.isEmpty()) {
-                        predicates.add(criteriaBuilder.or(assignmentPredicates.toArray(new Predicate[0])));
+                    
+                    // 组合 OR 条件
+                    if (!orPredicates.isEmpty()) {
+                        predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
                     }
                 } else {
                     // 单一条件查询
                     if (StringUtils.hasText(request.getReporterUid())) {
-                        predicates.add(criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()));
+                        var reporterJoin = root.join("reporter");
+                        predicates.add(criteriaBuilder.equal(reporterJoin.get("uid"), request.getReporterUid()));
                     }
                     if (StringUtils.hasText(request.getAssigneeUid())) {
-                        predicates.add(criteriaBuilder.equal(root.get("assignee").get("uid"), request.getAssigneeUid()));
+                        var assigneeJoin = root.join("assignee");
+                        predicates.add(criteriaBuilder.equal(assigneeJoin.get("uid"), request.getAssigneeUid()));
                     }
                 }
             }
