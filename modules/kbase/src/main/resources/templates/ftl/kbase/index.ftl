@@ -17,7 +17,7 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        kbase
+        kbase help center is under construction
         
         <script src="" async defer></script>
     </body>

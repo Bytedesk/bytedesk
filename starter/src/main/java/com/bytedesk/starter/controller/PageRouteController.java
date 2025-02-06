@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-01-28 23:52:29
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-06 11:14:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,7 +68,7 @@ public class PageRouteController {
 			zh.put("adminDashboard", "管理后台");
 			zh.put("agentClient", "客服工作台");
 			zh.put("visitorChat", "访客对话");
-			zh.put("workFlow", "工单系统");
+			zh.put("workFlow", "工作流");
 			zh.put("knowledgeBase", "知识库");
 			zh.put("helpCenter", "帮助中心");
 			zh.put("apiDoc", "API 文档");
@@ -76,13 +76,13 @@ public class PageRouteController {
 			
 			// 繁体中文
 			Map<String, String> zhTW = new HashMap<>();
-			zhTW.put("title", "微语");
+			zhTW.put("title", "微語");
 			zhTW.put("systemEntrance", "系統入口");
 			zhTW.put("systemDevelopment", "開發工具");
 			zhTW.put("adminDashboard", "管理後台");
 			zhTW.put("agentClient", "客服工作台");
 			zhTW.put("visitorChat", "訪客對話");
-			zhTW.put("workFlow", "工單系統");
+			zhTW.put("workFlow", "工作流");
 			zhTW.put("knowledgeBase", "知識庫");
 			zhTW.put("helpCenter", "幫助中心");
 			zhTW.put("apiDoc", "API 文檔");
