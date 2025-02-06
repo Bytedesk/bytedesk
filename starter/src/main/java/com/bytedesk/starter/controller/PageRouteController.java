@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 16:52:05
+ * @LastEditTime: 2025-02-06 17:17:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -82,13 +82,13 @@ public class PageRouteController {
 			zh.put("apiDoc", "API 文档");
 			zh.put("monitoring", "系统监控");
 			zh.put("voiceOfCustomer", "客户之声");
-			zh.put("moduleDevelopment", "模块开发");
+			zh.put("moduleDevelopment", "模块简介");
 			zh.put("forum", "用户社区");
-			zh.put("ticket", "工单管理");
-			zh.put("team", "团队管理");
-			zh.put("service", "服务管理");
-			zh.put("kbase", "知识库管理");
-			zh.put("ai", "AI管理");
+			zh.put("ticket", "工单模块");
+			zh.put("team", "团队模块");
+			zh.put("service", "服务模块");
+			zh.put("kbase", "知识库模块");
+			zh.put("ai", "AI模块");
 			
 			// 繁体中文
 			Map<String, String> zhTW = new HashMap<>();
@@ -104,13 +104,13 @@ public class PageRouteController {
 			zhTW.put("apiDoc", "API 文檔");
 			zhTW.put("monitoring", "系統監控");
 			zhTW.put("voiceOfCustomer", "客戶之聲");
-			zhTW.put("moduleDevelopment", "模組開發");
+			zhTW.put("moduleDevelopment", "模組簡介");
 			zhTW.put("forum", "用戶社區");
-			zhTW.put("ticket", "工單管理");
-			zhTW.put("team", "團隊管理");
-			zhTW.put("service", "服務管理");
-			zhTW.put("kbase", "知識庫管理");
-			zhTW.put("ai", "AI管理");
+			zhTW.put("ticket", "工單模組");
+			zhTW.put("team", "團隊模組");
+			zhTW.put("service", "服務模組");
+			zhTW.put("kbase", "知識庫模組");
+			zhTW.put("ai", "AI模組");
 			
 			i18n.put("en", en);
 			i18n.put("zh", zh);
