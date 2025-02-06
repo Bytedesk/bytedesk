@@ -57,7 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class UploadEventListener {
 
-    private final UploadService uploadService;
+    private final UploadRestService uploadService;
 
     private final KeywordService keywordService;
 

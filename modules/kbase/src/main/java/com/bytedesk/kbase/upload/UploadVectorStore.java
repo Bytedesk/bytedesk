@@ -47,7 +47,7 @@ public class UploadVectorStore {
 
 	private final RedisVectorStore vectorStore;
 
-	private final UploadService uploadService;
+	private final UploadRestService uploadService;
 
 	private final BytedeskEventPublisher bytedeskEventPublisher;
 

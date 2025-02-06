@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 15:14:50
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-06 11:40:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,17 +40,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.storage.UploadStorageException;
 import com.bytedesk.kbase.upload.storage.UploadStorageFileNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.alibaba.fastjson2.JSON;
 
 // https://spring.io/guides/gs/uploading-files
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UploadService extends BaseRestService<UploadEntity, UploadRequest, UploadResponse> {
+public class UploadRestService extends BaseRestService<UploadEntity, UploadRequest, UploadResponse> {
 
 	private final Path uploadDir;
 
@@ -311,6 +313,35 @@ public class UploadService extends BaseRestService<UploadEntity, UploadRequest, 
 		// 上一行没有自动初始化isLlm字段，所以这里需要手动设置
 		// uploadResponse.setIsLlm(entity.isLlm());
 		return uploadResponse;
+	}
+
+	public UploadResponse handleFileUpload(MultipartFile file, 
+										 String fileName, 
+										 String fileType, 
+										 String kbType,
+										 String client,
+										 String orgUid,
+										 UserProtobuf userProtobuf,
+										 String categoryUid,
+										 String kbUid) {
+		log.info("handleFileUpload fileName: {}, fileType: {}, kbType {}", fileName, fileType, kbType);
+		
+		String fileUrl = store(file, fileName);
+		
+		UploadRequest uploadRequest = UploadRequest.builder()
+				.fileName(fileName)
+				.fileSize(String.valueOf(file.getSize()))
+				.fileUrl(fileUrl)
+				.fileType(fileType)
+				.client(client)
+				.user(JSON.toJSONString(userProtobuf))
+				.categoryUid(categoryUid)
+				.kbUid(kbUid)
+				.build();
+		uploadRequest.setType(kbType);
+		uploadRequest.setOrgUid(orgUid);
+		
+		return create(uploadRequest);
 	}
 
 }

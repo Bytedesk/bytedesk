@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 17:36:31
+ * @LastEditTime: 2025-02-06 11:56:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -45,11 +44,11 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/upload")
-public class UploadController extends BaseRestController<UploadRequest> {
+public class UploadRestController extends BaseRestController<UploadRequest> {
 
 	private final AuthService authService;
 
-	private final UploadService uploadService;
+	private final UploadRestService uploadService;
 	
 	private final UploadVectorStore uploadVectorStore;
 
@@ -64,34 +63,15 @@ public class UploadController extends BaseRestController<UploadRequest> {
 			@RequestParam(name = "category_uid", required = false) String categoryUid,
 			@RequestParam(name = "kb_uid", required = false) String kbUid,
 			@RequestParam(name = "client", required = false) String client) {
-		log.info("upload fileName: {}, fileType: {}, kbType {}, categoryUid {}, kbUid {}",
-				fileName, fileType, kbType, categoryUid, kbUid);
-
-		// TODO: 检测是否同一文件，重复上传
-
-		// http://localhost:9003/file/20240319162820_img-service2.png
-		// String uploadPath = uploadService.store(file, fileName);
-		// String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
-		String fileUrl = uploadService.store(file, fileName);
-		//
+		
 		UserEntity user = authService.getUser();
 		UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
-		//
-		UploadRequest uploadRequest = UploadRequest.builder()
-				.fileName(fileName)
-				.fileSize(String.valueOf(file.getSize()))
-				.fileUrl(fileUrl)
-				.fileType(fileType)
-				.client(client)
-				.user(JSON.toJSONString(userProtobuf))
-				.categoryUid(categoryUid)
-				.kbUid(kbUid)
-				.build();
-		uploadRequest.setType(kbType);
-		uploadRequest.setOrgUid(user.getOrgUid());
-		uploadService.create(uploadRequest);
-
-		return ResponseEntity.ok(JsonResult.success("upload file success", fileUrl));
+		
+		UploadResponse response = uploadService.handleFileUpload(
+				file, fileName, fileType, kbType, client,
+				user.getOrgUid(), userProtobuf, categoryUid, kbUid);
+		
+		return ResponseEntity.ok(JsonResult.success("upload file success", response));
 	}
 
 	@ActionAnnotation(title = "upload", action = "process", description = "process upload")
