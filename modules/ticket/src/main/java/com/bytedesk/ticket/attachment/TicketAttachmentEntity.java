@@ -19,6 +19,7 @@ import com.bytedesk.ticket.ticket.TicketEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.CascadeType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,7 +35,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TicketAttachmentEntity extends BaseEntity {
     
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private TicketEntity ticket; 
 
     @ManyToOne
