@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-05 16:28:54
+ * @LastEditTime: 2025-02-06 10:25:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,8 +24,22 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.JoinType;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * 我创建的和待我处理的工单
+ * select * from bytedesk_ticket te1_0 join bytedesk_service_agent a1_0 on a1_0.id=te1_0.assignee_id join bytedesk_core_user r1_0 on r1_0.id=te1_0.reporter_id where te1_0.org_uid='df_org_uid' and te1_0.is_deleted=0 and (r1_0.uuid='1573932465389700' or a1_0.uuid='df_ag_uid') order by te1_0.updated_at desc limit 0,100
+ * 
+ * 我创建的：
+ * select * from bytedesk_ticket te1_0 join bytedesk_core_user r1_0 on r1_0.id=te1_0.reporter_id where te1_0.org_uid='df_org_uid' and te1_0.is_deleted=0 and r1_0.uuid='1573932465389700' order by te1_0.updated_at desc limit 0,100
+ * 
+ * 待我处理的：
+ * select * from bytedesk_ticket te1_0 join bytedesk_service_agent a1_0 on a1_0.id=te1_0.assignee_id where te1_0.org_uid='df_org_uid' and te1_0.is_deleted=0 and a1_0.uuid='df_ag_uid' order by te1_0.updated_at desc limit 0,100
+ * 
+ * 
+ */
 @Slf4j
 public class TicketSpecification extends BaseSpecification {
 
@@ -34,6 +48,19 @@ public class TicketSpecification extends BaseSpecification {
     public static Specification<TicketEntity> search(TicketRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
+            // 确保结果唯一
+            query.distinct(true);
+            
+            // 添加必要的 join
+            if (Boolean.TRUE.equals(request.getAssignmentAll())) {
+                if (StringUtils.hasText(request.getReporterUid())) {
+                    root.join("reporter", JoinType.LEFT);
+                }
+                if (StringUtils.hasText(request.getAssigneeUid())) {
+                    root.join("assignee", JoinType.LEFT);
+                }
+            }
+
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             
@@ -65,23 +92,37 @@ public class TicketSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("workgroup").get("uid"), request.getWorkgroupUid()));
             }
             // 处理 ALL 查询 - 我创建的或待我处理的
-            Boolean isAssignmentAll = request.getAssignmentAll();
-            if (Boolean.TRUE.equals(isAssignmentAll) && 
-                StringUtils.hasText(request.getReporterUid()) && 
-                StringUtils.hasText(request.getAssigneeUid())) {
-                log.info("assignmentAll true: {}, reporterUid: {}, assigneeUid: {}", isAssignmentAll, request.getReporterUid(), request.getAssigneeUid());
-                predicates.add(criteriaBuilder.or(
-                    criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()),
-                    criteriaBuilder.equal(root.get("assignee").get("uid"), request.getAssigneeUid())
-                ));
-            } else {
-                log.info("assignmentAll false: {}, reporterUid: {}, assigneeUid: {}", isAssignmentAll, request.getReporterUid(), request.getAssigneeUid());
-                // 正常的单一条件查询
-                if (StringUtils.hasText(request.getReporterUid())) {
-                    predicates.add(criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()));
-                }
-                if (StringUtils.hasText(request.getAssigneeUid())) {
-                    predicates.add(criteriaBuilder.equal(root.get("assignee").get("uid"), request.getAssigneeUid()));
+            if (StringUtils.hasText(request.getReporterUid()) || StringUtils.hasText(request.getAssigneeUid())) {
+                if (Boolean.TRUE.equals(request.getAssignmentAll())) {
+                    // 使用 OR 条件组合，并处理 NULL 的情况
+                    List<Predicate> assignmentPredicates = new ArrayList<>();
+                    if (StringUtils.hasText(request.getReporterUid())) {
+                        assignmentPredicates.add(
+                            criteriaBuilder.or(
+                                criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()),
+                                criteriaBuilder.isNull(root.get("reporter"))
+                            )
+                        );
+                    }
+                    if (StringUtils.hasText(request.getAssigneeUid())) {
+                        assignmentPredicates.add(
+                            criteriaBuilder.or(
+                                criteriaBuilder.equal(root.get("assignee").get("uid"), request.getAssigneeUid()),
+                                criteriaBuilder.isNull(root.get("assignee"))
+                            )
+                        );
+                    }
+                    if (!assignmentPredicates.isEmpty()) {
+                        predicates.add(criteriaBuilder.or(assignmentPredicates.toArray(new Predicate[0])));
+                    }
+                } else {
+                    // 单一条件查询
+                    if (StringUtils.hasText(request.getReporterUid())) {
+                        predicates.add(criteriaBuilder.equal(root.get("reporter").get("uid"), request.getReporterUid()));
+                    }
+                    if (StringUtils.hasText(request.getAssigneeUid())) {
+                        predicates.add(criteriaBuilder.equal(root.get("assignee").get("uid"), request.getAssigneeUid()));
+                    }
                 }
             }
             // 处理日期范围查询
@@ -94,7 +135,11 @@ public class TicketSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate));
             }
 
+            // 添加排序
+            query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
 }
+
