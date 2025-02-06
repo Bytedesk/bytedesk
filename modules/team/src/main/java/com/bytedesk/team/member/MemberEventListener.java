@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:00:54
+ * @LastEditTime: 2025-02-06 11:42:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.UploadEntity;
-import com.bytedesk.kbase.upload.UploadService;
+import com.bytedesk.kbase.upload.UploadRestService;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
 import com.bytedesk.team.department.DepartmentConsts;
@@ -61,7 +61,7 @@ public class MemberEventListener {
 
     private final TopicCacheService topicCacheService;
 
-    private final UploadService uploadService;
+    private final UploadRestService uploadService;
 
     @Transactional
     @Order(1)

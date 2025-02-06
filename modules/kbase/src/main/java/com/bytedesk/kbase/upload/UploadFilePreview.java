@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/file")
 public class UploadFilePreview {
 
-	private final UploadService uploadService;
+	private final UploadRestService uploadService;
 
 	/**
 	 * 浏览器预览文件，或放到 <img src> 标签中在线展示
