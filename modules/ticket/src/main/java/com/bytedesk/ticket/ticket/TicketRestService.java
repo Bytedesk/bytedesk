@@ -150,7 +150,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (reporterOptional.isPresent()) {
             ticket.setReporter(reporterOptional.get());
         }
-        // 
+        // 先保存工单
+        TicketEntity savedTicket = save(ticket);
+        // 保存附件
         List<TicketAttachmentEntity> attachments = new ArrayList<>();
         if (request.getUploadUids() != null) {
             for (String uploadUid : request.getUploadUids()) {
@@ -158,7 +160,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 if (uploadOptional.isPresent()) {
                     TicketAttachmentEntity attachment = new TicketAttachmentEntity();
                     attachment.setUid(uidUtils.getUid());
-                    attachment.setTicket(ticket);
+                    attachment.setTicket(savedTicket);
                     attachment.setUpload(uploadOptional.get());
                     attachmentRepository.save(attachment);
                     // 
@@ -166,9 +168,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 }
             }
         }
-        ticket.setAttachments(attachments);
-        // 
-        TicketEntity savedTicket = save(ticket);
+        savedTicket.setAttachments(attachments);
+        // 保存工单
+        savedTicket = save(savedTicket);
         if (savedTicket == null) {
             throw new RuntimeException("create ticket failed");
         }
@@ -176,6 +178,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         return convertToResponse(savedTicket);
     }
 
+    @Transactional
     @Override
     public TicketResponse update(TicketRequest request) {
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
@@ -227,7 +230,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         }
         ticket.setAttachments(attachments);
         // 
-        TicketEntity savedTicket = save(ticket);
+        TicketEntity savedTicket = ticketRepository.save(ticket);
         if (savedTicket == null) {
             throw new RuntimeException("update ticket failed");
         }
@@ -330,7 +333,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setDeleted(true);
         save(ticket);
     }
-
     
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,

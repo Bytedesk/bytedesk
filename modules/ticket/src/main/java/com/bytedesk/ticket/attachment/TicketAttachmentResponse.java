@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-06 12:20:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 12:20:09
+ * @LastEditTime: 2025-02-06 15:43:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,8 +15,8 @@ package com.bytedesk.ticket.attachment;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kbase.upload.UploadResponse;
-import com.bytedesk.ticket.comment.TicketCommentResponse;
-import com.bytedesk.ticket.ticket.TicketResponse;
+// import com.bytedesk.ticket.comment.TicketCommentResponse;
+// import com.bytedesk.ticket.ticket.TicketResponse;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +29,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TicketAttachmentResponse extends BaseResponse {
 
-    private TicketResponse ticket;
+    // 防止循环引用
+    // private TicketResponse ticket;
 
-    private TicketCommentResponse comment;
+    // private TicketCommentResponse comment;
     
     private UploadResponse upload;
 }
