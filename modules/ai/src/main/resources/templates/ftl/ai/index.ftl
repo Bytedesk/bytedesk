@@ -1,32 +1,145 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI智能助手 - 微语</title>
+    <meta name="description" content="微语AI智能助手，提供多模型智能对话及自动化服务">
+    <link href="/assets/vendor/bootstrap5/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+        .feature-box {
+            padding: 2rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .feature-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">微语AI助手</a>
+        </div>
+    </nav>
 
-        ai module is under construction...
-        <br>
-        Ollama/智谱/OpenAI/文心...
-        <br>
-        客服AI助手
-        <br>
-        智能体
-        <br>
-        工作流
-        
-        <script src="" async defer></script>
-    </body>
+    <div class="container my-5">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h1 class="display-4 mb-3">智能AI助手系统</h1>
+                <p class="lead">整合多种大语言模型，提供智能对话、自动化工作流、知识库管理等全方位AI解决方案</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🤖</div>
+                    <h3>多模型支持</h3>
+                    <ul class="list-unstyled">
+                        <li>OpenAI集成</li>
+                        <li>智谱AI对接</li>
+                        <li>文心一言集成</li>
+                        <li>Ollama本地部署</li>
+                        <li>自定义模型接入</li>
+                        <li>多模型协同</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">💬</div>
+                    <h3>智能客服</h3>
+                    <ul class="list-unstyled">
+                        <li>24/7自动回复</li>
+                        <li>多轮对话支持</li>
+                        <li>情感分析</li>
+                        <li>意图识别</li>
+                        <li>智能问答推荐</li>
+                        <li>人机协作服务</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🧠</div>
+                    <h3>智能体系统</h3>
+                    <ul class="list-unstyled">
+                        <li>角色定制</li>
+                        <li>知识库对接</li>
+                        <li>上下文管理</li>
+                        <li>多智能体协作</li>
+                        <li>任务规划执行</li>
+                        <li>持续学习优化</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">⚡</div>
+                    <h3>自动化工作流</h3>
+                    <ul class="list-unstyled">
+                        <li>流程自动化</li>
+                        <li>智能任务分发</li>
+                        <li>条件触发执行</li>
+                        <li>多步骤编排</li>
+                        <li>异常处理机制</li>
+                        <li>执行监控分析</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">📚</div>
+                    <h3>知识库管理</h3>
+                    <ul class="list-unstyled">
+                        <li>知识库构建</li>
+                        <li>文档智能导入</li>
+                        <li>知识图谱</li>
+                        <li>语义检索</li>
+                        <li>实时更新</li>
+                        <li>知识推理</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">📊</div>
+                    <h3>数据分析</h3>
+                    <ul class="list-unstyled">
+                        <li>对话质量分析</li>
+                        <li>用户意图洞察</li>
+                        <li>性能监控</li>
+                        <li>效果评估</li>
+                        <li>优化建议</li>
+                        <li>趋势预测</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">© 2025 微语. All rights reserved.</p>
+            <p class="text-muted">北京微语天下科技有限公司</p>
+        </div>
+    </footer>
+
+    <script src="/assets/vendor/jquery-3.7.1.min.js"></script>
+    <script src="/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
