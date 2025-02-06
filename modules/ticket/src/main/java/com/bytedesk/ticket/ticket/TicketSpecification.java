@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 10:28:53
+ * @LastEditTime: 2025-02-06 10:39:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.ticket.consts.TicketConsts;
 
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.JoinType;
@@ -101,14 +102,19 @@ public class TicketSpecification extends BaseSpecification {
                         predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
                     }
                 } else {
-                    // 单一条件查询
-                    if (StringUtils.hasText(request.getReporterUid())) {
-                        var reporterJoin = root.join("reporter");
-                        predicates.add(criteriaBuilder.equal(reporterJoin.get("uid"), request.getReporterUid()));
-                    }
-                    if (StringUtils.hasText(request.getAssigneeUid())) {
-                        var assigneeJoin = root.join("assignee");
-                        predicates.add(criteriaBuilder.equal(assigneeJoin.get("uid"), request.getAssigneeUid()));
+
+                    if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
+                        predicates.add(criteriaBuilder.isNull(root.get("assignee")));
+                    } else {
+                        // 单一条件查询
+                        if (StringUtils.hasText(request.getReporterUid())) {
+                            var reporterJoin = root.join("reporter");
+                            predicates.add(criteriaBuilder.equal(reporterJoin.get("uid"), request.getReporterUid()));
+                        }
+                        if (StringUtils.hasText(request.getAssigneeUid())) {
+                            var assigneeJoin = root.join("assignee");
+                            predicates.add(criteriaBuilder.equal(assigneeJoin.get("uid"), request.getAssigneeUid()));
+                        }
                     }
                 }
             }

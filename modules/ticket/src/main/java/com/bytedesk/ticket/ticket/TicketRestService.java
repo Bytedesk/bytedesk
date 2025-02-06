@@ -137,7 +137,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ticket.setType(TicketTypeEnum.AGENT.name());
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
         } else {
-            ticket.setType(TicketTypeEnum.GROUP.name());
+            ticket.setType(TicketTypeEnum.WORKGROUP.name());
             ticket.setStatus(TicketStatusEnum.NEW.name());
         }
         Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
