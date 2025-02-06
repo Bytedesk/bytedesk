@@ -166,6 +166,8 @@
                 <li><a href="/agenticflow/" target="_blank">${i18n[lang]["workFlow"]}</a></li>
                 <li><a href="/notebase/spaces" target="_blank">${i18n[lang]["knowledgeBase"]}</a></li>
                 <li><a href="/kbase/" target="_blank">${i18n[lang]["helpCenter"]}</a></li>
+                <#--  <li><a href="/voc/" target="_blank">${i18n[lang]["voiceOfCustomer"]}</a></li>  -->
+                <#--  <li><a href="/forum/" target="_blank">${i18n[lang]["forum"]}</a></li>  -->
             </ul>
 
             <h2>${i18n[lang]["systemDevelopment"]}</h2>

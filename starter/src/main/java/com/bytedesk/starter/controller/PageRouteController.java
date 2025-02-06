@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 11:14:10
+ * @LastEditTime: 2025-02-06 15:35:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,6 +59,8 @@ public class PageRouteController {
 			en.put("helpCenter", "Help Center");
 			en.put("apiDoc", "API Documentation");
 			en.put("monitoring", "Monitoring");
+			en.put("voiceOfCustomer", "Voice of Customer");
+			en.put("forum", "Forum");
 			
 			// 简体中文
 			Map<String, String> zh = new HashMap<>();
@@ -73,6 +75,8 @@ public class PageRouteController {
 			zh.put("helpCenter", "帮助中心");
 			zh.put("apiDoc", "API 文档");
 			zh.put("monitoring", "系统监控");
+			zh.put("voiceOfCustomer", "客户之声");
+			zh.put("forum", "用户社区");
 			
 			// 繁体中文
 			Map<String, String> zhTW = new HashMap<>();
@@ -87,6 +91,8 @@ public class PageRouteController {
 			zhTW.put("helpCenter", "幫助中心");
 			zhTW.put("apiDoc", "API 文檔");
 			zhTW.put("monitoring", "系統監控");
+			zhTW.put("voiceOfCustomer", "客戶之聲");
+			zhTW.put("forum", "用戶社區");
 			
 			i18n.put("en", en);
 			i18n.put("zh", zh);
