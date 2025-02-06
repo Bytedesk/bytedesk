@@ -145,6 +145,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ticket.setReporter(reporterOptional.get());
         }
         // 
+        
+        // 
         TicketEntity savedTicket = save(ticket);
         if (savedTicket == null) {
             throw new RuntimeException("create ticket failed");
