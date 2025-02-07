@@ -19,9 +19,9 @@
 
 	<properties>
 		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
-		<langchain4j.version>0.36.2</langchain4j.version>
-		<agentsflex.version>1.0.0-rc.1</agentsflex.version>
-		<ollama4j.version>1.0.89</ollama4j.version>
+		<langchain4j.version>1.0.0-beta1</langchain4j.version>
+		<agentsflex.version>1.0.0-rc.4</agentsflex.version>
+		<ollama4j.version>1.0.93</ollama4j.version>
 	</properties>
 
 	<dependencies>
