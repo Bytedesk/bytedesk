@@ -6,6 +6,13 @@
         "webUrl": "https://ollama.com/",
         "status": "PRODUCTION"
     },
+    "deepseek": {
+        "nickname": "DeepSeek",
+        "logo": "deepseek.png",
+        "apiUrl": "https://api.deepseek.com",
+        "webUrl": "https://deepseek.com/",
+        "status": "PRODUCTION"
+    },
     "zhipu": {
         "nickname": "智谱",
         "logo": "zhipu.png",    
@@ -76,13 +83,7 @@
         "webUrl": "https://www.siliconflow.cn/",
         "status": "DEVELOPMENT"
     },
-    "deepseek": {
-        "nickname": "DeepSeek",
-        "logo": "deepseek.png",
-        "apiUrl": "https://api.deepseek.com",
-        "webUrl": "https://deepseek.com/",
-        "status": "DEVELOPMENT"
-    },
+    
     "yi": {
         "nickname": "Yi",
         "logo": "yi.png",

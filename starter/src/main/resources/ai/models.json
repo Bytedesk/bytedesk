@@ -1,5 +1,49 @@
 {
     "ollama": [],
+    "deepseek": [
+        {
+            "name": "deepseek-chat",
+            "nickname": "DeepSeek-V3"
+        },
+        {
+            "name": "deepseek-reasoner",
+            "nickname": "DeepSeek-R1"
+        }
+    ],
+    "zhipu": [
+        {
+            "name": "glm-4",
+            "nickname": "GLM-4"
+        },
+        {
+            "name": "glm-4-plus",
+            "nickname": "GLM-4-Plus"
+        },
+        {
+            "name": "glm-4-air",
+            "nickname": "GLM-4-Air"
+        },
+        {
+            "name": "glm-4-airx",
+            "nickname": "GLM-4-AirX"
+        },
+        {
+            "name": "glm-4-flash",
+            "nickname": "GLM-4-Flash(免费)"
+        },
+        {
+            "name": "glm-4v",
+            "nickname": "GLM 4V"
+        },
+        {
+            "name": "glm-4v-plus",
+            "nickname": "GLM-4V-Plus"
+        },
+        {
+            "name": "glm-4-alltools",
+            "nickname": "GLM-4-AllTools"
+        }
+    ],
     "silicon": [
         {
             "name": "Qwen/Qwen2-7B-Instruct",
@@ -68,16 +112,7 @@
             "nickname": "Claude 3 Haiku"
         }
     ],
-    "deepseek": [
-        {
-            "name": "deepseek-chat",
-            "nickname": "DeepSeek Chat"
-        },
-        {
-            "name": "deepseek-coder",
-            "nickname": "DeepSeek Coder"
-        }
-    ],
+    
     "yi": [
         {
             "name": "yi-large",
@@ -102,40 +137,6 @@
         {
             "name": "yi-spark",
             "nickname": "Yi-Spark"
-        }
-    ],
-    "zhipu": [
-        {
-            "name": "glm-4",
-            "nickname": "GLM-4"
-        },
-        {
-            "name": "glm-4-plus",
-            "nickname": "GLM-4-Plus"
-        },
-        {
-            "name": "glm-4-air",
-            "nickname": "GLM-4-Air"
-        },
-        {
-            "name": "glm-4-airx",
-            "nickname": "GLM-4-AirX"
-        },
-        {
-            "name": "glm-4-flash",
-            "nickname": "GLM-4-Flash(免费)"
-        },
-        {
-            "name": "glm-4v",
-            "nickname": "GLM 4V"
-        },
-        {
-            "name": "glm-4v-plus",
-            "nickname": "GLM-4V-Plus"
-        },
-        {
-            "name": "glm-4-alltools",
-            "nickname": "GLM-4-AllTools"
         }
     ],
     "moonshot": [
