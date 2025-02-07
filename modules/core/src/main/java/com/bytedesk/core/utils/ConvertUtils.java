@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-09 12:21:51
+ * @LastEditTime: 2025-02-07 21:22:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.config.properties.BytedeskPropertiesResponse;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
@@ -141,6 +143,10 @@ public class ConvertUtils {
 
     public static AuthorityResponse convertToAuthorityResponse(AuthorityEntity authorityEntity) {
         return modelMapper.map(authorityEntity, AuthorityResponse.class);
+    }
+
+    public static BytedeskPropertiesResponse convertToBytedeskPropertiesResponse(BytedeskProperties bytedeskProperties) {
+        return modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
     }
 
 }

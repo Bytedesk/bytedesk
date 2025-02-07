@@ -16,7 +16,7 @@ package com.bytedesk.core.rbac.user;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.uid.UidUtils;
 
