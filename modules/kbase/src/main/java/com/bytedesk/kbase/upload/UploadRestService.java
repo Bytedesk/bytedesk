@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.storage.UploadStorageException;

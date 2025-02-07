@@ -15,7 +15,7 @@ package com.bytedesk.core.feature;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;

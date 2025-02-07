@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.bytedesk.core.config.BytedeskProperties;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.kbase.upload.storage.UploadStorageException;
 
 @Configuration
