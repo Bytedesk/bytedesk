@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:41:35
+ * @LastEditTime: 2025-02-07 14:34:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -123,7 +123,7 @@ public class RobotEventListener {
         //
         String threadTopic = threadProtobuf.getTopic();
         if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
-            // 内部大模型对话
+            // 内部大模型对话: 如客服AI助手，内部客服人员使用
             log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             // 机器人消息 org/robot/df_robot_uid/1420995827073219
             String[] splits = threadTopic.split("/");
@@ -199,7 +199,7 @@ public class RobotEventListener {
                 log.error("robot not found");
             }
         } else if (threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-            // 机器人客服对话
+            // 机器人客服对话，访客端调用，外部访客使用
             log.info("robot robot threadTopic {}, thread.type {}", threadTopic,
                     threadProtobuf.getType());
             ThreadEntity thread = threadService.findFirstByTopic(threadTopic)
@@ -230,13 +230,14 @@ public class RobotEventListener {
                 MessageProtobuf clonedMessage = SerializationUtils.clone(message);
                 clonedMessage.setUid(uidUtils.getUid());
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
-                // MessageUtils.notifyUser(clonedMessage);
                 messageSendService.sendProtobufMessage(clonedMessage);
+                
                 // 知识库
                 if (bytedeskProperties.getJavaAi()) {
                     log.info("robot java ai kb");
                     zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);
                 }
+                
                 // 通知python ai模块处理回答
                 if (bytedeskProperties.getPythonAi()) {
                     log.info("robot python");
@@ -244,7 +245,6 @@ public class RobotEventListener {
                     redisPubsubService.sendQuestionMessage(messageUid, threadTopic, robot.getKbUid(),
                             query);
                 }
-                // sendRobotReply(threadProtobuf, agent, query, robot);
             }
         }
     }
