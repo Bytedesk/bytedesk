@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 21:24:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 21:26:03
+ * @LastEditTime: 2025-02-07 22:27:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,20 +13,25 @@
  */
 package com.bytedesk.core.config.properties;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.utils.JsonResult;
 
 @RestController
-@RequestMapping("/test/api/properties")
+@RequestMapping("/config/properties")
 public class BytedeskPropertiesController {
 
-    // http://127.0.0.1:9003/test/api/properties/bytedesk
+    // http://127.0.0.1:9003/config/properties/bytedesk
     @GetMapping("/bytedesk")
-    public BytedeskPropertiesResponse getBytedeskProperties() {
-        return ConvertUtils.convertToBytedeskPropertiesResponse(BytedeskProperties.getInstance());
+    public ResponseEntity<JsonResult<?>> getBytedeskProperties() {
+
+        BytedeskPropertiesResponse bytedeskPropertiesResponse = ConvertUtils.convertToBytedeskPropertiesResponse(BytedeskProperties.getInstance());
+        
+        return ResponseEntity.ok(JsonResult.success(bytedeskPropertiesResponse));
     }
     
 }
