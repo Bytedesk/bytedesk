@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 20:45:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 22:30:29
+ * @LastEditTime: 2025-02-07 22:45:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,11 +31,20 @@ public class BytedeskPropertiesResponse implements Serializable {
     private String version;
     // 
     private Admin admin;
-    
+    private Features features;
+
+    // 
     @Data
     public static class Admin {
+        private Boolean allowRegister;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
+    }
+
+    @Data
+    public static class Features {
+        private Integer freeDays = 30;
+        private String avatarUrl;
     }
     
 }
