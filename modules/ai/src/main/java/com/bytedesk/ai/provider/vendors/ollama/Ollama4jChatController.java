@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:45:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 14:25:02
+ * @LastEditTime: 2025-02-07 15:55:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -180,16 +180,16 @@ public class Ollama4jChatController {
                 .build();
         // start conversation with model
         OllamaChatResult chatResult = ollama4jApi.chat(requestModel);
-        System.out.println("First answer: " + chatResult.getResponse());
+        System.out.println("First answer: " + chatResult.toString());
 
         // create next userQuestion
         requestModel = builder.withMessages(chatResult.getChatHistory()).withMessage(OllamaChatMessageRole.USER, "And what is the second largest city?").build();
         // "continue" conversation with model
         chatResult = ollama4jApi.chat(requestModel);
-        System.out.println("Second answer: " + chatResult.getResponse());
+        System.out.println("Second answer: " + chatResult.toString());
         System.out.println("Chat History: " + chatResult.getChatHistory());
 
-        return ResponseEntity.ok(JsonResult.success(chatResult.getResponse()));
+        return ResponseEntity.ok(JsonResult.success(chatResult.toString()));
     }
 
 }
