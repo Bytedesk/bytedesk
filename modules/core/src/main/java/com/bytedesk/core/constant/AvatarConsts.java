@@ -24,7 +24,7 @@ public class AvatarConsts {
     // Prevents instantiation
     private AvatarConsts() {}
 
-    // replace with your own CDN host address
+    // TODO: 从配置文件获取, 便于局域网访问， 默认使用 weiyuai 的 CDN
     public static final String DEFAULT_HOST = "https://cdn.weiyuai.cn";
 
     public static final String DEFAULT_AVATAR_URL = DEFAULT_HOST + "/avatars/admin.png";
