@@ -13,6 +13,7 @@ import io.github.ollama4j.models.response.LibraryModelDetail;
 import io.github.ollama4j.models.response.LibraryModelTag;
 import io.github.ollama4j.models.response.Model;
 import io.github.ollama4j.models.response.ModelDetail;
+// import io.github.ollama4j.types.OllamaModelType;
 
 
 // https://ollama4j.github.io/ollama4j/apis-model-management/list-library-models
