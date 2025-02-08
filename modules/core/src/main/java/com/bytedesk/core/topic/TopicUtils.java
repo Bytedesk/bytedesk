@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 17:40:00
+ * @LastEditTime: 2025-02-08 09:00:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,9 @@ public class TopicUtils {
     //
     public static final String TOPIC_FILE_ASSISTANT = "file";
     public static final String TOPIC_CLIPBOARD_ASSISTANT = "clipboard";
+    public static final String TOPIC_INTENT_CLASSIFICATION_ASSISTANT = "intent_classification";
+    public static final String TOPIC_INTENT_REWRITE_ASSISTANT = "intent_rewrite";
+    public static final String TOPIC_EMOTION_ASSISTANT = "emotion";
     public static final String TOPIC_SYSTEM_NOTIFICATION = "system";
     //
     // public static final String TOPIC_PRIVATE_PREFIX = "private/";

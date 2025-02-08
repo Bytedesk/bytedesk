@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 17:07:13
+ * @LastEditTime: 2025-02-08 09:01:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AssistantInitializer implements SmartInitializingSingleton {
 
-    private AssistantRepository assistantRepository;
+    // private AssistantRepository assistantRepository;
 
     private AssistantService assistantService;
 
@@ -41,9 +41,9 @@ public class AssistantInitializer implements SmartInitializingSingleton {
 
     // @PostConstruct
     public void init() {
-        if (assistantRepository.count() > 0) {
-            return;
-        }
+        // if (assistantRepository.count() > 0) {
+        //     return;
+        // }
 
         // 文件助手
         AssistantRequest fileAssistantRequest = AssistantRequest.builder()
@@ -54,10 +54,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
                 .build();
         fileAssistantRequest.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
         fileAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
-        // assistantRequest.setType(TypeConsts.TYPE_SYSTEM);
-        // assistantRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         assistantService.create(fileAssistantRequest);
-
 
         // 剪贴助手
         AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()
@@ -68,10 +65,40 @@ public class AssistantInitializer implements SmartInitializingSingleton {
                 .build();
         clipboardAssistantRequest.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
         clipboardAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
-        // assistantRequest2.setType(TypeConsts.TYPE_SYSTEM);
-        // assistantRequest2.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         assistantService.create(clipboardAssistantRequest);
 
+        // 意图改写
+        AssistantRequest intentRewriteAssistantRequest = AssistantRequest.builder()
+                .topic(TopicUtils.TOPIC_INTENT_REWRITE_ASSISTANT)
+                .nickname(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_NAME)
+                .avatar(AvatarConsts.DEFAULT_INTENT_REWRITE_ASSISTANT_AVATAR_URL)
+                .description(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION)
+                .build();
+        intentRewriteAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_REWRITE_ASSISTANT_UID);
+        intentRewriteAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        assistantService.create(intentRewriteAssistantRequest);
+
+        // 意图识别
+        AssistantRequest intentClassificationAssistantRequest = AssistantRequest.builder()
+                .topic(TopicUtils.TOPIC_INTENT_CLASSIFICATION_ASSISTANT)
+                .nickname(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME)
+                .avatar(AvatarConsts.DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_AVATAR_URL)
+                .description(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION)
+                .build();
+        intentClassificationAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID);
+        intentClassificationAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        assistantService.create(intentClassificationAssistantRequest);
+
+        // 情绪分析
+        AssistantRequest emotionAssistantRequest = AssistantRequest.builder()
+                .topic(TopicUtils.TOPIC_EMOTION_ASSISTANT)
+                .nickname(I18Consts.I18N_EMOTION_ASSISTANT_NAME)
+                .avatar(AvatarConsts.DEFAULT_EMOTION_ASSISTANT_AVATAR_URL)
+                .description(I18Consts.I18N_EMOTION_ASSISTANT_DESCRIPTION)
+                .build();
+        emotionAssistantRequest.setUid(BytedeskConsts.DEFAULT_EMOTION_ASSISTANT_UID);
+        emotionAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        assistantService.create(emotionAssistantRequest);
     }
 
     

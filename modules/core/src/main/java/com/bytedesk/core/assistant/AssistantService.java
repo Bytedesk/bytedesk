@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 17:35:41
+ * @LastEditTime: 2025-02-08 08:56:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,11 +52,21 @@ public class AssistantService {
             assistant.setUid(uidUtils.getUid());
         }
 
+        if (assistantRepository.existsByUid(assistant.getUid())) {
+            // don't throw exception, just return null
+            return null;
+        }
+
         return save(assistant);
     }
 
     private AssistantEntity save(AssistantEntity assistant) {
-        return assistantRepository.save(assistant);
+        try {
+            return assistantRepository.save(assistant);
+        } catch (Exception e) {
+            // TODO: handle exception
+            return null;
+        }
     }
 
     public AssistantResponse convertToResponse(AssistantEntity assistant) {
