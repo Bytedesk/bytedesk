@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 21:24:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 22:27:11
+ * @LastEditTime: 2025-02-08 08:28:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,11 +22,11 @@ import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 @RestController
-@RequestMapping("/config/properties")
+@RequestMapping("/config/bytedesk")
 public class BytedeskPropertiesController {
 
-    // http://127.0.0.1:9003/config/properties/bytedesk
-    @GetMapping("/bytedesk")
+    // http://127.0.0.1:9003/config/bytedesk/properties
+    @GetMapping("/properties")
     public ResponseEntity<JsonResult<?>> getBytedeskProperties() {
 
         BytedeskPropertiesResponse bytedeskPropertiesResponse = ConvertUtils.convertToBytedeskPropertiesResponse(BytedeskProperties.getInstance());
