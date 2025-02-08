@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 22:45:40
+ * @LastEditTime: 2025-02-08 10:03:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 package com.bytedesk.core.config.properties;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -130,8 +131,9 @@ public class BytedeskProperties {
         private Boolean javaAi = false;
         private Boolean pythonAi = true;
         private String emailType = "javamail";
+        private Date startDate;
         private Integer freeDays = 30;
-        private String avatarUrl;
+        private String avatarBaseUrl;
     }
 
     @Data
@@ -275,7 +277,7 @@ public class BytedeskProperties {
     }
 
     public String getAvatarUrl() {
-        return features.getAvatarUrl();
+        return features.getAvatarBaseUrl();
     }
 
     public String getCorsAllowedOrigins() {
