@@ -27,12 +27,19 @@ public class AvatarConsts {
     private AvatarConsts() {}
 
     private static BytedeskProperties bytedeskProperties;
+    private static final String FALLBACK_BASE_URL = "https://cdn.weiyuai.cn";
 
     private static String getDefaultHost() {
-        if (bytedeskProperties == null) {
-            bytedeskProperties = BytedeskProperties.getInstance();
+        try {
+            if (bytedeskProperties == null) {
+                bytedeskProperties = BytedeskProperties.getInstance();
+            }
+            String baseUrl = bytedeskProperties != null ? bytedeskProperties.getAvatarBaseUrl() : null;
+            return baseUrl != null ? baseUrl : FALLBACK_BASE_URL;
+        } catch (Exception e) {
+            // If anything goes wrong, return the fallback URL
+            return FALLBACK_BASE_URL;
         }
-        return bytedeskProperties.getAvatarBaseUrl();
     }
 
     public static String getDefaultAvatarUrl() {
