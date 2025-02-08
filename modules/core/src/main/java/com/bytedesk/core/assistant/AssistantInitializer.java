@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 09:01:52
+ * @LastEditTime: 2025-02-08 09:24:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,6 +67,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         clipboardAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         assistantService.create(clipboardAssistantRequest);
 
+        // https://mp.weixin.qq.com/s/nu-2ji9NOszcZ_6SWd469A
         // 意图改写
         AssistantRequest intentRewriteAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_INTENT_REWRITE_ASSISTANT)
@@ -78,7 +79,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         intentRewriteAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         assistantService.create(intentRewriteAssistantRequest);
 
-        // 意图识别
+        // 意图识别:意图槽位/意图置信度
         AssistantRequest intentClassificationAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_INTENT_CLASSIFICATION_ASSISTANT)
                 .nickname(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME)
@@ -100,7 +101,6 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         emotionAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         assistantService.create(emotionAssistantRequest);
     }
-
     
     
 }
