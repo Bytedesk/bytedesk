@@ -54,7 +54,7 @@
       news: false
     },
     showSupport: true,
-    chatParams: {
+    chatConfig: {
       org: 'df_org_uid',
       t: 0,
       sid: 'df_ag_uid'
