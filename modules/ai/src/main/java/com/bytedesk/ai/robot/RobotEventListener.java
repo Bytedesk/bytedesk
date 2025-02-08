@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 21:19:00
+ * @LastEditTime: 2025-02-08 21:21:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,7 +48,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.event.UploadSplitEvent;
 import com.bytedesk.kbase.faq.FaqRestService;
-
+import com.bytedesk.ai.provider.LlmProviderConsts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -183,7 +183,7 @@ public class RobotEventListener {
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                 messageSendService.sendProtobufMessage(clonedMessage);
                 //
-                if (robotProtobuf.getLlm().getProvider().equals("ollama")) {
+                if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
                     ollamaService.sendWsMessage(query, robotProtobuf.getLlm(), message);
                 } else {
                     // 目前所有的模型都使用zhipu
@@ -226,7 +226,7 @@ public class RobotEventListener {
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                 messageSendService.sendProtobufMessage(clonedMessage);
 
-                if (robot.getLlm().getProvider().equals("ollama")) {
+                if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
                     ollamaService.sendWsKbMessage(query, robot, message);
                 } else {
                     // 目前所有的模型都使用zhipu
