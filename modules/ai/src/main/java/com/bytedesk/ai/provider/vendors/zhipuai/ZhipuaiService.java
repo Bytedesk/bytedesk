@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 21:18:49
+ * @LastEditTime: 2025-02-08 21:26:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -176,10 +176,10 @@ public class ZhipuaiService {
             String history = ""; // TODO: 历史对话上下文，此处暂不使用
             prompt = PROMPT_TEMPLATE.replace("{context}", context).replace("{query}", query).replace("{history}",
                     history);
-            log.info("sendWsRobotMessage prompt 1 {}", prompt);
+            log.info("zhipuai sendWsKbMessage prompt 1 {}", prompt);
         } else {
             prompt = prompt + "\n" + query;
-            log.info("sendWsRobotMessage prompt 2 {}", prompt);
+            log.info("zhipuai sendWsKbMessage prompt 2 {}", prompt);
         }
         //
         List<ChatMessage> messages = new ArrayList<>();

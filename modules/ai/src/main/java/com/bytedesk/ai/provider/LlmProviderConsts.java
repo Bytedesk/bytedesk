@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 20:33:58
+ * @LastEditTime: 2025-02-08 21:21:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,12 @@ public class LlmProviderConsts {
     public static final String SILICON = "silicon";
     public static final String YI = "yi";
     public static final String STEPFUN = "stepfun";
-    
+    public static final String OPENROUTER = "openrouter";
+    public static final String GROQ = "groq";
+    public static final String ANTHROPIC = "anthropic";
+    public static final String OPENAI = "openai";
+    public static final String GEMINI = "gemini";
+    public static final String AIHUBMIX = "aihubmix";
+
     
 }
