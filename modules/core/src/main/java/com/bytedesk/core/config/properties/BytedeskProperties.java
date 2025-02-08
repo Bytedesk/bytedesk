@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 10:03:20
+ * @LastEditTime: 2025-02-08 10:15:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
@@ -276,8 +277,12 @@ public class BytedeskProperties {
         return features.getEmailType();
     }
 
-    public String getAvatarUrl() {
-        return features.getAvatarBaseUrl();
+    // 如果为空，则使用默认值
+    public String getAvatarBaseUrl() {
+        if (StringUtils.hasText(features.getAvatarBaseUrl())) {
+            return features.getAvatarBaseUrl();
+        }
+        return "https://cdn.weiyuai.cn";
     }
 
     public String getCorsAllowedOrigins() {

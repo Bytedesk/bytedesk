@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:32:23
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 14:08:49
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-08 10:33:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,7 +52,7 @@ public class AssistantEntity extends BaseEntityNoOrg {
     private String nickname;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+    private String avatar = AvatarConsts.getDefaultAvatarUrl();
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
