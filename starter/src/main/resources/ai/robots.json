@@ -1,11 +1,10 @@
 [
   {
     "uid": "1",
-    "nickname": "创建空白智能体",
+    "nickname": "创建空白智能体 - void agent",
     "type": "LLM",
     "category": "i18n.JOB",
     "prompt": "",
     "description": "创建一个空白智能体，不设置默认prompt，不设置默认角色。"
   }
-  
 ]
