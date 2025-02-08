@@ -44,6 +44,13 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: qfRxz3tVT8Nh
       SPRING_DATA_REDIS_DATABASE: 0
+      # bytedesk config
+      BYTEDESK_DEBUG: true
+      BYTEDESK_EDITION: enterprise
+      BYTEDESK_NAME: 
+      BYTEDESK_LOGO: 
+      BYTEDESK_DESCRIPTION: bytedesk description
+      BYTEDESK_VERSION: 0.6.1
       # Admin config
       BYTEDESK_ADMIN_EMAIL: admin@email.com
       BYTEDESK_ADMIN_PASSWORD: admin
@@ -63,7 +70,7 @@ services:
       BYTEDESK_FEATURES_PYTHON_AI: true
       BYTEDESK_FEATURES_EMAIL_TYPE: javamail
       BYTEDESK_FEATURES_ENABLE_REGISTRATION: false
-      BYTEDESK_FEATURES_AVATAR_URL: http://127.0.0.1:9003
+      BYTEDESK_FEATURES_AVATAR_BASE_URL: 
       # CORS config
       # BYTEDESK_CORS_ALLOWED_ORIGINS: *
       # JWT config
@@ -104,6 +111,11 @@ services:
       MANAGEMENT_SERVER_PORT: -1
       MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
       SPRING_SECURITY_BASIC_ENABLED: true
+      # ai config
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: true
+      SPRING_AI_OLLAMA_CHAT_ENABLED: true
+      SPRING_AI_MOONSHOT_CHAT_ENABLED: false
+      SPRING_AI_MINIMAX_CHAT_ENABLED: false
     ports:
       - 9003:9003
       - 9885:9885
