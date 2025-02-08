@@ -8,7 +8,7 @@
 
     <#--  <title>${article.title!''} - 文章详情 - ${knowledgebase.headline!'帮助中心'} - ${knowledgebase.name!'微语'}</title>  -->
 
-    <#include "../../common/template/header.ftl"/>
+    <#include "./template/header.ftl"/>
 
     <script src="/assets/js/article.js"></script>
 
@@ -16,7 +16,7 @@
 
 <body>
 
-    <#include "../../common/template/toplink.ftl"/>
+    <#include "./template/toplink.ftl"/>
 
     <div class="uk-section section-sub-nav uk-padding-remove">
         <div class="uk-container">
@@ -189,11 +189,11 @@
         </div>
     </div>
 
-    <#include "../../common/template/footer.ftl"/>
+    <#include "./template/footer.ftl"/>
 
-    <#include "../../common/template/offcanvas.ftl"/>
+    <#include "./template/offcanvas.ftl"/>
 
-    <#include "../../common/template/img_enlarge.ftl"/>
+    <#include "./template/img_enlarge.ftl"/>
 
 </body>
 

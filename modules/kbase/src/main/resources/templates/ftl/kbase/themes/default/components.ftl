@@ -8,7 +8,7 @@
 
     <title>Components - Knowledge Base HTML Template</title>
 
-    <#include "../../common/template/header.ftl"/>
+    <#include "./template/header.ftl"/>
 
 </head>
 
