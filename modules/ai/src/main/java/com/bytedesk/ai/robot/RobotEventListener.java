@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 20:21:37
+ * @LastEditTime: 2025-02-08 21:19:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,11 +28,9 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
 import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiService;
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessageCache;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
@@ -43,7 +41,6 @@ import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.core.redis.pubsub.RedisPubsubService;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -70,11 +67,11 @@ public class RobotEventListener {
 
     private final ThreadRestService threadService;
 
-    private final RedisPubsubService redisPubsubService;
+    // private final RedisPubsubService redisPubsubService;
 
-    private final BytedeskProperties bytedeskProperties;
+    // private final BytedeskProperties bytedeskProperties;
 
-    private final MessageCache messageCache;
+    // private final MessageCache messageCache;
 
     private final IMessageSendService messageSendService;
 
@@ -228,20 +225,27 @@ public class RobotEventListener {
                 clonedMessage.setUid(uidUtils.getUid());
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                 messageSendService.sendProtobufMessage(clonedMessage);
+
+                if (robot.getLlm().getProvider().equals("ollama")) {
+                    ollamaService.sendWsKbMessage(query, robot, message);
+                } else {
+                    // 目前所有的模型都使用zhipu
+                    zhipuaiService.sendWsKbMessage(query, robot, message);
+                }
                 
                 // 知识库
-                if (bytedeskProperties.getJavaAi()) {
-                    log.info("robot java ai kb");
-                    zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);
-                }
+                // if (bytedeskProperties.getJavaAi()) {
+                //     log.info("robot java ai kb");
+                //     zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);
+                // }
                 
                 // 通知python ai模块处理回答
-                if (bytedeskProperties.getPythonAi()) {
-                    log.info("robot python");
-                    messageCache.put(messageUid, message);
-                    redisPubsubService.sendQuestionMessage(messageUid, threadTopic, robot.getKbUid(),
-                            query);
-                }
+                // if (bytedeskProperties.getPythonAi()) {
+                //     log.info("robot python");
+                //     messageCache.put(messageUid, message);
+                //     redisPubsubService.sendQuestionMessage(messageUid, threadTopic, robot.getKbUid(),
+                //             query);
+                // }
             }
         }
     }

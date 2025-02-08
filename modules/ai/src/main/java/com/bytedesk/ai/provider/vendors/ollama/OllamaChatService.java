@@ -27,6 +27,7 @@ import com.agentsflex.llm.ollama.OllamaLlmConfig;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -100,6 +101,10 @@ public class OllamaChatService {
                 log.info("aiMessage.getStatus() == END");
             }
         });
+    }
+
+    public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
+    
     }
     
 }

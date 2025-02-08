@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 14:34:57
+ * @LastEditTime: 2025-02-08 21:18:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -167,11 +167,11 @@ public class ZhipuaiService {
 
     // 知识库问答
     // TODO: 使用自定义参数
-    public void sendWsKbMessage(String query, String kbUid, RobotEntity robot, MessageProtobuf messageProtobuf) {
+    public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
         //
         String prompt = robot.getLlm().getPrompt();
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = uploadVectorStore.searchText(query, kbUid);
+            List<String> contentList = uploadVectorStore.searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
             String history = ""; // TODO: 历史对话上下文，此处暂不使用
             prompt = PROMPT_TEMPLATE.replace("{context}", context).replace("{query}", query).replace("{history}",
