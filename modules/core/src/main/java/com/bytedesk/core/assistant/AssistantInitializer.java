@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-08 10:36:42
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-08 15:43:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,7 +68,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         assistantService.create(clipboardAssistantRequest);
 
         // https://mp.weixin.qq.com/s/nu-2ji9NOszcZ_6SWd469A
-        // 意图改写
+        // TODO: 意图改写
         AssistantRequest intentRewriteAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_INTENT_REWRITE_ASSISTANT)
                 .nickname(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_NAME)
@@ -79,7 +79,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         intentRewriteAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         assistantService.create(intentRewriteAssistantRequest);
 
-        // 意图识别:意图槽位/意图置信度
+        // TODO: 意图识别:意图槽位/意图置信度
         AssistantRequest intentClassificationAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_INTENT_CLASSIFICATION_ASSISTANT)
                 .nickname(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME)
@@ -90,7 +90,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         intentClassificationAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         assistantService.create(intentClassificationAssistantRequest);
 
-        // 情绪分析
+        // TODO: 情绪分析
         AssistantRequest emotionAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_EMOTION_ASSISTANT)
                 .nickname(I18Consts.I18N_EMOTION_ASSISTANT_NAME)
