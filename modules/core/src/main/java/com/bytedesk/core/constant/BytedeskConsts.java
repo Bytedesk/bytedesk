@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 17:05:53
+ * @LastEditTime: 2025-02-08 09:01:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,9 @@ public class BytedeskConsts {
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid";
     public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid";
     public static final String DEFAULT_CLIPBOARD_ASSISTANT_UID = "df_ca_uid";
+    public static final String DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID = "df_ica_uid";
+    public static final String DEFAULT_INTENT_REWRITE_ASSISTANT_UID = "df_ira_uid";
+    public static final String DEFAULT_EMOTION_ASSISTANT_UID = "df_ea_uid";
     public static final String DEFAULT_CHANNEL_UID = "df_ch_uid";
     public static final String DEFAULT_AGENT_ASSISTANT_UID = "df_as_uid";
     public static final String DEFAULT_SYSTEM_UID = "df_sys_uid";

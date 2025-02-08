@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 17:05:17
+ * @LastEditTime: 2025-02-08 09:01:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,6 +66,12 @@ public class AvatarConsts {
     public static final String DEFAULT_FILE_ASSISTANT_AVATAR_URL = DEFAULT_HOST + "/avatars/file.png";
     
     public static final String DEFAULT_CLIPBOARD_ASSISTANT_AVATAR_URL = DEFAULT_HOST + "/avatars/clipboard.png";
+
+    public static final String DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_AVATAR_URL = DEFAULT_HOST + "/avatars/intent_classification.png";
+
+    public static final String DEFAULT_INTENT_REWRITE_ASSISTANT_AVATAR_URL = DEFAULT_HOST + "/avatars/intent_rewrite.png";
+
+    public static final String DEFAULT_EMOTION_ASSISTANT_AVATAR_URL = DEFAULT_HOST + "/avatars/emotion.png";
     
     public static final String DEFAULT_SYSTEM_NOTIFICATION_AVATAR_URL = DEFAULT_HOST + "/avatars/notification.png";
 

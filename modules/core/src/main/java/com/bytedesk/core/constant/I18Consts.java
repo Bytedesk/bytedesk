@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 14:44:07
+ * @LastEditTime: 2025-02-08 09:01:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,9 +37,21 @@ public class I18Consts {
     // "文件助手"
     public static final String I18N_FILE_ASSISTANT_NAME = I18N_PREFIX + "file.assistant";
     public static final String I18N_CLIPBOARD_ASSISTANT_NAME = I18N_PREFIX + "clipboard.assistant";
+    // "意图改写"
+    public static final String I18N_INTENT_REWRITE_ASSISTANT_NAME = I18N_PREFIX + "intent.rewrite.assistant";
+    // "意图识别"
+    public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME = I18N_PREFIX + "intent.classification.assistant";
+    // "情绪分析"
+    public static final String I18N_EMOTION_ASSISTANT_NAME = I18N_PREFIX + "emotion.assistant";
     // "手机、电脑文件互传"
     public static final String I18N_FILE_ASSISTANT_DESCRIPTION = I18N_PREFIX + "file.assistant.description";
     public static final String I18N_CLIPBOARD_ASSISTANT_DESCRIPTION = I18N_PREFIX + "clipboard.assistant.description";
+    // "意图改写"
+    public static final String I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION = I18N_PREFIX + "intent.rewrite.assistant.description";
+    // "意图识别"
+    public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION = I18N_PREFIX + "intent.classification.assistant.description";
+    // "情绪分析"
+    public static final String I18N_EMOTION_ASSISTANT_DESCRIPTION = I18N_PREFIX + "emotion.assistant.description";
     // 系统通知
     public static final String I18N_SYSTEM_NOTIFICATION_NAME = I18N_PREFIX + "system.notification";
     public static final String I18N_SYSTEM_NOTIFICATION_DESCRIPTION = I18N_PREFIX + "system.notification.description";
