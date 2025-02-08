@@ -9,7 +9,7 @@
     
     <title>${knowledgebase.name!'微语'} - ${knowledgebase.headline!'帮助中心'}</title>
 
-    <#include "../../common/template/header.ftl"/>
+    <#include "./template/header.ftl"/>
 
     <style>
     </style>
@@ -18,7 +18,7 @@
 
 <body>
 
-    <#include "../../common/template/toplink_home.ftl"/>
+    <#include "./template/toplink_home.ftl"/>
 
     <div class="uk-section">
         <div class="uk-container">
@@ -95,13 +95,13 @@
         </div>
     </div>  -->
 
-    <#include "../../common/template/footer_home.ftl"/>
+    <#include "./template/footer_home.ftl"/>
 
-    <#include "../../common/template/offcanvas.ftl"/>
+    <#include "./template/offcanvas.ftl"/>
 
-    <#include "../../common/template/bytedesk.ftl"/>
+    <#include "./template/bytedesk.ftl"/>
 
-    <#include "../../common/template/img_enlarge.ftl"/>
+    <#include "./template/img_enlarge.ftl"/>
 
 </body>
 
