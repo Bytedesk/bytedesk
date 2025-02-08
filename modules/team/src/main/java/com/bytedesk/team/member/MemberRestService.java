@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-05 11:17:49
+ * @LastEditTime: 2025-02-08 10:40:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -113,7 +113,7 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         member.setRoleUids(request.getRoleUids());
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = modelMapper.map(request, UserRequest.class);
-        userRequest.setAvatar(AvatarConsts.DEFAULT_USER_AVATAR_URL);
+        userRequest.setAvatar(AvatarConsts.getDefaultUserAvatarUrl());
         userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
         userRequest.setOrgUid(request.getOrgUid());
         //
@@ -257,7 +257,7 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         // 生成user
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = UserRequest.builder().build();
-        userRequest.setAvatar(AvatarConsts.DEFAULT_AVATAR_URL);
+        userRequest.setAvatar(AvatarConsts.getDefaultAvatarUrl());
         userRequest.setNickname(memberExcel.getNickname());
         userRequest.setEmail(memberExcel.getEmail());
         userRequest.setMobile(memberExcel.getMobile());

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 10:37:15
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-08 10:37:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class UserRequest extends BaseRequest {
 	private String code;
 
 	@Builder.Default
-	private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+	private String avatar = AvatarConsts.getDefaultAvatarUrl();
 
 	@Builder.Default
 	private String description = I18Consts.I18N_USER_DESCRIPTION;

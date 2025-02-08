@@ -101,7 +101,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         LlmProviderRequest request = LlmProviderRequest.builder()
                 .name(providerName)
                 .nickname(providerJson.getNickname())
-                .logo(AvatarConsts.LLM_THREAD_DEFAULT_AVATAR_BASE_URL + providerJson.getLogo())
+                .logo(AvatarConsts.getLlmThreadDefaultAvatarBaseUrl() + providerJson.getLogo())
                 .apiUrl(providerJson.getApiUrl())
                 .webUrl(providerJson.getWebUrl())
                 .status(providerJson.getStatus())

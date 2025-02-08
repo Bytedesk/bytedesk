@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 12:14:35
+ * @LastEditTime: 2025-02-08 10:39:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -204,17 +204,17 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     public String getAvatar(String client) {
         if (client == null) {
-            return AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
+            return AvatarConsts.getDefaultVisitorAvatarUrl();
         }
         if (client.toUpperCase().contains(ClientEnum.WEB.name())) {
-            return AvatarConsts.DEFAULT_WEB_AVATAR_URL;
+            return AvatarConsts.getDefaultWebAvatarUrl();
         } else if (client.toUpperCase().contains(ClientEnum.ANDROID.name())) {
-            return AvatarConsts.DEFAULT_ANDROID_AVATAR_URL;
+            return AvatarConsts.getDefaultAndroidAvatarUrl();
         } else if (client.toUpperCase().contains(ClientEnum.IOS.name())) {
-           return AvatarConsts.DEFAULT_IOS_AVATAR_URL;
+           return AvatarConsts.getDefaultIosAvatarUrl();
         } else if (client.toUpperCase().contains(ClientEnum.UNIAPP.name())) {
-            return AvatarConsts.DEFAULT_UNIAPP_AVATAR_URL;
+            return AvatarConsts.getDefaultUniappAvatarUrl();
         }
-        return AvatarConsts.DEFAULT_VISITOR_AVATAR_URL;
+        return AvatarConsts.getDefaultVisitorAvatarUrl();
     }
 }

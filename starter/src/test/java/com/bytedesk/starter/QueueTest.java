@@ -60,7 +60,7 @@ public class QueueTest {
         for (int i = 0; i < VISITOR_COUNT; i++) {
             VisitorResponse visitor = VisitorResponse.builder()
                 .nickname("Visitor " + i)
-                .avatar(AvatarConsts.DEFAULT_VISITOR_AVATAR_URL)
+                .avatar(AvatarConsts.getDefaultVisitorAvatarUrl())
                 .build();
             visitor.setUid("visitor_" + i);
             visitors.add(visitor);

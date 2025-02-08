@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 10:45:25
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-08 10:37:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,7 +52,7 @@ public class UserInitializer {
                 .username(bytedeskProperties.getEmail())
                 .password(new BCryptPasswordEncoder().encode(bytedeskProperties.getPassword()))
                 .nickname(bytedeskProperties.getNickname())
-                .avatar(AvatarConsts.DEFAULT_AVATAR_URL)
+                .avatar(AvatarConsts.getDefaultAvatarUrl())
                 .mobile(bytedeskProperties.getMobile())
                 .num(bytedeskProperties.getMobile())
                 .superUser(true)

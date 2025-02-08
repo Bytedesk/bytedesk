@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:27:20
+ * @LastEditTime: 2025-02-08 10:39:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,7 @@ public class RobotRequest extends BaseRequest {
     private String nickname = I18Consts.I18N_ROBOT_NICKNAME;
     
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+    private String avatar = AvatarConsts.getDefaultRobotAvatar();
 
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;

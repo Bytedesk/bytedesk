@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 09:24:30
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-08 10:36:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,7 +49,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         AssistantRequest fileAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_FILE_ASSISTANT)
                 .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
-                .avatar(AvatarConsts.DEFAULT_FILE_ASSISTANT_AVATAR_URL)
+                .avatar(AvatarConsts.getDefaultFileAssistantAvatarUrl())
                 .description(I18Consts.I18N_FILE_ASSISTANT_DESCRIPTION)
                 .build();
         fileAssistantRequest.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
@@ -60,7 +60,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_CLIPBOARD_ASSISTANT)
                 .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
-                .avatar(AvatarConsts.DEFAULT_CLIPBOARD_ASSISTANT_AVATAR_URL)
+                .avatar(AvatarConsts.getDefaultClipboardAssistantAvatarUrl())
                 .description(I18Consts.I18N_CLIPBOARD_ASSISTANT_DESCRIPTION)
                 .build();
         clipboardAssistantRequest.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
@@ -72,7 +72,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         AssistantRequest intentRewriteAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_INTENT_REWRITE_ASSISTANT)
                 .nickname(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_NAME)
-                .avatar(AvatarConsts.DEFAULT_INTENT_REWRITE_ASSISTANT_AVATAR_URL)
+                .avatar(AvatarConsts.getDefaultIntentRewriteAssistantAvatarUrl())
                 .description(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION)
                 .build();
         intentRewriteAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_REWRITE_ASSISTANT_UID);
@@ -83,7 +83,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         AssistantRequest intentClassificationAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_INTENT_CLASSIFICATION_ASSISTANT)
                 .nickname(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME)
-                .avatar(AvatarConsts.DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_AVATAR_URL)
+                .avatar(AvatarConsts.getDefaultIntentClassificationAssistantAvatarUrl())
                 .description(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION)
                 .build();
         intentClassificationAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID);
@@ -94,7 +94,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         AssistantRequest emotionAssistantRequest = AssistantRequest.builder()
                 .topic(TopicUtils.TOPIC_EMOTION_ASSISTANT)
                 .nickname(I18Consts.I18N_EMOTION_ASSISTANT_NAME)
-                .avatar(AvatarConsts.DEFAULT_EMOTION_ASSISTANT_AVATAR_URL)
+                .avatar(AvatarConsts.getDefaultEmotionAssistantAvatarUrl())
                 .description(I18Consts.I18N_EMOTION_ASSISTANT_DESCRIPTION)
                 .build();
         emotionAssistantRequest.setUid(BytedeskConsts.DEFAULT_EMOTION_ASSISTANT_UID);

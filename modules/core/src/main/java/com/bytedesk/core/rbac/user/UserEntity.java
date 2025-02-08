@@ -86,7 +86,7 @@ public class UserEntity extends BaseEntityNoOrg {
     private String mobile;
 
 	@Builder.Default
-	private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+	private String avatar = AvatarConsts.getDefaultAvatarUrl();
 
 	@Builder.Default
 	private String description = I18Consts.I18N_USER_DESCRIPTION;
