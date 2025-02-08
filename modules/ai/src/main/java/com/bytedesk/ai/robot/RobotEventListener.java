@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 14:34:03
+ * @LastEditTime: 2025-02-08 20:21:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -185,9 +185,6 @@ public class RobotEventListener {
                 clonedMessage.setUid(uidUtils.getUid());
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                 messageSendService.sendProtobufMessage(clonedMessage);
-                // TODO: 获取大模型配置
-                // robotProtobuf.getLlm().getProvider()
-                // robotProtobuf.getLlm().getModel()
                 //
                 if (robotProtobuf.getLlm().getProvider().equals("ollama")) {
                     ollamaService.sendWsMessage(query, robotProtobuf.getLlm(), message);
