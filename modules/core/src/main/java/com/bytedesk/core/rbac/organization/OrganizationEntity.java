@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:10:58
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-08 10:37:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class OrganizationEntity extends BaseEntityNoOrg {
 
     // logo
     @Builder.Default
-    private String logo = AvatarConsts.DEFAULT_AVATAR_URL;
+    private String logo = AvatarConsts.getDefaultAvatarUrl();
 
     // organization code, 可读性强，供用户搜索
     @Column(unique = true)

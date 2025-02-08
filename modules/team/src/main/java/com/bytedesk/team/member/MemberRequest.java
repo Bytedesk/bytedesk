@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 10:43:37
+ * @LastEditTime: 2025-02-08 10:40:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ public class MemberRequest extends BaseRequest {
     private String nickname;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_AVATAR_URL;
+    private String avatar = AvatarConsts.getDefaultAvatarUrl();
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:26:55
+ * @LastEditTime: 2025-02-08 10:40:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ public class WorkgroupRequest extends BaseRequest {
     private String nickname;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_WORK_GROUP_AVATAR_URL;
+    private String avatar = AvatarConsts.getDefaultWorkGroupAvatarUrl();
 
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
