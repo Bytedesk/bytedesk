@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:48:33
+ * @LastEditTime: 2025-02-08 10:26:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -191,7 +191,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         Optional<RobotEntity> robotOptional = findByUid(robotUid);
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
-            robot.setAvatar(AvatarConsts.LLM_THREAD_DEFAULT_AVATAR);
+            robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
             // 更新机器人配置+大模型相关信息
             thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         }
@@ -472,7 +472,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         //
         RobotEntity robot = RobotEntity.builder()
                 .nickname(robotJson.getNickname())
-                .avatar(AvatarConsts.DEFAULT_ROBOT_AVATAR)
+                .avatar(AvatarConsts.getDefaultRobotAvatar())
                 .description(robotJson.getDescription())
                 .type(robotJson.getType())
                 .categoryUid(categoryUid)

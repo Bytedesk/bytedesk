@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 17:03:24
+ * @LastEditTime: 2025-02-08 10:26:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ public class RobotEntity extends BaseEntity {
     private String nickname = I18Consts.I18N_ROBOT_NICKNAME;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_ROBOT_AVATAR;
+    private String avatar = AvatarConsts.getDefaultRobotAvatar();
 
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;

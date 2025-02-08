@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:26:36
+ * @LastEditTime: 2025-02-08 10:27:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,7 +69,7 @@ public class AgentEntity extends BaseEntity {
     private String nickname;
 
     @Builder.Default
-    private String avatar = AvatarConsts.DEFAULT_AGENT_AVATAR_URL;
+    private String avatar = AvatarConsts.getDefaultAgentAvatarUrl();
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
