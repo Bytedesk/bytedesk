@@ -50,7 +50,7 @@ services:
       BYTEDESK_NAME: 
       BYTEDESK_LOGO: 
       BYTEDESK_DESCRIPTION: bytedesk description
-      BYTEDESK_VERSION: 0.6.1
+      BYTEDESK_VERSION: 0.6.2
       # Admin config
       BYTEDESK_ADMIN_EMAIL: admin@email.com
       BYTEDESK_ADMIN_PASSWORD: admin
