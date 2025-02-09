@@ -18,7 +18,6 @@
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>
-		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 		<langchain4j.version>1.0.0-beta1</langchain4j.version>
 		<agentsflex.version>1.0.0-rc.4</agentsflex.version>
 		<ollama4j.version>1.0.93</ollama4j.version>

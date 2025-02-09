@@ -16,7 +16,7 @@
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>
-		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
+		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
 	</properties>
 
 	<dependencies>
