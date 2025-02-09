@@ -116,6 +116,8 @@ services:
       SPRING_AI_OLLAMA_CHAT_ENABLED: true
       SPRING_AI_MOONSHOT_CHAT_ENABLED: false
       SPRING_AI_MINIMAX_CHAT_ENABLED: false
+      # wechat config
+      WECHAT_PAY_ENABLED: false
     ports:
       - 9003:9003
       - 9885:9885
