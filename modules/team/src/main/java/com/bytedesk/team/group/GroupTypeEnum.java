@@ -21,9 +21,11 @@ package com.bytedesk.team.group;
 // 私有群：需要邀请才能加入
 // 临时群：临时群组，没有特殊功能
 // 机器人群：机器人群组，没有特殊功能
+// 项目群：项目群组，项目管理，任务分配管理、日报、周报等
 public enum GroupTypeEnum {
     NORMAL, // 普通群组
-    TOPIC; // 话题群组
+    TOPIC, // 话题群组
+    PROJECT; // 项目群组
 
     // 根据字符串查找对应的枚举常量
     public static GroupTypeEnum fromValue(String value) {

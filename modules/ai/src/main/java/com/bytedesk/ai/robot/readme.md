@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-27 22:19:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 22:27:30
+ * @LastEditTime: 2025-02-10 14:25:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,10 @@
 ## 提示最佳实践模板
 
 ```md
+在每个prompt前面添加下面这句话，能够显著提高模型输出质量。
+“Take a deep breath and work on this step by step.”
+“深吸一口气，一步一步地完成这个任务。”
+
 ## 1. 任务描述
 - **描述**：清晰地描述您希望模型完成的任务。
 - **示例**：`请生成一个关于可持续发展的简短介绍。`

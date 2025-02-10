@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-16 18:19:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-04 17:00:41
+ * @LastEditTime: 2025-02-10 16:23:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,13 +56,19 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             // based on token, don't need session
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/**").authenticated()
                     // .requestMatchers("/actuator/**").authenticated() // monitor endpoints
                     .anyRequest().permitAll())
             // https://docs.spring.io/spring-security/reference/servlet/channels/websocket.html
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin().disable()))
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin().disable())
+                // .xssProtection(xss -> xss.enable())
+                // .contentSecurityPolicy(csp -> csp.policyDirectives("script-src 'self'"))
+            )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         //

@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -19,14 +20,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserRestService;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.upload.UploadEntity;
@@ -40,6 +45,7 @@ import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
+import com.bytedesk.core.topic.TopicUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -121,12 +127,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
         // 
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getThreadTopic());
-        if (threadOptional.isPresent()) {
-            ticket.setThread(threadOptional.get());
-        } else {
-            // TODO: 创建工单会话
-
+        if (StringUtils.hasText(request.getServiceThreadTopic())) {
+            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getServiceThreadTopic());
+            if (threadOptional.isPresent()) {
+                ticket.setServiceThread(threadOptional.get());
+            }
         }
         // 
         Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
@@ -146,9 +151,31 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ticket.setAssignee(assigneeOptional.get());
             ticket.setType(TicketTypeEnum.AGENT.name());
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+            // 
+            UserProtobuf userProtobuf = UserProtobuf.builder()
+                .nickname(assigneeOptional.get().getNickname())
+                .avatar(assigneeOptional.get().getAvatar())
+                .build();
+            userProtobuf.setUid(assigneeOptional.get().getUid());
+            userProtobuf.setType(UserTypeEnum.AGENT.name());
+            String userJson = JSON.toJSONString(userProtobuf);
+            // 创建工单会话
+            ThreadEntity thread = createTicketThread(request, TicketTypeEnum.AGENT, userJson);
+            ticket.setThread(thread);
         } else {
             ticket.setType(TicketTypeEnum.WORKGROUP.name());
             ticket.setStatus(TicketStatusEnum.NEW.name());
+            // 
+            UserProtobuf userProtobuf = UserProtobuf.builder()
+                .nickname(workgroupOptional.get().getNickname())
+                .avatar(workgroupOptional.get().getAvatar())
+                .build();
+            userProtobuf.setUid(workgroupOptional.get().getUid());
+            userProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+            String userJson = JSON.toJSONString(userProtobuf);
+            // 创建工单会话 
+            ThreadEntity thread = createTicketThread(request, TicketTypeEnum.WORKGROUP, userJson);
+            ticket.setThread(thread);
         }
         Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
         if (reporterOptional.isPresent()) {
@@ -190,11 +217,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             throw new RuntimeException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
-        // ticket = updateTicket(ticket.getId(), request);
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
-        // ticket.setCategoryUid(request.getCategoryUid());
         ticket.setStatus(request.getStatus());
         // 
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getThreadTopic());
@@ -216,6 +241,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (workgroupOptional.isPresent()) {
             ticket.setWorkgroup(workgroupOptional.get());
         }
+         // 先保存工单
+         TicketEntity savedTicket = save(ticket);
         // 
         List<TicketAttachmentEntity> attachments = new ArrayList<>();
         if (request.getUploadUids() != null) {
@@ -224,7 +251,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 if (uploadOptional.isPresent()) {
                     TicketAttachmentEntity attachment = new TicketAttachmentEntity();
                     attachment.setUid(uidUtils.getUid());
-                    attachment.setTicket(ticket);
+                    attachment.setTicket(savedTicket);
                     attachment.setUpload(uploadOptional.get());
                     attachmentRepository.save(attachment);
                     // 
@@ -232,27 +259,41 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 }
             }
         }
-        ticket.setAttachments(attachments);
+        savedTicket.setAttachments(attachments);
         // 
-        TicketEntity savedTicket = ticketRepository.save(ticket);
+        savedTicket = save(savedTicket);
         if (savedTicket == null) {
-            throw new RuntimeException("update ticket failed");
+            throw new RuntimeException("save ticket failed");
         }
         // 
         return convertToResponse(savedTicket);
     }
 
     // 创建工单会话
-    public ThreadEntity createTicketThread(UserEntity user) {
+    public ThreadEntity createTicketThread(TicketRequest request, TicketTypeEnum ticketType, String userJson) {
+        // 
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
         //
-        String topic = "";// TopicUtils.getTicketTopic(user.getUid());
+        String topic = "";
+        if (ticketType == TicketTypeEnum.AGENT) {
+            topic = TopicUtils.formatOrgAgentTicketThreadTopic(request.getAssigneeUid(), user.getUid());
+        } else if (ticketType == TicketTypeEnum.WORKGROUP) {
+            topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(request.getWorkgroupUid(), user.getUid());
+        }
         //
-        ThreadEntity thread = new ThreadEntity();
+        ThreadEntity thread = ThreadEntity.builder()
+            .type(ThreadTypeEnum.TICKET.name())
+            .state(ThreadStateEnum.STARTED.name())
+            .topic(topic)
+            .user(userJson)
+            .owner(user)
+            .build();
         thread.setUid(uidUtils.getUid());
-        thread.setType(ThreadTypeEnum.TICKET.name());
-        thread.setTopic(topic);
-        thread.setOwner(user);
         thread.setOrgUid(user.getOrgUid());
+        thread.setClient(request.getClient());
         // 
         return threadRestService.save(thread);
     }
@@ -330,11 +371,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             TicketEntity ticket = ticketRepository.save(entity);
             // 
             if (ticket == null) {
-                throw new RuntimeException("update ticket failed");
+                throw new RuntimeException("save ticket failed");
             }
             return ticket;
         } catch (Exception e) {
-            throw new RuntimeException("update ticket failed");
+            throw new RuntimeException("save ticket exception: " + e.getMessage());
         }
     }
     
