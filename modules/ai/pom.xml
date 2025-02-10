@@ -74,6 +74,14 @@
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
+		<!-- https://github.com/alibaba/spring-ai-alibaba/blob/main/README-zh.md -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter -->
+		<dependency>
+			<groupId>com.alibaba.cloud.ai</groupId>
+			<artifactId>spring-ai-alibaba-starter</artifactId>
+			<version>1.0.0-M5.1</version>
+		</dependency>
+
 		<!-- https://open.bigmodel.cn/dev/api#sdk_install -->
 		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
 		<!-- https://central.sonatype.com/artifact/cn.bigmodel.openapi/oapi-java-sdk/release-V4-2.3.1 -->
