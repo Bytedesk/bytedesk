@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 16:28:16
+ * @LastEditTime: 2025-02-10 23:32:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,8 +12,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.thread;
-
-// import java.util.List;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -41,9 +39,6 @@ public class ThreadEventListener {
     private final TopicService topicService;
 
     private final TopicCacheService topicCacheService;
-
-    // private final ThreadRestService threadService;
-    // private final ThreadPersistCache threadPersistCache;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
