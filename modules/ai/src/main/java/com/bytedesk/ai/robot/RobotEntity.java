@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 10:26:24
+ * @LastEditTime: 2025-02-10 08:26:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,9 +51,7 @@ public class RobotEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // TODO： 对内名称
-    // @Builder.Default
-    // private String name = I18Consts.I18N_ROBOT_NICKNAME;
+    private String name;
 
     // 对外名称
     @Builder.Default

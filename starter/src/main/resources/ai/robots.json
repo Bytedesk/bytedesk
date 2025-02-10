@@ -1,10 +1,74 @@
 [
   {
     "uid": "1",
+    "name": "void_agent",
     "nickname": "创建空白智能体 - void agent",
     "type": "LLM",
     "category": "i18n.JOB",
     "prompt": "",
     "description": "创建一个空白智能体，不设置默认prompt，不设置默认角色。"
+  },
+  {
+    "uid": "2",
+    "name": "customer_service",
+    "nickname": "客服问答 - 用于访客端",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关",
+    "description": "创建一个客服问答机器人，默认prompt：根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案. 另外，请提供更多相关的问答对。"
+  },
+  {
+    "uid": "3",
+    "name": "query_expansion",
+    "nickname": "问题扩写",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
+    "description": "创建一个问题扩写机器人，默认prompt：根据用户的问题，生成多个不同表述的问题，确保问题的多样性。"
+  },
+  {
+    "uid": "4",
+    "name": "intent_rewrite",
+    "nickname": "意图改写",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
+    "description": "创建一个意图改写机器人，默认prompt：根据用户的问题，生成多个不同表述的问题，确保问题的多样性。"
+  },
+  {
+    "uid": "5",
+    "name": "intent_classification",
+    "nickname": "意图识别",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "根据用户的问题，识别用户的意图，并返回意图的类型。",
+    "description": "创建一个意图识别机器人，默认prompt：根据用户的问题，识别用户的意图，并返回意图的类型。"
+  },
+  {
+    "uid": "6",
+    "name": "emotion_analysis",
+    "nickname": "情绪分析",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "根据用户的问题，识别用户的情绪，并返回情绪的类型。",
+    "description": "创建一个情绪分析机器人，默认prompt：根据用户的问题，识别用户的情绪，并返回情绪的类型。"
+  },
+  {
+    "uid": "7",
+    "name": "qa_evaluation",
+    "nickname": "答案评测",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "对机器人回答的问题进行评测，并给出评测结果。",
+    "description": "创建一个答案评测机器人，默认prompt：对机器人回答的问题进行评测，并给出评测结果。"
+  },
+  {
+    "uid": "8",
+    "name": "quality_inspection",
+    "nickname": "客服质检",
+    "type": "LLM",
+    "category": "i18n.JOB",
+    "prompt": "对客服的回答进行质检，并给出质检结果。",
+    "description": "创建一个客服质检机器人，默认prompt：对客服的回答进行质检，并给出质检结果。"
   }
 ]
