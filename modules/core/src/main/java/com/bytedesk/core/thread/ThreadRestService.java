@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 16:38:54
+ * @LastEditTime: 2025-02-10 15:07:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -154,7 +154,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .user(thread.getUser())
                 .owner(owner)
                 .build();
-        groupThread.setUid(uidUtils.getCacheSerialUid());
+        groupThread.setUid(uidUtils.getUid());
         groupThread.setOrgUid(thread.getOrgUid());
 
         ThreadEntity updateThread = save(groupThread);

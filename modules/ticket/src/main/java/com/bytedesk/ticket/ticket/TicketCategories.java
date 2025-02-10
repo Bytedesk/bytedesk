@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:42:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 22:30:55
+ * @LastEditTime: 2025-02-10 15:30:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -76,6 +76,9 @@ public class TicketCategories {
         // I18Consts.I18N_PREFIX + "ticket.category.operation.monitoring_alert",
         // I18Consts.I18N_PREFIX + "ticket.category.operation.security_issue",
         // I18Consts.I18N_PREFIX + "ticket.category.operation.performance_optimization"
+
+        // 其他
+        I18Consts.I18N_PREFIX + "ticket.category.other",
     };
 
     /**
