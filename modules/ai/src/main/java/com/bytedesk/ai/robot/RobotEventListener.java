@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 21:21:52
+ * @LastEditTime: 2025-02-10 22:36:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,12 +66,6 @@ public class RobotEventListener {
     private final UidUtils uidUtils;
 
     private final ThreadRestService threadService;
-
-    // private final RedisPubsubService redisPubsubService;
-
-    // private final BytedeskProperties bytedeskProperties;
-
-    // private final MessageCache messageCache;
 
     private final IMessageSendService messageSendService;
 
