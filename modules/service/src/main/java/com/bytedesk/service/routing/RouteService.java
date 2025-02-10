@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 22:38:54
+ * @LastEditTime: 2025-02-10 22:55:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -35,7 +36,7 @@ import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -73,11 +74,15 @@ public class RouteService {
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.toString());
+        // 
+        thread.setState(ThreadStateEnum.STARTED.name());
+        // 使用robot的serviceSettings配置
+        String robotString = ConvertAiUtils.convertToUserProtobufString(robot);
+        thread.setAgent(robotString);
         //
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         thread.setRobot(true);
         thread.setUnreadCount(0);
-        thread.setType(ThreadTypeEnum.ROBOT.name());
         threadService.save(thread);
         // 增加接待数量，待优化
         robot.increaseThreadCount();
@@ -222,7 +227,6 @@ public class RouteService {
                 messageSendService.sendProtobufMessage(messageProtobuf);
             }
             // 
-            thread.setType(ThreadTypeEnum.WORKGROUP.name());
             threadService.save(thread);
             // 
             return messageProtobuf;
