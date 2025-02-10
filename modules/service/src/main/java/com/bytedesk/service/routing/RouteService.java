@@ -224,7 +224,7 @@ public class RouteService {
             // 
             thread.setType(ThreadTypeEnum.WORKGROUP.name());
             threadService.save(thread);
-
+            // 
             return messageProtobuf;
         } else {
             // 离线状态永远显示离线提示语，不显示“继续会话”
