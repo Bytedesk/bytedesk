@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 15:55:32
+ * @LastEditTime: 2025-02-10 08:22:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -154,9 +154,9 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         emotionAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         assistantService.create(emotionAssistantRequest);
 
-        // TODO: 评测
+        // TODO: 答案评测
         
-        // TODO: 质检
+        // TODO: 客服质检
     }
     
     

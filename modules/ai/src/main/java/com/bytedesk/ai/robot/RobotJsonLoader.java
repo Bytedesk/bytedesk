@@ -32,7 +32,8 @@ public class RobotJsonLoader {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    // 加载robots.json，智能体列表
+    // 加载robots.json，智能体列表，此处可以换成数据库查询等其他方式
+    //  “Take a deep breath and work on this step by step.” 能显著提升回答准确性
     public List<RobotJson> loadRobots() {
         try {
             Resource resource = resourceLoader.getResource("classpath:ai/robots.json");
@@ -48,8 +49,8 @@ public class RobotJsonLoader {
     @Data
     public static class RobotJson {
         private String uid;
+        private String name;
         private String nickname;
-        // private String avatar;
         private String type;
         private String category;
         private String prompt;
