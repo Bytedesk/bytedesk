@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:43:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 18:16:49
+ * @LastEditTime: 2025-02-10 21:53:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,15 +21,19 @@ import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @Entity
 @Table(name = "bytedesk_service_worktime")
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class WorktimeEntity extends BaseEntity {
 
     @Builder.Default

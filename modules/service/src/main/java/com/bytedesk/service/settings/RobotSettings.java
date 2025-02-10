@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 16:19:00
+ * @LastEditTime: 2025-02-10 21:59:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,19 +49,20 @@ public class RobotSettings  implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotEntity robot;
 
-    //
+    // 是否应该转接到机器人
     public Boolean shouldTransferToRobot(Boolean isOffline, Boolean isInServiceTime) {
 
         if (defaultRobot) {
             // 默认机器人优先接待
             return true;
-        } else if (isOffline && offlineRobot) {
+        } else if (offlineRobot && isOffline) {
             // 所有客服离线,且设置机器人离线接待
             return true;
         } else if (nonWorktimeRobot && !isInServiceTime) {
             // 非工作时间,且设置机器人非工作时间接待
             return true;
         }
+        // 
         return false;
     }
 
