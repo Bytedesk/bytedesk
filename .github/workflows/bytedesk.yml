@@ -14,7 +14,7 @@
 # SERVER_PASSWORD / Secret：服务器密码
 # SERVER_PORT / Secret：服务器端口
 
-name: cicd
+name: bytedesk
 on:
   push:
     tags:
@@ -55,9 +55,20 @@ jobs:
           registry: registry.cn-hangzhou.aliyuncs.com
           username: ${{ secrets.ALIYUN_DOCKER_USERNAME }}
           password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+
+      # Add support for more platforms with QEMU (optional)
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
       # https://github.com/docker/setup-buildx-action
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+
+      # 提取版本号，并将其设置为环境变量
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
       # https://hub.docker.com/r/bytedesk/bytedesk-ce
       # https://cr.console.aliyun.com/repository/cn-hangzhou/bytedesk/bytedesk-ce/images
@@ -69,5 +80,7 @@ jobs:
           push: true
           tags: |
             bytedesk/bytedesk-ce:latest
+            bytedesk/bytedesk-ce:${{ steps.version.outputs.VERSION }}
             registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest
-          platforms: linux/amd64,linux/arm64,windows/amd64
+            registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:${{ steps.version.outputs.VERSION }}
+          platforms: linux/amd64,linux/arm64
