@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 15:47:18
+ * @LastEditTime: 2025-02-11 16:40:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,12 +15,8 @@ package com.bytedesk.ticket.ticket;
 
 import java.util.List;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.listener.TicketEntityListener;
@@ -49,7 +45,15 @@ public class TicketEntity extends BaseEntity {
     @Column(nullable = false)
     private String title;           // 工单标题(必填)
     
+    // 非结构化内容
     private String description;     // 工单描述(选填)
+
+    // 结构化内容
+    @Builder.Default
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    private String form = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     private String status = TicketStatusEnum.NEW.name();          // 状态(新建/处理中/已解决/已关闭)
@@ -79,8 +83,9 @@ public class TicketEntity extends BaseEntity {
     // @ManyToOne(fetch = FetchType.LAZY)
     // private WorkgroupEntity workgroup;
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 使用UserProtobuf json格式化
@@ -88,8 +93,9 @@ public class TicketEntity extends BaseEntity {
     // @ManyToOne(fetch = FetchType.LAZY)
     // private AgentEntity assignee;        // 处理人
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String assignee = BytedeskConsts.EMPTY_JSON_STRING;
     
     // 使用UserProtobuf json格式化
@@ -97,8 +103,9 @@ public class TicketEntity extends BaseEntity {
     // @ManyToOne(fetch = FetchType.LAZY)
     // private UserEntity reporter;        // 报告人
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String reporter = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 工单评论

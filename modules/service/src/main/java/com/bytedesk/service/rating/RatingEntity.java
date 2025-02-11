@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-07 11:37:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:12:36
+ * @LastEditTime: 2025-02-11 17:03:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,12 +13,8 @@
  */
 package com.bytedesk.service.rating;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 
@@ -94,7 +90,7 @@ public class RatingEntity extends BaseEntity {
     private ThreadEntity thread;
 
     @Builder.Default
-    @Column(name = "rate_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "rate_user", length = 512)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 } 

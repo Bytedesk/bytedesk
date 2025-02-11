@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:27:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 17:30:02
+ * @LastEditTime: 2025-02-11 17:08:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,12 +13,8 @@
  */
 package com.bytedesk.core.notification;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,7 +51,9 @@ public class NotificationEntity extends BaseEntity {
     private String status = NotificationStatusEnum.UNREAD.name();
 
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = 1024)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 }

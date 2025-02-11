@@ -52,8 +52,8 @@ public class RobotRequest extends BaseRequest {
     @Builder.Default
     private Boolean isFlowEnabled = false;
 
-    @Builder.Default
-    private RobotFlow flow = new RobotFlow();
+    // @Builder.Default
+    // private RobotFlow flow = new RobotFlow();
 
     @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_REPLY;

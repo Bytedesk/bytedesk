@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 15:22:26
+ * @LastEditTime: 2025-02-11 17:06:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,9 +13,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.message;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -57,8 +54,10 @@ public class MessageEntity extends BaseEntity {
     private String content;
 
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = 1024)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
@@ -78,8 +77,10 @@ public class MessageEntity extends BaseEntity {
     // private User user;
     // h2 db 不能使用 user, 所以重定义为 message_user
     @Builder.Default
-    @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "message_user")
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
 }

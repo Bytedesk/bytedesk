@@ -13,12 +13,8 @@
  */
 package com.bytedesk.core.action;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 
@@ -68,8 +64,9 @@ public class ActionEntity extends BaseEntity {
 
     // action failed object
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     // private String userUid;

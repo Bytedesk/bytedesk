@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 14:05:51
+ * @LastEditTime: 2025-02-11 17:07:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,12 +24,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -112,10 +108,12 @@ public class VisitorThreadEntity extends BaseEntity {
     private String client = ClientEnum.WEB.name();
 
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
     // of type character varying
-    @JdbcTypeCode(SqlTypes.JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = 1024)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
@@ -128,8 +126,10 @@ public class VisitorThreadEntity extends BaseEntity {
      * 注意：h2 db 不能使用 user, 所以重定义为 thread_user
      */
     @Builder.Default
-    @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "thread_user")
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
@@ -140,8 +140,10 @@ public class VisitorThreadEntity extends BaseEntity {
      * FIXME: 头像、昵称和机器人大模型中参数修改之后，不能及时同步更新
      */
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // json字段格式，搜索时，对数据库有依赖，不方便迁移
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "thread_agent")
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 机器人和agent可以同时存在，人工接待的时候，机器人可以同时给出答案，客服可以选用
