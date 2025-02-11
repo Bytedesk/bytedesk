@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 08:22:30
+ * @LastEditTime: 2025-02-11 14:31:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,15 +81,15 @@ public class AssistantInitializer implements SmartInitializingSingleton {
 
         // https://mp.weixin.qq.com/s/nu-2ji9NOszcZ_6SWd469A
         // TODO: 意图改写
-        AssistantRequest intentRewriteAssistantRequest = AssistantRequest.builder()
-                .topic(TopicUtils.TOPIC_INTENT_REWRITE_ASSISTANT)
-                .nickname(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_NAME)
-                .avatar(AvatarConsts.getDefaultIntentRewriteAssistantAvatarUrl())
-                .description(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION)
-                .build();
-        intentRewriteAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_REWRITE_ASSISTANT_UID);
-        intentRewriteAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
-        assistantService.create(intentRewriteAssistantRequest);
+        // AssistantRequest intentRewriteAssistantRequest = AssistantRequest.builder()
+        //         .topic(TopicUtils.TOPIC_INTENT_REWRITE_ASSISTANT)
+        //         .nickname(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_NAME)
+        //         .avatar(AvatarConsts.getDefaultIntentRewriteAssistantAvatarUrl())
+        //         .description(I18Consts.I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION)
+        //         .build();
+        // intentRewriteAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_REWRITE_ASSISTANT_UID);
+        // intentRewriteAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        // assistantService.create(intentRewriteAssistantRequest);
 
         /**
          * https://mp.weixin.qq.com/s/nu-2ji9NOszcZ_6SWd469A
@@ -133,30 +133,29 @@ public class AssistantInitializer implements SmartInitializingSingleton {
                 }]
          */
         // TODO: 意图识别:意图槽位/意图置信度
-        AssistantRequest intentClassificationAssistantRequest = AssistantRequest.builder()
-                .topic(TopicUtils.TOPIC_INTENT_CLASSIFICATION_ASSISTANT)
-                .nickname(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME)
-                .avatar(AvatarConsts.getDefaultIntentClassificationAssistantAvatarUrl())
-                .description(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION)
-                .build();
-        intentClassificationAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID);
-        intentClassificationAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
-        assistantService.create(intentClassificationAssistantRequest);
+        // AssistantRequest intentClassificationAssistantRequest = AssistantRequest.builder()
+        //         .topic(TopicUtils.TOPIC_INTENT_CLASSIFICATION_ASSISTANT)
+        //         .nickname(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME)
+        //         .avatar(AvatarConsts.getDefaultIntentClassificationAssistantAvatarUrl())
+        //         .description(I18Consts.I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION)
+        //         .build();
+        // intentClassificationAssistantRequest.setUid(BytedeskConsts.DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID);
+        // intentClassificationAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        // assistantService.create(intentClassificationAssistantRequest);
 
         // TODO: 情绪分析
-        AssistantRequest emotionAssistantRequest = AssistantRequest.builder()
-                .topic(TopicUtils.TOPIC_EMOTION_ASSISTANT)
-                .nickname(I18Consts.I18N_EMOTION_ASSISTANT_NAME)
-                .avatar(AvatarConsts.getDefaultEmotionAssistantAvatarUrl())
-                .description(I18Consts.I18N_EMOTION_ASSISTANT_DESCRIPTION)
-                .build();
-        emotionAssistantRequest.setUid(BytedeskConsts.DEFAULT_EMOTION_ASSISTANT_UID);
-        emotionAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
-        assistantService.create(emotionAssistantRequest);
+        // AssistantRequest emotionAssistantRequest = AssistantRequest.builder()
+        //         .topic(TopicUtils.TOPIC_EMOTION_ASSISTANT)
+        //         .nickname(I18Consts.I18N_EMOTION_ASSISTANT_NAME)
+        //         .avatar(AvatarConsts.getDefaultEmotionAssistantAvatarUrl())
+        //         .description(I18Consts.I18N_EMOTION_ASSISTANT_DESCRIPTION)
+        //         .build();
+        // emotionAssistantRequest.setUid(BytedeskConsts.DEFAULT_EMOTION_ASSISTANT_UID);
+        // emotionAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        // assistantService.create(emotionAssistantRequest);
 
-        // TODO: 答案评测
         
-        // TODO: 客服质检
+
     }
     
     

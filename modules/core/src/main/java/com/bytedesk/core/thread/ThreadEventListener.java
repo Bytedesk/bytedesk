@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 23:32:47
+ * @LastEditTime: 2025-02-11 13:45:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserUpdateEvent;
+import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.topic.TopicCacheService;
@@ -78,14 +79,37 @@ public class ThreadEventListener {
         // TODO: 会话关闭之后，需要取消订阅
         
         // 机器人接待的会话存在user == null的情况，不需要订阅topic
-        if (user == null) {
+        if (thread == null || user == null) {
             return;
         }
         
-        if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
-                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
-                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
+        if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
             // 防止首次消息延迟，立即订阅
+            TopicRequest request = TopicRequest.builder()
+                    .topic(thread.getTopic())
+                    .userUid(user.getUid())
+                    .build();
+            topicService.create(request);
+        } else if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+            // 工作组会话，需要订阅topic
+
+            // 判断状态，如果关闭，则取消订阅
+            if (thread.isClosed()) {
+                TopicRequest request = TopicRequest.builder()
+                        .topic(thread.getTopic())
+                        .userUid(user.getUid())
+                        .build();
+                topicService.remove(request);
+            } else {
+                // 重新订阅
+                TopicRequest request = TopicRequest.builder()
+                        .topic(thread.getTopic())
+                    .userUid(user.getUid())
+                    .build();
+                topicService.create(request);
+            }
+        } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
+            // 会员会话，需要订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
@@ -98,6 +122,24 @@ public class ThreadEventListener {
                     .userUid(user.getUid())
                     .build();
             topicCacheService.pushRequest(request);
+        }
+    }
+
+    @EventListener
+    public void onThreadCloseEvent(ThreadCloseEvent event) {
+        ThreadEntity thread = event.getThread();
+        log.info("thread event listener onThreadCloseEvent: {}", thread.getAgent());
+        // 
+        if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+            // 工作组会话
+            if (thread.isClosed()) {
+                // 取消订阅
+                TopicRequest request = TopicRequest.builder()
+                    .topic(thread.getTopic())
+                    .userUid(thread.getOwner().getUid())
+                    .build();
+                topicService.remove(request);
+            }
         }
     }
 

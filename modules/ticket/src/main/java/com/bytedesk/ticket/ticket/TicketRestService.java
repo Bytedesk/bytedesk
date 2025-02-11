@@ -134,9 +134,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             }
         }
         // 
-        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
-        if (categoryOptional.isPresent()) {
-            ticket.setCategory(categoryOptional.get());
+        if (StringUtils.hasText(request.getCategoryUid())) {
+            Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
+            if (categoryOptional.isPresent()) {
+                ticket.setCategory(categoryOptional.get());
+            }
         }
         // 
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
@@ -283,7 +285,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         } else if (ticketType == TicketTypeEnum.WORKGROUP) {
             topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(request.getWorkgroupUid(), user.getUid());
         }
-        //
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        if (threadOptional.isPresent()) {
+            return threadOptional.get();
+        }
+        // 创建工单会话
         ThreadEntity thread = ThreadEntity.builder()
             .type(ThreadTypeEnum.TICKET.name())
             .state(ThreadStateEnum.STARTED.name())
@@ -297,7 +303,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // 
         return threadRestService.save(thread);
     }
-    
 
     @Transactional
     public void assignTicket(Long ticketId, AgentEntity assignee) {

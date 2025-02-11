@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 16:49:44
+ * @LastEditTime: 2025-02-11 15:50:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,11 +16,6 @@ package com.bytedesk.ticket.ticket;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.category.CategoryResponse;
-import com.bytedesk.core.rbac.user.UserResponse;
-import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.service.agent.AgentResponse;
-import com.bytedesk.service.workgroup.WorkgroupResponse;
 import com.bytedesk.ticket.attachment.TicketAttachmentResponse;
 
 import lombok.Data;
@@ -42,17 +37,26 @@ public class TicketResponse extends BaseResponse {
     // 
     private String type;
     // 
-    private ThreadResponse thread;
+    // private ThreadResponse thread;
+    private String threadTopic;
 
-    private ThreadResponse serviceThread;
+    // private ThreadResponse serviceThread;
+    private String serviceThreadTopic;
     // 
-    private CategoryResponse category;
+    // private CategoryResponse category;
+    private String categoryUid;
+
+    // 使用UserProtobuf json格式化
+    // private WorkgroupResponse workgroup;
+    private String workgroup;
     // 
-    private WorkgroupResponse workgroup;
+    // 使用UserProtobuf json格式化
+    // private AgentResponse assignee;
+    private String assignee;
     // 
-    private AgentResponse assignee;
-    // 
-    private UserResponse reporter;
+    // 使用UserProtobuf json格式化
+    // private UserResponse reporter;
+    private String reporter;
     // 
     private String createdAt;
     private String updatedAt;
