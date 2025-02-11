@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 22:55:58
+ * @LastEditTime: 2025-02-11 12:47:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -167,7 +167,7 @@ public class RouteService {
 
     public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
-        log.info("RouteServiceImplVip routeWorkgroup: {}", workgroup.getUid());
+        log.info("routeService routeWorkgroup: {}", workgroup.getUid());
         if (workgroup.getAgents().isEmpty()) {
             throw new RuntimeException("No agents found in workgroup with uid " + workgroup.getUid());
         }
@@ -199,8 +199,12 @@ public class RouteService {
                 queueMemberRestService.save(queueMemberEntity);
                 // 
                 thread.setOwner(agent.getMember().getUser());
+                // 
                 UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
                 thread.setAgent(JSON.toJSONString(agentProtobuf));
+                thread.setRobot(false);
+                // 
+                threadService.save(thread);
                 // 
                 messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
