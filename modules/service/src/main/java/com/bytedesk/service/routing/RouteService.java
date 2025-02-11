@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 12:50:04
+ * @LastEditTime: 2025-02-11 13:29:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.service.routing;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 // import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -171,12 +172,18 @@ public class RouteService {
         }
     }
 
-    public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, ThreadEntity thread,
+    public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, String threadTopic,
             WorkgroupEntity workgroup) {
         log.info("routeService routeWorkgroup: {}", workgroup.getUid());
         if (workgroup.getAgents().isEmpty()) {
             throw new RuntimeException("No agents found in workgroup with uid " + workgroup.getUid());
         }
+
+        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("Thread with topic " + threadTopic + " not found");
+        }
+        ThreadEntity thread = threadOptional.get();
         // 下面人工接待
         AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agent == null) {
@@ -211,6 +218,7 @@ public class RouteService {
                 thread.setRobot(false);
                 // 
                 threadService.save(thread);
+                log.info("routeWorkgroup WelcomeMessage: {}", thread.toString());
                 // 
                 messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
@@ -235,6 +243,7 @@ public class RouteService {
                 thread.setRobot(false);
                 // 
                 threadService.save(thread);
+                log.info("routeWorkgroup QueueMessage: {}", thread.toString());
                 // 
                 messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 15:07:28
+ * @LastEditTime: 2025-02-11 13:06:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -135,7 +135,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         return convertToResponse(savedThread);
     }
-    
+
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
     public ThreadResponse createGroupMemberThread(ThreadEntity thread, UserEntity owner) {
@@ -169,7 +169,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public ThreadResponse createFileAssistantThread(UserEntity user) {
         //
         String topic = TopicUtils.getFileTopic(user.getUid());
-        // 
+        //
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
@@ -204,7 +204,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public ThreadResponse createClipboardAssistantThread(UserEntity user) {
         //
         String topic = TopicUtils.getClipboardTopic(user.getUid());
-        // 
+        //
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
@@ -330,8 +330,9 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(updateThread));
         // 发送消息
-        MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED : MessageTypeEnum.AGENT_CLOSED;
-        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getUid(), 
+        MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED
+                : MessageTypeEnum.AGENT_CLOSED;
+        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getUid(),
                 updateThread,
                 messageTypeEnum,
                 content);
@@ -379,7 +380,8 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         return threadRepository.findFirstByTopicAndOwnerAndDeleted(topic, user, false);
     }
 
-    // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a unique result: 4 results were returned
+    // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a
+    // unique result: 4 results were returned
     @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
     public List<ThreadEntity> findListByTopic(@NonNull String topic) {
         return threadRepository.findByTopicAndDeleted(topic, false);
@@ -393,7 +395,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // 找到某个访客当前对应某技能组未关闭会话
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
-        List<String> states = Arrays.asList(new String[] { ThreadStateEnum.CLOSED.name()});
+        List<String> states = Arrays.asList(new String[] { ThreadStateEnum.CLOSED.name() });
         return threadRepository.findTopicAndStatesNotInAndDeleted(topic, states, false);
     }
 
@@ -407,8 +409,10 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public List<ThreadEntity> findStateOpen() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });
-        // List<String> states = Arrays .asList(new String[] { ThreadStateEnum.CLOSED.name()});
-        // return threadRepository.findByTypesInAndStatesNotInAndDeleted(types, states, false);
+        // List<String> states = Arrays .asList(new String[] {
+        // ThreadStateEnum.CLOSED.name()});
+        // return threadRepository.findByTypesInAndStatesNotInAndDeleted(types, states,
+        // false);
         return threadRepository.findByTypesInAndStateAndDeletedFalse(types, ThreadStateEnum.STARTED.name());
     }
 
@@ -454,7 +458,8 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ThreadEntity entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            ThreadEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
