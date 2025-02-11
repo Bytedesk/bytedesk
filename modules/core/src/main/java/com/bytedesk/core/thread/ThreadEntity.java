@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 15:56:32
+ * @LastEditTime: 2025-02-11 15:24:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -160,7 +160,6 @@ public class ThreadEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     @JdbcTypeCode(SqlTypes.JSON)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
-    // private String agentUid;
 
     // multi agent assistants: monitoring agent、quality check agent、robot agent
     @Builder.Default

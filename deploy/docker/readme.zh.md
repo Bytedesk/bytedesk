@@ -23,6 +23,10 @@ git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
 # 启动docker compose容器, -f标志来指定文件路径, -d标志表示在后台模式下启动容器
 docker compose -p bytedesk -f docker-compose.yaml up -d
-# stop container
+# 内含ollama
+docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
+# 停止
 docker compose -p bytedesk -f docker-compose.yaml stop
+# 停止，内含ollama
+docker compose -p bytedesk -f docker-compose-ollama.yaml stop
 ```

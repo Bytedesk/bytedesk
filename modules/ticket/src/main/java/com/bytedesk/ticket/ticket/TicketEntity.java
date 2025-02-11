@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 17:16:11
+ * @LastEditTime: 2025-02-11 15:47:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,12 +15,12 @@ package com.bytedesk.ticket.ticket;
 
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.listener.TicketEntityListener;
@@ -30,7 +30,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Data;
@@ -62,27 +61,45 @@ public class TicketEntity extends BaseEntity {
     private String type = TicketTypeEnum.AGENT.name();        // 类型(agent/group)
 
     // 工单会话
-    @ManyToOne(fetch = FetchType.LAZY)
-    private ThreadEntity thread;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private ThreadEntity thread;
+    private String threadTopic;
 
     // 在线客服会话
-    @ManyToOne(fetch = FetchType.LAZY)
-    private ThreadEntity serviceThread;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private ThreadEntity serviceThread;
+    private String serviceThreadTopic;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private CategoryEntity category;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private CategoryEntity category;
+    private String categoryUid;
 
+    // 使用UserProtobuf json格式化
     // 一个工单一个工作组，一个工作组可以有多个工单
-    @ManyToOne(fetch = FetchType.LAZY)
-    private WorkgroupEntity workgroup;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private WorkgroupEntity workgroup;
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
+    // 使用UserProtobuf json格式化
     // 一个工单一个处理人，一个处理人可以处理多个工单
-    @ManyToOne(fetch = FetchType.LAZY)
-    private AgentEntity assignee;        // 处理人
-
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private AgentEntity assignee;        // 处理人
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String assignee = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    // 使用UserProtobuf json格式化
     // 一个工单一个报告人，一个报告人可以报告多个工单
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UserEntity reporter;        // 报告人
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private UserEntity reporter;        // 报告人
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String reporter = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 工单评论
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

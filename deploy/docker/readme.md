@@ -23,6 +23,10 @@ git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
 # start docker compose container, -f flag to specify file path, -d flag to start container in background mode
 docker compose -p bytedesk -f docker-compose.yaml up -d
+# with ollama
+docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 # stop container
 docker compose -p bytedesk -f docker-compose.yaml stop
+# stop ollama
+docker compose -p bytedesk -f docker-compose-ollama.yaml stop
 ```
