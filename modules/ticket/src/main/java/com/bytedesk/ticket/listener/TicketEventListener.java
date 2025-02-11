@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-05 12:13:48
+ * @LastEditTime: 2025-02-11 15:58:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.event.TicketUpdateEvent;
@@ -50,14 +52,14 @@ public class TicketEventListener {
         Map<String, Object> variables = new HashMap<>();
         variables.put("ticketUid", ticket.getUid());
         variables.put("orgUid", ticket.getOrgUid());
-        variables.put("userUid", ticket.getReporter().getUid());
+        variables.put("userUid", JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
         String processKey = null;
         if (ticket.getType().equals(TicketTypeEnum.AGENT.name())) {
             processKey = TicketConsts.TICKET_PROCESS_KEY_AGENT;
-            variables.put("agentUid", ticket.getAssignee().getUid());
+            variables.put("agentUid", JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid());
         } else {
             processKey = TicketConsts.TICKET_PROCESS_KEY_GROUP;
-            variables.put("workgroupUid", ticket.getWorkgroup().getUid());
+            variables.put("workgroupUid", JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
         }
         // 根据不同优先级设置不同的SLA时间
         switch (ticket.getPriority()) {

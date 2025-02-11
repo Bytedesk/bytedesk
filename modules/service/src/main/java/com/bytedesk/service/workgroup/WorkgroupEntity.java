@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 10:27:28
+ * @LastEditTime: 2025-02-11 17:05:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,14 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
@@ -111,10 +107,11 @@ public class WorkgroupEntity extends BaseEntity {
 
     /** 存储下一个待分配的客服等信息 */
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
     // of type character varying
-    @JdbcTypeCode(SqlTypes.JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = 1024)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
 

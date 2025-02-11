@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:19:09
+ * @LastEditTime: 2025-02-11 17:04:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,9 +15,6 @@ package com.bytedesk.service.leave_msg;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -68,7 +65,7 @@ public class LeaveMsgEntity extends BaseEntity {
     private String status = LeaveMsgStatusEnum.UNREAD.name();
 
     @Builder.Default
-    @Column(name = "leavemsg_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "leavemsg_user", length = 512)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 }

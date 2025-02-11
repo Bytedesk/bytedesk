@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 11:18:08
+ * @LastEditTime: 2025-02-11 16:55:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -121,6 +121,7 @@ public class VisitorThreadService
         //
         String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
+        threadService.save(thread);
         //
         return thread;
     }
@@ -135,7 +136,9 @@ public class VisitorThreadService
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
             thread.setExtra(extra);
         }
-        // 
+        // 保存
+        threadService.save(thread);
+        //
         return thread;
     }
 
@@ -153,6 +156,7 @@ public class VisitorThreadService
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
+        threadService.save(thread);
         //
         return thread;
     }
@@ -165,6 +169,8 @@ public class VisitorThreadService
         // 考虑到客服信息发生变化，更新客服信息
         String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
         thread.setAgent(agentString);
+        // 保存
+        threadService.save(thread);
         //
         return thread;
     }
@@ -182,6 +188,7 @@ public class VisitorThreadService
         //
         UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
+        threadService.save(thread);
         //
         return thread;
     }
@@ -194,6 +201,8 @@ public class VisitorThreadService
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToUserProtobufString(robot);
         thread.setAgent(robotString);
+        // 保存
+        threadService.save(thread);
         //
         return thread;
     }

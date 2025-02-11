@@ -18,7 +18,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.service_settings.InviteSettings;
 import com.bytedesk.kbase.service_settings.ServiceSettings;
@@ -129,7 +128,7 @@ public class AgentEntity extends BaseEntity {
 
     /** 存储当前接待数量等 */
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
     // of type character varying
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;

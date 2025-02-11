@@ -18,6 +18,8 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.sla.TicketSLAService;
 import com.bytedesk.ticket.ticket.TicketRestService;
@@ -84,8 +86,10 @@ public class TicketCaseListener implements CaseInstanceLifecycleListener {
     private void handleCaseTerminated(CaseInstance caseInstance) {
         // 通知相关人员工单被终止
         ticketService.findByUid(caseInstance.getId()).ifPresent(ticket -> {
+            String assigneeUid = JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid();
+            // 
             notificationService.notifyManager(
-                ticket.getAssignee().getUid(),
+                assigneeUid,
                 String.format("工单 #%d 已被终止", ticket.getId())
             );
         });

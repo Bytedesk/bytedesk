@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-19 10:17:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 10:26:29
+ * @LastEditTime: 2025-02-11 17:01:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,9 +12,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.feature;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -52,11 +49,11 @@ public class FeatureEntity extends BaseEntity {
     @Column(name = "min_version")
     private String minVersion;  // 最低支持版本
 
-    @Column(name = "config_schema", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "config_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String configSchema = BytedeskConsts.EMPTY_JSON_STRING; // 配置项schema(JSON)
 
-    @Column(name = "default_config", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "default_config", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String defaultConfig = BytedeskConsts.EMPTY_JSON_STRING; // 默认配置(JSON)
 } 

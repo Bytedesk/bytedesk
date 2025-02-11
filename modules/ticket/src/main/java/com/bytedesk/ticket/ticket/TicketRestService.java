@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -22,8 +21,6 @@ import java.time.LocalDateTime;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -75,7 +72,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final ThreadRestService threadRestService;
 
-    private final CategoryRestService categoryRestService;
+    // private final CategoryRestService categoryRestService;
 
     private final UploadRestService uploadRestService;
 
@@ -127,30 +124,30 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
         // 
-        if (StringUtils.hasText(request.getServiceThreadTopic())) {
-            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getServiceThreadTopic());
-            if (threadOptional.isPresent()) {
-                ticket.setServiceThread(threadOptional.get());
-            }
-        }
-        // 
-        if (StringUtils.hasText(request.getCategoryUid())) {
-            Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
-            if (categoryOptional.isPresent()) {
-                ticket.setCategory(categoryOptional.get());
-            }
-        }
-        // 
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
         if (workgroupOptional.isPresent()) {
-            ticket.setWorkgroup(workgroupOptional.get());
+            UserProtobuf workgroupProtobuf = UserProtobuf.builder()
+                .nickname(workgroupOptional.get().getNickname())
+                .avatar(workgroupOptional.get().getAvatar())
+                .build();
+            workgroupProtobuf.setUid(workgroupOptional.get().getUid());
+            workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+            String workgroupJson = JSON.toJSONString(workgroupProtobuf);
+            ticket.setWorkgroup(workgroupJson);
         } else {
             throw new RuntimeException("workgroup not found");
         }
         // 
         Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
         if (assigneeOptional.isPresent()) {
-            ticket.setAssignee(assigneeOptional.get());
+            UserProtobuf assigneeProtobuf = UserProtobuf.builder()
+                .nickname(assigneeOptional.get().getNickname())
+                .avatar(assigneeOptional.get().getAvatar())
+                .build();
+            assigneeProtobuf.setUid(assigneeOptional.get().getUid());
+            assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
+            String assigneeJson = JSON.toJSONString(assigneeProtobuf);
+            ticket.setAssignee(assigneeJson);
             ticket.setType(TicketTypeEnum.AGENT.name());
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
             // 
@@ -163,7 +160,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             String userJson = JSON.toJSONString(userProtobuf);
             // 创建工单会话
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.AGENT, userJson);
-            ticket.setThread(thread);
+            ticket.setThreadTopic(thread.getTopic());
         } else {
             ticket.setType(TicketTypeEnum.WORKGROUP.name());
             ticket.setStatus(TicketStatusEnum.NEW.name());
@@ -177,11 +174,17 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             String userJson = JSON.toJSONString(userProtobuf);
             // 创建工单会话 
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.WORKGROUP, userJson);
-            ticket.setThread(thread);
+            ticket.setThreadTopic(thread.getTopic());
         }
         Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
         if (reporterOptional.isPresent()) {
-            ticket.setReporter(reporterOptional.get());
+            UserProtobuf reporterProtobuf = UserProtobuf.builder()
+                .nickname(reporterOptional.get().getNickname())
+                .avatar(reporterOptional.get().getAvatar())
+                .build();
+            reporterProtobuf.setUid(reporterOptional.get().getUid());
+            reporterProtobuf.setType(UserTypeEnum.USER.name());
+            ticket.setReporter(JSON.toJSONString(reporterProtobuf));
         }
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
@@ -224,24 +227,26 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setPriority(request.getPriority());
         ticket.setStatus(request.getStatus());
         // 
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(request.getThreadTopic());
-        if (threadOptional.isPresent()) {
-            ticket.setThread(threadOptional.get());
-        }
-        // 
-        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
-        if (categoryOptional.isPresent()) {
-            ticket.setCategory(categoryOptional.get());
-        }
-        // 
         Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
         if (assigneeOptional.isPresent()) {
-            ticket.setAssignee(assigneeOptional.get());
+            UserProtobuf assigneeProtobuf = UserProtobuf.builder()
+                .nickname(assigneeOptional.get().getNickname())
+                .avatar(assigneeOptional.get().getAvatar())
+                .build();
+            assigneeProtobuf.setUid(assigneeOptional.get().getUid());
+            assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
+            ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
         }
         // 
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
         if (workgroupOptional.isPresent()) {
-            ticket.setWorkgroup(workgroupOptional.get());
+            UserProtobuf workgroupProtobuf = UserProtobuf.builder()
+                .nickname(workgroupOptional.get().getNickname())
+                .avatar(workgroupOptional.get().getAvatar())
+                .build();
+            workgroupProtobuf.setUid(workgroupOptional.get().getUid());
+            workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+            ticket.setWorkgroup(JSON.toJSONString(workgroupProtobuf));
         }
          // 先保存工单
          TicketEntity savedTicket = save(ticket);
@@ -317,7 +322,13 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // }
         // 分配工单...
         TicketEntity ticket = findTicketById(ticketId);
-        ticket.setAssignee(assignee);
+        UserProtobuf assigneeProtobuf = UserProtobuf.builder()
+            .nickname(assignee.getNickname())
+            .avatar(assignee.getAvatar())
+            .build();
+        assigneeProtobuf.setUid(assignee.getUid());
+        assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
+        ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
         ticket.setStatus("处理中");
         ticket.setUpdatedAt(LocalDateTime.now());
         

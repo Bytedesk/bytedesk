@@ -6,9 +6,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -219,10 +216,12 @@ public class UserEntity extends BaseEntityNoOrg {
 	// }
 
 	@Builder.Default
-	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+	// json字段格式，搜索时，对数据库有依赖，不方便迁移
+	// @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
 	// 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
 	// of type character varying
-	@JdbcTypeCode(SqlTypes.JSON)
+	// @JdbcTypeCode(SqlTypes.JSON)
+	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
 	private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
 	// return the first organization oid

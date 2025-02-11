@@ -137,9 +137,11 @@ public class RobotEventListener {
 
                     // 调用大模型
 
-                } else if (robot.getFlow().isEnabled()) {
-                    // 调用流程引擎
-                } else if (robot.isKbEnabled()) {
+                } 
+                // else if (robot.getFlow().isEnabled()) {
+                //     // 调用流程引擎
+                // } 
+                else if (robot.isKbEnabled()) {
                     // 搜索知识库
                 } else {
                     // 默认回复

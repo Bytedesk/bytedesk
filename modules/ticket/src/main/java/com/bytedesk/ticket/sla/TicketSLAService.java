@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 13:06:07
- * @LastEditors: jackning 270580156@qq.com  
- * @LastEditTime: 2025-02-05 14:57:46
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-11 15:58:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
@@ -55,7 +57,7 @@ public class TicketSLAService {
      * 检查工单是否违反 SLA
      */
     public boolean isSLABreached(TicketEntity ticket) {
-        Map<String, Object> sla = determineSLA(ticket.getCategory().getUid(), ticket.getPriority());
+        Map<String, Object> sla = determineSLA(ticket.getCategoryUid(), ticket.getPriority());
         
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime createdAt = ticket.getCreatedAt();
@@ -112,6 +114,6 @@ public class TicketSLAService {
             ticket.getId(),
             ticket.getCreatedAt()
         );
-        notificationService.notifyManager(ticket.getAssignee().getUid(), message);
+        notificationService.notifyManager(JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid(), message);
     }
 } 

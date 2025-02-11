@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 12:53:01
+ * @LastEditTime: 2025-02-11 16:47:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,9 +18,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -91,8 +88,8 @@ public class ServiceSettings implements Serializable {
     private boolean showPreForm = false;
 
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     // show history message or not

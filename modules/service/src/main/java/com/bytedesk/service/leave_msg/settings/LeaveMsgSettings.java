@@ -17,12 +17,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.service.leave_msg.LeaveMsgNotifyTypeEnum;
 import com.bytedesk.service.worktime.WorktimeEntity;
 
@@ -82,8 +78,8 @@ public class LeaveMsgSettings implements Serializable {
 
     // 留言表单
     @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    @JdbcTypeCode(SqlTypes.JSON)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
+    // @JdbcTypeCode(SqlTypes.JSON)
     private String leaveMsgForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     /** work time */
