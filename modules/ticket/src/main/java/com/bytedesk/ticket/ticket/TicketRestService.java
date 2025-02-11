@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -429,7 +430,24 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     @Override
     public TicketResponse convertToResponse(TicketEntity entity) {
-        return modelMapper.map(entity, TicketResponse.class);
+        TicketResponse ticketResponse = modelMapper.map(entity, TicketResponse.class);
+        // 
+        if (StringUtils.hasText(entity.getWorkgroup())) {
+            UserProtobuf workgroup = JSON.parseObject(entity.getWorkgroup(), UserProtobuf.class);
+            ticketResponse.setWorkgroup(workgroup);
+        }
+        // 
+        if (StringUtils.hasText(entity.getAssignee())) {
+            UserProtobuf assignee = JSON.parseObject(entity.getAssignee(), UserProtobuf.class);
+            ticketResponse.setAssignee(assignee);
+        }
+        // 
+        if (StringUtils.hasText(entity.getReporter())) {
+            UserProtobuf reporter = JSON.parseObject(entity.getReporter(), UserProtobuf.class);
+            ticketResponse.setReporter(reporter);
+        }
+        // 
+        return ticketResponse;
     }
 
     
