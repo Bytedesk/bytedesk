@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 12:48:32
+ * @LastEditTime: 2025-02-11 12:50:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -232,13 +232,13 @@ public class RouteService {
                 thread.setUnreadCount(0);
                 thread.setContent(content);
                 thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-                
+                thread.setRobot(false);
+                // 
+                threadService.save(thread);
                 // 
                 messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             }
-            // 
-            threadService.save(thread);
             // 
             return messageProtobuf;
         } else {
