@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 12:47:16
+ * @LastEditTime: 2025-02-11 12:48:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -122,6 +122,9 @@ public class RouteService {
                 queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
                 queueMemberRestService.save(queueMemberEntity);
                 // 
+                thread.setRobot(false);
+                threadService.save(thread);
+                // 
                 messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             } else {
@@ -142,6 +145,9 @@ public class RouteService {
                 thread.setUnreadCount(0);
                 thread.setContent(content);
                 thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+                // 
+                thread.setRobot(false);
+                threadService.save(thread);
                 // 
                 messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
@@ -226,6 +232,7 @@ public class RouteService {
                 thread.setUnreadCount(0);
                 thread.setContent(content);
                 thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+                
                 // 
                 messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
