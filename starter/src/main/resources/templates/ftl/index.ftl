@@ -94,7 +94,7 @@ Listed course START -->
 						<img src="assets/images/element/profit.svg" alt="">
 					</div>
 					<h5 class="mb-1"><a href="#" class="stretched-link">帮助中心</a></h5>
-					<span class="mb-0">帮助中心</span>
+					<span class="mb-0">对外知识库、帮助文档、内容公告</span>
 				</div>
 			</div>
 
