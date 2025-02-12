@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 18:09:31
+ * @LastEditTime: 2025-02-12 18:35:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,8 @@ public class ThreadSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
             if (StringUtils.hasText(request.getOwnerUid())) {
+                // 个人查询时，不显示隐藏的会话
+                predicates.add(criteriaBuilder.equal(root.get("hide"), false));
                 predicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
             }
             if (StringUtils.hasText(request.getOwnerNickname())) {
