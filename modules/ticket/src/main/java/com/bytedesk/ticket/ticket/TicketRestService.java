@@ -102,6 +102,14 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         return ticketPage.map(this::convertToResponse);
     }
 
+    public Page<TicketResponse> queryByServiceThreadTopic(TicketRequest request) {
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "updatedAt");
+        Specification<TicketEntity> spec = TicketSpecification.search(request);
+        Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
+        return ticketPage.map(this::convertToResponse);
+    }
+
     @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
     public Optional<TicketEntity> findByUid(String uid) {
@@ -316,10 +324,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         } else if (ticketType == TicketTypeEnum.WORKGROUP) {
             topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(request.getWorkgroupUid(), user.getUid());
         }
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-        if (threadOptional.isPresent()) {
-            return threadOptional.get();
-        }
+        // 每次均创建一个新会话
+        // Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        // if (threadOptional.isPresent()) {
+        //     return threadOptional.get();
+        // }
         // 创建工单会话
         ThreadEntity thread = ThreadEntity.builder()
             .type(ThreadTypeEnum.TICKET.name())
