@@ -457,6 +457,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     public TicketResponse convertToResponse(TicketEntity entity) {
         TicketResponse ticketResponse = modelMapper.map(entity, TicketResponse.class);
         // 
+        if (StringUtils.hasText(entity.getUser())) {
+            UserProtobuf user = JSON.parseObject(entity.getUser(), UserProtobuf.class);
+            ticketResponse.setUser(user);
+        }
+        // 
         if (StringUtils.hasText(entity.getWorkgroup())) {
             UserProtobuf workgroup = JSON.parseObject(entity.getWorkgroup(), UserProtobuf.class);
             ticketResponse.setWorkgroup(workgroup);
