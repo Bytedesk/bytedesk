@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 17:56:36
+ * @LastEditTime: 2025-02-12 11:04:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,6 +84,10 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 ```bash
 docker compose -p weiyu -f docker-compose.yaml stop
 ```
+
+### 宝塔面板
+
+- [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
 
 ## 演示
 

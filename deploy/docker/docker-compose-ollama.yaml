@@ -33,8 +33,7 @@ services:
       - ollama_data:/root/.ollama
     environment:
       - OLLAMA_MODELS=deepseek-r1:1.5b
-    command: >
-      sh -c "ollama serve & sleep 10 && ollama run deepseek-r1:1.5b && tail -f /dev/null"
+    command: serve
     networks:
       - bytedesk-network
 

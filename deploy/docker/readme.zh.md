@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 22:45:31
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-12 11:09:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,8 @@ cd bytedesk/deploy/docker
 docker compose -p bytedesk -f docker-compose.yaml up -d
 # 内含ollama
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
+# 拉取ollama模型
+docker exec ollama-bytedesk ollama pull deepseek-r1:1.5b
 # 停止
 docker compose -p bytedesk -f docker-compose.yaml stop
 # 停止，内含ollama
