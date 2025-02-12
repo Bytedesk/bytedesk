@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 13:04:41
+ * @LastEditTime: 2025-02-12 14:44:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,12 +37,12 @@ public class TicketResponse extends BaseResponse {
     private String priority;
     // 
     private String type;
-    // 
-    // private ThreadResponse thread;
-    private String threadTopic;
 
     // private ThreadResponse serviceThread;
     private String serviceThreadTopic;
+
+    // private ThreadResponse thread;
+    private String threadUid;
     // 
     // private CategoryResponse category;
     private String categoryUid;

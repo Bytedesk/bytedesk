@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 14:41:41
+ * @LastEditTime: 2025-02-12 14:44:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,8 +62,8 @@ public class TicketSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
-            if (StringUtils.hasText(request.getThreadTopic())) {
-                predicates.add(criteriaBuilder.equal(root.get("threadTopic"), request.getThreadTopic()));
+            if (StringUtils.hasText(request.getThreadUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("threadUid"), request.getThreadUid()));
             }
             if (StringUtils.hasText(request.getServiceThreadTopic())) {
                 predicates.add(criteriaBuilder.equal(root.get("serviceThreadTopic"), request.getServiceThreadTopic()));
