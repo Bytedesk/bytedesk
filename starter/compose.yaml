@@ -3,7 +3,7 @@ services:
     image: mysql:latest
     container_name: mysql-bytedesk
     environment:
-      MYSQL_DATABASE: bytedesk_im
+      MYSQL_DATABASE: bytedesk
       MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
