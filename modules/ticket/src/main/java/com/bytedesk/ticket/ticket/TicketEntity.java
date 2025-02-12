@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 16:40:53
+ * @LastEditTime: 2025-02-12 13:03:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -77,6 +77,12 @@ public class TicketEntity extends BaseEntity {
     // @ManyToOne(fetch = FetchType.LAZY)
     // private CategoryEntity category;
     private String categoryUid;
+
+    // user, 使用UserProtobuf json格式化
+    // 关联service thread ThreadEntity的user字段，访客信息
+    @Builder.Default
+    @Column(name = "ticket_user")
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 使用UserProtobuf json格式化
     // 一个工单一个工作组，一个工作组可以有多个工单
