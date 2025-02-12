@@ -70,7 +70,6 @@ public class TicketEntity extends BaseEntity {
     private String serviceThreadTopic;
 
     // 对应工单会话，工单会话uid。每一个在线客服会话，可以创建多个工单，每个工单对应一个工单会话
-    // 会话zhih'j
     // @ManyToOne(fetch = FetchType.LAZY)
     // private ThreadEntity thread;
     private String threadUid;

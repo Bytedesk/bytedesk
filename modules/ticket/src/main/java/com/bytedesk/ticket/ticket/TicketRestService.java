@@ -182,7 +182,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             }
             // 创建工单会话
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.AGENT, userJson);
-            ticket.setThreadTopic(thread.getTopic());
+            ticket.setThreadUid(thread.getUid());
         } else {
             ticket.setType(TicketTypeEnum.WORKGROUP.name());
             ticket.setStatus(TicketStatusEnum.NEW.name());
@@ -208,7 +208,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             }
             // 创建工单会话 
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.WORKGROUP, userJson);
-            ticket.setThreadTopic(thread.getTopic());
+            ticket.setThreadUid(thread.getUid());
         }
         Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
         if (reporterOptional.isPresent()) {
