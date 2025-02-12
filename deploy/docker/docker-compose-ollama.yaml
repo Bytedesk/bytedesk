@@ -31,6 +31,10 @@ services:
       - "21434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=deepseek-r1:1.5b
+    command: >
+      sh -c "ollama serve & sleep 10 && ollama run deepseek-r1:1.5b && tail -f /dev/null"
     networks:
       - bytedesk-network
 
@@ -127,7 +131,7 @@ services:
       # 
       SPRING_AI_OLLAMA_CHAT_ENABLED: true
       SPRING_AI_OLLAMA_BASE_URL: http://ollama-bytedesk:11434
-      # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen:7b
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: deepseek-r1:1.5b
       # SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
       # SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
       # 
