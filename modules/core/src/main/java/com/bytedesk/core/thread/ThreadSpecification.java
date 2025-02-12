@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 16:59:13
+ * @LastEditTime: 2025-02-12 18:09:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,9 @@ public class ThreadSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
+            if (StringUtils.hasText(request.getOwnerUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
+            }
             if (StringUtils.hasText(request.getOwnerNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("owner").get("nickname"),
                         "%" + request.getOwnerNickname() + "%"));
@@ -49,11 +52,13 @@ public class ThreadSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("client"), request.getClient()));
             }
             if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
                 // content
-                predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getSearchText() + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getSearchText() + "%"));
                 // user json字符串 中的 nickname
-                predicates.add(criteriaBuilder.like(root.get("user"), 
-                    "%" + "\"nickname\":\"" + request.getSearchText() + "\"" + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getSearchText() + "%"));
+                // 组合or条件
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
