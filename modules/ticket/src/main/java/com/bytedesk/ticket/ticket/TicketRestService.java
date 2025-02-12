@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -152,27 +153,51 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ticket.setType(TicketTypeEnum.AGENT.name());
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
             // 
-            UserProtobuf userProtobuf = UserProtobuf.builder()
-                .nickname(assigneeOptional.get().getNickname())
-                .avatar(assigneeOptional.get().getAvatar())
-                .build();
-            userProtobuf.setUid(assigneeOptional.get().getUid());
-            userProtobuf.setType(UserTypeEnum.AGENT.name());
-            String userJson = JSON.toJSONString(userProtobuf);
+            String userJson = BytedeskConsts.EMPTY_JSON_STRING;
+            // 使用在线客服工单会话user info
+            if (StringUtils.hasText(request.getServiceThreadTopic())) {
+                String serviceThreadTopic = request.getServiceThreadTopic();
+                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+                if (serviceThreadOptional.isPresent()) {
+                    userJson = serviceThreadOptional.get().getUser();
+                    ticket.setUser(userJson);
+                }
+            } else {
+                // 
+                UserProtobuf userProtobuf = UserProtobuf.builder()
+                    .nickname(assigneeOptional.get().getNickname())
+                    .avatar(assigneeOptional.get().getAvatar())
+                    .build();
+                userProtobuf.setUid(assigneeOptional.get().getUid());
+                userProtobuf.setType(UserTypeEnum.AGENT.name());
+                userJson = JSON.toJSONString(userProtobuf);
+            }
             // 创建工单会话
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.AGENT, userJson);
             ticket.setThreadTopic(thread.getTopic());
         } else {
             ticket.setType(TicketTypeEnum.WORKGROUP.name());
             ticket.setStatus(TicketStatusEnum.NEW.name());
+
+            String userJson = BytedeskConsts.EMPTY_JSON_STRING;
             // 
-            UserProtobuf userProtobuf = UserProtobuf.builder()
-                .nickname(workgroupOptional.get().getNickname())
+            if (StringUtils.hasText(request.getServiceThreadTopic())) {
+                String serviceThreadTopic = request.getServiceThreadTopic();
+                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+                if (serviceThreadOptional.isPresent()) {
+                    userJson = serviceThreadOptional.get().getUser();
+                    ticket.setUser(userJson);
+                }
+            } else {
+                // 
+                UserProtobuf userProtobuf = UserProtobuf.builder()
+                    .nickname(workgroupOptional.get().getNickname())
                 .avatar(workgroupOptional.get().getAvatar())
                 .build();
-            userProtobuf.setUid(workgroupOptional.get().getUid());
-            userProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-            String userJson = JSON.toJSONString(userProtobuf);
+                userProtobuf.setUid(workgroupOptional.get().getUid());
+                userProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+                userJson = JSON.toJSONString(userProtobuf);
+            }
             // 创建工单会话 
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.WORKGROUP, userJson);
             ticket.setThreadTopic(thread.getTopic());
