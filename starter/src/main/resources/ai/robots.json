@@ -15,7 +15,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关",
-    "description": "创建一个客服问答机器人，默认prompt：根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案. 另外，请提供更多相关的问答对。"
+    "description": "创建一个客服问答机器人"
   },
   {
     "uid": "3",
@@ -24,7 +24,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
-    "description": "创建一个问题扩写机器人，默认prompt：根据用户的问题，生成多个不同表述的问题，确保问题的多样性。"
+    "description": "创建一个问题扩写机器人"
   },
   {
     "uid": "4",
@@ -33,7 +33,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
-    "description": "创建一个意图改写机器人，默认prompt：根据用户的问题，生成多个不同表述的问题，确保问题的多样性。"
+    "description": "创建一个意图改写机器人"
   },
   {
     "uid": "5",
@@ -42,7 +42,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "根据用户的问题，识别用户的意图，并返回意图的类型。",
-    "description": "创建一个意图识别机器人，默认prompt：根据用户的问题，识别用户的意图，并返回意图的类型。"
+    "description": "创建一个意图识别机器人"
   },
   {
     "uid": "6",
@@ -51,7 +51,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "根据用户的问题，识别用户的情绪，并返回情绪的类型。",
-    "description": "创建一个情绪分析机器人，默认prompt：根据用户的问题，识别用户的情绪，并返回情绪的类型。"
+    "description": "创建一个情绪分析机器人"
   },
   {
     "uid": "7",
@@ -60,7 +60,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "对机器人回答的问题进行评测，并给出评测结果。",
-    "description": "创建一个机器人质检机器人，默认prompt：对机器人回答的问题进行评测，并给出评测结果。"
+    "description": "创建一个机器人质检机器人"
   },
   {
     "uid": "8",
@@ -69,7 +69,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "对客服的回答进行质检，并给出质检结果。",
-    "description": "创建一个客服质检机器人，默认prompt：对客服的回答进行质检，并给出质检结果。"
+    "description": "创建一个客服质检机器人"
   },
   {
     "uid": "9",
@@ -78,7 +78,7 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "对会话进行总结，并给出总结结果。",
-    "description": "创建一个会话小结机器人，默认prompt：对会话进行总结，并给出总结结果。"
+    "description": "创建一个会话小结机器人"
   },
   {
     "uid": "10",
@@ -87,7 +87,7 @@
     "type": "LLM",
     "category": "i18n.module.ticket",
     "prompt": "从对话记录中提取工单信息，自动填写工单表单。",
-    "description": "创建一个工单助手机器人，默认prompt：从对话记录中提取工单信息，自动填写工单表单。"
+    "description": "创建一个工单助手机器人"
   },
   {
     "uid": "11",
@@ -96,7 +96,7 @@
     "type": "LLM",
     "category": "i18n.module.ticket",
     "prompt": "访客填写完工单标题和描述后，自动搜索解决方案和FAQ，通过大模型给出解决方案。",
-    "description": "创建一个工单解决方案推荐机器人，默认prompt：访客填写完工单标题和描述后，自动搜索解决方案和FAQ，通过大模型给出解决方案。"
+    "description": "创建一个工单解决方案推荐机器人"
   },
   {
     "uid": "12",
@@ -105,7 +105,7 @@
     "type": "LLM",
     "category": "i18n.module.ticket",
     "prompt": "对工单进行总结，并给出总结结果。",
-    "description": "创建一个工单小结机器人，默认prompt：对工单进行总结，并给出总结结果。"
+    "description": "创建一个工单小结机器人"
   },
   {
     "uid": "13",
@@ -114,6 +114,24 @@
     "type": "LLM",
     "category": "i18n.module.service",
     "prompt": "对访客进行画像，并给出画像结果。",
-    "description": "创建一个访客画像机器人，默认prompt：对访客进行画像，并给出画像结果。"
+    "description": "创建一个访客画像机器人"
+  },
+  {
+    "uid": "14",
+    "name": "visitor_invitation",
+    "nickname": "接客助手",
+    "type": "LLM",
+    "category": "i18n.module.service",
+    "prompt": "主动邀请访客进行咨询，并给出邀请语，不限于1条，可连续邀请，可设置邀请间隔时间。",
+    "description": "创建一个接客助手机器人，默认prompt：主动邀请访客进行咨询，并给出邀请语，不限于1条，可连续邀请，可设置邀请间隔时间。"
+  },
+  {
+    "uid": "15",
+    "name": "visitor_recommendation",
+    "nickname": "导购助手",
+    "type": "LLM",
+    "category": "i18n.module.service",
+    "prompt": "针对电商网站，根据访客的浏览行为，给出推荐商品，并给出推荐理由。",
+    "description": "创建一个导购助手机器人，默认prompt：针对电商网站，根据访客的浏览行为，给出推荐商品，并给出推荐理由。"
   }
 ]
