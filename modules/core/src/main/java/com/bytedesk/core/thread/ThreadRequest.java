@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 21:22:00
+ * @LastEditTime: 2025-02-12 16:56:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,4 +78,6 @@ public class ThreadRequest extends BaseRequest {
     // group member uids
     @Builder.Default
     private List<String> memberUids = new ArrayList<>();
+
+    private String searchText;
 }
