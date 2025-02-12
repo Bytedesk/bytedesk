@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 14:29:34
+ * @LastEditTime: 2025-02-12 17:56:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,15 +86,22 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     /**  */
-    public Page<ThreadResponse> query(ThreadRequest pageParam) {
+    public Page<ThreadResponse> query(ThreadRequest request) {
 
         UserEntity user = authService.getUser();
-
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setOwnerUid(user.getUid());
+        // 
         // 优先加载最近更新的会话记录，updatedAt越大越新
-        Pageable pageable = PageRequest.of(pageParam.getPageNumber(), pageParam.getPageSize(), Sort.Direction.DESC,
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
 
-        Page<ThreadEntity> threadPage = findByOwner(user, pageable);
+        // Page<ThreadEntity> threadPage = findByOwner(user, pageable);
+        Specification<ThreadEntity> specs = ThreadSpecification.search(request);
+
+        Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
 
         return threadPage.map(this::convertToResponse);
     }
