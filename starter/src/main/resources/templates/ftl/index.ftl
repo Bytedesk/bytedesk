@@ -81,8 +81,8 @@ Listed course START -->
 						<img src="assets/images/element/engineering.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">AI知识库问答</a></h5>
-					<span class="mb-0">AI知识库问答、知识管理</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">企业知识库</a></h5>
+					<span class="mb-0">内部知识库管理、文档管理、AI问答</span>
 				</div>
 			</div>
 
@@ -110,26 +110,26 @@ Listed course START -->
 			</div>
 
 			<!-- Item -->
-			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
+			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/home.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">Open APIs</a></h5>
-					<span class="mb-0">We also supply many apis for developers</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">项目管理</a></h5>
+					<span class="mb-0">看板、日报、任务管理</span>
 				</div>
-			</div>  -->
+			</div>
 
 			<!-- Item -->
-			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
+			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/artist.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">Omni Channel</a></h5>
-					<span class="mb-0">We supply multi channel plugins, you can choose the one you need</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">工作流</a></h5>
+					<span class="mb-0">自定义工作流、流程编排</span>
 				</div>
-			</div>  -->
+			</div>
 		</div>
 	</div>
 </section>

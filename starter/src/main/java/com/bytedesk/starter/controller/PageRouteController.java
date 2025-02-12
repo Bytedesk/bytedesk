@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 11:30:02
+ * @LastEditTime: 2025-02-12 16:33:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -133,6 +133,15 @@ public class PageRouteController {
 			log.error("Error rendering index page", e);
 			throw e;
 		}
+	}
+
+	/**
+	 * 
+	 * http://127.0.0.1:9003/web
+	 */
+	@GetMapping("/web")
+	public String web() {
+		return "index";
 	}
 
 	/**

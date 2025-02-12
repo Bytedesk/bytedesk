@@ -14,9 +14,7 @@ Main Banner START -->
 			<div class="col-md-5">
 				<!-- Title -->
 				<h1 class="mb-3">基于AI全新打造</h1>
-				<h4 class="mb-3">企业IM + </h4>
-				<#--  社交IM、在线客服、AI助手、AI知识库问答、帮助中心、工单系统、VOC社媒客户之声、AI营销、SCRM私域运营 -->
-				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
+				<h4 class="mb-3">企业级多租户即时通讯解决方案</h4>
 				<!-- Button -->
 				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>
 			</div>
