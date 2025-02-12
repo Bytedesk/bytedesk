@@ -21,7 +21,7 @@
 # 因jar包太大, 从这里下载: https://cdn.weiyuai.cn/server.zip
 # 编辑配置文件：config/application.properties
 # 修改数据库连接信息
-spring.datasource.url=jdbc:mysql://127.0.0.1:3306/bytedesk_im
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/bytedesk
 spring.datasource.username=root
 spring.datasource.password=password
 # 修改redis连接信息
