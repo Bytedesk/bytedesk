@@ -87,7 +87,7 @@ docker compose -p bytedesk -f docker-compose.yaml stop
 local preview
 
 ```bash
-http://127.0.0.1:9003/dev
+http://127.0.0.1:9003/
 # open port: 9003, 9885
 ```
 

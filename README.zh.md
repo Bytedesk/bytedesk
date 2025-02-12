@@ -94,7 +94,7 @@ docker compose -p weiyu -f docker-compose.yaml stop
 本地预览
 
 ```bash
-http://127.0.0.1:9003/dev
+http://127.0.0.1:9003/
 # 开放端口：9003, 9885
 ```
 
