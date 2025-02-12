@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:26:45
+ * @LastEditTime: 2025-02-12 14:30:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -64,6 +65,17 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         Page<ThreadResponse> threadPage = threadService.query(request);
         //
         return ResponseEntity.ok(JsonResult.success(threadPage));
+    }
+
+    @GetMapping("/query/topic")
+    public ResponseEntity<?> queryByThreadTopic(ThreadRequest request) {
+
+        Optional<ThreadResponse> threadOptional = threadService.queryByThreadTopic(request);
+        //
+        if (threadOptional.isPresent()) {
+            return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
+        }
+        return ResponseEntity.ok(JsonResult.error("not found"));
     }
 
     @ActionAnnotation(title = "thread", action = "create", description = "create thread")

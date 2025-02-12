@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 13:03:03
+ * @LastEditTime: 2025-02-12 14:42:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,15 +64,16 @@ public class TicketEntity extends BaseEntity {
     @Builder.Default
     private String type = TicketTypeEnum.AGENT.name();        // 类型(agent/group)
 
-    // 工单会话
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private ThreadEntity thread;
-    private String threadTopic;
-
-    // 在线客服会话
+    // 对应在线客服会话
     // @ManyToOne(fetch = FetchType.LAZY)
     // private ThreadEntity serviceThread;
     private String serviceThreadTopic;
+
+    // 对应工单会话，工单会话uid。每一个在线客服会话，可以创建多个工单，每个工单对应一个工单会话
+    // 会话zhih'j
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private ThreadEntity thread;
+    private String threadUid;
 
     // @ManyToOne(fetch = FetchType.LAZY)
     // private CategoryEntity category;
