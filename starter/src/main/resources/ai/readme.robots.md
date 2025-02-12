@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 19:09:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 14:50:09
+ * @LastEditTime: 2025-02-13 07:20:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@
 - 访客画像：对访客进行画像，并给出画像结果
 - 接客助手：主动邀请访客进行咨询，并给出邀请语，不限于1条，可连续邀请，可设置邀请间隔时间。
 - 导购助手：针对电商网站，根据访客的浏览行为，给出推荐商品，并给出推荐理由。
+- 客服助手：角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度"
 
 ## 参考
 
