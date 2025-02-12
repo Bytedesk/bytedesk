@@ -82,7 +82,7 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 ### 拉取ollama deepseek-r1模型
 
 ```bash
-docker exec ollama-bytedesk ollama pull deepseek-r1:1.5b
+docker exec ollama-bytedesk ollama pull deepseek-r1
 ```
 
 ### 停止容器
