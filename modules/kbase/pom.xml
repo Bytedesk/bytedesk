@@ -24,7 +24,6 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
@@ -32,7 +31,6 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-tika-document-reader</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!--
@@ -40,7 +38,6 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
@@ -50,14 +47,12 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-redis-store-spring-boot-starter</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- ERROR: column cannot have more than 2000 dimensions for hnsw index -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
-			<scope>provided</scope>
 		</dependency> -->
 
 		<!-- //////////////////////////////////////////////////////////////// -->
