@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 15:09:46
+ * @LastEditTime: 2025-02-13 17:47:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -66,11 +66,18 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @GetMapping("/query/service-thread-topic")
     public ResponseEntity<?> queryByServiceThreadTopic(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryByServiceThreadTopic(request);
+        Page<TicketResponse> page = ticketService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @GetMapping("/query/thread-uid")
+    public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
 
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
@@ -105,7 +112,6 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
         return ticketService.uploadAttachment(id, file);
     }
-
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/

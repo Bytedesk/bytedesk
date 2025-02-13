@@ -96,19 +96,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         }
         request.setReporterUid(user.getUid());
         // 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "id");
-        Specification<TicketEntity> spec = TicketSpecification.search(request);
-        Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
-        return ticketPage.map(this::convertToResponse);
-    }
-
-    public Page<TicketResponse> queryByServiceThreadTopic(TicketRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-        Specification<TicketEntity> spec = TicketSpecification.search(request);
-        Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
-        return ticketPage.map(this::convertToResponse);
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
