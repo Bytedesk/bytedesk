@@ -112,15 +112,6 @@ services:
       MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
       SPRING_SECURITY_BASIC_ENABLED: true
       # ai config
-      # openai/deepseek
-      # https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html
-      SPRING_AI_OPENAI_CHAT_ENABLED: false
-      SPRING_AI_OPENAI_API_KEY: ''
-      SPRING_AI_OPENAI_BASE_URL: https://api.deepseek.com
-      # SPRING_AI_OPENAI_CHAT_MODEL: deepseek-chat
-      SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: deepseek-chat
-      SPRING_AI_OPENAI_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_OPENAI_EMBEDDING_ENABLED: false
       # zhipuai
       SPRING_AI_ZHIPUAI_CHAT_ENABLED: false
       SPRING_AI_ZHIPUAI_API_KEY: ''
@@ -132,6 +123,15 @@ services:
       # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen:7b
       # SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
       # SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
+      # openai/deepseek
+      # https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html
+      SPRING_AI_OPENAI_CHAT_ENABLED: false
+      SPRING_AI_OPENAI_API_KEY: ''
+      SPRING_AI_OPENAI_BASE_URL: https://api.deepseek.com
+      # SPRING_AI_OPENAI_CHAT_MODEL: deepseek-chat
+      SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: deepseek-chat
+      SPRING_AI_OPENAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_OPENAI_EMBEDDING_ENABLED: false
       # moonshot
       SPRING_AI_MOONSHOT_CHAT_ENABLED: false
       SPRING_AI_MINIMAX_CHAT_ENABLED: false
