@@ -14,11 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
@@ -223,7 +225,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
         // 保存附件
-        List<TicketAttachmentEntity> attachments = new ArrayList<>();
+        Set<TicketAttachmentEntity> attachments = new HashSet<>();
         if (request.getUploadUids() != null) {
             for (String uploadUid : request.getUploadUids()) {
                 Optional<UploadEntity> uploadOptional = uploadRestService.findByUid(uploadUid);
@@ -256,58 +258,90 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             throw new RuntimeException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        
+        // 更新基本信息
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
         ticket.setStatus(request.getStatus());
-        // 
-        Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
-        if (assigneeOptional.isPresent()) {
-            UserProtobuf assigneeProtobuf = UserProtobuf.builder()
-                .nickname(assigneeOptional.get().getNickname())
-                .avatar(assigneeOptional.get().getAvatar())
-                .build();
-            assigneeProtobuf.setUid(assigneeOptional.get().getUid());
-            assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-            ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
-        }
-        // 
-        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
-        if (workgroupOptional.isPresent()) {
-            UserProtobuf workgroupProtobuf = UserProtobuf.builder()
-                .nickname(workgroupOptional.get().getNickname())
-                .avatar(workgroupOptional.get().getAvatar())
-                .build();
-            workgroupProtobuf.setUid(workgroupOptional.get().getUid());
-            workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-            ticket.setWorkgroup(JSON.toJSONString(workgroupProtobuf));
-        }
-         // 先保存工单
-         TicketEntity savedTicket = save(ticket);
-        // 
-        List<TicketAttachmentEntity> attachments = new ArrayList<>();
+        
+        // 更新工作组和处理人信息
+        ticket = updateAssigneeAndWorkgroup(ticket, request);
+        
+        // 处理附件更新
         if (request.getUploadUids() != null) {
-            for (String uploadUid : request.getUploadUids()) {
+            ticket = updateAttachments(ticket, request.getUploadUids());
+        }
+
+        // 保存更新后的工单
+        ticket = ticketRepository.save(ticket);
+        if (ticket == null) {
+            throw new RuntimeException("update ticket failed");
+        }
+        
+        return convertToResponse(ticket);
+    }
+
+    private TicketEntity updateAssigneeAndWorkgroup(TicketEntity ticket, TicketRequest request) {
+        if (StringUtils.hasText(request.getAssigneeUid())) {
+            Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
+            if (assigneeOptional.isPresent()) {
+                UserProtobuf assigneeProtobuf = UserProtobuf.builder()
+                    .nickname(assigneeOptional.get().getNickname())
+                    .avatar(assigneeOptional.get().getAvatar())
+                    .build();
+                assigneeProtobuf.setUid(assigneeOptional.get().getUid());
+                assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
+                ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
+            }
+        }
+
+        if (StringUtils.hasText(request.getWorkgroupUid())) {
+            Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
+            if (workgroupOptional.isPresent()) {
+                UserProtobuf workgroupProtobuf = UserProtobuf.builder()
+                    .nickname(workgroupOptional.get().getNickname())
+                    .avatar(workgroupOptional.get().getAvatar())
+                    .build();
+                workgroupProtobuf.setUid(workgroupOptional.get().getUid());
+                workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+                ticket.setWorkgroup(JSON.toJSONString(workgroupProtobuf));
+            }
+        }
+        return ticket;
+    }
+
+    private TicketEntity updateAttachments(TicketEntity ticket, List<String> uploadUids) {
+        // 获取现有附件的 uploadUid 列表
+        Set<String> existingUploadUids = ticket.getAttachments().stream()
+            .map(attachment -> attachment.getUpload().getUid())
+            .collect(Collectors.toSet());
+        
+        // 处理新增的附件
+        for (String uploadUid : uploadUids) {
+            if (!existingUploadUids.contains(uploadUid)) {
                 Optional<UploadEntity> uploadOptional = uploadRestService.findByUid(uploadUid);
                 if (uploadOptional.isPresent()) {
                     TicketAttachmentEntity attachment = new TicketAttachmentEntity();
                     attachment.setUid(uidUtils.getUid());
-                    attachment.setTicket(savedTicket);
+                    attachment.setTicket(ticket);
                     attachment.setUpload(uploadOptional.get());
                     attachmentRepository.save(attachment);
-                    // 
-                    attachments.add(attachment);
+                    // 添加到工单的附件集合中
+                    ticket.getAttachments().add(attachment);
                 }
-            }
+            }   
         }
-        savedTicket.setAttachments(attachments);
-        // 
-        savedTicket = save(savedTicket);
-        if (savedTicket == null) {
-            throw new RuntimeException("save ticket failed");
-        }
-        // 
-        return convertToResponse(savedTicket);
+        
+        // 处理需要删除的附件
+        ticket.getAttachments().stream()
+            .filter(attachment -> !uploadUids.contains(attachment.getUpload().getUid()))
+            .forEach(attachment -> {
+                attachment.setDeleted(true);
+                attachmentRepository.save(attachment);
+            });
+
+        return ticket;
     }
 
     // 创建工单会话

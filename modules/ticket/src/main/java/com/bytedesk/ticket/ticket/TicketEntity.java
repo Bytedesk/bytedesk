@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 14:42:56
+ * @LastEditTime: 2025-02-13 16:42:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
 package com.bytedesk.ticket.ticket;
 
 import java.util.List;
+import java.util.Set;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -120,7 +121,7 @@ public class TicketEntity extends BaseEntity {
 
     // 工单附件
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TicketAttachmentEntity> attachments;
+    private Set<TicketAttachmentEntity> attachments;
 
     // 流程实例ID
     private String processInstanceId;
