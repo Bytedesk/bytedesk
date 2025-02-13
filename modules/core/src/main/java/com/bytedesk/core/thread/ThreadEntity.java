@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 09:19:33
+ * @LastEditTime: 2025-02-13 15:47:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EntityListeners({ ThreadEntityListener.class })
 @Table(name = "bytedesk_core_thread", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"topic", "owner_id"})
+    // @UniqueConstraint(columnNames = {"topic", "owner_id"}) // 同一个用户，针对某service thread 创建多个ticket，并对应多个ticket thread
 })
 public class ThreadEntity extends BaseEntity {
 
