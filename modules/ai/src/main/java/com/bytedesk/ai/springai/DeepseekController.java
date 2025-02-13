@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 13:44:15
+ * @LastEditTime: 2025-02-13 13:53:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,8 @@ import reactor.core.publisher.Flux;
 /**
  * deepseek
  * https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html#chat-options
+ * 参考：
+ * https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-openai/src/test/java/org/springframework/ai/openai/chat/proxy/DeepSeekWithOpenAiChatModelIT.java
  */
 @RestController
 @RequestMapping("/deepseek")
