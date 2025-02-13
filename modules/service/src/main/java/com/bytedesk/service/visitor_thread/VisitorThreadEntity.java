@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 17:07:20
+ * @LastEditTime: 2025-02-13 09:19:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -113,7 +113,7 @@ public class VisitorThreadEntity extends BaseEntity {
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
     // of type character varying
     // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(length = 1024)
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**

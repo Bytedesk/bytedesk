@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:27:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 17:08:06
+ * @LastEditTime: 2025-02-13 09:19:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,6 +54,6 @@ public class NotificationEntity extends BaseEntity {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(length = 1024)
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:15:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 17:06:33
+ * @LastEditTime: 2025-02-13 09:19:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_core_message_unread")
-public class MessageUnread implements Serializable  {
+public class MessageUnreadEntity implements Serializable  {
 
     private static final long serialVersionUID = 1L;
 
@@ -87,7 +87,7 @@ public class MessageUnread implements Serializable  {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(length = 1024)
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default

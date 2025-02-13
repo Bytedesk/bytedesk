@@ -20,9 +20,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface MessageUnreadRepository
-        extends JpaRepository<MessageUnread, Long>, JpaSpecificationExecutor<MessageUnread> {
+        extends JpaRepository<MessageUnreadEntity, Long>, JpaSpecificationExecutor<MessageUnreadEntity> {
 
-    List<MessageUnread> findByUserUid(String userUid);
+    List<MessageUnreadEntity> findByUserUid(String userUid);
 
     @Transactional
     void deleteByUserUid(String userUid);
