@@ -1,4 +1,4 @@
-package com.bytedesk.ai.controller;
+package com.bytedesk.ai.springai;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.http.ResponseEntity;
