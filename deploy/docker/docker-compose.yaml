@@ -113,6 +113,9 @@ services:
       SPRING_SECURITY_BASIC_ENABLED: true
       # ai config
       SPRING_AI_ZHIPUAI_CHAT_ENABLED: true
+      SPRING_AI_ZHIPUAI_API_KEY: ''
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
       # 
       SPRING_AI_OLLAMA_CHAT_ENABLED: true
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
