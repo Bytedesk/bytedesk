@@ -25,35 +25,37 @@
 
 	<dependencies>
 
+
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
-			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-openai-spring-boot-starter -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-openai-spring-boot-starter</artifactId>
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/index.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-ollama-spring-boot-starter -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-ollama-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-moonshot-spring-boot-starter -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-moonshot-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-moonshot-spring-boot-starter</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai-spring-boot-starter -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
