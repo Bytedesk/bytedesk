@@ -15,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -232,6 +231,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 if (uploadOptional.isPresent()) {
                     TicketAttachmentEntity attachment = new TicketAttachmentEntity();
                     attachment.setUid(uidUtils.getUid());
+                    attachment.setOrgUid(savedTicket.getOrgUid());
                     attachment.setTicket(savedTicket);
                     attachment.setUpload(uploadOptional.get());
                     attachmentRepository.save(attachment);
@@ -268,10 +268,28 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // 更新工作组和处理人信息
         ticket = updateAssigneeAndWorkgroup(ticket, request);
         
-        // 处理附件更新
+        // 处理附件更新：stackOverFlow
         if (request.getUploadUids() != null) {
             ticket = updateAttachments(ticket, request.getUploadUids());
         }
+         // 保存附件
+        //  Set<TicketAttachmentEntity> attachments = new HashSet<>();
+        //  if (request.getUploadUids() != null) {
+        //      for (String uploadUid : request.getUploadUids()) {
+        //          Optional<UploadEntity> uploadOptional = uploadRestService.findByUid(uploadUid);
+        //          if (uploadOptional.isPresent()) {
+        //              TicketAttachmentEntity attachment = new TicketAttachmentEntity();
+        //              attachment.setUid(uidUtils.getUid());
+        //              attachment.setOrgUid(ticket.getOrgUid());
+        //              attachment.setTicket(ticket);
+        //              attachment.setUpload(uploadOptional.get());
+        //              attachmentRepository.save(attachment);
+        //              // 
+        //              attachments.add(attachment);
+        //          }
+        //      }
+        //  }
+        //  ticket.setAttachments(attachments);
 
         // 保存更新后的工单
         ticket = ticketRepository.save(ticket);
@@ -311,7 +329,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         return ticket;
     }
 
-    private TicketEntity updateAttachments(TicketEntity ticket, List<String> uploadUids) {
+    // stackOverFlow
+    public TicketEntity updateAttachments(TicketEntity ticket, Set<String> uploadUids) {
         // 获取现有附件的 uploadUid 列表
         Set<String> existingUploadUids = ticket.getAttachments().stream()
             .map(attachment -> attachment.getUpload().getUid())
