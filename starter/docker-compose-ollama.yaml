@@ -24,6 +24,19 @@ services:
     networks:
       - bytedesk-network
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-bytedesk
+    ports:
+      - "21434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=deepseek-r1:1.5b
+    command: serve
+    networks:
+      - bytedesk-network
+
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
     # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
@@ -33,6 +46,7 @@ services:
     depends_on:
       - bytedesk-mysql
       - bytedesk-redis
+      - ollama
     environment:
       # db config
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-bytedesk:3306/bytedesk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
@@ -119,9 +133,9 @@ services:
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
       # ollama
       SPRING_AI_OLLAMA_CHAT_ENABLED: true
-      SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
-      # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen:7b
-      # SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_OLLAMA_BASE_URL: http://ollama-bytedesk:11434
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: deepseek-r1:1.5b
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
       # SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
       # moonshot
       SPRING_AI_MOONSHOT_CHAT_ENABLED: false
@@ -140,6 +154,7 @@ volumes:
   mysql_data:
   redis_data:
   upload_data:
+  ollama_data:
 
 networks:
   bytedesk-network:
