@@ -26,7 +26,7 @@ import com.bytedesk.core.config.properties.BytedeskPropertiesResponse;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.message_unread.MessageUnread;
+import com.bytedesk.core.message_unread.MessageUnreadEntity;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
 import com.bytedesk.core.rbac.role.RoleEntity;
@@ -128,7 +128,7 @@ public class ConvertUtils {
         return messageResponse;
     }
 
-    public static MessageResponse convertToMessageResponse(MessageUnread message) {
+    public static MessageResponse convertToMessageResponse(MessageUnreadEntity message) {
 
         MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
 

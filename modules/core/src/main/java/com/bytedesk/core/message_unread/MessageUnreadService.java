@@ -40,7 +40,7 @@ public class MessageUnreadService {
     // @Cacheable(value = "message_unread", key = "#userUid", unless = "#result ==
     // null")
     public List<MessageResponse> getMessages(String userUid) {
-        List<MessageUnread> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
+        List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
         delete(userUid);
         return messageUnreadList.stream().map(ConvertUtils::convertToMessageResponse).toList();
     }
@@ -50,7 +50,7 @@ public class MessageUnreadService {
     // })
     @Transactional
     public void create(MessageEntity message, String userUid) {
-        MessageUnread messageUnread = modelMapper.map(message, MessageUnread.class);
+        MessageUnreadEntity messageUnread = modelMapper.map(message, MessageUnreadEntity.class);
         messageUnread.setUserUid(userUid);
         messageUnreadRepository.save(messageUnread);
     }
