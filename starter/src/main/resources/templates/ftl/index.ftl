@@ -69,7 +69,7 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="#" class="stretched-link">AI助手</a></h5>
-					<span class="mb-0">对接各种大模型，支持私有部署大模型，支持私有知识库问答.</span>
+					<span class="mb-0">对接Ollama/DeepSeek/智谱等大模型，支持私有部署/Api调用大模型.</span>
 				</div>
 			</div>
 
