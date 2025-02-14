@@ -13,8 +13,13 @@
  */
 package com.bytedesk.ticket.consts;
 
+import com.bytedesk.core.constant.I18Consts;
+
 public class TicketConsts {
-    
+
+    public  static final String TICKET_PROCESS_NAME_GROUP = I18Consts.I18N_PREFIX + "ticket.process.name.group";
+
+    public static final String TICKET_PROCESS_NAME_AGENT = I18Consts.I18N_PREFIX + "ticket.process.name.agent";
 
     public static final String TICKET_PROCESS_KEY = "ticketProcess";
 
@@ -24,5 +29,7 @@ public class TicketConsts {
 
     // 未分配
     public static final String TICKET_FILTER_UNASSIGNED = "UNASSIGNED";
+
+
     
 }

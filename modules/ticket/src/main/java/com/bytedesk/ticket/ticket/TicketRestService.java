@@ -122,6 +122,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
+        // 默认是工作组工单，暂不启用一对一
+        ticket.setType(TicketTypeEnum.WORKGROUP.name());
         // 
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
         if (workgroupOptional.isPresent()) {
@@ -147,7 +149,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
             String assigneeJson = JSON.toJSONString(assigneeProtobuf);
             ticket.setAssignee(assigneeJson);
-            ticket.setType(TicketTypeEnum.AGENT.name());
+            // 暂不启用一对一
+            // ticket.setType(TicketTypeEnum.AGENT.name());
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
             // 
             String userJson = BytedeskConsts.EMPTY_JSON_STRING;
@@ -173,7 +176,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.AGENT, userJson);
             ticket.setThreadUid(thread.getUid());
         } else {
-            ticket.setType(TicketTypeEnum.WORKGROUP.name());
+            // ticket.setType(TicketTypeEnum.WORKGROUP.name());
             ticket.setStatus(TicketStatusEnum.NEW.name());
 
             String userJson = BytedeskConsts.EMPTY_JSON_STRING;
