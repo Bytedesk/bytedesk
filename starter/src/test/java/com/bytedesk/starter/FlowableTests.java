@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-02 11:21:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 08:26:01
+ * @LastEditTime: 2025-02-14 11:59:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,12 +22,16 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.bytedesk.kbase.upload.UploadEntity;
+import com.bytedesk.kbase.upload.UploadTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,6 +61,34 @@ public class FlowableTests {
             log.info("ProcessDefinition name = {},deploymentId = {}", processDefinition.getName(),
                     processDefinition.getDeploymentId());
         }
+    }
+
+    // 添加流程定义
+    @Test
+    public void testAddProcessDefinition() {
+        // 部署流程
+        Deployment deployment = repositoryService.createDeployment()
+                .name("请假流程")
+                .addClasspathResource("processes/StudentLeave.bpmn20.xml")
+                .deploy();
+        log.info("部署流程成功: {}", deployment.getId());
+    }
+
+    // 通过上传文件部署流程
+    @Test
+    public void testAddProcessDefinitionByUploadFile() {
+        // 上传文件
+        UploadEntity upload = UploadEntity.builder()
+                .fileName("请假流程")
+                .type(UploadTypeEnum.BPMN.name())
+                .fileUrl("")
+                .build();
+        // 将上传文件内容，部署流程
+        Deployment deployment = repositoryService.createDeployment()
+                .name("请假流程")
+                .addClasspathResource("processes/StudentLeave.bpmn20.xml")
+                .deploy();
+        log.info("部署流程成功: {}", deployment.getId());
     }
 
     @Test
