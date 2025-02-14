@@ -175,6 +175,7 @@
                 <li><a href="/swagger-ui/index.html" target="_blank">${i18n[lang]["apiDoc"]}</a></li>
                 <li><a href="/druid" target="_blank">Druid</a></li>
                 <li><a href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank">${i18n[lang]["docs"]}</a></li>
+                <li><a href="/web" target="_blank">Web</a></li>
             </ul>
 
             <h2>${i18n[lang]["moduleDevelopment"]}</h2>
