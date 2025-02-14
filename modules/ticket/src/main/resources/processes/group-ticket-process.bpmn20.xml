@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="BytedeskTicket" exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
-  <process id="groupTicketProcess" name="Group Ticket Process" isExecutable="true">
-    <startEvent id="start" name="Create Ticket" flowable:formFieldValidation="true"></startEvent>
-    <userTask id="createTicket" name="Create Ticket" flowable:assignee="${creatorUser}" flowable:formFieldValidation="true">
-      <documentation>Create a new ticket with details</documentation>
+  <process id="groupTicketProcess" name="工作组工单流程" isExecutable="true">
+    <startEvent id="start" name="创建工单" flowable:formFieldValidation="true"></startEvent>
+    <userTask id="createTicket" name="创建工单" flowable:assignee="${creatorUser}" flowable:formFieldValidation="true">
+      <documentation>创建新工单并填写详细信息</documentation>
       <extensionElements>
-        <flowable:formProperty id="title" name="Title" type="string" required="true"></flowable:formProperty>
-        <flowable:formProperty id="description" name="Description" type="string" required="true"></flowable:formProperty>
-        <flowable:formProperty id="priority" name="Priority" type="enum">
-          <flowable:value id="low" name="Low"></flowable:value>
-          <flowable:value id="medium" name="Medium"></flowable:value>
-          <flowable:value id="high" name="High"></flowable:value>
+        <flowable:formProperty id="title" name="标题" type="string" required="true"></flowable:formProperty>
+        <flowable:formProperty id="description" name="描述" type="string" required="true"></flowable:formProperty>
+        <flowable:formProperty id="priority" name="优先级" type="enum">
+          <flowable:value id="low" name="低"></flowable:value>
+          <flowable:value id="medium" name="中"></flowable:value>
+          <flowable:value id="high" name="高"></flowable:value>
         </flowable:formProperty>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="createTicket"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="createTicket" targetRef="evaluatePriority"></sequenceFlow>
-    <serviceTask id="evaluatePriority" name="Evaluate Priority" flowable:delegateExpression="${ticketEvaluatePriorityDelegate}"></serviceTask>
+    <serviceTask id="evaluatePriority" name="评估优先级" flowable:delegateExpression="${ticketEvaluatePriorityDelegate}"></serviceTask>
     <sequenceFlow id="sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b" sourceRef="evaluatePriority" targetRef="assignToGroup"></sequenceFlow>
-    <userTask id="assignToGroup" name="Group Handle" flowable:candidateGroups="${workgroupUid}" flowable:formFieldValidation="true">
-      <documentation>Group members handle the ticket</documentation>
+    <userTask id="assignToGroup" name="工作组处理" flowable:candidateGroups="${workgroupUid}" flowable:formFieldValidation="true">
+      <documentation>工作组成员处理工单</documentation>
       <extensionElements>
-        <flowable:formProperty id="solution" name="Solution" type="string" required="true"></flowable:formProperty>
-        <flowable:formProperty id="status" name="Status" type="enum">
-          <flowable:value id="resolved" name="Resolved"></flowable:value>
-          <flowable:value id="pending" name="Pending"></flowable:value>
-          <flowable:value id="escalated" name="Escalated"></flowable:value>
+        <flowable:formProperty id="solution" name="解决方案" type="string" required="true"></flowable:formProperty>
+        <flowable:formProperty id="status" name="状态" type="enum">
+          <flowable:value id="resolved" name="已解决"></flowable:value>
+          <flowable:value id="pending" name="处理中"></flowable:value>
+          <flowable:value id="escalated" name="已升级"></flowable:value>
         </flowable:formProperty>
       </extensionElements>
     </userTask>
@@ -36,96 +36,96 @@
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="sequenceFlow-9a5f6c89-bdd8-428f-b877-3cabfc132b2a" sourceRef="slaTimer" targetRef="slaNotification"></sequenceFlow>
-    <serviceTask id="slaNotification" name="SLA Timeout Notification" flowable:class="com.bytedesk.ticket.delegate.TicketSLATimeoutNotificationDelegate"></serviceTask>
+    <serviceTask id="slaNotification" name="SLA超时通知" flowable:class="com.bytedesk.ticket.delegate.TicketSLATimeoutNotificationDelegate"></serviceTask>
     <sequenceFlow id="sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" sourceRef="slaNotification" targetRef="assignToGroup"></sequenceFlow>
-    <userTask id="customerVerify" name="Customer Verify" flowable:assignee="${creatorUser}" flowable:formFieldValidation="true">
-      <documentation>Creator verifies if the issue is resolved</documentation>
+    <userTask id="customerVerify" name="客户确认" flowable:assignee="${creatorUser}" flowable:formFieldValidation="true">
+      <documentation>创建人验证问题是否解决</documentation>
       <extensionElements>
-        <flowable:formProperty id="satisfied" name="Satisfied" type="boolean" required="true"></flowable:formProperty>
-        <flowable:formProperty id="comment" name="Comment" type="string"></flowable:formProperty>
+        <flowable:formProperty id="satisfied" name="是否满意" type="boolean" required="true"></flowable:formProperty>
+        <flowable:formProperty id="comment" name="备注" type="string"></flowable:formProperty>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
     <sequenceFlow id="sequenceFlow-c405b332-2cc3-4866-842b-c4b0d82f653d" sourceRef="customerVerify" targetRef="satisfactionSurvey"></sequenceFlow>
-    <userTask id="satisfactionSurvey" name="Satisfaction Survey" flowable:assignee="${userUid}" flowable:formFieldValidation="true">
+    <userTask id="satisfactionSurvey" name="满意度调查" flowable:assignee="${userUid}" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:formProperty id="rating" name="Rating" type="enum">
-          <flowable:value id="5" name="Very Satisfied"></flowable:value>
-          <flowable:value id="4" name="Satisfied"></flowable:value>
-          <flowable:value id="3" name="Neutral"></flowable:value>
-          <flowable:value id="2" name="Dissatisfied"></flowable:value>
-          <flowable:value id="1" name="Very Dissatisfied"></flowable:value>
+        <flowable:formProperty id="rating" name="评分" type="enum">
+          <flowable:value id="5" name="非常满意"></flowable:value>
+          <flowable:value id="4" name="满意"></flowable:value>
+          <flowable:value id="3" name="一般"></flowable:value>
+          <flowable:value id="2" name="不满意"></flowable:value>
+          <flowable:value id="1" name="非常不满意"></flowable:value>
         </flowable:formProperty>
-        <flowable:formProperty id="feedback" name="Feedback" type="string"></flowable:formProperty>
+        <flowable:formProperty id="feedback" name="反馈意见" type="string"></flowable:formProperty>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
     <sequenceFlow id="sequenceFlow-0c15524d-972d-4287-a905-582a2abbbcaa" sourceRef="satisfactionSurvey" targetRef="end"></sequenceFlow>
-    <endEvent id="end" name="End Ticket"></endEvent>
+    <endEvent id="end" name="结束工单"></endEvent>
     <sequenceFlow id="sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" sourceRef="assignToGroup" targetRef="customerVerify"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_groupTicketProcess">
     <bpmndi:BPMNPlane bpmnElement="groupTicketProcess" id="BPMNPlane_groupTicketProcess">
       <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
-        <omgdc:Bounds height="30.0" width="30.0" x="30.0" y="115.0"></omgdc:Bounds>
+        <omgdc:Bounds height="30.0" width="30.0" x="130.0" y="215.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="createTicket" id="BPMNShape_createTicket">
-        <omgdc:Bounds height="80.0" width="100.0" x="105.0" y="90.0"></omgdc:Bounds>
+        <omgdc:Bounds height="80.0" width="100.0" x="205.0" y="190.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="evaluatePriority" id="BPMNShape_evaluatePriority">
-        <omgdc:Bounds height="60.0" width="100.0" x="255.0" y="100.0"></omgdc:Bounds>
+        <omgdc:Bounds height="60.0" width="100.0" x="355.0" y="200.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="assignToGroup" id="BPMNShape_assignToGroup">
-        <omgdc:Bounds height="60.0" width="100.0" x="405.0" y="100.0"></omgdc:Bounds>
+        <omgdc:Bounds height="60.0" width="100.0" x="505.0" y="200.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="slaTimer" id="BPMNShape_slaTimer">
-        <omgdc:Bounds height="31.0" width="31.0" x="470.5" y="145.5"></omgdc:Bounds>
+        <omgdc:Bounds height="31.0" width="31.0" x="570.5" y="245.5"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="slaNotification" id="BPMNShape_slaNotification">
-        <omgdc:Bounds height="60.0" width="100.0" x="495.0" y="285.0"></omgdc:Bounds>
+        <omgdc:Bounds height="60.0" width="100.0" x="595.0" y="385.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="customerVerify" id="BPMNShape_customerVerify">
-        <omgdc:Bounds height="60.0" width="100.0" x="585.0" y="100.0"></omgdc:Bounds>
+        <omgdc:Bounds height="60.0" width="100.0" x="685.0" y="200.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="satisfactionSurvey" id="BPMNShape_satisfactionSurvey">
-        <omgdc:Bounds height="60.0" width="100.0" x="735.0" y="100.0"></omgdc:Bounds>
+        <omgdc:Bounds height="60.0" width="100.0" x="835.0" y="200.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
-        <omgdc:Bounds height="28.0" width="28.0" x="885.0" y="116.0"></omgdc:Bounds>
+        <omgdc:Bounds height="28.0" width="28.0" x="985.0" y="216.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
-        <omgdi:waypoint x="59.9499984899576" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="105.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="159.94999848995764" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="205.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="204.95" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="254.9999999999364" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="304.9499999999581" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-9a5f6c89-bdd8-428f-b877-3cabfc132b2a" id="BPMNEdge_sequenceFlow-9a5f6c89-bdd8-428f-b877-3cabfc132b2a" flowable:sourceDockerX="15.5" flowable:sourceDockerY="15.5" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="501.44999457938695" y="161.0"></omgdi:waypoint>
-        <omgdi:waypoint x="545.0" y="161.0"></omgdi:waypoint>
-        <omgdi:waypoint x="545.0" y="285.0"></omgdi:waypoint>
+        <omgdi:waypoint x="601.449994579387" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="645.0" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="645.0" y="385.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" id="BPMNEdge_sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="495.0" y="315.0"></omgdi:waypoint>
-        <omgdi:waypoint x="455.0" y="315.0"></omgdi:waypoint>
-        <omgdi:waypoint x="455.0" y="159.95"></omgdi:waypoint>
+        <omgdi:waypoint x="594.999999999922" y="415.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="415.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="259.95"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-c405b332-2cc3-4866-842b-c4b0d82f653d" id="BPMNEdge_sequenceFlow-c405b332-2cc3-4866-842b-c4b0d82f653d" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="684.9499999999999" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="735.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="784.9499999999999" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="835.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-0c15524d-972d-4287-a905-582a2abbbcaa" id="BPMNEdge_sequenceFlow-0c15524d-972d-4287-a905-582a2abbbcaa" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
-        <omgdi:waypoint x="834.949999999996" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="885.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="934.949999999996" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="985.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" id="BPMNEdge_sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="504.95000000000005" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="584.9999999999723" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="604.95" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="685.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b" id="BPMNEdge_sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="354.95000000000005" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="404.9999999999364" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="454.95000000000005" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="505.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
