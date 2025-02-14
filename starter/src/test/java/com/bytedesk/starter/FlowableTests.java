@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-02 11:21:45
  * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-14 12:25:12
+ * @LastEditTime: 2025-02-14 13:13:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -94,7 +94,7 @@ public class FlowableTests {
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()
                 .name("请假流程")
-                .addClasspathResource("processes/StudentLeave.bpmn20.xml")
+                .addClasspathResource("processes/student-leave.bpmn20.xml")
                 .deploy();
         log.info("部署流程成功: {}", deployment.getId());
     }
@@ -106,7 +106,7 @@ public class FlowableTests {
         UploadEntity upload = UploadEntity.builder()
                 .fileName("请假流程")
                 .type(UploadTypeEnum.BPMN.name())
-                .fileUrl("https://example.com/processes/StudentLeave.bpmn20.xml")
+                .fileUrl("https://example.com/processes/student-leave.bpmn20.xml")
                 .build();
         
         // 从URL获取InputStream
@@ -185,7 +185,7 @@ public class FlowableTests {
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()
                 .name("请假流程")
-                .addClasspathResource("processes/StudentLeave.bpmn20.xml")
+                .addClasspathResource("processes/student-leave.bpmn20.xml")
                 .tenantId(orgUid)                         // 设置租户ID
                 .deploy();
         log.info("部署租户流程成功: deploymentId={}, tenantId={}", deployment.getId(), deployment.getTenantId());
@@ -199,7 +199,7 @@ public class FlowableTests {
         UploadEntity upload = UploadEntity.builder()
                 .fileName("请假流程")
                 .type(UploadTypeEnum.BPMN.name())
-                .fileUrl("https://example.com/processes/StudentLeave.bpmn20.xml")
+                .fileUrl("https://example.com/processes/student-leave.bpmn20.xml")
                 .build();
         
         // 从URL获取InputStream
@@ -212,5 +212,94 @@ public class FlowableTests {
                 .tenantId(orgUid)                         // 设置租户ID
                 .deploy();
         log.info("部署租户流程成功: deploymentId={}, tenantId={}", deployment.getId(), deployment.getTenantId());
+    }
+
+    @Test
+    public void testMultiTenantSameNameProcess() throws Exception {
+        String processName = "请假流程";
+        
+        // 部署第一个租户的流程
+        String tenant1 = "org_uid_1";
+        repositoryService.createDeployment()
+                .name(processName)
+                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .tenantId(tenant1)
+                .deploy();
+        
+        // 部署第二个租户的流程
+        String tenant2 = "org_uid_2";
+        repositoryService.createDeployment()
+                .name(processName)
+                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .tenantId(tenant2)
+                .deploy();
+
+        // 查询第一个租户的流程
+        List<ProcessDefinition> tenant1Processes = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionName(processName)
+                .processDefinitionTenantId(tenant1)
+                .orderByProcessDefinitionVersion().desc()
+                .list();
+
+        // 查询第二个租户的流程
+        List<ProcessDefinition> tenant2Processes = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionName(processName)
+                .processDefinitionTenantId(tenant2)
+                .orderByProcessDefinitionVersion().desc()
+                .list();
+
+        // 验证每个租户都能查到自己的流程
+        log.info("租户1的流程数量: {}", tenant1Processes.size());
+        log.info("租户2的流程数量: {}", tenant2Processes.size());
+        
+        for (ProcessDefinition pd : tenant1Processes) {
+            log.info("租户1的流程: tenantId={}, name={}, key={}, version={}", 
+                pd.getTenantId(), pd.getName(), pd.getKey(), pd.getVersion());
+        }
+        
+        for (ProcessDefinition pd : tenant2Processes) {
+            log.info("租户2的流程: tenantId={}, name={}, key={}, version={}", 
+                pd.getTenantId(), pd.getName(), pd.getKey(), pd.getVersion());
+        }
+    }
+
+    @Test
+    public void testSameTenantSameNameProcess() throws Exception {
+        String tenantId = "org_uid_1";
+        String processName = "请假流程";
+        
+        // 部署第一个流程 - 学生请假流程
+        repositoryService.createDeployment()
+                .name(processName)
+                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .tenantId(tenantId)
+                .deploy();
+        
+        // 部署第二个流程 - 员工请假流程
+        repositoryService.createDeployment()
+                .name(processName)
+                .addClasspathResource("processes/holiday-request.bpmn20.xml")
+                .tenantId(tenantId)
+                .deploy();
+
+        // 查询该租户下所有同名流程
+        List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionName(processName)
+                .processDefinitionTenantId(tenantId)
+                .orderByProcessDefinitionKey().asc()
+                .orderByProcessDefinitionVersion().desc()
+                .list();
+
+        // 验证同一租户下的同名流程
+        log.info("租户的同名流程数量: {}", processes.size());
+        
+        for (ProcessDefinition pd : processes) {
+            log.info("租户流程: tenantId={}, name={}, key={}, version={}, resourceName={}", 
+                pd.getTenantId(),
+                pd.getName(),
+                pd.getKey(),
+                pd.getVersion(),
+                pd.getResourceName());
+        }
     }
 }
