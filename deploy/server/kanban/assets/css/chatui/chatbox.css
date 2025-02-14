@@ -1,0 +1,10 @@
+.Message.left .Bubble {
+    text-align: left;
+}
+.MessageList {
+  height: 100%;
+}
+/* https://chatui.io/sdk/faq */
+/* .ChatFooter .Composer-input {
+  min-height: 68px;
+} */
