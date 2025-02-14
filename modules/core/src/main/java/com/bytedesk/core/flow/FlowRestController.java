@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.process;
+package com.bytedesk.core.flow;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -26,49 +26,49 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/ticket/process")
+@RequestMapping("/api/v1/flow")
 @AllArgsConstructor
-public class TicketProcessRestController extends BaseRestController<TicketProcessRequest> {
+public class FlowRestController extends BaseRestController<FlowRequest> {
 
-    private final TicketProcessRestService processService;
+    private final FlowRestService flowService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(TicketProcessRequest request) {
+    public ResponseEntity<?> queryByOrg(FlowRequest request) {
         
-        Page<TicketProcessResponse> process = processService.queryByOrg(request);
+        Page<FlowResponse> flow = flowService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(flow));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(TicketProcessRequest request) {
+    public ResponseEntity<?> queryByUser(FlowRequest request) {
         
-        Page<TicketProcessResponse> process = processService.queryByUser(request);
+        Page<FlowResponse> flow = flowService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(flow));
     }
 
     @Override
-    public ResponseEntity<?> create(TicketProcessRequest request) {
+    public ResponseEntity<?> create(FlowRequest request) {
         
-        TicketProcessResponse process = processService.create(request);
+        FlowResponse flow = flowService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(flow));
     }
 
     @Override
-    public ResponseEntity<?> update(TicketProcessRequest request) {
+    public ResponseEntity<?> update(FlowRequest request) {
         
-        TicketProcessResponse process = processService.update(request);
+        FlowResponse flow = flowService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(flow));
     }
 
     @Override
-    public ResponseEntity<?> delete(TicketProcessRequest request) {
+    public ResponseEntity<?> delete(FlowRequest request) {
         
-        processService.delete(request);
+        flowService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

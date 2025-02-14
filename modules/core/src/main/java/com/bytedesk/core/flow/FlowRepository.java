@@ -11,16 +11,16 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.process;
+package com.bytedesk.core.flow;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface TicketProcessRepository extends JpaRepository<TicketProcessEntity, Long>, JpaSpecificationExecutor<TicketProcessEntity> {
+public interface FlowRepository extends JpaRepository<FlowEntity, Long>, JpaSpecificationExecutor<FlowEntity> {
 
-    Optional<TicketProcessEntity> findByUid(String uid);
+    Optional<FlowEntity> findByUid(String uid);
 
     // Boolean existsByPlatform(String platform);
 }

@@ -11,17 +11,17 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.process;
+package com.bytedesk.core.flow;
 
-public class TicketProcessPermissions {
+public class FlowPermissions {
 
-    public static final String PROCESS_PREFIX = "PROCESS_";
-    // TicketProcess permissions
-    public static final String PROCESS_CREATE = "hasAuthority('PROCESS_CREATE')";
-    public static final String PROCESS_READ = "hasAuthority('PROCESS_READ')";
-    public static final String PROCESS_UPDATE = "hasAuthority('PROCESS_UPDATE')";
-    public static final String PROCESS_DELETE = "hasAuthority('PROCESS_DELETE')";
-    public static final String PROCESS_EXPORT = "hasAuthority('PROCESS_EXPORT')";
+    public static final String FLOW_PREFIX = "FLOW_";
+    // Flow permissions
+    public static final String FLOW_CREATE = "hasAuthority('FLOW_CREATE')";
+    public static final String FLOW_READ = "hasAuthority('FLOW_READ')";
+    public static final String FLOW_UPDATE = "hasAuthority('FLOW_UPDATE')";
+    public static final String FLOW_DELETE = "hasAuthority('FLOW_DELETE')";
+    public static final String FLOW_EXPORT = "hasAuthority('FLOW_EXPORT')";
 
     // 
     

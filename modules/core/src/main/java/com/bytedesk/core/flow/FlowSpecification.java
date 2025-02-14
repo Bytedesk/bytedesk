@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.process;
+package com.bytedesk.core.flow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +24,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TicketProcessSpecification extends BaseSpecification {
+public class FlowSpecification extends BaseSpecification {
     
-    public static Specification<TicketProcessEntity> search(TicketProcessRequest request) {
+    public static Specification<FlowEntity> search(FlowRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

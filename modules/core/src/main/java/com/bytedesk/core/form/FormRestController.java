@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.process;
+package com.bytedesk.core.form;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,47 +28,47 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/ticket/process")
 @AllArgsConstructor
-public class TicketProcessRestController extends BaseRestController<TicketProcessRequest> {
+public class FormRestController extends BaseRestController<FormRequest> {
 
-    private final TicketProcessRestService processService;
+    private final FormRestService formService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(TicketProcessRequest request) {
+    public ResponseEntity<?> queryByOrg(FormRequest request) {
         
-        Page<TicketProcessResponse> process = processService.queryByOrg(request);
+        Page<FormResponse> form = formService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(form));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(TicketProcessRequest request) {
+    public ResponseEntity<?> queryByUser(FormRequest request) {
         
-        Page<TicketProcessResponse> process = processService.queryByUser(request);
+        Page<FormResponse> form = formService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(form));
     }
 
     @Override
-    public ResponseEntity<?> create(TicketProcessRequest request) {
+    public ResponseEntity<?> create(FormRequest request) {
         
-        TicketProcessResponse process = processService.create(request);
+        FormResponse ticket_process = formService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(ticket_process));
     }
 
     @Override
-    public ResponseEntity<?> update(TicketProcessRequest request) {
+    public ResponseEntity<?> update(FormRequest request) {
         
-        TicketProcessResponse process = processService.update(request);
+        FormResponse ticket_process = formService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(process));
+        return ResponseEntity.ok(JsonResult.success(ticket_process));
     }
 
     @Override
-    public ResponseEntity<?> delete(TicketProcessRequest request) {
+    public ResponseEntity<?> delete(FormRequest request) {
         
-        processService.delete(request);
+        formService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
