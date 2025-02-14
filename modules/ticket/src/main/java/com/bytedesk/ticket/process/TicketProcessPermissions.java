@@ -15,13 +15,13 @@ package com.bytedesk.ticket.process;
 
 public class TicketProcessPermissions {
 
-    public static final String TAG_PREFIX = "TAG_";
+    public static final String TICKET_PROCESS_PREFIX = "TICKET_PROCESS_";
     // TicketProcess permissions
-    public static final String TAG_CREATE = "hasAuthority('TAG_CREATE')";
-    public static final String TAG_READ = "hasAuthority('TAG_READ')";
-    public static final String TAG_UPDATE = "hasAuthority('TAG_UPDATE')";
-    public static final String TAG_DELETE = "hasAuthority('TAG_DELETE')";
-    public static final String TAG_EXPORT = "hasAuthority('TAG_EXPORT')";
+    public static final String TICKET_PROCESS_CREATE = "hasAuthority('TICKET_PROCESS_CREATE')";
+    public static final String TICKET_PROCESS_READ = "hasAuthority('TICKET_PROCESS_READ')";
+    public static final String TICKET_PROCESS_UPDATE = "hasAuthority('TICKET_PROCESS_UPDATE')";
+    public static final String TICKET_PROCESS_DELETE = "hasAuthority('TICKET_PROCESS_DELETE')";
+    public static final String TICKET_PROCESS_EXPORT = "hasAuthority('TICKET_PROCESS_EXPORT')";
 
     // 
     
