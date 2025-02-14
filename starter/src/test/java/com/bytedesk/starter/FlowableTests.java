@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-02 11:21:45
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 12:06:33
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-14 12:25:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
 package com.bytedesk.starter;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,15 +53,38 @@ public class FlowableTests {
     @Autowired
     private HistoryService historyService;
 
-    /**
-     * 查询流程定义列表, 涉及到 act_re_procdef表，部署成功会新增记录
-     */
+    // 查询全部流程定义列表, 涉及到 act_re_procdef表，部署成功会新增记录
     @Test
     public void testProcessDefinition() {
         List<ProcessDefinition> processList = repositoryService.createProcessDefinitionQuery().list();
         for (ProcessDefinition processDefinition : processList) {
-            log.info("ProcessDefinition name = {},deploymentId = {}", processDefinition.getName(),
-                    processDefinition.getDeploymentId());
+            log.info("流程定义 name={}, key={}, version={}, deploymentId={}", 
+                processDefinition.getName(),
+                processDefinition.getKey(),
+                processDefinition.getVersion(),
+                processDefinition.getDeploymentId());
+        }
+    }
+
+    /**
+     * 自定义过滤条件查询流程定义列表, 涉及到 act_re_procdef表，部署成功会新增记录
+     */
+    @Test
+    public void testFilterProcessDefinition() {
+        List<ProcessDefinition> processList = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("StudentLeave")           // 按流程定义key过滤
+                .processDefinitionName("请假流程")              // 按流程定义名称过滤
+                .latestVersion()                               // 只查询最新版本
+                .active()                                      // 查询激活的流程
+                .orderByProcessDefinitionVersion().desc()      // 按版本降序排序
+                .list();
+
+        for (ProcessDefinition processDefinition : processList) {
+            log.info("流程定义 name={}, key={}, version={}, deploymentId={}", 
+                processDefinition.getName(),
+                processDefinition.getKey(),
+                processDefinition.getVersion(),
+                processDefinition.getDeploymentId());
         }
     }
 
@@ -77,16 +101,16 @@ public class FlowableTests {
 
     // 通过上传文件部署流程
     @Test
-    public void testAddProcessDefinitionByUploadFile() {
+    public void testAddProcessDefinitionByUploadFile() throws Exception {
         // 上传文件
         UploadEntity upload = UploadEntity.builder()
                 .fileName("请假流程")
                 .type(UploadTypeEnum.BPMN.name())
-                .fileUrl("")
+                .fileUrl("https://example.com/processes/StudentLeave.bpmn20.xml")
                 .build();
         
-        // 将文件URL转换为InputStream
-        InputStream inputStream = getClass().getResourceAsStream("/processes/StudentLeave.bpmn20.xml");
+        // 从URL获取InputStream
+        InputStream inputStream = new URL(upload.getFileUrl()).openStream();
         
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()
@@ -132,5 +156,61 @@ public class FlowableTests {
         for (HistoricActivityInstance activity : activities) {
             System.out.println(activity.getActivityName());
         }
+    }
+
+    // 按租户ID查询流程定义列表
+    @Test
+    public void testProcessDefinitionByTenant() {
+        String orgUid = "df_org_uid";
+        List<ProcessDefinition> processList = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionTenantId(orgUid)          // 按租户ID过滤
+                .latestVersion()                           // 只查询最新版本
+                .active()                                  // 查询激活的流程
+                .orderByProcessDefinitionVersion().desc()  // 按版本降序排序
+                .list();
+
+        for (ProcessDefinition processDefinition : processList) {
+            log.info("租户流程定义 tenantId={}, name={}, key={}, version={}", 
+                processDefinition.getTenantId(),
+                processDefinition.getName(),
+                processDefinition.getKey(),
+                processDefinition.getVersion());
+        }
+    }
+
+    // 部署带租户ID的流程定义
+    @Test
+    public void testAddProcessDefinitionWithTenant() {
+        String orgUid = "df_org_uid";
+        // 部署流程
+        Deployment deployment = repositoryService.createDeployment()
+                .name("请假流程")
+                .addClasspathResource("processes/StudentLeave.bpmn20.xml")
+                .tenantId(orgUid)                         // 设置租户ID
+                .deploy();
+        log.info("部署租户流程成功: deploymentId={}, tenantId={}", deployment.getId(), deployment.getTenantId());
+    }
+
+    // 通过上传文件部署带租户ID的流程
+    @Test
+    public void testAddProcessDefinitionByUploadFileWithTenant() throws Exception {
+        String orgUid = "df_org_uid";
+        // 上传文件
+        UploadEntity upload = UploadEntity.builder()
+                .fileName("请假流程")
+                .type(UploadTypeEnum.BPMN.name())
+                .fileUrl("https://example.com/processes/StudentLeave.bpmn20.xml")
+                .build();
+        
+        // 从URL获取InputStream
+        InputStream inputStream = new URL(upload.getFileUrl()).openStream();
+        
+        // 部署流程
+        Deployment deployment = repositoryService.createDeployment()
+                .name(upload.getFileName())
+                .addInputStream(upload.getFileName(), inputStream)
+                .tenantId(orgUid)                         // 设置租户ID
+                .deploy();
+        log.info("部署租户流程成功: deploymentId={}, tenantId={}", deployment.getId(), deployment.getTenantId());
     }
 }
