@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-02 11:21:45
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-14 14:10:46
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-14 14:42:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,7 +72,7 @@ public class FlowableTests {
     @Test
     public void testFilterProcessDefinition() {
         List<ProcessDefinition> processList = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey("StudentLeave")           // 按流程定义key过滤
+                .processDefinitionKey("StudentLeaveSimple")           // 按流程定义key过滤
                 .processDefinitionName("请假流程")              // 按流程定义名称过滤
                 .latestVersion()                               // 只查询最新版本
                 .active()                                      // 查询激活的流程
@@ -94,7 +94,7 @@ public class FlowableTests {
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()
                 .name("请假流程")
-                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .addClasspathResource("processes/student-leave-simple.bpmn20.xml")
                 .deploy();
         log.info("部署流程成功: {}", deployment.getId());
     }
@@ -106,7 +106,7 @@ public class FlowableTests {
         UploadEntity upload = UploadEntity.builder()
                 .fileName("请假流程")
                 .type(UploadTypeEnum.BPMN.name())
-                .fileUrl("https://example.com/processes/student-leave.bpmn20.xml")
+                .fileUrl("https://example.com/processes/student-leave-simple.bpmn20.xml")
                 .build();
         
         // 从URL获取InputStream
@@ -127,7 +127,7 @@ public class FlowableTests {
         Map<String, Object> map = new HashMap<>();
         map.put("day", 5);
         map.put("studentUser", "小明");
-        ProcessInstance studentLeave = runtimeService.startProcessInstanceByKey("StudentLeave", map);
+        ProcessInstance studentLeave = runtimeService.startProcessInstanceByKey("StudentLeaveSimple", map);
         Task task = taskService.createTaskQuery().processInstanceId(studentLeave.getId()).singleResult();
         taskService.complete(task.getId());
 
@@ -185,7 +185,7 @@ public class FlowableTests {
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()
                 .name("请假流程")
-                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .addClasspathResource("processes/student-leave-simple.bpmn20.xml")
                 .tenantId(orgUid)                         // 设置租户ID
                 .deploy();
         log.info("部署租户流程成功: deploymentId={}, tenantId={}", deployment.getId(), deployment.getTenantId());
@@ -352,7 +352,7 @@ public class FlowableTests {
         UploadEntity upload = UploadEntity.builder()
                 .fileName("请假流程")
                 .type(UploadTypeEnum.BPMN.name())
-                .fileUrl("https://example.com/processes/student-leave.bpmn20.xml")
+                .fileUrl("https://example.com/processes/student-leave-simple.bpmn20.xml")
                 .build();
         
         // 从URL获取InputStream
@@ -375,7 +375,7 @@ public class FlowableTests {
         String tenant1 = "org_uid_1";
         repositoryService.createDeployment()
                 .name(processName)
-                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .addClasspathResource("processes/student-leave-simple.bpmn20.xml")
                 .tenantId(tenant1)
                 .deploy();
         
@@ -383,7 +383,7 @@ public class FlowableTests {
         String tenant2 = "org_uid_2";
         repositoryService.createDeployment()
                 .name(processName)
-                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .addClasspathResource("processes/student-leave-simple.bpmn20.xml")
                 .tenantId(tenant2)
                 .deploy();
 
@@ -424,7 +424,7 @@ public class FlowableTests {
         // 部署第一个流程 - 学生请假流程
         repositoryService.createDeployment()
                 .name(processName)
-                .addClasspathResource("processes/student-leave.bpmn20.xml")
+                .addClasspathResource("processes/student-leave-simple.bpmn20.xml")
                 .tenantId(tenantId)
                 .deploy();
         

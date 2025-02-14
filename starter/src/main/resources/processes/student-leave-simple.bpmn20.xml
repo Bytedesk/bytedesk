@@ -6,7 +6,7 @@
   xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
   typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
   targetNamespace="http://www.flowable.org/processdef">
-  <process id="StudentLeave" name="学生请假流程" isExecutable="true">
+  <process id="StudentLeaveSimple" name="学生请假简单流程" isExecutable="true">
     <startEvent id="start" name="开始" flowable:formFieldValidation="true"></startEvent>
     <userTask id="apply" name="请假申请" flowable:assignee="${studentUser}"
       flowable:formFieldValidation="true">
@@ -14,11 +14,11 @@
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
-    <userTask id="teacherPass" name="老师审批" flowable:candidateGroups="${teacherGroup}"
+    <userTask id="teacherPass" name="老师审批" flowable:candidateGroups="teachers"
       flowable:formFieldValidation="true"></userTask>
     <exclusiveGateway id="judgeTask" name="判断是否大于2天"></exclusiveGateway>
     <endEvent id="end" name="结束"></endEvent>
-    <userTask id="principalPass" name="校长审批" flowable:candidateGroups="${principalGroup}"
+    <userTask id="principalPass" name="校长审批" flowable:candidateGroups="principals"
       flowable:formFieldValidation="true"></userTask>
     <sequenceFlow id="principalCheck" name="通过" sourceRef="principalPass" targetRef="end">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${outcome=='通过'}]]></conditionExpression>
