@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 15:58:22
+ * @LastEditTime: 2025-02-14 11:33:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,9 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.kbase.upload.UploadEntity;
+import com.bytedesk.kbase.upload.UploadTypeEnum;
+import com.bytedesk.kbase.upload.event.UploadCreateEvent;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.event.TicketUpdateEvent;
@@ -105,6 +108,18 @@ public class TicketEventListener {
     @EventListener
     public void handleTicketUpdateEvent(TicketUpdateEvent event) {
         log.info("TicketEventListener handleTicketUpdateEvent: {}", event);
+    }
+
+    // 监听上传BPMN流程图
+    @EventListener
+    public void onUploadCreateEvent(UploadCreateEvent event) {
+        UploadEntity upload = event.getUpload();
+        log.info("TicketEventListener upload bpmn create: {}", upload.toString());
+        // 上传BPMN流程图
+        if (upload.getType().equals(UploadTypeEnum.BPMN.name())) {
+            // 启动流程
+            // ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(upload.getFileName());
+        }
     }
     
 }

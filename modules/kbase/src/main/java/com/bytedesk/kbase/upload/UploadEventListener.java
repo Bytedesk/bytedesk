@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:57:35
+ * @LastEditTime: 2025-02-14 11:30:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,10 +85,6 @@ public class UploadEventListener {
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
             // 通知python ai模块处理
             uploadVectorStore.readSplitWriteToVectorStore(upload);
-            // redisPubsubService.sendParseFileMessage(
-            //         upload.getUid(),
-            //         upload.getFileUrl(),
-            //         upload.getKbUid());
             return;
         }
         // 导入Excel文件

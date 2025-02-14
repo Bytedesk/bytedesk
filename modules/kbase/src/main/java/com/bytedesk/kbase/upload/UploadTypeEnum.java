@@ -27,6 +27,7 @@ public enum UploadTypeEnum {
     MEMBER, // 导入成员
     CHAT, // 聊天对话
     TICKET, // 工单
+    BPMN, // 流程图
     ATTACHMENT; // 附件
 
     // 根据字符串查找对应的枚举常量
