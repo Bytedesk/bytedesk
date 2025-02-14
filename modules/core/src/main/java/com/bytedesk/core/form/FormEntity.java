@@ -37,8 +37,10 @@ import lombok.experimental.Accessors;
 @Table(name = "bytedesk_core_form")
 public class FormEntity extends BaseEntity {
 
+    @Column(name = "form_name")
     private String name;
 
+    @Column(name = "form_key")
     private String key;
 
     private String description;
