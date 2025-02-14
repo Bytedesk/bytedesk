@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 17:30:17
+ * @LastEditTime: 2025-02-14 18:10:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/ticket/process")
+@RequestMapping("/api/v1/form")
 @AllArgsConstructor
 public class FormRestController extends BaseRestController<FormRequest> {
 
