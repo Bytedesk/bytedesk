@@ -13,12 +13,21 @@
     exporterVersion="6.8.0">
     <process id="groupTicketProcess" name="Group Ticket Process" isExecutable="true">
         <startEvent id="start" name="Create Ticket" flowable:formFieldValidation="true"></startEvent>
-        <sequenceFlow id="sequenceFlow-bc10ee85-13ff-41cb-9801-e3312a63a5c9" sourceRef="start"
-            targetRef="evaluatePriority"></sequenceFlow>
-        <!-- <businessRuleTask id="evaluatePriority" name="Evaluate Priority" 
-            flowable:decisionRef="ticketPriorityRules"
-            flowable:decisionRefBinding="latest"
-            flowable:resultVariable="priorityResult"></businessRuleTask> -->
+        <userTask id="createTicket" name="Create Ticket" flowable:assignee="${creatorUser}" 
+            flowable:formFieldValidation="true">
+            <documentation>Create a new ticket with details</documentation>
+            <extensionElements>
+                <flowable:formProperty id="title" name="Title" type="string" required="true"></flowable:formProperty>
+                <flowable:formProperty id="description" name="Description" type="string" required="true"></flowable:formProperty>
+                <flowable:formProperty id="priority" name="Priority" type="enum">
+                    <flowable:value id="low" name="Low"></flowable:value>
+                    <flowable:value id="medium" name="Medium"></flowable:value>
+                    <flowable:value id="high" name="High"></flowable:value>
+                </flowable:formProperty>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="createTicket"></sequenceFlow>
+        <sequenceFlow id="flow2" sourceRef="createTicket" targetRef="evaluatePriority"></sequenceFlow>
         <serviceTask id="evaluatePriority" name="Evaluate Priority"
             flowable:delegateExpression="${ticketEvaluatePriorityDelegate}"/>
         <sequenceFlow id="sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b"
@@ -48,9 +57,9 @@
             sourceRef="slaNotification" targetRef="assignToGroup"></sequenceFlow>
         <sequenceFlow id="sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e"
             sourceRef="assignToGroup" targetRef="customerVerify"></sequenceFlow>
-        <userTask id="customerVerify" name="Customer Verify" flowable:assignee="${userUid}"
+        <userTask id="customerVerify" name="Customer Verify" flowable:assignee="${creatorUser}"
             flowable:formFieldValidation="true">
-            <documentation>Customer verifies if the issue is resolved</documentation>
+            <documentation>Creator verifies if the issue is resolved</documentation>
             <extensionElements>
                 <flowable:formProperty id="satisfied" name="Satisfied" type="boolean"
                     required="true"></flowable:formProperty>
@@ -83,6 +92,9 @@
             <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
                 <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="115.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="createTicket" id="BPMNShape_createTicket">
+                <omgdc:Bounds height="80" width="100" x="180" y="90"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="evaluatePriority" id="BPMNShape_evaluatePriority">
                 <omgdc:Bounds height="60.0" width="100.0" x="180.0" y="100.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
@@ -105,14 +117,22 @@
             <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
                 <omgdc:Bounds height="28.0" width="28.0" x="780.0" y="195.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
-            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-bc10ee85-13ff-41cb-9801-e3312a63a5c9"
-                id="BPMNEdge_sequenceFlow-bc10ee85-13ff-41cb-9801-e3312a63a5c9"
+            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1"
                 flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
                 flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
                 <omgdi:waypoint x="129.9499750044467" y="130.0"></omgdi:waypoint>
                 <omgdi:waypoint x="142.0" y="130.0"></omgdi:waypoint>
                 <omgdi:waypoint x="142.0" y="130.0"></omgdi:waypoint>
                 <omgdi:waypoint x="179.99999999997692" y="130.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2"
+                flowable:sourceDockerX="15.500000000000002"
+                flowable:sourceDockerY="15.500000000000002" flowable:targetDockerX="50.0"
+                flowable:targetDockerY="30.0">
+                <omgdi:waypoint x="410.5843666811879" y="256.1566324820013"></omgdi:waypoint>
+                <omgdi:waypoint x="410.0" y="330.0"></omgdi:waypoint>
+                <omgdi:waypoint x="230.0" y="330.0"></omgdi:waypoint>
+                <omgdi:waypoint x="230.0" y="319.95"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="sequenceFlow-9a5f6c89-bdd8-428f-b877-3cabfc132b2a"
                 id="BPMNEdge_sequenceFlow-9a5f6c89-bdd8-428f-b877-3cabfc132b2a"

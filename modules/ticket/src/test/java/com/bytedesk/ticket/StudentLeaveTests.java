@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-class TicketApplicationTests {
+class StudentLeaveTests {
 
 	@Autowired
 	private ProcessEngine processEngine;
