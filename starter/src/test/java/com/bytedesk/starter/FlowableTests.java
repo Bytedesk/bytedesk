@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-02 11:21:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 11:59:32
+ * @LastEditTime: 2025-02-14 12:06:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.starter;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,10 +84,14 @@ public class FlowableTests {
                 .type(UploadTypeEnum.BPMN.name())
                 .fileUrl("")
                 .build();
-        // 将上传文件内容，部署流程
+        
+        // 将文件URL转换为InputStream
+        InputStream inputStream = getClass().getResourceAsStream("/processes/StudentLeave.bpmn20.xml");
+        
+        // 部署流程
         Deployment deployment = repositoryService.createDeployment()
-                .name("请假流程")
-                .addClasspathResource("processes/StudentLeave.bpmn20.xml")
+                .name(upload.getFileName())
+                .addInputStream(upload.getFileName(), inputStream)
                 .deploy();
         log.info("部署流程成功: {}", deployment.getId());
     }
