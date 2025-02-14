@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.process;
+package com.bytedesk.core.flow;
 
 import java.util.Optional;
 
@@ -32,70 +32,70 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TicketProcessRestService extends BaseRestService<TicketProcessEntity, TicketProcessRequest, TicketProcessResponse> {
+public class FlowRestService extends BaseRestService<FlowEntity, FlowRequest, FlowResponse> {
 
-    private final TicketProcessRepository processRepository;
+    private final FlowRepository flowRepository;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
     @Override
-    public Page<TicketProcessResponse> queryByOrg(TicketProcessRequest request) {
+    public Page<FlowResponse> queryByOrg(FlowRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
-        Specification<TicketProcessEntity> spec = TicketProcessSpecification.search(request);
-        Page<TicketProcessEntity> page = processRepository.findAll(spec, pageable);
+        Specification<FlowEntity> spec = FlowSpecification.search(request);
+        Page<FlowEntity> page = flowRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<TicketProcessResponse> queryByUser(TicketProcessRequest request) {
+    public Page<FlowResponse> queryByUser(FlowRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "process", key = "#uid", unless="#result==null")
+    @Cacheable(value = "flow", key = "#uid", unless="#result==null")
     @Override
-    public Optional<TicketProcessEntity> findByUid(String uid) {
-        return processRepository.findByUid(uid);
+    public Optional<FlowEntity> findByUid(String uid) {
+        return flowRepository.findByUid(uid);
     }
 
     @Override
-    public TicketProcessResponse create(TicketProcessRequest request) {
+    public FlowResponse create(FlowRequest request) {
         
-        TicketProcessEntity entity = modelMapper.map(request, TicketProcessEntity.class);
+        FlowEntity entity = modelMapper.map(request, FlowEntity.class);
         entity.setUid(uidUtils.getUid());
 
-        TicketProcessEntity savedEntity = save(entity);
+        FlowEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create process failed");
+            throw new RuntimeException("Create flow failed");
         }
         return convertToResponse(savedEntity);
     }
 
     @Override
-    public TicketProcessResponse update(TicketProcessRequest request) {
-        Optional<TicketProcessEntity> optional = processRepository.findByUid(request.getUid());
+    public FlowResponse update(FlowRequest request) {
+        Optional<FlowEntity> optional = flowRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            TicketProcessEntity entity = optional.get();
+            FlowEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            TicketProcessEntity savedEntity = save(entity);
+            FlowEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update process failed");
+                throw new RuntimeException("Update flow failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("TicketProcess not found");
+            throw new RuntimeException("Flow not found");
         }
     }
 
     @Override
-    public TicketProcessEntity save(TicketProcessEntity entity) {
+    public FlowEntity save(FlowEntity entity) {
         try {
-            return processRepository.save(entity);
+            return flowRepository.save(entity);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -103,31 +103,31 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<TicketProcessEntity> optional = processRepository.findByUid(uid);
+        Optional<FlowEntity> optional = flowRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // processRepository.delete(optional.get());
+            // flowRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("TicketProcess not found");
+            throw new RuntimeException("Flow not found");
         }
     }
 
     @Override
-    public void delete(TicketProcessRequest request) {
+    public void delete(FlowRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TicketProcessEntity entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FlowEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public TicketProcessResponse convertToResponse(TicketProcessEntity entity) {
-        return modelMapper.map(entity, TicketProcessResponse.class);
+    public FlowResponse convertToResponse(FlowEntity entity) {
+        return modelMapper.map(entity, FlowResponse.class);
     }
     
 }
