@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 12:34:14
+ * @LastEditTime: 2025-02-14 13:25:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -35,7 +37,6 @@ import com.bytedesk.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.event.TicketUpdateEvent;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRestService;
-import com.bytedesk.ticket.ticket.TicketTypeEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,8 @@ public class TicketEventListener {
 
     private final TicketRestService ticketRestService;
 
+    private final RepositoryService repositoryService;
+
     @Order(5)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -56,9 +59,13 @@ public class TicketEventListener {
         String orgUid = organization.getUid();
         log.info("ticket - organization created: {}", orgUid);
         // 为每个组织加载自己的流程文件
-        // 1. 查询流程文件
-        // 2. 加载流程文件
-        // 3. 部署流程
+        // 部署流程
+        Deployment deployment = repositoryService.createDeployment()
+                .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                .addClasspathResource("processes/group-ticket-process.bpmn20.xml")
+                .tenantId(orgUid)                         // 设置租户ID
+                .deploy();
+        log.info("部署租户流程成功: deploymentId={}, tenantId={}", deployment.getId(), deployment.getTenantId());
     }
 
     @EventListener
@@ -71,14 +78,15 @@ public class TicketEventListener {
         variables.put("ticketUid", ticket.getUid());
         variables.put("orgUid", ticket.getOrgUid());
         variables.put("userUid", JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
-        String processKey = null;
-        if (ticket.getType().equals(TicketTypeEnum.AGENT.name())) {
-            processKey = TicketConsts.TICKET_PROCESS_KEY_AGENT;
-            variables.put("agentUid", JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid());
-        } else {
-            processKey = TicketConsts.TICKET_PROCESS_KEY_GROUP;
-            variables.put("workgroupUid", JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
-        }
+        // String processKey = null;
+        // if (ticket.getType().equals(TicketTypeEnum.AGENT.name())) {
+        //     processKey = TicketConsts.TICKET_PROCESS_KEY_AGENT;
+        //     variables.put("agentUid", JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid());
+        // } else {
+        // 默认是工作组工单，暂不启用一对一
+        String processKey = TicketConsts.TICKET_PROCESS_KEY_GROUP;
+        variables.put("workgroupUid", JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
+        // }
         // 根据不同优先级设置不同的SLA时间
         switch (ticket.getPriority()) {
             case "CRITICAL":
@@ -106,7 +114,7 @@ public class TicketEventListener {
         // 启动流程时指定租户   
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey(processKey)
-            // .tenantId(ticket.getOrgUid())
+            .tenantId(ticket.getOrgUid())
             .variables(variables)
             .start();
         log.info("TicketEventListener processInstance: {}", processInstance.getId());
