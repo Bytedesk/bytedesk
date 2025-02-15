@@ -84,10 +84,12 @@ services:
       # Upload config
       BYTEDESK_UPLOAD_TYPE: local
       BYTEDESK_UPLOAD_DIR: /app/uploads
-      BYTEDESK_UPLOAD_URL: http://localhost:9003
+      # 上传文件的访问地址，请修改为服务器实际的地址
+      BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
       # Knowledge base config
       BYTEDESK_KBASE_THEME: default
       BYTEDESK_KBASE_HTML_PATH: helpcenter
+      # 知识库的访问地址，请修改为服务器实际的地址
       BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
       # Socket config
       BYTEDESK_SOCKET_HOST: 0.0.0.0
