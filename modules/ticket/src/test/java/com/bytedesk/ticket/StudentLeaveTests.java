@@ -217,6 +217,10 @@ class StudentLeaveTests {
 		// 先创建几个请假申请
 		createLeaveProcesses();
 
+		// 用于查询当前正在运行的任务
+		// 只能查到未完成的任务
+		// 主要用于任务处理、分配等操作
+		// 可以查询待办任务、候选任务等
 		// 查询学生的所有请假申请
 		List<Task> studentTasks = taskService.createTaskQuery()
 			.taskAssignee("student1")  // 查询指定学生的任务
@@ -231,6 +235,10 @@ class StudentLeaveTests {
 			assertEquals("请假申请", task.getName());
 		});
 
+		// - 用于查询历史流程实例数据
+		// 可以查询已完成和未完成的流程
+		// 包含流程的完整历史记录
+		// 用于统计分析、审计等场景
 		// 查询学生的历史请假记录
 		List<HistoricProcessInstance> historicInstances = processEngine.getHistoryService()
 			.createHistoricProcessInstanceQuery()
@@ -238,6 +246,11 @@ class StudentLeaveTests {
 			.orderByProcessInstanceStartTime()
 			.desc()
 			.list();
+
+		// 数据范围：Task 查询运行时数据，Historic 查询历史数据
+		// 使用场景：Task 用于流程控制，Historic 用于历史追溯
+		// 数据持久性：Task 数据会随任务完成而删除，Historic 数据会永久保存
+		// 性能影响：Task 查询更轻量，Historic 查询可能涉及更多数据
 
 		assertNotNull(historicInstances);
 		historicInstances.forEach(instance -> {
@@ -560,6 +573,11 @@ class StudentLeaveTests {
 			.list();
 		
 		teacherTasks.forEach(task -> {
+			// 1. 先认领任务
+			String teacherId = "teacher1";  // 具体教师ID
+			taskService.claim(task.getId(), teacherId);
+			
+			// 2. 再完成任务
 			Map<String, Object> teacherVariables = new HashMap<>();
 			teacherVariables.put("outcome", "通过");
 			taskService.complete(task.getId(), teacherVariables);
