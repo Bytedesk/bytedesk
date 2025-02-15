@@ -804,6 +804,43 @@ class StudentLeaveTests {
 		}
 	}
 
+	// 1. 查询教师组的候选任务（未认领）
+	@Test
+	void testUnclaimedTeacherTasks() {
+		// 查询教师组的候选任务（未认领）
+		List<Task> unclaimedTasks = taskService.createTaskQuery()
+			.taskCandidateGroup("teachers")
+			.orderByTaskCreateTime()
+			.desc()
+			.list();
+		log.info("教师组未认领任务数: {}", unclaimedTasks.size());
+	}
+
+	// 2. 查询特定教师已认领的任务
+	@Test
+	void testClaimedTeacherTasks() {
+		// 查询特定教师已认领的任务
+		String teacherId = "teacher1";
+		List<Task> claimedTasks = taskService.createTaskQuery()
+			.taskAssignee(teacherId)      // 查询已分配给特定教师的任务
+			.orderByTaskCreateTime()
+			.desc()
+			.list();
+		log.info("教师{}已认领任务数: {}", teacherId, claimedTasks.size());
+	}
+
+	// 3. 查询教师组所有相关任务（包括已认领和未认领）
+	@Test
+	void testAllTeacherTasks() {
+		// 查询教师组所有相关任务（包括已认领和未认领）
+		List<Task> allTeacherTasks = taskService.createTaskQuery()
+			.taskCandidateOrAssigned("teachers")  // 候选组任务或已分配任务
+			.orderByTaskCreateTime()
+			.desc()
+			.list();
+		log.info("教师组总任务数: {}", allTeacherTasks.size());
+	}
+
 	@Test
 	void contextLoads() {
 	}
