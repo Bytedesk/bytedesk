@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 13:18:09
+ * @LastEditTime: 2025-02-15 14:00:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,9 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TicketProcessRestService extends BaseRestService<TicketProcessEntity, TicketProcessRequest, TicketProcessResponse> {
@@ -87,14 +89,17 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
             }
         }
         // 流程key不能重复
-        Optional<TicketProcessEntity> optionalKey = processRepository.findByKey(request.getKey());
+        Optional<TicketProcessEntity> optionalKey = processRepository.findByKeyAndOrgUid(request.getKey(), request.getOrgUid());
         if (optionalKey.isPresent()) {
-            throw new RuntimeException("Process key already exists");
+            throw new RuntimeException("Process key " + request.getKey() + " in org " + request.getOrgUid() + " already exists");
         }
 
         UserEntity user = authService.getUser();
         if (user != null) {
             request.setUserUid(user.getUid());
+        } else {
+            // 如果用户为空，则设置为系统用户
+            log.warn("TicketProcessRestService create process, user is null");
         }
         
         TicketProcessEntity entity = modelMapper.map(request, TicketProcessEntity.class);

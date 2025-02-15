@@ -20,7 +20,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
-import com.bytedesk.ticket.listener.TicketEntityListener;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
