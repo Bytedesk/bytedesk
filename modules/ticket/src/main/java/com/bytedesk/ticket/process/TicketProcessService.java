@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 15:10:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 16:01:21
+ * @LastEditTime: 2025-02-15 16:35:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -96,51 +96,45 @@ public class TicketProcessService {
         if (!ticketProcess.isPresent()) {
             throw new RuntimeException("流程定义不存在" + request.getUid());
         }
-        String orgUid = ticketProcess.get().getOrgUid();
-        String processKey = ticketProcess.get().getKey();
         
-        // 查询指定租户的所有版本流程定义
+        // 获取部署ID
+        String deploymentId = ticketProcess.get().getDeploymentId();
+        if (deploymentId == null) {
+            log.warn("流程未部署，无需取消部署: processUid={}", request.getUid());
+            return List.of();
+        }
+
+        // 先查询要删除的流程定义
         List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(processKey)
-                .processDefinitionTenantId(orgUid)
-                .orderByProcessDefinitionVersion().desc()
+                .deploymentId(deploymentId)  // 使用部署ID查询
                 .list();
         
         log.info("删除前流程版本数量: {}", processes.size());
         
-        for (ProcessDefinition pd : processes) {
-            log.info("流程定义: deploymentId={}, version={}", pd.getDeploymentId(), pd.getVersion());
+        try {
+            // 删除部署
+            repositoryService.deleteDeployment(deploymentId, false);
+            log.info("成功删除流程部署: deploymentId={}", deploymentId);
             
-            try {
-                // 第一种方式：级联删除，会删除和当前规则相关的所有信息，包括历史
-                // repositoryService.deleteDeployment(pd.getDeploymentId(), true);
-                
-                // 第二种方式：非级联删除，如果当前规则下有正在执行的流程，则抛出异常
-                repositoryService.deleteDeployment(pd.getDeploymentId(), false);
-                
-                log.info("成功删除流程定义: deploymentId={}", pd.getDeploymentId());
-            } catch (Exception e) {
-                log.error("删除流程定义失败: deploymentId={}, error={}", 
-                    pd.getDeploymentId(), e.getMessage());
-            }
+            // 更新实体状态
+            ticketProcess.get().setDeployed(false);
+            ticketProcess.get().setDeploymentId(null);
+            ticketProcessRepository.save(ticketProcess.get());
+            
+        } catch (Exception e) {
+            log.error("删除流程部署失败: deploymentId={}, error={}", 
+                deploymentId, e.getMessage());
+            throw new RuntimeException("删除流程部署失败: " + e.getMessage());
         }
 
-        // 取消流程部署
-        ticketProcess.get().setDeployed(false);
-        ticketProcess.get().setDeploymentId(null);
-        ticketProcessRepository.save(ticketProcess.get());
-    
-        
         // 验证删除结果
         List<ProcessDefinition> remainingProcesses = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(processKey)
-                .processDefinitionTenantId(orgUid)
-                .orderByProcessDefinitionVersion().desc()
+                .deploymentId(deploymentId)
                 .list();
         
         log.info("删除后流程版本数量: {}", remainingProcesses.size());
 
-        return remainingProcesses;
+        return processes;  // 返回删除前的流程定义列表
     }
     
     
