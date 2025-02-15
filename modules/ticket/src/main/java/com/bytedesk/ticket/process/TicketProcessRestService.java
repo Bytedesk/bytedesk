@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 14:00:26
+ * @LastEditTime: 2025-02-15 14:03:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,6 +87,9 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
             if (optional.isPresent()) {
                 return convertToResponse(optional.get());
             }
+        } else {
+            // 生成uid
+            request.setUid(uidUtils.getUid());
         }
         // 流程key不能重复
         Optional<TicketProcessEntity> optionalKey = processRepository.findByKeyAndOrgUid(request.getKey(), request.getOrgUid());
@@ -98,12 +101,11 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         if (user != null) {
             request.setUserUid(user.getUid());
         } else {
-            // 如果用户为空，则设置为系统用户
-            log.warn("TicketProcessRestService create process, user is null");
+            // 如果用户为空，则为系统自动创建
         }
         
         TicketProcessEntity entity = modelMapper.map(request, TicketProcessEntity.class);
-        entity.setUid(uidUtils.getUid());
+        // entity.setUid(uidUtils.getUid()); // 移动到开头
 
         TicketProcessEntity savedEntity = save(entity);
         if (savedEntity == null) {

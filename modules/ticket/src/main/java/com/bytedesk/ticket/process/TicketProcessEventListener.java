@@ -74,7 +74,7 @@ public class TicketProcessEventListener {
                     .key(TicketConsts.TICKET_PROCESS_KEY_GROUP)
                     .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
                     .build();
-            processRequest.setUid(processUid.toLowerCase());
+            processRequest.setUid(processUid);
             processRequest.setContent(groupTicketBpmn20Xml);
             processRequest.setOrgUid(orgUid);
             ticketProcessRestService.create(processRequest);
