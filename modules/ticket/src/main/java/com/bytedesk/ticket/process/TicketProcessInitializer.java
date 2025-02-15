@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 13:03:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 13:51:20
+ * @LastEditTime: 2025-02-15 14:05:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -79,7 +79,7 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
         try {
             // 读取文件内容
             String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(), "UTF-8");
-            log.info("groupTicketBpmn20Xml: {}", groupTicketBpmn20Xml);
+            // log.info("groupTicketBpmn20Xml: {}", groupTicketBpmn20Xml);
             // 判断所有组织是否存在 TicketProcessEntity
             List<OrganizationEntity> organizations = organizationService.findAll();
             for (OrganizationEntity organization : organizations) {
@@ -92,17 +92,18 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
 
                 if (!existingDeployments.isEmpty()) {
                     log.info("工单流程已存在，跳过部署: tenantId={}", orgUid);
+                    
                     continue;
                 }
 
-                String processUid = orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP;
+                String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP).toLowerCase();
                 // 初始化 TicketProcessEntity
                 TicketProcessRequest processRequest = TicketProcessRequest.builder()
                         .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
                         .key(TicketConsts.TICKET_PROCESS_KEY_GROUP)
                         .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
                         .build();
-                processRequest.setUid(processUid.toLowerCase());
+                processRequest.setUid(processUid);
                 processRequest.setOrgUid(orgUid);
                 processRequest.setContent(groupTicketBpmn20Xml);
                 ticketProcessRestService.create(processRequest);
