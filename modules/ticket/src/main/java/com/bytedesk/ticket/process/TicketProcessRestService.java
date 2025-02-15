@@ -78,6 +78,11 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
 
     @Override
     public TicketProcessResponse create(TicketProcessRequest request) {
+        // 流程key不能重复
+        Optional<TicketProcessEntity> optional = processRepository.findByKey(request.getKey());
+        if (optional.isPresent()) {
+            throw new RuntimeException("Process key already exists");
+        }
         
         TicketProcessEntity entity = modelMapper.map(request, TicketProcessEntity.class);
         entity.setUid(uidUtils.getUid());
