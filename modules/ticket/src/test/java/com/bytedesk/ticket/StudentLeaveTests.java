@@ -392,7 +392,7 @@ class StudentLeaveTests {
 		createAndSubmitToTeacher();  // 创建待处理任务
 		createAndCompleteTeacherTasks();  // 创建并完成一些任务
 
-		// 查询待处理任务
+		// 查询待处理任务，待认领
 		List<Task> activeTasks = taskService.createTaskQuery()
 			.taskCandidateGroup("teachers")
 			.orderByTaskCreateTime()

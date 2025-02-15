@@ -62,11 +62,12 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="/assets/images/logo.png" alt="微语社交" height="30">
+                <img src="/logo.png" alt="微语社交" height="30">
+                <span class="text-white">微语社交</span>
             </a>
             <div class="d-flex">
-                <a href="/login" class="btn btn-discord me-2">登录</a>
-                <a href="/register" class="btn btn-outline-light">注册</a>
+                <#--  <a href="/login" class="btn btn-discord me-2">登录</a>  -->
+                <#--  <a href="/register" class="btn btn-outline-light">注册</a>  -->
             </div>
         </div>
     </nav>
@@ -76,7 +77,7 @@
             <div class="col">
                 <h1 class="display-4 mb-3">想象一个地方...</h1>
                 <p class="lead">在这里，你可以属于学习小组、游戏社区或者全球艺术社区。这里有一个属于你的位置，让你找到归属。</p>
-                <a href="/register" class="btn btn-discord btn-lg mt-3">开始你的社区之旅</a>
+                <a href="/social/" class="btn btn-discord btn-lg mt-3">开始你的社区之旅</a>
             </div>
         </div>
 
