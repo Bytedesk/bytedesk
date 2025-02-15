@@ -22,5 +22,7 @@ public interface TicketProcessRepository extends JpaRepository<TicketProcessEnti
 
     Optional<TicketProcessEntity> findByUid(String uid);
 
+    Optional<TicketProcessEntity> findByKey(String key);
+
     // Boolean existsByPlatform(String platform);
 }
