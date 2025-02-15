@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 13:03:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 13:16:34
+ * @LastEditTime: 2025-02-15 13:51:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.Deployment;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -44,6 +46,8 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
     private final OrganizationService organizationService;
 
     private final TicketProcessRestService ticketProcessRestService;
+
+    private final RepositoryService repositoryService;
 
     private final ResourceLoader resourceLoader;
 
@@ -80,6 +84,17 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
             List<OrganizationEntity> organizations = organizationService.findAll();
             for (OrganizationEntity organization : organizations) {
                 String orgUid = organization.getUid();
+                // 检查是否已经部署
+                List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
+                        .deploymentTenantId(orgUid)
+                        .deploymentName(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                        .list();
+
+                if (!existingDeployments.isEmpty()) {
+                    log.info("工单流程已存在，跳过部署: tenantId={}", orgUid);
+                    continue;
+                }
+
                 String processUid = orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP;
                 // 初始化 TicketProcessEntity
                 TicketProcessRequest processRequest = TicketProcessRequest.builder()
@@ -91,11 +106,21 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
                 processRequest.setOrgUid(orgUid);
                 processRequest.setContent(groupTicketBpmn20Xml);
                 ticketProcessRestService.create(processRequest);
+
+                // 部署流程
+                Deployment deployment = repositoryService.createDeployment()
+                        .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                        .addClasspathResource("processes/group-ticket-process.bpmn20.xml")
+                        .tenantId(orgUid)
+                        .deploy();
+
+                log.info("部署租户流程成功: deploymentId={}, tenantId={}",
+                        deployment.getId(), deployment.getTenantId());
             }
-            
+
         } catch (IOException e) {
             log.error("读取 processes/group-ticket-process.bpmn20.xml 文件内容失败", e);
         }
-        
+
     }
-}           
+}
