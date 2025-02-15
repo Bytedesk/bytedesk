@@ -87,6 +87,16 @@ docker exec ollama-bytedesk ollama run deepseek-r1
 docker compose -p weiyu -f docker-compose.yaml stop
 ```
 
+### 修改配置，否则上传图片、文件和知识库无法正常显示
+
+- 修改 `docker-compose.yaml` 文件
+
+```bash
+# 请将服务器127.0.0.1替换为你的服务器ip
+BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
+BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
+```
+
 ### 宝塔面板
 
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
@@ -96,6 +106,7 @@ docker compose -p weiyu -f docker-compose.yaml stop
 本地预览
 
 ```bash
+# 请将127.0.0.1替换为你的服务器ip
 http://127.0.0.1:9003/
 # 开放端口：9003, 9885
 ```

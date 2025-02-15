@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 10:54:51
+ * @LastEditTime: 2025-02-15 13:18:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -78,18 +79,23 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
 
     @Override
     public TicketProcessResponse create(TicketProcessRequest request) {
+        //  判断uid是否存在
+        if (StringUtils.hasText(request.getUid())) {
+            Optional<TicketProcessEntity> optional = processRepository.findByUid(request.getUid());
+            if (optional.isPresent()) {
+                return convertToResponse(optional.get());
+            }
+        }
         // 流程key不能重复
-        Optional<TicketProcessEntity> optional = processRepository.findByKey(request.getKey());
-        if (optional.isPresent()) {
+        Optional<TicketProcessEntity> optionalKey = processRepository.findByKey(request.getKey());
+        if (optionalKey.isPresent()) {
             throw new RuntimeException("Process key already exists");
         }
 
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("User not found");
+        if (user != null) {
+            request.setUserUid(user.getUid());
         }
-        String userUid = user.getUid();
-        request.setUserUid(userUid);
         
         TicketProcessEntity entity = modelMapper.map(request, TicketProcessEntity.class);
         entity.setUid(uidUtils.getUid());
@@ -155,5 +161,6 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
     public TicketProcessResponse convertToResponse(TicketProcessEntity entity) {
         return modelMapper.map(entity, TicketProcessResponse.class);
     }
-    
+
+ 
 }

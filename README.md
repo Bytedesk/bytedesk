@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 12:35:54
+ * @LastEditTime: 2025-02-15 13:25:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,11 +84,22 @@ docker exec ollama-bytedesk ollama run deepseek-r1
 docker compose -p bytedesk -f docker-compose.yaml stop
 ```
 
+### change config, otherwise upload image, file and knowledge base cannot be displayed normally
+
+- change `docker-compose.yaml` file
+
+```bash
+# please replace 127.0.0.1 with your server ip
+BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
+BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
+```
+
 ## Preview
 
 local preview
 
 ```bash
+# please replace 127.0.0.1 with your server ip
 http://127.0.0.1:9003/
 # open port: 9003, 9885
 ```
