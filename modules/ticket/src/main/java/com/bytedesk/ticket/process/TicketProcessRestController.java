@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 15:45:34
+ * @LastEditTime: 2025-02-15 16:11:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -78,7 +80,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     }
     // 修改查询方法
     @RequestMapping("/query/deployments")
-    public ResponseEntity<?> queryProcessDefinition(TicketProcessRequest request) {
+    public ResponseEntity<?> queryProcesses(TicketProcessRequest request) {
         List<ProcessDefinition> definitions = processService.query(request);
         
         List<ProcessDefinitionResponse> dtos = definitions.stream()
@@ -97,21 +99,43 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     }
 
     // 部署流程
-    @RequestMapping("/deploy")
-    public ResponseEntity<?> deployProcess(TicketProcessRequest request) {
+    @PostMapping("/deploy")
+    public ResponseEntity<?> deployProcess(@RequestBody TicketProcessRequest request) {
+        ProcessDefinition definition = processService.deploy(request);
         
-        ProcessDefinition processDefinition = processService.deploy(request);
+        // 转换为 DTO 返回
+        ProcessDefinitionResponse dto = ProcessDefinitionResponse.builder()
+            .id(definition.getId())
+            .key(definition.getKey())
+            .name(definition.getName())
+            .description(definition.getDescription())
+            .version(definition.getVersion())
+            .deploymentId(definition.getDeploymentId())
+            .tenantId(definition.getTenantId())
+            .build();
 
-        return ResponseEntity.ok(JsonResult.success(processDefinition));
+        return ResponseEntity.ok(JsonResult.success(dto));
     }
 
     // 取消部署流程
-    @RequestMapping("/undeploy")
-    public ResponseEntity<?> undeployProcess(TicketProcessRequest request) {
+    @PostMapping("/undeploy")
+    public ResponseEntity<?> undeployProcess(@RequestBody TicketProcessRequest request) {
+        List<ProcessDefinition> definitions = processService.undeploy(request);
+        
+        // 转换为 DTO 列表返回
+        List<ProcessDefinitionResponse> dtos = definitions.stream()
+            .map(def -> ProcessDefinitionResponse.builder()
+                .id(def.getId())
+                .key(def.getKey())
+                .name(def.getName())
+                .description(def.getDescription())
+                .version(def.getVersion())
+                .deploymentId(def.getDeploymentId())
+                .tenantId(def.getTenantId())
+                .build())
+            .collect(Collectors.toList());
 
-        List<ProcessDefinition> processDefinition = processService.undeploy(request);
-
-        return ResponseEntity.ok(JsonResult.success(processDefinition));
+        return ResponseEntity.ok(JsonResult.success(dtos));
     }
     
 }
