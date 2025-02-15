@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 15:10:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 16:35:36
+ * @LastEditTime: 2025-02-15 16:43:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,8 @@ package com.bytedesk.ticket.process;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
@@ -36,20 +38,39 @@ public class TicketProcessService {
     // 查询流程
     public List<ProcessDefinition> query(TicketProcessRequest request) {
         String orgUid = request.getOrgUid();
+        if (orgUid == null) {
+            throw new RuntimeException("租户ID不能为空");
+        }
+        
+        // 先查询已部署的流程定义实体
+        List<TicketProcessEntity> deployedProcesses = ticketProcessRepository.findByOrgUidAndDeployedTrue(orgUid);
+        
+        // 收集所有部署ID
+        Set<String> deploymentIds = deployedProcesses.stream()
+            .map(TicketProcessEntity::getDeploymentId)
+            .filter(id -> id != null)
+            .collect(Collectors.toSet());
+        
+        if (deploymentIds.isEmpty()) {
+            return List.of();
+        }
+
         // 查询租户流程定义
         List<ProcessDefinition> processList = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionTenantId(orgUid)          // 按租户ID过滤
-                .latestVersion()                           // 只查询最新版本
-                .active()                                  // 查询激活的流程
-                .orderByProcessDefinitionVersion().desc()  // 按版本降序排序
-                .list();
+            .deploymentIds(deploymentIds)           // 按部署ID过滤
+            .processDefinitionTenantId(orgUid)      // 按租户ID过滤
+            .latestVersion()                        // 只查询最新版本
+            .active()                               // 查询激活的流程
+            .orderByProcessDefinitionVersion().desc() // 按版本降序排序
+            .list();
 
         for (ProcessDefinition processDefinition : processList) {
-            log.info("租户流程定义 tenantId={}, name={}, key={}, version={}", 
+            log.info("租户流程定义 tenantId={}, name={}, key={}, version={}, deploymentId={}", 
                 processDefinition.getTenantId(),
                 processDefinition.getName(),
                 processDefinition.getKey(),
-                processDefinition.getVersion());
+                processDefinition.getVersion(),
+                processDefinition.getDeploymentId());
         }
 
         return processList;

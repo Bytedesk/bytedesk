@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 13:59:11
+ * @LastEditTime: 2025-02-15 16:45:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ticket.process;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +24,8 @@ public interface TicketProcessRepository extends JpaRepository<TicketProcessEnti
     Optional<TicketProcessEntity> findByUid(String uid);
 
     Optional<TicketProcessEntity> findByKeyAndOrgUid(String key, String orgUid);
+
+    List<TicketProcessEntity> findByOrgUidAndDeployedTrue(String orgUid);
 
     // Boolean existsByPlatform(String platform);
 }
