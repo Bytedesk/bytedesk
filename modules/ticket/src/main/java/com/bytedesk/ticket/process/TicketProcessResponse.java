@@ -40,6 +40,8 @@ public class TicketProcessResponse extends BaseResponse {
 
     // private String type;
 
+    private String content;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
