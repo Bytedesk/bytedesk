@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 12:59:36
+ * @LastEditTime: 2025-02-15 14:42:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,12 @@ public class TicketProcessResponse extends BaseResponse {
     // private String type;
 
     private String content;
+
+    // 是否已部署流程
+    private boolean isDeployed;
+
+    // 部署id
+    private String deploymentId;
 
     private String userUid;
 
