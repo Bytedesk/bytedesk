@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 13:52:47
+ * @LastEditTime: 2025-02-15 15:22:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,9 @@
  */
 package com.bytedesk.ticket.process;
 
+import java.util.List;
+
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,13 +31,15 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TicketProcessRestController extends BaseRestController<TicketProcessRequest> {
 
-    private final TicketProcessRestService processService;
+    private final TicketProcessRestService processRestService;
+
+    private final TicketProcessService processService;
     
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(TicketProcessRequest request) {
         
-        Page<TicketProcessResponse> process = processService.queryByOrg(request);
+        Page<TicketProcessResponse> process = processRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(process));
     }
@@ -42,7 +47,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     @Override
     public ResponseEntity<?> queryByUser(TicketProcessRequest request) {
         
-        Page<TicketProcessResponse> process = processService.queryByUser(request);
+        Page<TicketProcessResponse> process = processRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(process));
     }
@@ -50,7 +55,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     @Override
     public ResponseEntity<?> create(TicketProcessRequest request) {
         
-        TicketProcessResponse process = processService.create(request);
+        TicketProcessResponse process = processRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(process));
     }
@@ -58,7 +63,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     @Override
     public ResponseEntity<?> update(TicketProcessRequest request) {
         
-        TicketProcessResponse process = processService.update(request);
+        TicketProcessResponse process = processRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(process));
     }
@@ -66,9 +71,36 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     @Override
     public ResponseEntity<?> delete(TicketProcessRequest request) {
         
-        processService.delete(request);
+        processRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // 查询流程
+    @RequestMapping("/query/deployments")
+    public ResponseEntity<?> queryProcessDefinition(TicketProcessRequest request) {
+
+        List<ProcessDefinition> processDefinition = processService.query(request);
+
+        return ResponseEntity.ok(JsonResult.success(processDefinition));
+    }
+
+    // 部署流程
+    @RequestMapping("/deploy")
+    public ResponseEntity<?> deployProcess(TicketProcessRequest request) {
+        
+        ProcessDefinition processDefinition = processService.deploy(request);
+
+        return ResponseEntity.ok(JsonResult.success(processDefinition));
+    }
+
+    // 删除流程
+    @RequestMapping("/delete/deployment")
+    public ResponseEntity<?> deleteDeployment(TicketProcessRequest request) {
+        
+        List<ProcessDefinition> processDefinition = processService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success(processDefinition));
     }
     
 }
