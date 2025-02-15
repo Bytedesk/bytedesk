@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.organization;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -68,6 +69,10 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
                 "id");
         Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
         return orgPage.map(organization -> convertToResponse(organization));
+    }
+
+    public List<OrganizationEntity> findAll() {
+        return organizationRepository.findAll();
     }
 
     @Transactional
@@ -156,7 +161,7 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
     })
     public OrganizationEntity save(OrganizationEntity organization) {
         try {
-            return organizationRepository.save(organization);
+                    return organizationRepository.save(organization);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, organization);
         }

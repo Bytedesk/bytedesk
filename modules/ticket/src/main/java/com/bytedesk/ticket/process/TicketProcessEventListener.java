@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 12:55:55
+ * @LastEditTime: 2025-02-15 13:07:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.process.event.TicketProcessCreateEvent;
 
@@ -46,10 +45,6 @@ public class TicketProcessEventListener {
     @Autowired
     private TicketProcessRestService ticketProcessRestService;
 
-    @Autowired
-    private UidUtils uidUtils;
-
-
     @Order(8)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -62,16 +57,18 @@ public class TicketProcessEventListener {
             // 读取文件内容
             String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(), "UTF-8");
             log.info("groupTicketBpmn20Xml: {}", groupTicketBpmn20Xml);
+            // 生成 processUid
+            String processUid = orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP;
             // 创建 TicketProcessEntity
-            TicketProcessEntity processEntity = TicketProcessEntity.builder()
+            TicketProcessRequest processRequest = TicketProcessRequest.builder()
                     .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
                     .key(TicketConsts.TICKET_PROCESS_KEY_GROUP)
-                    .content(groupTicketBpmn20Xml)
                     .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
                     .build();
-            processEntity.setUid(uidUtils.getUid());
-            processEntity.setOrgUid(orgUid);
-            ticketProcessRestService.save(processEntity);
+            processRequest.setUid(processUid.toLowerCase());
+            processRequest.setContent(groupTicketBpmn20Xml);
+            processRequest.setOrgUid(orgUid);
+            ticketProcessRestService.create(processRequest);
         } catch (IOException e) {
             log.error("读取 processes/group-ticket-process.bpmn20.xml 文件内容失败", e);
         }
