@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 09:22:18
+ * @LastEditTime: 2025-02-15 10:54:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,6 +83,13 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         if (optional.isPresent()) {
             throw new RuntimeException("Process key already exists");
         }
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        String userUid = user.getUid();
+        request.setUserUid(userUid);
         
         TicketProcessEntity entity = modelMapper.map(request, TicketProcessEntity.class);
         entity.setUid(uidUtils.getUid());
@@ -127,7 +134,6 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // processRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("TicketProcess not found");
