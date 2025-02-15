@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 15:10:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 15:17:26
+ * @LastEditTime: 2025-02-15 16:01:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
 package com.bytedesk.ticket.process;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
@@ -29,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketProcessService {
     
     private final RepositoryService repositoryService;
+
+    private final TicketProcessRepository ticketProcessRepository;
 
     // 查询流程
     public List<ProcessDefinition> query(TicketProcessRequest request) {
@@ -54,10 +57,12 @@ public class TicketProcessService {
 
     // 部署流程
     public ProcessDefinition deploy(TicketProcessRequest request) {
-        // 部署流程
-        String orgUid = request.getOrgUid();
-        // BPMN流程定义XML字符串
-        String bpmnXml = request.getContent();
+        Optional<TicketProcessEntity> ticketProcess = ticketProcessRepository.findByUid(request.getUid());
+        if (!ticketProcess.isPresent()) {
+            throw new RuntimeException("流程定义不存在" + request.getUid());
+        }
+        String orgUid = ticketProcess.get().getOrgUid();
+        String bpmnXml = ticketProcess.get().getContent();
 
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()
@@ -65,6 +70,11 @@ public class TicketProcessService {
                 .addString(request.getKey() + ".bpmn20.xml", bpmnXml)
                 .tenantId(orgUid)
                 .deploy();
+
+        // 更新流程定义
+        ticketProcess.get().setDeployed(true);
+        ticketProcess.get().setDeploymentId(deployment.getId());
+        ticketProcessRepository.save(ticketProcess.get());
         
         // 验证部署结果
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
@@ -81,10 +91,13 @@ public class TicketProcessService {
     }
 
     // 删除流程
-    public List<ProcessDefinition> delete(TicketProcessRequest request) {
-        // 删除流程
-        String orgUid = request.getOrgUid();
-        String processKey = request.getKey();
+    public List<ProcessDefinition> undeploy(TicketProcessRequest request) {
+        Optional<TicketProcessEntity> ticketProcess = ticketProcessRepository.findByUid(request.getUid());
+        if (!ticketProcess.isPresent()) {
+            throw new RuntimeException("流程定义不存在" + request.getUid());
+        }
+        String orgUid = ticketProcess.get().getOrgUid();
+        String processKey = ticketProcess.get().getKey();
         
         // 查询指定租户的所有版本流程定义
         List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
@@ -111,6 +124,12 @@ public class TicketProcessService {
                     pd.getDeploymentId(), e.getMessage());
             }
         }
+
+        // 取消流程部署
+        ticketProcess.get().setDeployed(false);
+        ticketProcess.get().setDeploymentId(null);
+        ticketProcessRepository.save(ticketProcess.get());
+    
         
         // 验证删除结果
         List<ProcessDefinition> remainingProcesses = repositoryService.createProcessDefinitionQuery()
