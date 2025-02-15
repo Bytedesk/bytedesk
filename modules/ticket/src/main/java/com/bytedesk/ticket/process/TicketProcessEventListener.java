@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 13:52:17
+ * @LastEditTime: 2025-02-15 14:40:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@ package com.bytedesk.ticket.process;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.flowable.engine.RepositoryService;
@@ -85,6 +86,14 @@ public class TicketProcessEventListener {
                     .addClasspathResource("processes/group-ticket-process.bpmn20.xml")
                     .tenantId(orgUid)
                     .deploy();
+
+            // 更新 TicketProcessEntity
+            Optional<TicketProcessEntity> processEntity = ticketProcessRestService.findByUid(processUid);
+            if (processEntity.isPresent()) {
+                processEntity.get().setDeploymentId(deployment.getId());
+                processEntity.get().setDeployed(true);
+                ticketProcessRestService.save(processEntity.get());
+            }
 
             log.info("部署租户流程成功: deploymentId={}, tenantId={}",
                     deployment.getId(), deployment.getTenantId());

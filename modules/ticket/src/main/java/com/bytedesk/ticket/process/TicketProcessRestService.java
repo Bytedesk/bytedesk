@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 14:03:30
+ * @LastEditTime: 2025-02-15 14:48:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -119,8 +119,11 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         Optional<TicketProcessEntity> optional = processRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             TicketProcessEntity entity = optional.get();
-            modelMapper.map(request, entity);
-            //
+            entity.setKey(request.getKey());
+            entity.setName(request.getName());
+            entity.setContent(request.getContent());
+            entity.setDescription(request.getDescription());
+            // 
             TicketProcessEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update process failed");
@@ -137,7 +140,8 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         try {
             return processRepository.save(entity);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            log.error("Save process failed: {}", e.getMessage());
+            throw new RuntimeException("Save process failed: " + e.getMessage());
         }
     }
 
