@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 15:22:17
+ * @LastEditTime: 2025-02-15 15:45:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.ticket.process;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.data.domain.Page;
@@ -75,14 +76,24 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
 
         return ResponseEntity.ok(JsonResult.success());
     }
-
-    // 查询流程
+    // 修改查询方法
     @RequestMapping("/query/deployments")
     public ResponseEntity<?> queryProcessDefinition(TicketProcessRequest request) {
+        List<ProcessDefinition> definitions = processService.query(request);
+        
+        List<ProcessDefinitionResponse> dtos = definitions.stream()
+            .map(def -> ProcessDefinitionResponse.builder()
+                .id(def.getId())
+                .key(def.getKey())
+                .name(def.getName())
+                .description(def.getDescription())
+                .version(def.getVersion())
+                .deploymentId(def.getDeploymentId())
+                .tenantId(def.getTenantId())
+                .build())
+            .collect(Collectors.toList());
 
-        List<ProcessDefinition> processDefinition = processService.query(request);
-
-        return ResponseEntity.ok(JsonResult.success(processDefinition));
+        return ResponseEntity.ok(JsonResult.success(dtos));
     }
 
     // 部署流程
@@ -94,11 +105,11 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
         return ResponseEntity.ok(JsonResult.success(processDefinition));
     }
 
-    // 删除流程
-    @RequestMapping("/delete/deployment")
-    public ResponseEntity<?> deleteDeployment(TicketProcessRequest request) {
-        
-        List<ProcessDefinition> processDefinition = processService.delete(request);
+    // 取消部署流程
+    @RequestMapping("/undeploy")
+    public ResponseEntity<?> undeployProcess(TicketProcessRequest request) {
+
+        List<ProcessDefinition> processDefinition = processService.undeploy(request);
 
         return ResponseEntity.ok(JsonResult.success(processDefinition));
     }
