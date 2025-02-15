@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 16:33:37
+ * @LastEditTime: 2025-02-16 07:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,6 +69,7 @@ public class PageRouteController {
 			en.put("service", "Service");
 			en.put("kbase", "Kbase");
 			en.put("ai", "AI");
+			en.put("social", "Social");
 			
 			// 简体中文
 			Map<String, String> zh = new HashMap<>();
@@ -93,7 +94,7 @@ public class PageRouteController {
 			zh.put("service", "客服模块");
 			zh.put("kbase", "知识库模块");
 			zh.put("ai", "AI模块");
-			
+			zh.put("social", "社交IM模块");
 			// 繁体中文
 			Map<String, String> zhTW = new HashMap<>();
 			zhTW.put("title", "微語");
@@ -117,7 +118,7 @@ public class PageRouteController {
 			zhTW.put("service", "客服模組");
 			zhTW.put("kbase", "知識庫模組");
 			zhTW.put("ai", "AI模組");
-			
+			zhTW.put("social", "社交IM模組");
 			i18n.put("en", en);
 			i18n.put("zh", zh);
 			i18n.put("zh-TW", zhTW);
