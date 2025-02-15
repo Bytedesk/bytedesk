@@ -135,6 +135,9 @@ services:
       # moonshot
       SPRING_AI_MOONSHOT_CHAT_ENABLED: false
       SPRING_AI_MINIMAX_CHAT_ENABLED: false
+      # vector store
+      SPRING_AI_VECTORSTORE_REDIS_INITIALIZE_SCHEMA: true
+      SPRING_AI_VECTORSTORE_REDIS_URI: redis://:qfRxz3tVT8Nh@redis-bytedesk:6379
       # wechat config
       WECHAT_PAY_ENABLED: false
     ports:
