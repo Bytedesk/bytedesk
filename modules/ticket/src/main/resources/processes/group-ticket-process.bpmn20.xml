@@ -8,9 +8,12 @@
         <flowable:formProperty id="title" name="标题" type="string" required="true"></flowable:formProperty>
         <flowable:formProperty id="description" name="描述" type="string" required="true"></flowable:formProperty>
         <flowable:formProperty id="priority" name="优先级" type="enum">
+          <flowable:value id="lowest" name="最低"></flowable:value>
           <flowable:value id="low" name="低"></flowable:value>
           <flowable:value id="medium" name="中"></flowable:value>
           <flowable:value id="high" name="高"></flowable:value>
+          <flowable:value id="urgent" name="紧急"></flowable:value>
+          <flowable:value id="critical" name="严重"></flowable:value>
         </flowable:formProperty>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>

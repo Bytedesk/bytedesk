@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-14 15:48:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 17:21:52
+ * @LastEditTime: 2025-02-16 08:14:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,6 +37,8 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.bytedesk.ticket.consts.TicketConsts;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,7 +75,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            "groupTicketProcess", variables);
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
         assertNotNull(processInstance);
         log.info("Started process instance id {}", processInstance.getId());
 
@@ -83,7 +85,7 @@ public class GroupTicketProcessTests {
             .taskAssignee("user1")
             .singleResult();
         assertNotNull(createTask);
-        assertEquals("Create Ticket", createTask.getName());
+        assertEquals("创建工单", createTask.getName());
 
         // 完成工单创建
         Map<String, Object> ticketVariables = new HashMap<>();
@@ -203,7 +205,7 @@ public class GroupTicketProcessTests {
             variables.put("slaTime", "PT4H");
             
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-                "groupTicketProcess", variables);
+                TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
             
             // 完成创建任务
             Task createTask = taskService.createTaskQuery()
@@ -234,7 +236,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT1S"); // 1秒SLA
         
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            "groupTicketProcess", variables);
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
         
         // 完成创建任务
         Task createTask = taskService.createTaskQuery()
@@ -279,7 +281,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT4H");
         
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            "groupTicketProcess", variables);
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
         
         // 获取创建工单任务
         Task createTask = taskService.createTaskQuery()
@@ -532,7 +534,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT4H");
         
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            "groupTicketProcess", variables);
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
         
         // 完成创建任务
         Task createTask = taskService.createTaskQuery()
