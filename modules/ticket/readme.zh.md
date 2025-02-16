@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-01 13:21:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 23:39:39
+ * @LastEditTime: 2025-02-16 23:44:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,11 +38,9 @@
 - 工单分类
 - 工单标签
 - 工单模板
-- 工单打印
 - 工单统计
 - 工单报表
 - 工单自动回复
-- LDAP登录
 
 ## 评论系统
 
