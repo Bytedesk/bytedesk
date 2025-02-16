@@ -12,12 +12,12 @@
         <flowable:formProperty id="title" name="标题" type="string" required="true"></flowable:formProperty>
         <flowable:formProperty id="description" name="描述" type="string" required="true"></flowable:formProperty>
         <flowable:formProperty id="priority" name="优先级" type="enum">
-          <flowable:value id="lowest" name="最低"></flowable:value>
-          <flowable:value id="low" name="低"></flowable:value>
-          <flowable:value id="medium" name="中"></flowable:value>
-          <flowable:value id="high" name="高"></flowable:value>
-          <flowable:value id="urgent" name="紧急"></flowable:value>
-          <flowable:value id="critical" name="严重"></flowable:value>
+          <flowable:value id="LOWEST" name="最低"></flowable:value>
+          <flowable:value id="LOW" name="低"></flowable:value>
+          <flowable:value id="MEDIUM" name="中"></flowable:value>
+          <flowable:value id="HIGH" name="高"></flowable:value>
+          <flowable:value id="URGENT" name="紧急"></flowable:value>
+          <flowable:value id="CRITICAL" name="严重"></flowable:value>
         </flowable:formProperty>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
@@ -31,9 +31,9 @@
       <extensionElements>
         <flowable:formProperty id="solution" name="解决方案" type="string" required="true"></flowable:formProperty>
         <flowable:formProperty id="status" name="状态" type="enum">
-          <flowable:value id="resolved" name="已解决"></flowable:value>
-          <flowable:value id="pending" name="处理中"></flowable:value>
-          <flowable:value id="escalated" name="已升级"></flowable:value>
+          <flowable:value id="RESOLVED" name="已解决"></flowable:value>
+          <flowable:value id="PENDING" name="处理中"></flowable:value>
+          <flowable:value id="ESCALATED" name="已升级"></flowable:value>
         </flowable:formProperty>
         <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
         <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
@@ -83,7 +83,7 @@
         sourceRef="assignToGroup" 
         targetRef="escalateTicket">
         <conditionExpression xsi:type="tFormalExpression">
-            ${status == 'escalated'}
+            ${status == 'ESCALATED'}
         </conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow_back_to_group" 
