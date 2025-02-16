@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-14 15:48:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 09:15:58
+ * @LastEditTime: 2025-02-16 19:55:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.bytedesk.ticket.consts.TicketConsts;
+import com.bytedesk.ticket.ticket.TicketPriorityEnum;
+import com.bytedesk.ticket.ticket.TicketStatusEnum;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,7 +94,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "Test Ticket");
         ticketVariables.put("description", "Test Description");
-        ticketVariables.put("priority", "medium");
+        ticketVariables.put("priority", TicketPriorityEnum.MEDIUM.name());
         taskService.complete(createTask.getId(), ticketVariables);
 
         // 验证工作组任务
@@ -106,7 +108,7 @@ public class GroupTicketProcessTests {
         // 完成工作组处理
         Map<String, Object> groupVariables = new HashMap<>();
         groupVariables.put("solution", "问题已修复");
-        groupVariables.put("status", "resolved");
+        groupVariables.put("status", TicketStatusEnum.RESOLVED.name());
         taskService.complete(groupTask.getId(), groupVariables);
 
         // 验证客户验证任务
@@ -217,7 +219,7 @@ public class GroupTicketProcessTests {
             Map<String, Object> ticketVariables = new HashMap<>();
             ticketVariables.put("title", "Ticket " + (i + 1));
             ticketVariables.put("description", "Description " + (i + 1));
-            ticketVariables.put("priority", "medium");
+            ticketVariables.put("priority", TicketPriorityEnum.MEDIUM.name());
             taskService.complete(createTask.getId(), ticketVariables);
         }
     }
@@ -248,7 +250,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "SLA Test Ticket");
         ticketVariables.put("description", "SLA Test Description");
-        ticketVariables.put("priority", "high");
+        ticketVariables.put("priority", TicketPriorityEnum.HIGH.name());
         taskService.complete(createTask.getId(), ticketVariables);
 
         // 等待SLA超时
@@ -317,7 +319,7 @@ public class GroupTicketProcessTests {
         Map<String, String> formValues = new HashMap<>();
         formValues.put("title", "测试工单");
         formValues.put("description", "这是一个测试工单");
-        formValues.put("priority", "medium");
+        formValues.put("priority", TicketPriorityEnum.MEDIUM.name());
         
         formService.submitTaskFormData(createTask.getId(), formValues);
         
@@ -546,7 +548,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "测试工单");
         ticketVariables.put("description", "这是一个测试工单");
-        ticketVariables.put("priority", "medium");
+        ticketVariables.put("priority", TicketPriorityEnum.MEDIUM.name());
         taskService.complete(createTask.getId(), ticketVariables);
         
         return processInstance;
@@ -574,7 +576,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "Test Execution Listener");
         ticketVariables.put("description", "Testing execution listeners");
-        ticketVariables.put("priority", "medium");
+        ticketVariables.put("priority", TicketPriorityEnum.MEDIUM.name());
         taskService.complete(createTask.getId(), ticketVariables);
 
         // 认领并完成工作组任务 - 会触发 assignToGroup 任务的 start 和 end 事件
@@ -624,7 +626,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "Test Task Listener");
         ticketVariables.put("description", "Testing task listeners");
-        ticketVariables.put("priority", "medium");
+        ticketVariables.put("priority", TicketPriorityEnum.MEDIUM.name());
         taskService.complete(createTask.getId(), ticketVariables);
 
         // 认领工作组任务 - 会触发 assignment 事件
@@ -638,7 +640,7 @@ public class GroupTicketProcessTests {
         // 完成工作组任务 - 会触发 complete 事件
         Map<String, Object> groupVariables = new HashMap<>();
         groupVariables.put("solution", "问题已修复");
-        groupVariables.put("status", "resolved");
+        groupVariables.put("status", TicketStatusEnum.RESOLVED.name());
         taskService.complete(groupTask.getId(), groupVariables);
     }
 
@@ -664,7 +666,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "Test Escalation");
         ticketVariables.put("description", "Testing ticket escalation");
-        ticketVariables.put("priority", "high");
+        ticketVariables.put("priority", TicketPriorityEnum.HIGH.name());
         taskService.complete(createTask.getId(), ticketVariables);
 
         // 获取工作组任务
@@ -679,7 +681,7 @@ public class GroupTicketProcessTests {
         // 完成任务并标记为需要升级
         Map<String, Object> groupVariables = new HashMap<>();
         groupVariables.put("solution", "需要更高级别支持");
-        groupVariables.put("status", "escalated");  // 触发升级流程
+        groupVariables.put("status", TicketStatusEnum.ESCALATED.name());  // 触发升级流程
         taskService.complete(groupTask.getId(), groupVariables);
 
         // 验证流程变量
@@ -721,7 +723,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "Test SLA Timeout");
         ticketVariables.put("description", "Testing SLA timeout notification");
-        ticketVariables.put("priority", "high");
+        ticketVariables.put("priority", TicketPriorityEnum.HIGH.name());
         taskService.complete(createTask.getId(), ticketVariables);
 
         // 等待2秒，确保SLA超时
@@ -768,7 +770,7 @@ public class GroupTicketProcessTests {
         Map<String, Object> ticketVariables = new HashMap<>();
         ticketVariables.put("title", "Test Escalation and Return");
         ticketVariables.put("description", "Testing ticket escalation and return flow");
-        ticketVariables.put("priority", "high");
+        ticketVariables.put("priority", TicketPriorityEnum.HIGH.name());
         taskService.complete(createTask.getId(), ticketVariables);
 
         // 获取工作组任务
@@ -783,7 +785,7 @@ public class GroupTicketProcessTests {
         // 完成任务并标记为需要升级
         Map<String, Object> escalateVariables = new HashMap<>();
         escalateVariables.put("solution", "需要更高级别支持");
-        escalateVariables.put("status", "escalated");  // 触发升级流程
+        escalateVariables.put("status", "ESCALATED");
         taskService.complete(groupTask.getId(), escalateVariables);
 
         // 验证流程变量
@@ -807,7 +809,7 @@ public class GroupTicketProcessTests {
         // senior_agent完成返回的工作组任务
         Map<String, Object> resolveVariables = new HashMap<>();
         resolveVariables.put("solution", "高级支持已解决");
-        resolveVariables.put("status", "resolved");
+        resolveVariables.put("status", "RESOLVED");
         taskService.complete(returnedTask.getId(), resolveVariables);
 
         // 验证流程继续到客户确认
@@ -817,6 +819,87 @@ public class GroupTicketProcessTests {
             .singleResult();
         assertNotNull(verifyTask);
         assertEquals("客户确认", verifyTask.getName());
+    }
+
+    // 测试工单优先级评估
+    @Test
+    void testTicketPriorityEvaluation() {
+        // 1. 测试高优先级工单
+        testPriorityEvaluation("高优先级工单", TicketPriorityEnum.URGENT.name(), "紧急问题描述", true);
+        
+        // 2. 测试中优先级工单
+        testPriorityEvaluation("普通工单", TicketPriorityEnum.MEDIUM.name(), "一般问题描述", false);
+        
+        // 3. 测试低优先级工单
+        testPriorityEvaluation("低优先级工单", TicketPriorityEnum.LOW.name(), "minor issue", false);
+    }
+
+    // 辅助方法：测试不同优先级的工单评估
+    private void testPriorityEvaluation(String title, String inputPriority, String description, boolean isUrgent) {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 获取创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        assertNotNull(createTask);
+        
+        // 设置工单信息
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", title);
+        ticketVariables.put("description", description);
+        ticketVariables.put("priority", inputPriority);
+        
+        // 完成创建任务，触发优先级评估
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 获取评估后的流程变量
+        Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
+        
+        // 验证优先级评估结果
+        String evaluatedPriority = (String) processVariables.get("evaluatedPriority");
+        assertNotNull(evaluatedPriority);
+        log.info("Ticket priority evaluation - input: {}, evaluated: {}", inputPriority, evaluatedPriority);
+
+        // 验证SLA时间是否根据优先级正确设置
+        String slaTime = (String) processVariables.get("slaTime");
+        assertNotNull(slaTime);
+        if (isUrgent) {
+            // 紧急工单应该有更短的SLA时间
+            assertTrue(slaTime.contains("PT2H") || slaTime.contains("PT1H"));
+        } else {
+            // 普通工单保持默认SLA时间
+            assertEquals("PT4H", slaTime);
+        }
+
+        // 验证评估原因
+        String evaluationReason = (String) processVariables.get("evaluationReason");
+        assertNotNull(evaluationReason);
+        log.info("Priority evaluation reason: {}", evaluationReason);
+
+        // 验证工作组任务是否创建
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        assertNotNull(groupTask);
+        
+        // 验证优先级是否影响任务属性
+        if (isUrgent) {
+            assertEquals(50, groupTask.getPriority()); // 高优先级任务
+        } else {
+            assertEquals(0, groupTask.getPriority());  // 普通优先级任务
+        }
     }
 
 }
