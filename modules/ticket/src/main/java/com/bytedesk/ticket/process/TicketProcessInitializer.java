@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 13:03:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 14:39:09
+ * @LastEditTime: 2025-02-16 21:38:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,11 @@
 package com.bytedesk.ticket.process;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.FileUtils;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -75,12 +76,15 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
     }
 
     private void initProcess() {
-        // 读取 processes/group-ticket-process.bpmn20.xml 文件内容
-        Resource resource = resourceLoader.getResource("classpath:processes/group-ticket-process.bpmn20.xml");
         try {
-            // 读取文件内容
-            String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(), "UTF-8");
-            // log.info("groupTicketBpmn20Xml: {}", groupTicketBpmn20Xml);
+            // 使用 getInputStream() 而不是 getFile()
+            Resource resource = resourceLoader.getResource("classpath:processes/group-ticket-process.bpmn20.xml");
+            String groupTicketBpmn20Xml = "";
+            
+            try (InputStream inputStream = resource.getInputStream()) {
+                groupTicketBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+            
             // 判断所有组织是否存在 TicketProcessEntity
             List<OrganizationEntity> organizations = organizationService.findAll();
             for (OrganizationEntity organization : organizations) {
@@ -93,7 +97,6 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
 
                 if (!existingDeployments.isEmpty()) {
                     log.info("工单流程已存在，跳过部署: tenantId={}", orgUid);
-                    
                     continue;
                 }
 
@@ -112,7 +115,8 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
                 // 部署流程
                 Deployment deployment = repositoryService.createDeployment()
                         .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                        .addClasspathResource("processes/group-ticket-process.bpmn20.xml")
+                        .addInputStream(TicketConsts.TICKET_PROCESS_KEY_GROUP + ".bpmn20.xml", 
+                            resource.getInputStream())  // 使用 InputStream
                         .tenantId(orgUid)
                         .deploy();
 
@@ -129,8 +133,8 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
             }
 
         } catch (IOException e) {
-            log.error("读取 processes/group-ticket-process.bpmn20.xml 文件内容失败", e);
+            log.error("读取流程文件失败", e);
+            throw new RuntimeException("读取流程文件失败: " + e.getMessage());
         }
-
     }
 }

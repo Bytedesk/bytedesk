@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 14:40:15
+ * @LastEditTime: 2025-02-16 21:38:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,11 @@
 package com.bytedesk.ticket.process;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.FileUtils;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.springframework.context.event.EventListener;
@@ -66,7 +67,12 @@ public class TicketProcessEventListener {
         // 读取并部署流程
         try {
             Resource resource = resourceLoader.getResource("classpath:processes/group-ticket-process.bpmn20.xml");
-            String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(), "UTF-8");
+            // String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(), "UTF-8");
+            String groupTicketBpmn20Xml = "";
+            
+            try (InputStream inputStream = resource.getInputStream()) {
+                groupTicketBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
 
             // 生成 processUid 并创建流程记录
             String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP).toLowerCase();
