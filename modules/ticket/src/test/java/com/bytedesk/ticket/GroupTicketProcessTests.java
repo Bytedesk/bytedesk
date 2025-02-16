@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-14 15:48:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 08:32:18
+ * @LastEditTime: 2025-02-16 09:15:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -639,6 +640,183 @@ public class GroupTicketProcessTests {
         groupVariables.put("solution", "问题已修复");
         groupVariables.put("status", "resolved");
         taskService.complete(groupTask.getId(), groupVariables);
+    }
+
+    @Test
+    void testTicketEscalation() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test Escalation");
+        ticketVariables.put("description", "Testing ticket escalation");
+        ticketVariables.put("priority", "high");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 获取工作组任务
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        
+        // 认领任务
+        taskService.claim(groupTask.getId(), "agent1");
+        
+        // 完成任务并标记为需要升级
+        Map<String, Object> groupVariables = new HashMap<>();
+        groupVariables.put("solution", "需要更高级别支持");
+        groupVariables.put("status", "escalated");  // 触发升级流程
+        taskService.complete(groupTask.getId(), groupVariables);
+
+        // 验证流程变量
+        Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
+        assertEquals("ESCALATED", processVariables.get("status"));
+        assertNotNull(processVariables.get("escalatedTime"));
+        assertEquals("工单需要更高级别处理", processVariables.get("escalatedReason"));
+
+        // 验证任务流转
+        Task escalatedTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        assertNotNull(escalatedTask);
+        assertEquals("工作组处理", escalatedTask.getName());
+    }
+
+    // 测试 SLA 超时通知，自动触发（基于时间）
+    @Test
+    void testSLATimeoutNotification() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT1S");  // 设置1秒的SLA时间，方便测试
+        variables.put("startTime", new Date());
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test SLA Timeout");
+        ticketVariables.put("description", "Testing SLA timeout notification");
+        ticketVariables.put("priority", "high");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 等待2秒，确保SLA超时
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // 验证流程变量
+        Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
+        assertNotNull(processVariables.get("slaTimeoutTime"));
+        assertEquals("超过处理时限", processVariables.get("slaTimeoutReason"));
+
+        // 验证任务是否返回到工作组
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        assertNotNull(groupTask);
+        assertEquals("工作组处理", groupTask.getName());
+    }
+
+    // 测试工单升级和返回，人工触发（基于状态）
+    @Test
+    void testTicketEscalationAndReturn() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test Escalation and Return");
+        ticketVariables.put("description", "Testing ticket escalation and return flow");
+        ticketVariables.put("priority", "high");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 获取工作组任务
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        
+        // 认领任务
+        taskService.claim(groupTask.getId(), "agent1");
+        
+        // 完成任务并标记为需要升级
+        Map<String, Object> escalateVariables = new HashMap<>();
+        escalateVariables.put("solution", "需要更高级别支持");
+        escalateVariables.put("status", "escalated");  // 触发升级流程
+        taskService.complete(groupTask.getId(), escalateVariables);
+
+        // 验证流程变量
+        Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
+        assertEquals("ESCALATED", processVariables.get("status"));
+        assertNotNull(processVariables.get("escalatedTime"));
+        assertEquals("工单需要更高级别处理", processVariables.get("escalatedReason"));
+        assertEquals("escalated", processVariables.get("previousStatus"));
+
+        // 验证任务返回到工作组
+        Task returnedTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        assertNotNull(returnedTask);
+        assertEquals("工作组处理", returnedTask.getName());
+
+        // 完成返回的工作组任务
+        taskService.claim(returnedTask.getId(), "senior_agent");
+        
+        // senior_agent完成返回的工作组任务
+        Map<String, Object> resolveVariables = new HashMap<>();
+        resolveVariables.put("solution", "高级支持已解决");
+        resolveVariables.put("status", "resolved");
+        taskService.complete(returnedTask.getId(), resolveVariables);
+
+        // 验证流程继续到客户确认
+        Task verifyTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        assertNotNull(verifyTask);
+        assertEquals("客户确认", verifyTask.getName());
     }
 
 }
