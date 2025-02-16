@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-14 15:48:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 08:14:37
+ * @LastEditTime: 2025-02-16 08:32:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -100,11 +100,11 @@ public class GroupTicketProcessTests {
             .taskCandidateGroup("support")
             .singleResult();
         assertNotNull(groupTask);
-        assertEquals("Group Handle", groupTask.getName());
+        assertEquals("工作组处理", groupTask.getName());
 
         // 完成工作组处理
         Map<String, Object> groupVariables = new HashMap<>();
-        groupVariables.put("solution", "Problem solved");
+        groupVariables.put("solution", "问题已修复");
         groupVariables.put("status", "resolved");
         taskService.complete(groupTask.getId(), groupVariables);
 
@@ -114,7 +114,7 @@ public class GroupTicketProcessTests {
             .taskAssignee("user1")
             .singleResult();
         assertNotNull(verifyTask);
-        assertEquals("Customer Verify", verifyTask.getName());
+        assertEquals("客户确认", verifyTask.getName());
     }
 
     // 测试工单创建者查询
@@ -551,5 +551,94 @@ public class GroupTicketProcessTests {
         return processInstance;
     }
 
+    @Test
+    void testExecutionListener() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例 - 会触发 start 事件
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test Execution Listener");
+        ticketVariables.put("description", "Testing execution listeners");
+        ticketVariables.put("priority", "medium");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 认领并完成工作组任务 - 会触发 assignToGroup 任务的 start 和 end 事件
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        
+        taskService.claim(groupTask.getId(), "agent1");
+        
+        Map<String, Object> groupVariables = new HashMap<>();
+        groupVariables.put("solution", "问题已修复");
+        groupVariables.put("status", "resolved");
+        taskService.complete(groupTask.getId(), groupVariables);
+
+        // 完成客户确认任务 - 会触发流程的 end 事件
+        Task verifyTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        
+        Map<String, Object> verifyVariables = new HashMap<>();
+        verifyVariables.put("satisfied", true);
+        verifyVariables.put("comment", "服务很好");
+        taskService.complete(verifyTask.getId(), verifyVariables);
+    }
+
+    @Test
+    void testTaskListener() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务 - 会触发 create 和 complete 事件
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test Task Listener");
+        ticketVariables.put("description", "Testing task listeners");
+        ticketVariables.put("priority", "medium");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 认领工作组任务 - 会触发 assignment 事件
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        
+        taskService.claim(groupTask.getId(), "agent1");
+        
+        // 完成工作组任务 - 会触发 complete 事件
+        Map<String, Object> groupVariables = new HashMap<>();
+        groupVariables.put("solution", "问题已修复");
+        groupVariables.put("status", "resolved");
+        taskService.complete(groupTask.getId(), groupVariables);
+    }
 
 }
