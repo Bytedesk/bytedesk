@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 21:38:30
+ * @LastEditTime: 2025-02-17 07:43:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -66,7 +66,7 @@ public class TicketProcessEventListener {
 
         // 读取并部署流程
         try {
-            Resource resource = resourceLoader.getResource("classpath:processes/group-ticket-process.bpmn20.xml");
+            Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_GROUP_PATH);
             // String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(), "UTF-8");
             String groupTicketBpmn20Xml = "";
             
@@ -89,7 +89,7 @@ public class TicketProcessEventListener {
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()
                     .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                    .addClasspathResource("processes/group-ticket-process.bpmn20.xml")
+                    .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH)
                     .tenantId(orgUid)
                     .deploy();
 

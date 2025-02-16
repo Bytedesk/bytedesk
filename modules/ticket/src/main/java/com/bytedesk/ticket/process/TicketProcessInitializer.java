@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 13:03:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 21:38:13
+ * @LastEditTime: 2025-02-17 07:46:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,7 +78,7 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
     private void initProcess() {
         try {
             // 使用 getInputStream() 而不是 getFile()
-            Resource resource = resourceLoader.getResource("classpath:processes/group-ticket-process.bpmn20.xml");
+            Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_GROUP_PATH);
             String groupTicketBpmn20Xml = "";
             
             try (InputStream inputStream = resource.getInputStream()) {
@@ -115,8 +115,7 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
                 // 部署流程
                 Deployment deployment = repositoryService.createDeployment()
                         .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                        .addInputStream(TicketConsts.TICKET_PROCESS_KEY_GROUP + ".bpmn20.xml", 
-                            resource.getInputStream())  // 使用 InputStream
+                        .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH)
                         .tenantId(orgUid)
                         .deploy();
 

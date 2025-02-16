@@ -27,6 +27,10 @@ public class TicketConsts {
 
     public static final String TICKET_PROCESS_KEY_GROUP = "groupTicketProcess";
 
+    public static final String TICKET_PROCESS_GROUP_PATH = "processes/group-ticket-process.bpmn20.xml";
+
+    public static final String TICKET_PROCESS_AGENT_PATH = "processes/agent-ticket-process.bpmn20.xml";
+
     // 未分配
     public static final String TICKET_FILTER_UNASSIGNED = "UNASSIGNED";
 
