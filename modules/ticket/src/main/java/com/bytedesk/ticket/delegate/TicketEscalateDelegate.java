@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-28 13:33:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 09:09:10
+ * @LastEditTime: 2025-02-16 09:21:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,11 @@ import java.util.Date;
  * 两种服务任务的区别：
  * SLA 超时：自动触发，基于时间
  * 工单升级：人工触发，基于状态
+ * 
+ * 用途：实现服务任务的具体业务逻辑
+ * 绑定位置：服务任务节点
+ * 主要场景：自动化处理、系统集成、规则执行
+ * 特点：一次性执行，完成特定业务功能  
  */
 @Slf4j
 @Component("ticketEscalateDelegate")

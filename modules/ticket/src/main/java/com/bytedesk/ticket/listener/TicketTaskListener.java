@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-16 08:41:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 08:49:14
+ * @LastEditTime: 2025-02-16 09:20:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,11 @@ import org.springframework.stereotype.Component;
  * 关注任务的生命周期
  * 可以访问和修改任务相关信息
  * 适合处理任务级别的业务逻辑
+ * 
+ * 用途：监听用户任务的生命周期事件
+ * 绑定位置：只能绑定到用户任务
+ * 主要场景：任务级别的监控和处理
+ * 特点：可以访问和修改任务相关信息
  */
 @Slf4j
 @Component("ticketTaskListener")

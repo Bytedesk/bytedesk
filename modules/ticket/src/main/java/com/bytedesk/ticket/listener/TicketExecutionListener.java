@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-28 10:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 08:47:37
+ * @LastEditTime: 2025-02-16 09:19:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,11 @@ import java.util.Map;
  * 关注流程执行的生命周期
  * 可以访问和修改流程变量
  * 适合处理流程级别的业务逻辑
+ * 
+ * 用途：监听流程执行的生命周期事件
+ * 绑定位置：流程定义、活动节点、连线
+ * 主要场景：流程级别的监控和处理
+ * 特点：可以访问和修改流程变量    
  */
 @Slf4j
 @Component("ticketExecutionListener")
