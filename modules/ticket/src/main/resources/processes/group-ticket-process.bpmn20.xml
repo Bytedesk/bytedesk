@@ -48,7 +48,7 @@
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="sequenceFlow-9a5f6c89-bdd8-428f-b877-3cabfc132b2a" sourceRef="slaTimer" targetRef="slaNotification"></sequenceFlow>
-    <serviceTask id="slaNotification" name="SLA超时通知" flowable:class="com.bytedesk.ticket.delegate.TicketSLATimeoutNotificationDelegate"></serviceTask>
+    <serviceTask id="slaNotification" name="SLA超时通知" flowable:delegateExpression="${ticketSLATimeoutNotificationDelegate}"></serviceTask>
     <sequenceFlow id="sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" sourceRef="slaNotification" targetRef="assignToGroup"></sequenceFlow>
     <userTask id="customerVerify" name="客户确认" flowable:assignee="${creatorUser}" flowable:formFieldValidation="true">
       <documentation>创建人验证问题是否解决</documentation>
@@ -75,6 +75,21 @@
     <sequenceFlow id="sequenceFlow-0c15524d-972d-4287-a905-582a2abbbcaa" sourceRef="satisfactionSurvey" targetRef="end"></sequenceFlow>
     <endEvent id="end" name="结束工单"></endEvent>
     <sequenceFlow id="sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" sourceRef="assignToGroup" targetRef="customerVerify"></sequenceFlow>
+    <serviceTask id="escalateTicket" 
+        name="升级工单" 
+        flowable:delegateExpression="${ticketEscalateDelegate}">
+    </serviceTask>
+    <sequenceFlow id="flow_to_escalate" 
+        sourceRef="assignToGroup" 
+        targetRef="escalateTicket">
+        <conditionExpression xsi:type="tFormalExpression">
+            ${status == 'escalated'}
+        </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_back_to_group" 
+        sourceRef="escalateTicket" 
+        targetRef="assignToGroup">
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_groupTicketProcess">
     <bpmndi:BPMNPlane bpmnElement="groupTicketProcess" id="BPMNPlane_groupTicketProcess">
@@ -104,6 +119,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
         <omgdc:Bounds height="28.0" width="28.0" x="985.0" y="216.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="escalateTicket" id="BPMNShape_escalateTicket">
+        <omgdc:Bounds height="60.0" width="100.0" x="505.0" y="100.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
         <omgdi:waypoint x="159.94999848995764" y="230.0"></omgdi:waypoint>
@@ -137,6 +155,16 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b" id="BPMNEdge_sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
         <omgdi:waypoint x="454.95000000000005" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="505.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_to_escalate" id="BPMNEdge_flow_to_escalate">
+        <omgdi:waypoint x="555.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_back_to_group" id="BPMNEdge_flow_back_to_group">
+        <omgdi:waypoint x="505.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="455.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="455.0" y="230.0"></omgdi:waypoint>
         <omgdi:waypoint x="505.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
