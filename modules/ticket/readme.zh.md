@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-01 13:21:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 11:08:42
+ * @LastEditTime: 2025-02-16 23:39:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,3 +81,11 @@
 - 工单升级规则
 
 修复已知bug，使项目能够运行
+
+## 增值功能
+
+- 消息通知：站内信、用户端推送等
+- 关键数据：展示当前节点处理人最希望看到的数据
+- 移动办公：H5形式，接入钉钉、微信服务号、企业微信等
+- 增值操作：“协同”，即可以选择指定人（通常是助理），替自己处理一些审批
+- 实时跟踪：可以实时查看当前所处节点，以及对应处理人，并可对其发起“催办”
