@@ -60,8 +60,10 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
 
         AgentResponse agent = agentService.syncCurrentThreadCount(request);
-        
-        return ResponseEntity.ok(JsonResult.success(agent));
+        if (agent != null) {
+            return ResponseEntity.ok(JsonResult.success(agent));
+        }
+        return ResponseEntity.ok(JsonResult.error("sync current thread count failed"));
     }
 
     @ActionAnnotation(title = "agent", action = "create", description = "create agent")

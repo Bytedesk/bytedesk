@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:45:51
+ * @LastEditTime: 2025-02-17 17:02:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -252,15 +252,18 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     public AgentResponse syncCurrentThreadCount(AgentRequest request) {
 
-        AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
-        int currentThreadCount = threadRestService.countByThreadTopicAndState(agent.getUid(), ThreadStateEnum.STARTED.name());
-        agent.setCurrentThreadCount(currentThreadCount);
-        //
-        AgentEntity updatedAgent = save(agent);
-        if (updatedAgent == null) {
-            throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
+        if (StringUtils.hasText(request.getUid())) {
+            AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+            int currentThreadCount = threadRestService.countByThreadTopicAndState(agent.getUid(), ThreadStateEnum.STARTED.name());
+            agent.setCurrentThreadCount(currentThreadCount);
+            // 更新Agent的信息
+            AgentEntity updatedAgent = save(agent);
+            if (updatedAgent == null) {
+                throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
+            }
+            return convertToResponse(updatedAgent);
         }
-        return convertToResponse(updatedAgent);
+        return null;
     }
 
     @Transactional

@@ -17,7 +17,7 @@
 
 	<properties>
 		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>
-		<protobuf.version>4.29.3</protobuf.version>
+		<protobuf.version>3.25.5</protobuf.version>
 	</properties>
 
 	<dependencies>
@@ -114,16 +114,7 @@
 			<groupId>com.googlecode.protobuf-java-format</groupId>
 			<artifactId>protobuf-java-format</artifactId>
 			<version>1.4</version>
-			<!-- <scope>provided</scope> -->
 		</dependency>
-
-		<!-- https://github.com/redisson/redisson?tab=readme-ov-file -->
-		<!-- https://mvnrepository.com/artifact/org.redisson/redisson -->
-		<!-- <dependency>
-			<groupId>org.redisson</groupId>
-			<artifactId>redisson</artifactId>
-			<version>3.27.0</version>
-		</dependency> -->
 
 		<!-- TODO: Rate Limiter -->
 		<!-- https://bucket4j.com/8.14.0/toc.html -->
