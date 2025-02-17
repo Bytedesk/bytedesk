@@ -169,5 +169,50 @@
     "category": "i18n.module.service",
     "prompt": "针对物流咨询的客户，给出专业的解答，并给出解决方案，并给出解决方案的理由。",
     "description": "创建一个物流客服机器人"
+  },
+  {
+    "uid": "20",
+    "name": "language_translation",
+    "nickname": "语言翻译",
+    "type": "LLM",
+    "category": "i18n.module.service",
+    "prompt": "针对不同的语言，给出翻译结果。",
+    "description": "创建一个语言翻译机器人"
+  },
+  {
+    "uid": "21",
+    "name": "language_recognition",
+    "nickname": "语言识别",
+    "type": "LLM",
+    "category": "i18n.module.service",
+    "prompt": "针对不同的语言，给出识别结果。",
+    "description": "创建一个语言识别机器人"
+  },
+  {
+    "uid": "22",
+    "name": "semantic_analysis",
+    "nickname": "语义分析",
+    "type": "LLM",
+    "category": "i18n.module.service",
+    "prompt": "从对话记录中提取语义信息，并给出语义信息。",
+    "description": "创建一个语义分析机器人"
+  },
+  {
+    "uid": "23",
+    "name": "entity_recognition",
+    "nickname": "实体识别",
+    "type": "LLM",
+    "category": "i18n.module.service",
+    "prompt": "从对话记录中提取实体信息，并给出实体信息。",
+    "description": "创建一个实体识别机器人"
+  },
+  {
+    "uid": "24",
+    "name": "sentiment_analysis",
+    "nickname": "情感分析",
+    "type": "LLM",
+    "category": "i18n.module.service",
+    "prompt": "从对话记录中提取情感信息，并给出情感信息。",
+    "description": "创建一个情感分析机器人"
   }
 ]
