@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ticket.comment.TicketCommentService;
 import com.bytedesk.ticket.consts.TicketConsts;
-import com.bytedesk.ticket.ticket.TicketService;
+// import com.bytedesk.ticket.ticket.TicketService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class TicketFlowService {
     private final TaskService taskService;
     private final RepositoryService repositoryService;
     private final HistoryService historyService;
-    private final TicketService assignmentService;
+    // private final TicketService assignmentService;
     private final TicketCommentService commentService;
     // private final AgentRestService agentService;
     // private final WorkgroupRestService workgroupService;
@@ -258,13 +258,13 @@ public class TicketFlowService {
      */
     public void assignTicketToWorkgroup(String taskId, String workgroupId) {
         // 添加工作组作为候选组
-        assignmentService.addCandidateGroup(taskId, workgroupId);
+        // assignmentService.addCandidateGroup(taskId, workgroupId);
         
         // 获取工作组成员作为候选人
-        List<String> workgroupMembers = assignmentService.getWorkgroupUsers(workgroupId);
-        for (String userId : workgroupMembers) {
-            assignmentService.addCandidateUser(taskId, userId);
-        }
+        // List<String> workgroupMembers = assignmentService.getWorkgroupUsers(workgroupId);
+        // for (String userId : workgroupMembers) {
+        //     assignmentService.addCandidateUser(taskId, userId);
+        // }
     }
 
     /**
@@ -272,19 +272,21 @@ public class TicketFlowService {
      */
     public List<Task> queryUserAvailableTasks(String userId) {
         // 获取用户所在的工作组
-        List<String> userWorkgroups = assignmentService.getUserWorkgroups(userId);
+        // List<String> userWorkgroups = assignmentService.getUserWorkgroups(userId);
         
-        return taskService.createTaskQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
-            .or()
-                .taskAssignee(userId)
-                .taskCandidateUser(userId)
-                .taskCandidateGroupIn(userWorkgroups)
-            .endOr()
-            .active()
-            .orderByTaskCreateTime()
-            .desc()
-            .list();
+        // return taskService.createTaskQuery()
+        //     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
+        //     .or()
+        //         .taskAssignee(userId)
+        //         .taskCandidateUser(userId)
+        //         .taskCandidateGroupIn(userWorkgroups)
+        //     .endOr()
+        //     .active()
+        //     .orderByTaskCreateTime()
+        //     .desc()
+        //     .list();
+
+        return null;
     }
 
     /**
