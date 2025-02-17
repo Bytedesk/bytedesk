@@ -169,57 +169,57 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // }
 
     // 查询 待分配
-    @GetMapping("/query/unclaimed")
-    public ResponseEntity<?> queryUnclaimed(TicketRequest request) {
+    // @GetMapping("/query/unclaimed")
+    // public ResponseEntity<?> queryUnclaimed(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryUnclaimed(request);
+    //     Page<TicketResponse> page = ticketService.queryUnclaimed(request);
 
-        return ResponseEntity.ok(JsonResult.success(page));
-    }
+    //     return ResponseEntity.ok(JsonResult.success(page));
+    // }
 
     // 查询 待我处理
-    @GetMapping("/query/claimed")
-    public ResponseEntity<?> queryClaimed(TicketRequest request) {
+    // @GetMapping("/query/claimed")
+    // public ResponseEntity<?> queryClaimed(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryClaimed(request);
+    //     Page<TicketResponse> page = ticketService.queryClaimed(request);
 
-        return ResponseEntity.ok(JsonResult.success(page));
-    }
+    //     return ResponseEntity.ok(JsonResult.success(page));
+    // }
 
     // 查询 我创建的
-    @GetMapping("/query/created")
-    public ResponseEntity<?> queryCreated(TicketRequest request) {
+    // @GetMapping("/query/created")
+    // public ResponseEntity<?> queryCreated(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryCreated(request);
+    //     Page<TicketResponse> page = ticketService.queryCreated(request);
 
-        return ResponseEntity.ok(JsonResult.success(page));
-    }
+    //     return ResponseEntity.ok(JsonResult.success(page));
+    // }
 
     // 认领claim 任务
-    @PostMapping("/{id}/claim")
-    public ResponseEntity<?> claim(@PathVariable Long id) {
+    // @PostMapping("/{id}/claim")
+    // public ResponseEntity<?> claim(@PathVariable Long id) {
 
-        ticketService.claim(id);
+    //     ticketService.claim(id);
 
-        return ResponseEntity.ok(JsonResult.success());
-    }
+    //     return ResponseEntity.ok(JsonResult.success());
+    // }
 
     // 退回unclaim 任务
-    @PostMapping("/{id}/unclaim")
-    public ResponseEntity<?> unclaim(@PathVariable Long id) {
+    // @PostMapping("/{id}/unclaim")
+    // public ResponseEntity<?> unclaim(@PathVariable Long id) {
 
-        ticketService.unclaim(id);
+    //     ticketService.unclaim(id);
 
-        return ResponseEntity.ok(JsonResult.success());
-    }
+    //     return ResponseEntity.ok(JsonResult.success());
+    // }
 
     // 完成任务
-    @PostMapping("/{id}/complete")
-    public ResponseEntity<?> complete(@PathVariable Long id) {
+    // @PostMapping("/{id}/complete")
+    // public ResponseEntity<?> complete(@PathVariable Long id) {
 
-        ticketService.complete(id);
+    //     ticketService.complete(id);
 
-        return ResponseEntity.ok(JsonResult.success());
-    }
+    //     return ResponseEntity.ok(JsonResult.success());
+    // }
     
 } 

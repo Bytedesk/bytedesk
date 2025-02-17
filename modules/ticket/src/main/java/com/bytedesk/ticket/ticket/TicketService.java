@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 18:06:38
+ * @LastEditTime: 2025-02-17 21:37:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.ticket.consts.TicketConsts;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,43 +43,20 @@ public class TicketService {
     private final TicketRepository ticketRepository;
 
     /**
-     * 创建工单
-     * 在 ticketRestService 中已经创建 ticketEntity 对象, 这里只需要启动流程实例
-     */
-    @Transactional
-    public TicketResponse createTicket(TicketEntity ticket) {        
-
-        // 2. 启动流程实例
-        // Map<String, Object> variables = new HashMap<>();
-        // variables.put("ticketUid", ticket.getUid());
-        // variables.put("reporterUid", ticket.getReporterUid());
-        // variables.put("workgroupUid", ticket.getWorkgroupUid());
-        // variables.put("orgUid", ticket.getOrgUid());
-        
-        runtimeService.startProcessInstanceByKey(
-            "groupTicketSimpleProcess", 
-            ticket.getUid()  // businessKey
-            // variables
-        );
-
-        // return TicketResponse.fromEntity(ticket);
-        return null;
-    }
-
-    /**
      * 查询我创建的工单
      */
     public Page<TicketResponse> queryCreated(TicketRequest request) {
         Pageable pageable = request.getPageable();
+        // 
         List<Task> tasks = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskAssignee(request.getUserUid())
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+            .taskAssignee(request.getReporterUid())
             .processVariableValueEquals("orgUid", request.getOrgUid())
             .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
         long total = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskAssignee(request.getUserUid())
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+            .taskAssignee(request.getReporterUid())
             .processVariableValueEquals("orgUid", request.getOrgUid())
             .count();
 
@@ -95,130 +74,130 @@ public class TicketService {
     /**
      * 查询待我处理的工单
      */
-    public Page<TicketResponse> queryClaimed(TicketRequest request) {
-        Pageable pageable = request.getPageable();
-        List<Task> tasks = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskAssignee(request.getUserUid())
-            .taskDefinitionKey("assignToGroup")
-            .processVariableValueEquals("orgUid", request.getOrgUid())
-            .listPage(pageable.getPageNumber(), pageable.getPageSize());
+    // public Page<TicketResponse> queryClaimed(TicketRequest request) {
+    //     Pageable pageable = request.getPageable();
+    //     List<Task> tasks = taskService.createTaskQuery()
+    //         .processDefinitionKey("groupTicketSimpleProcess")
+    //         .taskAssignee(request.getUserUid())
+    //         .taskDefinitionKey("assignToGroup")
+    //         .processVariableValueEquals("orgUid", request.getOrgUid())
+    //         .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
-        long total = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskAssignee(request.getUserUid())
-            .taskDefinitionKey("assignToGroup")
-            .processVariableValueEquals("orgUid", request.getOrgUid())
-            .count();
+    //     long total = taskService.createTaskQuery()
+    //         .processDefinitionKey("groupTicketSimpleProcess")
+    //         .taskAssignee(request.getUserUid())
+    //         .taskDefinitionKey("assignToGroup")
+    //         .processVariableValueEquals("orgUid", request.getOrgUid())
+    //         .count();
 
-        List<TicketResponse> responses = tasks.stream()
-            .map(task -> {
-                String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
-                TicketEntity ticket = ticketRepository.findByUid(ticketUid);
-                return TicketResponse.fromEntity(ticket);
-            })
-            .toList();
+    //     List<TicketResponse> responses = tasks.stream()
+    //         .map(task -> {
+    //             String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
+    //             TicketEntity ticket = ticketRepository.findByUid(ticketUid);
+    //             return TicketResponse.fromEntity(ticket);
+    //         })
+    //         .toList();
 
-        return new PageImpl<>(responses, pageable, total);
-    }
+    //     return new PageImpl<>(responses, pageable, total);
+    // }
 
     /**
      * 查询待分配的工单
      */
-    public Page<TicketResponse> queryUnassigned(TicketRequest request) {
-        Pageable pageable = request.getPageable();
-        List<Task> tasks = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskCandidateGroup(request.getWorkgroupUid())
-            .processVariableValueEquals("orgUid", request.getOrgUid())
-            .listPage(pageable.getPageNumber(), pageable.getPageSize());
+    // public Page<TicketResponse> queryUnassigned(TicketRequest request) {
+    //     Pageable pageable = request.getPageable();
+    //     List<Task> tasks = taskService.createTaskQuery()
+    //         .processDefinitionKey("groupTicketSimpleProcess")
+    //         .taskCandidateGroup(request.getWorkgroupUid())
+    //         .processVariableValueEquals("orgUid", request.getOrgUid())
+    //         .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
-        long total = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskCandidateGroup(request.getWorkgroupUid())
-            .processVariableValueEquals("orgUid", request.getOrgUid())
-            .count();
+    //     long total = taskService.createTaskQuery()
+    //         .processDefinitionKey("groupTicketSimpleProcess")
+    //         .taskCandidateGroup(request.getWorkgroupUid())
+    //         .processVariableValueEquals("orgUid", request.getOrgUid())
+    //         .count();
 
-        List<TicketResponse> responses = tasks.stream()
-            .map(task -> {
-                String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
-                TicketEntity ticket = ticketRepository.findByUid(ticketUid);
-                return TicketResponse.fromEntity(ticket);
-            })
-            .toList();
+    //     List<TicketResponse> responses = tasks.stream()
+    //         .map(task -> {
+    //             String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
+    //             TicketEntity ticket = ticketRepository.findByUid(ticketUid);
+    //             return TicketResponse.fromEntity(ticket);
+    //         })
+    //         .toList();
 
-        return new PageImpl<>(responses, pageable, total);
-    }
+    //     return new PageImpl<>(responses, pageable, total);
+    // }
 
     /**
      * 认领工单
      */
-    @Transactional
-    public void claimTicket(TicketRequest request) {
-        Task task = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskDefinitionKey("assignToGroup")
-            .processVariableValueEquals("ticketUid", request.getTicketUid())
-            .processVariableValueEquals("orgUid", request.getOrgUid())
-            .singleResult();
+    // @Transactional
+    // public void claimTicket(TicketRequest request) {
+    //     Task task = taskService.createTaskQuery()
+    //         .processDefinitionKey("groupTicketSimpleProcess")
+    //         .taskDefinitionKey("assignToGroup")
+    //         .processVariableValueEquals("ticketUid", request.getTicketUid())
+    //         .processVariableValueEquals("orgUid", request.getOrgUid())
+    //         .singleResult();
 
-        if (task != null) {
-            taskService.claim(task.getId(), request.getUserUid());
+    //     if (task != null) {
+    //         taskService.claim(task.getId(), request.getUserUid());
             
-            // 更新工单状态
-            TicketEntity ticket = ticketRepository.findByUid(request.getTicketUid());
-            ticket.setAssigneeUid(request.getUserUid());
-            ticket.setStatus(TicketStatusEnum.PENDING);
-            ticketRepository.save(ticket);
-        }
-    }
+    //         // 更新工单状态
+    //         TicketEntity ticket = ticketRepository.findByUid(request.getTicketUid());
+    //         ticket.setAssigneeUid(request.getUserUid());
+    //         ticket.setStatus(TicketStatusEnum.PENDING);
+    //         ticketRepository.save(ticket);
+    //     }
+    // }
 
     /**
      * 退回工单
      */
-    @Transactional
-    public void unclaimTicket(TicketRequest request) {
-        Task task = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .taskDefinitionKey("assignToGroup")
-            .taskAssignee(request.getUserUid())
-            .processVariableValueEquals("ticketUid", request.getTicketUid())
-            .processVariableValueEquals("orgUid", request.getOrgUid())
-            .singleResult();
+    // @Transactional
+    // public void unclaimTicket(TicketRequest request) {
+    //     Task task = taskService.createTaskQuery()
+    //         .processDefinitionKey("groupTicketSimpleProcess")
+    //         .taskDefinitionKey("assignToGroup")
+    //         .taskAssignee(request.getUserUid())
+    //         .processVariableValueEquals("ticketUid", request.getTicketUid())
+    //         .processVariableValueEquals("orgUid", request.getOrgUid())
+    //         .singleResult();
 
-        if (task != null) {
-            taskService.unclaim(task.getId());
+    //     if (task != null) {
+    //         taskService.unclaim(task.getId());
             
-            // 更新工单状态
-            TicketEntity ticket = ticketRepository.findByUid(request.getTicketUid());
-            ticket.setAssigneeUid(null);
-            ticket.setStatus(TicketStatusEnum.OPEN);
-            ticketRepository.save(ticket);
-        }
-    }
+    //         // 更新工单状态
+    //         TicketEntity ticket = ticketRepository.findByUid(request.getTicketUid());
+    //         ticket.setAssigneeUid(null);
+    //         ticket.setStatus(TicketStatusEnum.OPEN);
+    //         ticketRepository.save(ticket);
+    //     }
+    // }
 
     /**
      * 完成工单
      */
-    @Transactional
-    public void completeTicket(TicketRequest request) {
-        Task task = taskService.createTaskQuery()
-            .processDefinitionKey("groupTicketSimpleProcess")
-            .processVariableValueEquals("ticketUid", request.getTicketUid())
-            .processVariableValueEquals("orgUid", request.getOrgUid())
-            .singleResult();
+    // @Transactional
+    // public void completeTicket(TicketRequest request) {
+    //     Task task = taskService.createTaskQuery()
+    //         .processDefinitionKey("groupTicketSimpleProcess")
+    //         .processVariableValueEquals("ticketUid", request.getTicketUid())
+    //         .processVariableValueEquals("orgUid", request.getOrgUid())
+    //         .singleResult();
 
-        if (task != null) {
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("status", request.getStatus());
-            variables.put("solution", request.getSolution());
-            taskService.complete(task.getId(), variables);
+    //     if (task != null) {
+    //         Map<String, Object> variables = new HashMap<>();
+    //         variables.put("status", request.getStatus());
+    //         variables.put("solution", request.getSolution());
+    //         taskService.complete(task.getId(), variables);
             
-            // 更新工单状态
-            TicketEntity ticket = ticketRepository.findByUid(request.getTicketUid());
-            ticket.setStatus(TicketStatusEnum.valueOf(request.getStatus()));
-            ticket.setSolution(request.getSolution());
-            ticketRepository.save(ticket);
-        }
-    }
+    //         // 更新工单状态
+    //         TicketEntity ticket = ticketRepository.findByUid(request.getTicketUid());
+    //         ticket.setStatus(TicketStatusEnum.valueOf(request.getStatus()));
+    //         ticket.setSolution(request.getSolution());
+    //         ticketRepository.save(ticket);
+    //     }
+    // }
 } 
