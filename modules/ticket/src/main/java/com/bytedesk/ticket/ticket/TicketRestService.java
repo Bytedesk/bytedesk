@@ -4,9 +4,7 @@ import org.flowable.engine.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -75,14 +73,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final ThreadRestService threadRestService;
 
-    // private final CategoryRestService categoryRestService;
-
     private final UploadRestService uploadRestService;
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<TicketEntity> spec = TicketSpecification.search(request);
         Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
         return ticketPage.map(this::convertToResponse);

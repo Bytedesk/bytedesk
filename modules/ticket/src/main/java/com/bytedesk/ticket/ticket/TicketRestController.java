@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 17:40:31
+ * @LastEditTime: 2025-02-17 17:49:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -160,13 +160,13 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     // 查询 所有
-    @GetMapping("/query/all")   
-    public ResponseEntity<?> queryAll(TicketRequest request) {
+    // @GetMapping("/query/all")   
+    // public ResponseEntity<?> queryAll(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryAll(request);
+    //     Page<TicketResponse> page = ticketService.queryAll(request);
 
-        return ResponseEntity.ok(JsonResult.success(page));
-    }
+    //     return ResponseEntity.ok(JsonResult.success(page));
+    // }
 
     // 查询 待分配
     @GetMapping("/query/unclaimed")
