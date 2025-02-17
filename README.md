@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 13:25:39
+ * @LastEditTime: 2025-02-17 22:39:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,7 +58,7 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 
 ### AI Chat
 
-- Chat with LLM
+- Chat with Ollama/DeepSeek/ZhipuAI/...
 - Chat with Knowledge base(RAG)
 - ...
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 12:37:41
+ * @LastEditTime: 2025-02-17 22:39:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,8 +59,7 @@
 
 ### AI 大模型
 
-- Ollama/智谱/OpenAI/文心...
-- 客服AI助手
+- Ollama/DeepSeek/ZhipuAI/...
 - 智能体
 - 工作流
 - ...
