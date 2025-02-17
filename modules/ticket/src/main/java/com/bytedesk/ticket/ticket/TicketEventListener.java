@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 18:05:54
+ * @LastEditTime: 2025-02-18 07:14:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,6 +53,7 @@ public class TicketEventListener {
         variables.put("ticketUid", ticket.getUid());
         variables.put("workgroupUid", JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
         variables.put("reporterUid", JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
+        variables.put("orgUid", ticket.getOrgUid());
 
         // 根据不同优先级设置不同的SLA时间
         switch (ticket.getPriority()) {
