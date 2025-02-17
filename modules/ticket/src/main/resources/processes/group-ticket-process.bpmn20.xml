@@ -75,20 +75,57 @@
     <sequenceFlow id="sequenceFlow-0c15524d-972d-4287-a905-582a2abbbcaa" sourceRef="satisfactionSurvey" targetRef="end"></sequenceFlow>
     <endEvent id="end" name="结束工单"></endEvent>
     <sequenceFlow id="sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" sourceRef="assignToGroup" targetRef="customerVerify"></sequenceFlow>
-    <serviceTask id="escalateTicket" 
-        name="升级工单" 
-        flowable:delegateExpression="${ticketEscalateDelegate}">
-    </serviceTask>
-    <sequenceFlow id="flow_to_escalate" 
-        sourceRef="assignToGroup" 
-        targetRef="escalateTicket">
-        <conditionExpression xsi:type="tFormalExpression">
-            ${status == 'ESCALATED'}
-        </conditionExpression>
+    <serviceTask id="escalateTicket" name="升级工单" flowable:delegateExpression="${ticketEscalateDelegate}"></serviceTask>
+    <sequenceFlow id="flow_to_escalate" sourceRef="assignToGroup" targetRef="escalateTicket">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status == 'ESCALATED'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow_back_to_group" 
-        sourceRef="escalateTicket" 
-        targetRef="assignToGroup">
+    <sequenceFlow id="flow_back_to_group" sourceRef="escalateTicket" targetRef="assignToGroup"></sequenceFlow>
+    <intermediateThrowEvent id="sendAssignedNotification" name="发送分配通知">
+      <messageEventDefinition messageRef="ticketAssignedMessage">
+        <extensionElements>
+          <flowable:field name="messageType">
+            <flowable:string>ASSIGNED</flowable:string>
+          </flowable:field>
+        </extensionElements>
+      </messageEventDefinition>
+    </intermediateThrowEvent>
+    <serviceTask id="handleAssignedMessage" name="处理分配通知" flowable:delegateExpression="${ticketMessageDelegate}"></serviceTask>
+    <sequenceFlow id="flow_assigned_to_handler" sourceRef="sendAssignedNotification" targetRef="handleAssignedMessage"></sequenceFlow>
+    <sequenceFlow id="flow_assigned_back" sourceRef="handleAssignedMessage" targetRef="assignToGroup"></sequenceFlow>
+    <intermediateThrowEvent id="sendEscalatedNotification" name="发送升级通知">
+      <messageEventDefinition messageRef="ticketEscalatedMessage">
+        <extensionElements>
+          <flowable:field name="messageType">
+            <flowable:string>ESCALATED</flowable:string>
+          </flowable:field>
+        </extensionElements>
+      </messageEventDefinition>
+    </intermediateThrowEvent>
+    <serviceTask id="handleEscalatedMessage" name="处理升级通知" flowable:delegateExpression="${ticketMessageDelegate}"></serviceTask>
+    <sequenceFlow id="flow_escalated_to_handler" sourceRef="sendEscalatedNotification" targetRef="handleEscalatedMessage"></sequenceFlow>
+    <sequenceFlow id="flow_escalated_back" sourceRef="handleEscalatedMessage" targetRef="assignToGroup"></sequenceFlow>
+    <intermediateThrowEvent id="sendResolvedNotification" name="发送解决通知">
+      <messageEventDefinition messageRef="ticketResolvedMessage">
+        <extensionElements>
+          <flowable:field name="messageType">
+            <flowable:string>RESOLVED</flowable:string>
+          </flowable:field>
+        </extensionElements>
+      </messageEventDefinition>
+    </intermediateThrowEvent>
+    <serviceTask id="handleResolvedMessage" name="处理解决通知" flowable:delegateExpression="${ticketMessageDelegate}"></serviceTask>
+    <sequenceFlow id="flow_resolved_to_handler" sourceRef="sendResolvedNotification" targetRef="handleResolvedMessage"></sequenceFlow>
+    <sequenceFlow id="flow_resolved_back" sourceRef="handleResolvedMessage" targetRef="customerVerify"></sequenceFlow>
+    <sequenceFlow id="flow_to_assigned_notification" sourceRef="assignToGroup" targetRef="sendAssignedNotification">
+      <conditionExpression xsi:type="tFormalExpression">
+        ${status == 'PENDING'}
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_to_escalated_notification" sourceRef="escalateTicket" targetRef="sendEscalatedNotification"></sequenceFlow>
+    <sequenceFlow id="flow_to_resolved_notification" sourceRef="assignToGroup" targetRef="sendResolvedNotification">
+      <conditionExpression xsi:type="tFormalExpression">
+        ${status == 'RESOLVED'}
+      </conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_groupTicketProcess">
@@ -123,6 +160,57 @@
       <bpmndi:BPMNShape bpmnElement="escalateTicket" id="BPMNShape_escalateTicket">
         <omgdc:Bounds height="60.0" width="100.0" x="505.0" y="100.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendAssignedNotification" id="BPMNShape_sendAssignedNotification">
+        <omgdc:Bounds height="30.0" width="30.0" x="655.0" y="115.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendEscalatedNotification" id="BPMNShape_sendEscalatedNotification">
+        <omgdc:Bounds height="30.0" width="30.0" x="540.0" y="30.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendResolvedNotification" id="BPMNShape_sendResolvedNotification">
+        <omgdc:Bounds height="30.0" width="30.0" x="655.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleAssignedMessage" id="BPMNShape_handleAssignedMessage">
+        <omgdc:Bounds height="60.0" width="100.0" x="705.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleEscalatedMessage" id="BPMNShape_handleEscalatedMessage">
+        <omgdc:Bounds height="60.0" width="100.0" x="590.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleResolvedMessage" id="BPMNShape_handleResolvedMessage">
+        <omgdc:Bounds height="60.0" width="100.0" x="705.0" y="270.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" id="BPMNEdge_sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="594.999999999922" y="415.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="415.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="259.95"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-c405b332-2cc3-4866-842b-c4b0d82f653d" id="BPMNEdge_sequenceFlow-c405b332-2cc3-4866-842b-c4b0d82f653d" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="784.9499999999999" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="835.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_to_assigned_notification" id="BPMNEdge_flow_to_assigned_notification" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="604.9499999999999" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="655.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" id="BPMNEdge_sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="604.95" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="685.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_to_escalate" id="BPMNEdge_flow_to_escalate" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="555.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="159.95"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_back_to_group" id="BPMNEdge_flow_back_to_group" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="505.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="455.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="455.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="504.99999999998187" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_to_escalated_notification" id="BPMNEdge_flow_to_escalated_notification" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="555.0" y="100.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="59.949944354253695"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
         <omgdi:waypoint x="159.94999848995764" y="230.0"></omgdi:waypoint>
         <omgdi:waypoint x="205.0" y="230.0"></omgdi:waypoint>
@@ -136,36 +224,47 @@
         <omgdi:waypoint x="645.0" y="261.0"></omgdi:waypoint>
         <omgdi:waypoint x="645.0" y="385.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" id="BPMNEdge_sequenceFlow-07427c3a-696b-4964-b0c6-2c22ad9a0384" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="594.999999999922" y="415.0"></omgdi:waypoint>
-        <omgdi:waypoint x="555.0" y="415.0"></omgdi:waypoint>
-        <omgdi:waypoint x="555.0" y="259.95"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-c405b332-2cc3-4866-842b-c4b0d82f653d" id="BPMNEdge_sequenceFlow-c405b332-2cc3-4866-842b-c4b0d82f653d" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="784.9499999999999" y="230.0"></omgdi:waypoint>
-        <omgdi:waypoint x="835.0" y="230.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow_to_resolved_notification" id="BPMNEdge_flow_to_resolved_notification" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="604.95" y="239.99000000000007"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="245.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="300.0"></omgdi:waypoint>
+        <omgdi:waypoint x="655.0" y="300.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-0c15524d-972d-4287-a905-582a2abbbcaa" id="BPMNEdge_sequenceFlow-0c15524d-972d-4287-a905-582a2abbbcaa" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
         <omgdi:waypoint x="934.949999999996" y="230.0"></omgdi:waypoint>
         <omgdi:waypoint x="985.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" id="BPMNEdge_sequenceFlow-dbd150a1-5d93-4c09-aec6-11f47705eb1e" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="604.95" y="230.0"></omgdi:waypoint>
-        <omgdi:waypoint x="685.0" y="230.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b" id="BPMNEdge_sequenceFlow-d42ed887-6f67-4060-8889-8fabec33506b" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
         <omgdi:waypoint x="454.95000000000005" y="230.0"></omgdi:waypoint>
         <omgdi:waypoint x="505.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow_to_escalate" id="BPMNEdge_flow_to_escalate">
-        <omgdi:waypoint x="555.0" y="200.0"></omgdi:waypoint>
-        <omgdi:waypoint x="555.0" y="160.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow_assigned_to_handler" id="BPMNEdge_flow_assigned_to_handler">
+        <omgdi:waypoint x="685.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="705.0" y="130.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow_back_to_group" id="BPMNEdge_flow_back_to_group">
-        <omgdi:waypoint x="505.0" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="455.0" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="455.0" y="230.0"></omgdi:waypoint>
-        <omgdi:waypoint x="505.0" y="230.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow_assigned_back" id="BPMNEdge_flow_assigned_back">
+        <omgdi:waypoint x="755.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="755.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_escalated_to_handler" id="BPMNEdge_flow_escalated_to_handler">
+        <omgdi:waypoint x="570.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="45.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_escalated_back" id="BPMNEdge_flow_escalated_back">
+        <omgdi:waypoint x="640.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_resolved_to_handler" id="BPMNEdge_flow_resolved_to_handler">
+        <omgdi:waypoint x="685.0" y="300.0"></omgdi:waypoint>
+        <omgdi:waypoint x="705.0" y="300.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_resolved_back" id="BPMNEdge_flow_resolved_back">
+        <omgdi:waypoint x="805.0" y="300.0"></omgdi:waypoint>
+        <omgdi:waypoint x="835.0" y="300.0"></omgdi:waypoint>
+        <omgdi:waypoint x="835.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="785.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
