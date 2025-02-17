@@ -78,7 +78,7 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
     private void initProcess() {
         try {
             // 使用 getInputStream() 而不是 getFile()
-            Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_GROUP_PATH);
+            Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_GROUP_PATH_SIMPLE);
             String groupTicketBpmn20Xml = "";
             
             try (InputStream inputStream = resource.getInputStream()) {
@@ -103,9 +103,9 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
                 String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE).toLowerCase();
                 // 初始化 TicketProcessEntity
                 TicketProcessRequest processRequest = TicketProcessRequest.builder()
-                        .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                        .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                         .key(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                        .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                        .description(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                         .build();
                 processRequest.setUid(processUid);
                 processRequest.setOrgUid(orgUid);
@@ -114,8 +114,8 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
 
                 // 部署流程
                 Deployment deployment = repositoryService.createDeployment()
-                        .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                        .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH)
+                        .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
+                        .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH_SIMPLE)
                         .tenantId(orgUid)
                         .deploy();
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 14:55:23
+ * @LastEditTime: 2025-02-17 15:26:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,7 +56,7 @@ public class TicketProcessEventListener {
         // 检查是否已经部署
         List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
                 .deploymentTenantId(orgUid)
-                .deploymentName(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                .deploymentName(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                 .list();
 
         if (!existingDeployments.isEmpty()) {
@@ -66,7 +66,7 @@ public class TicketProcessEventListener {
 
         // 读取并部署流程
         try {
-            Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_GROUP_PATH);
+            Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_GROUP_PATH_SIMPLE);
             // String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(), "UTF-8");
             String groupTicketBpmn20Xml = "";
             
@@ -77,9 +77,9 @@ public class TicketProcessEventListener {
             // 生成 processUid 并创建流程记录
             String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE).toLowerCase();
             TicketProcessRequest processRequest = TicketProcessRequest.builder()
-                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                     .key(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                    .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                    .description(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                     .build();
             processRequest.setUid(processUid);
             processRequest.setContent(groupTicketBpmn20Xml);
@@ -88,8 +88,8 @@ public class TicketProcessEventListener {
 
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()
-                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                    .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH)
+                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
+                    .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH_SIMPLE)
                     .tenantId(orgUid)
                     .deploy();
 

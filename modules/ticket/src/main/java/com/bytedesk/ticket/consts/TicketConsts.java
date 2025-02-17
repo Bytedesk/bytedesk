@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:00:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 14:54:44
+ * @LastEditTime: 2025-02-17 15:25:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,8 @@ import com.bytedesk.core.constant.I18Consts;
 public class TicketConsts {
 
     public  static final String TICKET_PROCESS_NAME_GROUP = I18Consts.I18N_PREFIX + "ticket.process.name.group";
+
+    public static final String TICKET_PROCESS_NAME_GROUP_SIMPLE = I18Consts.I18N_PREFIX + "ticket.process.name.group.simple";
 
     public static final String TICKET_PROCESS_NAME_AGENT = I18Consts.I18N_PREFIX + "ticket.process.name.agent";
 
