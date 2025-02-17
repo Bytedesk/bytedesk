@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 13:21:02
+ * @LastEditTime: 2025-02-17 13:33:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,19 +36,19 @@ public class SpringAiOllamaConfig {
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
     private String ollamaBaseUrl;
 
-    @Bean
+    @Bean("ollamaApi")
     OllamaApi ollamaApi() {
         return new OllamaApi(ollamaBaseUrl);
     }
 
-    @Bean
+    @Bean("ollamaOptions")
     OllamaOptions ollamaOptions() {
         return OllamaOptions.builder()
         .model(OllamaModel.QWEN_2_5_7B.id())
         .build();
     }
 
-    @Bean
+    @Bean("ollamaChatModel")
     OllamaChatModel ollamaChatModel(OllamaApi ollamaApi, OllamaOptions ollamaOptions) {
         return OllamaChatModel.builder()
         .ollamaApi(ollamaApi)
@@ -56,7 +56,7 @@ public class SpringAiOllamaConfig {
         .build();
     }
 
-    @Bean
+    @Bean("ollamaEmbeddingModel")
     OllamaEmbeddingModel ollamaEmbeddingModel(OllamaApi ollamaApi, OllamaOptions ollamaOptions) {
         return OllamaEmbeddingModel.builder()
         .ollamaApi(ollamaApi)

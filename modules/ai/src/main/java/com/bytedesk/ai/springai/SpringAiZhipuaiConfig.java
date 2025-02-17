@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 13:19:47
+ * @LastEditTime: 2025-02-17 13:34:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Primary;
 import com.zhipu.oapi.ClientV4;
 
 import lombok.Data;
-
 /**
  * https://open.bigmodel.cn/dev/api#sdk_install
  * https://github.com/MetaGLM/zhipuai-sdk-java-v4
@@ -49,12 +48,12 @@ public class SpringAiZhipuaiConfig {
     @Value("${spring.ai.zhipuai.chat.options.temperature:0.7}")
     double zhipuaiApiTemperature;
 
-    @Bean
+    @Bean("zhipuaiApi")
     ZhiPuAiApi zhipuaiApi() {
         return new ZhiPuAiApi(zhipuaiApiKey);
     }
 
-    @Bean
+    @Bean("zhipuaiChatOptions")
     ZhiPuAiChatOptions zhipuaiChatOptions() {
         return ZhiPuAiChatOptions.builder()
                 .model(zhipuaiApiModel)
@@ -64,38 +63,38 @@ public class SpringAiZhipuaiConfig {
 
     // https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
     // https://open.bigmodel.cn/overview
-    @Bean
+    @Bean("zhipuaiEmbeddingOptions")
     ZhiPuAiEmbeddingOptions ZhiPuAiEmbeddingOptions() {
         return ZhiPuAiEmbeddingOptions.builder()
                 .model(ZhiPuAiApi.EmbeddingModel.Embedding_2.getValue())
                 .build();
     }
 
-    @Bean
+    @Bean("zhipuaiEmbeddingModel")
     @Primary
     ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel(ZhiPuAiApi zhipuaiApi) {
         return new ZhiPuAiEmbeddingModel(zhipuaiApi);
     }
 
     // https://open.bigmodel.cn/dev/api/normal-model/glm-4
-    @Bean
+    @Bean("zhipuaiChatModel")
     @Primary
     ZhiPuAiChatModel zhipuaiChatModel(ZhiPuAiApi zhipuaiApi, ZhiPuAiChatOptions zhipuaiChatOptions) {
         return new ZhiPuAiChatModel(zhipuaiApi, zhipuaiChatOptions);
     }
 
-    @Bean
+    @Bean("zhipuaiImageApi")
     ZhiPuAiImageApi zhipuaiImageApi() {
         return new ZhiPuAiImageApi(zhipuaiApiKey);
     }
 
-    @Bean
+    @Bean("zhipuaiImageModel")
     ZhiPuAiImageModel zhiPuAiImageModel(ZhiPuAiImageApi zhipuaiImageApi) {
         return new ZhiPuAiImageModel(zhipuaiImageApi);
     }
 
-    @Bean
-    ClientV4 client() {
+    @Bean("zhipuaiClient")
+    ClientV4 zhipuaiClient() {
         return new ClientV4.Builder(zhipuaiApiKey).build();
     }
 

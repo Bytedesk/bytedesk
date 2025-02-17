@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 13:25:27
+ * @LastEditTime: 2025-02-17 13:43:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,13 @@ import org.springframework.context.annotation.Configuration;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.bytedesk.ai.springai.advisor.SimpleLoggerAdvisor;
 
 /**
  * Spring AI Alibaba
  * https://java2ai.com/docs/dev/get-started/
  * https://github.com/alibaba/spring-ai-alibaba
+ * https://java2ai.com/docs/dev/tutorials/basics/chat-client/?spm=4347728f.63599dc2.0.0.8c026e97YbEM8P
  * Examples:
  * https://github.com/springaialibaba/spring-ai-alibaba-examples
  * 阿里云百炼大模型获取api key：
