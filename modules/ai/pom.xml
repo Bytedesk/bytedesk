@@ -21,6 +21,7 @@
 		<langchain4j.version>1.0.0-beta1</langchain4j.version>
 		<agentsflex.version>1.0.0-rc.4</agentsflex.version>
 		<ollama4j.version>1.0.93</ollama4j.version>
+		<spring-ai-alibaba.version>1.0.0-M5.1</spring-ai-alibaba.version>
 	</properties>
 
 	<dependencies>
@@ -80,11 +81,12 @@
 		<!-- https://java2ai.com/docs/1.0.0-M5.1/overview/?spm=5176.29160081.0.0.2856aa5cNBNg4X -->
 		<!-- https://github.com/alibaba/spring-ai-alibaba/blob/main/README-zh.md -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter</artifactId>
-			<version>1.0.0-M5.1</version>
-		</dependency> -->
+			<version>${spring-ai-alibaba.version}</version>
+		</dependency>
+
 
 		<!-- TODO: deepseek ai -->
 		<!-- https://javaai.pig4cloud.com/deepseek -->

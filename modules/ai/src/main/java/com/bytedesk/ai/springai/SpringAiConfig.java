@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:09:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 09:08:28
+ * @LastEditTime: 2025-02-17 12:24:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,13 +24,28 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAiConfig {
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
-    @Bean
-    ChatClient chatClient(ChatClient.Builder builder) {
+    @Bean("defaultChatClient")
+    ChatClient defaultChatClient(ChatClient.Builder builder) {
         return builder
                 .defaultSystem("You are a friendly chat bot that answers question in the voice of a {voice}")
                 .build();
     }
 
+    // chatModel bean
+    // @Bean
+    // ChatModel chatModel(ChatModel.Builder builder) {
+    //     return builder
+    //             .defaultSystem("You are a friendly chat bot that answers question in the voice of a {voice}")
+    //             .build();
+    // }
 
-    
+    // embeddingModel bean
+    // @Bean
+    // EmbeddingModel embeddingModel(EmbeddingModel.Builder builder) {
+    //     return builder
+    //             .defaultSystem("You are a friendly chat bot that answers question in the voice of a {voice}")
+    //             .build();
+    // }
+
+
 }

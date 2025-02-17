@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 12:30:07
+ * @LastEditTime: 2025-02-17 11:14:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.provider.vendors.zhipuai;
+package com.bytedesk.ai.springai;
 
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Primary;
 
 import com.zhipu.oapi.ClientV4;
 
+import lombok.Data;
+
 /**
  * https://open.bigmodel.cn/dev/api#sdk_install
  * https://github.com/MetaGLM/zhipuai-sdk-java-v4
@@ -34,8 +36,9 @@ import com.zhipu.oapi.ClientV4;
  * https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
  * https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
  */
+@Data
 @Configuration
-public class ZhipuaiConfig {
+public class SpringAiZhipuaiConfig {
 
     @Value("${spring.ai.zhipuai.api-key}")
     String zhiPuAiApiKey;
@@ -43,33 +46,42 @@ public class ZhipuaiConfig {
     @Value("${spring.ai.zhipuai.chat.options.model}")
     String zhiPuAiApiModel;
 
+    @Value("${spring.ai.zhipuai.chat.options.temperature}")
+    double zhiPuAiApiTemperature;
+
     @Bean
     ZhiPuAiApi zhipuaiApi() {
         return new ZhiPuAiApi(zhiPuAiApiKey);
     }
 
+    @Bean
+    ZhiPuAiChatOptions zhipuaiChatOptions() {
+        return ZhiPuAiChatOptions.builder()
+                .model(zhiPuAiApiModel)
+                .temperature(zhiPuAiApiTemperature)
+                .build();
+    }
+
+    // https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
     // https://open.bigmodel.cn/overview
     @Bean
     ZhiPuAiEmbeddingOptions ZhiPuAiEmbeddingOptions() {
         return ZhiPuAiEmbeddingOptions.builder()
-                .model(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
+                .model(ZhiPuAiApi.EmbeddingModel.Embedding_2.getValue())
                 .build();
     }
 
     @Bean
     @Primary
-    ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel() {
-        return new ZhiPuAiEmbeddingModel(zhipuaiApi());
+    ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel(ZhiPuAiApi zhipuaiApi) {
+        return new ZhiPuAiEmbeddingModel(zhipuaiApi);
     }
 
+    // https://open.bigmodel.cn/dev/api/normal-model/glm-4
     @Bean
     @Primary
-    ZhiPuAiChatModel zhipuaiChatModel() {
-        return new ZhiPuAiChatModel(zhipuaiApi(), ZhiPuAiChatOptions.builder()
-                .model(zhiPuAiApiModel)
-                .temperature(0.4)
-                .maxTokens(200)
-                .build());
+    ZhiPuAiChatModel zhipuaiChatModel(ZhiPuAiApi zhipuaiApi, ZhiPuAiChatOptions zhipuaiChatOptions) {
+        return new ZhiPuAiChatModel(zhipuaiApi, zhipuaiChatOptions);
     }
 
     @Bean
@@ -78,8 +90,8 @@ public class ZhipuaiConfig {
     }
 
     @Bean
-    ZhiPuAiImageModel zhiPuAiImageModel() {
-        return new ZhiPuAiImageModel(zhipuaiImageApi());
+    ZhiPuAiImageModel zhiPuAiImageModel(ZhiPuAiImageApi zhipuaiImageApi) {
+        return new ZhiPuAiImageModel(zhipuaiImageApi);
     }
 
     @Bean

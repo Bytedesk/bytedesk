@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 09:08:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 10:15:45
+ * @LastEditTime: 2025-02-17 12:24:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 import org.springframework.ai.chat.client.ChatClient;
+// import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,8 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class CustomerSupportAssistant {
 
-    private final ChatClient chatClient;
+    // @Qualifier("defaultChatClient")
+    private final ChatClient defaultChatClient;
 
     // public CustomerSupportAssistant(ChatClient.Builder builder, VectorStore vectorStore, ChatMemory chatMemory) {
 
@@ -56,7 +58,7 @@ public class CustomerSupportAssistant {
 
     public Flux<String> chat(String chatId, String userMessageContent) {
 
-        return this.chatClient.prompt()
+        return this.defaultChatClient.prompt()
                 .user(userMessageContent)
                 .advisors(advisor -> advisor
                         .param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)

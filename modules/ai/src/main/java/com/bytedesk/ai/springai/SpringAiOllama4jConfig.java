@@ -1,4 +1,17 @@
-package com.bytedesk.ai.provider.vendors.ollama;
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-11-11 12:19:49
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-17 10:35:26
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.ai.springai;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +24,7 @@ import io.github.ollama4j.OllamaAPI;
  * https://ollama4j.github.io/ollama4j/intro
  */
 @Configuration
-public class Ollama4jConfig {
+public class SpringAiOllama4jConfig {
 
     @Value("${spring.ai.ollama.base-url}")
     private String ollamaBaseUrl;
