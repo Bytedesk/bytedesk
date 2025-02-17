@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 16:53:59
+ * @LastEditTime: 2025-02-17 22:32:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,8 +23,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -70,4 +72,8 @@ public class TicketResponse extends BaseResponse {
     // 
     private String createdAt;
     private String updatedAt;
+    // 
+    public static TicketResponse fromEntity(TicketEntity ticket) {
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
 } 

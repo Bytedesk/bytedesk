@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 21:37:07
+ * @LastEditTime: 2025-02-17 22:34:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
@@ -21,13 +20,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.bytedesk.ticket.consts.TicketConsts;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TicketService {
 
-    private final ProcessEngine processEngine;
+    // private final ProcessEngine processEngine;
     private final RuntimeService runtimeService;
     private final TaskService taskService;
     private final TicketRepository ticketRepository;
@@ -63,9 +60,14 @@ public class TicketService {
         List<TicketResponse> responses = tasks.stream()
             .map(task -> {
                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
-                TicketEntity ticket = ticketRepository.findByUid(ticketUid);
-                return TicketResponse.fromEntity(ticket);
+                Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
+                if (ticket.isPresent()) {
+                    return TicketConvertUtils.convertToResponse(ticket.get());
+                } else {
+                    return null;
+                }
             })
+            .filter(Objects::nonNull)
             .toList();
 
         return new PageImpl<>(responses, pageable, total);
