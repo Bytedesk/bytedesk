@@ -240,15 +240,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <!-- <version>3.25.2</version> -->
-            <version>4.28.2</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!--aliyun
         sms-->
         <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 21:46:52
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-17 16:30:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,42 +50,51 @@ public class MessageEventListener {
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
         log.info("MessageJsonEvent {}", event.getJson());
-        //
-        String messageJson = event.getJson();
-        //
-        // messageJson = processMessage(messageJson);
-        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
-        if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
-            messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
-        }
-        //
-        ThreadProtobuf thread = messageProtobuf.getThread();
-        if (thread == null) {
-            throw new RuntimeException("thread is null");
-        }
-        // 替换掉客户端时间戳，统一各个客户端时间戳，防止出现因为客户端时间戳不一致导致的消息乱序
-        messageProtobuf.setCreatedAt(LocalDateTime.now());
-
-        // 1. 拦截黑名单用户消息
-        if (isBlackList(messageProtobuf)) {
-            return;
-        }
-
-        // TODO: 2. 过滤敏感词，将敏感词替换为*
-        // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-
-        messageJson = JSON.toJSONString(messageProtobuf);
-        // 缓存消息，用于定期持久化到数据库
-        messagePersistCache.pushForPersist(messageJson);
-        // 发送给Stomp客户端
-        messageSocketService.sendJsonMessage(messageJson);
-        // 发送给mqtt客户端
+        
         try {
-            MessageProto.Message message = MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(),
-                    messageJson);
-            messageSocketService.sendProtoMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
+            String messageJson = event.getJson();
+            MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+            if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
+                messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
+            }
+            
+            ThreadProtobuf thread = messageProtobuf.getThread();
+            if (thread == null) {
+                throw new RuntimeException("thread is null");
+            }
+            
+            // Replace client timestamp
+            messageProtobuf.setCreatedAt(LocalDateTime.now());
+
+            // Check blacklist
+            if (isBlackList(messageProtobuf)) {
+                return;
+            }
+
+            // Filter sensitive words
+            messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
+            
+            // Cache message for persistence
+            messagePersistCache.pushForPersist(messageJson);
+            
+            // Send to Stomp clients
+            messageSocketService.sendJsonMessage(messageJson);
+            
+            // Send to MQTT clients - with additional error handling
+            try {
+                MessageProto.Message.Builder builder = MessageProto.Message.newBuilder();
+                MessageProto.Message message = MessageConvertUtils.toProtoBean(builder, messageJson);
+                if (message != null) {
+                    messageSocketService.sendProtoMessage(message);
+                } else {
+                    log.error("Failed to convert message to proto format");
+                }
+            } catch (IOException e) {
+                log.error("Error sending proto message: ", e);
+            }
+        } catch (Exception e) {
+            log.error("Error processing message event: ", e);
+            // Consider whether to rethrow or handle the error differently
         }
     }
 
@@ -106,32 +115,12 @@ public class MessageEventListener {
         return false;
     }
 
-    // private String processMessage(String messageJson) {
-    // // log.info("processMessage {}", messageJson);
-    // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson,
-    // MessageProtobuf.class);
-    // if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
-    // messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
-    // }
-    // //
-    // ThreadProtobuf thread = messageProtobuf.getThread();
-    // if (thread == null) {
-    // throw new RuntimeException("thread is null");
-    // }
-    // // 替换掉客户端时间戳，统一各个客户端时间戳，防止出现因为客户端时间戳不一致导致的消息乱序
-    // messageProtobuf.setCreatedAt(LocalDateTime.now());
-
-    // // TODO:
-    // // 1. 拦截黑名单用户消息
-    // // 2. 过滤敏感词，将敏感词替换为*
-    // // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-
-    // String msgJson = JSON.toJSONString(messageProtobuf);
-    // // 缓存消息，用于定期持久化到数据库
-    // messagePersistCache.pushForPersist(msgJson);
-    // //
-    // return msgJson;
-    // }
+    // 过滤敏感词
+    private String filterTaboo(String messageJson) {
+        // TODO: 过滤敏感词，将敏感词替换为*
+        // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
+        return messageJson;
+    }
 
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {

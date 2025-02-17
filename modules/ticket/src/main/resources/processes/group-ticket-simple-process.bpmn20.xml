@@ -35,10 +35,10 @@
     <exclusiveGateway id="verifyGateway" name="验证结果"></exclusiveGateway>
     <sequenceFlow id="flow3" sourceRef="assignToGroup" targetRef="customerVerify"></sequenceFlow>
     <sequenceFlow id="flow_to_gateway" sourceRef="customerVerify" targetRef="verifyGateway"></sequenceFlow>
-    <sequenceFlow id="flow_verify_ok" sourceRef="verifyGateway" targetRef="end">
+    <sequenceFlow id="flow_verify_ok" name="验证通过" sourceRef="verifyGateway" targetRef="end">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verified == true}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow_verify_fail" sourceRef="verifyGateway" targetRef="assignToGroup">
+    <sequenceFlow id="flow_verify_fail" name="验证失败" sourceRef="verifyGateway" targetRef="assignToGroup">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verified == false}]]></conditionExpression>
     </sequenceFlow>
     <endEvent id="end" name="结束工单"></endEvent>
