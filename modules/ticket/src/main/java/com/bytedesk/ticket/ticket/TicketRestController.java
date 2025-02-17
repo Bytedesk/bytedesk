@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 17:47:18
+ * @LastEditTime: 2025-02-17 17:40:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -159,5 +159,67 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return "";
     }
 
+    // 查询 所有
+    @GetMapping("/query/all")   
+    public ResponseEntity<?> queryAll(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketService.queryAll(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    // 查询 待分配
+    @GetMapping("/query/unclaimed")
+    public ResponseEntity<?> queryUnclaimed(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketService.queryUnclaimed(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    // 查询 待我处理
+    @GetMapping("/query/claimed")
+    public ResponseEntity<?> queryClaimed(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketService.queryClaimed(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    // 查询 我创建的
+    @GetMapping("/query/created")
+    public ResponseEntity<?> queryCreated(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketService.queryCreated(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    // 认领claim 任务
+    @PostMapping("/{id}/claim")
+    public ResponseEntity<?> claim(@PathVariable Long id) {
+
+        ticketService.claim(id);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // 退回unclaim 任务
+    @PostMapping("/{id}/unclaim")
+    public ResponseEntity<?> unclaim(@PathVariable Long id) {
+
+        ticketService.unclaim(id);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // 完成任务
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<?> complete(@PathVariable Long id) {
+
+        ticketService.complete(id);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
     
 } 

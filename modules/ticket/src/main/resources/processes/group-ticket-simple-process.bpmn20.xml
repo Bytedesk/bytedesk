@@ -5,17 +5,16 @@
       <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
       <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
     </extensionElements>
-    <startEvent id="start" name="创建工单" flowable:formFieldValidation="true"></startEvent>
-    <userTask id="createTicket" name="创建工单" flowable:assignee="${creatorUser}" flowable:formFieldValidation="true">
+    <startEvent id="start" name="创建工单"></startEvent>
+    <userTask id="createTicket" name="创建工单" flowable:assignee="${reporterUid}">
       <documentation>创建新工单并填写详细信息</documentation>
       <extensionElements>
         <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
-        <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="createTicket"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="createTicket" targetRef="assignToGroup"></sequenceFlow>
-    <userTask id="assignToGroup" name="工作组处理" flowable:candidateGroups="${workgroupUid}" flowable:formFieldValidation="true">
+    <userTask id="assignToGroup" name="工作组处理" flowable:candidateGroups="${workgroupUid}">
       <documentation>工作组成员处理工单</documentation>
       <extensionElements>
         <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
@@ -25,21 +24,20 @@
         <flowable:taskListener event="complete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="customerVerify" name="客户验证" flowable:assignee="${creatorUser}" flowable:formFieldValidation="true">
+    <userTask id="customerVerify" name="客户验证" flowable:assignee="${reporterUid}">
       <documentation>客户验证工单是否解决</documentation>
       <extensionElements>
         <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
-        <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="verifyGateway" name="验证结果"></exclusiveGateway>
     <sequenceFlow id="flow3" sourceRef="assignToGroup" targetRef="customerVerify"></sequenceFlow>
     <sequenceFlow id="flow_to_gateway" sourceRef="customerVerify" targetRef="verifyGateway"></sequenceFlow>
     <sequenceFlow id="flow_verify_ok" name="验证通过" sourceRef="verifyGateway" targetRef="end">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verified == true}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${verified == true}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow_verify_fail" name="验证失败" sourceRef="verifyGateway" targetRef="assignToGroup">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verified == false}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${verified == false}</conditionExpression>
     </sequenceFlow>
     <endEvent id="end" name="结束工单"></endEvent>
   </process>
