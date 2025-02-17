@@ -122,7 +122,7 @@ services:
       # ollama
       SPRING_AI_OLLAMA_CHAT_ENABLED: true
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
-      # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen:7b
+      # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: deepseek-r1:1.5b
       # SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
       # SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
       # openai/deepseek

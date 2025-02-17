@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 19:09:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 12:47:04
+ * @LastEditTime: 2025-02-17 09:48:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,6 +35,11 @@
 - 售前客服：针对售前咨询的客户，给出专业的解答，并给出推荐商品，并给出推荐理由。
 - 售后客服：针对售后咨询的客户，给出专业的解答，并给出解决方案，并给出解决方案的理由。
 - 物流客服：针对物流咨询的客户，给出专业的解答，并给出解决方案，并给出解决方案的理由。
+- 语言翻译：针对不同的语言，给出翻译结果。
+- 语言识别：针对不同的语言，给出识别结果。
+- 语义分析：从对话记录中提取语义信息，并给出语义信息。
+- 实体识别：从对话记录中提取实体信息，并给出实体信息。
+- 情感分析：从对话记录中提取情感信息，并给出情感信息。
 
 ## 参考
 
