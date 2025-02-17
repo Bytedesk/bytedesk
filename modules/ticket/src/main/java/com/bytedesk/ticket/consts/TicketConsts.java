@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:00:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 10:37:31
+ * @LastEditTime: 2025-02-17 14:54:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,11 @@ public class TicketConsts {
 
     public static final String TICKET_PROCESS_KEY_GROUP = "groupTicketProcess";
 
+    public static final String TICKET_PROCESS_KEY_GROUP_SIMPLE = "groupTicketSimpleProcess";
+
     public static final String TICKET_PROCESS_GROUP_PATH = "processes/group-ticket-process.bpmn20.xml";
+
+    public static final String TICKET_PROCESS_GROUP_PATH_SIMPLE = "processes/group-ticket-simple-process.bpmn20.xml";
 
     public static final String TICKET_PROCESS_AGENT_PATH = "processes/agent-ticket-process.bpmn20.xml";
 

@@ -63,10 +63,7 @@ public class GroupTicketProcessTests {
 
     @Autowired
     private FormService formService;
-
-    // @Autowired
-    // private FormRepositoryService formRepositoryService;
-
+    
     // 测试基本工单流程
     @Test
     void testBasicTicketProcess() {
@@ -900,6 +897,165 @@ public class GroupTicketProcessTests {
         } else {
             assertEquals(0, groupTask.getPriority());  // 普通优先级任务
         }
+    }
+
+    // 测试工单消息通知
+    @Test
+    void testTicketNotifications() {
+        // 1. 测试分配通知
+        testAssignedNotification();
+        
+        // 2. 测试升级通知
+        testEscalatedNotification();
+        
+        // 3. 测试解决通知
+        testResolvedNotification();
+    }
+
+    // 测试分配通知
+    private void testAssignedNotification() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        assertNotNull(createTask);
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test Assigned Notification");
+        ticketVariables.put("description", "Testing assigned notification");
+        ticketVariables.put("priority", "MEDIUM");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 获取工作组任务
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        assertNotNull(groupTask);
+
+        // 认领任务并设置状态为处理中，触发分配通知
+        taskService.claim(groupTask.getId(), "agent1");
+        Map<String, Object> assignedVariables = new HashMap<>();
+        assignedVariables.put("status", "PENDING");
+        taskService.complete(groupTask.getId(), assignedVariables);
+
+        // 验证消息处理任务
+        Task messageTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskDefinitionKey("handleAssignedMessage")
+            .singleResult();
+        assertNotNull(messageTask);
+        assertEquals("处理分配通知", messageTask.getName());
+    }
+
+    // 测试升级通知
+    private void testEscalatedNotification() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        assertNotNull(createTask);
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test Escalated Notification");
+        ticketVariables.put("description", "Testing escalated notification");
+        ticketVariables.put("priority", "HIGH");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 获取工作组任务
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        assertNotNull(groupTask);
+
+        // 升级工单，触发升级通知
+        taskService.claim(groupTask.getId(), "agent1");
+        Map<String, Object> escalatedVariables = new HashMap<>();
+        escalatedVariables.put("status", "ESCALATED");
+        escalatedVariables.put("escalatedReason", "需要高级支持");
+        taskService.complete(groupTask.getId(), escalatedVariables);
+
+        // 验证消息处理任务
+        Task messageTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskDefinitionKey("handleEscalatedMessage")
+            .singleResult();
+        assertNotNull(messageTask);
+        assertEquals("处理升级通知", messageTask.getName());
+    }
+
+    // 测试解决通知
+    private void testResolvedNotification() {
+        // 准备流程变量
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("creatorUser", "user1");
+        variables.put("workgroupUid", "support");
+        variables.put("slaTime", "PT4H");
+
+        // 启动流程实例
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+        assertNotNull(processInstance);
+
+        // 完成创建工单任务
+        Task createTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee("user1")
+            .singleResult();
+        assertNotNull(createTask);
+        
+        Map<String, Object> ticketVariables = new HashMap<>();
+        ticketVariables.put("title", "Test Resolved Notification");
+        ticketVariables.put("description", "Testing resolved notification");
+        ticketVariables.put("priority", "MEDIUM");
+        taskService.complete(createTask.getId(), ticketVariables);
+
+        // 获取工作组任务
+        Task groupTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support")
+            .singleResult();
+        assertNotNull(groupTask);
+
+        // 解决工单，触发解决通知
+        taskService.claim(groupTask.getId(), "agent1");
+        Map<String, Object> resolvedVariables = new HashMap<>();
+        resolvedVariables.put("status", "RESOLVED");
+        resolvedVariables.put("solution", "问题已修复");
+        taskService.complete(groupTask.getId(), resolvedVariables);
+
+        // 验证消息处理任务
+        Task messageTask = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskDefinitionKey("handleResolvedMessage")
+            .singleResult();
+        assertNotNull(messageTask);
+        assertEquals("处理解决通知", messageTask.getName());
     }
 
 }
