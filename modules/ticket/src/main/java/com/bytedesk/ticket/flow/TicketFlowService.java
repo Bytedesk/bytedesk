@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ticket.comment.TicketCommentService;
 import com.bytedesk.ticket.consts.TicketConsts;
-import com.bytedesk.ticket.service.TicketAssignmentService;
+import com.bytedesk.ticket.ticket.TicketService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class TicketFlowService {
     private final TaskService taskService;
     private final RepositoryService repositoryService;
     private final HistoryService historyService;
-    private final TicketAssignmentService assignmentService;
+    private final TicketService assignmentService;
     private final TicketCommentService commentService;
     // private final AgentRestService agentService;
     // private final WorkgroupRestService workgroupService;
