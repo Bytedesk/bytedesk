@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 11:14:59
+ * @LastEditTime: 2025-02-17 13:19:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,25 +40,25 @@ import lombok.Data;
 @Configuration
 public class SpringAiZhipuaiConfig {
 
-    @Value("${spring.ai.zhipuai.api-key}")
-    String zhiPuAiApiKey;
+    @Value("${spring.ai.zhipuai.api-key:}")
+    String zhipuaiApiKey;
 
-    @Value("${spring.ai.zhipuai.chat.options.model}")
-    String zhiPuAiApiModel;
+    @Value("${spring.ai.zhipuai.chat.options.model:glm-4-flash}")
+    String zhipuaiApiModel;
 
-    @Value("${spring.ai.zhipuai.chat.options.temperature}")
-    double zhiPuAiApiTemperature;
+    @Value("${spring.ai.zhipuai.chat.options.temperature:0.7}")
+    double zhipuaiApiTemperature;
 
     @Bean
     ZhiPuAiApi zhipuaiApi() {
-        return new ZhiPuAiApi(zhiPuAiApiKey);
+        return new ZhiPuAiApi(zhipuaiApiKey);
     }
 
     @Bean
     ZhiPuAiChatOptions zhipuaiChatOptions() {
         return ZhiPuAiChatOptions.builder()
-                .model(zhiPuAiApiModel)
-                .temperature(zhiPuAiApiTemperature)
+                .model(zhipuaiApiModel)
+                .temperature(zhipuaiApiTemperature)
                 .build();
     }
 
@@ -86,7 +86,7 @@ public class SpringAiZhipuaiConfig {
 
     @Bean
     ZhiPuAiImageApi zhipuaiImageApi() {
-        return new ZhiPuAiImageApi(zhiPuAiApiKey);
+        return new ZhiPuAiImageApi(zhipuaiApiKey);
     }
 
     @Bean
@@ -96,7 +96,7 @@ public class SpringAiZhipuaiConfig {
 
     @Bean
     ClientV4 client() {
-        return new ClientV4.Builder(zhiPuAiApiKey).build();
+        return new ClientV4.Builder(zhipuaiApiKey).build();
     }
 
 }
