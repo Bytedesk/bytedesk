@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 12:28:06
+ * @LastEditTime: 2025-02-17 12:51:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,12 +15,15 @@ package com.bytedesk.ai.provider.vendors.alibaba;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.utils.JsonResult;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.http.ResponseEntity;
 // import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,7 +46,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @RequiredArgsConstructor
 public class AlibabaController {
 
-	// @Qualifier("dashScopeChatClient")
+	// @Qualifier("dashScopeChatClient") // 不起作用？，只能重命名变量名
 	private final ChatClient dashScopeChatClient;
 
 	/**
@@ -51,9 +54,12 @@ public class AlibabaController {
 	 * http://127.0.0.1:9003/alibaba/simple/chat?query=
 	 */
 	@GetMapping("/simple/chat")
-	public String simpleChat(@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？") String query) {
+	public ResponseEntity<?> simpleChat(
+			@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？") String query) {
 
-		return dashScopeChatClient.prompt(query).call().content();
+		String result = dashScopeChatClient.prompt(query).call().content();
+
+		return ResponseEntity.ok(JsonResult.success(result));
 	}
 
 	/**
@@ -61,7 +67,8 @@ public class AlibabaController {
 	 * http://127.0.0.1:9003/alibaba/stream/chat?query=
 	 */
 	@GetMapping("/stream/chat")
-	public Flux<String> streamChat(@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？")String query, HttpServletResponse response) {
+	public Flux<String> streamChat(@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？") String query,
+			HttpServletResponse response) {
 
 		response.setCharacterEncoding("UTF-8");
 
@@ -88,7 +95,7 @@ public class AlibabaController {
 				.advisors(
 						a -> a
 								.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id)
-								.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
-				).stream().content();
+								.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
+				.stream().content();
 	}
 }
