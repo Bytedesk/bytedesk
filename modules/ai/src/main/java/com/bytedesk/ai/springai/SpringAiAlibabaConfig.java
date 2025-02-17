@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 12:09:59
+ * @LastEditTime: 2025-02-17 12:58:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,9 +16,12 @@ package com.bytedesk.ai.springai;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 
 /**
@@ -35,8 +38,16 @@ public class SpringAiAlibabaConfig {
 
     private static final String DEFAULT_PROMPT = "你是一个博学的智能聊天助手，请根据用户提问回答！";
 
+    @Value("${spring.ai.dashscope.api-key}")
+    private String dashScopeApiKey;
+
+    @Bean("dashScopeApi")
+    DashScopeApi dashScopeApi() {
+        return new DashScopeApi(dashScopeApiKey);
+    }
+
     @Bean("dashScopeChatClient")
-    ChatClient dashScopeChatClient(ChatClient.Builder chatClientBuilder) {
+    ChatClient dashScopeChatClient(ChatClient.Builder chatClientBuilder, DashScopeChatOptions dashScopeChatOptions) {
         return chatClientBuilder
                 .defaultSystem(DEFAULT_PROMPT)
                 // 实现 Chat Memory 的 Advisor
@@ -47,11 +58,23 @@ public class SpringAiAlibabaConfig {
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor())
                 // 设置 ChatClient 中 ChatModel 的 Options 参数
-                .defaultOptions(
-                        DashScopeChatOptions.builder()
-                                .withTopP(0.7)
-                                .build())
+                .defaultOptions(dashScopeChatOptions)
                 .build();
+    }
+
+    @Bean("dashScopeChatOptions")
+    DashScopeChatOptions dashScopeChatOptions() {
+        return DashScopeChatOptions.builder()
+                .withModel("qwen2.5:1.5b")
+                .withTopP(0.7)
+                .withTemperature(0.7)
+
+                .build();
+    }
+
+    @Bean("dashScopeChatModel")
+    DashScopeChatModel dashScopeChatModel(DashScopeApi dashScopeApi, DashScopeChatOptions dashScopeChatOptions) {
+        return new DashScopeChatModel(dashScopeApi, dashScopeChatOptions);
     }
 
 }
