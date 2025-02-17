@@ -17,6 +17,7 @@
 
 	<properties>
 		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>
+		<protobuf.version>4.29.3</protobuf.version>
 	</properties>
 
 	<dependencies>
@@ -93,13 +94,18 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java-util</artifactId>
-			<!-- <version>3.25.2</version> -->
-			<version>4.28.2</version>
-			<scope>provided</scope>
+			<version>${protobuf.version}</version>
 		</dependency>
 
 		<!--
@@ -108,7 +114,7 @@
 			<groupId>com.googlecode.protobuf-java-format</groupId>
 			<artifactId>protobuf-java-format</artifactId>
 			<version>1.4</version>
-			<scope>provided</scope>
+			<!-- <scope>provided</scope> -->
 		</dependency>
 
 		<!-- https://github.com/redisson/redisson?tab=readme-ov-file -->
