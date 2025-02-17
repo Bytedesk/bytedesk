@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 12:58:42
+ * @LastEditTime: 2025-02-17 13:25:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,23 +32,39 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
  * https://github.com/springaialibaba/spring-ai-alibaba-examples
  * 阿里云百炼大模型获取api key：
  * https://bailian.console.aliyun.com/?apiKey=1#/api-key
+ * 阿里云百炼大模型模型列表：
+ * https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.11c67980m5X2VR#/model-market
  */
 @Configuration
 public class SpringAiAlibabaConfig {
 
     private static final String DEFAULT_PROMPT = "你是一个博学的智能聊天助手，请根据用户提问回答！";
 
-    @Value("${spring.ai.dashscope.api-key}")
+    @Value("${spring.ai.dashscope.api-key:}")
     private String dashScopeApiKey;
+
+    @Value("${spring.ai.dashscope.chat.options.model:deepseek-r1}")
+    private String dashScopeChatOptionsModel;
+
+    @Value("${spring.ai.dashscope.chat.options.temperature:0.7}")
+    private double dashScopeChatOptionsTemperature;
+
+    @Value("${spring.ai.dashscope.chat.options.topP:3}")
+    private double dashScopeChatOptionsTopP;
 
     @Bean("dashScopeApi")
     DashScopeApi dashScopeApi() {
         return new DashScopeApi(dashScopeApiKey);
     }
 
+    @Bean("dashScopeChatClientBuilder")
+    ChatClient.Builder dashScopeChatClientBuilder(DashScopeChatModel dashScopeChatModel) {
+        return ChatClient.builder(dashScopeChatModel);
+    }
+
     @Bean("dashScopeChatClient")
-    ChatClient dashScopeChatClient(ChatClient.Builder chatClientBuilder, DashScopeChatOptions dashScopeChatOptions) {
-        return chatClientBuilder
+    ChatClient dashScopeChatClient(ChatClient.Builder dashScopeChatClientBuilder, DashScopeChatOptions dashScopeChatOptions) {
+        return dashScopeChatClientBuilder
                 .defaultSystem(DEFAULT_PROMPT)
                 // 实现 Chat Memory 的 Advisor
                 // 在使用 Chat Memory 时，需要指定对话 ID，以便 Spring AI 处理上下文。
@@ -65,10 +81,9 @@ public class SpringAiAlibabaConfig {
     @Bean("dashScopeChatOptions")
     DashScopeChatOptions dashScopeChatOptions() {
         return DashScopeChatOptions.builder()
-                .withModel("qwen2.5:1.5b")
-                .withTopP(0.7)
-                .withTemperature(0.7)
-
+                .withModel(dashScopeChatOptionsModel)
+                .withTopP(dashScopeChatOptionsTopP)
+                .withTemperature(dashScopeChatOptionsTemperature)
                 .build();
     }
 

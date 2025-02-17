@@ -189,7 +189,7 @@ public class ZhipuaiService {
         //
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 // 模型名称
-                .model(springAiZhipuaiConfig.getZhiPuAiApiModel())
+                .model(springAiZhipuaiConfig.getZhipuaiApiModel())
                 // .model(Constants.ModelChatGLM3TURBO)
                 // .model(robotSimple.getLlm().getModel())
                 // .temperature(robotSimple.getLlm().getTemperature())
@@ -263,7 +263,7 @@ public class ZhipuaiService {
         //
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 // 模型名称
-                .model(springAiZhipuaiConfig.getZhiPuAiApiModel())
+                .model(springAiZhipuaiConfig.getZhipuaiApiModel())
                 // .model(Constants.ModelChatGLM3TURBO)
                 // .model(robotSimple.getLlm().getModel())
                 // .temperature(robotSimple.getLlm().getTemperature())
@@ -335,7 +335,7 @@ public class ZhipuaiService {
         //
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 // 模型名称
-                .model(springAiZhipuaiConfig.getZhiPuAiApiModel())
+                .model(springAiZhipuaiConfig.getZhipuaiApiModel())
                 .stream(Boolean.TRUE)
                 .messages(messages)
                 .requestId(uidUtils.getUid())
@@ -431,7 +431,7 @@ public class ZhipuaiService {
         messages.add(chatMessage);
         
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(springAiZhipuaiConfig.getZhiPuAiApiModel())
+                .model(springAiZhipuaiConfig.getZhipuaiApiModel())
                 .stream(Boolean.FALSE)
                 .invokeMethod(Constants.invokeMethod)
                 .messages(messages)
