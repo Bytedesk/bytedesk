@@ -32,15 +32,15 @@ public class SpringAiDeepseekConfig {
     @Value("${spring.ai.openai.api-key}")
     private String apiKey;
 
-    @Bean
-    OpenAiApi openAiApi() {
+    @Bean("deepSeekApi")
+    OpenAiApi deepSeekApi() {
         return OpenAiApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .build();
     }
 
-    @Bean
+    @Bean("deepSeekChatModel")
     OpenAiChatModel deepSeekChatModel(OpenAiApi openAiApi) {
         return OpenAiChatModel.builder()
                 .openAiApi(openAiApi)

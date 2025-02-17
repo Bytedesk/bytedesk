@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 10:31:50
+ * @LastEditTime: 2025-02-17 13:36:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,6 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-// import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -72,7 +71,7 @@ public class ZhipuaiService {
 
     private final SpringAiZhipuaiConfig springAiZhipuaiConfig;
 
-    private final ClientV4 client;
+    private final ClientV4 zhipuaiClient;
 
     private final UidUtils uidUtils;
 
@@ -199,7 +198,7 @@ public class ZhipuaiService {
                 .requestId(messageProtobuf.getUid())
                 .build();
         //
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        ModelApiResponse sseModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
         if (sseModelApiResp.isSuccess()) {
             AtomicBoolean isFirst = new AtomicBoolean(true);
             List<Choice> choices = new ArrayList<>();
@@ -273,7 +272,7 @@ public class ZhipuaiService {
                 .requestId(messageProtobuf.getUid())
                 .build();
         //
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        ModelApiResponse sseModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
         if (sseModelApiResp.isSuccess()) {
             AtomicBoolean isFirst = new AtomicBoolean(true);
             List<Choice> choices = new ArrayList<>();
@@ -342,7 +341,7 @@ public class ZhipuaiService {
                 .build();
         //
         StringBuilder answer = new StringBuilder();
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        ModelApiResponse sseModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
         if (sseModelApiResp.isSuccess()) {
             AtomicBoolean isFirst = new AtomicBoolean(true);
             List<Choice> choices = new ArrayList<>();
@@ -445,7 +444,7 @@ public class ZhipuaiService {
 
         while (retryCount < maxRetries) {
             try {
-                ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+                ModelApiResponse invokeModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
                 log.info("model output: {}", JSON.toJSONString(invokeModelApiResp));
                 return; // 成功则返回
                 
@@ -532,7 +531,7 @@ public class ZhipuaiService {
                 .requestId(messageUid)
                 .build();
         //
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        ModelApiResponse sseModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
         if (sseModelApiResp.isSuccess()) {
             AtomicBoolean isFirst = new AtomicBoolean(true);
             List<Choice> choices = new ArrayList<>();
@@ -621,7 +620,7 @@ public class ZhipuaiService {
                 .requestId(messageProtobuf.getUid())
                 .build();
         //
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        ModelApiResponse sseModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
         if (sseModelApiResp.isSuccess()) {
             AtomicBoolean isFirst = new AtomicBoolean(true);
             List<Choice> choices = new ArrayList<>();
