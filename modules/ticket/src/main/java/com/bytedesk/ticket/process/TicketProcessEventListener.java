@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 07:43:37
+ * @LastEditTime: 2025-02-17 14:55:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,10 +75,10 @@ public class TicketProcessEventListener {
             }
 
             // 生成 processUid 并创建流程记录
-            String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP).toLowerCase();
+            String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE).toLowerCase();
             TicketProcessRequest processRequest = TicketProcessRequest.builder()
                     .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                    .key(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                    .key(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                     .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
                     .build();
             processRequest.setUid(processUid);

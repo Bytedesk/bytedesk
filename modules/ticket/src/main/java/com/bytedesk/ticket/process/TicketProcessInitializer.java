@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 13:03:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 07:46:16
+ * @LastEditTime: 2025-02-17 14:55:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -100,11 +100,11 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
                     continue;
                 }
 
-                String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP).toLowerCase();
+                String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE).toLowerCase();
                 // 初始化 TicketProcessEntity
                 TicketProcessRequest processRequest = TicketProcessRequest.builder()
                         .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                        .key(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                        .key(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                         .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
                         .build();
                 processRequest.setUid(processUid);
