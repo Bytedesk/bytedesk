@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 10:21:49
+ * @LastEditTime: 2025-02-17 12:27:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+// import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,9 +33,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/spring/ai")
 @RequiredArgsConstructor
-public class SpringAIController {
+public class SpringAiController {
 
-    private final ChatClient chatClient;
+//     @Qualifier("defaultChatClient")
+    private final ChatClient defaultChatClient;
 
     private final VectorStore vectorStore;
 
@@ -46,7 +48,7 @@ public class SpringAIController {
     ResponseEntity<JsonResult<?>> completion(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message, String voice) {
 
-        String completion = this.chatClient.prompt()
+        String completion = this.defaultChatClient.prompt()
                 .system(sp -> sp.param("voice", voice))
                 .user(message)
                 .call()

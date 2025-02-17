@@ -47,19 +47,19 @@ public class DeepseekController {
     // spring.ai.openai.chat.options.temperature=0.7
     // The DeepSeek API doesn't support embeddings, so we need to disable it.
     // spring.ai.openai.embedding.enabled=false
-    private final OpenAiChatModel chatModel;
+    private final OpenAiChatModel deepSeekChatModel;
 
     // http://127.0.0.1:9003/deepseek/ai/generate?message=hello
     @GetMapping("/ai/generate")
     public ResponseEntity<JsonResult<?>> generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        return ResponseEntity.ok(JsonResult.success(this.chatModel.call(message)));
+        return ResponseEntity.ok(JsonResult.success(this.deepSeekChatModel.call(message)));
     }
 
     // http://127.0.0.1:9003/deepseek/ai/generateStream?message=hello
     @GetMapping("/ai/generateStream")
     public Flux<ChatResponse> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return this.chatModel.stream(prompt);
+        return this.deepSeekChatModel.stream(prompt);
     }
     
 }
