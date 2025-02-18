@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 17:45:59
+ * @LastEditTime: 2025-02-18 17:50:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@ package com.bytedesk.ticket.ticket;
 
 import java.util.Set;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
@@ -23,7 +24,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.springframework.util.StringUtils;
-import com.alibaba.fastjson.JSON;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

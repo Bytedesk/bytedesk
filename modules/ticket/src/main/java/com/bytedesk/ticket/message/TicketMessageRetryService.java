@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-18 17:01:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 17:49:34
+ * @LastEditTime: 2025-02-18 17:54:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,29 +18,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+// import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketMessageRetryService {
 
-    private final TicketMessageRepository messageRepository;
+    // private final TicketMessageRepository messageRepository;
     
     @Scheduled(fixedDelay = 300000) // 5分钟
     public void retryFailedMessages() {
-        List<TicketMessageEntity> failedMessages = 
-            messageRepository.findByStatusAndRetryCountLessThan(
-                TicketMessageStatusEnum.FAILED, 3);
+        // List<TicketMessageEntity> failedMessages = 
+        //     messageRepository.findByStatusAndRetryCountLessThan(
+        //         TicketMessageStatusEnum.FAILED, 3);
                 
-        for (TicketMessageEntity message : failedMessages) {
-            try {
-                // 重试发送消息
-                // message.setRetryCount(message.getRetryCount() + 1);
-                // messageRepository.save(message);
-            } catch (Exception e) {
-                log.error("消息重试失败: {}", e.getMessage());
-            }
-        }
+        // for (TicketMessageEntity message : failedMessages) {
+        //     try {
+        //         // 重试发送消息
+        //         // message.setRetryCount(message.getRetryCount() + 1);
+        //         messageRepository.save(message);
+        //     } catch (Exception e) {
+        //         log.error("消息重试失败: {}", e.getMessage());
+        //     }
+        // }
     }
 } 
