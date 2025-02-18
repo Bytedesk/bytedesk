@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 11:48:22
+ * @LastEditTime: 2025-02-18 11:58:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -161,6 +161,11 @@ public class TicketService {
      * 查询待分配的工单
      */
     public Page<TicketResponse> queryUnassigned(TicketRequest request) {
+        // 如果workgroupUid为空，则查询所有待分配的工单
+        if (!StringUtils.hasText(request.getWorkgroupUid())) {
+            return queryAllUnassigned(request);
+        }
+        
         Pageable pageable = request.getPageable();
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
@@ -174,6 +179,40 @@ public class TicketService {
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .count();
 
+        List<TicketResponse> responses = tasks.stream()
+                .map(task -> {
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
+                    Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
+                    if (ticket.isPresent()) {
+                        return TicketConvertUtils.convertToResponse(ticket.get());
+                    } else {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        return new PageImpl<>(responses, pageable, total);
+    }
+
+    /**
+     * 查询所有待分配的工单
+     */
+    public Page<TicketResponse> queryAllUnassigned(TicketRequest request) {
+        // 查询所有待分配的工单
+        Pageable pageable = request.getPageable();
+        List<Task> tasks = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .taskCandidateGroup(null)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .listPage(pageable.getPageNumber(), pageable.getPageSize());
+
+        long total = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .taskCandidateGroup(null)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .count();
+        
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
                     String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
