@@ -3,6 +3,7 @@ package com.bytedesk.ticket.ticket;
 import org.flowable.engine.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,6 +42,8 @@ import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
+import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
+import com.bytedesk.ticket.ticket.event.TicketUpdateWorkgroupEvent;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
 import com.bytedesk.core.topic.TopicUtils;
@@ -74,6 +77,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     private final ThreadRestService threadRestService;
 
     private final UploadRestService uploadRestService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
@@ -171,7 +176,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.AGENT, userJson);
             ticket.setThreadUid(thread.getUid());
         } else {
-            // ticket.setType(TicketTypeEnum.WORKGROUP.name());
             ticket.setStatus(TicketStatusEnum.NEW.name());
 
             String userJson = BytedeskConsts.EMPTY_JSON_STRING;
@@ -263,6 +267,24 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket = ticketRepository.save(ticket);
         if (ticket == null) {
             throw new RuntimeException("update ticket failed");
+        }
+
+        // 发布事件，判断assignee是否被修改
+        if (StringUtils.hasText(request.getAssigneeUid())) {
+            String oldAssigneeUid = JSON.parse()ticket.getAssignee();
+            if (oldAssigneeUid != null && !oldAssigneeUid.equals(request.getAssigneeUid())) {
+                TicketUpdateAssigneeEvent ticketUpdateAssigneeEvent = new TicketUpdateAssigneeEvent(ticket, oldAssigneeUid, request.getAssigneeUid());
+                applicationEventPublisher.publishEvent(ticketUpdateAssigneeEvent);
+            }
+        }
+
+        // 发布事件，判断workgroupUid是否被修改
+        if (StringUtils.hasText(request.getWorkgroupUid())) {
+            String oldWorkgroupUid = ticket.getWorkgroup();
+            if (oldWorkgroupUid != null && !oldWorkgroupUid.equals(request.getWorkgroupUid())) {
+                TicketUpdateWorkgroupEvent ticketUpdateWorkgroupEvent = new TicketUpdateWorkgroupEvent(ticket, oldWorkgroupUid, request.getWorkgroupUid());
+                applicationEventPublisher.publishEvent(ticketUpdateWorkgroupEvent);
+            }
         }
         
         return convertToResponse(ticket);

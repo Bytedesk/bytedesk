@@ -18,8 +18,8 @@ import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.ticket.event.TicketCreateEvent;
-import com.bytedesk.ticket.event.TicketUpdateEvent;
+import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
+import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;

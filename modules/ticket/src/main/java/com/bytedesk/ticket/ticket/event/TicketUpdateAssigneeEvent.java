@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-23 14:54:58
+ * @Date: 2025-02-18 10:58:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 14:58:19
+ * @LastEditTime: 2025-02-18 10:59:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.event;
+package com.bytedesk.ticket.ticket.event;
 
 import org.springframework.context.ApplicationEvent;
 
@@ -22,13 +22,18 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TicketUpdateEvent extends ApplicationEvent {
+public class TicketUpdateAssigneeEvent extends ApplicationEvent {
 
     private TicketEntity ticket;
 
-    public TicketUpdateEvent(TicketEntity ticket) {
+    private String oldAssigneeUid;
+
+    private String newAssigneeUid;
+
+    public TicketUpdateAssigneeEvent(TicketEntity ticket, String oldAssigneeUid, String newAssigneeUid) {
         super(ticket);
         this.ticket = ticket;
+        this.oldAssigneeUid = oldAssigneeUid;
+        this.newAssigneeUid = newAssigneeUid;
     }
-
 }

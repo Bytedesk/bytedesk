@@ -1061,4 +1061,59 @@ public class GroupTicketProcessTests {
         assertEquals("处理解决通知", messageTask.getName());
     }
 
+    // 流程实例启动后，测试更新工作组
+    @Test
+    void testUpdateWorkgroup() {
+        // 1. 启动流程实例，设置初始工作组
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("reporterUid", "user1");
+        variables.put("workgroupUid", "support1");  // 初始工作组
+        variables.put("orgUid", "org1");
+        variables.put("slaTime", "PT4H");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+            TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE, 
+            variables
+        );
+        assertNotNull(processInstance);
+
+        // 2. 验证当前任务属于初始工作组
+        Task task = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support1")
+            .singleResult();
+        assertNotNull(task);
+        assertEquals("assignToGroup", task.getTaskDefinitionKey());
+
+        // 3. 更新工作组
+        runtimeService.setVariable(processInstance.getId(), "workgroupUid", "support2");
+
+        // 4. 验证任务已转移到新工作组
+        // 原工作组不再能看到任务
+        task = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support1")
+            .singleResult();
+        assertNull(task);
+
+        // 新工作组可以看到任务
+        task = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskCandidateGroup("support2")
+            .singleResult();
+        assertNotNull(task);
+        assertEquals("assignToGroup", task.getTaskDefinitionKey());
+
+        // 5. 测试任务认领和完成
+        taskService.claim(task.getId(), "agent1");
+        
+        Map<String, Object> completeVariables = new HashMap<>();
+        completeVariables.put("status", "RESOLVED");
+        taskService.complete(task.getId(), completeVariables);
+
+        // 6. 验证流程变量
+        String finalWorkgroup = (String) runtimeService.getVariable(processInstance.getId(), "workgroupUid");
+        assertEquals("support2", finalWorkgroup);
+    }
+
 }

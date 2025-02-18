@@ -129,6 +129,7 @@ services:
       SPRING_SECURITY_BASIC_ENABLED: true
       # ai config
       # zhipuai
+      # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
       SPRING_AI_ZHIPUAI_API_KEY: ''
       SPRING_AI_ZHIPUAI_CHAT_ENABLED: false
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
