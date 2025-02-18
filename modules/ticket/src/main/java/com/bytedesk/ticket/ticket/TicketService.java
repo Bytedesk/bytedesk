@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 16:44:29
+ * @LastEditTime: 2025-02-18 17:12:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,10 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.ticket.consts.TicketConsts;
+// import com.bytedesk.ticket.message.event.TicketMessageEvent;
+// import com.bytedesk.ticket.message.event.TicketMessageType;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +44,7 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+// import org.springframework.context.ApplicationEventPublisher;
 
 @Slf4j
 @Service
@@ -52,6 +56,7 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final HistoryService historyService;
     private final AgentRestService agentRestService;
+    // private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 查询工单，并过滤掉没有任务的工单
@@ -278,13 +283,15 @@ public class TicketService {
                 .singleResult();
 
         if (task != null) {
-            // 认领工单
+            // 1. 认领工单
             taskService.claim(task.getId(), request.getAssigneeUid());
 
-            // 更新工单状态
+            // 2. 更新工单状态
             Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
             if (ticketOptional.isPresent()) {
                 TicketEntity ticket = ticketOptional.get();
+                
+                // 3. 设置处理人信息
                 Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
                 if (assigneeOptional.isPresent()) {
                     UserProtobuf assigneeProtobuf = UserProtobuf.builder()
@@ -295,8 +302,30 @@ public class TicketService {
                     assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
                     ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
                     ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+
+                    // 4. 更新流程变量
+                    Map<String, Object> variables = new HashMap<>();
+                    variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getAssignee());
+                    variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
+                    variables.put(TicketConsts.TICKET_VARIABLE_CLAIM_TIME, new Date());
+                    runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
+
+                    // 5. 发布工单分配消息事件
+                    // 此处没有使用ticket自带消息机制，便于扩展
+                    // eventPublisher.publishEvent(TicketMessageEvent.builder()
+                    //     .ticketUid(ticket.getUid())
+                    //     .processInstanceId(ticket.getProcessInstanceId())
+                    //     .type(TicketMessageType.ASSIGNED.name())
+                    //     .assignee(assigneeProtobuf)
+                    //     .description("工单已分配给 " + assigneeProtobuf.getNickname())
+                    //     .createTime(new Date())
+                    //     .build());
                 }
+
+                // 6. 保存工单
                 ticketRepository.save(ticket);
+
+                // 7. 返回工单响应
                 return TicketConvertUtils.convertToResponse(ticket);
             } else {
                 throw new RuntimeException("工单 " + request.getUid() + " 不存在");
