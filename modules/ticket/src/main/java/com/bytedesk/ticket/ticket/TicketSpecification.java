@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 14:44:59
+ * @LastEditTime: 2025-02-18 16:11:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -74,14 +74,14 @@ public class TicketSpecification extends BaseSpecification {
                     "%" + "\"uid\":\"" + request.getWorkgroupUid() + "\"" + "%"));
             }
             // 处理 ALL 查询 - 我创建的或待我处理的
-            if (StringUtils.hasText(request.getReporterUid()) || StringUtils.hasText(request.getAssigneeUid())) {
+            if (StringUtils.hasText(request.getReporter().getUid()) || StringUtils.hasText(request.getAssigneeUid())) {
                 if (Boolean.TRUE.equals(request.getAssignmentAll())) {
                     List<Predicate> orPredicates = new ArrayList<>();
                     
                     // 处理 reporter 条件
-                    if (StringUtils.hasText(request.getReporterUid())) {
+                    if (StringUtils.hasText(request.getReporter().getUid())) {
                         orPredicates.add(criteriaBuilder.like(root.get("reporter"), 
-                            "%" + "\"uid\":\"" + request.getReporterUid() + "\"" + "%"));
+                            "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
                     }
                     
                     // 处理 assignee 条件
@@ -103,9 +103,9 @@ public class TicketSpecification extends BaseSpecification {
                     }
                 } else {
                     // 单一条件查询
-                    if (StringUtils.hasText(request.getReporterUid())) {
+                    if (StringUtils.hasText(request.getReporter().getUid())) {
                         predicates.add(criteriaBuilder.like(root.get("reporter"), 
-                            "%" + "\"uid\":\"" + request.getReporterUid() + "\"" + "%"));
+                            "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
                     }
                     if (StringUtils.hasText(request.getAssigneeUid())) {
                         if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
