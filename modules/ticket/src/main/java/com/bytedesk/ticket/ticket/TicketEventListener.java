@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 11:25:35
+ * @LastEditTime: 2025-02-18 12:10:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -119,7 +119,17 @@ public class TicketEventListener {
     @EventListener
     public void handleTicketUpdateEvent(TicketUpdateEvent event) {
         log.info("TicketEventListener handleTicketUpdateEvent: {}", event);
-        // TicketEntity ticket = event.getTicket();
+        TicketEntity ticket = event.getTicket();
+        // 判断是否删除
+        if (ticket.isDeleted()) {
+            // 同步更新流程实例
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(ticket.getProcessInstanceId())
+                .singleResult();
+            if (processInstance != null) {
+                runtimeService.deleteProcessInstance(processInstance.getId(), "deleted by user");
+            }
+        }
     }
 
     @EventListener
