@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 14:42:50
+ * @LastEditTime: 2025-02-18 15:05:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,28 +62,28 @@ public class TicketService {
         Specification<TicketEntity> spec = TicketSpecification.search(request);
         // 2. 获取符合条件的工单
         Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
-        
+
         // 3. 获取这些工单的当前任务
         List<TicketResponse> responses = ticketPage.getContent().stream()
-            .map(ticket -> {
-                // 查询工单对应的当前任务
-                Task task = taskService.createTaskQuery()
-                    .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                    .processInstanceId(ticket.getProcessInstanceId())
-                    .singleResult();
-                // 如果任务为空，则返回null
-                if (task == null) {
-                    return null;
-                }
-                // 如果任务不为空，则返回工单响应
-                return TicketConvertUtils.convertToResponse(ticket);
-            })
-            .filter(Objects::nonNull)
-            .toList();
+                .map(ticket -> {
+                    // 查询工单对应的当前任务
+                    Task task = taskService.createTaskQuery()
+                            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                            .processInstanceId(ticket.getProcessInstanceId())
+                            .singleResult();
+                    // 如果任务为空，则返回null
+                    if (task == null) {
+                        return null;
+                    }
+                    // 如果任务不为空，则返回工单响应
+                    return TicketConvertUtils.convertToResponse(ticket);
+                })
+                .filter(Objects::nonNull)
+                .toList();
 
         return new PageImpl<>(responses, pageable, ticketPage.getTotalElements());
     }
-    
+
     /**
      * 查询企业orgUid所有工单
      */
@@ -104,7 +104,8 @@ public class TicketService {
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -138,7 +139,8 @@ public class TicketService {
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -175,7 +177,8 @@ public class TicketService {
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -197,7 +200,7 @@ public class TicketService {
         if (!StringUtils.hasText(request.getWorkgroupUid())) {
             return queryAllUnassigned(request);
         }
-        
+
         Pageable pageable = request.getPageable();
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
@@ -213,7 +216,8 @@ public class TicketService {
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -233,7 +237,7 @@ public class TicketService {
     public Page<TicketResponse> queryAllUnassigned(TicketRequest request) {
         // 查询所有待分配的工单
         Pageable pageable = request.getPageable();
-        // 
+        //
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
@@ -243,10 +247,11 @@ public class TicketService {
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .count();
-        
+
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -369,36 +374,39 @@ public class TicketService {
 
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(request.getProcessInstanceId())
-                .includeProcessVariables()  // 重要：包含流程变量
+                .includeProcessVariables() // 重要：包含流程变量
                 .orderByProcessInstanceEndTime().asc()
                 .list();
 
-        return historicProcessInstances.stream()
-            .map((HistoricProcessInstance historicProcessInstance) -> {
-                Map<String, Object> variables = historicProcessInstance.getProcessVariables();
-                
-                return TicketHistoryResponse.builder()
-                    .processInstanceId(historicProcessInstance.getId())
-                    .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
-                    .processDefinitionName(historicProcessInstance.getProcessDefinitionName())
-                    .processDefinitionKey(historicProcessInstance.getProcessDefinitionKey())
-                    .processDefinitionVersion(historicProcessInstance.getProcessDefinitionVersion())
-                    .businessKey(historicProcessInstance.getBusinessKey())
-                    .name(historicProcessInstance.getName())
-                    // 从流程变量中获取
-                    .description((String) variables.get(TicketConsts.TICKET_VARIABLE_DESCRIPTION))
-                    .startUserId((String) variables.get(TicketConsts.TICKET_VARIABLE_START_USER_ID))
-                    .status((String) variables.get(TicketConsts.TICKET_VARIABLE_STATUS))
-                    .priority((String) variables.get(TicketConsts.TICKET_VARIABLE_PRIORITY))
-                    .categoryUid((String) variables.get(TicketConsts.TICKET_VARIABLE_CATEGORY_UID))
-                    .startTime(historicProcessInstance.getStartTime())
-                    .endTime(historicProcessInstance.getEndTime())
-                    .durationInMillis(historicProcessInstance.getDurationInMillis())
-                    .deleteReason(historicProcessInstance.getDeleteReason())
-                    .tenantId(historicProcessInstance.getTenantId())
-                    .build();
-            })
-            .toList();
+        List<TicketHistoryResponse> responses = historicProcessInstances.stream()
+                .map(historicProcessInstance -> {
+                    Map<String, Object> variables = historicProcessInstance.getProcessVariables();
+
+                    return TicketHistoryResponse.builder()
+                            .processInstanceId(historicProcessInstance.getId())
+                            .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
+                            .processDefinitionName(historicProcessInstance.getProcessDefinitionName())
+                            .processDefinitionKey(historicProcessInstance.getProcessDefinitionKey())
+                            .processDefinitionVersion(historicProcessInstance.getProcessDefinitionVersion())
+                            .businessKey(historicProcessInstance.getBusinessKey())
+                            .startTime(historicProcessInstance.getStartTime())
+                            .endTime(historicProcessInstance.getEndTime())
+                            .durationInMillis(historicProcessInstance.getDurationInMillis())
+                            .deleteReason(historicProcessInstance.getDeleteReason())
+                            .tenantId(historicProcessInstance.getTenantId())
+                            .name(historicProcessInstance.getName())
+                            // 从流程变量中获取状态
+                            .description((String) variables.get(TicketConsts.TICKET_VARIABLE_DESCRIPTION))
+                            .startUserId((String) variables.get(TicketConsts.TICKET_VARIABLE_START_USER_ID))
+                            .status((String) variables.get(TicketConsts.TICKET_VARIABLE_STATUS))
+                            .priority((String) variables.get(TicketConsts.TICKET_VARIABLE_PRIORITY))
+                            .categoryUid((String) variables.get(TicketConsts.TICKET_VARIABLE_CATEGORY_UID))
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        return responses;
     }
 
 }
