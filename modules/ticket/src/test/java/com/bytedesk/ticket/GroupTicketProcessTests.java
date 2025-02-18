@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-14 15:48:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-16 19:55:22
+ * @LastEditTime: 2025-02-18 09:21:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.flowable.engine.FormService;
-import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.HistoryService;
+// import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.form.FormProperty;
@@ -52,8 +53,8 @@ import org.flowable.engine.impl.form.EnumFormType;
 @SpringBootTest
 public class GroupTicketProcessTests {
 
-    @Autowired
-    private ProcessEngine processEngine;
+    // @Autowired
+    // private ProcessEngine processEngine;
 
     @Autowired
     private RuntimeService runtimeService;
@@ -63,7 +64,10 @@ public class GroupTicketProcessTests {
 
     @Autowired
     private FormService formService;
-    
+
+    @Autowired
+    private HistoryService historyService;
+
     // 测试基本工单流程
     @Test
     void testBasicTicketProcess() {
@@ -258,8 +262,7 @@ public class GroupTicketProcessTests {
         }
 
         // 验证是否触发了SLA通知
-        List<HistoricTaskInstance> historicTasks = processEngine.getHistoryService()
-            .createHistoricTaskInstanceQuery()
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
             .processInstanceId(processInstance.getId())
             .orderByHistoricTaskInstanceStartTime()
             .asc()
