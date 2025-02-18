@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 07:28:18
+ * @LastEditTime: 2025-02-18 09:13:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -228,22 +228,39 @@ public class TicketService {
         }
     }
 
-
     /**
-     * 查询某个工单的处理历史，通过historyService查询
+     * 查询某个工单的处理历史
      */
     public List<TicketHistory> queryTicketHistory(TicketRequest request) {
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-            .processInstanceId(request.getUid())
+            .processInstanceId(request.getProcessInstanceId())
             .list();
 
-        return historicProcessInstances.stream()
+        List<TicketHistory> responses = historicProcessInstances.stream()
             .map(historicProcessInstance -> {
                 return TicketHistory.builder()
                     .processInstanceId(historicProcessInstance.getId())
+                    .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
+                    .processDefinitionName(historicProcessInstance.getProcessDefinitionName())
+                    .processDefinitionKey(historicProcessInstance.getProcessDefinitionKey())
+                    .processDefinitionVersion(historicProcessInstance.getProcessDefinitionVersion())
+                    .businessKey(historicProcessInstance.getBusinessKey())
+                    .startUserId(historicProcessInstance.getStartUserId())
+                    .startTime(historicProcessInstance.getStartTime())
+                    .endTime(historicProcessInstance.getEndTime())
+                    .durationInMillis(historicProcessInstance.getDurationInMillis())
+                    .deleteReason(historicProcessInstance.getDeleteReason())
+                    .tenantId(historicProcessInstance.getTenantId())
+                    .name(historicProcessInstance.getName())
+                    .description(historicProcessInstance.getDescription())
+                    // 从流程变量中获取状态
+                    .status((String) historicProcessInstance.getProcessVariables().get("status"))
                     .build();
             })
+            .filter(Objects::nonNull)
             .toList();
+
+        return responses;
     }
 
 } 
