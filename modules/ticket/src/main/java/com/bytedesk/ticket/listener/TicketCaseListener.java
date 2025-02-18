@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 13:06:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 15:31:45
+ * @LastEditTime: 2025-02-18 21:49:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,6 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.sla.TicketSLAService;
 import com.bytedesk.ticket.ticket.TicketRestService;
@@ -86,7 +84,7 @@ public class TicketCaseListener implements CaseInstanceLifecycleListener {
     private void handleCaseTerminated(CaseInstance caseInstance) {
         // 通知相关人员工单被终止
         ticketService.findByUid(caseInstance.getId()).ifPresent(ticket -> {
-            String assigneeUid = JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid();
+            String assigneeUid = ticket.getAssignee().getUid();
             // 
             notificationService.notifyManager(
                 assigneeUid,

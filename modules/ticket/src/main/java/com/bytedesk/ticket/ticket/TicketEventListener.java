@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 21:47:39
+ * @LastEditTime: 2025-02-18 22:11:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,8 +51,8 @@ public class TicketEventListener {
 
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
-        log.info("TicketEventListener handleTicketCreateEvent: {}", event);
         TicketEntity ticket = event.getTicket();
+        log.info("开始创建工单流程实例: ticketUid={}, orgUid={}", ticket.getUid(), ticket.getOrgUid());
 
         // 1. 准备流程变量
         Map<String, Object> variables = new HashMap<>();
@@ -72,18 +72,30 @@ public class TicketEventListener {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
             .tenantId(ticket.getOrgUid())
-            .name(ticket.getTitle())                // 流程实例名称
-            .businessKey(ticket.getUid())          // 业务键
+            .name(ticket.getTitle())
+            .businessKey(ticket.getUid())
             .variables(variables)
             .start();
+        
+        log.info("流程实例创建成功: processInstanceId={}, businessKey={}", 
+            processInstance.getId(), processInstance.getBusinessKey());
 
-        // 3. 设置流程实例变量
+        // 3. 验证任务是否创建
+        Task task = taskService.createTaskQuery()
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+            .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+            .processInstanceId(processInstance.getId())
+            .singleResult();
+        
+        log.info("流程任务创建状态: task={}", task);
+
+        // 4. 设置流程实例变量
         // 可以在流程执行的任何时候调用, 每次调用都会产生一次变量更新历史记录
         // 适合设置运行时的动态变量或需要更新的变量
         // 每次调用都会有一次数据库操作
         runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_START_TIME, new Date());
 
-        // 4. 设置 SLA 时间
+        // 5. 设置 SLA 时间
         String slaTime = switch (ticket.getPriority()) {
             case "CRITICAL" -> "PT30M";
             case "URGENT" -> "PT1H";
@@ -95,21 +107,23 @@ public class TicketEventListener {
         runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_SLA_TIME, slaTime);
         // 第一步的assignee设置为reporter
         runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getReporter());
-        // 5. 更新工单的流程实例ID
+        // 6. 更新工单的流程实例ID
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticket.getUid());
         if (ticketOptional.isPresent()) {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
             // 
             if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
-                Task task = taskService.createTaskQuery()
+                Task taskClaim = taskService.createTaskQuery()
                     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                     .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
                     .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticketEntity.getUid())
                     .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, ticketEntity.getOrgUid())
                     .singleResult();
-                if (task != null) {
-                    taskService.claim(task.getId(), ticketEntity.getAssignee().getUid());
+                if (taskClaim != null) {
+                    taskService.claim(taskClaim.getId(), ticketEntity.getAssignee().getUid());
+                } else {
+                    log.error("工单认领失败: taskClaim={}", taskClaim);
                 }
             }
             ticketRestService.save(ticketEntity);

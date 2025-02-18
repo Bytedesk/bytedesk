@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 21:46:59
+ * @LastEditTime: 2025-02-18 21:59:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,11 +51,11 @@ public class TicketEntity extends BaseEntity {
     private String description;     // 工单描述(选填)
 
     // 结构化内容
-    @Builder.Default
+    // @Builder.Default
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
-    private String form = BytedeskConsts.EMPTY_JSON_STRING;
+    // private String form = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
     private String status = TicketStatusEnum.NEW.name();          // 状态(新建/处理中/已解决/已关闭)

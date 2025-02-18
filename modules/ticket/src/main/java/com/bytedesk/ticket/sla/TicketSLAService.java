@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
@@ -114,6 +112,6 @@ public class TicketSLAService {
             ticket.getId(),
             ticket.getCreatedAt()
         );
-        notificationService.notifyManager(JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid(), message);
+        notificationService.notifyManager(ticket.getAssignee().getUid(), message);
     }
 } 

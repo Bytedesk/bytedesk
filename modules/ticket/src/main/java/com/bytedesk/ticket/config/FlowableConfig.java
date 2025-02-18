@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-15 21:33:51
+ * @Date: 2025-01-23 13:45:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-05 11:48:47
+ * @LastEditTime: 2025-02-18 22:16:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,17 @@ public class FlowableConfig {
 
     // @Autowired
     // private RepositoryService repositoryService;
+    
+    // @Autowired
+    // private TicketProcessInstanceListener processInstanceListener;
+    
+    // @Autowired
+    // private RuntimeService runtimeService;
+    
+    // @PostConstruct
+    // public void init() {
+    //     runtimeService.addEventListener(processInstanceListener);
+    // }
     
     @Bean
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> engineConfigurationConfigurer() {
