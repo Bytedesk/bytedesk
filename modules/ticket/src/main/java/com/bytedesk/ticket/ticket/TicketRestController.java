@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 12:37:08
+ * @LastEditTime: 2025-02-18 12:45:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -160,7 +160,6 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
 
         return "";
     }
-
 
     /**
      * 查询工单，并过滤掉没有任务的工单
