@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 06:58:15
+ * @LastEditTime: 2025-02-19 07:34:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,9 +16,11 @@ package com.bytedesk.ticket.ticket;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -418,9 +420,9 @@ public class TicketService {
     }
 
     /**
-     * 查询某个工单的处理历史
+     * 查询某个工单实例的处理历史
      */
-    public List<TicketHistoryProcessResponse> queryTicketProcessInstanceHistory(TicketRequest request) {
+    public List<TicketHistoryProcessResponse> queryTicketProcessHistory(TicketRequest request) {
         // processInstanceId不能为空
         if (request.getProcessInstanceId() == null) {
             if (StringUtils.hasText(request.getUid())) {
@@ -495,7 +497,7 @@ public class TicketService {
     /**
      * 查询某个工单的流程实例历史
      */
-    public List<TicketHistoryProcessResponse> queryTicketTaskHistory(TicketRequest request) {
+    public List<TicketHistoryTaskResponse> queryTicketTaskHistory(TicketRequest request) {
         // processInstanceId不能为空
         if (request.getProcessInstanceId() == null) {
             if (StringUtils.hasText(request.getUid())) {
@@ -511,17 +513,112 @@ public class TicketService {
 
         List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(request.getProcessInstanceId())
+                .includeTaskLocalVariables()    // 包含任务局部变量
+                .includeProcessVariables()      // 包含流程变量
                 .orderByHistoricTaskInstanceStartTime().asc()
                 .list();
 
-        List<TicketHistoryProcessResponse> responses = historicTasks.stream()
+        List<TicketHistoryTaskResponse> responses = historicTasks.stream()
                 .map(historicTask -> {
-                    return TicketHistoryProcessResponse.builder()
+                    return TicketHistoryTaskResponse.builder()
                             .taskId(historicTask.getId())
                             .taskName(historicTask.getName())
+                            .taskDefinitionKey(historicTask.getTaskDefinitionKey())
+                            .taskDefinitionId(historicTask.getTaskDefinitionId())
+                            .description(historicTask.getDescription())
+                            .category(historicTask.getCategory())
+                            .formKey(historicTask.getFormKey())
+                            .processInstanceId(historicTask.getProcessInstanceId())
+                            .processDefinitionId(historicTask.getProcessDefinitionId())
+                            .executionId(historicTask.getExecutionId())
+                            
+                            .assignee(historicTask.getAssignee())
+                            .owner(historicTask.getOwner())
+                            // 注意：历史任务可能无法直接获取候选人/组信息
+                            
+                            .priority(historicTask.getPriority())
+                            .createTime(historicTask.getCreateTime())
+                            .dueDate(historicTask.getDueDate())
+                            .claimTime(historicTask.getClaimTime())
+                            .endTime(historicTask.getEndTime())
+                            .durationInMillis(historicTask.getDurationInMillis())
+                            .deleteReason(historicTask.getDeleteReason())
+                            .tenantId(historicTask.getTenantId())
+                            
+                            .taskLocalVariables(historicTask.getTaskLocalVariables())
+                            .processVariables(historicTask.getProcessVariables())
                             .build();
                 })
                 .toList();
         return responses;
+    }
+
+    /**
+     * 查询工单的完整活动历史
+     */
+    public List<TicketHistoryActivityResponse> queryTicketActivityHistory(TicketRequest request) {
+        // processInstanceId不能为空
+        if (request.getProcessInstanceId() == null) {
+            if (StringUtils.hasText(request.getUid())) {
+                Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+                if (ticketOptional.isPresent()) {
+                    request.setProcessInstanceId(ticketOptional.get().getProcessInstanceId());
+                }
+            } else {
+                throw new RuntimeException("processInstanceId不能为空");
+            }
+        }
+
+        List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(request.getProcessInstanceId())
+                .orderByHistoricActivityInstanceStartTime().asc()
+                .list();
+
+        return activities.stream()
+                .map(activity -> {
+                    // 获取活动相关的变量
+                    Map<String, Object> processVariables = new HashMap<>();
+                    Map<String, Object> taskLocalVariables = new HashMap<>();
+                    
+                    // 如果是用户任务，获取任务变量
+                    if ("userTask".equals(activity.getActivityType())) {
+                        List<HistoricVariableInstance> taskVars = historyService
+                                .createHistoricVariableInstanceQuery()
+                                .taskId(activity.getTaskId())
+                                .list();
+                        
+                        taskVars.forEach(var -> 
+                            taskLocalVariables.put(var.getVariableName(), var.getValue()));
+                    }
+                    
+                    // 获取流程变量
+                    List<HistoricVariableInstance> processVars = historyService
+                            .createHistoricVariableInstanceQuery()
+                            .processInstanceId(activity.getProcessInstanceId())
+                            .list();
+                    
+                    processVars.forEach(var -> 
+                        processVariables.put(var.getVariableName(), var.getValue()));
+
+                    return TicketHistoryActivityResponse.builder()
+                            .id(activity.getId())
+                            .activityId(activity.getActivityId())
+                            .activityName(activity.getActivityName())
+                            .activityType(activity.getActivityType())
+                            .processDefinitionId(activity.getProcessDefinitionId())
+                            .processInstanceId(activity.getProcessInstanceId())
+                            .executionId(activity.getExecutionId())
+                            .taskId(activity.getTaskId())
+                            .calledProcessInstanceId(activity.getCalledProcessInstanceId())
+                            .assignee(activity.getAssignee())
+                            .startTime(activity.getStartTime())
+                            .endTime(activity.getEndTime())
+                            .durationInMillis(activity.getDurationInMillis())
+                            .tenantId(activity.getTenantId())
+                            .taskLocalVariables(taskLocalVariables)
+                            .processVariables(processVariables)
+                            .build();
+                })
+                .toList();
     }
 }
