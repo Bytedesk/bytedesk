@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:00:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 14:42:12
+ * @LastEditTime: 2025-02-18 15:20:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,5 +70,7 @@ public class TicketConsts {
     public static final String TICKET_VARIABLE_START_TIME = "startTime"; // 开始时间
 
     public static final String TICKET_VARIABLE_SLA_TIME = "slaTime"; // SLA时间
+
+    public static final String TICKET_VARIABLE_ASSIGNEE = "assignee"; // 分配给谁
     
 }
