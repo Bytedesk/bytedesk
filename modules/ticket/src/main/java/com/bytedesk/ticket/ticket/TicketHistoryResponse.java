@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class TicketHistory {
+public class TicketHistoryResponse {
     private String processInstanceId;      // 流程实例ID
     private String processDefinitionId;    // 流程定义ID
     private String processDefinitionName;  // 流程定义名称
