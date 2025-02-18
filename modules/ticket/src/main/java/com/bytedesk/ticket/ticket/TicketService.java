@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 23:16:29
+ * @LastEditTime: 2025-02-19 00:03:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -443,6 +443,25 @@ public class TicketService {
                 .map(historicProcessInstance -> {
                     Map<String, Object> variables = historicProcessInstance.getProcessVariables();
 
+                    // 从流程变量中获取 assignee
+                    UserProtobuf assignee = null;
+                    Object assigneeObj = variables.get(TicketConsts.TICKET_VARIABLE_ASSIGNEE);
+                    if (assigneeObj != null) {
+                        if (assigneeObj instanceof UserProtobuf) {
+                            // 如果已经是 UserProtobuf 对象，直接使用
+                            assignee = (UserProtobuf) assigneeObj;
+                        } else if (assigneeObj instanceof String) {
+                            // 如果是 JSON 字符串，需要解析
+                            try {
+                                assignee = JSON.parseObject((String) assigneeObj, UserProtobuf.class);
+                            } catch (Exception e) {
+                                log.warn("Failed to parse assignee JSON: {}", assigneeObj, e);
+                            }
+                        } else {
+                            log.warn("Unexpected assignee type: {}", assigneeObj.getClass());
+                        }
+                    }
+
                     return TicketHistoryResponse.builder()
                             .processInstanceId(historicProcessInstance.getId())
                             .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
@@ -457,8 +476,7 @@ public class TicketService {
                             .tenantId(historicProcessInstance.getTenantId())
                             .name(historicProcessInstance.getName())
                             // 从流程变量中获取状态
-                            .assignee(JSON.parseObject((String) variables.get(TicketConsts.TICKET_VARIABLE_ASSIGNEE),
-                                    UserProtobuf.class))
+                            .assignee(assignee)
                             .description((String) variables.get(TicketConsts.TICKET_VARIABLE_DESCRIPTION))
                             .startUserId((String) variables.get(TicketConsts.TICKET_VARIABLE_START_USER_ID))
                             .status((String) variables.get(TicketConsts.TICKET_VARIABLE_STATUS))
