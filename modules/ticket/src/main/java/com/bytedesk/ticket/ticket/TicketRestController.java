@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 12:45:59
+ * @LastEditTime: 2025-02-18 16:41:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -202,8 +202,8 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
      */
     @PostMapping("/claim")
     public ResponseEntity<?> claimTicket(@RequestBody TicketRequest request) {
-        ticketService.claimTicket(request);
-        return ResponseEntity.ok(JsonResult.success());
+        TicketResponse response = ticketService.claimTicket(request);
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
@@ -211,8 +211,8 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
      */
     @PostMapping("/unclaim")
     public ResponseEntity<?> unclaimTicket(@RequestBody TicketRequest request) {
-        ticketService.unclaimTicket(request);
-        return ResponseEntity.ok(JsonResult.success());
+        TicketResponse response = ticketService.unclaimTicket(request);
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
@@ -220,8 +220,8 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
      */
     @PostMapping("/complete")
     public ResponseEntity<?> completeTicket(@RequestBody TicketRequest request) {
-        ticketService.completeTicket(request);
-        return ResponseEntity.ok(JsonResult.success());
+        TicketResponse response = ticketService.completeTicket(request);
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**

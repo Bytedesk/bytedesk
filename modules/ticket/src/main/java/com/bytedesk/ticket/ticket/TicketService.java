@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 16:10:24
+ * @LastEditTime: 2025-02-18 16:44:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -269,7 +269,7 @@ public class TicketService {
      * 认领工单
      */
     @Transactional
-    public void claimTicket(TicketRequest request) {
+    public TicketResponse claimTicket(TicketRequest request) {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
@@ -278,6 +278,7 @@ public class TicketService {
                 .singleResult();
 
         if (task != null) {
+            // 认领工单
             taskService.claim(task.getId(), request.getAssigneeUid());
 
             // 更新工单状态
@@ -296,15 +297,19 @@ public class TicketService {
                     ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
                 }
                 ticketRepository.save(ticket);
+                return TicketConvertUtils.convertToResponse(ticket);
+            } else {
+                throw new RuntimeException("工单 " + request.getUid() + " 不存在");
             }
         }
+        return null;
     }
 
     /**
      * 退回工单
      */
     @Transactional
-    public void unclaimTicket(TicketRequest request) {
+    public TicketResponse unclaimTicket(TicketRequest request) {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
@@ -323,15 +328,17 @@ public class TicketService {
                 // ticket.setAssigneeUid(null);
                 // ticket.setStatus(TicketStatusEnum.OPEN);
                 ticketRepository.save(ticket);
+                return TicketConvertUtils.convertToResponse(ticket);
             }
         }
+        return null;
     }
 
     /**
      * 完成工单
      */
     @Transactional
-    public void completeTicket(TicketRequest request) {
+    public TicketResponse completeTicket(TicketRequest request) {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
@@ -351,8 +358,10 @@ public class TicketService {
                 // ticket.setStatus(TicketStatusEnum.valueOf(request.getStatus()));
                 // ticket.setSolution(request.getSolution());
                 ticketRepository.save(ticket);
+                return TicketConvertUtils.convertToResponse(ticket);
             }
         }
+        return null;
     }
 
     /**
