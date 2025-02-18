@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:00:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 16:51:35
+ * @LastEditTime: 2025-02-18 22:30:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,13 @@ public class TicketConsts {
     public static final String TICKET_FILTER_UNASSIGNED = "UNASSIGNED";
 
     // task definition key
-    public static final String TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP = "assignToGroup";
+    public static final String TICKET_USER_TASK_CREATE_TICKET = "createTicket";
+
+    public static final String TICKET_USER_TASK_ASSIGN_TO_GROUP = "assignToGroup";
+
+    public static final String TICKET_USER_TASK_CUSTOMER_VERIFY = "customerVerify";
+
+    public static final String TICKET_EXCLUSIVE_GATEWAY_VERIFY_GATEWAY = "verifyGateway";
 
     // variables
     public static final String TICKET_VARIABLE_TICKET_UID = "ticketUid";

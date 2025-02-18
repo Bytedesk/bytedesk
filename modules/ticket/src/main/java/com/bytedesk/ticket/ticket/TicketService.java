@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 22:13:06
+ * @LastEditTime: 2025-02-18 22:38:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -168,7 +168,7 @@ public class TicketService {
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskAssignee(request.getAssigneeUid())
-                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
                 .listPage(pageable.getPageNumber(), pageable.getPageSize());
@@ -176,7 +176,7 @@ public class TicketService {
         long total = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskAssignee(request.getAssigneeUid())
-                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
                 .count();
@@ -289,7 +289,7 @@ public class TicketService {
         // 2. 查询任务
         Task task = taskService.createTaskQuery()
                 .processInstanceId(ticket.getProcessInstanceId()) // 使用processInstanceId查询
-                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                // .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_CREATE_TICKET)
                 .active() // 只查询活动的任务
                 .singleResult();
 
@@ -364,7 +364,7 @@ public class TicketService {
     public TicketResponse unclaimTicket(TicketRequest request) {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .taskAssignee(request.getAssigneeUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
