@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 10:59:56
+ * @LastEditTime: 2025-02-18 11:25:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,10 +57,10 @@ public class TicketEventListener {
 
         // 启动工单流程
         Map<String, Object> variables = new HashMap<>();
-        variables.put("ticketUid", ticket.getUid());
-        variables.put("workgroupUid", JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
-        variables.put("reporterUid", JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
-        variables.put("orgUid", ticket.getOrgUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticket.getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, ticket.getOrgUid());
 
         // 根据不同优先级设置不同的SLA时间
         switch (ticket.getPriority()) {
@@ -104,9 +104,9 @@ public class TicketEventListener {
             if (StringUtils.hasText(ticketEntity.getAssignee())) {
                 Task task = taskService.createTaskQuery()
                     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                    .taskDefinitionKey("assignToGroup")
-                    .processVariableValueEquals("ticketUid", ticketEntity.getUid())
-                    .processVariableValueEquals("orgUid", ticketEntity.getOrgUid())
+                    .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                    .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticketEntity.getUid())
+                    .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, ticketEntity.getOrgUid())
                     .singleResult();
                 if (task != null) {
                     taskService.claim(task.getId(), JSON.parseObject(ticketEntity.getAssignee(), UserProtobuf.class).getUid());
@@ -135,6 +135,9 @@ public class TicketEventListener {
     @EventListener
     public void handleTicketUpdateWorkgroupEvent(TicketUpdateWorkgroupEvent event) {
         log.info("TicketEventListener handleTicketUpdateWorkgroupEvent: {}", event);
+        TicketEntity ticket = event.getTicket();
+        // 更新当前技能组workgroupUid
+        runtimeService.setVariable(ticket.getProcessInstanceId(), TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, event.getNewWorkgroupUid());
     }
 
     // 监听上传BPMN流程图

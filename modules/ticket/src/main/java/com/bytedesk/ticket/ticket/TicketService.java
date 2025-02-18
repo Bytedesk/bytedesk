@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 11:08:33
+ * @LastEditTime: 2025-02-18 11:27:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,19 +59,19 @@ public class TicketService {
         //
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
                 .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
         long total = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
                 .count();
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -94,18 +94,18 @@ public class TicketService {
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskAssignee(request.getReporterUid())
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
         long total = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskAssignee(request.getReporterUid())
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .count();
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -127,22 +127,22 @@ public class TicketService {
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskAssignee(request.getAssigneeUid())
-                .taskDefinitionKey("assignToGroup")
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
                 .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
         long total = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskAssignee(request.getAssigneeUid())
-                .taskDefinitionKey("assignToGroup")
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
                 .count();
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -164,18 +164,18 @@ public class TicketService {
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskCandidateGroup(request.getWorkgroupUid())
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
         long total = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskCandidateGroup(request.getWorkgroupUid())
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .count();
 
         List<TicketResponse> responses = tasks.stream()
                 .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), "ticketUid");
+                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(), TicketConsts.TICKET_VARIABLE_TICKET_UID);
                     Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
@@ -196,9 +196,9 @@ public class TicketService {
     public void claimTicket(TicketRequest request) {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskDefinitionKey("assignToGroup")
-                .processVariableValueEquals("ticketUid", request.getUid())
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
 
         if (task != null) {
@@ -231,10 +231,10 @@ public class TicketService {
     public void unclaimTicket(TicketRequest request) {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskDefinitionKey("assignToGroup")
+                .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
                 .taskAssignee(request.getAssigneeUid())
-                .processVariableValueEquals("ticketUid", request.getUid())
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
 
         if (task != null) {
@@ -258,8 +258,8 @@ public class TicketService {
     public void completeTicket(TicketRequest request) {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .processVariableValueEquals("ticketUid", request.getUid())
-                .processVariableValueEquals("orgUid", request.getOrgUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
 
         if (task != null) {
