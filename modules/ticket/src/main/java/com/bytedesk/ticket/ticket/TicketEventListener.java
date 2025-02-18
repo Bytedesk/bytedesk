@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 14:41:18
+ * @LastEditTime: 2025-02-18 14:58:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,6 +63,12 @@ public class TicketEventListener {
         variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, ticket.getOrgUid());
+        // 
+        variables.put(TicketConsts.TICKET_VARIABLE_DESCRIPTION, ticket.getDescription());
+        variables.put(TicketConsts.TICKET_VARIABLE_START_USER_ID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
+        variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
+        variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
 
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
@@ -74,11 +80,9 @@ public class TicketEventListener {
             .start();
 
         // 3. 设置流程实例变量
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_DESCRIPTION, ticket.getDescription());
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_START_USER_ID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
+        // 可以在流程执行的任何时候调用, 每次调用都会产生一次变量更新历史记录
+        // 适合设置运行时的动态变量或需要更新的变量
+        // 每次调用都会有一次数据库操作
         runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_START_TIME, new Date());
 
         // 4. 设置 SLA 时间
