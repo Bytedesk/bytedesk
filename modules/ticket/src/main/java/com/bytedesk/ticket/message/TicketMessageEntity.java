@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-18 17:06:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 17:15:42
+ * @LastEditTime: 2025-02-18 17:49:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,21 +25,21 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+// @Data
 @Builder
 @Accessors(chain = true)
-@AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+// @AllArgsConstructor
+// @NoArgsConstructor
 @Table(name = "bytedesk_ticket_message")
 public class TicketMessageEntity extends BaseEntity {
 
-    private String ticketUid;
-    private String processInstanceId;
-    private String type;
-    private String assignee;
-    private String description;
+    // private String ticketUid;
+    // private String processInstanceId;
+    // private String type;
+    // private String assignee;
+    // private String description;
 
-    private TicketMessageStatusEnum status;
-    private int retryCount;
+    // private TicketMessageStatusEnum status;
+    // private int retryCount;
 }
