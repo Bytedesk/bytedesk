@@ -270,8 +270,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         }
 
         // 发布事件，判断assignee是否被修改
-        if (StringUtils.hasText(request.getAssigneeUid())) {
-            String oldAssigneeUid = JSON.parse()ticket.getAssignee();
+        if (StringUtils.hasText(request.getAssigneeUid()) && StringUtils.hasText(ticket.getAssignee())) {
+            String oldAssigneeUid = JSON.parseObject(ticket.getAssignee(), UserProtobuf.class).getUid();
             if (oldAssigneeUid != null && !oldAssigneeUid.equals(request.getAssigneeUid())) {
                 TicketUpdateAssigneeEvent ticketUpdateAssigneeEvent = new TicketUpdateAssigneeEvent(ticket, oldAssigneeUid, request.getAssigneeUid());
                 applicationEventPublisher.publishEvent(ticketUpdateAssigneeEvent);
@@ -279,8 +279,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         }
 
         // 发布事件，判断workgroupUid是否被修改
-        if (StringUtils.hasText(request.getWorkgroupUid())) {
-            String oldWorkgroupUid = ticket.getWorkgroup();
+        if (StringUtils.hasText(request.getWorkgroupUid()) && StringUtils.hasText(ticket.getWorkgroup())) {
+            String oldWorkgroupUid = JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid();
             if (oldWorkgroupUid != null && !oldWorkgroupUid.equals(request.getWorkgroupUid())) {
                 TicketUpdateWorkgroupEvent ticketUpdateWorkgroupEvent = new TicketUpdateWorkgroupEvent(ticket, oldWorkgroupUid, request.getWorkgroupUid());
                 applicationEventPublisher.publishEvent(ticketUpdateWorkgroupEvent);
