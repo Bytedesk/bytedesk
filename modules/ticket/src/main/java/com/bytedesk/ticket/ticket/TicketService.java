@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 17:12:20
+ * @LastEditTime: 2025-02-18 17:39:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -134,6 +134,7 @@ public class TicketService {
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskAssignee(request.getReporter().getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .orderByTaskCreateTime().desc()
                 .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
         long total = taskService.createTaskQuery()
@@ -280,6 +281,7 @@ public class TicketService {
                 .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .orderByTaskCreateTime().desc()
                 .singleResult();
 
         if (task != null) {
@@ -290,7 +292,7 @@ public class TicketService {
             Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
             if (ticketOptional.isPresent()) {
                 TicketEntity ticket = ticketOptional.get();
-                
+
                 // 3. 设置处理人信息
                 Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
                 if (assigneeOptional.isPresent()) {
@@ -313,13 +315,13 @@ public class TicketService {
                     // 5. 发布工单分配消息事件
                     // 此处没有使用ticket自带消息机制，便于扩展
                     // eventPublisher.publishEvent(TicketMessageEvent.builder()
-                    //     .ticketUid(ticket.getUid())
-                    //     .processInstanceId(ticket.getProcessInstanceId())
-                    //     .type(TicketMessageType.ASSIGNED.name())
-                    //     .assignee(assigneeProtobuf)
-                    //     .description("工单已分配给 " + assigneeProtobuf.getNickname())
-                    //     .createTime(new Date())
-                    //     .build());
+                    // .ticketUid(ticket.getUid())
+                    // .processInstanceId(ticket.getProcessInstanceId())
+                    // .type(TicketMessageType.ASSIGNED.name())
+                    // .assignee(assigneeProtobuf)
+                    // .description("工单已分配给 " + assigneeProtobuf.getNickname())
+                    // .createTime(new Date())
+                    // .build());
                 }
 
                 // 6. 保存工单
@@ -434,7 +436,8 @@ public class TicketService {
                             .tenantId(historicProcessInstance.getTenantId())
                             .name(historicProcessInstance.getName())
                             // 从流程变量中获取状态
-                            .assignee(JSON.parseObject((String) variables.get(TicketConsts.TICKET_VARIABLE_ASSIGNEE), UserProtobuf.class))
+                            .assignee(JSON.parseObject((String) variables.get(TicketConsts.TICKET_VARIABLE_ASSIGNEE),
+                                    UserProtobuf.class))
                             .description((String) variables.get(TicketConsts.TICKET_VARIABLE_DESCRIPTION))
                             .startUserId((String) variables.get(TicketConsts.TICKET_VARIABLE_START_USER_ID))
                             .status((String) variables.get(TicketConsts.TICKET_VARIABLE_STATUS))

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 16:41:44
+ * @LastEditTime: 2025-02-18 17:45:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -203,6 +203,9 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @PostMapping("/claim")
     public ResponseEntity<?> claimTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.claimTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -212,6 +215,9 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @PostMapping("/unclaim")
     public ResponseEntity<?> unclaimTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.unclaimTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -221,6 +227,9 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @PostMapping("/complete")
     public ResponseEntity<?> completeTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.completeTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -232,4 +241,5 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         List<TicketHistoryResponse> histories = ticketService.queryTicketHistory(request);
         return ResponseEntity.ok(JsonResult.success(histories));
     }
+
 } 
