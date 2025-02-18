@@ -16,6 +16,7 @@ package com.bytedesk.ticket.ticket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -134,5 +135,21 @@ public class TicketSpecification extends BaseSpecification {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    public static Specification<TicketEntity> equalOrgUid(String orgUid) {
+        return (root, query, cb) -> cb.equal(root.get("orgUid"), orgUid);
+    }
+    
+    public static Specification<TicketEntity> equalPriority(String priority) {
+        return (root, query, cb) -> cb.equal(root.get("priority"), priority);
+    }
+    
+    public static Specification<TicketEntity> equalStatus(String status) {
+        return (root, query, cb) -> cb.equal(root.get("status"), status);
+    }
+    
+    public static Specification<TicketEntity> betweenCreatedAt(Date startTime, Date endTime) {
+        return (root, query, cb) -> cb.between(root.get("createdAt"), startTime, endTime);
     }
 }
