@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 22:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 22:32:59
+ * @LastEditTime: 2025-02-18 21:48:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.ticket.ticket;
 import org.modelmapper.ModelMapper;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 
@@ -28,23 +27,23 @@ public class TicketConvertUtils {
         // 
         TicketResponse ticketResponse = modelMapper.map(entity, TicketResponse.class);
         // 
-        if (StringUtils.hasText(entity.getUser())) {
-            UserProtobuf user = JSON.parseObject(entity.getUser(), UserProtobuf.class);
+        if (StringUtils.hasText(entity.getUserString())) {
+            UserProtobuf user = entity.getUser();
             ticketResponse.setUser(user);
         }
         // 
-        if (StringUtils.hasText(entity.getWorkgroup())) {
-            UserProtobuf workgroup = JSON.parseObject(entity.getWorkgroup(), UserProtobuf.class);
+        if (StringUtils.hasText(entity.getWorkgroupString())) {
+            UserProtobuf workgroup = entity.getWorkgroup();
             ticketResponse.setWorkgroup(workgroup);
         }
         // 
-        if (StringUtils.hasText(entity.getAssignee())) {
-            UserProtobuf assignee = JSON.parseObject(entity.getAssignee(), UserProtobuf.class);
+        if (StringUtils.hasText(entity.getAssigneeString())) {
+            UserProtobuf assignee = entity.getAssignee();
             ticketResponse.setAssignee(assignee);
         }
         // 
-        if (StringUtils.hasText(entity.getReporter())) {
-            UserProtobuf reporter = JSON.parseObject(entity.getReporter(), UserProtobuf.class);
+        if (StringUtils.hasText(entity.getReporterString())) {
+            UserProtobuf reporter = entity.getReporter();
             ticketResponse.setReporter(reporter);
         }
         // 

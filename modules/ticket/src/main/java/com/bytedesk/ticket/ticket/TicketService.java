@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 21:09:54
+ * @LastEditTime: 2025-02-18 21:20:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -276,7 +276,7 @@ public class TicketService {
      */
     @Transactional
     public TicketResponse claimTicket(TicketRequest request) {
-        log.info("认领工单: {}", request);
+        log.info("认领工单 request: uid={}, assigneeUid={}, orgUid={}", request.getUid(), request.getAssigneeUid(), request.getOrgUid());
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
@@ -284,7 +284,7 @@ public class TicketService {
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
                 .singleResult();
-        log.info("认领工单: {}", task);
+        log.info("认领工单 task: {}", task);
         // 如果工单不存在，则返回null
         if (task == null) {
             throw new RuntimeException("工单 " + request.getUid() + " 不存在");
