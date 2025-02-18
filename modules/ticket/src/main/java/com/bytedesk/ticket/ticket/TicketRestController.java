@@ -220,7 +220,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
      */
     @GetMapping("/history")
     public ResponseEntity<?> queryTicketHistory(TicketRequest request) {
-        List<TicketHistory> histories = ticketService.queryTicketHistory(request);
+        List<TicketHistoryResponse> histories = ticketService.queryTicketHistory(request);
         return ResponseEntity.ok(JsonResult.success(histories));
     }
 } 

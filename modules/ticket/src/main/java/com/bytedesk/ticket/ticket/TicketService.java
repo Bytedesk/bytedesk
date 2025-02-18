@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 11:27:32
+ * @LastEditTime: 2025-02-18 11:48:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -282,15 +283,28 @@ public class TicketService {
     /**
      * 查询某个工单的处理历史
      */
-    public List<TicketHistory> queryTicketHistory(TicketRequest request) {
+    public List<TicketHistoryResponse> queryTicketHistory(TicketRequest request) {
+        // processInstanceId不能为空
+        if (request.getProcessInstanceId() == null) {
+            if (StringUtils.hasText(request.getUid())) {
+                // 根据uid查询processInstanceId
+                Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+                if (ticketOptional.isPresent()) {
+                    request.setProcessInstanceId(ticketOptional.get().getProcessInstanceId());
+                }
+            } else {
+                throw new RuntimeException("processInstanceId不能为空");
+            }
+        }
+
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(request.getProcessInstanceId())
                 .orderByProcessInstanceEndTime().asc()
                 .list();
 
-        List<TicketHistory> responses = historicProcessInstances.stream()
+        List<TicketHistoryResponse> responses = historicProcessInstances.stream()
                 .map(historicProcessInstance -> {
-                    return TicketHistory.builder()
+                    return TicketHistoryResponse.builder()
                             .processInstanceId(historicProcessInstance.getId())
                             .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
                             .processDefinitionName(historicProcessInstance.getProcessDefinitionName())
