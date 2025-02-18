@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 16:53:13
+ * @LastEditTime: 2025-02-18 21:46:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,8 +16,10 @@ package com.bytedesk.ticket.ticket;
 import java.util.List;
 import java.util.Set;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 
@@ -127,4 +129,38 @@ public class TicketEntity extends BaseEntity {
 
     // 流程定义实体UID
     private String processEntityUid;
+
+
+    // 获取工单的访客
+    public UserProtobuf getUser() {
+        return JSON.parseObject(user, UserProtobuf.class);
+    }
+    public String getUserString() {
+        return user;
+    }
+
+    // 获取工单的处理人
+    public UserProtobuf getAssignee() {
+        return JSON.parseObject(assignee, UserProtobuf.class);
+    }
+    public String getAssigneeString() {
+        return assignee;
+    }
+
+    // 获取工单的报告人
+    public UserProtobuf getReporter() {
+        return JSON.parseObject(reporter, UserProtobuf.class);
+    }
+    public String getReporterString() {
+        return reporter;
+    }
+
+    // 获取工单的工作组
+    public UserProtobuf getWorkgroup() {
+        return JSON.parseObject(workgroup, UserProtobuf.class);
+    }
+    public String getWorkgroupString() {
+        return workgroup;
+    }
+
 } 

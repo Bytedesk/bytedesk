@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 15:22:07
+ * @LastEditTime: 2025-02-18 21:47:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,8 +26,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
@@ -60,12 +58,12 @@ public class TicketEventListener {
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
         variables.put(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticket.getUid());
-        variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
-        variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, ticket.getWorkgroup().getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, ticket.getReporter().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, ticket.getOrgUid());
         // 
         variables.put(TicketConsts.TICKET_VARIABLE_DESCRIPTION, ticket.getDescription());
-        variables.put(TicketConsts.TICKET_VARIABLE_START_USER_ID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_START_USER_ID, ticket.getReporter().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
         variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
         variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
@@ -103,7 +101,7 @@ public class TicketEventListener {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
             // 
-            if (StringUtils.hasText(ticketEntity.getAssignee())) {
+            if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
                 Task task = taskService.createTaskQuery()
                     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                     .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
@@ -111,7 +109,7 @@ public class TicketEventListener {
                     .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, ticketEntity.getOrgUid())
                     .singleResult();
                 if (task != null) {
-                    taskService.claim(task.getId(), JSON.parseObject(ticketEntity.getAssignee(), UserProtobuf.class).getUid());
+                    taskService.claim(task.getId(), ticketEntity.getAssignee().getUid());
                 }
             }
             ticketRestService.save(ticketEntity);
