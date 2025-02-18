@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 07:14:17
+ * @LastEditTime: 2025-02-18 10:45:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,15 +18,21 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.event.TicketUpdateEvent;
@@ -42,6 +48,8 @@ public class TicketEventListener {
     private final RuntimeService runtimeService;
 
     private final TicketRestService ticketRestService;
+
+    private final TaskService taskService;
 
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
@@ -93,6 +101,18 @@ public class TicketEventListener {
         if (ticketOptional.isPresent()) {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
+            // 
+            if (StringUtils.hasText(ticketEntity.getAssignee())) {
+                Task task = taskService.createTaskQuery()
+                    .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                    .taskDefinitionKey("assignToGroup")
+                    .processVariableValueEquals("ticketUid", ticketEntity.getUid())
+                    .processVariableValueEquals("orgUid", ticketEntity.getOrgUid())
+                    .singleResult();
+                if (task != null) {
+                    taskService.claim(task.getId(), JSON.parseObject(ticketEntity.getAssignee(), UserProtobuf.class).getUid());
+                }
+            }
             ticketRestService.save(ticketEntity);
         }
     }
