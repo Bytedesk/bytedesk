@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecificationExecutor<TicketEntity> {
 
     Optional<TicketEntity> findByUid(String uid);
+
+    Optional<TicketEntity> findByProcessInstanceId(String processInstanceId);
     
     long countByStatus(String status);
     long countByStatusNot(String status);
