@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 00:03:13
+ * @LastEditTime: 2025-02-19 06:58:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -419,7 +420,7 @@ public class TicketService {
     /**
      * 查询某个工单的处理历史
      */
-    public List<TicketHistoryResponse> queryTicketHistory(TicketRequest request) {
+    public List<TicketHistoryProcessResponse> queryTicketProcessInstanceHistory(TicketRequest request) {
         // processInstanceId不能为空
         if (request.getProcessInstanceId() == null) {
             if (StringUtils.hasText(request.getUid())) {
@@ -439,7 +440,7 @@ public class TicketService {
                 .orderByProcessInstanceEndTime().asc()
                 .list();
 
-        List<TicketHistoryResponse> responses = historicProcessInstances.stream()
+        List<TicketHistoryProcessResponse> responses = historicProcessInstances.stream()
                 .map(historicProcessInstance -> {
                     Map<String, Object> variables = historicProcessInstance.getProcessVariables();
 
@@ -462,7 +463,7 @@ public class TicketService {
                         }
                     }
 
-                    return TicketHistoryResponse.builder()
+                    return TicketHistoryProcessResponse.builder()
                             .processInstanceId(historicProcessInstance.getId())
                             .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
                             .processDefinitionName(historicProcessInstance.getProcessDefinitionName())
@@ -490,4 +491,37 @@ public class TicketService {
         return responses;
     }
 
+
+    /**
+     * 查询某个工单的流程实例历史
+     */
+    public List<TicketHistoryProcessResponse> queryTicketTaskHistory(TicketRequest request) {
+        // processInstanceId不能为空
+        if (request.getProcessInstanceId() == null) {
+            if (StringUtils.hasText(request.getUid())) {
+                // 根据uid查询processInstanceId
+                Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+                if (ticketOptional.isPresent()) {
+                    request.setProcessInstanceId(ticketOptional.get().getProcessInstanceId());
+                }
+            } else {
+                throw new RuntimeException("processInstanceId不能为空");
+            }
+        }
+
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .processInstanceId(request.getProcessInstanceId())
+                .orderByHistoricTaskInstanceStartTime().asc()
+                .list();
+
+        List<TicketHistoryProcessResponse> responses = historicTasks.stream()
+                .map(historicTask -> {
+                    return TicketHistoryProcessResponse.builder()
+                            .taskId(historicTask.getId())
+                            .taskName(historicTask.getName())
+                            .build();
+                })
+                .toList();
+        return responses;
+    }
 }

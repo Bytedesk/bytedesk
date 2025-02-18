@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.HistoryService;
+// import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -28,9 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest
 class StudentLeaveTests {
 
-	@Autowired
-	private ProcessEngine processEngine;
+	// @Autowired
+	// private ProcessEngine processEngine;
 
+	@Autowired
+	private HistoryService historyService;
+	
 	@Autowired
 	private RuntimeService runtimeService;
 
@@ -130,7 +134,7 @@ class StudentLeaveTests {
 		createAndCompleteStudentTasks();
 
 		// 查询学生已完成的历史任务
-		List<HistoricTaskInstance> historicTasks = processEngine.getHistoryService()
+		List<HistoricTaskInstance> historicTasks = historyService
 			.createHistoricTaskInstanceQuery()
 			.taskAssignee("student1")
 			.finished()  // 只查询已完成的任务
@@ -149,7 +153,7 @@ class StudentLeaveTests {
 			assertEquals("请假申请", task.getName());
 
 			// 获取流程实例的完整历史记录
-			List<HistoricTaskInstance> processHistory = processEngine.getHistoryService()
+			List<HistoricTaskInstance> processHistory = historyService
 				.createHistoricTaskInstanceQuery()
 				.processInstanceId(task.getProcessInstanceId())
 				.orderByHistoricTaskInstanceStartTime()
@@ -165,7 +169,7 @@ class StudentLeaveTests {
 			});
 
 			// 获取流程变量
-			List<HistoricVariableInstance> variables = processEngine.getHistoryService()
+			List<HistoricVariableInstance> variables = historyService
 				.createHistoricVariableInstanceQuery()
 				.processInstanceId(task.getProcessInstanceId())
 				.list();
@@ -240,7 +244,7 @@ class StudentLeaveTests {
 		// 包含流程的完整历史记录
 		// 用于统计分析、审计等场景
 		// 查询学生的历史请假记录
-		List<HistoricProcessInstance> historicInstances = processEngine.getHistoryService()
+		List<HistoricProcessInstance> historicInstances = historyService
 			.createHistoricProcessInstanceQuery()
 			.variableValueEquals("studentUser", "student1")
 			.orderByProcessInstanceStartTime()
@@ -320,7 +324,7 @@ class StudentLeaveTests {
 		createAndCompleteTeacherTasks();
 
 		// 查询教师组已完成的历史任务
-		List<HistoricTaskInstance> historicTasks = processEngine.getHistoryService()
+		List<HistoricTaskInstance> historicTasks = historyService
 			.createHistoricTaskInstanceQuery()
 			.taskCandidateGroup("teachers")
 			.finished()  // 只查询已完成的任务
@@ -338,7 +342,7 @@ class StudentLeaveTests {
 			assertEquals("老师审批", task.getName());
 
 			// 获取任务的历史变量
-			List<HistoricVariableInstance> variables = processEngine.getHistoryService()
+			List<HistoricVariableInstance> variables = historyService
 				.createHistoricVariableInstanceQuery()
 				.processInstanceId(task.getProcessInstanceId())
 				.list();
@@ -356,7 +360,7 @@ class StudentLeaveTests {
 		createAndCompletePrincipalTasks();
 
 		// 查询校长组已完成的历史任务
-		List<HistoricTaskInstance> historicTasks = processEngine.getHistoryService()
+		List<HistoricTaskInstance> historicTasks = historyService
 			.createHistoricTaskInstanceQuery()
 			.taskCandidateGroup("principals")
 			.finished()  // 只查询已完成的任务
@@ -374,7 +378,7 @@ class StudentLeaveTests {
 			assertEquals("校长审批", task.getName());
 
 			// 获取任务的历史变量
-			List<HistoricVariableInstance> variables = processEngine.getHistoryService()
+			List<HistoricVariableInstance> variables = historyService
 				.createHistoricVariableInstanceQuery()
 				.processInstanceId(task.getProcessInstanceId())
 				.list();
@@ -400,7 +404,7 @@ class StudentLeaveTests {
 			.list();
 
 		// 查询历史任务
-		List<HistoricTaskInstance> historicTasks = processEngine.getHistoryService()
+		List<HistoricTaskInstance> historicTasks = historyService
 			.createHistoricTaskInstanceQuery()
 			.taskCandidateGroup("teachers")
 			.finished()
@@ -436,7 +440,7 @@ class StudentLeaveTests {
 				task.getAssignee());
 			
 			// 获取历史变量
-			List<HistoricVariableInstance> variables = processEngine.getHistoryService()
+			List<HistoricVariableInstance> variables = historyService
 				.createHistoricVariableInstanceQuery()
 				.processInstanceId(task.getProcessInstanceId())
 				.list();
@@ -467,7 +471,7 @@ class StudentLeaveTests {
 			.list();
 
 		// 查询历史任务
-		List<HistoricTaskInstance> historicTasks = processEngine.getHistoryService()
+		List<HistoricTaskInstance> historicTasks = historyService
 			.createHistoricTaskInstanceQuery()
 			.taskCandidateGroup("principals")
 			.finished()
@@ -503,7 +507,7 @@ class StudentLeaveTests {
 				task.getAssignee());
 			
 			// 获取历史变量
-			List<HistoricVariableInstance> variables = processEngine.getHistoryService()
+			List<HistoricVariableInstance> variables = historyService
 				.createHistoricVariableInstanceQuery()
 				.processInstanceId(task.getProcessInstanceId())
 				.list();
@@ -751,7 +755,7 @@ class StudentLeaveTests {
 		// 统计每个教师的任务处理情况
 		for (String teacher : teachers) {
 			// 统计已处理的任务
-			long completedCount = processEngine.getHistoryService()
+			long completedCount = historyService
 				.createHistoricTaskInstanceQuery()
 				.taskAssignee(teacher)
 				.finished()
