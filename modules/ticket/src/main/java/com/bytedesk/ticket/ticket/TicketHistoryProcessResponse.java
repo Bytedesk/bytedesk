@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-18 09:13:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 07:18:42
+ * @LastEditTime: 2025-02-19 07:34:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,9 +19,12 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TicketHistoryProcessResponse {
     private String processInstanceId;      // 流程实例ID
     private String processDefinitionId;    // 流程定义ID

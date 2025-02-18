@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 17:45:08
+ * @LastEditTime: 2025-02-19 07:34:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -234,12 +234,30 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     /**
-     * 查询工单处理历史
+     * 查询工单任务历史
      */
-    @GetMapping("/history")
-    public ResponseEntity<?> queryTicketHistory(TicketRequest request) {
-        List<TicketHistoryProcessResponse> histories = ticketService.queryTicketHistory(request);
+    @GetMapping("/history/task")
+    public ResponseEntity<?> queryTicketTaskHistory(TicketRequest request) {
+        List<TicketHistoryTaskResponse> histories = ticketService.queryTicketTaskHistory(request);
         return ResponseEntity.ok(JsonResult.success(histories));
+    }
+
+    /**
+     * 查询工单流程实例历史
+     */
+    @GetMapping("/history/process")
+    public ResponseEntity<?> queryTicketProcessHistory(TicketRequest request) {
+        List<TicketHistoryProcessResponse> histories = ticketService.queryTicketProcessHistory(request);
+        return ResponseEntity.ok(JsonResult.success(histories));
+    }
+
+    /**
+     * 查询工单活动历史
+     */
+    @GetMapping("/history/activity")
+    public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
+        List<TicketHistoryActivityResponse> activities = ticketService.queryTicketActivityHistory(request);
+        return ResponseEntity.ok(JsonResult.success(activities));
     }
 
 } 
