@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 22:35:38
+ * @LastEditTime: 2025-02-18 23:13:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
@@ -48,6 +49,8 @@ public class TicketEventListener {
     private final TicketRestService ticketRestService;
 
     private final TaskService taskService;
+
+    private final ThreadRestService threadRestService;
 
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
@@ -76,17 +79,20 @@ public class TicketEventListener {
             .businessKey(ticket.getUid())
             .variables(variables)
             .start();
-        
         log.info("流程实例创建成功: processInstanceId={}, businessKey={}", 
             processInstance.getId(), processInstance.getBusinessKey());
 
-        // 3. 验证任务是否创建
-        // Task task = taskService.createTaskQuery()
-        //     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-        //     .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
-        //     .processInstanceId(processInstance.getId())
-        //     .singleResult();
-        // log.info("流程任务创建状态: task={}", task);
+        // 3. 创建任务
+        Task task = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .taskAssignee(ticket.getReporter().getUid())
+            .singleResult();
+        if (task != null) {
+            // 完成工单创建任务
+            taskService.complete(task.getId());
+        } else {
+            log.error("工单创建任务创建失败: task={}", task);
+        }
 
         // 4. 设置流程实例变量
         // 可以在流程执行的任何时候调用, 每次调用都会产生一次变量更新历史记录
@@ -140,6 +146,8 @@ public class TicketEventListener {
             if (processInstance != null) {
                 runtimeService.deleteProcessInstance(processInstance.getId(), "deleted by user");
             }
+            // 同步删除工单会话
+            threadRestService.deleteByTopic(ticket.getServiceThreadTopic());
         }
     }
 

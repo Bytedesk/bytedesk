@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 13:23:22
+ * @LastEditTime: 2025-02-18 23:10:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -457,6 +457,23 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         return null;
     }
 
+    public void deleteByTopic(String topic) {
+        List<ThreadEntity> threads = findListByTopic(topic);
+        threads.forEach(thread -> {
+            thread.setDeleted(true);
+            save(thread);
+        });
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<ThreadEntity> threadOptional = findByUid(uid);
+        threadOptional.ifPresent(thread -> {
+            thread.setDeleted(true);
+            save(thread);
+        });
+    }
+
     @Caching(evict = {
             @CacheEvict(value = "thread", key = "#thread.uid"),
             @CacheEvict(value = "thread", key = "#thread.topic")
@@ -479,11 +496,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Override
-    public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
-    }
+    
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,

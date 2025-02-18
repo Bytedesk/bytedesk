@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 22:38:55
+ * @LastEditTime: 2025-02-18 23:16:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -289,7 +289,7 @@ public class TicketService {
         // 2. 查询任务
         Task task = taskService.createTaskQuery()
                 .processInstanceId(ticket.getProcessInstanceId()) // 使用processInstanceId查询
-                // .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_CREATE_TICKET)
+                .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .active() // 只查询活动的任务
                 .singleResult();
 
