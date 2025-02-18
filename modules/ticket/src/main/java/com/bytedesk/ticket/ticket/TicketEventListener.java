@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 22:11:56
+ * @LastEditTime: 2025-02-18 22:35:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,13 +81,12 @@ public class TicketEventListener {
             processInstance.getId(), processInstance.getBusinessKey());
 
         // 3. 验证任务是否创建
-        Task task = taskService.createTaskQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-            .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
-            .processInstanceId(processInstance.getId())
-            .singleResult();
-        
-        log.info("流程任务创建状态: task={}", task);
+        // Task task = taskService.createTaskQuery()
+        //     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+        //     .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
+        //     .processInstanceId(processInstance.getId())
+        //     .singleResult();
+        // log.info("流程任务创建状态: task={}", task);
 
         // 4. 设置流程实例变量
         // 可以在流程执行的任何时候调用, 每次调用都会产生一次变量更新历史记录
@@ -112,13 +111,10 @@ public class TicketEventListener {
         if (ticketOptional.isPresent()) {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
-            // 
+            // 认领任务
             if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
                 Task taskClaim = taskService.createTaskQuery()
-                    .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                    .taskDefinitionKey(TicketConsts.TICKET_TASK_DEFINITION_ASSIGN_TO_GROUP)
-                    .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticketEntity.getUid())
-                    .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, ticketEntity.getOrgUid())
+                    .processInstanceId(processInstance.getId())
                     .singleResult();
                 if (taskClaim != null) {
                     taskService.claim(taskClaim.getId(), ticketEntity.getAssignee().getUid());
