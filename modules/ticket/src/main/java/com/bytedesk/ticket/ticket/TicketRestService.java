@@ -26,7 +26,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserRestService;
+// import com.bytedesk.core.rbac.user.UserRestService;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -66,7 +66,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final AuthService authService;
 
-    private final UserRestService userRestService;
+    // private final UserRestService userRestService;
 
     private final UidUtils uidUtils;
 
@@ -90,11 +90,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     @Override
     public Page<TicketResponse> queryByUser(TicketRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("user not found");
-        }
-        request.setReporterUid(user.getUid());
+        // UserEntity user = authService.getUser();
+        // if (user == null) {
+        //     throw new RuntimeException("user not found");
+        // }
+        // request.setReporterUid(user.getUid());
         // 
         return queryByOrg(request);
     }
@@ -201,16 +201,18 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ThreadEntity thread = createTicketThread(request, TicketTypeEnum.WORKGROUP, userJson);
             ticket.setThreadUid(thread.getUid());
         }
-        Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
-        if (reporterOptional.isPresent()) {
-            UserProtobuf reporterProtobuf = UserProtobuf.builder()
-                .nickname(reporterOptional.get().getNickname())
-                .avatar(reporterOptional.get().getAvatar())
-                .build();
-            reporterProtobuf.setUid(reporterOptional.get().getUid());
-            reporterProtobuf.setType(UserTypeEnum.USER.name());
-            ticket.setReporter(JSON.toJSONString(reporterProtobuf));
-        }
+        // 
+        // Optional<UserEntity> reporterOptional = userRestService.findByUid(request.getReporterUid());
+        // if (reporterOptional.isPresent()) {
+        //     UserProtobuf reporterProtobuf = UserProtobuf.builder()
+        //         .nickname(reporterOptional.get().getNickname())
+        //         .avatar(reporterOptional.get().getAvatar())
+        //         .build();
+        //     reporterProtobuf.setUid(reporterOptional.get().getUid());
+        //     reporterProtobuf.setType(UserTypeEnum.USER.name());
+        //     ticket.setReporter(JSON.toJSONString(reporterProtobuf));
+        // }
+        ticket.setReporter(JSON.toJSONString(request.getReporter()));
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
         // 保存附件
