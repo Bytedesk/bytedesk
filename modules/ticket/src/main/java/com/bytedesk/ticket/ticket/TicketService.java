@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 09:13:14
+ * @LastEditTime: 2025-02-18 09:25:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,11 +40,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TicketService {
 
-    // private final ProcessEngine processEngine;
     private final RuntimeService runtimeService;
     private final TaskService taskService;
     private final TicketRepository ticketRepository;
     private final HistoryService historyService;
+    
     /**
      * 查询我创建的工单
      */
@@ -234,6 +234,7 @@ public class TicketService {
     public List<TicketHistory> queryTicketHistory(TicketRequest request) {
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
             .processInstanceId(request.getProcessInstanceId())
+            .orderByProcessInstanceEndTime().asc()
             .list();
 
         List<TicketHistory> responses = historicProcessInstances.stream()

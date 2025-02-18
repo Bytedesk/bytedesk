@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 09:15:25
+ * @LastEditTime: 2025-02-18 09:17:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,14 +43,16 @@ import com.bytedesk.ticket.comment.TicketCommentEntity;
 @AllArgsConstructor
 public class TicketRestController extends BaseRestController<TicketRequest> {
     
-    private final TicketRestService ticketService;
+    private final TicketRestService ticketRestService;
+
+    private final TicketService ticketService;
 
     private final ModelMapper modelMapper;
 
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryByOrg(request);
+        Page<TicketResponse> page = ticketRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -58,7 +60,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @Override
     public ResponseEntity<?> queryByUser(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryByUser(request);
+        Page<TicketResponse> page = ticketRestService.queryByUser(request);
         
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -66,7 +68,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @GetMapping("/query/service-thread-topic")
     public ResponseEntity<?> queryByServiceThreadTopic(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryByOrg(request);
+        Page<TicketResponse> page = ticketRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -74,7 +76,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @GetMapping("/query/thread-uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketService.queryByOrg(request);
+        Page<TicketResponse> page = ticketRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -82,7 +84,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
 
-        TicketResponse response = ticketService.create(request);
+        TicketResponse response = ticketRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -90,7 +92,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @Override
     public ResponseEntity<?> update(TicketRequest request) {
 
-        TicketResponse response = ticketService.update(request);
+        TicketResponse response = ticketRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -98,19 +100,19 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @Override
     public ResponseEntity<?> delete(TicketRequest request) {
 
-        ticketService.delete(request);
+        ticketRestService.delete(request);
         
         return ResponseEntity.ok(JsonResult.success());
     }
     
     @PostMapping("/{id}/comments")
     public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
-        return ticketService.addComment(id, comment);
+        return ticketRestService.addComment(id, comment);
     }
     
     @PostMapping("/{id}/attachments")
     public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
-        return ticketService.uploadAttachment(id, file);
+        return ticketRestService.uploadAttachment(id, file);
     }
 
     // https://github.com/alibaba/easyexcel
@@ -119,7 +121,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
         // query data to export
-        Page<TicketResponse> ticketPage = ticketService.queryByOrg(request);
+        Page<TicketResponse> ticketPage = ticketRestService.queryByOrg(request);
         // 
         try {
             //
@@ -159,5 +161,66 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return "";
     }
 
-    
+    /**
+     * 查询我创建的工单
+     */
+    @GetMapping("/query/created")
+    public ResponseEntity<?> queryCreated(TicketRequest request) {
+        Page<TicketResponse> page = ticketService.queryCreated(request);
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    /**
+     * 查询待我处理的工单
+     */
+    @GetMapping("/query/claimed")
+    public ResponseEntity<?> queryClaimed(TicketRequest request) {
+        Page<TicketResponse> page = ticketService.queryClaimed(request);
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    /**
+     * 查询待分配的工单
+     */
+    @GetMapping("/query/unassigned")
+    public ResponseEntity<?> queryUnassigned(TicketRequest request) {
+        Page<TicketResponse> page = ticketService.queryUnassigned(request);
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    /**
+     * 认领工单
+     */
+    @PostMapping("/claim")
+    public ResponseEntity<?> claimTicket(@RequestBody TicketRequest request) {
+        ticketService.claimTicket(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    /**
+     * 退回工单
+     */
+    @PostMapping("/unclaim")
+    public ResponseEntity<?> unclaimTicket(@RequestBody TicketRequest request) {
+        ticketService.unclaimTicket(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    /**
+     * 完成工单
+     */
+    @PostMapping("/complete")
+    public ResponseEntity<?> completeTicket(@RequestBody TicketRequest request) {
+        ticketService.completeTicket(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    /**
+     * 查询工单处理历史
+     */
+    @GetMapping("/history")
+    public ResponseEntity<?> queryTicketHistory(TicketRequest request) {
+        List<TicketHistory> histories = ticketService.queryTicketHistory(request);
+        return ResponseEntity.ok(JsonResult.success(histories));
+    }
 } 
