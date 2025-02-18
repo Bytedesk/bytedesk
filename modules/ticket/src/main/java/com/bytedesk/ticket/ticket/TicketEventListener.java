@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 12:10:34
+ * @LastEditTime: 2025-02-18 14:41:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -55,47 +56,43 @@ public class TicketEventListener {
         log.info("TicketEventListener handleTicketCreateEvent: {}", event);
         TicketEntity ticket = event.getTicket();
 
-        // 启动工单流程
+        // 1. 准备流程变量
         Map<String, Object> variables = new HashMap<>();
+        // 基本变量
         variables.put(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticket.getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, JSON.parseObject(ticket.getWorkgroup(), UserProtobuf.class).getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, ticket.getOrgUid());
 
-        // 根据不同优先级设置不同的SLA时间
-        switch (ticket.getPriority()) {
-            case "CRITICAL":
-                variables.put("slaTime", "PT30M");     // 30分钟
-                break;
-            case "URGENT":
-                variables.put("slaTime", "PT1H");     // 1小时
-                break;
-            case "HIGH":
-                variables.put("slaTime", "PT2H");     // 2小时
-                break;
-            case "MEDIUM":
-                variables.put("slaTime", "PT4H");     // 4小时
-                break;
-            case "LOW":
-                variables.put("slaTime", "PT8H");     // 8小时
-                break;
-            case "LOWEST":
-                variables.put("slaTime", "P1D");      // 1天
-                break;
-            default:
-                variables.put("slaTime", "P1D");      // 1天
-        }
-
-        // 启动流程时指定租户   
-        String processKey = TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE;
+        // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey(processKey)
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
             .tenantId(ticket.getOrgUid())
+            .name(ticket.getTitle())                // 流程实例名称
+            .businessKey(ticket.getUid())          // 业务键
             .variables(variables)
             .start();
-        log.info("TicketEventListener processInstance: {}", processInstance.getId());
 
-        // 设置工单的流程实例ID
+        // 3. 设置流程实例变量
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_DESCRIPTION, ticket.getDescription());
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_START_USER_ID, JSON.parseObject(ticket.getReporter(), UserProtobuf.class).getUid());
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_START_TIME, new Date());
+
+        // 4. 设置 SLA 时间
+        String slaTime = switch (ticket.getPriority()) {
+            case "CRITICAL" -> "PT30M";
+            case "URGENT" -> "PT1H";
+            case "HIGH" -> "PT2H";
+            case "MEDIUM" -> "PT4H";
+            case "LOW" -> "PT8H";
+            default -> "P1D";
+        };
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_SLA_TIME, slaTime);
+
+        // 5. 更新工单的流程实例ID
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticket.getUid());
         if (ticketOptional.isPresent()) {
             TicketEntity ticketEntity = ticketOptional.get();
@@ -116,6 +113,7 @@ public class TicketEventListener {
         }
     }
 
+    // 监听工单更新事件
     @EventListener
     public void handleTicketUpdateEvent(TicketUpdateEvent event) {
         log.info("TicketEventListener handleTicketUpdateEvent: {}", event);

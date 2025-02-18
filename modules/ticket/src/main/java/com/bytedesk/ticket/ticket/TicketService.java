@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 12:52:19
+ * @LastEditTime: 2025-02-18 14:42:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -369,34 +369,36 @@ public class TicketService {
 
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(request.getProcessInstanceId())
+                .includeProcessVariables()  // 重要：包含流程变量
                 .orderByProcessInstanceEndTime().asc()
                 .list();
 
-        List<TicketHistoryResponse> responses = historicProcessInstances.stream()
-                .map(historicProcessInstance -> {
-                    return TicketHistoryResponse.builder()
-                            .processInstanceId(historicProcessInstance.getId())
-                            .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
-                            .processDefinitionName(historicProcessInstance.getProcessDefinitionName())
-                            .processDefinitionKey(historicProcessInstance.getProcessDefinitionKey())
-                            .processDefinitionVersion(historicProcessInstance.getProcessDefinitionVersion())
-                            .businessKey(historicProcessInstance.getBusinessKey())
-                            .startUserId(historicProcessInstance.getStartUserId())
-                            .startTime(historicProcessInstance.getStartTime())
-                            .endTime(historicProcessInstance.getEndTime())
-                            .durationInMillis(historicProcessInstance.getDurationInMillis())
-                            .deleteReason(historicProcessInstance.getDeleteReason())
-                            .tenantId(historicProcessInstance.getTenantId())
-                            .name(historicProcessInstance.getName())
-                            .description(historicProcessInstance.getDescription())
-                            // 从流程变量中获取状态
-                            .status((String) historicProcessInstance.getProcessVariables().get("status"))
-                            .build();
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        return responses;
+        return historicProcessInstances.stream()
+            .map((HistoricProcessInstance historicProcessInstance) -> {
+                Map<String, Object> variables = historicProcessInstance.getProcessVariables();
+                
+                return TicketHistoryResponse.builder()
+                    .processInstanceId(historicProcessInstance.getId())
+                    .processDefinitionId(historicProcessInstance.getProcessDefinitionId())
+                    .processDefinitionName(historicProcessInstance.getProcessDefinitionName())
+                    .processDefinitionKey(historicProcessInstance.getProcessDefinitionKey())
+                    .processDefinitionVersion(historicProcessInstance.getProcessDefinitionVersion())
+                    .businessKey(historicProcessInstance.getBusinessKey())
+                    .name(historicProcessInstance.getName())
+                    // 从流程变量中获取
+                    .description((String) variables.get(TicketConsts.TICKET_VARIABLE_DESCRIPTION))
+                    .startUserId((String) variables.get(TicketConsts.TICKET_VARIABLE_START_USER_ID))
+                    .status((String) variables.get(TicketConsts.TICKET_VARIABLE_STATUS))
+                    .priority((String) variables.get(TicketConsts.TICKET_VARIABLE_PRIORITY))
+                    .categoryUid((String) variables.get(TicketConsts.TICKET_VARIABLE_CATEGORY_UID))
+                    .startTime(historicProcessInstance.getStartTime())
+                    .endTime(historicProcessInstance.getEndTime())
+                    .durationInMillis(historicProcessInstance.getDurationInMillis())
+                    .deleteReason(historicProcessInstance.getDeleteReason())
+                    .tenantId(historicProcessInstance.getTenantId())
+                    .build();
+            })
+            .toList();
     }
 
 }
