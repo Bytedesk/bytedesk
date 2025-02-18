@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 10:48:59
+ * @LastEditTime: 2025-02-18 10:59:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,8 +31,10 @@ import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
 import com.bytedesk.ticket.consts.TicketConsts;
-import com.bytedesk.ticket.event.TicketCreateEvent;
-import com.bytedesk.ticket.event.TicketUpdateEvent;
+import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
+import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
+import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
+import com.bytedesk.ticket.ticket.event.TicketUpdateWorkgroupEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,13 +119,22 @@ public class TicketEventListener {
     @EventListener
     public void handleTicketUpdateEvent(TicketUpdateEvent event) {
         log.info("TicketEventListener handleTicketUpdateEvent: {}", event);
-        TicketEntity ticket = event.getTicket();
-        // 
-        if (StringUtils.hasText(ticket.getAssignee())) {
-            Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticket.getUid());
-            
-        }
+        // TicketEntity ticket = event.getTicket();
+    }
 
+    @EventListener
+    public void handleTicketUpdateAssigneeEvent(TicketUpdateAssigneeEvent event) {
+        log.info("TicketEventListener handleTicketUpdateAssigneeEvent: {}", event);
+        TicketEntity ticket = event.getTicket();
+        // 撤回原assignee的claim
+        taskService.unclaim(ticket.getProcessInstanceId());
+        // 重新claim新的assignee
+        taskService.claim(ticket.getProcessInstanceId(), event.getNewAssigneeUid());
+    }
+
+    @EventListener
+    public void handleTicketUpdateWorkgroupEvent(TicketUpdateWorkgroupEvent event) {
+        log.info("TicketEventListener handleTicketUpdateWorkgroupEvent: {}", event);
     }
 
     // 监听上传BPMN流程图
