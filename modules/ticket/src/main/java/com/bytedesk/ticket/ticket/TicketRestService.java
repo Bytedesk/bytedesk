@@ -279,6 +279,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 assigneeProtobuf.setUid(assigneeOptional.get().getUid());
                 assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
                 ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
+                ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
             }
         }
 
