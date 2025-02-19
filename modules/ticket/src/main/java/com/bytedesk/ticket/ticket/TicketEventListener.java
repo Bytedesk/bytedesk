@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 12:28:09
+ * @LastEditTime: 2025-02-19 13:41:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -148,8 +148,8 @@ public class TicketEventListener {
             if (processInstance != null) {
                 runtimeService.deleteProcessInstance(processInstance.getId(), "deleted by user");
             }
-            // 同步删除工单会话
-            threadRestService.deleteByTopic(ticket.getServiceThreadTopic());
+            // 删除工单会话
+            threadRestService.deleteByUid(ticket.getThreadUid());
         }
     }
 
