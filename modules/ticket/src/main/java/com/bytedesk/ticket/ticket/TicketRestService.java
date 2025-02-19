@@ -150,8 +150,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
             String assigneeJson = JSON.toJSONString(assigneeProtobuf);
             ticket.setAssignee(assigneeJson);
-            // 暂不启用一对一
-            // ticket.setType(TicketTypeEnum.AGENT.name());
             ticket.setStatus(TicketStatusEnum.CLAIMED.name());
             //
             String userJson = BytedeskConsts.EMPTY_JSON_STRING;
@@ -164,60 +162,21 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                     ticket.setUser(userJson);
                 }
             }
-            // } else {
-            // //
-            // UserProtobuf userProtobuf = UserProtobuf.builder()
-            // .nickname(assigneeOptional.get().getNickname())
-            // .avatar(assigneeOptional.get().getAvatar())
-            // .build();
-            // userProtobuf.setUid(assigneeOptional.get().getUid());
-            // userProtobuf.setType(UserTypeEnum.AGENT.name());
-            // userJson = JSON.toJSONString(userProtobuf);
-            // }
-            // 此处不创建工单会话，只有被认领的时候，才会创建工单会话
-            // ThreadEntity thread = createTicketThread(request, TicketTypeEnum.AGENT,
-            // userJson);
-            // ticket.setThreadUid(thread.getUid());
         } else {
             ticket.setStatus(TicketStatusEnum.NEW.name());
 
-            // String userJson = BytedeskConsts.EMPTY_JSON_STRING;
-            // //
-            // if (StringUtils.hasText(request.getServiceThreadTopic())) {
-            // String serviceThreadTopic = request.getServiceThreadTopic();
-            // Optional<ThreadEntity> serviceThreadOptional =
-            // threadRestService.findFirstByTopic(serviceThreadTopic);
-            // if (serviceThreadOptional.isPresent()) {
-            // userJson = serviceThreadOptional.get().getUser();
-            // ticket.setUser(userJson);
-            // }
-            // } else {
-            // //
-            // UserProtobuf userProtobuf = UserProtobuf.builder()
-            // .nickname(workgroupOptional.get().getNickname())
-            // .avatar(workgroupOptional.get().getAvatar())
-            // .build();
-            // userProtobuf.setUid(workgroupOptional.get().getUid());
-            // userProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-            // userJson = JSON.toJSONString(userProtobuf);
-            // }
-            // 创建工单会话 此处不创建工单会话，只有被认领的时候，才会创建工单会话
-            // ThreadEntity thread = createTicketThread(request, TicketTypeEnum.WORKGROUP,
-            // userJson);
-            // ticket.setThreadUid(thread.getUid());
+            String userJson = BytedeskConsts.EMPTY_JSON_STRING;
+            // 使用在线客服工单会话user info
+            if (StringUtils.hasText(request.getServiceThreadTopic())) {
+                String serviceThreadTopic = request.getServiceThreadTopic();
+                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+                if (serviceThreadOptional.isPresent()) {
+                    userJson = serviceThreadOptional.get().getUser();
+                    ticket.setUser(userJson);
+                }
+            }
         }
-        //
-        // Optional<UserEntity> reporterOptional =
-        // userRestService.findByUid(request.getReporterUid());
-        // if (reporterOptional.isPresent()) {
-        // UserProtobuf reporterProtobuf = UserProtobuf.builder()
-        // .nickname(reporterOptional.get().getNickname())
-        // .avatar(reporterOptional.get().getAvatar())
-        // .build();
-        // reporterProtobuf.setUid(reporterOptional.get().getUid());
-        // reporterProtobuf.setType(UserTypeEnum.USER.name());
-        // ticket.setReporter(JSON.toJSONString(reporterProtobuf));
-        // }
+        // 
         ticket.setReporter(JSON.toJSONString(request.getReporter()));
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
@@ -382,7 +341,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
                 if (serviceThreadOptional.isPresent()) {
                     visitorJson = serviceThreadOptional.get().getUser();
-                    ticket.setUser(visitorJson);
                 }
             } else {
                 //
@@ -402,7 +360,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
                 if (serviceThreadOptional.isPresent()) {
                     visitorJson = serviceThreadOptional.get().getUser();
-                    ticket.setUser(visitorJson);
                 } else {
                     //
                     UserProtobuf userProtobuf = UserProtobuf.builder()
