@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:12:21
+ * @LastEditTime: 2025-02-20 06:44:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,6 +80,7 @@ public class LeaveMsgSettings implements Serializable {
     @Builder.Default
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String leaveMsgForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     /** work time */

@@ -78,7 +78,7 @@ public class UploadEntity extends BaseEntity {
 
     // 上传用户
     @Builder.Default
-    @Column(name = "upload_user", length = 512)
+    @Column(name = "upload_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 

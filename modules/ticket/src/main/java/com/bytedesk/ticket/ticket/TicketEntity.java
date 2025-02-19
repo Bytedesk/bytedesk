@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 22:43:15
+ * @LastEditTime: 2025-02-20 06:46:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,7 +86,7 @@ public class TicketEntity extends BaseEntity {
     // user, 使用UserProtobuf json格式化
     // 关联service thread ThreadEntity的user字段，访客信息
     @Builder.Default
-    @Column(name = "ticket_user")
+    @Column(name = "ticket_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 使用UserProtobuf json格式化
@@ -97,6 +97,7 @@ public class TicketEntity extends BaseEntity {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 使用UserProtobuf json格式化
@@ -107,6 +108,7 @@ public class TicketEntity extends BaseEntity {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String assignee = BytedeskConsts.EMPTY_JSON_STRING;
     
     // 使用UserProtobuf json格式化
@@ -117,6 +119,7 @@ public class TicketEntity extends BaseEntity {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String reporter = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 工单评论

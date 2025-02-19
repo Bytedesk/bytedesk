@@ -80,7 +80,7 @@ public class MessageEntity extends BaseEntity {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "message_user")
+    @Column(name = "message_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
 }

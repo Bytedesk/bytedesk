@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:15:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 09:19:45
+ * @LastEditTime: 2025-02-20 06:43:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -99,7 +99,7 @@ public class MessageUnreadEntity implements Serializable  {
 
     // h2 db 不能使用 user, 所以重定义为 message_user
     @Builder.Default
-    @Column(name = "message_user", length = 512)
+    @Column(name = "message_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
