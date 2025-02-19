@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 09:23:54
+ * @LastEditTime: 2025-02-19 10:07:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,10 +39,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SpringAiController {
 
-//     @Qualifier("defaultChatClient")
     private final ChatClient defaultChatClient;
 
-    private final VectorStore vectorStore;
+    private final VectorStore ollamaRedisVectorStore;
 
     private final ChatModel ollamaChatModel;
 
@@ -69,7 +68,7 @@ public class SpringAiController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
         // 创建qaAdvisor
         var qaAdvisor = new QuestionAnswerAdvisor(
-                this.vectorStore,
+                this.ollamaRedisVectorStore,
                 SearchRequest.builder()
                         .similarityThreshold(0.8d)
                         .topK(6)
@@ -92,7 +91,7 @@ public class SpringAiController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
 
         ChatClient chatClient = ChatClient.builder(ollamaChatModel)
-                .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.builder().build()))
+                .defaultAdvisors(new QuestionAnswerAdvisor(ollamaRedisVectorStore, SearchRequest.builder().build()))
                 .build();
 
         // Update filter expression at runtime

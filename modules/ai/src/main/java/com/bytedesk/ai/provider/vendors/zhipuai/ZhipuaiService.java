@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 13:36:40
+ * @LastEditTime: 2025-02-19 10:03:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,6 +63,9 @@ import lombok.extern.slf4j.Slf4j;
  * https://github.com/MetaGLM/zhipuai-sdk-java-v4
  * 
  * https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
+ * 
+ * https://open.bigmodel.cn/dev/api/normal-model/glm-4
+ * https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-zhipuai/src/main/java/org/springframework/ai/zhipuai/api/ZhiPuAiApi.java
  */
 @Slf4j
 @Service
@@ -71,6 +74,8 @@ public class ZhipuaiService {
 
     private final SpringAiZhipuaiConfig springAiZhipuaiConfig;
 
+    // TODO: 替换掉
+    // https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
     private final ClientV4 zhipuaiClient;
 
     private final UidUtils uidUtils;

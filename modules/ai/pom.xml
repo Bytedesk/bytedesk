@@ -22,6 +22,7 @@
 		<agentsflex.version>1.0.0-rc.4</agentsflex.version>
 		<ollama4j.version>1.0.93</ollama4j.version>
 		<spring-ai-alibaba.version>1.0.0-M5.1</spring-ai-alibaba.version>
+		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
 	</properties>
 
 	<dependencies>
@@ -104,7 +105,7 @@
 		<dependency>
 			<groupId>cn.bigmodel.openapi</groupId>
 			<artifactId>oapi-java-sdk</artifactId>
-			<version>release-V4-2.3.1</version>
+			<version>${zhipuai.version}</version>
 		</dependency>
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->

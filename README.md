@@ -75,7 +75,7 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 # run ollama deepseek-r1 model
-docker exec ollama-bytedesk ollama run deepseek-r1
+docker exec ollama-bytedesk ollama pull deepseek-r1
 ```
 
 ### stop container

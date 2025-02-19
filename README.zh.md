@@ -77,7 +77,7 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 ```bash
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose-ollama.yaml up -d
 # 运行模型
-docker exec ollama-bytedesk ollama run deepseek-r1
+docker exec ollama-bytedesk ollama pull deepseek-r1
 ```
 
 ### 停止容器

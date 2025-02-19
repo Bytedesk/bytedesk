@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:53:03
+ * @LastEditTime: 2025-02-19 10:08:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class UploadVectorStore {
 
-	private final RedisVectorStore vectorStore;
+	private final RedisVectorStore ollamaRedisVectorStore;
 
 	private final UploadRestService uploadService;
 
@@ -207,7 +207,7 @@ public class UploadVectorStore {
 		// [com.bytedesk.kbase.upload.Upload#52]
 		uploadService.save(upload);
 		// log.info("Parsing document, this will take a while.");
-		vectorStore.write(docList);
+		ollamaRedisVectorStore.write(docList);
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
 		// 通知相关组件，文件处理成功
 		bytedeskEventPublisher.publishEvent(new UploadSplitEvent(docList, upload.getKbUid(), upload.getOrgUid()));
@@ -221,7 +221,7 @@ public class UploadVectorStore {
 				.query(query)
 				.topK(2)
 				.build();
-		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+		List<Document> similarDocuments = ollamaRedisVectorStore.similaritySearch(searchRequest);
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		// TODO: 将 query, kbUid 对应的 contentList 缓存到Redis中，下次直接从Redis中取
 		//
@@ -243,7 +243,7 @@ public class UploadVectorStore {
 		// .withTopK(2);
 		// .withSimilarityThreshold(0.5)
 		// .withFilterExpression(expression);
-		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+		List<Document> similarDocuments = ollamaRedisVectorStore.similaritySearch(searchRequest);
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		//
@@ -251,7 +251,7 @@ public class UploadVectorStore {
 	}
 
 	public void deleteDoc(List<String> docIdList) {
-		vectorStore.delete(docIdList);
+		ollamaRedisVectorStore.delete(docIdList);
 	}
 
 	//
