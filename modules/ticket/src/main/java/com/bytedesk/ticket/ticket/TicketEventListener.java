@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 23:13:46
+ * @LastEditTime: 2025-02-19 12:28:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,7 @@ import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
 import com.bytedesk.ticket.consts.TicketConsts;
+import com.bytedesk.ticket.ticket.dto.TicketRequest;
 import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
@@ -43,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class TicketEventListener {
-    
+
     private final RuntimeService runtimeService;
 
     private final TicketRestService ticketRestService;
@@ -51,6 +52,8 @@ public class TicketEventListener {
     private final TaskService taskService;
 
     private final ThreadRestService threadRestService;
+
+    private final TicketService ticketService;
 
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
@@ -64,7 +67,7 @@ public class TicketEventListener {
         variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, ticket.getWorkgroup().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, ticket.getReporter().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, ticket.getOrgUid());
-        // 
+        //
         variables.put(TicketConsts.TICKET_VARIABLE_DESCRIPTION, ticket.getDescription());
         variables.put(TicketConsts.TICKET_VARIABLE_START_USER_ID, ticket.getReporter().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
@@ -73,20 +76,20 @@ public class TicketEventListener {
 
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-            .tenantId(ticket.getOrgUid())
-            .name(ticket.getTitle())
-            .businessKey(ticket.getUid())
-            .variables(variables)
-            .start();
-        log.info("流程实例创建成功: processInstanceId={}, businessKey={}", 
-            processInstance.getId(), processInstance.getBusinessKey());
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .tenantId(ticket.getOrgUid())
+                .name(ticket.getTitle())
+                .businessKey(ticket.getUid())
+                .variables(variables)
+                .start();
+        log.info("流程实例创建成功: processInstanceId={}, businessKey={}",
+                processInstance.getId(), processInstance.getBusinessKey());
 
         // 3. 创建任务
         Task task = taskService.createTaskQuery()
-            .processInstanceId(processInstance.getId())
-            .taskAssignee(ticket.getReporter().getUid())
-            .singleResult();
+                .processInstanceId(processInstance.getId())
+                .taskAssignee(ticket.getReporter().getUid())
+                .singleResult();
         if (task != null) {
             // 完成工单创建任务
             taskService.complete(task.getId());
@@ -111,24 +114,23 @@ public class TicketEventListener {
         };
         runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_SLA_TIME, slaTime);
         // 第一步的assignee设置为reporter
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getReporter());
+        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_ASSIGNEE,
+                ticket.getReporter());
         // 6. 更新工单的流程实例ID
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticket.getUid());
         if (ticketOptional.isPresent()) {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
+            ticketRestService.save(ticketEntity);
             // 认领任务
             if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
-                Task taskClaim = taskService.createTaskQuery()
-                    .processInstanceId(processInstance.getId())
-                    .singleResult();
-                if (taskClaim != null) {
-                    taskService.claim(taskClaim.getId(), ticketEntity.getAssignee().getUid());
-                } else {
-                    log.error("工单认领失败: taskClaim={}", taskClaim);
-                }
+                TicketRequest request = new TicketRequest();
+                request.setUid(ticketEntity.getUid());
+                request.setAssigneeUid(ticketEntity.getAssignee().getUid());
+                request.setOrgUid(ticketEntity.getOrgUid());
+                // 认领工单
+                ticketService.claimTicket(request);
             }
-            ticketRestService.save(ticketEntity);
         }
     }
 
@@ -141,8 +143,8 @@ public class TicketEventListener {
         if (ticket.isDeleted()) {
             // 同步更新流程实例
             ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(ticket.getProcessInstanceId())
-                .singleResult();
+                    .processInstanceId(ticket.getProcessInstanceId())
+                    .singleResult();
             if (processInstance != null) {
                 runtimeService.deleteProcessInstance(processInstance.getId(), "deleted by user");
             }
@@ -166,7 +168,8 @@ public class TicketEventListener {
         log.info("TicketEventListener handleTicketUpdateWorkgroupEvent: {}", event);
         TicketEntity ticket = event.getTicket();
         // 更新当前技能组workgroupUid
-        runtimeService.setVariable(ticket.getProcessInstanceId(), TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, event.getNewWorkgroupUid());
+        runtimeService.setVariable(ticket.getProcessInstanceId(), TicketConsts.TICKET_VARIABLE_WORKGROUP_UID,
+                event.getNewWorkgroupUid());
     }
 
     // 监听上传BPMN流程图
@@ -177,9 +180,9 @@ public class TicketEventListener {
         // 上传BPMN流程图
         if (upload.getType().equals(UploadTypeEnum.BPMN.name())) {
             // 启动流程
-            // ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(upload.getFileName());
+            // ProcessInstance processInstance =
+            // runtimeService.startProcessInstanceByKey(upload.getFileName());
         }
     }
-    
-}
 
+}
