@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 20:51:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 09:24:29
+ * @LastEditTime: 2025-02-19 10:11:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,9 +35,9 @@ public class KbaseConfig {
         // https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
         // https://redis.io/docs/interact/search-and-query/
         // 初始化向量库, 创建索引
-        @Bean
-        @ConditionalOnProperty(name = "spring.ai.vectorstore.redis.initialize-schema", havingValue = "true")
-        public RedisVectorStore vectorStore(EmbeddingModel ollamaEmbeddingModel, RedisVectorStoreProperties properties) {
+        @Bean("ollamaRedisVectorStore")
+        @ConditionalOnProperty(name = { "spring.ai.ollama.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
+        public RedisVectorStore ollamaRedisVectorStore(EmbeddingModel ollamaEmbeddingModel, RedisVectorStoreProperties properties) {
 
                 var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
                 var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);
