@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 15:52:07
+ * @LastEditTime: 2025-02-19 16:14:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -242,7 +242,7 @@ public class TicketService {
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
                     } else {
-        return null;
+                        return null;
                     }
                 })
                 .filter(Objects::nonNull)
@@ -276,7 +276,7 @@ public class TicketService {
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
                     } else {
-        return null;
+                        return null;
                     }
                 })
                 .filter(Objects::nonNull)
@@ -302,8 +302,8 @@ public class TicketService {
         TicketEntity ticket = ticketOptional.get();
 
         // 判断状态是否为NEW或退回状态，如果不是，则不能认领
-        if (!ticket.getStatus().equals(TicketStatusEnum.NEW.name()) && 
-            !ticket.getStatus().equals(TicketStatusEnum.UNCLAIMED.name())) {
+        if (!ticket.getStatus().equals(TicketStatusEnum.NEW.name()) &&
+                !ticket.getStatus().equals(TicketStatusEnum.UNCLAIMED.name())) {
             throw new RuntimeException("已经被认领，工单状态为" + ticket.getStatus() + "，不能重复认领: " + request.getUid());
         }
 
@@ -336,9 +336,9 @@ public class TicketService {
             log.info("工单认领成功: taskId={}, assigneeUid={}", task.getId(), assigneeUid);
 
             // 只添加任务评论
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-                "CLAIMED", "工单被 " + assigneeUid + " 认领");
-                
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                    "CLAIMED", "工单被 " + assigneeUid + " 认领");
+
         } catch (Exception e) {
             log.error("工单认领失败: ", e);
             throw new RuntimeException("工单认领失败: " + e.getMessage());
@@ -435,8 +435,8 @@ public class TicketService {
 
         try {
             // 5. 添加任务评论，记录开始处理
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-                "PROCESSING", "工单开始处理");
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                    "PROCESSING", "工单开始处理");
 
             // 6. 设置任务变量
             Map<String, Object> variables = new HashMap<>();
@@ -449,7 +449,7 @@ public class TicketService {
             ticketRepository.save(ticket);
 
             log.info("工单开始处理成功: taskId={}, assigneeUid={}", task.getId(), ticket.getAssigneeString());
-            
+
             return TicketConvertUtils.convertToResponse(ticket);
         } catch (Exception e) {
             log.error("工单开始处理失败: ", e);
@@ -477,7 +477,7 @@ public class TicketService {
         if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能退回: " + request.getUid());
         }
-        if (!StringUtils.hasText(ticket.getAssigneeString()) ) {
+        if (!StringUtils.hasText(ticket.getAssigneeString())) {
             throw new RuntimeException("非已认领工单，不能退回: " + request.getUid());
         }
         // 判断认领人是否为本人，如果不是，则不能退回
@@ -504,10 +504,10 @@ public class TicketService {
 
         // 退回任务
         taskService.unclaim(task.getId());
-        
+
         // 只添加任务评论
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "UNCLAIMED", "工单被退回到工作组");
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "UNCLAIMED", "工单被退回到工作组");
 
         // 更新工单状态
         ticket.setAssignee(null);
@@ -546,7 +546,7 @@ public class TicketService {
         }
 
         // 3. 查询任务
-        Task task = taskService.createTaskQuery()   
+        Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
@@ -560,8 +560,8 @@ public class TicketService {
         taskService.setAssignee(task.getId(), request.getAssigneeUid());
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "TRANSFERRED", "工单被转派给 " + request.getAssigneeUid());
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "TRANSFERRED", "工单被转派给 " + request.getAssigneeUid());
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
@@ -584,11 +584,11 @@ public class TicketService {
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
-        TicketEntity ticket = ticketOptional.get(); 
+        TicketEntity ticket = ticketOptional.get();
 
         // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) && 
-            !ticket.getStatus().equals(TicketStatusEnum.RESUMED.name())) {
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) &&
+                !ticket.getStatus().equals(TicketStatusEnum.RESUMED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能挂起: " + request.getUid());
         }
 
@@ -597,15 +597,15 @@ public class TicketService {
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .singleResult();    
+                .singleResult();
 
         if (task == null) {
             throw new RuntimeException("工单任务不存在: " + request.getUid());
         }
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "HOLDING", "工单被挂起");
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "HOLDING", "工单被挂起");
 
         // 4. 挂起任务
         taskService.setAssignee(task.getId(), null);
@@ -628,7 +628,7 @@ public class TicketService {
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
-        if (!ticketOptional.isPresent()) {  
+        if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
@@ -650,11 +650,11 @@ public class TicketService {
         }
 
         // 4. 恢复任务
-        taskService.setAssignee(task.getId(), request.getAssigneeUid());    
+        taskService.setAssignee(task.getId(), request.getAssigneeUid());
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "RESUMED", "工单被恢复");
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "RESUMED", "工单被恢复");
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.RESUMED.name());
@@ -699,8 +699,8 @@ public class TicketService {
         taskService.setAssignee(task.getId(), null);
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "PENDING", "工单被待回应");
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "PENDING", "工单被待回应");
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PENDING.name());
@@ -722,12 +722,12 @@ public class TicketService {
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
-        }   
+        }
         TicketEntity ticket = ticketOptional.get();
 
         // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.CLOSED.name()) && 
-            !ticket.getStatus().equals(TicketStatusEnum.CANCELLED.name())) {
+        if (!ticket.getStatus().equals(TicketStatusEnum.CLOSED.name()) &&
+                !ticket.getStatus().equals(TicketStatusEnum.CANCELLED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能重新打开: " + request.getUid());
         }
 
@@ -746,8 +746,8 @@ public class TicketService {
         taskService.setAssignee(task.getId(), request.getAssigneeUid());
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "REOPENED", "工单被重新打开");
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "REOPENED", "工单被重新打开");
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PROCESSING.name());
@@ -788,29 +788,33 @@ public class TicketService {
             throw new RuntimeException("工单任务不存在: " + request.getUid());
         }
 
-        // 4. 升级任务
-        taskService.setAssignee(task.getId(), request.getAssigneeUid());
+        try {
+            // 4. 升级任务
+            taskService.setAssignee(task.getId(), request.getAssigneeUid());
 
-        // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "ESCALATED", "工单被升级");
+            // comment
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                    "ESCALATED", "工单被升级");
 
-        // 5. 更新工单状态
-        ticket.setStatus(TicketStatusEnum.ESCALATED.name());
-        ticketRepository.save(ticket);
+            // 5. 更新工单状态
+            ticket.setStatus(TicketStatusEnum.ESCALATED.name());
+            ticketRepository.save(ticket);
 
-        return TicketConvertUtils.convertToResponse(ticket);
+            return TicketConvertUtils.convertToResponse(ticket);
+            
+        } catch (Exception e) {
+            log.error("工单升级失败: ", e);
+            throw new RuntimeException("工单升级失败: " + e.getMessage());
+        }
     }
 
-
     /**
-     * 完成工单
-     * PROCESSING -> RESOLVED (解决)
+     * 解决工单
      */
     @Transactional
     public TicketResponse resolveTicket(TicketRequest request) {
-        log.info("开始完成工单: uid={}, status={}, orgUid={}",
-                request.getUid(), request.getStatus(), request.getOrgUid());
+        log.info("开始解决工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -820,8 +824,8 @@ public class TicketService {
         TicketEntity ticket = ticketOptional.get();
 
         // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) && 
-            !ticket.getStatus().equals(TicketStatusEnum.RESUMED.name())) {
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) &&
+                !ticket.getStatus().equals(TicketStatusEnum.RESUMED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能解决: " + request.getUid());
         }
 
@@ -832,27 +836,30 @@ public class TicketService {
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
 
-        log.info("查询到的任务: task={}", task);
         if (task == null) {
             throw new RuntimeException("工单任务不存在: " + request.getUid());
         }
 
-        Map<String, Object> variables = new HashMap<>();
-        variables.put(TicketConsts.TICKET_VARIABLE_STATUS, request.getStatus());
-        // variables.put("solution", request.getSolution());
-        taskService.complete(task.getId(), variables);
-            log.info("工单完成: task={}", task);
+        try {
+            // 4. 添加评论。
+            // 注意添加评论一定要放在complete之前，否则会报错找不到task
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                    "RESOLVED", "工单已解决");
 
-        // 只添加任务评论
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "RESOLVED", "工单已解决");
+            // 5. 完成任务
+            taskService.complete(task.getId());
 
-        // 更新工单状态: 处理中 -> 已解决
-        ticket.setStatus(TicketStatusEnum.RESOLVED.name());
-        // ticket.setSolution(request.getSolution());
-        ticketRepository.save(ticket);
+            // 6. 更新工单状态
+            ticket.setStatus(TicketStatusEnum.RESOLVED.name());
+            // ticket.setResolvedTime(new Date());
+            ticketRepository.save(ticket);
 
-        return TicketConvertUtils.convertToResponse(ticket);
+            return TicketConvertUtils.convertToResponse(ticket);
+
+        } catch (Exception e) {
+            log.error("工单解决失败: ", e);
+            throw new RuntimeException("工单解决失败: " + e.getMessage());
+        }
     }
 
     /**
@@ -888,8 +895,8 @@ public class TicketService {
         }
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "CLOSED", "工单已关闭");
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "CLOSED", "工单已关闭");
 
         // 4. 关闭任务
         taskService.complete(task.getId());
@@ -934,8 +941,8 @@ public class TicketService {
         }
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "CANCELLED", "工单已取消");
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                "CANCELLED", "工单已取消");
 
         // 4. 取消任务
         taskService.deleteTask(task.getId());
@@ -1098,47 +1105,47 @@ public class TicketService {
 
         // 获取活动历史，过滤掉 sequenceFlow
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(request.getProcessInstanceId())
-            .orderByHistoricActivityInstanceStartTime().asc()
-            .list()
-            .stream()
-            .filter(activity -> !"sequenceFlow".equals(activity.getActivityType()))
-            .collect(Collectors.toList());
-        
+                .processInstanceId(request.getProcessInstanceId())
+                .orderByHistoricActivityInstanceStartTime().asc()
+                .list()
+                .stream()
+                .filter(activity -> !"sequenceFlow".equals(activity.getActivityType()))
+                .collect(Collectors.toList());
+
         // 获取任务评论
         List<Comment> comments = taskService.getProcessInstanceComments(request.getProcessInstanceId());
-        
+
         // 合并活动和评论信息
         List<TicketHistoryActivityResponse> responses = new ArrayList<>();
-        
+
         // 添加活动历史，只保留关键信息
         responses.addAll(activities.stream()
-            .map(activity -> TicketHistoryActivityResponse.builder()
-                .id(activity.getId())
-                .activityName(activity.getActivityName())
-                .activityType(activity.getActivityType())
-                .assignee(activity.getAssignee())
-                .startTime(activity.getStartTime())
-                .endTime(activity.getEndTime())
-                .durationInMillis(activity.getDurationInMillis())
-                .build())
-            .collect(Collectors.toList()));
-        
+                .map(activity -> TicketHistoryActivityResponse.builder()
+                        .id(activity.getId())
+                        .activityName(activity.getActivityName())
+                        .activityType(activity.getActivityType())
+                        .assignee(activity.getAssignee())
+                        .startTime(activity.getStartTime())
+                        .endTime(activity.getEndTime())
+                        .durationInMillis(activity.getDurationInMillis())
+                        .build())
+                .collect(Collectors.toList()));
+
         // 添加评论历史
         responses.addAll(comments.stream()
-            .map(comment -> TicketHistoryActivityResponse.builder()
-                .id(comment.getId())
-                .activityType("comment")
-                .activityName(comment.getType())
-                .description(comment.getFullMessage())
-                .startTime(comment.getTime())
-                .assignee(comment.getUserId())
-                .build())
-            .collect(Collectors.toList()));
-        
+                .map(comment -> TicketHistoryActivityResponse.builder()
+                        .id(comment.getId())
+                        .activityType("comment")
+                        .activityName(comment.getType())
+                        .description(comment.getFullMessage())
+                        .startTime(comment.getTime())
+                        .assignee(comment.getUserId())
+                        .build())
+                .collect(Collectors.toList()));
+
         // 按时间排序
         return responses.stream()
-            .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
-            .collect(Collectors.toList());
+                .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
+                .collect(Collectors.toList());
     }
 }
