@@ -5,7 +5,7 @@
     "nickname": "创建空白智能体 - void agent",
     "type": "LLM",
     "category": "i18n.module.void",
-    "prompt": "",
+    "prompt": "请回答用户提出的问题",
     "description": "创建一个空白智能体，不设置默认prompt，不设置默认角色。"
   },
   {
