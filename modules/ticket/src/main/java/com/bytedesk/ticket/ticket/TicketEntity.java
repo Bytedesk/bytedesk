@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 21:59:32
+ * @LastEditTime: 2025-02-19 13:18:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -130,6 +130,8 @@ public class TicketEntity extends BaseEntity {
     // 流程定义实体UID
     private String processEntityUid;
 
+    // 工单会话client
+    private String client;
 
     // 获取工单的访客
     public UserProtobuf getUser() {
