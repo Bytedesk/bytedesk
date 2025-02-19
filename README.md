@@ -90,6 +90,12 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 docker exec ollama-bytedesk ollama pull deepseek-r1
 ```
 
+### ollama
+
+```bash
+ollama pull 
+```
+
 ### stop container
 
 ```bash

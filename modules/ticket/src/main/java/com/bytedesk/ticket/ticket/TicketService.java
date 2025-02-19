@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 14:43:47
+ * @LastEditTime: 2025-02-19 15:52:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -587,7 +587,8 @@ public class TicketService {
         TicketEntity ticket = ticketOptional.get(); 
 
         // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) && 
+            !ticket.getStatus().equals(TicketStatusEnum.RESUMED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能挂起: " + request.getUid());
         }
 
@@ -819,7 +820,8 @@ public class TicketService {
         TicketEntity ticket = ticketOptional.get();
 
         // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) && 
+            !ticket.getStatus().equals(TicketStatusEnum.RESUMED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能解决: " + request.getUid());
         }
 
@@ -843,7 +845,7 @@ public class TicketService {
 
         // 只添加任务评论
         taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-            "COMPLETED", "工单已解决");
+            "RESOLVED", "工单已解决");
 
         // 更新工单状态: 处理中 -> 已解决
         ticket.setStatus(TicketStatusEnum.RESOLVED.name());
