@@ -323,6 +323,18 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     /**
+     * 客户验证工单
+     */
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.verifyTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
      * 关闭工单
      */
     @PostMapping("/close")
