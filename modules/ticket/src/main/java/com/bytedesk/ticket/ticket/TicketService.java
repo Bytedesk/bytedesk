@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 18:03:27
+ * @LastEditTime: 2025-02-19 18:37:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -885,7 +885,7 @@ public class TicketService {
         }
 
         // 3. 判断验证人是否为提交人
-        if (!ticket.getReporter().getUid().equals(request.getReporter().getUid())) {
+        if (!ticket.getReporter().getUid().equals(request.getAssigneeUid())) {
             throw new RuntimeException("非工单提交人，不能验证: " + request.getUid());
         }
 
@@ -917,9 +917,11 @@ public class TicketService {
             // 8. 更新工单状态
             if (request.getVerified()) {
                 ticket.setStatus(TicketStatusEnum.CLOSED.name());
+                ticket.setVerified(true);
                 ticket.setClosedTime(LocalDateTime.now());
             } else {
                 ticket.setStatus(TicketStatusEnum.REOPENED.name());
+                ticket.setVerified(false);
                 // 重置解决时间
                 ticket.setResolvedTime(null);
             }
