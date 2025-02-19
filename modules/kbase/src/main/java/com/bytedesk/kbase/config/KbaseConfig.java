@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 20:51:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 08:56:50
+ * @LastEditTime: 2025-02-19 09:24:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ public class KbaseConfig {
         // 初始化向量库, 创建索引
         @Bean
         @ConditionalOnProperty(name = "spring.ai.vectorstore.redis.initialize-schema", havingValue = "true")
-        public RedisVectorStore vectorStore(EmbeddingModel embeddingModel, RedisVectorStoreProperties properties) {
+        public RedisVectorStore vectorStore(EmbeddingModel ollamaEmbeddingModel, RedisVectorStoreProperties properties) {
 
                 var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
                 var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);
@@ -47,7 +47,7 @@ public class KbaseConfig {
                                 null,
                                 jedisProperties.getPassword());
                 // 初始化向量库, 创建索引
-                return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                return RedisVectorStore.builder(jedisPooled, ollamaEmbeddingModel)
                         .indexName(properties.getIndex())
                         .prefix(properties.getPrefix())
                         .metadataFields(kbUid, fileUid)

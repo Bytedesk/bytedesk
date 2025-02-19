@@ -1,23 +1,24 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-31 11:00:20
+ * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:32:42
+ * @LastEditTime: 2025-02-19 09:48:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
  *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.provider.vendors.zhipuai;
+package com.bytedesk.ai.springai;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImagePrompt;
@@ -34,14 +35,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiService;
 import com.bytedesk.core.utils.JsonResult;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
 /**
  * https://open.bigmodel.cn/dev/api#sdk_install
@@ -52,26 +54,40 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/zhipuai")
-@AllArgsConstructor
-@Tag(name = "ZhipuaiController", description = "智谱AI接口")
-public class ZhipuaiController {
+@RequiredArgsConstructor
+public class SpringAiZhipuaiController {
 
-    private final ZhiPuAiChatModel chatModel;
+    private final ZhiPuAiChatModel zhipuaiChatModel;
 
     private final ZhiPuAiImageModel zhiPuAiImageModel;
 
     private final ZhipuaiService zhipuaiService;
 
-    // http://127.0.0.1:9003/zhipuai/chat?q=讲个笑话
+    // http://127.0.0.1:9003/zhipuai/chat?message=hello
     @GetMapping("/chat")
-    public ResponseEntity<?> generation(@RequestParam(value = "q", defaultValue = "讲个笑话") String question) {
-        ChatResponse response = chatModel.call(
-                new Prompt(
-                        question,
-                        ZhiPuAiChatOptions.builder()
-                                .model(ZhiPuAiApi.ChatModel.GLM_3_Turbo.getValue())
-                                .temperature(0.5)
-                                .build()));
+    public ResponseEntity<JsonResult<?>> chat(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        return ResponseEntity.ok(JsonResult.success(zhipuaiChatModel.call(message)));
+    }
+
+    // http://127.0.0.1:9003/zhipuai/chatStream?message=hello
+    @GetMapping("/chatStream")
+    public Flux<ChatResponse> chatStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        Prompt prompt = new Prompt(new UserMessage(message));
+        return zhipuaiChatModel.stream(prompt);
+    }
+
+    //自定义chat model
+    // http://127.0.0.1:9003/zhipuai/chat/model?message=hello
+    @GetMapping("/chat/model")
+    public ResponseEntity<JsonResult<?>> chatModel(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        ChatResponse response = zhipuaiChatModel.call(
+        new Prompt(
+            message,
+            ZhiPuAiChatOptions.builder()
+                .model(ZhiPuAiApi.ChatModel.GLM_4_Flash.getValue())
+                .temperature(0.5)
+            .build()
+        ));
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -181,5 +197,6 @@ public class ZhipuaiController {
         }
         writer.close();
     }
+
 
 }
