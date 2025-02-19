@@ -1115,5 +1115,5 @@ public class GroupTicketProcessTests {
         String finalWorkgroup = (String) runtimeService.getVariable(processInstance.getId(), "workgroupUid");
         assertEquals("support2", finalWorkgroup);
     }
-
+    
 }
