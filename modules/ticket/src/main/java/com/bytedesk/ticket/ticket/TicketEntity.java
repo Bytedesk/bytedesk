@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 13:18:50
+ * @LastEditTime: 2025-02-19 18:05:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -130,8 +131,18 @@ public class TicketEntity extends BaseEntity {
     // 流程定义实体UID
     private String processEntityUid;
 
+    // 客户验证
+    private Boolean verified;
+
+    // 解决时间
+    private LocalDateTime resolvedTime;
+
+    // 关闭时间
+    private LocalDateTime closedTime;
+
     // 工单会话client
     private String client;
+
 
     // 获取工单的访客
     public UserProtobuf getUser() {

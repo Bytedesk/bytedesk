@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 16:14:40
+ * @LastEditTime: 2025-02-19 18:03:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,6 +55,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 // import org.springframework.context.ApplicationEventPublisher;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -801,7 +802,7 @@ public class TicketService {
             ticketRepository.save(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
-            
+
         } catch (Exception e) {
             log.error("工单升级失败: ", e);
             throw new RuntimeException("工单升级失败: " + e.getMessage());
@@ -851,7 +852,7 @@ public class TicketService {
 
             // 6. 更新工单状态
             ticket.setStatus(TicketStatusEnum.RESOLVED.name());
-            // ticket.setResolvedTime(new Date());
+            ticket.setResolvedTime(LocalDateTime.now());
             ticketRepository.save(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
@@ -859,6 +860,76 @@ public class TicketService {
         } catch (Exception e) {
             log.error("工单解决失败: ", e);
             throw new RuntimeException("工单解决失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 客户验证工单
+     * RESOLVED -> CLOSED/REOPENED (验证通过/不通过)
+     */
+    @Transactional
+    public TicketResponse verifyTicket(TicketRequest request) {
+        log.info("开始验证工单: uid={}, verified={}, orgUid={}",
+                request.getUid(), request.getVerified(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.RESOLVED.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能验证: " + request.getUid());
+        }
+
+        // 3. 判断验证人是否为提交人
+        if (!ticket.getReporter().getUid().equals(request.getReporter().getUid())) {
+            throw new RuntimeException("非工单提交人，不能验证: " + request.getUid());
+        }
+
+        // 4. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        try {
+            // 5. 设置验证结果变量
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("verified", request.getVerified());
+            
+            // 6. 添加评论
+            String commentType = request.getVerified() ? "VERIFIED_OK" : "VERIFIED_FAIL";
+            String commentMessage = request.getVerified() ? "客户确认工单已解决" : "客户反馈工单未解决";
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+                commentType, commentMessage);
+
+            // 7. 完成任务
+            taskService.complete(task.getId(), variables);
+
+            // 8. 更新工单状态
+            if (request.getVerified()) {
+                ticket.setStatus(TicketStatusEnum.CLOSED.name());
+                ticket.setClosedTime(LocalDateTime.now());
+            } else {
+                ticket.setStatus(TicketStatusEnum.REOPENED.name());
+                // 重置解决时间
+                ticket.setResolvedTime(null);
+            }
+            ticketRepository.save(ticket);
+
+            return TicketConvertUtils.convertToResponse(ticket);
+
+        } catch (Exception e) {
+            log.error("工单验证失败: ", e);
+            throw new RuntimeException("工单验证失败: " + e.getMessage());
         }
     }
 
