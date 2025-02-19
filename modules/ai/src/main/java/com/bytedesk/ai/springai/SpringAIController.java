@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 13:43:28
+ * @LastEditTime: 2025-02-19 09:23:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,7 +44,7 @@ public class SpringAiController {
 
     private final VectorStore vectorStore;
 
-    private final ChatModel chatModel;
+    private final ChatModel ollamaChatModel;
 
     // http://127.0.0.1:9003/spring/ai/completion?message=hello&voice=agent
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
@@ -75,7 +75,7 @@ public class SpringAiController {
                         .topK(6)
                         .build());
         // 使用chatClient
-        ChatResponse response = ChatClient.builder(chatModel)
+        ChatResponse response = ChatClient.builder(ollamaChatModel)
                 .build()
                 .prompt()
                 .advisors(qaAdvisor)
@@ -91,7 +91,7 @@ public class SpringAiController {
     ResponseEntity<JsonResult<?>> filter(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
 
-        ChatClient chatClient = ChatClient.builder(chatModel)
+        ChatClient chatClient = ChatClient.builder(ollamaChatModel)
                 .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.builder().build()))
                 .build();
 

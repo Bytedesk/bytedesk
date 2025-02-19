@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 13:53:48
+ * @LastEditTime: 2025-02-19 09:36:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/deepseek")
 @RequiredArgsConstructor
-public class DeepseekController {
+public class SpringAiDeepseekController {
     
     // deepseek chat model
     // 在配置文件中修改：
