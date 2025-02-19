@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 10:21:22
+ * @LastEditTime: 2025-02-19 11:12:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -336,7 +336,7 @@ public class TicketService {
             assigneeProtobuf.setUid(assigneeOptional.get().getUid());
             assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
             ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
-            ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+            ticket.setStatus(TicketStatusEnum.CLAIMED.name());
 
             // 4. 更新流程变量
             Map<String, Object> variables = new HashMap<>();
@@ -369,6 +369,17 @@ public class TicketService {
      */
     @Transactional
     public TicketResponse unclaimTicket(TicketRequest request) {
+        log.info("开始退回工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 查询任务
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
@@ -377,20 +388,31 @@ public class TicketService {
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
 
-        if (task != null) {
-            taskService.unclaim(task.getId());
-
-            // 更新工单状态
-            Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
-            if (ticketOptional.isPresent()) {
-                TicketEntity ticket = ticketOptional.get();
-                // ticket.setAssigneeUid(null);
-                // ticket.setStatus(TicketStatusEnum.OPEN);
-                ticketRepository.save(ticket);
-                return TicketConvertUtils.convertToResponse(ticket);
-            }
+        // 如果任务不存在，则返回null
+        if (task == null) {
+            // return null;
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
         }
-        return null;
+
+        log.info("退回工单: task={}", task);
+
+        // 退回任务，即取消认领任务
+        taskService.unclaim(task.getId());
+
+        // 更新工单状态
+        ticket.setAssignee(null);
+        ticket.setStatus(TicketStatusEnum.UNCLAIMED.name());
+        ticketRepository.save(ticket);
+
+        // 发布工单退回消息事件
+        // eventPublisher.publishEvent(TicketMessageEvent.builder()
+        // .ticketUid(ticket.getUid())
+        // .processInstanceId(ticket.getProcessInstanceId())
+        // .type(TicketMessageType.UNCLAIMED.name())
+        // .build());
+
+        return TicketConvertUtils.convertToResponse(ticket);
+
     }
 
     /**
@@ -398,29 +420,40 @@ public class TicketService {
      */
     @Transactional
     public TicketResponse completeTicket(TicketRequest request) {
+        log.info("开始完成工单: uid={}, status={}, orgUid={}",
+                request.getUid(), request.getStatus(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 查询任务
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
 
-        if (task != null) {
-            Map<String, Object> variables = new HashMap<>();
-            variables.put(TicketConsts.TICKET_VARIABLE_STATUS, request.getStatus());
-            // variables.put("solution", request.getSolution());
-            taskService.complete(task.getId(), variables);
-
-            // 更新工单状态
-            Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
-            if (ticketOptional.isPresent()) {
-                TicketEntity ticket = ticketOptional.get();
-                // ticket.setStatus(TicketStatusEnum.valueOf(request.getStatus()));
-                // ticket.setSolution(request.getSolution());
-                ticketRepository.save(ticket);
-                return TicketConvertUtils.convertToResponse(ticket);
-            }
+        log.info("查询到的任务: task={}", task);
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
         }
-        return null;
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(TicketConsts.TICKET_VARIABLE_STATUS, request.getStatus());
+        // variables.put("solution", request.getSolution());
+        taskService.complete(task.getId(), variables);
+            log.info("工单完成: task={}", task);
+
+        // 更新工单状态: 处理中 -> 已解决
+        ticket.setStatus(TicketStatusEnum.RESOLVED.name());
+        // ticket.setSolution(request.getSolution());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
     }
 
     /**
@@ -497,7 +530,6 @@ public class TicketService {
         return responses;
     }
 
-
     /**
      * 查询某个工单的流程实例历史
      */
@@ -517,8 +549,8 @@ public class TicketService {
 
         List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(request.getProcessInstanceId())
-                .includeTaskLocalVariables()    // 包含任务局部变量
-                .includeProcessVariables()      // 包含流程变量
+                .includeTaskLocalVariables() // 包含任务局部变量
+                .includeProcessVariables() // 包含流程变量
                 .orderByHistoricTaskInstanceStartTime().asc()
                 .list();
 
@@ -535,11 +567,11 @@ public class TicketService {
                             .processInstanceId(historicTask.getProcessInstanceId())
                             .processDefinitionId(historicTask.getProcessDefinitionId())
                             .executionId(historicTask.getExecutionId())
-                            
+
                             .assignee(historicTask.getAssignee())
                             .owner(historicTask.getOwner())
                             // 注意：历史任务可能无法直接获取候选人/组信息
-                            
+
                             .priority(historicTask.getPriority())
                             .createTime(historicTask.getCreateTime())
                             .dueDate(historicTask.getDueDate())
@@ -548,7 +580,7 @@ public class TicketService {
                             .durationInMillis(historicTask.getDurationInMillis())
                             .deleteReason(historicTask.getDeleteReason())
                             .tenantId(historicTask.getTenantId())
-                            
+
                             .taskLocalVariables(historicTask.getTaskLocalVariables())
                             .processVariables(historicTask.getProcessVariables())
                             .build();
@@ -583,26 +615,24 @@ public class TicketService {
                     // 获取活动相关的变量
                     Map<String, Object> processVariables = new HashMap<>();
                     Map<String, Object> taskLocalVariables = new HashMap<>();
-                    
+
                     // 如果是用户任务，获取任务变量
                     if ("userTask".equals(activity.getActivityType())) {
                         List<HistoricVariableInstance> taskVars = historyService
                                 .createHistoricVariableInstanceQuery()
                                 .taskId(activity.getTaskId())
                                 .list();
-                        
-                        taskVars.forEach(var -> 
-                            taskLocalVariables.put(var.getVariableName(), var.getValue()));
+
+                        taskVars.forEach(var -> taskLocalVariables.put(var.getVariableName(), var.getValue()));
                     }
-                    
+
                     // 获取流程变量
                     List<HistoricVariableInstance> processVars = historyService
                             .createHistoricVariableInstanceQuery()
                             .processInstanceId(activity.getProcessInstanceId())
                             .list();
-                    
-                    processVars.forEach(var -> 
-                        processVariables.put(var.getVariableName(), var.getValue()));
+
+                    processVars.forEach(var -> processVariables.put(var.getVariableName(), var.getValue()));
 
                     return TicketHistoryActivityResponse.builder()
                             .id(activity.getId())

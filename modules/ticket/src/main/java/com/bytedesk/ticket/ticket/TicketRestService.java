@@ -153,7 +153,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             ticket.setAssignee(assigneeJson);
             // 暂不启用一对一
             // ticket.setType(TicketTypeEnum.AGENT.name());
-            ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+            ticket.setStatus(TicketStatusEnum.CLAIMED.name());
             // 
             String userJson = BytedeskConsts.EMPTY_JSON_STRING;
             // 使用在线客服工单会话user info
@@ -305,7 +305,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 assigneeProtobuf.setUid(assigneeOptional.get().getUid());
                 assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
                 ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
-                ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+                ticket.setStatus(TicketStatusEnum.CLAIMED.name());
             }
         }
 
