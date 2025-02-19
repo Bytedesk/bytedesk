@@ -94,6 +94,7 @@ docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 ### ollama
 
 ```bash
+ollama pull deepseek-r1:1.5b
 ollama pull qwen2.5:1.5b
 ```
 
