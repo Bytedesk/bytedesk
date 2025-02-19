@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 09:19:23
+ * @LastEditTime: 2025-02-20 06:44:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -129,7 +129,7 @@ public class VisitorThreadEntity extends BaseEntity {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "thread_user")
+    @Column(name = "thread_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
@@ -143,7 +143,7 @@ public class VisitorThreadEntity extends BaseEntity {
     // json字段格式，搜索时，对数据库有依赖，不方便迁移
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "thread_agent")
+    @Column(name = "thread_agent", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 机器人和agent可以同时存在，人工接待的时候，机器人可以同时给出答案，客服可以选用
