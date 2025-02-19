@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 13:12:01
+ * @LastEditTime: 2025-02-19 14:14:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -1047,11 +1047,14 @@ public class TicketService {
             }
         }
 
-        // 获取活动历史
+        // 获取活动历史，过滤掉 sequenceFlow
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
             .processInstanceId(request.getProcessInstanceId())
             .orderByHistoricActivityInstanceStartTime().asc()
-            .list();
+            .list()
+            .stream()
+            .filter(activity -> !"sequenceFlow".equals(activity.getActivityType()))
+            .collect(Collectors.toList());
         
         // 获取任务评论
         List<Comment> comments = taskService.getProcessInstanceComments(request.getProcessInstanceId());
@@ -1059,50 +1062,34 @@ public class TicketService {
         // 合并活动和评论信息
         List<TicketHistoryActivityResponse> responses = new ArrayList<>();
         
-        // 添加活动历史
+        // 添加活动历史，只保留关键信息
         responses.addAll(activities.stream()
-            .map(activity -> convertToActivityResponse(activity))
+            .map(activity -> TicketHistoryActivityResponse.builder()
+                .id(activity.getId())
+                .activityName(activity.getActivityName())
+                .activityType(activity.getActivityType())
+                .assignee(activity.getAssignee())
+                .startTime(activity.getStartTime())
+                .endTime(activity.getEndTime())
+                .durationInMillis(activity.getDurationInMillis())
+                .build())
             .collect(Collectors.toList()));
         
         // 添加评论历史
         responses.addAll(comments.stream()
-            .map(comment -> convertCommentToResponse(comment))
+            .map(comment -> TicketHistoryActivityResponse.builder()
+                .id(comment.getId())
+                .activityType("comment")
+                .activityName(comment.getType())
+                .description(comment.getFullMessage())
+                .startTime(comment.getTime())
+                .assignee(comment.getUserId())
+                .build())
             .collect(Collectors.toList()));
         
         // 按时间排序
         return responses.stream()
             .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
             .collect(Collectors.toList());
-    }
-
-    private TicketHistoryActivityResponse convertToActivityResponse(HistoricActivityInstance activity) {
-        return TicketHistoryActivityResponse.builder()
-            .id(activity.getId())
-            .activityId(activity.getActivityId())
-            .activityName(activity.getActivityName())
-            .activityType(activity.getActivityType())
-            .processDefinitionId(activity.getProcessDefinitionId())
-            .processInstanceId(activity.getProcessInstanceId())
-            .executionId(activity.getExecutionId())
-            .taskId(activity.getTaskId())
-            .calledProcessInstanceId(activity.getCalledProcessInstanceId())
-            .assignee(activity.getAssignee())
-            .startTime(activity.getStartTime())
-            .endTime(activity.getEndTime())
-            .durationInMillis(activity.getDurationInMillis())
-            .tenantId(activity.getTenantId())
-            .build();
-    }
-    
-
-    private TicketHistoryActivityResponse convertCommentToResponse(Comment comment) {
-        return TicketHistoryActivityResponse.builder()
-            .id(comment.getId())
-            .activityType("comment")
-            .activityName(comment.getType())
-            // .description(comment.getFullMessage())
-            .startTime(comment.getTime())
-            .assignee(comment.getUserId())
-            .build();
     }
 }

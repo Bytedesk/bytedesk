@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 07:31:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 08:49:47
+ * @LastEditTime: 2025-02-19 14:13:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,6 +39,7 @@ public class TicketHistoryActivityResponse {
     private Date endTime;                 // 结束时间
     private Long durationInMillis;        // 持续时间
     private String tenantId;              // 租户ID
+    private String description;           
     
     private Map<String, Object> taskLocalVariables;    // 任务局部变量
     private Map<String, Object> processVariables;      // 流程变量
