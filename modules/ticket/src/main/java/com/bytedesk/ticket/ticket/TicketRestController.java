@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 07:34:43
+ * @LastEditTime: 2025-02-19 12:20:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -215,6 +215,18 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     /**
+     * 开始处理工单
+     */
+    @PostMapping("/start")
+    public ResponseEntity<?> startTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.startTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
      * 退回工单
      */
     @PostMapping("/unclaim")
@@ -227,11 +239,95 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     /**
+     * 转派工单
+     */
+    @PostMapping("/transfer")
+    public ResponseEntity<?> transferTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.transferTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 挂起工单
+     */
+    @PostMapping("/hold")
+    public ResponseEntity<?> holdTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.holdTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 待回应工单
+     */
+    @PostMapping("/pending")
+    public ResponseEntity<?> pendingTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.pendingTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 重新打开工单
+     */
+    @PostMapping("/reopen")
+    public ResponseEntity<?> reopenTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.reopenTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 升级工单
+     */
+    @PostMapping("/escalate")
+    public ResponseEntity<?> escalateTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.escalateTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
      * 完成工单
      */
-    @PostMapping("/complete")
-    public ResponseEntity<?> completeTicket(@RequestBody TicketRequest request) {
-        TicketResponse response = ticketService.completeTicket(request);
+    @PostMapping("/resolve")
+    public ResponseEntity<?> resolveTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.resolveTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 关闭工单
+     */
+    @PostMapping("/close")
+    public ResponseEntity<?> closeTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.closeTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 取消工单
+     */
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancelTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.cancelTicket(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("工单不存在"));
         }

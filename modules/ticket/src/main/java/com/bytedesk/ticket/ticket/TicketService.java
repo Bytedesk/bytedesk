@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 11:46:59
+ * @LastEditTime: 2025-02-19 12:19:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -240,7 +240,7 @@ public class TicketService {
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
                     } else {
-                        return null;
+        return null;
                     }
                 })
                 .filter(Objects::nonNull)
@@ -274,7 +274,7 @@ public class TicketService {
                     if (ticket.isPresent()) {
                         return TicketConvertUtils.convertToResponse(ticket.get());
                     } else {
-                        return null;
+        return null;
                     }
                 })
                 .filter(Objects::nonNull)
@@ -285,6 +285,7 @@ public class TicketService {
 
     /**
      * 认领工单
+     * NEW -> CLAIMED (认领)
      */
     @Transactional
     public TicketResponse claimTicket(TicketRequest request) {
@@ -380,7 +381,79 @@ public class TicketService {
     }
 
     /**
+     * 开始处理工单
+     * CLAIMED -> PROCESSING (开始处理)
+     */
+    @Transactional
+    public TicketResponse startTicket(TicketRequest request) {
+        log.info("开始处理工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能开始处理: " + request.getUid());
+        }
+
+        // 3. 判断处理人是否为本人
+        if (!StringUtils.hasText(ticket.getAssigneeString())) {
+            throw new RuntimeException("工单未被认领，不能开始处理: " + request.getUid());
+        }
+
+        if (!ticket.getAssignee().getUid().equals(request.getAssigneeUid())) {
+            throw new RuntimeException("非工单处理人，不能开始处理: " + request.getUid());
+        }
+
+        // 4. 判断工单是否已开始处理
+        if (ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+            throw new RuntimeException("工单已开始处理，不能重复开始处理: " + request.getUid());
+        }
+
+        // 5. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        try {
+            // 5. 添加任务评论，记录开始处理
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+                "PROCESSING", "工单开始处理");
+
+            // 6. 设置任务变量
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("startProcessingTime", new Date());
+            variables.put("processingUser", ticket.getAssigneeString());
+            taskService.setVariables(task.getId(), variables);
+
+            // 7. 更新工单状态
+            ticket.setStatus(TicketStatusEnum.PROCESSING.name());
+            ticketRepository.save(ticket);
+
+            log.info("工单开始处理成功: taskId={}, assigneeUid={}", task.getId(), ticket.getAssigneeString());
+            
+            return TicketConvertUtils.convertToResponse(ticket);
+        } catch (Exception e) {
+            log.error("工单开始处理失败: ", e);
+            throw new RuntimeException("工单开始处理失败: " + e.getMessage());
+        }
+    }
+
+
+    /**
      * 退回工单
+     * CLAIMED -> UNCLAIMED (退回)
      */
     @Transactional
     public TicketResponse unclaimTicket(TicketRequest request) {
@@ -446,10 +519,242 @@ public class TicketService {
     }
 
     /**
-     * 完成工单
+     * 转派工单
+     * CLAIMED -> CLAIMED (转派)
      */
     @Transactional
-    public TicketResponse completeTicket(TicketRequest request) {
+    public TicketResponse transferTicket(TicketRequest request) {
+        log.info("开始转派工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能转派: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()   
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // 4. 转派任务
+        taskService.setAssignee(task.getId(), request.getAssigneeUid());
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "TRANSFERRED", "工单被转派给 " + request.getAssigneeUid());
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.CLAIMED.name());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 挂起工单
+     * PROCESSING -> HOLDING (挂起)
+     */
+    @Transactional
+    public TicketResponse holdTicket(TicketRequest request) {
+        log.info("开始挂起工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get(); 
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能挂起: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();    
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "HOLDING", "工单被挂起");
+
+        // 4. 挂起任务
+        taskService.setAssignee(task.getId(), null);
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.HOLDING.name());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 待回应工单
+     * PROCESSING -> PENDING (待回应)
+     */
+    @Transactional
+    public TicketResponse pendingTicket(TicketRequest request) {
+        log.info("开始待回应工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能待处理: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // 4. 待处理任务
+        taskService.setAssignee(task.getId(), null);
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "PENDING", "工单被待回应");
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.PENDING.name());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 重新打开工单
+     * HOLDING -> PROCESSING (重新打开)
+     */
+    @Transactional
+    public TicketResponse reopenTicket(TicketRequest request) {
+        log.info("开始重新打开工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }   
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.HOLDING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能重新打开: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // 4. 重新打开任务
+        taskService.setAssignee(task.getId(), request.getAssigneeUid());
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "REOPENED", "工单被重新打开");
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.PROCESSING.name());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 升级工单
+     * PROCESSING -> ESCALATED (升级)
+     */
+    @Transactional
+    public TicketResponse escalateTicket(TicketRequest request) {
+        log.info("开始升级工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能升级: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // 4. 升级任务
+        taskService.setAssignee(task.getId(), request.getAssigneeUid());
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "ESCALATED", "工单被升级");
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.ESCALATED.name());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+
+    /**
+     * 完成工单
+     * PROCESSING -> RESOLVED (解决)
+     */
+    @Transactional
+    public TicketResponse resolveTicket(TicketRequest request) {
         log.info("开始完成工单: uid={}, status={}, orgUid={}",
                 request.getUid(), request.getStatus(), request.getOrgUid());
 
@@ -460,7 +765,12 @@ public class TicketService {
         }
         TicketEntity ticket = ticketOptional.get();
 
-        // 2. 查询任务
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能解决: " + request.getUid());
+        }
+
+        // 3. 查询任务
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
@@ -485,6 +795,98 @@ public class TicketService {
         // 更新工单状态: 处理中 -> 已解决
         ticket.setStatus(TicketStatusEnum.RESOLVED.name());
         // ticket.setSolution(request.getSolution());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 关闭工单
+     * PROCESSING -> CLOSED (关闭)
+     */
+    @Transactional
+    public TicketResponse closeTicket(TicketRequest request) {
+        log.info("开始关闭工单: uid={}, status={}, orgUid={}",
+                request.getUid(), request.getStatus(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能关闭: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "CLOSED", "工单已关闭");
+
+        // 4. 关闭任务
+        taskService.complete(task.getId());
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.CLOSED.name());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 取消工单
+     * PROCESSING -> CANCELLED (取消)
+     */
+    @Transactional
+    public TicketResponse cancelTicket(TicketRequest request) {
+        log.info("开始取消工单: uid={}, status={}, orgUid={}",
+                request.getUid(), request.getStatus(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能取消: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "CANCELLED", "工单已取消");
+
+        // 4. 取消任务
+        taskService.deleteTask(task.getId());
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.CANCELLED.name());
         ticketRepository.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
