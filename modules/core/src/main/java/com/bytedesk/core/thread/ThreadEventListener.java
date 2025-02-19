@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 13:45:30
+ * @LastEditTime: 2025-02-19 22:32:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,10 +51,12 @@ public class ThreadEventListener {
         if (user == null) {
             return;
         }
+        
         // 创建客服会话之后，需要订阅topic
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
-                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
+                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
+                || thread.getType().equals(ThreadTypeEnum.TICKET.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
