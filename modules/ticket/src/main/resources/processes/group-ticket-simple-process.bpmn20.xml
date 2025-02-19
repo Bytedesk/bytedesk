@@ -5,7 +5,7 @@
       <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
       <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
     </extensionElements>
-    <startEvent id="start" name="创建工单"></startEvent>
+    <startEvent id="start" name="开始"></startEvent>
     <userTask id="createTicket" name="创建工单" flowable:assignee="${reporterUid}">
       <documentation>创建新工单并填写详细信息</documentation>
       <extensionElements>
@@ -39,7 +39,7 @@
     <sequenceFlow id="flow_verify_fail" name="未解决" sourceRef="verifyGateway" targetRef="assignToGroup">
       <conditionExpression xsi:type="tFormalExpression">${verified == false}</conditionExpression>
     </sequenceFlow>
-    <endEvent id="end" name="结束工单"></endEvent>
+    <endEvent id="end" name="结束"></endEvent>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_groupTicketSimpleProcess">
     <bpmndi:BPMNPlane bpmnElement="groupTicketSimpleProcess" id="BPMNPlane_groupTicketSimpleProcess">
