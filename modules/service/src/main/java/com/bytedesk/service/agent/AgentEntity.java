@@ -131,6 +131,7 @@ public class AgentEntity extends BaseEntity {
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
     // of type character varying
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     // org member

@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket;
+package com.bytedesk.ticket.ticket.dto;
 
 import java.util.Set;
 

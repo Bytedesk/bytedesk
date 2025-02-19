@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.ticket.consts.TicketConsts;
+import com.bytedesk.ticket.ticket.dto.TicketRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 
 import jakarta.persistence.criteria.Predicate;
