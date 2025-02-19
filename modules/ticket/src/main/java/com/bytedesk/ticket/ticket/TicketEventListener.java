@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 13:41:24
+ * @LastEditTime: 2025-02-19 22:44:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.topic.TopicCacheService;
+import com.bytedesk.core.topic.TopicRequest;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
@@ -55,11 +60,12 @@ public class TicketEventListener {
 
     private final TicketService ticketService;
 
+    private final TopicCacheService topicCacheService;
+
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
         TicketEntity ticket = event.getTicket();
         log.info("开始创建工单流程实例: ticketUid={}, orgUid={}", ticket.getUid(), ticket.getOrgUid());
-
         // 1. 准备流程变量
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
@@ -73,7 +79,7 @@ public class TicketEventListener {
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
         variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
         variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
-
+        
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
@@ -132,6 +138,13 @@ public class TicketEventListener {
                 ticketService.claimTicket(request);
             }
         }
+        // 订阅工单会话
+        UserEntity owner = ticket.getOwner();
+        TopicRequest topicRequest = TopicRequest.builder()
+                .topic(TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getWorkgroup().getUid(), ticket.getUid()))
+                .userUid(owner.getUid())
+                .build();
+        topicCacheService.push(JSON.toJSONString(topicRequest));
     }
 
     // 监听工单更新事件

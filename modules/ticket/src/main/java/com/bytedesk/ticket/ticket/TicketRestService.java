@@ -110,10 +110,10 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
-        // UserEntity user = authService.getUser();
-        // if (user == null) {
-        // throw new RuntimeException("user not found");
-        // }
+        UserEntity owner = authService.getUser();
+        if (owner == null) {
+            throw new RuntimeException("user not found");
+        }
         // String userUid = user.getUid();
         // 检查用户是否有创建工单的权限
         // if (!identityService.hasPrivilege(userId, "TICKET_CREATE")) {
@@ -125,6 +125,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setStatus(TicketStatusEnum.NEW.name());
         // 默认是工作组工单，暂不启用一对一
         ticket.setType(TicketTypeEnum.WORKGROUP.name());
+        ticket.setOwner(owner);
         //
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
         if (workgroupOptional.isPresent()) {
@@ -334,7 +335,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         String topic = "";
         //
         if (ticket.getType().equals(TicketTypeEnum.AGENT.name())) {
-            topic = TopicUtils.formatOrgAgentTicketThreadTopic(ticket.getAssignee().getUid(), owner.getUid());
+            topic = TopicUtils.formatOrgAgentTicketThreadTopic(ticket.getAssignee().getUid(), ticket.getUid());
             // 使用在线客服工单会话user info
             if (StringUtils.hasText(ticket.getServiceThreadTopic())) {
                 String serviceThreadTopic = ticket.getServiceThreadTopic();
@@ -353,7 +354,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 visitorJson = JSON.toJSONString(userProtobuf);
             }
         } else if (ticket.getType().equals(TicketTypeEnum.WORKGROUP.name())) {
-            topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getWorkgroup().getUid(), owner.getUid());
+            topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getWorkgroup().getUid(), ticket.getUid());
             // 使用在线客服工单会话user info
             if (StringUtils.hasText(ticket.getServiceThreadTopic())) {
                 String serviceThreadTopic = ticket.getServiceThreadTopic();
