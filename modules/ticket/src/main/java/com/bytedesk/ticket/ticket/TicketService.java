@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 14:14:01
+ * @LastEditTime: 2025-02-19 14:43:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -304,7 +304,7 @@ public class TicketService {
         // 判断状态是否为NEW或退回状态，如果不是，则不能认领
         if (!ticket.getStatus().equals(TicketStatusEnum.NEW.name()) && 
             !ticket.getStatus().equals(TicketStatusEnum.UNCLAIMED.name())) {
-            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能认领: " + request.getUid());
+            throw new RuntimeException("已经被认领，工单状态为" + ticket.getStatus() + "，不能重复认领: " + request.getUid());
         }
 
         // 2. 查询任务
@@ -617,11 +617,57 @@ public class TicketService {
     }
 
     /**
+     * 恢复工单
+     * HOLDING -> RESUMED (恢复)
+     */
+    @Transactional
+    public TicketResponse resumeTicket(TicketRequest request) {
+        log.info("开始恢复工单: uid={}, assigneeUid={}, orgUid={}",
+                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+
+        // 1. 查询工单
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {  
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+
+        // 2. 判断工单状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.HOLDING.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能恢复: " + request.getUid());
+        }
+
+        // 3. 查询任务
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
+                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+                .singleResult();
+
+        if (task == null) {
+            throw new RuntimeException("工单任务不存在: " + request.getUid());
+        }
+
+        // 4. 恢复任务
+        taskService.setAssignee(task.getId(), request.getAssigneeUid());    
+
+        // comment
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "RESUMED", "工单被恢复");
+
+        // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.RESUMED.name());
+        ticketRepository.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
      * 待回应工单
      * PROCESSING -> PENDING (待回应)
      */
     @Transactional
-    public TicketResponse pendingTicket(TicketRequest request) {
+    public TicketResponse pendTicket(TicketRequest request) {
         log.info("开始待回应工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssigneeUid(), request.getOrgUid());
 
@@ -664,7 +710,7 @@ public class TicketService {
 
     /**
      * 重新打开工单
-     * HOLDING -> PROCESSING (重新打开)
+     * CLOSED/CANCELLED -> REOPENED -> PROCESSING (重新打开)
      */
     @Transactional
     public TicketResponse reopenTicket(TicketRequest request) {
@@ -679,7 +725,8 @@ public class TicketService {
         TicketEntity ticket = ticketOptional.get();
 
         // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.HOLDING.name())) {
+        if (!ticket.getStatus().equals(TicketStatusEnum.CLOSED.name()) && 
+            !ticket.getStatus().equals(TicketStatusEnum.CANCELLED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能重新打开: " + request.getUid());
         }
 
