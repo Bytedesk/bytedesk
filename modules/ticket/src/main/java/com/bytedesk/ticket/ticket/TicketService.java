@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 11:32:02
+ * @LastEditTime: 2025-02-19 11:46:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -298,6 +298,12 @@ public class TicketService {
         }
         TicketEntity ticket = ticketOptional.get();
 
+        // 判断状态是否为NEW或退回状态，如果不是，则不能认领
+        if (!ticket.getStatus().equals(TicketStatusEnum.NEW.name()) && 
+            !ticket.getStatus().equals(TicketStatusEnum.UNCLAIMED.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能认领: " + request.getUid());
+        }
+
         // 2. 查询任务
         Task task = taskService.createTaskQuery()
                 .processInstanceId(ticket.getProcessInstanceId()) // 使用processInstanceId查询
@@ -387,6 +393,18 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+
+        // 判断状态是否为已认领，如果不是，则不能退回
+        if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能退回: " + request.getUid());
+        }
+        if (!StringUtils.hasText(ticket.getAssigneeString()) ) {
+            throw new RuntimeException("非已认领工单，不能退回: " + request.getUid());
+        }
+        // 判断认领人是否为本人，如果不是，则不能退回
+        if (!ticket.getAssignee().getUid().equals(request.getAssigneeUid())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能退回: " + request.getUid());
+        }
 
         // 2. 查询任务
         Task task = taskService.createTaskQuery()
