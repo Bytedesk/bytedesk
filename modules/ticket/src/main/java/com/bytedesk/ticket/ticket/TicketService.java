@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 11:12:30
+ * @LastEditTime: 2025-02-19 11:32:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,9 +18,9 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -53,6 +53,10 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 // import org.springframework.context.ApplicationEventPublisher;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -321,6 +325,11 @@ public class TicketService {
         try {
             taskService.claim(task.getId(), assigneeUid);
             log.info("工单认领成功: taskId={}, assigneeUid={}", task.getId(), assigneeUid);
+
+            // 只添加任务评论
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+                "CLAIMED", "工单被 " + assigneeUid + " 认领");
+                
         } catch (Exception e) {
             log.error("工单认领失败: ", e);
             throw new RuntimeException("工单认领失败: " + e.getMessage());
@@ -396,8 +405,12 @@ public class TicketService {
 
         log.info("退回工单: task={}", task);
 
-        // 退回任务，即取消认领任务
+        // 退回任务
         taskService.unclaim(task.getId());
+        
+        // 只添加任务评论
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "UNCLAIMED", "工单被退回到工作组");
 
         // 更新工单状态
         ticket.setAssignee(null);
@@ -412,7 +425,6 @@ public class TicketService {
         // .build());
 
         return TicketConvertUtils.convertToResponse(ticket);
-
     }
 
     /**
@@ -447,6 +459,10 @@ public class TicketService {
         // variables.put("solution", request.getSolution());
         taskService.complete(task.getId(), variables);
             log.info("工单完成: task={}", task);
+
+        // 只添加任务评论
+        taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
+            "COMPLETED", "工单已解决");
 
         // 更新工单状态: 处理中 -> 已解决
         ticket.setStatus(TicketStatusEnum.RESOLVED.name());
@@ -605,54 +621,62 @@ public class TicketService {
             }
         }
 
+        // 获取活动历史
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(request.getProcessInstanceId())
-                .orderByHistoricActivityInstanceStartTime().asc()
-                .list();
+            .processInstanceId(request.getProcessInstanceId())
+            .orderByHistoricActivityInstanceStartTime().asc()
+            .list();
+        
+        // 获取任务评论
+        List<Comment> comments = taskService.getProcessInstanceComments(request.getProcessInstanceId());
+        
+        // 合并活动和评论信息
+        List<TicketHistoryActivityResponse> responses = new ArrayList<>();
+        
+        // 添加活动历史
+        responses.addAll(activities.stream()
+            .map(activity -> convertToActivityResponse(activity))
+            .collect(Collectors.toList()));
+        
+        // 添加评论历史
+        responses.addAll(comments.stream()
+            .map(comment -> convertCommentToResponse(comment))
+            .collect(Collectors.toList()));
+        
+        // 按时间排序
+        return responses.stream()
+            .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
+            .collect(Collectors.toList());
+    }
 
-        return activities.stream()
-                .map(activity -> {
-                    // 获取活动相关的变量
-                    Map<String, Object> processVariables = new HashMap<>();
-                    Map<String, Object> taskLocalVariables = new HashMap<>();
+    private TicketHistoryActivityResponse convertToActivityResponse(HistoricActivityInstance activity) {
+        return TicketHistoryActivityResponse.builder()
+            .id(activity.getId())
+            .activityId(activity.getActivityId())
+            .activityName(activity.getActivityName())
+            .activityType(activity.getActivityType())
+            .processDefinitionId(activity.getProcessDefinitionId())
+            .processInstanceId(activity.getProcessInstanceId())
+            .executionId(activity.getExecutionId())
+            .taskId(activity.getTaskId())
+            .calledProcessInstanceId(activity.getCalledProcessInstanceId())
+            .assignee(activity.getAssignee())
+            .startTime(activity.getStartTime())
+            .endTime(activity.getEndTime())
+            .durationInMillis(activity.getDurationInMillis())
+            .tenantId(activity.getTenantId())
+            .build();
+    }
+    
 
-                    // 如果是用户任务，获取任务变量
-                    if ("userTask".equals(activity.getActivityType())) {
-                        List<HistoricVariableInstance> taskVars = historyService
-                                .createHistoricVariableInstanceQuery()
-                                .taskId(activity.getTaskId())
-                                .list();
-
-                        taskVars.forEach(var -> taskLocalVariables.put(var.getVariableName(), var.getValue()));
-                    }
-
-                    // 获取流程变量
-                    List<HistoricVariableInstance> processVars = historyService
-                            .createHistoricVariableInstanceQuery()
-                            .processInstanceId(activity.getProcessInstanceId())
-                            .list();
-
-                    processVars.forEach(var -> processVariables.put(var.getVariableName(), var.getValue()));
-
-                    return TicketHistoryActivityResponse.builder()
-                            .id(activity.getId())
-                            .activityId(activity.getActivityId())
-                            .activityName(activity.getActivityName())
-                            .activityType(activity.getActivityType())
-                            .processDefinitionId(activity.getProcessDefinitionId())
-                            .processInstanceId(activity.getProcessInstanceId())
-                            .executionId(activity.getExecutionId())
-                            .taskId(activity.getTaskId())
-                            .calledProcessInstanceId(activity.getCalledProcessInstanceId())
-                            .assignee(activity.getAssignee())
-                            .startTime(activity.getStartTime())
-                            .endTime(activity.getEndTime())
-                            .durationInMillis(activity.getDurationInMillis())
-                            .tenantId(activity.getTenantId())
-                            .taskLocalVariables(taskLocalVariables)
-                            .processVariables(processVariables)
-                            .build();
-                })
-                .toList();
+    private TicketHistoryActivityResponse convertCommentToResponse(Comment comment) {
+        return TicketHistoryActivityResponse.builder()
+            .id(comment.getId())
+            .activityType("comment")
+            .activityName(comment.getType())
+            // .description(comment.getFullMessage())
+            .startTime(comment.getTime())
+            .assignee(comment.getUserId())
+            .build();
     }
 }
