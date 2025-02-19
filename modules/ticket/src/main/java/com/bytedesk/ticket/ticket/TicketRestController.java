@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 12:20:20
+ * @LastEditTime: 2025-02-19 14:43:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -263,11 +263,23 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     /**
+     * 恢复工单
+     */
+    @PostMapping("/resume")
+    public ResponseEntity<?> resumeTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.resumeTicket(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("工单不存在"));
+        }
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
      * 待回应工单
      */
-    @PostMapping("/pending")
-    public ResponseEntity<?> pendingTicket(@RequestBody TicketRequest request) {
-        TicketResponse response = ticketService.pendingTicket(request);
+    @PostMapping("/pend")
+    public ResponseEntity<?> pendTicket(@RequestBody TicketRequest request) {
+        TicketResponse response = ticketService.pendTicket(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("工单不存在"));
         }

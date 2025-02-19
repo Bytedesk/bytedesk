@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:21:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 12:15:02
+ * @LastEditTime: 2025-02-19 14:39:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ public enum TicketStatusEnum {
     PROCESSING,    // 处理中 - 处理人正在处理工单
     PENDING,        // 待处理 - 等待客户响应或第三方处理
     HOLDING,        // 挂起 - 暂停处理（如等待更多信息）
+    RESUMED,        // 恢复 - 恢复处理
     REOPENED,       // 重新打开 - 已解决的工单被重新打开
     RESOLVED,       // 已解决 - 工单问题已解决，等待确认
     ESCALATED,      // 已升级 - 工单已升级到更高级别处理
