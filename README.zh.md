@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:44:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 22:39:33
+ * @LastEditTime: 2025-02-19 13:28:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,6 +64,18 @@
 - 工作流
 - ...
 
+### 社交群组
+
+- 类似 Discord
+- ...
+
+### 多租户
+
+- 多租户管理
+- 租户隔离
+- 租户统计
+- ...
+
 ## Docker 快速开始
 
 ### 克隆项目并启动docker compose容器
@@ -74,7 +86,7 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 
 ### 或者 使用 docker compose ollama
 
-```bash
+```bash 
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose-ollama.yaml up -d
 # 运行模型
 docker exec ollama-bytedesk ollama pull deepseek-r1
