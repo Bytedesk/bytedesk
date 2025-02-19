@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 07:34:32
+ * @LastEditTime: 2025-02-19 08:51:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,6 +37,11 @@ import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.ticket.consts.TicketConsts;
 // import com.bytedesk.ticket.message.event.TicketMessageEvent;
 // import com.bytedesk.ticket.message.event.TicketMessageType;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
+import com.bytedesk.ticket.ticket.dto.TicketRequest;
+import com.bytedesk.ticket.ticket.dto.TicketResponse;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -357,7 +362,6 @@ public class TicketService {
 
         // 7. 返回工单响应
         return TicketConvertUtils.convertToResponse(ticket);
-
     }
 
     /**

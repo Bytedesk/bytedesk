@@ -42,6 +42,8 @@ import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
+import com.bytedesk.ticket.ticket.dto.TicketRequest;
+import com.bytedesk.ticket.ticket.dto.TicketResponse;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateWorkgroupEvent;
 import com.bytedesk.ticket.comment.TicketCommentEntity;

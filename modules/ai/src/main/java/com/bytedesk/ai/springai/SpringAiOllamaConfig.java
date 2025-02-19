@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 13:33:03
+ * @LastEditTime: 2025-02-19 09:08:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.ai.springai;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,31 +35,48 @@ public class SpringAiOllamaConfig {
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
     private String ollamaBaseUrl;
 
+    @Value("${spring.ai.ollama.chat.options.model:qwen2.5:1.5b}")
+    private String ollamaChatModel;
+
+    @Value("${spring.ai.ollama.chat.options.numa:false}")
+    private boolean ollamaChatNuma;
+
+    @Value("${spring.ai.ollama.embedding.options.model:qwen2.5:1.5b}")
+    private String ollamaEmbeddingModel;
+
+
     @Bean("ollamaApi")
     OllamaApi ollamaApi() {
         return new OllamaApi(ollamaBaseUrl);
     }
 
-    @Bean("ollamaOptions")
-    OllamaOptions ollamaOptions() {
+    @Bean("ollamaChatOptions")
+    OllamaOptions ollamaChatOptions() {
         return OllamaOptions.builder()
-        .model(OllamaModel.QWEN_2_5_7B.id())
+        .model(ollamaChatModel)
+        .build();
+    }
+
+    @Bean("ollamaEmbeddingOptions")
+    OllamaOptions ollamaEmbeddingOptions() {
+        return OllamaOptions.builder()
+        .model(ollamaEmbeddingModel)
         .build();
     }
 
     @Bean("ollamaChatModel")
-    OllamaChatModel ollamaChatModel(OllamaApi ollamaApi, OllamaOptions ollamaOptions) {
+    OllamaChatModel ollamaChatModel(OllamaApi ollamaApi, OllamaOptions ollamaChatOptions) {
         return OllamaChatModel.builder()
         .ollamaApi(ollamaApi)
-        .defaultOptions(ollamaOptions)
+        .defaultOptions(ollamaChatOptions)
         .build();
     }
 
     @Bean("ollamaEmbeddingModel")
-    OllamaEmbeddingModel ollamaEmbeddingModel(OllamaApi ollamaApi, OllamaOptions ollamaOptions) {
+    OllamaEmbeddingModel ollamaEmbeddingModel(OllamaApi ollamaApi, OllamaOptions ollamaEmbeddingOptions) {
         return OllamaEmbeddingModel.builder()
         .ollamaApi(ollamaApi)
-        .defaultOptions(ollamaOptions)
+        .defaultOptions(ollamaEmbeddingOptions)
         .build();
     }
 

@@ -33,6 +33,11 @@ import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
+import com.bytedesk.ticket.ticket.dto.TicketRequest;
+import com.bytedesk.ticket.ticket.dto.TicketResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 

@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.ticket.ticket.dto.TicketResponse;
 
 
 public class TicketConvertUtils {

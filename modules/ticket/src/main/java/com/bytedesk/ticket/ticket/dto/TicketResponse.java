@@ -11,13 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket;
+package com.bytedesk.ticket.ticket.dto;
 
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentResponse;
+import com.bytedesk.ticket.ticket.TicketConvertUtils;
+import com.bytedesk.ticket.ticket.TicketEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
