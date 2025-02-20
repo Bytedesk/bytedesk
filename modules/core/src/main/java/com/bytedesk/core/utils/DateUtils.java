@@ -2,6 +2,8 @@ package com.bytedesk.core.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -166,5 +168,23 @@ public class DateUtils {
         cal.setTime(new Date());
         return cal.get(Calendar.HOUR_OF_DAY);
     }
+
+    public static DateTimeFormatter getDateTimeFormatter() {
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    }
+
+    public static DateTimeFormatter getDateFormatter() {
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    }
+    
+    public static LocalDateTime parseLocalDateTime(String time) {
+        return LocalDateTime.parse(time, DateUtils.getDateTimeFormatter());
+    }
+
+    public static LocalDateTime parseLocalDateTime(String time, DateTimeFormatter formatter) {
+        return LocalDateTime.parse(time, formatter);
+    }
+    
+    
 
 }
