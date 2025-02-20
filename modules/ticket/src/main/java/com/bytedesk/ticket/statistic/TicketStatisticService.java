@@ -174,10 +174,12 @@ public class TicketStatisticService {
             String type,
             boolean shouldSave) {
 
+        // 获取当前小时
+        int hour = LocalDateTime.now().getHour();
         // 根据orgUid、workgroupUid/assigneeUid、date判断是否已经存在
         Optional<TicketStatisticEntity> statisticOptional = statisticRepository
-            .findByTypeAndOrgUidAndWorkgroupUidAndAssigneeUidAndDate(
-                type, orgUid, workgroupUid, assigneeUid, DateUtils.formatToday());
+            .findByTypeAndOrgUidAndWorkgroupUidAndAssigneeUidAndDateAndHour(
+                type, orgUid, workgroupUid, assigneeUid, DateUtils.formatToday(), hour);
 
         TicketStatisticEntity statistic;
         if (statisticOptional.isPresent()) {
@@ -193,6 +195,8 @@ public class TicketStatisticService {
                 .statisticStartTime(startTime)
                 .statisticEndTime(endTime)
                 .type(type)
+                .hour(hour)
+                .date(DateUtils.formatToday())
                 .build();
             statistic.setUid(uidUtils.getUid());
             statistic.setOrgUid(orgUid);
@@ -213,7 +217,6 @@ public class TicketStatisticService {
         }
 
         if (shouldSave) {
-            statistic.setDate(DateUtils.formatToday());
             TicketStatisticEntity savedStatistic = statisticRepository.save(statistic);
             if (savedStatistic == null) {
                 throw new RuntimeException("保存统计记录失败");

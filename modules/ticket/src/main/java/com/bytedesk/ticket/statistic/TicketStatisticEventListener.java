@@ -16,7 +16,7 @@ package com.bytedesk.ticket.statistic;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.quartz.event.QuartzHourlyEvent;
+import com.bytedesk.core.quartz.event.QuartzHalfHourEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,10 +27,10 @@ public class TicketStatisticEventListener {
 
     private final TicketStatisticService ticketStatisticService;
 
-    // 每小时计算一次工单统计
+    // 每半小时计算一次工单统计
     @EventListener
-    public void handleQuartzHourlyEvent(QuartzHourlyEvent event) {
-        log.info("TicketStatisticEventListener handleQuartzHourlyEvent: {}", event);
+    public void handleQuartzHalfHourEvent(QuartzHalfHourEvent event) {
+        log.info("TicketStatisticEventListener handleQuartzHalfHourEvent: {}", event);
         ticketStatisticService.calculateTodayStatistics();
     }
     
