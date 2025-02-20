@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-17 22:30:19
+ * @Date: 2025-02-20 14:38:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-18 21:48:33
+ * @LastEditTime: 2025-02-20 14:41:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,14 +11,17 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket;
+package com.bytedesk.ticket.utils;
 
 import org.modelmapper.ModelMapper;
+
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.ticket.statistic.TicketStatisticEntity;
+import com.bytedesk.ticket.statistic.TicketStatisticResponse;
+import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.dto.TicketResponse;
-
 
 public class TicketConvertUtils {
 
@@ -50,6 +53,11 @@ public class TicketConvertUtils {
         // 
         return ticketResponse;
         
+    }
+    
+
+    public static TicketStatisticResponse convertToStatisticResponse(TicketStatisticEntity entity) {
+        return modelMapper.map(entity, TicketStatisticResponse.class);
     }
     
 }
