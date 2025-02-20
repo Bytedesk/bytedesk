@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -34,6 +36,8 @@ public class TicketStatisticService {
 
     private final AgentRepository agentRepository;
 
+    private final UidUtils uidUtils;
+
     /**
      * 计算所有工单统计
      */
@@ -45,25 +49,22 @@ public class TicketStatisticService {
         // 计算工作组工单统计
         List<WorkgroupEntity> workgroups = workgroupRepository.findAll();
         for (WorkgroupEntity workgroup : workgroups) {
-            calculateWorkgroupStatistics(workgroup.getUid(), startTime, endTime);
+            calculateWorkgroupStatistics(workgroup.getUid(), workgroup.getOrgUid(), startTime, endTime);
         }
 
         // 计算处理人工单统计
         List<AgentEntity> agents = agentRepository.findAll();
         for (AgentEntity agent : agents) {
-            calculateAssigneeStatistics(agent.getUid(), startTime, endTime);
+            calculateAssigneeStatistics(agent.getUid(), agent.getOrgUid(), startTime, endTime);
         }
-
     }
-
-
 
 
     /**
      * 计算工作组的工单统计
      */
     @Transactional
-    public TicketStatisticEntity calculateWorkgroupStatistics(String workgroupUid, LocalDateTime startTime, LocalDateTime endTime) {
+    public TicketStatisticEntity calculateWorkgroupStatistics(String workgroupUid, String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
         List<TicketEntity> tickets = ticketRepository.findByWorkgroupContainingAndCreatedAtBetween(
             "\"uid\":\"" + workgroupUid + "\"", startTime, endTime);
 
@@ -72,7 +73,10 @@ public class TicketStatisticService {
             .statisticStartTime(startTime)
             .statisticEndTime(endTime)
             .build();
-
+        statistic.setUid(uidUtils.getUid());
+        statistic.setOrgUid(orgUid);
+        statistic.setDate(DateUtils.formatDateNow());
+        
         // 基本统计
         calculateBasicStatistics(statistic, tickets);
         // 状态统计
@@ -91,7 +95,7 @@ public class TicketStatisticService {
      * 计算处理人的工单统计
      */
     @Transactional
-    public TicketStatisticEntity calculateAssigneeStatistics(String assigneeUid, LocalDateTime startTime, LocalDateTime endTime) {
+    public TicketStatisticEntity calculateAssigneeStatistics(String assigneeUid, String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
         List<TicketEntity> tickets = ticketRepository.findByAssigneeContainingAndCreatedAtBetween(
             "\"uid\":\"" + assigneeUid + "\"", startTime, endTime);
 
@@ -100,10 +104,17 @@ public class TicketStatisticService {
             .statisticStartTime(startTime)
             .statisticEndTime(endTime)
             .build();
+        statistic.setUid(uidUtils.getUid());
+        statistic.setOrgUid(orgUid);
+        statistic.setDate(DateUtils.formatDateNow());
 
+        // 基本统计
         calculateBasicStatistics(statistic, tickets);
+        // 状态统计
         calculateStatusStatistics(statistic, tickets);
+        // 时间统计
         calculateTimeStatistics(statistic, tickets);
+        // 满意度统计
         calculateSatisfactionStatistics(statistic, tickets);
 
         return statisticRepository.save(statistic);

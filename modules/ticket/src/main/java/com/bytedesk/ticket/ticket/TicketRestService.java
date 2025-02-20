@@ -68,8 +68,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final AuthService authService;
 
-    // private final UserRestService userRestService;
-
     private final UidUtils uidUtils;
 
     private final AgentRestService agentRestService;

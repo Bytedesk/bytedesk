@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 13:18:01
+ * @LastEditTime: 2025-02-20 14:08:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,10 @@ package com.bytedesk.ticket.statistic;
 
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -31,29 +34,22 @@ public class TicketStatisticRestService extends BaseRestService<TicketStatisticE
     
     private final TicketStatisticRepository ticketStatisticRepository;
 
+    private final ModelMapper modelMapper;
 
     @Override
     public Page<TicketStatisticResponse> queryByOrg(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        Pageable pageable = request.getPageable();
+        Specification<TicketStatisticEntity> spec = TicketStatisticSpecification.search(request);
+        Page<TicketStatisticEntity> ticketStatisticPage = ticketStatisticRepository.findAll(spec, pageable);
+        return ticketStatisticPage.map(this::convertToResponse);
     }
 
     @Override
     public Page<TicketStatisticResponse> queryByUser(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public TicketStatisticResponse update(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-    
-    
-    public TicketStatisticResponse convertToResponse(TicketStatisticEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        Pageable pageable = request.getPageable();
+        Specification<TicketStatisticEntity> spec = TicketStatisticSpecification.search(request);
+        Page<TicketStatisticEntity> ticketStatisticPage = ticketStatisticRepository.findAll(spec, pageable);
+        return ticketStatisticPage.map(this::convertToResponse);
     }
 
     @Override
@@ -61,6 +57,14 @@ public class TicketStatisticRestService extends BaseRestService<TicketStatisticE
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
+
+
+    @Override
+    public TicketStatisticResponse update(TicketStatisticRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+    
 
     @Override
     public void delete(TicketStatisticRequest request) {
@@ -92,10 +96,17 @@ public class TicketStatisticRestService extends BaseRestService<TicketStatisticE
     }
 
     @Override
+    public TicketStatisticResponse convertToResponse(TicketStatisticEntity entity) {
+        return modelMapper.map(entity, TicketStatisticResponse.class);
+    }
+
+    @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             TicketStatisticEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
+
+
 
 } 
