@@ -298,12 +298,12 @@ public class TicketStatisticService {
      */
     private void calculateSatisfactionStatistics(TicketStatisticEntity statistic, List<TicketEntity> tickets) {
         List<TicketEntity> verifiedTickets = tickets.stream()
-            .filter(t -> t.getVerified() != null)
+            .filter(TicketEntity::isVerified)
             .toList();
 
         if (!verifiedTickets.isEmpty()) {
             long satisfiedCount = verifiedTickets.stream()
-                .filter(TicketEntity::getVerified)
+                .filter(TicketEntity::isVerified)
                 .count();
             
             statistic.setSatisfiedTickets(satisfiedCount);

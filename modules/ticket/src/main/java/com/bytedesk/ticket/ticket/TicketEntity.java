@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 06:46:21
+ * @LastEditTime: 2025-02-20 16:28:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -136,8 +136,19 @@ public class TicketEntity extends BaseEntity {
     // 流程定义实体UID
     private String processEntityUid;
 
+    // 是否评价
+    @Builder.Default
+    @Column(name = "is_rated")
+    private boolean rated = false;
+
+    // 满意度评价
+    @Builder.Default
+    private int rating = TicketRatingEnum.GOOD.getValue();
+
     // 客户验证
-    private Boolean verified;
+    @Builder.Default
+    @Column(name = "is_verified")
+    private boolean verified = false;
 
     // 解决时间
     private LocalDateTime resolvedTime;
