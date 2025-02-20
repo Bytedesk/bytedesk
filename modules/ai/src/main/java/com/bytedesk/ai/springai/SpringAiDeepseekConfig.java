@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 11:19:38
+ * @LastEditTime: 2025-02-20 12:26:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ai.springai;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,12 +42,30 @@ public class SpringAiDeepseekConfig {
                 .build();
     }
 
+    @Bean("deepSeekChatOptions")
+    ChatOptions deepSeekChatOptions() {
+        return ChatOptions.builder()
+                .model("deepseek-chat")
+                .build();
+    }
+
     @Bean("deepSeekChatModel")
     OpenAiChatModel deepSeekChatModel(OpenAiApi openAiApi) {
         return OpenAiChatModel.builder()
                 .openAiApi(openAiApi)
                 .build();
     }
-    
-    
+
+    @Bean("deepSeekChatClientBuilder")
+    ChatClient.Builder deepSeekChatClientBuilder(OpenAiChatModel deepSeekChatModel) {
+        return ChatClient.builder(deepSeekChatModel);
+    }
+
+    @Bean("deepSeekChatClient")
+    ChatClient deepSeekChatClient(ChatClient.Builder deepSeekChatClientBuilder, ChatOptions deepSeekChatOptions) {
+        return deepSeekChatClientBuilder
+                .defaultOptions(deepSeekChatOptions)
+                .build();
+    }
+
 }

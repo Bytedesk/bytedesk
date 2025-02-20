@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-16 15:07:52
+ * @Date: 2025-01-20 17:01:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-20 17:35:58
+ * @LastEditTime: 2025-02-20 12:36:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,18 +16,28 @@ package com.bytedesk.ticket.statistic;
 import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "bytedesk_ticket_statistics")
-public class TicketStatistics extends BaseEntity {
+public class TicketStatisticEntity extends BaseEntity {
 
     private long totalTickets;
-    private long openTickets;
-    private long closedTickets;
-    private double averageResolutionTime;
-    private long slaBreaches;
 
-} 
+    private long openTickets;
+
+    private long closedTickets;
+
+    private double averageResolutionTime;
+
+    // private long slaBreaches;
+
+}
