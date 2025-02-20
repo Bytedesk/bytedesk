@@ -60,15 +60,21 @@ public class TicketStatisticRestController extends BaseRestController<TicketStat
     @Override
     public ResponseEntity<?> update(TicketStatisticRequest request) {
         
-        
+        TicketStatisticResponse response = ticketStatisticRestService.update(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("更新失败"));
+        }
 
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
 
     @Override
     public ResponseEntity<?> delete(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        
+        ticketStatisticRestService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
 
