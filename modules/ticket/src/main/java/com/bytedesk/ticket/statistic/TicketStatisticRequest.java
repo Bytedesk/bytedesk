@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 14:14:49
+ * @LastEditTime: 2025-02-20 15:00:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ public class TicketStatisticRequest extends BaseRequest {
 
     // 处理人统计
     private String assigneeUid;             // 处理人ID
-
+    
     // 时间范围
     private String statisticStartTime;    // 统计开始时间
     
