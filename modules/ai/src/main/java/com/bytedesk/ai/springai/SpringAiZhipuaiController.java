@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 09:48:40
+ * @LastEditTime: 2025-02-20 10:14:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiService;
+import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.ServletException;
@@ -61,7 +61,7 @@ public class SpringAiZhipuaiController {
 
     private final ZhiPuAiImageModel zhiPuAiImageModel;
 
-    private final ZhipuaiService zhipuaiService;
+    private final ZhipuaiChatService zhipuaiChatService;
 
     // http://127.0.0.1:9003/zhipuai/chat?message=hello
     @GetMapping("/chat")
@@ -115,7 +115,7 @@ public class SpringAiZhipuaiController {
         executorService.submit(() -> {
             try {
                 // 调用你的服务方法来获取SSE数据
-                zhipuaiService.getSseAnswer(uid, sid, question, emitter);
+                zhipuaiChatService.getSseAnswer(uid, sid, question, emitter);
                 // 将数据作为SSE事件发送
                 // emitter.send(SseEmitter.event().data(sseData));
                 // 完成后完成SSE流
