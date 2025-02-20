@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.service.agent.AgentEntity;
@@ -41,11 +42,23 @@ public class TicketStatisticService {
 
     // 查询某时间段统计
     public TicketStatisticResponse queryByDate(TicketStatisticRequest request) {
-        // return statisticRepository.findAll(request.getPageable());
+        // 判断类型：
+        // 1. orgUid, startTime, endTime
+        // 2. workgroupUid, startTime, endTime
+        // 3. assigneeUid, startTime, endTime
+        LocalDateTime startTime = DateUtils.parseLocalDateTime(request.getStatisticStartTime());
+        LocalDateTime endTime = DateUtils.parseLocalDateTime(request.getStatisticEndTime());
+        // 根据类型，调用不同的方法
+        if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_ORG)) {
+            return queryOrgStatistics(request.getOrgUid(), startTime, endTime);
+        } else if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_WORKGROUP)) {
+            return calculateWorkgroupStatistics(request.getWorkgroupUid(), request.getOrgUid(), startTime, endTime, false);
+        } else if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_AGENT)) {
+            return calculateAssigneeStatistics(request.getAssigneeUid(), request.getOrgUid(), startTime, endTime, false);
+        }
+
         return null;
     }
-
-
 
     /**
      * 计算所有工单统计
@@ -70,6 +83,34 @@ public class TicketStatisticService {
         }
     }
 
+    // orgUid, startTime, endTime
+    public TicketStatisticResponse queryOrgStatistics(String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
+        List<TicketEntity> tickets = ticketRepository.findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
+        TicketStatisticEntity statistic = TicketStatisticEntity.builder()
+            .statisticStartTime(startTime)
+            .statisticEndTime(endTime)
+            .build();
+        statistic.setUid(uidUtils.getUid());
+        statistic.setOrgUid(orgUid);
+        statistic.setDate(DateUtils.formatDateNow());
+
+        // 基本统计
+        calculateBasicStatistics(statistic, tickets);
+        // 状态统计
+        calculateStatusStatistics(statistic, tickets);
+        // 优先级统计
+        calculatePriorityStatistics(statistic, tickets);
+        // 时间统计
+        calculateTimeStatistics(statistic, tickets);
+        // 满意度统计
+        calculateSatisfactionStatistics(statistic, tickets);
+
+        // 不能保存
+        // statisticRepository.save(statistic);
+
+        return TicketConvertUtils.convertToStatisticResponse(statistic);
+    }
+
     
     /**
      * 计算工作组的工单统计
@@ -86,7 +127,6 @@ public class TicketStatisticService {
             .build();
         statistic.setUid(uidUtils.getUid());
         statistic.setOrgUid(orgUid);
-        
         
         // 基本统计
         calculateBasicStatistics(statistic, tickets);
