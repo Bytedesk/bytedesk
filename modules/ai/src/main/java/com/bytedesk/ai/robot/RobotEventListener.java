@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 23:22:35
+ * @LastEditTime: 2025-02-20 10:14:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
-import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiService;
+import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -59,9 +59,9 @@ public class RobotEventListener {
 
     private final RobotRestService robotService;
 
-    private final ZhipuaiService zhipuaiService;
+    private final ZhipuaiChatService zhipuaiChatService;
 
-    private final OllamaChatService ollamaService;
+    private final OllamaChatService ollamaChatService;
 
     private final UidUtils uidUtils;
 
@@ -180,10 +180,10 @@ public class RobotEventListener {
                 messageSendService.sendProtobufMessage(clonedMessage);
                 //
                 if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                    ollamaService.sendWsMessage(query, robotProtobuf.getLlm(), message);
+                    ollamaChatService.sendWsMessage(query, robotProtobuf.getLlm(), message);
                 } else {
                     // 目前所有的模型都使用zhipu
-                    zhipuaiService.sendWsMessage(query, robotProtobuf.getLlm(), message);
+                    zhipuaiChatService.sendWsMessage(query, robotProtobuf.getLlm(), message);
                 }
             } else {
                 log.error("robot not found");
@@ -231,10 +231,10 @@ public class RobotEventListener {
             messageSendService.sendProtobufMessage(clonedMessage);
 
             if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                ollamaService.sendWsKbMessage(query, robot, message);
+                ollamaChatService.sendWsKbMessage(query, robot, message);
             } else {
                 // 目前所有的模型都使用zhipu
-                zhipuaiService.sendWsKbMessage(query, robot, message);
+                zhipuaiChatService.sendWsKbMessage(query, robot, message);
             }
 
             // 知识库
@@ -261,7 +261,7 @@ public class RobotEventListener {
 
         for (Document document : documents) {
             // 调用模型生成问答对
-            String qaPairs = zhipuaiService.generateQaPairsAsync(document.getText());
+            String qaPairs = zhipuaiChatService.generateQaPairsAsync(document.getText());
             log.info("generateQaPairsAsync qaPairs {}", qaPairs);
 
             // Save QA pairs to database
