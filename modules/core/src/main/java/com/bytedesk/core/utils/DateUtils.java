@@ -56,7 +56,7 @@ public class DateUtils {
         return dateFormatter.format(new Date());
     }
 
-    public static String formatDateNow() {
+    public static String formatToday() {
         SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat);
         return dateFormatter.format(new Date());
     }

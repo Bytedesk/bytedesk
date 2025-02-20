@@ -4,12 +4,15 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.DateUtils;
 import com.bytedesk.service.agent.AgentEntity;
@@ -33,6 +36,8 @@ public class TicketStatisticService {
     private final TicketRepository ticketRepository;
     
     private final TicketStatisticRepository statisticRepository;
+
+    private final OrganizationRepository organizationRepository;
 
     private final WorkgroupRepository workgroupRepository;
 
@@ -63,30 +68,7 @@ public class TicketStatisticService {
      * 查询组织统计
      */
     public TicketStatisticResponse queryOrgStatistics(String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
-        List<TicketEntity> tickets = ticketRepository.findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
-        TicketStatisticEntity statistic = TicketStatisticEntity.builder()
-            .statisticStartTime(startTime)
-            .statisticEndTime(endTime)
-            .build();
-        statistic.setUid(uidUtils.getUid());
-        statistic.setOrgUid(orgUid);
-        statistic.setDate(DateUtils.formatDateNow());
-
-        // 基本统计
-        calculateBasicStatistics(statistic, tickets);
-        // 状态统计
-        calculateStatusStatistics(statistic, tickets);
-        // 优先级统计
-        calculatePriorityStatistics(statistic, tickets);
-        // 时间统计
-        calculateTimeStatistics(statistic, tickets);
-        // 满意度统计
-        calculateSatisfactionStatistics(statistic, tickets);
-
-        // 不能保存
-        // statisticRepository.save(statistic);
-
-        return TicketConvertUtils.convertToStatisticResponse(statistic);
+        return calculateOrgStatistics(orgUid, startTime, endTime, false);
     }
 
     /**
@@ -111,6 +93,12 @@ public class TicketStatisticService {
         LocalDateTime startTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endTime = LocalDateTime.now();
 
+        // 计算组织工单统计
+        List<OrganizationEntity> organizations = organizationRepository.findAll();
+        for (OrganizationEntity organization : organizations) {
+            calculateOrgStatistics(organization.getUid(), startTime, endTime, true);
+        }
+
         // 计算工作组工单统计
         List<WorkgroupEntity> workgroups = workgroupRepository.findAll();
         for (WorkgroupEntity workgroup : workgroups) {
@@ -123,100 +111,119 @@ public class TicketStatisticService {
             calculateAssigneeStatistics(agent.getUid(), agent.getOrgUid(), startTime, endTime, true);
         }
     }
+
+    /**
+     * 计算组织的工单统计
+     */
+    @Transactional
+    public TicketStatisticResponse calculateOrgStatistics(
+            String orgUid, 
+            LocalDateTime startTime, 
+            LocalDateTime endTime, 
+            boolean shouldSave) {
+
+        List<TicketEntity> tickets = ticketRepository.findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
+
+        return calculateStatistics(tickets, orgUid, null, null, startTime, endTime, TicketStatisticTypeEnum.ORG.name(), shouldSave);
+    }
     
     /**
      * 计算工作组的工单统计
      */
     @Transactional
-    public TicketStatisticResponse calculateWorkgroupStatistics(String workgroupUid, String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
+    public TicketStatisticResponse calculateWorkgroupStatistics(
+            String workgroupUid, 
+            String orgUid, 
+            LocalDateTime startTime, 
+            LocalDateTime endTime, 
+            boolean shouldSave) {
+
         List<TicketEntity> tickets = ticketRepository.findByWorkgroupContainingAndCreatedAtBetween(
             "\"uid\":\"" + workgroupUid + "\"", startTime, endTime);
 
-        // 根据orgUid
-
-        TicketStatisticEntity statistic = TicketStatisticEntity.builder()
-            .workgroupUid(workgroupUid)
-            .statisticStartTime(startTime)
-            .statisticEndTime(endTime)
-            .build();
-        statistic.setUid(uidUtils.getUid());
-        statistic.setOrgUid(orgUid);
-        
-        // 基本统计
-        calculateBasicStatistics(statistic, tickets);
-        // 状态统计
-        calculateStatusStatistics(statistic, tickets);
-        // 优先级统计
-        calculatePriorityStatistics(statistic, tickets);
-        // 时间统计
-        calculateTimeStatistics(statistic, tickets);
-        // 满意度统计
-        calculateSatisfactionStatistics(statistic, tickets);
-
-        // 判断是否所有统计指标都为0
-        if (isAllStatisticsZero(statistic)) {
-            log.info("所有统计指标为0，不保存统计记录 workgroupUid: {}", workgroupUid);
-            return null;
-        }
-
-        if (shouldSave) {
-            statistic.setDate(DateUtils.formatDateNow());
-            TicketStatisticEntity savedStatistic = statisticRepository.save(statistic);
-            if (savedStatistic != null) {
-                return TicketConvertUtils.convertToStatisticResponse(savedStatistic);
-            } else {
-                throw new RuntimeException("保存统计记录失败");
-            }
-        }
-
-        return TicketConvertUtils.convertToStatisticResponse(statistic);
+        return calculateStatistics(tickets, orgUid, workgroupUid, null, startTime, endTime, TicketStatisticTypeEnum.WORKGROUP.name(), shouldSave);
     }
 
     /**
      * 计算处理人的工单统计
      */
     @Transactional
-    public TicketStatisticResponse calculateAssigneeStatistics(String assigneeUid, String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
+    public TicketStatisticResponse calculateAssigneeStatistics(
+            String assigneeUid, 
+            String orgUid, 
+            LocalDateTime startTime, 
+            LocalDateTime endTime, 
+            boolean shouldSave) {
+
         List<TicketEntity> tickets = ticketRepository.findByAssigneeContainingAndCreatedAtBetween(
             "\"uid\":\"" + assigneeUid + "\"", startTime, endTime);
 
-        TicketStatisticEntity statistic = TicketStatisticEntity.builder()
-            .assigneeUid(assigneeUid)
-            .statisticStartTime(startTime)
-            .statisticEndTime(endTime)
-            .build();
-        statistic.setUid(uidUtils.getUid());
-        statistic.setOrgUid(orgUid);
-        
+        return calculateStatistics(tickets, orgUid, null, assigneeUid, startTime, endTime, TicketStatisticTypeEnum.AGENT.name(), shouldSave);
+    }
 
-        // 基本统计
+     /**
+     * 计算统计数据
+     */
+    private TicketStatisticResponse calculateStatistics(
+            List<TicketEntity> tickets, 
+            String orgUid,
+            String workgroupUid,
+            String assigneeUid,
+            LocalDateTime startTime, 
+            LocalDateTime endTime,
+            String type,
+            boolean shouldSave) {
+
+        // 根据orgUid、workgroupUid/assigneeUid、date判断是否已经存在
+        Optional<TicketStatisticEntity> statisticOptional = statisticRepository
+            .findByTypeAndOrgUidAndWorkgroupUidAndAssigneeUidAndDate(
+                type, orgUid, workgroupUid, assigneeUid, DateUtils.formatToday());
+
+        TicketStatisticEntity statistic;
+        if (statisticOptional.isPresent()) {
+            // 更新现有记录
+            statistic = statisticOptional.get();
+            statistic.setStatisticStartTime(startTime);
+            statistic.setStatisticEndTime(endTime);
+        } else {
+            // 创建新记录
+            statistic = TicketStatisticEntity.builder()
+                .workgroupUid(workgroupUid)
+                .assigneeUid(assigneeUid)
+                .statisticStartTime(startTime)
+                .statisticEndTime(endTime)
+                .type(type)
+                .build();
+            statistic.setUid(uidUtils.getUid());
+            statistic.setOrgUid(orgUid);
+        }
+
+        // 计算各项统计指标
         calculateBasicStatistics(statistic, tickets);
-        // 状态统计
         calculateStatusStatistics(statistic, tickets);
-        // 时间统计
+        calculatePriorityStatistics(statistic, tickets);
         calculateTimeStatistics(statistic, tickets);
-        // 满意度统计
         calculateSatisfactionStatistics(statistic, tickets);
 
         // 判断是否所有统计指标都为0
         if (isAllStatisticsZero(statistic)) {
-            log.info("所有统计指标为0，不保存统计记录 assigneeUid: {}", assigneeUid);
+            log.info("所有统计指标为0，不保存统计记录 workgroupUid: {}, assigneeUid: {}", 
+                workgroupUid, assigneeUid);
             return null;
         }
 
         if (shouldSave) {
-            // 设置统计日期
-            statistic.setDate(DateUtils.formatDateNow());
+            statistic.setDate(DateUtils.formatToday());
             TicketStatisticEntity savedStatistic = statisticRepository.save(statistic);
-            if (savedStatistic != null) {
-                return TicketConvertUtils.convertToStatisticResponse(savedStatistic);
-            } else {
+            if (savedStatistic == null) {
                 throw new RuntimeException("保存统计记录失败");
             }
+            return TicketConvertUtils.convertToStatisticResponse(savedStatistic);
         }
 
         return TicketConvertUtils.convertToStatisticResponse(statistic);
     }
+
 
     /**
      * 计算基本统计
@@ -240,9 +247,13 @@ public class TicketStatisticService {
 
         statistic.setNewTickets(statusCounts.getOrDefault(TicketStatusEnum.NEW.name(), 0L));
         statistic.setClaimedTickets(statusCounts.getOrDefault(TicketStatusEnum.CLAIMED.name(), 0L));
+        statistic.setUnclaimedTickets(statusCounts.getOrDefault(TicketStatusEnum.UNCLAIMED.name(), 0L));
         statistic.setProcessingTickets(statusCounts.getOrDefault(TicketStatusEnum.PROCESSING.name(), 0L));
+        statistic.setPendingTickets(statusCounts.getOrDefault(TicketStatusEnum.PENDING.name(), 0L));
+        statistic.setHoldingTickets(statusCounts.getOrDefault(TicketStatusEnum.HOLDING.name(), 0L));
+        statistic.setReopenedTickets(statusCounts.getOrDefault(TicketStatusEnum.REOPENED.name(), 0L));
         statistic.setResolvedTickets(statusCounts.getOrDefault(TicketStatusEnum.RESOLVED.name(), 0L));
-        // ... 其他状态统计
+        statistic.setEscalatedTickets(statusCounts.getOrDefault(TicketStatusEnum.ESCALATED.name(), 0L));
     }
 
     /**
