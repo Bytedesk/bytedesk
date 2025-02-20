@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 09:34:36
+ * @LastEditTime: 2025-02-20 10:04:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ai.springai;
 
+import java.util.List;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
@@ -21,14 +23,19 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
+import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
+import org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpander;
 import org.springframework.ai.rag.preretrieval.query.transformation.CompressionQueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
+import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 // import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -301,23 +308,77 @@ public class SpringAiController {
         ResponseEntity<JsonResult<?>> multiQueryExpander(
                         @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
 
-                                MultiQueryExpander queryExpander = MultiQueryExpander.builder()
-                                .chatClientBuilder(chatClientBuilder)
+                MultiQueryExpander queryExpander = MultiQueryExpander.builder()
+                                .chatClientBuilder(ChatClient.builder(ollamaChatModel).build().mutate())
                                 .numberOfQueries(3)
+                                // .includeOriginal(false)
                                 .build();
-                            List<Query> queries = expander.expand(new Query("How to run a Spring Boot app?"));
+                List<Query> queries = queryExpander.expand(new Query("How to run a Spring Boot app?"));
 
                 // 使用chatClient
                 String answer = ChatClient.builder(ollamaChatModel)
                                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                                 .build()
-                                .prompt()       
-                                .user(transformedQuery.text())
+                                .prompt()
+                                .user(queries.get(0).text())
                                 .call()
                                 .content();
 
                 return ResponseEntity.ok(JsonResult.success(answer));
         }
 
+
+        // VectorStoreDocumentRetriever
+        // A VectorStoreDocumentRetriever retrieves documents from a vector store that are semantically similar to the input query. 
+        // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_vectorstoredocumentretriever
+        // http://127.0.0.1:9003/spring/ai/vector-store-document-retriever?message=什么时间考试？
+        @GetMapping("/vector-store-document-retriever")
+        ResponseEntity<JsonResult<?>> vectorStoreDocumentRetriever(
+                        @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+
+                DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
+                                .vectorStore(ollamaRedisVectorStore)
+                                .similarityThreshold(0.73)
+                                .topK(5)
+                                .filterExpression(new FilterExpressionBuilder()
+                                                .eq("genre", "fairytale")
+                                                // .eq("tenant", TenantContextHolder.getTenantIdentifier())
+                                                .build())
+                                .build();
+                List<Document> documents = retriever.retrieve(new Query("What is the main character of the story?"));
+                log.info("documents: {}", documents);
+
+                // 使用chatClient       
+                // String answer = ChatClient.builder(ollamaChatModel)
+                //                 // .defaultAdvisors(retrievalAugmentationAdvisor)
+                //                 .build()
+                //                 .prompt()
+                //                 .user(message)
+                //                 .call()
+                //                 .content();
+
+                return ResponseEntity.ok(JsonResult.success(documents));
+        }
+
+
+        // 上下文扩展 ContextualQueryAugmenter
+        // The ContextualQueryAugmenter augments the user query with contextual data from the content of the provided documents.
+        // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_contextualqueryaugmenter
+        // http://127.0.0.1:9003/spring/ai/contextual-query-augmenter?message=什么时间考试？
+        @GetMapping("/contextual-query-augmenter")
+        ResponseEntity<JsonResult<?>> contextualQueryAugmenter(
+                        @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+
+                ContextualQueryAugmenter queryAugmenter = ContextualQueryAugmenter.builder()
+                // .allowEmptyContext(true)
+                .build();
+
+                // Query query = new Query("What is the capital of Denmark?");
+                // Query augmentedQuery = queryAugmenter.augment(query);
+
+                return ResponseEntity.ok(JsonResult.success(queryAugmenter));
+        }
+
+        
 
 }
