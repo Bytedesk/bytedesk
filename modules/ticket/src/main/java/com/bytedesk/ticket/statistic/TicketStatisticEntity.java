@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:01:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 12:48:29
+ * @LastEditTime: 2025-02-20 13:27:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ticket.statistic;
 import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,14 +24,15 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+// import java.util.HashMap;
+// import java.util.Map;
 
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners({TicketStatisticEntityListener.class})
 @Entity(name = "bytedesk_ticket_statistics")
 public class TicketStatisticEntity extends BaseEntity {
 
@@ -83,31 +85,31 @@ public class TicketStatisticEntity extends BaseEntity {
     private LocalDateTime statisticEndTime;      // 统计结束时间
 
     // 未读消息统计
-    @Builder.Default
-    private Map<String, Integer> unreadCountMap = new HashMap<>();  // 每个用户的未读数 <UserUid, UnreadCount>
+    // @Builder.Default
+    // private Map<String, Integer> unreadCountMap = new HashMap<>();  // 每个用户的未读数 <UserUid, UnreadCount>
 
     /**
      * 增加用户未读数
      */
-    public void incrementUnreadCount(String userUid) {
-        unreadCountMap.compute(userUid, (k, v) -> v == null ? 1 : v + 1);
-        this.unreadTickets++;
-    }
+    // public void incrementUnreadCount(String userUid) {
+    //     unreadCountMap.compute(userUid, (k, v) -> v == null ? 1 : v + 1);
+    //     this.unreadTickets++;
+    // }
 
     /**
      * 清除用户未读数
      */
-    public void clearUnreadCount(String userUid) {
-        Integer count = unreadCountMap.remove(userUid);
-        if (count != null) {
-            this.unreadTickets -= count;
-        }
-    }
+    // public void clearUnreadCount(String userUid) {
+    //     Integer count = unreadCountMap.remove(userUid);
+    //     if (count != null) {
+    //         this.unreadTickets -= count;
+    //     }
+    // }
 
     /**
      * 获取用户未读数
      */
-    public int getUnreadCount(String userUid) {
-        return unreadCountMap.getOrDefault(userUid, 0);
-    }
+    // public int getUnreadCount(String userUid) {
+    //     return unreadCountMap.getOrDefault(userUid, 0);
+    // }
 }

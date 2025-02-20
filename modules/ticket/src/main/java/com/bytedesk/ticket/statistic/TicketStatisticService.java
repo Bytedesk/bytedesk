@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRepository;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketPriorityEnum;
 import com.bytedesk.ticket.ticket.TicketRepository;
@@ -26,13 +30,43 @@ public class TicketStatisticService {
     
     private final TicketStatisticRepository statisticRepository;
 
+    private final WorkgroupRepository workgroupRepository;
+
+    private final AgentRepository agentRepository;
+
+    /**
+     * 计算所有工单统计
+     */
+    public void calculateAllStatistics() {
+        // 当日凌晨，到当前时间
+        LocalDateTime startTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endTime = LocalDateTime.now();
+
+        // 计算工作组工单统计
+        List<WorkgroupEntity> workgroups = workgroupRepository.findAll();
+        for (WorkgroupEntity workgroup : workgroups) {
+            calculateWorkgroupStatistics(workgroup.getUid(), startTime, endTime);
+        }
+        
+        // 计算处理人工单统计
+        List<AgentEntity> agents = agentRepository.findAll();
+        for (AgentEntity agent : agents) {
+            calculateAssigneeStatistics(agent.getUid(), startTime, endTime);
+        }
+
+
+    }
+
+
+
+
     /**
      * 计算工作组的工单统计
      */
     @Transactional
     public TicketStatisticEntity calculateWorkgroupStatistics(String workgroupUid, LocalDateTime startTime, LocalDateTime endTime) {
-        List<TicketEntity> tickets = ticketRepository.findByWorkgroupUidAndCreatedAtBetween(
-            workgroupUid, startTime, endTime);
+        List<TicketEntity> tickets = ticketRepository.findByWorkgroupContainingAndCreatedAtBetween(
+            "\"uid\":\"" + workgroupUid + "\"", startTime, endTime);
 
         TicketStatisticEntity statistic = TicketStatisticEntity.builder()
             .workgroupUid(workgroupUid)
@@ -59,8 +93,8 @@ public class TicketStatisticService {
      */
     @Transactional
     public TicketStatisticEntity calculateAssigneeStatistics(String assigneeUid, LocalDateTime startTime, LocalDateTime endTime) {
-        List<TicketEntity> tickets = ticketRepository.findByAssigneeUidAndCreatedAtBetween(
-            assigneeUid, startTime, endTime);
+        List<TicketEntity> tickets = ticketRepository.findByAssigneeContainingAndCreatedAtBetween(
+            "\"uid\":\"" + assigneeUid + "\"", startTime, endTime);
 
         TicketStatisticEntity statistic = TicketStatisticEntity.builder()
             .assigneeUid(assigneeUid)
@@ -184,11 +218,14 @@ public class TicketStatisticService {
      */
     @Transactional
     public void updateUnreadStatistics(String ticketUid, String userUid) {
-        TicketStatisticEntity statistic = statisticRepository.findByWorkgroupUid(
-            ticketRepository.findByUid(ticketUid).get().getWorkgroup().getUid())
+        TicketEntity ticket = ticketRepository.findByUid(ticketUid)
+            .orElseThrow(() -> new RuntimeException("工单不存在"));
+            
+        String workgroupUid = ticket.getWorkgroup().getUid();
+        TicketStatisticEntity statistic = statisticRepository.findByWorkgroupUid(workgroupUid)
             .orElseThrow(() -> new RuntimeException("统计记录不存在"));
 
-        statistic.incrementUnreadCount(userUid);
+        statistic.setUnreadTickets(statistic.getUnreadTickets() + 1);
         statisticRepository.save(statistic);
     }
 
@@ -197,11 +234,16 @@ public class TicketStatisticService {
      */
     @Transactional
     public void clearUnreadStatistics(String ticketUid, String userUid) {
-        TicketStatisticEntity statistic = statisticRepository.findByWorkgroupUid(
-            ticketRepository.findByUid(ticketUid).get().getWorkgroup().getUid())
+        TicketEntity ticket = ticketRepository.findByUid(ticketUid)
+            .orElseThrow(() -> new RuntimeException("工单不存在"));
+            
+        String workgroupUid = ticket.getWorkgroup().getUid();
+        TicketStatisticEntity statistic = statisticRepository.findByWorkgroupUid(workgroupUid)
             .orElseThrow(() -> new RuntimeException("统计记录不存在"));
 
-        statistic.clearUnreadCount(userUid);
+        if (statistic.getUnreadTickets() > 0) {
+            statistic.setUnreadTickets(statistic.getUnreadTickets() - 1);
+        }
         statisticRepository.save(statistic);
     }
 }

@@ -26,9 +26,11 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
 
     Optional<TicketEntity> findByProcessInstanceId(String processInstanceId);
 
-    List<TicketEntity> findByWorkgroupUidAndCreatedAtBetween(String workgroupUid, LocalDateTime startTime, LocalDateTime endTime);
+    List<TicketEntity> findByWorkgroupContainingAndCreatedAtBetween(
+        String workgroupUid, LocalDateTime startTime, LocalDateTime endTime);
 
-    List<TicketEntity> findByAssigneeUidAndCreatedAtBetween(String assigneeUid, LocalDateTime startTime, LocalDateTime endTime);
+    List<TicketEntity> findByAssigneeContainingAndCreatedAtBetween(
+        String assigneeUid, LocalDateTime startTime, LocalDateTime endTime);
 
     long countByStatus(String status);
     long countByStatusNot(String status);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 12:54:13
+ * @LastEditTime: 2025-02-20 13:39:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,45 +13,65 @@
  */
 package com.bytedesk.ticket.statistic;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.JsonResult;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/ticket/statistic")
+@RequiredArgsConstructor
 public class TicketStatisticRestController extends BaseRestController<TicketStatisticRequest> {
 
+    private final TicketStatisticRestService ticketStatisticRestService;
+
     @Override
-    public ResponseEntity<?> create(TicketStatisticRequest arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    public ResponseEntity<?> queryByOrg(TicketStatisticRequest request) {
+
+        Page<TicketStatisticResponse> page = ticketStatisticRestService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
-    public ResponseEntity<?> delete(TicketStatisticRequest arg0) {
+    public ResponseEntity<?> queryByUser(TicketStatisticRequest request) {
+
+        Page<TicketStatisticResponse> page = ticketStatisticRestService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @Override
+    public ResponseEntity<?> create(TicketStatisticRequest request) {
+        
+        TicketStatisticResponse response = ticketStatisticRestService.create(request);
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("创建失败"));
+        }
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @Override
+    public ResponseEntity<?> update(TicketStatisticRequest request) {
+        
+        
+
+    }
+
+
+    @Override
+    public ResponseEntity<?> delete(TicketStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByOrg(TicketStatisticRequest arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
-    }
 
-    @Override
-    public ResponseEntity<?> queryByUser(TicketStatisticRequest arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public ResponseEntity<?> update(TicketStatisticRequest arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
+  
     
 }
