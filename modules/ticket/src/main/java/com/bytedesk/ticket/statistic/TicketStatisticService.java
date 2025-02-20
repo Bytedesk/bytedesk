@@ -47,13 +47,12 @@ public class TicketStatisticService {
         for (WorkgroupEntity workgroup : workgroups) {
             calculateWorkgroupStatistics(workgroup.getUid(), startTime, endTime);
         }
-        
+
         // 计算处理人工单统计
         List<AgentEntity> agents = agentRepository.findAll();
         for (AgentEntity agent : agents) {
             calculateAssigneeStatistics(agent.getUid(), startTime, endTime);
         }
-
 
     }
 
