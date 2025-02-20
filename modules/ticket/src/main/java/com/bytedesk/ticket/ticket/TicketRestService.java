@@ -46,6 +46,7 @@ import com.bytedesk.ticket.ticket.dto.TicketRequest;
 import com.bytedesk.ticket.ticket.dto.TicketResponse;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateWorkgroupEvent;
+import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
 import com.bytedesk.core.topic.TopicUtils;

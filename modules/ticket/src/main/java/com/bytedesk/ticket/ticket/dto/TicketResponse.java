@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 22:32:27
+ * @LastEditTime: 2025-02-20 14:40:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,8 @@ import java.util.Set;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentResponse;
-import com.bytedesk.ticket.ticket.TicketConvertUtils;
 import com.bytedesk.ticket.ticket.TicketEntity;
+import com.bytedesk.ticket.utils.TicketConvertUtils;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
