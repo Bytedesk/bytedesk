@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 13:39:29
+ * @LastEditTime: 2025-02-20 13:40:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@ package com.bytedesk.ticket.statistic;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class TicketStatisticRestController extends BaseRestController<TicketStatisticRequest> {
 
     private final TicketStatisticRestService ticketStatisticRestService;
+
+    private final TicketStatisticService ticketStatisticService;
 
     @Override
     public ResponseEntity<?> queryByOrg(TicketStatisticRequest request) {
@@ -77,7 +80,14 @@ public class TicketStatisticRestController extends BaseRestController<TicketStat
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    // 计算所有工单统计
+    @PostMapping("/calculate")
+    public ResponseEntity<?> calculateAllStatistics() {
 
-  
+        ticketStatisticService.calculateAllStatistics();
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
     
 }
