@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-16 18:50:22
+ * @Date: 2025-02-20 13:27:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 13:16:39
+ * @LastEditTime: 2025-02-20 13:27:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,17 +13,20 @@
  */
 package com.bytedesk.ticket.statistic;
 
-import java.util.Optional;
+import org.springframework.stereotype.Component;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import jakarta.persistence.PostPersist;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-public interface TicketStatisticRepository extends JpaRepository<TicketStatisticEntity, Long>, JpaSpecificationExecutor<TicketStatisticEntity> {
-
-    Optional<TicketStatisticEntity> findByUid(String uid);
-
-    Optional<TicketStatisticEntity> findByWorkgroupUid(String workgroupUid);
-
-    // List<TicketStatisticEntity> findByAssigneeUid(String assigneeUid);    
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class TicketStatisticEntityListener {
     
-} 
+    @PostPersist
+    public void postPersist(TicketStatisticEntity statistic) {
+        log.info("TicketStatisticEntityListener postPersist: {}", statistic);
+    }
+    
+}

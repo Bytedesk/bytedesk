@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 12:54:18
+ * @LastEditTime: 2025-02-20 13:18:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TicketStatisticRestService extends BaseRestService<TicketStatisticEntity, TicketStatisticRequest, TicketStatisticResponse> {@Override
+public class TicketStatisticRestService extends BaseRestService<TicketStatisticEntity, TicketStatisticRequest, TicketStatisticResponse> {
+    
+    private final TicketStatisticRepository ticketStatisticRepository;
+
+
+    @Override
+    public Page<TicketStatisticResponse> queryByOrg(TicketStatisticRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public Page<TicketStatisticResponse> queryByUser(TicketStatisticRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public TicketStatisticResponse update(TicketStatisticRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
     
     
     public TicketStatisticResponse convertToResponse(TicketStatisticEntity entity) {
@@ -43,20 +64,31 @@ public class TicketStatisticRestService extends BaseRestService<TicketStatisticE
 
     @Override
     public void delete(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(request.getUid());
     }
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<TicketStatisticEntity> entity = findByUid(uid);
+        if (entity.isPresent()) {
+            entity.get().setDeleted(true);
+            save(entity.get());
+        }
     }
 
     @Override
     public Optional<TicketStatisticEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return ticketStatisticRepository.findByUid(uid);
+    }
+
+    @Override
+    public TicketStatisticEntity save(TicketStatisticEntity entity) {
+        try {
+            return ticketStatisticRepository.save(entity);
+        } catch (Exception e) {
+            log.error("save ticket statistic entity error: {}", e.getMessage());
+        }
+        return null;
     }
 
     @Override
@@ -64,30 +96,6 @@ public class TicketStatisticRestService extends BaseRestService<TicketStatisticE
             TicketStatisticEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    @Override
-    public Page<TicketStatisticResponse> queryByOrg(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
-    }
-
-    @Override
-    public Page<TicketStatisticResponse> queryByUser(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public TicketStatisticEntity save(TicketStatisticEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
-
-    @Override
-    public TicketStatisticResponse update(TicketStatisticRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
 } 
