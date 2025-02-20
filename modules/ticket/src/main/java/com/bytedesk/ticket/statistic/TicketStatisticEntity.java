@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:01:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 16:07:19
+ * @LastEditTime: 2025-02-20 17:07:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,8 +37,8 @@ import java.time.LocalDateTime;
 @EntityListeners({TicketStatisticEntityListener.class})
 @Table(name = "bytedesk_ticket_statistics", uniqueConstraints = {
     @UniqueConstraint(
-        columnNames = {"org_uid", "workgroup_uid", "assignee_uid", "date"},
-        name = "uk_org_uid_workgroup_uid_assignee_uid_date"
+        columnNames = {"org_uid", "workgroup_uid", "assignee_uid", "date", "hour"},
+        name = "uk_org_uid_workgroup_uid_assignee_uid_date_hour"
     )
 })
 public class TicketStatisticEntity extends BaseEntity {
@@ -94,6 +94,10 @@ public class TicketStatisticEntity extends BaseEntity {
     // 时间范围
     private LocalDateTime statisticStartTime;    // 统计开始时间
     private LocalDateTime statisticEndTime;      // 统计结束时间
+
+    // 最细统计粒度，用于展示当天工单趋势变化
+    @Builder.Default
+    private int hour = 0;
 
     // 日期，每个orgUid，每个日期一个统计
     private String date;
