@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 11:42:17
+ * @LastEditTime: 2025-02-20 11:57:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -103,14 +104,15 @@ public class SpringAiPromptController {
 
 	// http://127.0.0.1:9003/prompt/roles?message=&name=&voice=pirate
 	@GetMapping("/roles")
-	public ResponseEntity<JsonResult<?>> roles(@RequestParam(value = "message",
-			defaultValue = "Tell me about three famous pirates from the Golden Age of Piracy and why they did.  Write at least a sentence for each pirate.") String message,
+	public ResponseEntity<JsonResult<?>> roles(
+			@RequestParam(value = "message", defaultValue = "Tell me about three famous pirates from the Golden Age of Piracy and why they did.  Write at least a sentence for each pirate.") String message,
 			@RequestParam(value = "name", defaultValue = "Bob") String name,
 			@RequestParam(value = "voice", defaultValue = "pirate") String voice) {
 
 		// 使用prompt模板
 		// name, The name of the AI assistant. The default value is Bob
-		// voice, The style of voice that the AI assistant will use to reply. The default value is pirate
+		// voice, The style of voice that the AI assistant will use to reply. The
+		// default value is pirate
 		UserMessage userMessage = new UserMessage(message);
 		SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemResource);
 		Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", name, "voice", voice));
@@ -124,28 +126,27 @@ public class SpringAiPromptController {
 	}
 
 	// 通过stuff=true，将文档内容添加到上下文
-    // http://127.0.0.1:9003/prompt/stuff?message=&stuff=true
-    @GetMapping("/stuff")
-	public ResponseEntity<JsonResult<?>> stuff(@RequestParam(value = "message",
-			defaultValue = "Which athletes won the mixed doubles gold medal in curling at the 2022 Winter Olympics?'") String message,
+	// http://127.0.0.1:9003/prompt/stuff?message=&stuff=true
+	@GetMapping("/stuff")
+	public ResponseEntity<JsonResult<?>> stuff(
+			@RequestParam(value = "message", defaultValue = "Which athletes won the mixed doubles gold medal in curling at the 2022 Winter Olympics?'") String message,
 			@RequestParam(value = "stuff", defaultValue = "false") boolean stuff) {
-        
-        // 使用prompt模板
+
+		// 使用prompt模板
 		PromptTemplate promptTemplate = new PromptTemplate(qaPromptResource);
 		Map<String, Object> map = new HashMap<>();
 		map.put("question", message);
 
 		if (stuff) {
-            // 将文档内容添加到上下文
+			// 将文档内容添加到上下文
 			map.put("context", docsToStuffResource);
-		}
-		else {
-            // 不将文档内容添加到上下文
+		} else {
+			// 不将文档内容添加到上下文
 			map.put("context", "");
 		}
 		Prompt prompt = promptTemplate.create(map);
 		log.info("prompt: {}", prompt);
-	
+
 		ChatResponse response = defaultChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
@@ -154,10 +155,11 @@ public class SpringAiPromptController {
 	}
 
 	// rag
-    // http://127.0.0.1:9003/prompt/rag?message=
-    @GetMapping("/rag")
-    public ResponseEntity<JsonResult<?>> rag(@RequestParam(value = "message", defaultValue = "What is the most popular bike brand?") String message) {
-        // Step 1 - Load JSON document as Documents
+	// http://127.0.0.1:9003/prompt/rag?message=
+	@GetMapping("/rag")
+	public ResponseEntity<JsonResult<?>> rag(
+			@RequestParam(value = "message", defaultValue = "What is the most popular bike brand?") String message) {
+		// Step 1 - Load JSON document as Documents
 
 		log.info("Loading JSON as Documents");
 		JsonReader jsonReader = new JsonReader(bikesResource, "name", "price", "shortDescription", "description");
@@ -189,13 +191,17 @@ public class SpringAiPromptController {
 				.chatResponse();
 		log.info("AI responded.");
 
-        // FIXME: [500] Internal Server Error - {"error":{}}
-        return ResponseEntity.ok(JsonResult.success(chatResponse)); 
-    }
+		// FIXME: [500] Internal Server Error - {"error":{}}
+		return ResponseEntity.ok(JsonResult.success(chatResponse));
+	}
 
 	// http://127.0.0.1:9003/prompt/format?actor=
-    @GetMapping("/format")
-	public ResponseEntity<JsonResult<?>> generate(@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
+	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+	@GetMapping("/format")
+	public ResponseEntity<JsonResult<?>> generate(
+			@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
+
+		// using the low-level ChatModel API directly:
 		var outputParser = new BeanOutputConverter<>(ActorsFilms.class);
 
 		String format = outputParser.getFormat();
@@ -206,22 +212,60 @@ public class SpringAiPromptController {
 				""";
 		PromptTemplate promptTemplate = new PromptTemplate(userMessage, Map.of("actor", actor, "format", format));
 		Prompt prompt = promptTemplate.create();
-		
+
 		String response = defaultChatClient.prompt(prompt)
 				.call()
 				.content();
 		log.info("response: " + response);
 
+		// 或者 使用structured output
+		// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+		ActorsFilms actorsFilms = defaultChatClient.prompt()
+				.user(u -> u.text("Generate the filmography of 5 movies for {actor}.")
+						.param("actor", "Tom Hanks"))
+				.call()
+				.entity(ActorsFilms.class);
+		log.info("actorsFilms: {}", actorsFilms);
+
 		return ResponseEntity.ok(JsonResult.success(outputParser.convert(response)));
 	}
-    
 
-    private Message getSystemMessage(List<Document> similarDocuments) {
+	// structured output
+	// http://127.0.0.1:9003/prompt/structured?message=
+	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+	@GetMapping("/structured")
+	public ResponseEntity<JsonResult<?>> structured(
+			@RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message) {
+
+		 
+		StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
+		String userInputTemplate = """
+				Your response should be in JSON format.
+				The data structure for the JSON should match this Java class: java.util.HashMap
+				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+				{message}
+				{format}
+				"""; // user input with a "format" placeholder.
+		log.info("userInputTemplate: {}", userInputTemplate);
+		// 
+		Prompt prompt = new Prompt(
+				new PromptTemplate(
+						userInputTemplate,
+						Map.of("message", message, "format", outputConverter.getFormat()) // replace the "format"
+				).createMessage());
+
+		ChatResponse response = defaultChatClient.prompt(prompt)
+				.call()
+				.chatResponse();
+
+		return ResponseEntity.ok(JsonResult.success(response));
+	}
+
+	private Message getSystemMessage(List<Document> similarDocuments) {
 		String documents = similarDocuments.stream().map(entry -> entry.getText()).collect(Collectors.joining("\n"));
 		SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemBikePrompt);
 		Message systemMessage = systemPromptTemplate.createMessage(Map.of("documents", documents));
 		return systemMessage;
 	}
-    
 
 }
