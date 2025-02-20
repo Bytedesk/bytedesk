@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 10:08:00
+ * @LastEditTime: 2025-02-20 09:05:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -232,8 +232,8 @@ public class UploadVectorStore {
 	public List<String> searchText(String query, String kbUid) {
 		log.info("searchText kbUid {}, query: {}", kbUid, query);
 		// Retrieve documents similar to a query
-		FilterExpressionBuilder b = new FilterExpressionBuilder();
-		Expression expression = b.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
+		FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+		Expression expression = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
 		log.info("expression: {}", expression.toString());
 		//
 		SearchRequest searchRequest = SearchRequest.builder()
