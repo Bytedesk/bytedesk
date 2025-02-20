@@ -40,50 +40,28 @@ public class TicketStatisticService {
 
     private final UidUtils uidUtils;
 
-    // 查询某时间段统计
+    /**
+     * 查询某时间段统计
+     */
     public TicketStatisticResponse queryByDate(TicketStatisticRequest request) {
-        // 判断类型：
-        // 1. orgUid, startTime, endTime
-        // 2. workgroupUid, startTime, endTime
-        // 3. assigneeUid, startTime, endTime
+        // 解析时间
         LocalDateTime startTime = DateUtils.parseLocalDateTime(request.getStatisticStartTime());
         LocalDateTime endTime = DateUtils.parseLocalDateTime(request.getStatisticEndTime());
         // 根据类型，调用不同的方法
         if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_ORG)) {
             return queryOrgStatistics(request.getOrgUid(), startTime, endTime);
         } else if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_WORKGROUP)) {
-            return calculateWorkgroupStatistics(request.getWorkgroupUid(), request.getOrgUid(), startTime, endTime, false);
+            return queryWorkgroupStatistics(request.getWorkgroupUid(), request.getOrgUid(), startTime, endTime);
         } else if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_AGENT)) {
-            return calculateAssigneeStatistics(request.getAssigneeUid(), request.getOrgUid(), startTime, endTime, false);
+            return queryAssigneeStatistics(request.getAssigneeUid(), request.getOrgUid(), startTime, endTime);
+        } else {
+            throw new RuntimeException("类型错误");
         }
-
-        return null;
     }
 
     /**
-     * 计算所有工单统计
-    /**
-     * 计算所有工单统计
+     * 查询组织统计
      */
-    public void calculateTodayStatistics() {
-        // 当日凌晨，到当前时间
-        LocalDateTime startTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime endTime = LocalDateTime.now();
-
-        // 计算工作组工单统计
-        List<WorkgroupEntity> workgroups = workgroupRepository.findAll();
-        for (WorkgroupEntity workgroup : workgroups) {
-            calculateWorkgroupStatistics(workgroup.getUid(), workgroup.getOrgUid(), startTime, endTime, true);
-        }
-
-        // 计算处理人工单统计
-        List<AgentEntity> agents = agentRepository.findAll();
-        for (AgentEntity agent : agents) {
-            calculateAssigneeStatistics(agent.getUid(), agent.getOrgUid(), startTime, endTime, true);
-        }
-    }
-
-    // orgUid, startTime, endTime
     public TicketStatisticResponse queryOrgStatistics(String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
         List<TicketEntity> tickets = ticketRepository.findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
         TicketStatisticEntity statistic = TicketStatisticEntity.builder()
@@ -111,6 +89,40 @@ public class TicketStatisticService {
         return TicketConvertUtils.convertToStatisticResponse(statistic);
     }
 
+    /**
+     * 查询工作组统计
+     */
+    public TicketStatisticResponse queryWorkgroupStatistics(String workgroupUid, String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
+        return calculateWorkgroupStatistics(workgroupUid, orgUid, startTime, endTime, false);
+    }
+
+    /**
+     * 查询处理人统计
+     */
+    public TicketStatisticResponse queryAssigneeStatistics(String assigneeUid, String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
+        return calculateAssigneeStatistics(assigneeUid, orgUid, startTime, endTime, false);
+    }
+
+    /**
+     * 计算所有工单统计
+     */
+    public void calculateTodayStatistics() {
+        // 当日凌晨，到当前时间
+        LocalDateTime startTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endTime = LocalDateTime.now();
+
+        // 计算工作组工单统计
+        List<WorkgroupEntity> workgroups = workgroupRepository.findAll();
+        for (WorkgroupEntity workgroup : workgroups) {
+            calculateWorkgroupStatistics(workgroup.getUid(), workgroup.getOrgUid(), startTime, endTime, true);
+        }
+
+        // 计算处理人工单统计
+        List<AgentEntity> agents = agentRepository.findAll();
+        for (AgentEntity agent : agents) {
+            calculateAssigneeStatistics(agent.getUid(), agent.getOrgUid(), startTime, endTime, true);
+        }
+    }
     
     /**
      * 计算工作组的工单统计
@@ -119,6 +131,8 @@ public class TicketStatisticService {
     public TicketStatisticResponse calculateWorkgroupStatistics(String workgroupUid, String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
         List<TicketEntity> tickets = ticketRepository.findByWorkgroupContainingAndCreatedAtBetween(
             "\"uid\":\"" + workgroupUid + "\"", startTime, endTime);
+
+        // 根据orgUid
 
         TicketStatisticEntity statistic = TicketStatisticEntity.builder()
             .workgroupUid(workgroupUid)
