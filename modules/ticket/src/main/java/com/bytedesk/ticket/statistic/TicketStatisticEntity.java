@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:01:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 12:36:28
+ * @LastEditTime: 2025-02-20 12:48:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
@@ -30,14 +34,80 @@ import lombok.NoArgsConstructor;
 @Entity(name = "bytedesk_ticket_statistics")
 public class TicketStatisticEntity extends BaseEntity {
 
-    private long totalTickets;
+    // 基本统计
+    private long totalTickets;           // 总工单数
+    private long openTickets;            // 开放工单数
+    private long closedTickets;          // 已关闭工单数
+    private long unreadTickets;          // 未读工单数
 
-    private long openTickets;
+    // 状态统计
+    private long newTickets;             // 新建工单数
+    private long claimedTickets;         // 已认领工单数
+    private long unclaimedTickets;       // 已退回工单数
+    private long processingTickets;      // 处理中工单数
+    private long pendingTickets;         // 待处理工单数
+    private long holdingTickets;         // 挂起工单数
+    private long reopenedTickets;        // 重新打开工单数
+    private long resolvedTickets;        // 已解决工单数
+    private long escalatedTickets;       // 已升级工单数
 
-    private long closedTickets;
+    // 优先级统计
+    private long criticalTickets;        // 紧急工单数
+    private long highTickets;            // 高优先级工单数
+    private long mediumTickets;          // 中优先级工单数
+    private long lowTickets;             // 低优先级工单数
 
-    private double averageResolutionTime;
+    // 时间统计
+    private double averageResolutionTime;    // 平均解决时间(小时)
+    private double averageFirstResponseTime; // 平均首次响应时间(分钟)
+    private long slaBreachCount;            // SLA违反次数
+    private double slaComplianceRate;        // SLA达标率(%)
 
-    // private long slaBreaches;
+    // 工作组统计
+    private String workgroupUid;            // 工作组ID
+    private long workgroupTickets;          // 工作组工单数
+    private double workgroupResolutionRate;  // 工作组解决率(%)
 
+    // 处理人统计
+    private String assigneeUid;             // 处理人ID
+    private long assigneeTickets;           // 处理人工单数
+    private double assigneeResolutionRate;   // 处理人解决率(%)
+
+    // 客户满意度
+    private double customerSatisfactionRate; // 客户满意度(%)
+    private long satisfiedTickets;          // 满意工单数
+    private long unsatisfiedTickets;        // 不满意工单数
+
+    // 时间范围
+    private LocalDateTime statisticStartTime;    // 统计开始时间
+    private LocalDateTime statisticEndTime;      // 统计结束时间
+
+    // 未读消息统计
+    @Builder.Default
+    private Map<String, Integer> unreadCountMap = new HashMap<>();  // 每个用户的未读数 <UserUid, UnreadCount>
+
+    /**
+     * 增加用户未读数
+     */
+    public void incrementUnreadCount(String userUid) {
+        unreadCountMap.compute(userUid, (k, v) -> v == null ? 1 : v + 1);
+        this.unreadTickets++;
+    }
+
+    /**
+     * 清除用户未读数
+     */
+    public void clearUnreadCount(String userUid) {
+        Integer count = unreadCountMap.remove(userUid);
+        if (count != null) {
+            this.unreadTickets -= count;
+        }
+    }
+
+    /**
+     * 获取用户未读数
+     */
+    public int getUnreadCount(String userUid) {
+        return unreadCountMap.getOrDefault(userUid, 0);
+    }
 }
