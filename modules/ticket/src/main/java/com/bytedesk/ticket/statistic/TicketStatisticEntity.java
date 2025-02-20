@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:01:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 14:13:30
+ * @LastEditTime: 2025-02-20 16:07:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@ package com.bytedesk.ticket.statistic;
 
 import com.bytedesk.core.base.BaseEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -26,8 +27,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-// import java.util.HashMap;
-// import java.util.Map;
 
 @Data
 @Entity
@@ -38,11 +37,15 @@ import java.time.LocalDateTime;
 @EntityListeners({TicketStatisticEntityListener.class})
 @Table(name = "bytedesk_ticket_statistics", uniqueConstraints = {
     @UniqueConstraint(
-        columnNames = {"org_uid", "date"},
-        name = "uk_org_uid_date"
+        columnNames = {"org_uid", "workgroup_uid", "assignee_uid", "date"},
+        name = "uk_org_uid_workgroup_uid_assignee_uid_date"
     )
 })
 public class TicketStatisticEntity extends BaseEntity {
+
+    @Builder.Default
+    @Column(name = "statistic_type")
+    private String type = TicketStatisticTypeEnum.WORKGROUP.name(); // 统计类型，workgroup/agent/org
 
     // 基本统计
     private long totalTickets;           // 总工单数

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 13:16:39
+ * @LastEditTime: 2025-02-20 16:10:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ public interface TicketStatisticRepository extends JpaRepository<TicketStatistic
 
     Optional<TicketStatisticEntity> findByWorkgroupUid(String workgroupUid);
 
-    // List<TicketStatisticEntity> findByAssigneeUid(String assigneeUid);    
-    
+    Optional<TicketStatisticEntity> findByAssigneeUid(String assigneeUid);
+
+    Optional<TicketStatisticEntity> findByTypeAndOrgUidAndWorkgroupUidAndAssigneeUidAndDate(String type, String orgUid, String workgroupUid, String assigneeUid, String date);
 } 
