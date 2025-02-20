@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 11:37:31
+ * @LastEditTime: 2025-02-20 11:42:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,6 +44,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Prompt Engineering 提示词工程
+ * AI应用的核心：提示词的好坏直接影响AI的回答质量
+ * 
+ * Prompt四个核心要点：
+ * 1. 指令：明确告诉AI要做什么
+ * 2. 上下文：提供给AI一些相关的信息
+ * 3. 用户输入：用户输入的信息
+ * 4. 格式：告诉AI返回格式，比如json
+ * 另外可以提供一些示例：提供给AI一些示例
+ * 
  * https://docs.spring.io/spring-ai/reference/api/prompt.html
  * https://github.com/Azure-Samples/spring-ai-azure-workshop
  */
