@@ -41,7 +41,7 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
@@ -119,7 +119,7 @@ public class VisitorThreadService
         thread.setUid(uidUtils.getUid());
         thread.setOrgUid(workgroup.getOrgUid());
         //
-        String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
+        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
         threadService.save(thread);
         //
@@ -132,7 +132,7 @@ public class VisitorThreadService
         if (visitorRequest.isWeChat()) {
             thread.setExtra(visitorRequest.getThreadExtra());
         } else {
-            String extra = ConvertServiceUtils
+            String extra = ServiceConvertUtils
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
             thread.setExtra(extra);
         }
@@ -151,7 +151,7 @@ public class VisitorThreadService
                 .build();
         thread.setUid(uidUtils.getUid());
         //
-        String visitor = ConvertServiceUtils.convertToUserProtobufJSONString(visitorRequest);
+        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
         //
         thread.setOwner(agent.getMember().getUser());
@@ -163,11 +163,11 @@ public class VisitorThreadService
 
     public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
-        String extra = ConvertServiceUtils
+        String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         thread.setExtra(extra);
         // 考虑到客服信息发生变化，更新客服信息
-        String agentString = ConvertServiceUtils.convertToUserProtobufJSONString(agent);
+        String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
         thread.setAgent(agentString);
         // 保存
         threadService.save(thread);
@@ -186,7 +186,7 @@ public class VisitorThreadService
         thread.setUid(uidUtils.getUid());
         thread.setOrgUid(robot.getOrgUid());
         //
-        UserProtobuf visitor = ConvertServiceUtils.convertToUserProtobuf(visitorRequest);
+        UserProtobuf visitor = ServiceConvertUtils.convertToUserProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
         threadService.save(thread);
         //
@@ -195,7 +195,7 @@ public class VisitorThreadService
 
     public ThreadEntity reInitRobotThreadExtra(ThreadEntity thread, RobotEntity robot) {
         //
-        String extra = ConvertServiceUtils
+        String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置

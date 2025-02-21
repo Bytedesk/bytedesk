@@ -56,7 +56,7 @@ import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
-import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberRestService;
 
@@ -348,7 +348,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Override
     public AgentResponse convertToResponse(AgentEntity entity) {
-        return ConvertServiceUtils.convertToAgentResponse(entity);
+        return ServiceConvertUtils.convertToAgentResponse(entity);
     }
 
     private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数

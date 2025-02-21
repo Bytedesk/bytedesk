@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRepository;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -24,6 +26,7 @@ import com.bytedesk.service.rating.RatingRepository;
 import com.bytedesk.service.thread_transfer.ThreadTransferEntity;
 import com.bytedesk.service.thread_transfer.ThreadTransferRepository;
 import com.bytedesk.service.thread_transfer.ThreadTransferTypeEnum;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 
@@ -49,7 +52,62 @@ public class ServiceStatisticService {
 
     private final WorkgroupRepository workgroupRepository;
 
+    private final RobotRepository robotRepository;
 
+
+    /**
+     * 查询某时间段统计
+     */
+    public ServiceStatisticResponse queryByDate(ServiceStatisticRequest request) {
+        // 解析时间
+        LocalDateTime startTime = BdDateUtils.parseLocalDateTime(request.getStatisticStartTime());
+        LocalDateTime endTime = BdDateUtils.parseLocalDateTime(request.getStatisticEndTime());
+        // 根据类型，调用不同的方法
+        if (request.getType().equals(ServiceStatisticTypeEnum.ORG.name())) {
+            return queryOrgStatistics(request.getOrgUid(), startTime, endTime);
+        } else if (request.getType().equals(ServiceStatisticTypeEnum.WORKGROUP.name())) {
+            return queryWorkgroupStatistics(request.getWorkgroupUid(), request.getOrgUid(), startTime, endTime);
+        } else if (request.getType().equals(ServiceStatisticTypeEnum.AGENT.name())) {
+            return queryAgentStatistics(request.getAgentUid(), request.getOrgUid(), startTime, endTime);
+        } else if (request.getType().equals(ServiceStatisticTypeEnum.ROBOT.name())) {
+            return queryRobotStatistics(request.getRobotUid(), request.getOrgUid(), startTime, endTime);
+        } else {
+            throw new RuntimeException("类型错误");
+        }
+    }
+
+    /**
+     * 查询组织统计
+     */
+    public ServiceStatisticResponse queryOrgStatistics(String orgUid, LocalDateTime startTime, LocalDateTime endTime) {
+        return calculateOrgStatistic(orgUid, startTime, endTime, false);
+    }
+
+    /**
+     * 查询工作组统计
+     */
+    public ServiceStatisticResponse queryWorkgroupStatistics(String orgUid, String workgroupUid, LocalDateTime startTime, LocalDateTime endTime) {
+        return calculateWorkgroupStatistic(orgUid, workgroupUid, startTime, endTime, false);
+    }
+
+    /**
+     * 查询处理人统计
+     */
+    public ServiceStatisticResponse queryAgentStatistics(String orgUid, String agentUid, LocalDateTime startTime, LocalDateTime endTime) {
+        return calculateAgentStatistic(orgUid, agentUid, startTime, endTime, false);
+    }
+
+    /**
+     * 查询机器人统计
+     */
+    public ServiceStatisticResponse queryRobotStatistics(String orgUid, String robotUid, LocalDateTime startTime, LocalDateTime endTime) {
+        return calculateRobotStatistic(orgUid, robotUid, startTime, endTime, false);
+    }
+
+
+    /**
+     * 计算今日统计
+     */
     public void calculateTodayStatistics() {
         
         // 当日凌晨，到当前时间
@@ -59,179 +117,119 @@ public class ServiceStatisticService {
         // 计算组织统计
         List<OrganizationEntity> organizations = organizationRepository.findAll();
         for (OrganizationEntity organization : organizations) {
-            // calculateOrgStatistics(organization.getUid(), startTime, endTime, true);
+            calculateOrgStatistic(organization.getUid(), startTime, endTime, true);
         }
 
         // 计算工作组统计
         List<WorkgroupEntity> workgroups = workgroupRepository.findAll();
         for (WorkgroupEntity workgroup : workgroups) {
-            // calculateWorkgroupStatistics(workgroup.getUid(), workgroup.getOrgUid(), startTime, endTime, true);
+            calculateWorkgroupStatistic(workgroup.getOrgUid(), workgroup.getUid(), startTime, endTime, true);
         }
 
         // 计算处理人统计
         List<AgentEntity> agents = agentRepository.findAll();
         for (AgentEntity agent : agents) {
-            // calculateAssigneeStatistics(agent.getUid(), agent.getOrgUid(), startTime, endTime, true);
+            calculateAgentStatistic(agent.getOrgUid(), agent.getUid(), startTime, endTime, true);
+        }
+
+        // 计算机器人统计
+        List<RobotEntity> robots = robotRepository.findAll();
+        for (RobotEntity robot : robots) {
+            calculateRobotStatistic(robot.getOrgUid(), robot.getUid(), startTime, endTime, true);
         }
     }
 
     /**
-     * 计算并更新统计数据
+     * 计算组织统计
      */
     @Transactional
-    public void calculateOrgStatistic(String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
-        // 当前日期
-        String date = BdDateUtils.formatToday(); // 当前日期: 2025-02-21
-        // 获取当前小时
-        int hour = LocalDateTime.now().getHour(); // 当前小时: 10
+    public ServiceStatisticResponse calculateOrgStatistic(String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
+        return calculateStatistic(ServiceStatisticTypeEnum.ORG.name(), orgUid, null, null, null, startTime, endTime, shouldSave);
+    }
+
+    /**
+     * 计算工作组统计
+     */
+    @Transactional
+    public ServiceStatisticResponse calculateWorkgroupStatistic(String orgUid, String workgroupUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
+        return calculateStatistic(ServiceStatisticTypeEnum.WORKGROUP.name(), orgUid, workgroupUid, null, null, startTime, endTime, shouldSave);
+    }
+
+    /**
+     * 计算客服统计
+     */
+    @Transactional
+    public ServiceStatisticResponse calculateAgentStatistic(String orgUid, String agentUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
+        return calculateStatistic(ServiceStatisticTypeEnum.AGENT.name(), orgUid, null, agentUid, null, startTime, endTime, shouldSave);
+    }
+
+    /**
+     * 计算机器人统计
+     */
+    @Transactional
+    public ServiceStatisticResponse calculateRobotStatistic(String orgUid, String robotUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
+        return calculateStatistic(ServiceStatisticTypeEnum.ROBOT.name(), orgUid, null, null, robotUid, startTime, endTime, shouldSave);
+    }
+
+
+    /**
+     * 统一的统计计算方法
+     */
+    @Transactional
+    private ServiceStatisticResponse calculateStatistic(String type, String orgUid, String workgroupUid, 
+            String agentUid, String robotUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
+            
+        // 当前日期和小时
+        String date = BdDateUtils.formatToday();
+        int hour = LocalDateTime.now().getHour();
 
         // 获取或创建统计实体
         ServiceStatisticEntity statistic = serviceStatisticRepository
-            .findByOrgUidAndDateAndHour(orgUid, date, hour)
+            .findByTypeAndOrgUidAndWorkgroupUidAndAgentUidAndRobotUidAndDateAndHour(
+                type, orgUid, workgroupUid, agentUid, robotUid, date, hour)
             .orElse(ServiceStatisticEntity.builder()
+                .type(type)
+                .workgroupUid(workgroupUid)
+                .agentUid(agentUid)
+                .robotUid(robotUid)
                 .date(date)
                 .hour(hour)
                 .build());
         statistic.setOrgUid(orgUid);
 
-        // 获取指定时间段的队列成员数据
-        List<QueueMemberEntity> queueMembers = queueMemberRepository
-            .findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
+        // 获取相关数据
+        List<QueueMemberEntity> queueMembers = queueMemberRepository.findByOrgUidAndWorkgroupUidAndAgentUidAndCreatedAtBetween(orgUid, workgroupUid, agentUid, startTime, endTime);
 
-        // 更新各项统计指标
+        // 更新基础指标
         updateBasicMetrics(statistic, orgUid, startTime, endTime);
         updateThreadFlowMetrics(statistic, queueMembers);
         updateTimeMetrics(statistic, queueMembers);
         updateQualityMetrics(statistic, orgUid, startTime, endTime);
         updateMessageMetrics(statistic, queueMembers);
-        updateRobotMetrics(statistic, queueMembers);
-        updateWorkloadMetrics(statistic, orgUid, startTime, endTime);
 
-        statistic.calculateRates();
-        serviceStatisticRepository.save(statistic);
-    }
-
-    /**
-     * 按工作组统计
-     */
-    @Transactional
-    public void calculateWorkgroupStatistic(String workgroupUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
-        // 当前日期
-        String date = BdDateUtils.formatToday(); // 当前日期: 2025-02-21
-        // 获取当前小时
-        int hour = LocalDateTime.now().getHour(); // 当前小时: 10
-
-        // 获取或创建工作组统计实体
-        ServiceStatisticEntity statistic = serviceStatisticRepository
-            .findByWorkgroupUidAndDateAndHour(workgroupUid, date, hour)
-            .orElse(ServiceStatisticEntity.builder()
-                .workgroupUid(workgroupUid)
-                .type(ServiceStatisticTypeEnum.WORKGROUP.name())
-                .date(date)
-                .hour(hour)
-                .build());
-
-        // 获取工作组相关数据
-        List<QueueMemberEntity> workgroupMembers = queueMemberRepository
-            .findByWorkgroupUidAndCreatedAtBetween(workgroupUid, startTime, endTime);
-
-        // 更新统计指标
-        updateThreadFlowMetrics(statistic, workgroupMembers);
-        updateTimeMetrics(statistic, workgroupMembers);
-        updateQualityMetrics(statistic, workgroupUid, startTime, endTime);
-        updateMessageMetrics(statistic, workgroupMembers);
-        updateWorkloadMetrics(statistic, workgroupUid, startTime, endTime);
-
-        statistic.calculateRates();
-        serviceStatisticRepository.save(statistic);
-    }
-
-    /**
-     * 按客服统计
-     */
-    @Transactional
-    public void calculateAgentStatistic(String agentUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
-        // 当前日期
-        String date = BdDateUtils.formatToday(); // 当前日期: 2025-02-21
-        // 获取当前小时
-        int hour = LocalDateTime.now().getHour(); // 当前小时: 10
-
-        // 获取或创建客服统计实体
-        ServiceStatisticEntity statistic = serviceStatisticRepository
-            .findByAgentUidAndDateAndHour(agentUid, date, hour)
-            .orElse(ServiceStatisticEntity.builder()
-                .agentUid(agentUid)
-                .type(ServiceStatisticTypeEnum.AGENT.name())
-                .date(date)
-                .hour(hour)
-                .build());
-
-        // 获取客服相关数据
-        List<QueueMemberEntity> agentMembers = queueMemberRepository
-            .findByAgentUidAndCreatedAtBetween(agentUid, startTime, endTime);
-        AgentEntity agent = agentRepository.findByUid(agentUid).orElse(null);
-
-        if (agent != null) {
-            // 更新客服特有指标
-            statistic.setCurrentThreadCount(agent.getCurrentThreadCount());
-            
-            // 计算在线状态分布
-            List<AgentStatusLogEntity> statusLogs = agentStatusLogRepository
-                .findByAgentUidAndCreatedAtBetween(agentUid, startTime, endTime);
-            Map<String, Long> statusDuration = calculateStatusDuration(statusLogs);
-            updateAgentStatusMetrics(statistic, statusDuration);
+        // 根据类型更新特定指标
+        if (agentUid != null) {
+            AgentEntity agent = agentRepository.findByUid(agentUid).orElse(null);
+            if (agent != null) {
+                statistic.setCurrentThreadCount(agent.getCurrentThreadCount());
+                List<AgentStatusLogEntity> statusLogs = agentStatusLogRepository
+                    .findByAgentUidAndCreatedAtBetween(agentUid, startTime, endTime);
+                updateAgentStatusMetrics(statistic, calculateStatusDuration(statusLogs));
+            }
+        } else if (robotUid != null) {
+            updateRobotSpecificMetrics(statistic, queueMembers);
         }
 
-        // 更新通用指标
-        updateThreadFlowMetrics(statistic, agentMembers);
-        updateTimeMetrics(statistic, agentMembers);
-        updateQualityMetrics(statistic, agentUid, startTime, endTime);
-        updateMessageMetrics(statistic, agentMembers);
-
         statistic.calculateRates();
-        serviceStatisticRepository.save(statistic);
+
+        if (shouldSave) {
+            serviceStatisticRepository.save(statistic);
+        }
+
+        return ServiceConvertUtils.convertToServiceStatisticResponse(statistic);
     }
-
-    /**
-     * 按机器人统计
-     */
-    @Transactional
-    public void calculateRobotStatistic(String robotUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
-        // 当前日期
-        String date = BdDateUtils.formatToday(); // 当前日期: 2025-02-21
-        // 获取当前小时
-        int hour = LocalDateTime.now().getHour(); // 当前小时: 10
-
-
-        ServiceStatisticEntity statistic = serviceStatisticRepository
-            .findByRobotUidAndDateAndHour(robotUid, date, hour)
-            .orElse(ServiceStatisticEntity.builder()
-                .robotUid(robotUid)
-                .type(ServiceStatisticTypeEnum.ROBOT.name())
-                .date(date)
-                .hour(hour)
-                .build());
-
-        // 获取机器人相关数据
-        List<QueueMemberEntity> robotMembers = queueMemberRepository
-            .findByRobotUidAndCreatedAtBetween(robotUid, startTime, endTime);
-
-        // 更新机器人特有指标
-        updateRobotSpecificMetrics(statistic, robotMembers);
-
-        // 更新通用指标
-        updateThreadFlowMetrics(statistic, robotMembers);
-        updateTimeMetrics(statistic, robotMembers);
-        updateMessageMetrics(statistic, robotMembers);
-
-        statistic.calculateRates();
-        serviceStatisticRepository.save(statistic);
-    }
-
 
     
-
-
     /**
      * 更新基础会话指标
      */
@@ -254,7 +252,7 @@ public class ServiceStatisticService {
 
         // 获取队列成员数据
         List<QueueMemberEntity> queueMembers = queueMemberRepository
-            .findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
+            .findByOrgUidAndWorkgroupUidAndAgentUidAndCreatedAtBetween(orgUid, null, null, startTime, endTime);
 
         // 当前排队人数
         statistic.setQueuingThreadCount((int) queueMembers.stream()
@@ -431,29 +429,28 @@ public class ServiceStatisticService {
     /**
      * 更新机器人指标
      */
-    private void updateRobotMetrics(ServiceStatisticEntity statistic, List<QueueMemberEntity> queueMembers) {
-        // TODO: 需要机器人会话标记来统计机器人相关指标
-        // statistic.setRobotThreadCount();
-        // statistic.setRobotToHumanCount();
-        // statistic.setRobotSolveRate();
-    }
+    // private void updateRobotMetrics(ServiceStatisticEntity statistic, List<QueueMemberEntity> queueMembers) {
+    //     // TODO: 需要机器人会话标记来统计机器人相关指标
+    //     // statistic.setRobotThreadCount();
+    //     // statistic.setRobotToHumanCount();
+    //     // statistic.setRobotSolveRate();
+    // }
 
     /**
      * 更新工作量指标
      */
-    private void updateWorkloadMetrics(ServiceStatisticEntity statistic, String orgUid, 
-            LocalDateTime startTime, LocalDateTime endTime) {
-        // 获取时间段内的状态日志
-        List<AgentStatusLogEntity> statusLogs = agentStatusLogRepository
-            .findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
-
-        // 计算各状态时长
-        Map<String, Long> statusDuration = calculateStatusDuration(statusLogs);
+    // private void updateWorkloadMetrics(ServiceStatisticEntity statistic, String orgUid, 
+    //         LocalDateTime startTime, LocalDateTime endTime) {
+    //     // 获取时间段内的状态日志
+    //     List<AgentStatusLogEntity> statusLogs = agentStatusLogRepository
+    //         .findByOrgUidAndCreatedAtBetween(orgUid, startTime, endTime);
+    //     // 计算各状态时长
+    //     Map<String, Long> statusDuration = calculateStatusDuration(statusLogs);
         
-        statistic.setOnlineTime(statusDuration.getOrDefault("AVAILABLE", 0L).intValue());
-        statistic.setBusyTime(statusDuration.getOrDefault("BUSY", 0L).intValue());
-        statistic.setOfflineTime(statusDuration.getOrDefault("OFFLINE", 0L).intValue());
-    }
+    //     statistic.setOnlineTime(statusDuration.getOrDefault("AVAILABLE", 0L).intValue());
+    //     statistic.setBusyTime(statusDuration.getOrDefault("BUSY", 0L).intValue());
+    //     statistic.setOfflineTime(statusDuration.getOrDefault("OFFLINE", 0L).intValue());
+    // }
 
     /**
      * 计算状态持续时长

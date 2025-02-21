@@ -52,12 +52,12 @@ public class ThreadMessageUtil {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
         //
-        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     // 将此方法设为静态，以便在没有实例化类的情况下调用
     public static MessageProtobuf getThreadWelcomeMessage(AgentEntity agent, ThreadEntity thread) {
-        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+        UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .content(agent.getServiceSettings().getWelcomeTip())
@@ -75,11 +75,11 @@ public class ThreadMessageUtil {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
         //
-        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadQueueMessage(AgentEntity agent, ThreadEntity thread) {
-        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+        UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .content(thread.getContent())
@@ -97,7 +97,7 @@ public class ThreadMessageUtil {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
         //
-        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadQueuingMessage(UserProtobuf user, ThreadEntity thread) {
@@ -118,7 +118,7 @@ public class ThreadMessageUtil {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
         //
-        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadContinueMessage(UserProtobuf user, ThreadEntity thread) {
@@ -139,13 +139,13 @@ public class ThreadMessageUtil {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
         //
-        return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
 
     public static MessageEntity getThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
 
-        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(agent);
+        UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .content(thread.getContent())
@@ -169,7 +169,7 @@ public class ThreadMessageUtil {
 
     public static MessageEntity getThreadOfflineMessage(WorkgroupEntity workgroup, ThreadEntity thread) {
 
-        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(workgroup);
+        UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .content(thread.getContent())

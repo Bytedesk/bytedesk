@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 15:44:32
+ * @LastEditTime: 2025-02-21 16:41:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,13 +40,16 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 
     List<QueueMemberEntity> findByStatusOrderByPriorityDesc(String status);
 
-    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetween(String orgUid, LocalDateTime startTime, LocalDateTime endTime);
+//     List<QueueMemberEntity> findByOrgUidAndCreatedAtBetween(String orgUid, LocalDateTime startTime, LocalDateTime endTime);
 
-    List<QueueMemberEntity> findByRobotUidAndCreatedAtBetween(String robotUid, LocalDateTime startTime, LocalDateTime endTime);
+//     List<QueueMemberEntity> findByRobotUidAndCreatedAtBetween(String robotUid, LocalDateTime startTime, LocalDateTime endTime);
 
-    List<QueueMemberEntity> findByWorkgroupUidAndCreatedAtBetween(String workgroupUid, LocalDateTime startTime, LocalDateTime endTime);
+//     List<QueueMemberEntity> findByWorkgroupUidAndCreatedAtBetween(String workgroupUid, LocalDateTime startTime, LocalDateTime endTime);
 
-    List<QueueMemberEntity> findByAgentUidAndCreatedAtBetween(String agentUid, LocalDateTime startTime, LocalDateTime endTime);
+//     List<QueueMemberEntity> findByAgentUidAndCreatedAtBetween(String agentUid, LocalDateTime startTime, LocalDateTime endTime);
+
+    List<QueueMemberEntity> findByOrgUidAndWorkgroupUidAndAgentUidAndCreatedAtBetween(String orgUid, String workgroupUid, String agentUid, LocalDateTime startTime, LocalDateTime endTime);
+
 
     int countByQueueUidAndStatus(String queueUid, String status);
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 15:34:25
+ * @LastEditTime: 2025-02-21 16:55:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,17 +28,19 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.service.statistic.ServiceStatisticEntity;
+import com.bytedesk.service.statistic.ServiceStatisticResponse;
 import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupResponse;
 
-public class ConvertServiceUtils {
+public class ServiceConvertUtils {
 
     private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
     
-    private ConvertServiceUtils() {}
+    private ServiceConvertUtils() {}
 
     //
     public static VisitorResponse convertToVisitorResponse(VisitorEntity visitor) {
@@ -132,6 +134,10 @@ public class ConvertServiceUtils {
     public static String convertToServiceSettingsResponseVisitorJSONString(
         ServiceSettings serviceSettings) {
         return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
+    }
+
+    public static ServiceStatisticResponse convertToServiceStatisticResponse(ServiceStatisticEntity statistic) {
+        return modelMapper.map(statistic, ServiceStatisticResponse.class);
     }
 
 
