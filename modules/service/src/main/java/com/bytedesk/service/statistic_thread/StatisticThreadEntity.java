@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 09:16:05
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:19:47
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-21 14:40:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_service_statistic_thread")
@@ -51,10 +51,6 @@ public class StatisticThreadEntity extends BaseEntity {
 
     private String status;
 
-    // 会话创建时间，继承自BaseEntity
-    // @Temporal(TemporalType.TIMESTAMP)
-    // @Column(name = "created_at", updatable = false)
-
     // 是否有排队
     @Builder.Default
     @Column(name = "is_queued")
@@ -64,6 +60,7 @@ public class StatisticThreadEntity extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "queue_accepted_at")
     private Date queueAcceptedAt;
+    
     // 计算排队时长
     @Builder.Default
     @Column(name = "queue_duration")
@@ -121,14 +118,20 @@ public class StatisticThreadEntity extends BaseEntity {
     // 会话类型
     @Column(name = "thread_type")
     private String type;
+
     // 会话归属客服
-    // agentUid/workgroupUid/robotUid
-    // @Column(name = "belong_to_uid")
     private String agentUid;
 
-    // @Builder.Default
-    // @Column(name = "flow_nodes", columnDefinition = TypeConsts.COLUMN_TYPE_JSONB)
-    // @JdbcTypeCode(SqlTypes.JSON)
-    // private String flow = BytedeskConsts.EMPTY_JSON_STRING;
+    // 会话归属工作组
+    private String workgroupUid;
 
+    // 会话归属机器人
+    private String robotUid;
+
+    // 会话归属组织, 在baseEntity中
+    // private String orgUid;
+
+    // 会话创建时间，继承自BaseEntity
+    // @Temporal(TemporalType.TIMESTAMP)
+    // @Column(name = "created_at", updatable = false)
 }

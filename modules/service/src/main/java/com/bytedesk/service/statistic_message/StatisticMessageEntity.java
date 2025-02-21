@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 16:02:03
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:18:41
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-21 14:43:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,17 +47,23 @@ public class StatisticMessageEntity extends BaseEntity {
     // 所属会话uid
     private String threadUid;
 
-    // 访客消息uid
-    private String messageUid;
+    // 消息类型
+    private String messageType;
 
+    // 消息状态
     private String status;
 
-    // 消息创建时间，继承自BaseEntity
-    // @Temporal(TemporalType.TIMESTAMP)
-    // @Column(name = "created_at", updatable = false)
+    // 访客消息uid
+    private String visitorMessageUid;
 
+    // 访客消息创建时间
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "message_at")
+    private Date messageAt;
+ 
     // 客服回复消息uid
     private String responseMessageUid;
+
     // 客服回复消息回复时间
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "response_at")
@@ -67,6 +73,24 @@ public class StatisticMessageEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "response_duration")
     private long responseDuration = 0;
+
+
+    // 消息归属客服
+    private String agentUid;
+
+    // 消息归属工作组
+    private String workgroupUid;
+
+    // 消息归属机器人
+    private String robotUid;
+
+    // 消息归属组织, 在baseEntity中
+    // private String orgUid;
+
+    // 消息创建时间，继承自BaseEntity
+    // @Temporal(TemporalType.TIMESTAMP)
+    // @Column(name = "created_at", updatable = false)
+
 
     
 }
