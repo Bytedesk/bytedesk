@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 17:09:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 17:29:05
+ * @LastEditTime: 2025-02-21 17:32:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceStatisticResponse extends BaseResponse {
@@ -47,64 +48,53 @@ public class ServiceStatisticResponse extends BaseResponse {
     //////////////////////////////// 会话流转指标 /////////////////////////////////
 
     // 总流入会话量
-
     private Integer totalIncomingThreads;
 
     // 已接入会话量
-
     private Integer acceptedThreadCount;
 
     // 放弃排队会话量
-
     private Integer abandonedThreadCount;
 
     // 转接会话量
-
     private Integer transferredThreadCount;
 
     // 邀请会话量(主动邀请)
-
     private Integer invitedThreadCount;
 
     // 超时转接会话量
-
     private Integer timeoutTransferCount;
 
     //////////////////////////////// 时间指标 /////////////////////////////////
 
     // 平均等待时间(秒)
-
     private Integer avgWaitingTime;
 
     // 平均首次响应时间(秒)
-
     private Integer avgFirstResponseTime;
 
     // 平均会话时长(秒)
-
     private Integer avgConversationTime;
 
     // 最长响应时间(秒)
-
     private Integer maxResponseTime;
 
     // 最短响应时间(秒)
-
     private Integer minResponseTime;
 
     //////////////////////////////// 质量指标 /////////////////////////////////
 
     // 接通率(%) = 已接入会话量/总流入会话量
 
-    private double acceptRate.0;
+    private double acceptRate;
 
     // 放弃率(%) = 放弃排队会话量/总流入会话量
 
-    private double abandonRate.0;
+    private double abandonRate;
 
     // 转接率(%) = 转接会话量/已接入会话量
 
-    private double transferRate.0;
+    private double transferRate;
 
     // 满意度评价总数
 
@@ -116,11 +106,11 @@ public class ServiceStatisticResponse extends BaseResponse {
 
     // 满意率(%) = 满意评价数/评价总数
 
-    private double satisfactionRate.0;
+    private double satisfactionRate;
 
     // 参评率(%) = 评价总数/已接入会话量
 
-    private double ratingRate.0;
+    private double ratingRate;
 
     //////////////////////////////// 消息指标 /////////////////////////////////
 
@@ -148,7 +138,7 @@ public class ServiceStatisticResponse extends BaseResponse {
 
     // 机器人问题解决率(%)
 
-    private double robotSolveRate.0;
+    private double robotSolveRate;
 
     //////////////////////////////// 工作量指标 /////////////////////////////////
 
@@ -184,7 +174,7 @@ public class ServiceStatisticResponse extends BaseResponse {
 
     private Integer firstSolveCount; // 首次解决会话数
 
-    private double firstSolveRate.0; // 首次解决率
+    private double firstSolveRate; // 首次解决率
 
     // 响应时间分布
 
@@ -205,8 +195,7 @@ public class ServiceStatisticResponse extends BaseResponse {
     //////////////////////////////// 统计维度 /////////////////////////////////
 
     // 统计类型: ORG/WORKGROUP/AGENT/ROBOT
-
-    private String type = ServiceStatisticTypeEnum.ORG.name();
+    private String type;
 
     private String workgroupUid;
     private String agentUid;
