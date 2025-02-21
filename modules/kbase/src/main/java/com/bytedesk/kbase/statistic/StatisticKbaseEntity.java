@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-09-11 08:58:40
+ * @Date: 2024-09-11 08:59:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:24:20
+ * @LastEditTime: 2025-02-21 13:27:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.statistic_robot;
+package com.bytedesk.kbase.statistic;
 
 import com.bytedesk.core.base.BaseEntity;
 
@@ -25,9 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * 某个机器人的会话统计数据
- */
+// 知识库统计数据
 @Entity
 @Data
 @Builder
@@ -35,14 +33,12 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_service_statistic_robot", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"robotUid", "date"})
+@Table(name = "bytedesk_kbase_statistic", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"kbaseUid", "date"})
 })
-public class StatisticRobotEntity extends BaseEntity {
+public class StatisticKbaseEntity extends BaseEntity {
     
-    
-
-    private String robotUid;
+    private String kbaseUid;
 
     private String date;
 }

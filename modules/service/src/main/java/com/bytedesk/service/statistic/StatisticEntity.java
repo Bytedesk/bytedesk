@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 09:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 12:05:28
+ * @LastEditTime: 2025-02-21 13:52:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.service.statistic;
 
 import com.bytedesk.core.base.BaseEntity;
 
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -39,7 +38,6 @@ import lombok.experimental.Accessors;
  9. 参评率： 今日参加评价的数量与接入会话数量的比值
  2. 当前在线客服数：当前处于可接待状态的客服数量
 
- TODO: 民生银行增加2项
  1. 坐席当前接待数量
  2. 当前渠道接待人数
 
@@ -104,12 +102,127 @@ import lombok.experimental.Accessors;
 })
 public class StatisticEntity extends BaseEntity {
 
-    @Embedded
-    private StatisticIndex statisticIndex;
 
-    
+     ////////////////////////////// 人工会话数据 ///////////////////////////////
+    // 正在排队人数/会话数
+    @Builder.Default
+    private int queuingThreadCount = 0;
 
-    // 统计时间，按天统计
+    // 人工正在接待人数
+    @Builder.Default
+    private int currentThreadCount = 0;
+
+    // 人工已接待人数
+    @Builder.Default
+    private int totalVisitorCount = 0;
+
+    // 人工已接待会话数
+    @Builder.Default
+    private int totalThreadCount = 0;
+
+    // 预警会话量
+    @Builder.Default
+    private int warningThreadCount = 0;
+
+    // 待处理留言量
+    @Builder.Default
+    private int unprocessedMessageCount = 0;
+
+    // 当前在线接待客服数
+    @Builder.Default
+    private Integer onlineAgentCount = 0;
+
+    ///////////////////////////////// 机器人会话数据 ///////////////////////////////
+
+    // 机器人接待人次
+    @Builder.Default
+    private int robotVisitorCount = 0;
+
+    // 机器人接待会话量
+    @Builder.Default
+    private int robotThreadCount = 0;
+
+    //////////////////////////////////// 绩效考核指标//////////////////////////////
+
+    // 3分钟人工回复率
+    @Builder.Default
+    private int threeMinuteReplyRate = 0;
+
+    // 平均人工首次响应时长
+    @Builder.Default
+    private int firstResponseTime = 0;
+
+    // 平均人工响应时长
+    @Builder.Default
+    private int averageResponseTime = 0;
+
+    // 平均人工服务时长
+    @Builder.Default
+    private int averageServiceTime = 0;
+
+    // 评价满意率
+    @Builder.Default
+    private int rateSatisfactionRate = 0;
+
+    // 问题解决率
+    @Builder.Default
+    private int problemSolveRate = 0;
+
+    //////////////////////////////////// 工单数据 ////////////////////////////////
+
+    // 待分配工单
+    @Builder.Default
+    private int unassignedTicketCount = 0;
+
+    // 处理中工单
+    @Builder.Default
+    private int processingTicketCount = 0;
+
+    // 已完成工单
+    @Builder.Default
+    private int completedTicketCount = 0;
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    // // 会话量：本日累计的会话数量，包含了访客来访和客服主动发起会话两种
+    // private Long threadCount;
+
+    // 未接入会话量：放弃排队的数量
+    // private Long unattendedThreadCount;
+
+    // 接入率：今日累计已已接入会话与总会话数的比值
+    // private Double attendeeRate;
+
+    // 满意度：满意数量与评价总量的比值
+    // private Double satisfactionRate;
+
+    // 参评率： 今日参加评价的数量与接入会话数量的比值
+    // private Double evaluationRate;
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    public void incrementThreadCount() {
+        this.currentThreadCount++;
+    }
+
+    public void decrementThreadCount() {
+        this.currentThreadCount--;
+    }
+
+    // 统计类型，org/workgroup/agent/robot
+    private String type;
+
+    private String workgroupUid;
+
+    private String agentUid;
+
+    private String robotUid;
+
+    // 最细统计粒度，用于展示当天工单趋势变化
+    @Builder.Default
+    private int hour = 0;
+
+    // 日期，每个orgUid，每个日期一个统计
     private String date;
 
 }
