@@ -17,8 +17,8 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.kbase.service_settings.InviteSettings;
-import com.bytedesk.kbase.service_settings.ServiceSettingsResponse;
+import com.bytedesk.kbase.settings.InviteSettings;
+import com.bytedesk.kbase.settings.ServiceSettingsResponse;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;

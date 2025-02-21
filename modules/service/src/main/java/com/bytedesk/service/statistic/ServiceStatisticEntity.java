@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 09:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 13:52:05
+ * @LastEditTime: 2025-02-21 13:59:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,7 +88,8 @@ import lombok.experimental.Accessors;
 */
 
 /**
- * 组织级别统计数据
+ * 客服对话统计数据：
+ * 组织、工作组、客服、机器人
  */
 @Entity
 @Data
@@ -98,11 +99,14 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_service_statistic", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"orgUid", "date"})
+    @UniqueConstraint(
+        columnNames = {"orgUid", "workgroupUid", "agentUid",   "robotUid", "date", "hour"},
+        name = "uk_org_uid_workgroup_uid_agent_uid_robot_uid_date_hour"
+    )
 })
-public class StatisticEntity extends BaseEntity {
+public class ServiceStatisticEntity extends BaseEntity {
 
-
+    
      ////////////////////////////// 人工会话数据 ///////////////////////////////
     // 正在排队人数/会话数
     @Builder.Default
@@ -210,13 +214,20 @@ public class StatisticEntity extends BaseEntity {
     }
 
     // 统计类型，org/workgroup/agent/robot
-    private String type;
+    @Builder.Default
+    private String type = ServiceStatisticTypeEnum.ORG.name();
 
+    // 工作组uid
     private String workgroupUid;
 
+    // 客服uid
     private String agentUid;
 
+    // 机器人uid
     private String robotUid;
+
+    // 组织uid, 在baseEntity中
+    // private String orgUid;
 
     // 最细统计粒度，用于展示当天工单趋势变化
     @Builder.Default

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-17 17:09:31
+ * @Date: 2024-07-17 17:09:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-11 09:03:33
+ * @LastEditTime: 2024-09-10 23:18:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,22 @@
  */
 package com.bytedesk.service.statistic;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import com.bytedesk.core.base.BaseRequest;
 
-public interface StatisticRepository extends JpaRepository<StatisticEntity, Long>, JpaSpecificationExecutor<StatisticEntity> {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ServiceStatisticRequest extends BaseRequest {
+    
+    // 统计时间，按天统计
+    private String date;
 
 }

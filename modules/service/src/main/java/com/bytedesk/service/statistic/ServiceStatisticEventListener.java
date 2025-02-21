@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-10 23:11:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:04:01
+ * @LastEditTime: 2025-02-21 13:56:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,11 +30,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class StatisticEventListener {
+public class ServiceStatisticEventListener {
 
     @EventListener
     public void onStatisticThreadCreateEvent(StatisticThreadCreateEvent event) {
-        log.info("StatisticEventListener onStatisticThreadCreateEvent: {}", event);
+        log.info("ServiceStatisticEventListener onServiceStatisticThreadCreateEvent: {}", event);
     }
 
     // @EventListener

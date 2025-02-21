@@ -17,8 +17,8 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.kbase.service_settings.InviteSettings;
-import com.bytedesk.kbase.service_settings.ServiceSettings;
+import com.bytedesk.kbase.settings.InviteSettings;
+import com.bytedesk.kbase.settings.ServiceSettings;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

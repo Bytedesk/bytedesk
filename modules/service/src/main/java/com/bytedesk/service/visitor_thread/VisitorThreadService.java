@@ -39,7 +39,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.utils.ConvertServiceUtils;
 import com.bytedesk.service.visitor.VisitorRequest;

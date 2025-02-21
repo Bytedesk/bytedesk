@@ -22,8 +22,8 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 // import com.bytedesk.ai.settings.RobotServiceSettings;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.service_settings.ServiceSettings;
-import com.bytedesk.kbase.service_settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 
 public class ConvertAiUtils {
 

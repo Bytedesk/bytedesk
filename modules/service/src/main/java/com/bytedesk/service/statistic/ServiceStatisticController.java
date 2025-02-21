@@ -21,34 +21,34 @@ import com.bytedesk.core.base.BaseRestController;
 
 @RestController
 @RequestMapping("/api/v1/vip/statistic")
-public class StatisticController extends BaseRestController<StatisticRequest> {
+public class ServiceStatisticController extends BaseRestController<ServiceStatisticRequest> {
 
     @Override
-    public ResponseEntity<?> queryByOrg(StatisticRequest request) {
+    public ResponseEntity<?> queryByOrg(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(StatisticRequest request) {
+    public ResponseEntity<?> queryByUser(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
     @Override
-    public ResponseEntity<?> create(StatisticRequest request) {
+    public ResponseEntity<?> create(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
     @Override
-    public ResponseEntity<?> update(StatisticRequest request) {
+    public ResponseEntity<?> update(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     @Override
-    public ResponseEntity<?> delete(StatisticRequest request) {
+    public ResponseEntity<?> delete(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
