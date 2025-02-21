@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 09:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 15:21:15
+ * @LastEditTime: 2025-02-21 15:35:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
 
 /**
  * 客服对话统计数据：
@@ -187,21 +186,7 @@ public class ServiceStatisticEntity extends BaseEntity {
     @Builder.Default
     private int offlineTime = 0;
 
-    //////////////////////////////// 统计维度 /////////////////////////////////
-
-    // 统计类型: ORG/WORKGROUP/AGENT/ROBOT
-    @Builder.Default
-    private String type = ServiceStatisticTypeEnum.ORG.name();
-
-    private String workgroupUid;
-    private String agentUid; 
-    private String robotUid;
-
-    // 统计时间维度
-    @Builder.Default
-    private int hour = 0;
-    private String date;
-
+    
     //////////////////////////////// 扩展指标 /////////////////////////////////
 
     // 客服工作状态分布
@@ -247,6 +232,22 @@ public class ServiceStatisticEntity extends BaseEntity {
     
     @Builder.Default
     private int durationOver15Min = 0;   // 超过15分钟会话数
+
+    //////////////////////////////// 统计维度 /////////////////////////////////
+
+    // 统计类型: ORG/WORKGROUP/AGENT/ROBOT
+    @Builder.Default
+    private String type = ServiceStatisticTypeEnum.ORG.name();
+
+    private String workgroupUid;
+    private String agentUid; 
+    private String robotUid;
+
+    // 统计时间维度
+    @Builder.Default
+    private int hour = 0;
+    private String date;
+
 
     //////////////////////////////// 辅助方法 /////////////////////////////////
 

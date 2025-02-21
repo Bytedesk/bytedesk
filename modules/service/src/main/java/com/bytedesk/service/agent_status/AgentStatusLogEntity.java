@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:19:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:23:17
+ * @LastEditTime: 2025-02-21 15:24:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,6 @@ public class AgentStatusLogEntity extends BaseEntity {
 
     private String agentUid;
 
-    // baseEntity 自带 createTime
-    // private LocalDateTime createTime;
+    // baseEntity 自带 createdAt
+    // private LocalDateTime createdAt;
 }
