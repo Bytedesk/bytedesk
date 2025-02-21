@@ -29,7 +29,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 // import com.bytedesk.core.rbac.role.RolePermissions;
-import com.bytedesk.core.utils.DateUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -95,7 +95,7 @@ public class AutoReplyRestController extends BaseRestController<AutoReplyRequest
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "AutoReply-" + DateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "AutoReply-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据

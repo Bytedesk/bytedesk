@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import com.bytedesk.core.redis.JedisProperties;
 
@@ -35,6 +36,7 @@ public class KbaseConfig {
         // https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
         // https://redis.io/docs/interact/search-and-query/
         // 初始化向量库, 创建索引
+        @Primary
         @Bean("ollamaRedisVectorStore")
         @ConditionalOnProperty(name = { "spring.ai.ollama.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
         public RedisVectorStore ollamaRedisVectorStore(EmbeddingModel ollamaEmbeddingModel, RedisVectorStoreProperties properties) {

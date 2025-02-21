@@ -3,20 +3,23 @@ package com.bytedesk.core.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.StringUtils;
 
 /**
  * 时间常用函数
  */
-public class DateUtils {
+public class BdDateUtils {
 
-    private DateUtils() {
+    private BdDateUtils() {
     }
 
     private static final String datetimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -178,13 +181,24 @@ public class DateUtils {
     }
     
     public static LocalDateTime parseLocalDateTime(String time) {
-        return LocalDateTime.parse(time, DateUtils.getDateTimeFormatter());
+        return LocalDateTime.parse(time, BdDateUtils.getDateTimeFormatter());
     }
 
     public static LocalDateTime parseLocalDateTime(String time, DateTimeFormatter formatter) {
         return LocalDateTime.parse(time, formatter);
     }
-    
+
+    public static String getCurrentLocalDateTime() {
+        return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
+    }
+
+    public static ZonedDateTime getCurrentZonedDateTime() {
+        return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId());
+    }
+
+    public static ZoneId getCurrentZoneId() {
+        return LocaleContextHolder.getTimeZone().toZoneId();
+    }
     
 
 }

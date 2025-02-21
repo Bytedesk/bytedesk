@@ -21,6 +21,7 @@ import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import lombok.Data;
 
@@ -45,7 +46,6 @@ public class SpringAiOllamaConfig {
     @Value("${spring.ai.ollama.embedding.options.model:qwen2.5:1.5b}")
     private String ollamaEmbeddingModel;
 
-
     @Bean("ollamaApi")
     OllamaApi ollamaApi() {
         return new OllamaApi(ollamaBaseUrl);
@@ -65,6 +65,7 @@ public class SpringAiOllamaConfig {
         .build();
     }
 
+    @Primary
     @Bean("ollamaChatModel")
     OllamaChatModel ollamaChatModel(OllamaApi ollamaApi, OllamaOptions ollamaChatOptions) {
         return OllamaChatModel.builder()
@@ -73,6 +74,7 @@ public class SpringAiOllamaConfig {
         .build();
     }
 
+    @Primary
     @Bean("ollamaEmbeddingModel")
     OllamaEmbeddingModel ollamaEmbeddingModel(OllamaApi ollamaApi, OllamaOptions ollamaEmbeddingOptions) {
         return OllamaEmbeddingModel.builder()
@@ -86,6 +88,7 @@ public class SpringAiOllamaConfig {
         return ChatClient.builder(ollamaChatModel);
     }
 
+    @Primary
     @Bean("ollamaChatClient")
     ChatClient ollamaChatClient(ChatClient.Builder ollamaChatClientBuilder, OllamaOptions ollamaChatOptions) {
         return ollamaChatClientBuilder

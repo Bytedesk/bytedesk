@@ -27,7 +27,7 @@ import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
-import com.bytedesk.core.utils.DateUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -94,7 +94,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "Faq-" + DateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "Faq-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
