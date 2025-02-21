@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-07 11:37:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 17:03:16
+ * @LastEditTime: 2025-02-21 15:11:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -93,4 +93,7 @@ public class RatingEntity extends BaseEntity {
     @Column(name = "rate_user", length = 512)
     // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 评价时间, baseEntity 自带 createTime
+    // private LocalDateTime createTime;
 } 

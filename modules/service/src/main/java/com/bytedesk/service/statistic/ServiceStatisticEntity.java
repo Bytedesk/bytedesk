@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 09:17:39
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-21 14:31:26
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-21 15:21:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -202,6 +202,52 @@ public class ServiceStatisticEntity extends BaseEntity {
     private int hour = 0;
     private String date;
 
+    //////////////////////////////// 扩展指标 /////////////////////////////////
+
+    // 客服工作状态分布
+    @Builder.Default
+    private int availableAgentCount = 0;  // 空闲客服数
+    
+    @Builder.Default
+    private int busyAgentCount = 0;      // 忙碌客服数
+    
+    @Builder.Default
+    private int awayAgentCount = 0;      // 离开客服数
+
+    // 会话分配
+    @Builder.Default
+    private int autoAssignedCount = 0;   // 自动分配会话数
+    
+    @Builder.Default
+    private int manualAssignedCount = 0; // 手动分配会话数
+
+    // 会话质量
+    @Builder.Default
+    private int firstSolveCount = 0;     // 首次解决会话数
+    
+    @Builder.Default
+    private double firstSolveRate = 0.0; // 首次解决率
+
+    // 响应时间分布
+    @Builder.Default
+    private int responseWithin1Min = 0;  // 1分钟内响应数
+    
+    @Builder.Default
+    private int responseWithin5Min = 0;  // 5分钟内响应数
+    
+    @Builder.Default
+    private int responseOver5Min = 0;    // 超过5分钟响应数
+
+    // 会话时长分布
+    @Builder.Default
+    private int durationWithin5Min = 0;  // 5分钟内结束会话数
+    
+    @Builder.Default
+    private int durationWithin15Min = 0; // 15分钟内结束会话数
+    
+    @Builder.Default
+    private int durationOver15Min = 0;   // 超过15分钟会话数
+
     //////////////////////////////// 辅助方法 /////////////////////////////////
 
     public void incrementThreadCount() {
@@ -212,7 +258,7 @@ public class ServiceStatisticEntity extends BaseEntity {
         this.currentThreadCount--;
     }
 
-    // 计算各类率值
+    // 计算各类比率的方法也需要更新
     public void calculateRates() {
         // 接通率
         this.acceptRate = totalIncomingThreads > 0 ? 
@@ -229,6 +275,10 @@ public class ServiceStatisticEntity extends BaseEntity {
         // 满意率
         this.satisfactionRate = totalRatingCount > 0 ?
             (double) satisfiedRatingCount / totalRatingCount * 100 : 0;
+
+            // 计算首次解决率
+        this.firstSolveRate = acceptedThreadCount > 0 ? 
+        (double) firstSolveCount / acceptedThreadCount * 100 : 0;
             
         // 参评率
         this.ratingRate = acceptedThreadCount > 0 ?

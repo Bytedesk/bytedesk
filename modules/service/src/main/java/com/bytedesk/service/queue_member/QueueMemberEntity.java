@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 16:41:25
+ * @LastEditTime: 2025-02-21 14:53:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,6 +71,10 @@ public class QueueMemberEntity extends BaseEntity {
 
     private String agentAvatar;  // 客服头像
 
+    private String workgroupUid;  // 工作组ID
+
+    private String workgroupName;  // 工作组名称
+
     @Builder.Default
     private int beforeNumber = 0;  // 前面排队人数
 
@@ -133,6 +137,10 @@ public class QueueMemberEntity extends BaseEntity {
     private boolean rated = false;
 
     private String client;  // 客户端类型
+
+    private int hour;  // 小时
+
+    private String date;  // 日期
 
     /**
      * 计算等待时间(秒)
