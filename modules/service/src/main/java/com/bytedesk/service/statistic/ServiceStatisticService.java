@@ -186,19 +186,6 @@ public class ServiceStatisticService {
         int hour = LocalDateTime.now().getHour();
 
         // 获取或创建统计实体
-        // ServiceStatisticEntity statistic = serviceStatisticRepository
-        //     .findByTypeAndOrgUidAndWorkgroupUidAndAgentUidAndRobotUidAndDateAndHour(
-        //         type, orgUid, workgroupUid, agentUid, robotUid, date, hour)
-        //     .orElse(ServiceStatisticEntity.builder()
-        //         .type(type)
-        //         .workgroupUid(workgroupUid)
-        //         .agentUid(agentUid)
-        //         .robotUid(robotUid)
-        //         .date(date)
-        //         .hour(hour)
-        //         .build());
-        // statistic.setOrgUid(orgUid);
-
         ServiceStatisticEntity statistic = null;
         Optional<ServiceStatisticEntity> statisticOptional = serviceStatisticRepository
             .findByTypeAndOrgUidAndWorkgroupUidAndAgentUidAndRobotUidAndDateAndHour(
