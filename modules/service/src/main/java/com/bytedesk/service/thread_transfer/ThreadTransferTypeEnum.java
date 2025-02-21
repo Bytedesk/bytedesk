@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-23 10:17:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 15:06:52
+ * @LastEditTime: 2025-02-21 15:23:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,5 +15,6 @@ package com.bytedesk.service.thread_transfer;
 
 public enum ThreadTransferTypeEnum {
     AGENT_TO_AGENT,
-    ROBOT_TO_AGENT;
+    ROBOT_TO_AGENT,
+    TIMEOUT;
 }
