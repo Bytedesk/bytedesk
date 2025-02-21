@@ -52,8 +52,8 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
-import com.bytedesk.kbase.service_settings.InviteSettings;
-import com.bytedesk.kbase.service_settings.ServiceSettings;
+import com.bytedesk.kbase.settings.InviteSettings;
+import com.bytedesk.kbase.settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

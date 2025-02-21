@@ -17,8 +17,8 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.kbase.service_settings.InviteSettings;
-import com.bytedesk.kbase.service_settings.ServiceSettingsRequest;
+import com.bytedesk.kbase.settings.InviteSettings;
+import com.bytedesk.kbase.settings.ServiceSettingsRequest;
 
 import lombok.Builder;
 import lombok.Data;

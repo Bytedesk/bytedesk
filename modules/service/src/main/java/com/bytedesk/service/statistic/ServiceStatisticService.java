@@ -22,40 +22,40 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 
 @Service
-public class StatisticService extends BaseRestService<StatisticEntity, StatisticRequest, StatisticResponse> {
+public class ServiceStatisticService extends BaseRestService<ServiceStatisticEntity, ServiceStatisticRequest, ServiceStatisticResponse> {
 
     @Override
-    public Page<StatisticResponse> queryByOrg(StatisticRequest request) {
+    public Page<ServiceStatisticResponse> queryByOrg(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
     @Override
-    public Page<StatisticResponse> queryByUser(StatisticRequest request) {
+    public Page<ServiceStatisticResponse> queryByUser(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Override
-    public Optional<StatisticEntity> findByUid(String uid) {
+    public Optional<ServiceStatisticEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
 
     @Override
-    public StatisticResponse create(StatisticRequest request) {
+    public ServiceStatisticResponse create(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
     @Override
-    public StatisticResponse update(StatisticRequest request) {
+    public ServiceStatisticResponse update(ServiceStatisticRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     @Override
-    public StatisticEntity save(StatisticEntity entity) {
+    public ServiceStatisticEntity save(ServiceStatisticEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
@@ -67,19 +67,19 @@ public class StatisticService extends BaseRestService<StatisticEntity, Statistic
     }
 
     @Override
-    public void delete(StatisticRequest entity) {
+    public void delete(ServiceStatisticRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, StatisticEntity entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ServiceStatisticEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public StatisticResponse convertToResponse(StatisticEntity entity) {
+    public ServiceStatisticResponse convertToResponse(ServiceStatisticEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
