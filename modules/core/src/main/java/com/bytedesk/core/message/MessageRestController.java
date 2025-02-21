@@ -30,7 +30,7 @@ import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.message_unread.MessageUnreadService;
 // import com.bytedesk.core.socket.MqService;
-import com.bytedesk.core.utils.DateUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -143,7 +143,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "Message-" + DateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "Message-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据

@@ -27,7 +27,7 @@ import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
-import com.bytedesk.core.utils.DateUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -97,7 +97,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "QuickReply-" + DateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "QuickReply-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
