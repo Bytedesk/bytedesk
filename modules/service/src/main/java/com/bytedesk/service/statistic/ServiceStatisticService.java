@@ -54,7 +54,6 @@ public class ServiceStatisticService {
 
     private final RobotRepository robotRepository;
 
-
     /**
      * 查询某时间段统计
      */
@@ -103,7 +102,6 @@ public class ServiceStatisticService {
     public ServiceStatisticResponse queryRobotStatistics(String orgUid, String robotUid, LocalDateTime startTime, LocalDateTime endTime) {
         return calculateRobotStatistic(orgUid, robotUid, startTime, endTime, false);
     }
-
 
     /**
      * 计算今日统计

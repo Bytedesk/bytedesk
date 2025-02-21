@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.uid.UidUtils;
@@ -53,11 +52,11 @@ public class TicketStatisticService {
         LocalDateTime startTime = BdDateUtils.parseLocalDateTime(request.getStatisticStartTime());
         LocalDateTime endTime = BdDateUtils.parseLocalDateTime(request.getStatisticEndTime());
         // 根据类型，调用不同的方法
-        if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_ORG)) {
+        if (request.getType().equals(TicketStatisticTypeEnum.ORG.name())) {
             return queryOrgStatistics(request.getOrgUid(), startTime, endTime);
-        } else if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_WORKGROUP)) {
+        } else if (request.getType().equals(TicketStatisticTypeEnum.WORKGROUP.name())) {
             return queryWorkgroupStatistics(request.getWorkgroupUid(), request.getOrgUid(), startTime, endTime);
-        } else if (request.getType().equals(BytedeskConsts.STATISTIC_FILTER_TYPE_AGENT)) {
+        } else if (request.getType().equals(TicketStatisticTypeEnum.AGENT.name())) {
             return queryAssigneeStatistics(request.getAssigneeUid(), request.getOrgUid(), startTime, endTime);
         } else {
             throw new RuntimeException("类型错误");
