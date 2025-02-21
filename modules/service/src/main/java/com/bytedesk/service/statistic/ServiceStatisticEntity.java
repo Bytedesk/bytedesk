@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 09:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 13:59:10
+ * @LastEditTime: 2025-02-21 14:07:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,25 +36,21 @@ import lombok.experimental.Accessors;
  7. 接入率：今日累计已已接入会话与总会话数的比值
  8. 满意率：满意数量与评价总量的比值
  9. 参评率： 今日参加评价的数量与接入会话数量的比值
- 2. 当前在线客服数：当前处于可接待状态的客服数量
-
- 1. 坐席当前接待数量
- 2. 当前渠道接待人数
-
- // 后备指标：
- 转接量：转出会话的数量，转出的会话不计入接入会话数中
- 客服邀请量：客服邀请其他客服，并成功加入会话的数量
- 访客邀请量：客服主动邀请访客，并成功加入会话的数量
- 接待人数：区别于会话量，1个访客可以对应多个会话
+ 10. 当前在线客服数：当前处于可接待状态的客服数量
+ 11. 坐席当前接待数量
+ 12. 当前渠道接待人数
+ 13. 转接量：转出会话的数量，转出的会话不计入接入会话数中
+ 14. 客服邀请量：客服邀请其他客服，并成功加入会话的数量
+ 15. 访客邀请量：客服主动邀请访客，并成功加入会话的数量
+ 16. 接待人数：区别于会话量，1个访客可以对应多个会话
 
  //
- 周报/月报：从咨询维度，查询每个客服的详细数据。
  数量统计：咨询总量、有效咨询、无效咨询、接通率、已总结咨询数、客服消息条数、会话回合数；
  时间统计：平均首响时间、平均响应时间、平均咨询用时、最长响应时间、最短响应时间；
  客服往来明细：从咨询维度，查询每个客服的详细数据，包含转接、邀请等多人会话的详细数据
- pv、uv：以折线图、表格的形式，按照时间、访客来源的维度统计pv、uv
+ 访客来源统计：以折线图、表格的形式，按照时间、访客来源的维度统计pv、uv
 
-// 在线技能组监控, https://tech.antfin.com/docs/2/92734
+// 在线技能组监控
 技能组：技能组名称。
 对话中用户数量：正在对话中的用户数。
 请求最长等待时间：客户请求转人工到成功转到人工最长等待的时间。
@@ -70,7 +66,7 @@ import lombok.experimental.Accessors;
 放弃量：排队中中途放弃的量。
 放弃率：排队中中途放弃的量/流入量
 
-// 在线坐席监控, https://tech.antfin.com/docs/2/92735
+// 在线坐席监控
 姓名：坐席的姓名。
 工号：坐席的工号。
 工位号：登录时选择的物理位置。
