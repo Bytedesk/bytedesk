@@ -156,6 +156,9 @@ services:
       # SPRING_AI_VECTORSTORE_REDIS_URI: redis://:qfRxz3tVT8Nh@redis-bytedesk:6379
       SPRING_AI_VECTORSTORE_REDIS_INDEX_NAME: bytedesk_vs_index
       # SPRING_AI_VECTORSTORE_REDIS_PREFIX: bytedesk_vs_prefix:
+      # mcp
+      SPRING_AI_MCP_CLIENT_ENABLED: false
+      SPRING_AI_MCP_SERVER_ENABLED: false
       # wechat config
       WECHAT_PAY_ENABLED: false
     ports:
