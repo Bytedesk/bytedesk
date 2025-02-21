@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 09:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 17:03:59
+ * @LastEditTime: 2025-02-22 07:35:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,14 @@ import lombok.experimental.Accessors;
 /**
  * 客服对话统计数据：
  * 组织、工作组、客服、机器人
+ * 
+ * 可监控机器人的服务关键数据，包含解决率、评价满意度、服务转人工率、未知回答率、有效会话、当前生效知识等关键运营指标，可点击“详细指标”快速跳转至数据看板页面。
+ * 可对客服进行监控，监控今日会话总数、待处理会话数、处理中会话数、今日已处理会话数、今日已完成会话数、留言数。
+ * 可对客服组进行监控，监控客服组登录坐席、开启自动领取坐席数、空闲坐席数、领取会话数、已处理会话数、流失会话数、留言数。
+ * 可监控客服当日登录状态、会话总数、会话状态、已处理会话数、转出会话数、已完成会话数、留言数。
+ * 可对客服会话情况、坐席状态等进行数据量化图表趋势、占比等监控。
+ * 支持整合各个模块的相关数据，并通过多维度数据统计，一屏展示相关内容，辅助管理人员随时掌握平台情况。
+ * 支持自定义报表样式、生成周期、生成方式等，以达到更高的效率。
  */
 @Entity
 @Data
