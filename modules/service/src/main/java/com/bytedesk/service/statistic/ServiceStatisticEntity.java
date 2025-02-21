@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 09:17:39
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 14:07:07
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-21 14:31:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,63 +25,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- 数据总览:
- 实时的写到redis，定时同步到mysql
-
- 1. 正在接待人数： 当前正在咨询的访客数量
- 3. 当前排队人数：当前处于排队状态的访客数量
- 5. 会话量：本日累计的会话数量，包含了访客来访和客服主动发起会话两种
- 6. 未接入会话量：放弃排队的数量
- 7. 接入率：今日累计已已接入会话与总会话数的比值
- 8. 满意率：满意数量与评价总量的比值
- 9. 参评率： 今日参加评价的数量与接入会话数量的比值
- 10. 当前在线客服数：当前处于可接待状态的客服数量
- 11. 坐席当前接待数量
- 12. 当前渠道接待人数
- 13. 转接量：转出会话的数量，转出的会话不计入接入会话数中
- 14. 客服邀请量：客服邀请其他客服，并成功加入会话的数量
- 15. 访客邀请量：客服主动邀请访客，并成功加入会话的数量
- 16. 接待人数：区别于会话量，1个访客可以对应多个会话
-
- //
- 数量统计：咨询总量、有效咨询、无效咨询、接通率、已总结咨询数、客服消息条数、会话回合数；
- 时间统计：平均首响时间、平均响应时间、平均咨询用时、最长响应时间、最短响应时间；
- 客服往来明细：从咨询维度，查询每个客服的详细数据，包含转接、邀请等多人会话的详细数据
- 访客来源统计：以折线图、表格的形式，按照时间、访客来源的维度统计pv、uv
-
-// 在线技能组监控
-技能组：技能组名称。
-对话中用户数量：正在对话中的用户数。
-请求最长等待时间：客户请求转人工到成功转到人工最长等待的时间。
-平均满意度：满意量/参评量。
-平均对话时长：总对话时长/对话量。
-在线人数：状态为在线的客服数量。
-离线中人数：状态为离线的客服数量。
-当前排队量：申请转人工但还没有成功转入人工的客户数量。
-总接通量：成功对话的总量。
-接通率：成功接通的量/流入量。
-转接量：操作转接数量。
-转接率：操作转接数量/总接通量。
-放弃量：排队中中途放弃的量。
-放弃率：排队中中途放弃的量/流入量
-
-// 在线坐席监控
-姓名：坐席的姓名。
-工号：坐席的工号。
-工位号：登录时选择的物理位置。
-当前状态：分为在线和离线。
-对话中用户数：正在对话中的用户数量。
-累计应答量：今日累计服务的用户数。
-主动转接量：主动转接给其他坐席的对话量。
-超时转接量：回复超时，自动转接到其他客服的会话数量。
-平均满意度：满意度/应答量。
-平均对话时长：总对话时长/应答量。
-离线时间：最近一次的离线时间点。
-离线时长：离线状态的时间总和。
-今日首次上线时间：今日首次上线的时间点。
-累计上线时长：在线状态的时间总和。
-*/
 
 /**
  * 客服对话统计数据：
@@ -96,110 +39,170 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "bytedesk_service_statistic", uniqueConstraints = {
     @UniqueConstraint(
-        columnNames = {"orgUid", "workgroupUid", "agentUid",   "robotUid", "date", "hour"},
+        columnNames = {"orgUid", "workgroupUid", "agentUid", "robotUid", "date", "hour"},
         name = "uk_org_uid_workgroup_uid_agent_uid_robot_uid_date_hour"
     )
 })
 public class ServiceStatisticEntity extends BaseEntity {
 
+    //////////////////////////////// 基础会话指标 /////////////////////////////////
     
-     ////////////////////////////// 人工会话数据 ///////////////////////////////
-    // 正在排队人数/会话数
+    // 当前在线客服数量
+    @Builder.Default
+    private int onlineAgentCount = 0;
+    
+    // 当前离线客服数量
+    @Builder.Default
+    private int offlineAgentCount = 0;
+
+    // 当前排队人数
     @Builder.Default
     private int queuingThreadCount = 0;
+    
+    // 当前最长等待时间(秒)
+    @Builder.Default
+    private int maxWaitingTime = 0;
 
-    // 人工正在接待人数
+    // 当前会话数量
     @Builder.Default
     private int currentThreadCount = 0;
 
-    // 人工已接待人数
+    //////////////////////////////// 会话流转指标 /////////////////////////////////
+
+    // 总流入会话量
     @Builder.Default
-    private int totalVisitorCount = 0;
-
-    // 人工已接待会话数
+    private int totalIncomingThreads = 0;
+    
+    // 已接入会话量
     @Builder.Default
-    private int totalThreadCount = 0;
-
-    // 预警会话量
+    private int acceptedThreadCount = 0;
+    
+    // 放弃排队会话量
     @Builder.Default
-    private int warningThreadCount = 0;
-
-    // 待处理留言量
+    private int abandonedThreadCount = 0;
+    
+    // 转接会话量
     @Builder.Default
-    private int unprocessedMessageCount = 0;
-
-    // 当前在线接待客服数
+    private int transferredThreadCount = 0;
+    
+    // 邀请会话量(主动邀请)
     @Builder.Default
-    private Integer onlineAgentCount = 0;
-
-    ///////////////////////////////// 机器人会话数据 ///////////////////////////////
-
-    // 机器人接待人次
+    private int invitedThreadCount = 0;
+    
+    // 超时转接会话量
     @Builder.Default
-    private int robotVisitorCount = 0;
+    private int timeoutTransferCount = 0;
 
-    // 机器人接待会话量
+    //////////////////////////////// 时间指标 /////////////////////////////////
+    
+    // 平均等待时间(秒)
+    @Builder.Default
+    private int avgWaitingTime = 0;
+    
+    // 平均首次响应时间(秒)
+    @Builder.Default
+    private int avgFirstResponseTime = 0;
+    
+    // 平均会话时长(秒)
+    @Builder.Default
+    private int avgConversationTime = 0;
+    
+    // 最长响应时间(秒)
+    @Builder.Default
+    private int maxResponseTime = 0;
+    
+    // 最短响应时间(秒)
+    @Builder.Default
+    private int minResponseTime = 0;
+
+    //////////////////////////////// 质量指标 /////////////////////////////////
+    
+    // 接通率(%) = 已接入会话量/总流入会话量
+    @Builder.Default
+    private double acceptRate = 0.0;
+    
+    // 放弃率(%) = 放弃排队会话量/总流入会话量
+    @Builder.Default
+    private double abandonRate = 0.0;
+    
+    // 转接率(%) = 转接会话量/已接入会话量
+    @Builder.Default
+    private double transferRate = 0.0;
+    
+    // 满意度评价总数
+    @Builder.Default
+    private int totalRatingCount = 0;
+    
+    // 满意评价数
+    @Builder.Default
+    private int satisfiedRatingCount = 0;
+    
+    // 满意率(%) = 满意评价数/评价总数
+    @Builder.Default
+    private double satisfactionRate = 0.0;
+    
+    // 参评率(%) = 评价总数/已接入会话量
+    @Builder.Default
+    private double ratingRate = 0.0;
+
+    //////////////////////////////// 消息指标 /////////////////////////////////
+    
+    // 客服发送消息数
+    @Builder.Default
+    private int agentMessageCount = 0;
+    
+    // 访客发送消息数 
+    @Builder.Default
+    private int visitorMessageCount = 0;
+    
+    // 平均会话消息数
+    @Builder.Default
+    private int avgMessagePerThread = 0;
+
+    //////////////////////////////// 机器人指标 /////////////////////////////////
+    
+    // 机器人会话量
     @Builder.Default
     private int robotThreadCount = 0;
-
-    //////////////////////////////////// 绩效考核指标//////////////////////////////
-
-    // 3分钟人工回复率
+    
+    // 机器人转人工量
     @Builder.Default
-    private int threeMinuteReplyRate = 0;
-
-    // 平均人工首次响应时长
+    private int robotToHumanCount = 0;
+    
+    // 机器人问题解决率(%)
     @Builder.Default
-    private int firstResponseTime = 0;
+    private double robotSolveRate = 0.0;
 
-    // 平均人工响应时长
+    //////////////////////////////// 工作量指标 /////////////////////////////////
+    
+    // 在线时长(秒)
     @Builder.Default
-    private int averageResponseTime = 0;
-
-    // 平均人工服务时长
+    private int onlineTime = 0;
+    
+    // 忙碌时长(秒)
     @Builder.Default
-    private int averageServiceTime = 0;
-
-    // 评价满意率
+    private int busyTime = 0;
+    
+    // 离线时长(秒)
     @Builder.Default
-    private int rateSatisfactionRate = 0;
+    private int offlineTime = 0;
 
-    // 问题解决率
+    //////////////////////////////// 统计维度 /////////////////////////////////
+
+    // 统计类型: ORG/WORKGROUP/AGENT/ROBOT
     @Builder.Default
-    private int problemSolveRate = 0;
+    private String type = ServiceStatisticTypeEnum.ORG.name();
 
-    //////////////////////////////////// 工单数据 ////////////////////////////////
+    private String workgroupUid;
+    private String agentUid; 
+    private String robotUid;
 
-    // 待分配工单
+    // 统计时间维度
     @Builder.Default
-    private int unassignedTicketCount = 0;
+    private int hour = 0;
+    private String date;
 
-    // 处理中工单
-    @Builder.Default
-    private int processingTicketCount = 0;
-
-    // 已完成工单
-    @Builder.Default
-    private int completedTicketCount = 0;
-
-    ///////////////////////////////////////////////////////////////////////////
-
-    // // 会话量：本日累计的会话数量，包含了访客来访和客服主动发起会话两种
-    // private Long threadCount;
-
-    // 未接入会话量：放弃排队的数量
-    // private Long unattendedThreadCount;
-
-    // 接入率：今日累计已已接入会话与总会话数的比值
-    // private Double attendeeRate;
-
-    // 满意度：满意数量与评价总量的比值
-    // private Double satisfactionRate;
-
-    // 参评率： 今日参加评价的数量与接入会话数量的比值
-    // private Double evaluationRate;
-
-    ///////////////////////////////////////////////////////////////////////////
+    //////////////////////////////// 辅助方法 /////////////////////////////////
 
     public void incrementThreadCount() {
         this.currentThreadCount++;
@@ -209,27 +212,26 @@ public class ServiceStatisticEntity extends BaseEntity {
         this.currentThreadCount--;
     }
 
-    // 统计类型，org/workgroup/agent/robot
-    @Builder.Default
-    private String type = ServiceStatisticTypeEnum.ORG.name();
-
-    // 工作组uid
-    private String workgroupUid;
-
-    // 客服uid
-    private String agentUid;
-
-    // 机器人uid
-    private String robotUid;
-
-    // 组织uid, 在baseEntity中
-    // private String orgUid;
-
-    // 最细统计粒度，用于展示当天工单趋势变化
-    @Builder.Default
-    private int hour = 0;
-
-    // 日期，每个orgUid，每个日期一个统计
-    private String date;
-
+    // 计算各类率值
+    public void calculateRates() {
+        // 接通率
+        this.acceptRate = totalIncomingThreads > 0 ? 
+            (double) acceptedThreadCount / totalIncomingThreads * 100 : 0;
+            
+        // 放弃率
+        this.abandonRate = totalIncomingThreads > 0 ?
+            (double) abandonedThreadCount / totalIncomingThreads * 100 : 0;
+            
+        // 转接率
+        this.transferRate = acceptedThreadCount > 0 ?
+            (double) transferredThreadCount / acceptedThreadCount * 100 : 0;
+            
+        // 满意率
+        this.satisfactionRate = totalRatingCount > 0 ?
+            (double) satisfiedRatingCount / totalRatingCount * 100 : 0;
+            
+        // 参评率
+        this.ratingRate = acceptedThreadCount > 0 ?
+            (double) totalRatingCount / acceptedThreadCount * 100 : 0;
+    }
 }
