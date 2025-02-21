@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-17 17:09:31
+ * @Date: 2024-06-23 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 15:03:22
+ * @LastEditTime: 2024-08-05 18:18:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,22 +11,14 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.statistic;
+package com.bytedesk.service.thread_transfer;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ServiceStatisticRepository extends JpaRepository<ServiceStatisticEntity, Long>, JpaSpecificationExecutor<ServiceStatisticEntity> {
-
-    Optional<ServiceStatisticEntity> findByOrgUidAndDateAndHour(String orgUid, String date, int hour);
-
-    Optional<ServiceStatisticEntity> findByWorkgroupUidAndDateAndHour(String workgroupUid, String date, int hour);
-
-    Optional<ServiceStatisticEntity> findByAgentUidAndDateAndHour(String agentUid, String date, int hour);
-
-    Optional<ServiceStatisticEntity> findByRobotUidAndDateAndHour(String robotUid, String date, int hour);
+public interface ThreadTransferRepository extends JpaRepository<ThreadTransferEntity, Long>, JpaSpecificationExecutor<ThreadTransferEntity> {
     
-    
+    Optional<ThreadTransferEntity> findByUid(String uid);
 }

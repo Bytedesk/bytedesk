@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-17 17:09:31
+ * @Date: 2024-09-11 11:15:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 15:03:22
+ * @LastEditTime: 2024-09-19 16:09:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,22 +11,11 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.statistic;
-
-import java.util.Optional;
+package com.bytedesk.service.agent_status;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ServiceStatisticRepository extends JpaRepository<ServiceStatisticEntity, Long>, JpaSpecificationExecutor<ServiceStatisticEntity> {
-
-    Optional<ServiceStatisticEntity> findByOrgUidAndDateAndHour(String orgUid, String date, int hour);
-
-    Optional<ServiceStatisticEntity> findByWorkgroupUidAndDateAndHour(String workgroupUid, String date, int hour);
-
-    Optional<ServiceStatisticEntity> findByAgentUidAndDateAndHour(String agentUid, String date, int hour);
-
-    Optional<ServiceStatisticEntity> findByRobotUidAndDateAndHour(String robotUid, String date, int hour);
-    
+public interface AgentStatusLogRepository extends JpaRepository<AgentStatusLogEntity, Long>, JpaSpecificationExecutor<AgentStatusLogEntity> {
     
 }

@@ -21,7 +21,7 @@ public enum QueueMemberStatusEnum {
     WAITING("waiting"),         // 等待中
     SERVING("serving"),         // 正在服务
     COMPLETED("completed"),     // 已完成
-    CANCELLED("cancelled"),     // 已取消(访客取消)
+    ABANDONED("abandoned"),     // 已放弃
     TIMEOUT("timeout"),         // 已超时
     REJECTED("rejected");       // 已拒绝(无可用客服)
     
@@ -39,7 +39,7 @@ public enum QueueMemberStatusEnum {
      * 检查是否是结束状态
      */
     public boolean isEndStatus() {
-        return this == COMPLETED || this == CANCELLED || 
+        return this == COMPLETED || this == ABANDONED || 
                this == TIMEOUT || this == REJECTED;
     }
     
