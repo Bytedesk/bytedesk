@@ -7,17 +7,14 @@ import java.util.HashMap;
 import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.time.format.DateTimeFormatter;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.scheduling.annotation.Scheduled;
-
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
 import com.bytedesk.service.agent_status.AgentStatusLogEntity;
@@ -27,52 +24,54 @@ import com.bytedesk.service.rating.RatingRepository;
 import com.bytedesk.service.thread_transfer.ThreadTransferEntity;
 import com.bytedesk.service.thread_transfer.ThreadTransferRepository;
 import com.bytedesk.service.thread_transfer.ThreadTransferTypeEnum;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ServiceStatisticService {
     
-    @Autowired
-    private ServiceStatisticRepository serviceStatisticRepository;
+    private final ServiceStatisticRepository serviceStatisticRepository;
 
-    @Autowired
-    private QueueMemberRepository queueMemberRepository;
+    private final QueueMemberRepository queueMemberRepository;
     
-    @Autowired
-    private AgentRepository agentRepository;
+    private final AgentRepository agentRepository;
     
-    @Autowired
-    private AgentStatusLogRepository agentStatusLogRepository;
+    private final AgentStatusLogRepository agentStatusLogRepository;
     
-    @Autowired
-    private RatingRepository ratingRepository;
+    private final RatingRepository ratingRepository;
     
-    @Autowired
-    private ThreadTransferRepository threadTransferRepository;
+    private final ThreadTransferRepository threadTransferRepository;
 
-    // 添加定时任务支持
-    @Scheduled(cron = "0 0 * * * *") // 每小时执行
-    public void hourlyStatistic() {
-        // TODO: 获取所有需要统计的组织
-        List<String> orgUids = new ArrayList<>();
-        String date = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-        int hour = LocalDateTime.now().getHour();
+    private final OrganizationRepository organizationRepository;
+
+    private final WorkgroupRepository workgroupRepository;
+
+
+    public void calculateTodayStatistics() {
         
-        for (String orgUid : orgUids) {
-            calculateAndUpdateStatistic(orgUid, date, hour);
+        // 当日凌晨，到当前时间
+        LocalDateTime startTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endTime = LocalDateTime.now();
+
+        // 计算组织统计
+        List<OrganizationEntity> organizations = organizationRepository.findAll();
+        for (OrganizationEntity organization : organizations) {
+            // calculateOrgStatistics(organization.getUid(), startTime, endTime, true);
         }
-    }
-    
-    @Scheduled(cron = "0 0 0 * * *") // 每天零点执行
-    public void dailyStatistic() {
-        // TODO: 获取所有需要统计的组织
-        List<String> orgUids = new ArrayList<>();
-        String date = LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
-        
-        for (String orgUid : orgUids) {
-            // 汇总前一天24小时的数据
-            for (int hour = 0; hour < 24; hour++) {
-                calculateAndUpdateStatistic(orgUid, date, hour);
-            }
+
+        // 计算工作组统计
+        List<WorkgroupEntity> workgroups = workgroupRepository.findAll();
+        for (WorkgroupEntity workgroup : workgroups) {
+            // calculateWorkgroupStatistics(workgroup.getUid(), workgroup.getOrgUid(), startTime, endTime, true);
+        }
+
+        // 计算处理人统计
+        List<AgentEntity> agents = agentRepository.findAll();
+        for (AgentEntity agent : agents) {
+            // calculateAssigneeStatistics(agent.getUid(), agent.getOrgUid(), startTime, endTime, true);
         }
     }
 
@@ -80,10 +79,14 @@ public class ServiceStatisticService {
      * 计算并更新统计数据
      */
     @Transactional
-    public void calculateAndUpdateStatistic(String orgUid, String date, int hour) {
+    public void calculateAndUpdateStatistic(String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean shouldSave) {
         // 计算时间范围
-        LocalDateTime startTime = LocalDateTime.parse(date + "T" + String.format("%02d:00:00", hour));
-        LocalDateTime endTime = startTime.plusHours(1);
+        // LocalDateTime startTime = LocalDateTime.parse(date + "T" + String.format("%02d:00:00", hour));
+        // LocalDateTime endTime = startTime.plusHours(1);
+        // 当前日期
+        String date = BdDateUtils.formatToday();
+        // 获取当前小时
+        int hour = LocalDateTime.now().getHour();
 
         // 获取或创建统计实体
         ServiceStatisticEntity statistic = serviceStatisticRepository
@@ -516,4 +519,6 @@ public class ServiceStatisticService {
             statistic.setRobotSolveRate(solveRate);
         }
     }
+
+
 }

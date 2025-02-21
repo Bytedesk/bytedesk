@@ -173,13 +173,15 @@ public class TicketStatisticService {
             LocalDateTime endTime,
             String type,
             boolean shouldSave) {
-
+        
+        // 当前日期
+        String date = BdDateUtils.formatToday();
         // 获取当前小时
         int hour = LocalDateTime.now().getHour();
         // 根据orgUid、workgroupUid/assigneeUid、date判断是否已经存在
         Optional<TicketStatisticEntity> statisticOptional = statisticRepository
             .findByTypeAndOrgUidAndWorkgroupUidAndAssigneeUidAndDateAndHour(
-                type, orgUid, workgroupUid, assigneeUid, BdDateUtils.formatToday(), hour);
+                type, orgUid, workgroupUid, assigneeUid, date, hour);
 
         TicketStatisticEntity statistic;
         if (statisticOptional.isPresent()) {
