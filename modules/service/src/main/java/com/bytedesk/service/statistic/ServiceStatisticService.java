@@ -3,6 +3,7 @@ package com.bytedesk.service.statistic;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
+import java.util.Optional;
 import java.util.HashMap;
 import java.util.Comparator;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRepository;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
@@ -53,6 +55,8 @@ public class ServiceStatisticService {
     private final WorkgroupRepository workgroupRepository;
 
     private final RobotRepository robotRepository;
+
+    private final UidUtils uidUtils;
 
     /**
      * 查询某时间段统计
@@ -182,18 +186,37 @@ public class ServiceStatisticService {
         int hour = LocalDateTime.now().getHour();
 
         // 获取或创建统计实体
-        ServiceStatisticEntity statistic = serviceStatisticRepository
+        // ServiceStatisticEntity statistic = serviceStatisticRepository
+        //     .findByTypeAndOrgUidAndWorkgroupUidAndAgentUidAndRobotUidAndDateAndHour(
+        //         type, orgUid, workgroupUid, agentUid, robotUid, date, hour)
+        //     .orElse(ServiceStatisticEntity.builder()
+        //         .type(type)
+        //         .workgroupUid(workgroupUid)
+        //         .agentUid(agentUid)
+        //         .robotUid(robotUid)
+        //         .date(date)
+        //         .hour(hour)
+        //         .build());
+        // statistic.setOrgUid(orgUid);
+
+        ServiceStatisticEntity statistic = null;
+        Optional<ServiceStatisticEntity> statisticOptional = serviceStatisticRepository
             .findByTypeAndOrgUidAndWorkgroupUidAndAgentUidAndRobotUidAndDateAndHour(
-                type, orgUid, workgroupUid, agentUid, robotUid, date, hour)
-            .orElse(ServiceStatisticEntity.builder()
+                type, orgUid, workgroupUid, agentUid, robotUid, date, hour);
+        if (statisticOptional.isPresent()) {
+            statistic = statisticOptional.get();
+        } else {
+            statistic = ServiceStatisticEntity.builder()
                 .type(type)
                 .workgroupUid(workgroupUid)
                 .agentUid(agentUid)
                 .robotUid(robotUid)
                 .date(date)
                 .hour(hour)
-                .build());
-        statistic.setOrgUid(orgUid);
+                .build();
+            statistic.setUid(uidUtils.getUid());
+            statistic.setOrgUid(orgUid);
+        }
 
         // 获取相关数据
         List<QueueMemberEntity> queueMembers = queueMemberRepository.findByOrgUidAndWorkgroupUidAndAgentUidAndCreatedAtBetween(orgUid, workgroupUid, agentUid, startTime, endTime);
