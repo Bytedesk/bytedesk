@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-09-11 09:17:05
+ * @Date: 2024-09-21 12:00:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-23 10:16:50
+ * @LastEditTime: 2024-09-21 12:00:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,14 +11,8 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.statistic_agent;
+package com.bytedesk.kbase.statistic;
 
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
-public interface StatisticAgentRepository extends JpaRepository<StatisticAgentEntity, Long>, JpaSpecificationExecutor<StatisticAgentEntity> {
+public class StatisticKbaseRequest {
     
-    Optional<StatisticAgentEntity> findByAgentUidAndDate(String agentUid, String date);
 }
