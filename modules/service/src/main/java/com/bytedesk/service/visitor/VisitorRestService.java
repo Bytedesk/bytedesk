@@ -35,7 +35,7 @@ import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.strategy.CsThreadCreationContext;
-import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -197,7 +197,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     @Override
     public VisitorResponse convertToResponse(VisitorEntity entity) {
-        return ConvertServiceUtils.convertToVisitorResponse(entity);
+        return ServiceConvertUtils.convertToVisitorResponse(entity);
     }
 
     public String getAvatar(String client) {

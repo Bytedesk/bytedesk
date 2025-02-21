@@ -38,7 +38,7 @@ import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
-import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -168,7 +168,7 @@ public class RouteService {
             // 保存留言消息
             messageRestService.save(message);
             // 返回留言消息
-            return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+            return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
         }
     }
 
@@ -213,7 +213,7 @@ public class RouteService {
                 // 
                 thread.setOwner(agent.getMember().getUser());
                 // 
-                UserProtobuf agentProtobuf = ConvertServiceUtils.convertToUserProtobuf(agent);
+                UserProtobuf agentProtobuf = ServiceConvertUtils.convertToUserProtobuf(agent);
                 thread.setAgent(JSON.toJSONString(agentProtobuf));
                 thread.setRobot(false);
                 // 
@@ -267,7 +267,7 @@ public class RouteService {
         // 保存留言消息
         messageRestService.save(message);
             // 返回留言消息
-            return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+            return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
 

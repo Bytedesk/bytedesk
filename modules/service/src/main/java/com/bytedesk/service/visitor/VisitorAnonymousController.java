@@ -32,7 +32,7 @@ import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.service.utils.ConvertServiceUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -79,7 +79,7 @@ public class VisitorAnonymousController {
             visitorRequest.setNickname(ipService.createVisitorNickname(httpRequest));
         }
         VisitorResponse visitor = visitorService.create(visitorRequest);
-        UserProtobuf user = ConvertServiceUtils.convertToUserProtobuf(visitor);
+        UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(visitor);
         //
         return ResponseEntity.ok(JsonResult.success(user));
     }
