@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 13:41:21
+ * @LastEditTime: 2025-02-22 15:38:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -98,6 +98,28 @@ public class FaqEntity extends BaseEntity {
     private String docUid; // 对应文档
 
     private String fileUid; // 对应文件
+
+    // 是否是常见问题/
+    @Builder.Default
+    private boolean isCommon = false;
+
+    // 是否是快捷按钮
+    @Builder.Default
+    private boolean isShortcut = false;
+
+    // 是否是猜你相问
+    @Builder.Default
+    private boolean isGuess = false;
+
+    // 是否是热门问题
+    @Builder.Default
+    private boolean isHot = false;
+
+    // 是否是快捷路径
+    @Builder.Default
+    private boolean isShortcutPath = false;
+
+    
 
     public void up() {
         this.setUpCount(this.upCount + 1);
