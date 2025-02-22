@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 12:33:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 12:37:46
+ * @LastEditTime: 2025-02-22 13:17:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,9 @@ import org.springframework.context.annotation.Primary;
 
 /**
  * http://127.0.0.1:9003/doc.html#/home
+ * 
+ * https://doc.xiaominfo.com/docs/quick-start
+ * https://github.com/xiaoymin/knife4j?tab=readme-ov-file
  */
 @Configuration
 public class Knife4jConfig {
@@ -35,6 +38,28 @@ public class Knife4jConfig {
     
     @Value("${server.port}")
     private String port;
+
+    /**
+     * 根据@Tag 上的排序，写入x-order
+     *
+     * @return the global open api customizer
+     */
+    // @Bean
+    // public GlobalOpenApiCustomizer orderGlobalOpenApiCustomizer() {
+    //     return openApi -> {
+    //         if (openApi.getTags()!=null){
+    //             openApi.getTags().forEach(tag -> {
+    //                 Map<String,Object> map=new HashMap<>();
+    //                 map.put("x-order", RandomUtil.randomInt(0,100));
+    //                 tag.setExtensions(map);
+    //             });
+    //         }
+    //         if(openApi.getPaths()!=null){
+    //             openApi.addExtension("x-test123","333");
+    //             openApi.getPaths().addExtension("x-abb",RandomUtil.randomInt(1,100));
+    //         }
+    //     };
+    // }
     
     @Bean
 	@Primary
