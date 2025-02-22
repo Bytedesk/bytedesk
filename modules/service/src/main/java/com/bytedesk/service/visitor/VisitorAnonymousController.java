@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.bytedesk.core.apilimit.ApiRateLimiter;
+
+import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
