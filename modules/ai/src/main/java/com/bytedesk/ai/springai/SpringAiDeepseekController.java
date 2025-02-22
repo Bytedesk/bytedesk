@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 09:36:29
+ * @LastEditTime: 2025-02-22 10:55:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import reactor.core.publisher.Flux;
  * https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-openai/src/test/java/org/springframework/ai/openai/chat/proxy/DeepSeekWithOpenAiChatModelIT.java
  */
 @RestController
-@RequestMapping("/deepseek")
+@RequestMapping("/springai/deepseek")
 @RequiredArgsConstructor
 public class SpringAiDeepseekController {
     
@@ -49,13 +49,13 @@ public class SpringAiDeepseekController {
     // spring.ai.openai.embedding.enabled=false
     private final OpenAiChatModel deepSeekChatModel;
 
-    // http://127.0.0.1:9003/deepseek/ai/generate?message=hello
+    // http://127.0.0.1:9003/springai/deepseek/ai/generate?message=hello
     @GetMapping("/ai/generate")
     public ResponseEntity<JsonResult<?>> generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         return ResponseEntity.ok(JsonResult.success(this.deepSeekChatModel.call(message)));
     }
 
-    // http://127.0.0.1:9003/deepseek/ai/generateStream?message=hello
+    // http://127.0.0.1:9003/springai/deepseek/ai/generateStream?message=hello
     @GetMapping("/ai/generateStream")
     public Flux<ChatResponse> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));

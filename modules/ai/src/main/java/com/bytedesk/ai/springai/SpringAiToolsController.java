@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 10:22:09
+ * @LastEditTime: 2025-02-22 10:56:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/tools")
+@RequestMapping("/springai/tools")
 @RequiredArgsConstructor
 public class SpringAiToolsController {
 
@@ -59,7 +59,7 @@ public class SpringAiToolsController {
 
     // private final ChatClient deepSeekChatClient;
 
-    // http://127.0.0.1:9003/tools/time?message=
+    // http://127.0.0.1:9003/springai/tools/time?message=
     // get current date and time
     @GetMapping("/time")
     public ResponseEntity<JsonResult<?>> time(
@@ -83,7 +83,7 @@ public class SpringAiToolsController {
     }
 
     // set alarm
-    // http://127.0.0.1:9003/tools/alarm?message=
+    // http://127.0.0.1:9003/springai/tools/alarm?message=
     @GetMapping("/alarm")
     public ResponseEntity<JsonResult<?>> alarm(
             @RequestParam(value = "message", defaultValue = "Can you set an alarm 10 minutes from now?") String message) {
@@ -99,7 +99,7 @@ public class SpringAiToolsController {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // http://127.0.0.1:9003/tools/method-tool-callback?message=
+    // http://127.0.0.1:9003/springai/tools/method-tool-callback?message=
     @GetMapping("/method-tool-callback")
     public ResponseEntity<JsonResult<?>> methodToolCallback(
             @RequestParam(value = "message", defaultValue = "What is the current date and time?") String message) {
@@ -124,7 +124,7 @@ public class SpringAiToolsController {
     }
 
     // weather 
-    // http://127.0.0.1:9003/tools/weather?message=
+    // http://127.0.0.1:9003/springai/tools/weather?message=
     // https://docs.spring.io/spring-ai/reference/api/tools.html#_programmatic_specification_functiontoolcallback
     @GetMapping("/weather")
     public ResponseEntity<JsonResult<?>> weather(

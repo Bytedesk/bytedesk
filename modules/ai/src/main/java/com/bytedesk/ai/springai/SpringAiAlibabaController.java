@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 09:14:08
+ * @LastEditTime: 2025-02-22 10:55:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
  * https://bailian.console.aliyun.com/?apiKey=1#/api-key
  */
 @RestController
-@RequestMapping("/alibaba")
+@RequestMapping("/springai/alibaba")
 @RequiredArgsConstructor
 public class SpringAiAlibabaController {
 
@@ -51,7 +51,7 @@ public class SpringAiAlibabaController {
 
 	/**
 	 * ChatClient 简单调用
-	 * http://127.0.0.1:9003/alibaba/simple/chat?query=
+	 * http://127.0.0.1:9003/springai/alibaba/simple/chat?query=
 	 */
 	@GetMapping("/simple/chat")
 	public ResponseEntity<?> simpleChat(
@@ -64,7 +64,7 @@ public class SpringAiAlibabaController {
 
 	/**
 	 * ChatClient 流式调用
-	 * http://127.0.0.1:9003/alibaba/stream/chat?query=
+	 * http://127.0.0.1:9003/springai/alibaba/stream/chat?query=
 	 */
 	@GetMapping("/stream/chat")
 	public Flux<String> streamChat(@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？") String query,
@@ -78,9 +78,9 @@ public class SpringAiAlibabaController {
 	/**
 	 * ChatClient 使用自定义的 Advisor 实现功能增强.
 	 * eg:
-	 * http://127.0.0.1:9003/alibaba/advisor/chat/123?query=你好，我叫牧生，之后的会话中都带上我的名字
+	 * http://127.0.0.1:9003/springai/alibaba/advisor/chat/123?query=你好，我叫牧生，之后的会话中都带上我的名字
 	 * 你好，牧生！很高兴认识你。在接下来的对话中，我会记得带上你的名字。有什么想聊的吗？
-	 * http://127.0.0.1:9003/alibaba/advisor/chat/123?query=我叫什么名字？
+	 * http://127.0.0.1:9003/springai/alibaba/advisor/chat/123?query=我叫什么名字？
 	 * 你叫牧生呀。有什么事情想要分享或者讨论吗，牧生？
 	 */
 	@GetMapping("/advisor/chat/{id}")
