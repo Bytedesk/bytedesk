@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 14:31:02
+ * @LastEditTime: 2025-02-22 16:05:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,11 +34,13 @@ public class TextRequest extends BaseRequest {
 
     private String name;
 
+    // private String content;
+
     // @Builder.Default
     // private String type = TextTypeEnum.CUSTOMER.name();
 
-    @Builder.Default
-    private String color = "red";
+    // @Builder.Default
+    // private String color = "red";
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();

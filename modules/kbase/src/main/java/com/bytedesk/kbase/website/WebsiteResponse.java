@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:18:57
+ * @LastEditTime: 2025-02-22 16:06:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,9 +34,15 @@ public class WebsiteResponse extends BaseResponse {
 
     private String name;
 
+    private String url;
+
+    private String description;
+
     private String type;
 
-    private String color;
+    private String content;
+
+    // private String color;
 
     private LocalDateTime createdAt;
 }
