@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 12:51:36
+ * @LastEditTime: 2025-02-22 09:14:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.provider.vendors.alibaba;
+package com.bytedesk.ai.springai;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +44,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @RestController
 @RequestMapping("/alibaba")
 @RequiredArgsConstructor
-public class AlibabaController {
+public class SpringAiAlibabaController {
 
 	// @Qualifier("dashScopeChatClient") // 不起作用？，只能重命名变量名
 	private final ChatClient dashScopeChatClient;
@@ -97,5 +97,14 @@ public class AlibabaController {
 								.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id)
 								.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
 				.stream().content();
+	}
+
+	// airline ticket
+	@GetMapping("/airline/ticket")
+	public ResponseEntity<?> airlineTicket() {
+
+		
+
+		return ResponseEntity.ok(JsonResult.success("airline ticket"));
 	}
 }

@@ -83,6 +83,7 @@ public class SpringAiOllamaConfig {
         .build();
     }
 
+    @Primary
     @Bean("ollamaChatClientBuilder")
     ChatClient.Builder ollamaChatClientBuilder(OllamaChatModel ollamaChatModel) {
         return ChatClient.builder(ollamaChatModel);
