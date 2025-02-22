@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 13:30:11
+ * @LastEditTime: 2025-02-22 14:47:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,9 +30,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -259,12 +257,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	@Override
 	public Page<UploadResponse> queryByOrg(UploadRequest request) {
-
-		Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-				"updatedAt");
+		Pageable pageable = request.getPageable();
 		Specification<UploadEntity> specification = UploadSpecification.search(request);
 		Page<UploadEntity> page = uploadRepository.findAll(specification, pageable);
-
 		return page.map(this::convertToResponse);
 	}
 
