@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 10:54:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 11:42:20
+ * @LastEditTime: 2025-02-22 12:08:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,20 +13,51 @@
  */
 package com.bytedesk.ai.springai.demo.bytedesk;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.ai.springai.demo.bytedesk.SpringAiBytedeskService.FileContent;
+import com.bytedesk.core.utils.JsonResult;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/springai/demo/bytedesk")
+@RequiredArgsConstructor
 public class SpringAiBytedeskController {
 
+    private final SpringAiBytedeskService service;
     
     @GetMapping("/chat")
     public String chat() {
         return "Hello, World!";
     }
+
+    // 获取所有文件
+    // http://127.0.0.1:9003/springai/demo/bytedesk/files
+    @GetMapping("/files")
+    public ResponseEntity<JsonResult<?>> getFiles() {
+
+        List<FileContent> files = service.getAllFiles();
+        
+        return ResponseEntity.ok(JsonResult.success(files));
+    }
+
+    // 获取所有文件夹
+    // http://127.0.0.1:9003/springai/demo/bytedesk/folders
+    @GetMapping("/folders")
+    public ResponseEntity<JsonResult<?>> getFolders() {
+
+        List<String> folders = service.getAllFolders();
+        
+        return ResponseEntity.ok(JsonResult.success(folders));
+    }
+    
+    
 }
