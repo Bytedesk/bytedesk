@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 16:50:41
+ * @LastEditTime: 2025-02-22 18:43:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-// import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.kbase.split.SplitStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,6 +47,9 @@ public class TextEntity extends BaseEntity {
     // @Builder.Default
     // @Column(name = "text_type")
     // private String type = MessageTypeEnum.TEXT.name();
+
+    @Builder.Default
+    private String status = SplitStatusEnum.NEW.name();
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
