@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:51:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 14:05:17
+ * @LastEditTime: 2025-02-22 14:06:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bytedesk.core.annotation.UserIp;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +61,11 @@ public class SpringAiAudioController {
 	@UserIp
 	@GetMapping("/text2audio/{prompt}")
 	@Operation(summary = "DashScope Speech Synthesis")
-	public JsonResult<byte[]> textToAudio(@PathVariable("prompt") String prompt) {
+	public JsonResult<?> textToAudio(@PathVariable("prompt") String prompt) {
+
+		if (prompt == null || prompt.isEmpty()) {
+			return JsonResult.error("Prompt is required");
+		}
 
 		byte[] audioData = audioService.text2audio(prompt);
 
