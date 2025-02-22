@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:09:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 09:20:47
+ * @LastEditTime: 2025-02-22 09:23:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,28 +55,27 @@ public class SpringAiConfig {
     // 客服助手
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html#_chat_memory
     @Bean("customerSupportAssistant")
-    public ChatClient customerSupportAssistant(ChatClient.Builder defaultChatClientBuilder, InMemoryChatMemory defaultChatMemory, VectorStore ollamaVectorStore) {
+    public ChatClient customerSupportAssistant(ChatClient.Builder defaultChatClientBuilder,
+            InMemoryChatMemory defaultChatMemory, VectorStore ollamaVectorStore) {
 
         return defaultChatClientBuilder
-            .defaultSystem("""
-                    You are a customer chat support agent of an airline named "Funnair". Respond in a friendly,
-                    helpful, and joyful manner.
+                .defaultSystem("""
+                        You are a customer chat support agent of an airline named "Funnair". Respond in a friendly,
+                        helpful, and joyful manner.
 
-                    Before providing information about a booking or cancelling a booking, you MUST always
-                    get the following information from the user: booking number, customer first name and last name.
+                        Before providing information about a booking or cancelling a booking, you MUST always
+                        get the following information from the user: booking number, customer first name and last name.
 
-                    Before changing a booking you MUST ensure it is permitted by the terms.
+                        Before changing a booking you MUST ensure it is permitted by the terms.
 
-                    If there is a charge for the change, you MUST ask the user to consent before proceeding.
-                    """)
-            .defaultAdvisors(
-                    new MessageChatMemoryAdvisor(defaultChatMemory), // CHAT MEMORY
-                    new QuestionAnswerAdvisor(ollamaVectorStore), // RAG
-                    new SimpleLoggerAdvisor())
-            .defaultTools("getBookingDetails", "changeBooking", "cancelBooking") // FUNCTION CALLING
-            .build();
+                        If there is a charge for the change, you MUST ask the user to consent before proceeding.
+                        """)
+                .defaultAdvisors(
+                        new MessageChatMemoryAdvisor(defaultChatMemory), // CHAT MEMORY
+                        new QuestionAnswerAdvisor(ollamaVectorStore), // RAG
+                        new SimpleLoggerAdvisor())
+                .defaultTools("getBookingDetails", "changeBooking", "cancelBooking") // FUNCTION CALLING
+                .build();
     }
-
-    
 
 }
