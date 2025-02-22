@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 10:54:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 10:54:15
+ * @LastEditTime: 2025-02-22 11:17:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,17 +13,35 @@
  */
 package com.bytedesk.ai.springai.demo;
 
+import java.time.LocalDate;
+
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
+
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+
 @RestController
-@RequestMapping("/springai/airline")
+@RequestMapping("/springai/demo/airline")
+@RequiredArgsConstructor
 public class SpringAiAirlineController {
 
+    private final ChatClient airlineTicketChatClient;
+
     @GetMapping("/chat")
-    public String chat() {
-        return "Hello, World!";
-    }
+    public Flux<String> chat(String chatId, String userMessageContent) {
+
+		return this.airlineTicketChatClient.prompt()
+			.system(s -> s.param("current_date", LocalDate.now().toString()))
+			.user(userMessageContent)
+			.advisors(a -> a.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
+			.stream()
+			.content();
+	}
 
 }

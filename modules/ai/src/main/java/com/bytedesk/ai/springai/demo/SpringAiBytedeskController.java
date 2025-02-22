@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/springai/bytedesk")
+@RequestMapping("/springai/demo/bytedesk")
 public class SpringAiBytedeskController {
 
     @GetMapping("/chat")
