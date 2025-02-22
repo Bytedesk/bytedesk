@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 15:37:27
+ * @LastEditTime: 2025-02-22 16:49:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,9 +53,9 @@ public class WebsiteEntity extends BaseEntity {
     private String content;
 
     // 网站类型
-    @Builder.Default
-    @Column(name = "website_type", nullable = false)
-    private String type = MessageTypeEnum.TEXT.name();
+    // @Builder.Default
+    // @Column(name = "website_type")
+    // private String type = MessageTypeEnum.TEXT.name();
 
     // @Builder.Default
     // @Column(nullable = false)
