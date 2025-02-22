@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 16:07:26
+ * @LastEditTime: 2025-02-22 16:16:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,8 +45,7 @@ public class FileEntity extends BaseEntity {
     private String content;
 
     // 对应 uploadEntity 的 fileUrl
-    @Column(name = "file_url")
-    private String url;
+    private String fileUrl;
 
     @Builder.Default
     @Column(name = "file_type", nullable = false)
