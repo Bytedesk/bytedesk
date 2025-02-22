@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 12:16:43
+ * @LastEditTime: 2025-02-22 14:10:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,7 +103,7 @@ public class SpringAiZhipuaiConfig {
     }
 
     @Bean("zhipuaiImageModel")
-    ZhiPuAiImageModel zhiPuAiImageModel(ZhiPuAiImageApi zhipuaiImageApi) {
+    ZhiPuAiImageModel zhipuaiImageModel(ZhiPuAiImageApi zhipuaiImageApi) {
         return new ZhiPuAiImageModel(zhipuaiImageApi);
     }
 

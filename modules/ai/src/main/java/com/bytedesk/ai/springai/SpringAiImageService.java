@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:53:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 13:57:23
+ * @LastEditTime: 2025-02-22 14:12:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,7 +45,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class SpringAiImageService {
 
-    private final ImageModel imageModel;
+    private final ImageModel dashScopeImageModel;
 
 	private final ChatClient dashScopeChatClient;  
 
@@ -77,7 +77,7 @@ public class SpringAiImageService {
 
 	public void text2Image(String prompt, HttpServletResponse response) {
 
-		ImageResponse imageResponse = imageModel.call(new ImagePrompt(prompt));
+		ImageResponse imageResponse = dashScopeImageModel.call(new ImagePrompt(prompt));
 		String imageUrl = imageResponse.getResult().getOutput().getUrl();
 
 		try {

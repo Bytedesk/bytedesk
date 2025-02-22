@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:52:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 14:08:38
+ * @LastEditTime: 2025-02-22 14:17:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +35,8 @@ public class SpringAiImageController {
 
     private final SpringAiImageService imageService;
 
+
+	// http://127.0.0.1:9003/springai/image/image2text
 	@UserIp
 	@PostMapping("/image2text")
 	@Operation(summary = "DashScope Image Recognition")
@@ -48,11 +49,13 @@ public class SpringAiImageController {
 		return imageService.image2Text(image).map(JsonResult::success);
 	}
 
+
+	// http://127.0.0.1:9003/springai/image/text2Image?prompt=A beautiful sunset over a calm ocean
 	@UserIp
-	@GetMapping("/text2Image/{prompt}")
+	@GetMapping("/text2Image")
 	@Operation(summary = "DashScope Image Generation")
 	public JsonResult<?> text2Image(
-			@PathVariable("prompt") String prompt,
+			@RequestParam(value = "prompt", defaultValue = "A beautiful sunset over a calm ocean") String prompt,
 			HttpServletResponse response
 	) {
 
