@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:51:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 14:06:23
+ * @LastEditTime: 2025-02-22 14:18:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +39,7 @@ public class SpringAiAudioController {
 
 	/**
 	 * audio2text
+	 * http://127.0.0.1:9003/springai/audio/audio2text
 	 * 用于将音频转换为文本输出
 	 */
 	@UserIp
@@ -56,12 +56,13 @@ public class SpringAiAudioController {
 
 	/**
 	 * text2audio
+	 * http://127.0.0.1:9003/springai/audio/text2audio?prompt=Hello, how are you?
 	 * 用于将文本转换为语音输出
 	 */
 	@UserIp
-	@GetMapping("/text2audio/{prompt}")
+	@GetMapping("/text2audio")
 	@Operation(summary = "DashScope Speech Synthesis")
-	public JsonResult<?> textToAudio(@PathVariable("prompt") String prompt) {
+	public JsonResult<?> textToAudio(@RequestParam(value = "prompt", defaultValue = "Hello, how are you?") String prompt) {
 
 		if (prompt == null || prompt.isEmpty()) {
 			return JsonResult.error("Prompt is required");
