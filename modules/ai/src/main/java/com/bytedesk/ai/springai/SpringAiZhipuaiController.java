@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 10:14:35
+ * @LastEditTime: 2025-02-22 10:56:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/zhipuai")
+@RequestMapping("/springai/zhipuai")
 @RequiredArgsConstructor
 public class SpringAiZhipuaiController {
 
@@ -63,13 +63,13 @@ public class SpringAiZhipuaiController {
 
     private final ZhipuaiChatService zhipuaiChatService;
 
-    // http://127.0.0.1:9003/zhipuai/chat?message=hello
+    // http://127.0.0.1:9003/springai/zhipuai/chat?message=hello
     @GetMapping("/chat")
     public ResponseEntity<JsonResult<?>> chat(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         return ResponseEntity.ok(JsonResult.success(zhipuaiChatModel.call(message)));
     }
 
-    // http://127.0.0.1:9003/zhipuai/chatStream?message=hello
+    // http://127.0.0.1:9003/springai/zhipuai/chatStream?message=hello
     @GetMapping("/chatStream")
     public Flux<ChatResponse> chatStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
@@ -77,7 +77,7 @@ public class SpringAiZhipuaiController {
     }
 
     //自定义chat model
-    // http://127.0.0.1:9003/zhipuai/chat/model?message=hello
+    // http://127.0.0.1:9003/springai/zhipuai/chat/model?message=hello
     @GetMapping("/chat/model")
     public ResponseEntity<JsonResult<?>> chatModel(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         ChatResponse response = zhipuaiChatModel.call(
@@ -91,7 +91,7 @@ public class SpringAiZhipuaiController {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // http://127.0.0.1:9003/zhipuai/image
+    // http://127.0.0.1:9003/springai/zhipuai/image
     @GetMapping("/image")
     public ResponseEntity<?> image() {
         ImageResponse response = zhiPuAiImageModel.call(new ImagePrompt("A light cream colored mini golden doodle"));
@@ -101,7 +101,7 @@ public class SpringAiZhipuaiController {
     //
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    // http://127.0.0.1:9003/zhipuai/sse?uid=&sid=&content=hi
+    // http://127.0.0.1:9003/springai/zhipuai/sse?uid=&sid=&content=hi
     @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> sseEndpoint(
             @RequestParam(value = "uid", required = true) String uid,
@@ -133,7 +133,7 @@ public class SpringAiZhipuaiController {
         return ResponseEntity.ok().body(emitter);
     }
 
-    // http://127.0.0.1:9003/zhipuai/sse/test
+    // http://127.0.0.1:9003/springai/zhipuai/sse/test
     @GetMapping(value = "/sse/test", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> sseTest(@RequestParam(value = "q", defaultValue = "讲个笑话") String question) {
         log.info("sseTest question {}", question);
@@ -178,7 +178,7 @@ public class SpringAiZhipuaiController {
         executorService.shutdown();
     }
 
-    // http://127.0.0.1:9003/zhipuai/stream-sse
+    // http://127.0.0.1:9003/springai/zhipuai/stream-sse
     @GetMapping("/stream-sse")
     public void streamSse(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
