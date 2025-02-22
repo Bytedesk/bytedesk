@@ -27,9 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.ai.springai.tool_calling.DateTimeTools;
-import com.bytedesk.ai.springai.tool_calling.WeatherRequest;
-import com.bytedesk.ai.springai.tool_calling.WeatherService;
+import com.bytedesk.ai.springai.tools.DateTimeTools;
+import com.bytedesk.ai.springai.tools.WeatherRequest;
+import com.bytedesk.ai.springai.tools.WeatherService;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
