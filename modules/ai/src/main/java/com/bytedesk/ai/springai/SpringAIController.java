@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 10:04:29
+ * @LastEditTime: 2025-02-22 09:16:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,11 +42,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
 /**
  * spring ai rag
@@ -63,6 +66,8 @@ public class SpringAiController {
         private final VectorStore ollamaRedisVectorStore;
 
         private final ChatModel ollamaChatModel;
+
+        private final ChatClient customerSupportAssistant;
 
         // http://127.0.0.1:9003/spring/ai/completion?message=hello&voice=agent
         // https://docs.spring.io/spring-ai/reference/api/chatclient.html
@@ -379,6 +384,21 @@ public class SpringAiController {
                 return ResponseEntity.ok(JsonResult.success(queryAugmenter));
         }
 
+
+        // 聊天
+        // http://127.0.0.1:9003/spring/ai/chat?chatId=1&userMessageContent=什么时间考试？
+        @GetMapping("/chat")
+        public Flux<String> chat(
+                        @RequestParam(value = "chatId", defaultValue = "1") String chatId,
+                        @RequestParam(value = "userMessageContent", defaultValue = "什么时间考试？") String userMessageContent) {
+
+                return this.customerSupportAssistant.prompt()
+                        .user(userMessageContent)
+                        .advisors(advisor -> advisor
+                                .param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                                .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
+                        .stream().content();
+            }
         
 
 }
