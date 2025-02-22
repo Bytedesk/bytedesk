@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-22 10:54:39
+ * @Date: 2025-02-22 11:37:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 10:57:08
+ * @LastEditTime: 2025-02-22 11:37:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,19 +11,11 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.demo;
+package com.bytedesk.ai.springai.demo.shopping;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Configuration;
 
-@RestController
-@RequestMapping("/springai/demo/bytedesk")
-public class SpringAiBytedeskController {
-
-    @GetMapping("/chat")
-    public String chat() {
-        return "Hello, World!";
-    }
-
+@Configuration
+public class SpringAiShoppingConfig {
+    
 }

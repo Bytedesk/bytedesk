@@ -8,42 +8,42 @@
 
 ## 介绍
 
-### 企业IM
+### [企业IM](./team/readme.zh.md)
 
 - 局域网即时通讯
 - 企业成员管理
 - 聊天记录监控
 - ...
 
-### 全渠道客服
+### [全渠道客服](./service/readme.zh.md)
 
 - 多渠道接入
 - 人工客服
 - 统计报表
 - ...
 
-### 知识库
+### [知识库](./kbase/readme.zh.md)
 
 - 对接大模型L
 - 自定义知识库
 - AI对话
 - ...
 
-### 工单系统
+### [工单系统](./ticket/readme.zh.md)
 
 - 工单管理
 - 工单SLA管理
 - 工单统计和报表
 - ...
 
-### AI 大模型
+### [AI大模型](./ai/readme.zh.md)
 
 - Ollama/DeepSeek/ZhipuAI/...
 - 智能体
 - 工作流
 - ...
 
-### 社交群组
+### [社交群组](./social/readme.zh.md)
 
 - 类似 Discord
 - ...

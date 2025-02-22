@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:09:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 09:23:46
+ * @LastEditTime: 2025-02-22 11:58:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,7 +56,7 @@ public class SpringAiConfig {
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html#_chat_memory
     @Bean("customerSupportAssistant")
     public ChatClient customerSupportAssistant(ChatClient.Builder defaultChatClientBuilder,
-            InMemoryChatMemory defaultChatMemory, VectorStore ollamaVectorStore) {
+            InMemoryChatMemory defaultChatMemory, VectorStore ollamaRedisVectorStore) {
 
         return defaultChatClientBuilder
                 .defaultSystem("""
@@ -72,7 +72,7 @@ public class SpringAiConfig {
                         """)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(defaultChatMemory), // CHAT MEMORY
-                        new QuestionAnswerAdvisor(ollamaVectorStore), // RAG
+                        new QuestionAnswerAdvisor(ollamaRedisVectorStore), // RAG
                         new SimpleLoggerAdvisor())
                 .defaultTools("getBookingDetails", "changeBooking", "cancelBooking") // FUNCTION CALLING
                 .build();
