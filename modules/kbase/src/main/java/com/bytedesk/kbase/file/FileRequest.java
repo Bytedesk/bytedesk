@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:14:28
+ * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 16:02:27
+ * @LastEditTime: 2025-02-22 16:04:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,17 +11,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.text;
+package com.bytedesk.kbase.file;
 
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,30 +24,29 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-@Entity
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_kbase_text")
-public class TextEntity extends BaseEntity {
+public class FileRequest extends BaseRequest {
 
     private String name;
 
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String content;
+    private String url;
 
-    @Builder.Default
-    @Column(name = "text_type", nullable = false)
-    private String type = MessageTypeEnum.TEXT.name();
+    // @Builder.Default
+    // private String color = "red";
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
+
+    // 对应 uploadEntity 的 uid
+    private String uploadUid;
 
     private String userUid;
 }
