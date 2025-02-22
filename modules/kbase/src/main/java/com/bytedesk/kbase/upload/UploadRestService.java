@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-06 11:40:29
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-22 13:30:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,7 +67,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	public UploadResponse create(UploadRequest request) {
 
 		UploadEntity upload = modelMapper.map(request, UploadEntity.class);
-		upload.setUid(uidUtils.getCacheSerialUid());
+		upload.setUid(uidUtils.getUid());
 		// upload.setClient(ClientEnum.fromValue(request.getClient()).name());
 		upload.setClient(request.getClient());
 		// upload.setType(UploadTypeEnum.fromValue(request.getType()).name());

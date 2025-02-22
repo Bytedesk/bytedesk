@@ -161,6 +161,19 @@ services:
       SPRING_AI_MCP_SERVER_ENABLED: false
       # wechat config
       WECHAT_PAY_ENABLED: false
+      # springdoc
+      SPRINGDOC_SHOW_ACTUATOR: false
+      # swagger-ui
+      # http://服务器ip:9003/swagger-ui/index.html
+      SPRINGDOC_SWAGGER_UI_ENABLED: true
+      SPRINGDOC_SWAGGER_UI_PATH: /index.html
+      # api-docs
+      SPRINGDOC_API_DOCS_ENABLED: true
+      SPRINGDOC_API_DOCS_PATH: /v3/api-docs
+      # knife4j
+      #  http://服务器ip:9003/doc.html
+      KNIFE4J_ENABLED: true
+      KNIFE4J_SETTING_LANGUAGE: zh_cn
     ports:
       - 9003:9003
       - 9885:9885
