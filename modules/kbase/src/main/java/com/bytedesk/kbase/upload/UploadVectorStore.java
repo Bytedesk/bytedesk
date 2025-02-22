@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 09:05:59
+ * @LastEditTime: 2025-02-22 18:59:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -254,18 +254,5 @@ public class UploadVectorStore {
 		ollamaRedisVectorStore.delete(docIdList);
 	}
 
-	//
-	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
-	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
-	// public List<String> searchText(String query) {
-	// // Retrieve documents similar to a query
-	// SearchRequest searchRequest = SearchRequest.query(query).withTopK(2);
-	// List<Document> similarDocuments =
-	// vectorStore.similaritySearch(searchRequest);
-	// List<String> contentList =
-	// similarDocuments.stream().map(Document::getContent).toList();
-	// //
-	// return contentList;
-	// }
 
 }

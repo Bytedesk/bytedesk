@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-23 17:02:46
+ * @Date: 2024-03-22 23:07:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 18:56:23
+ * @LastEditTime: 2025-01-09 18:00:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,17 +11,17 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.split;
+package com.bytedesk.service.browse;
 
-public enum SplitTypeEnum {
-    TEXT,
-    FILE,
-    WEBSITE,
-    IMAGE,
-    VIDEO,
-    AUDIO,
-    PDF,
-    DOC,
-    EXCEL,
-    PPT
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface BrowseRepository extends JpaRepository<BrowseEntity, Long>, JpaSpecificationExecutor<BrowseEntity> {
+
+    Optional<BrowseEntity> findByUid(String uid);
+
 }
