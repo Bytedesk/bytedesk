@@ -38,7 +38,7 @@ import lombok.Data;
  */
 @Data
 @Configuration
-public class SpringAiZhipuaiConfig {
+public class SpringAIZhipuaiConfig {
 
     @Value("${spring.ai.zhipuai.api-key:}")
     String zhipuaiApiKey;

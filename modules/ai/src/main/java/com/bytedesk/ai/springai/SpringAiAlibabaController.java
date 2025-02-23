@@ -44,7 +44,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @RestController
 @RequestMapping("/springai/alibaba")
 @RequiredArgsConstructor
-public class SpringAiAlibabaController {
+public class SpringAIAlibabaController {
 
 	// @Qualifier("dashScopeChatClient") // 不起作用？，只能重命名变量名
 	private final ChatClient dashScopeChatClient;

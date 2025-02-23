@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.ai.springai.demo.bytedesk.SpringAiBytedeskService.FileContent;
+import com.bytedesk.ai.springai.demo.bytedesk.SpringAIBytedeskService.FileContent;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/demo/bytedesk")
 @RequiredArgsConstructor
-public class SpringAiBytedeskController {
+public class SpringAIBytedeskController {
 
-    private final SpringAiBytedeskService service;
+    private final SpringAIBytedeskService service;
     
     @GetMapping("/chat")
     public String chat() {

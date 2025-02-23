@@ -31,9 +31,9 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/image")
 @RequiredArgsConstructor
-public class SpringAiImageController {
+public class SpringAIImageController {
 
-    private final SpringAiImageService imageService;
+    private final SpringAIImageService imageService;
 
 
 	// http://127.0.0.1:9003/springai/image/image2text

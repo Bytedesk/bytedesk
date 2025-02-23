@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import com.bytedesk.ai.springai.advisor.BdLoggerAdvisor;
 
 @Configuration
-public class SpringAiAirlineConfig {
+public class SpringAIAirlineConfig {
 
     // https://java2ai.com/docs/1.0.0-M5.1/practices/playground-flight-booking/?spm=4347728f.3651acb5.0.0.491e3bbcfEUpsq
     @Bean("airlineTicketChatClient")

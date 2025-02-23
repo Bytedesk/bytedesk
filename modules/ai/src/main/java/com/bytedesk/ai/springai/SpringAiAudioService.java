@@ -37,7 +37,7 @@ import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
-public class SpringAiAudioService {
+public class SpringAIAudioService {
 
     private final AudioTranscriptionModel transcriptionModel;
 

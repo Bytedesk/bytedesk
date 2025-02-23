@@ -43,7 +43,7 @@ import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
-public class SpringAiImageService {
+public class SpringAIImageService {
 
     private final ImageModel dashScopeImageModel;
 

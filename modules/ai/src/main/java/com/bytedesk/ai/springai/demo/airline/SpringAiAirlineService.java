@@ -16,6 +16,6 @@ package com.bytedesk.ai.springai.demo.airline;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SpringAiAirlineService {
+public class SpringAIAirlineService {
     
 }

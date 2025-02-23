@@ -24,7 +24,7 @@ import io.github.ollama4j.OllamaAPI;
  * https://ollama4j.github.io/ollama4j/intro
  */
 @Configuration
-public class SpringAiOllama4jConfig {
+public class SpringAIOllama4jConfig {
 
     @Value("${spring.ai.ollama.base-url}")
     private String ollamaBaseUrl;

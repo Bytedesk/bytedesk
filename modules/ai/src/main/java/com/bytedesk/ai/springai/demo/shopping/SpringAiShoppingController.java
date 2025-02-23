@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/springai/demo/shopping")
-public class SpringAiShoppingController {
+public class SpringAIShoppingController {
 
     @GetMapping("/chat")
     public String chat() {

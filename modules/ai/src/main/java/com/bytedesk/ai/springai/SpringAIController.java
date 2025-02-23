@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 09:16:11
+ * @LastEditTime: 2025-02-24 00:22:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,7 +59,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/spring/ai")
 @RequiredArgsConstructor
-public class SpringAiController {
+public class SpringAIController {
 
         private final ChatClient defaultChatClient;
 

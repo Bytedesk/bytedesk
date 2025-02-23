@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/tools")
 @RequiredArgsConstructor
-public class SpringAiToolsController {
+public class SpringAIToolsController {
 
     // private final ChatClient defaultChatClient;
     private final ChatClient zhipuaiChatClient;

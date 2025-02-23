@@ -16,6 +16,6 @@ package com.bytedesk.ai.springai.demo.shopping;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SpringAiShoppingService {
+public class SpringAIShoppingService {
     
 }
