@@ -28,8 +28,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
-import com.bytedesk.service.statistic.ServiceStatisticEntity;
-import com.bytedesk.service.statistic.ServiceStatisticResponse;
 import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
@@ -136,9 +134,6 @@ public class ServiceConvertUtils {
         return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
     }
 
-    public static ServiceStatisticResponse convertToServiceStatisticResponse(ServiceStatisticEntity statistic) {
-        return modelMapper.map(statistic, ServiceStatisticResponse.class);
-    }
-
+    
 
 }
