@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 10:14:03
+ * @LastEditTime: 2025-02-24 00:30:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotMessage;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotTypeEnum;
-import com.bytedesk.ai.springai.SpringAiZhipuaiConfig;
+import com.bytedesk.ai.springai.SpringAIZhipuaiConfig;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.message.IMessageSendService;
@@ -72,7 +72,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ZhipuaiChatService {
 
-    private final SpringAiZhipuaiConfig springAiZhipuaiConfig;
+    private final SpringAIZhipuaiConfig springAiZhipuaiConfig;
 
     // TODO: 替换掉
     // https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
