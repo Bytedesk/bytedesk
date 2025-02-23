@@ -159,7 +159,7 @@ services:
       # 阿里云百炼大模型模型列表：
       # https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.11c67980m5X2VR#/model-market
       SPRING_AI_DASHSCOPE_API_KEY: ''
-      SPRING_AI_DASHSCOPE_CHAT_ENABLED: true
+      SPRING_AI_DASHSCOPE_CHAT_ENABLED: false
       SPRING_AI_DASHSCOPE_CHAT_OPTIONS_MODEL: deepseek-r1
       SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TEMPERATURE: 0.7
       # moonshot
@@ -170,8 +170,24 @@ services:
       # SPRING_AI_VECTORSTORE_REDIS_URI: redis://:qfRxz3tVT8Nh@redis-bytedesk:6379
       SPRING_AI_VECTORSTORE_REDIS_INDEX_NAME: bytedesk_vs_index
       # SPRING_AI_VECTORSTORE_REDIS_PREFIX: bytedesk_vs_prefix:
+      # mcp
+      SPRING_AI_MCP_CLIENT_ENABLED: false
+      SPRING_AI_MCP_SERVER_ENABLED: false
       # wechat config
       WECHAT_PAY_ENABLED: false
+      # springdoc
+      SPRINGDOC_SHOW_ACTUATOR: false
+      # swagger-ui
+      # http://服务器ip:9003/swagger-ui/index.html
+      SPRINGDOC_SWAGGER_UI_ENABLED: true
+      SPRINGDOC_SWAGGER_UI_PATH: /index.html
+      # api-docs
+      SPRINGDOC_API_DOCS_ENABLED: true
+      SPRINGDOC_API_DOCS_PATH: /v3/api-docs
+      # knife4j
+      #  http://服务器ip:9003/doc.html
+      KNIFE4J_ENABLED: true
+      KNIFE4J_SETTING_LANGUAGE: zh_cn
     ports:
       - 9003:9003
       - 9885:9885
