@@ -43,7 +43,7 @@
 		<jackson.version>2.18.2</jackson.version>
         <flowable.version>7.1.0</flowable.version>
         <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
-        <revision>0.6.3</revision>
+        <revision>0.6.4</revision>
     </properties>
 
     <dependencies>
