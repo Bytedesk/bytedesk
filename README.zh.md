@@ -1,16 +1,3 @@
-<!--
- * @Author: jackning 270580156@qq.com
- * @Date: 2024-06-05 09:44:23
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 11:12:41
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
--->
 # 微语 - 对话即服务
 
 企业级多租户即时通讯解决方案
@@ -24,7 +11,8 @@
 - [English](./README.md)
 - [中文](./README.zh.md)
 
-![statistics](./images/admin/statistics_zh.png)
+![weiyu](./images/weiyu.png)
+<!-- ![statistics](./images/admin/statistics_zh.png) -->
 ![chat](./images/admin/chat_zh.png)
 
 ## 介绍
