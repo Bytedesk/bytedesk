@@ -37,7 +37,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/deepseek")
 @RequiredArgsConstructor
-public class SpringAiDeepseekController {
+public class SpringAIDeepseekController {
     
     // deepseek chat model
     // 在配置文件中修改：

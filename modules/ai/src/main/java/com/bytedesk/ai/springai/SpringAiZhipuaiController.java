@@ -55,7 +55,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/zhipuai")
 @RequiredArgsConstructor
-public class SpringAiZhipuaiController {
+public class SpringAIZhipuaiController {
 
     private final ZhiPuAiChatModel zhipuaiChatModel;
 

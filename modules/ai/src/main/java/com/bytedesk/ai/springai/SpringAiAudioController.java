@@ -33,9 +33,9 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/audio")
 @RequiredArgsConstructor
-public class SpringAiAudioController {
+public class SpringAIAudioController {
 
-    private final SpringAiAudioService audioService;
+    private final SpringAIAudioService audioService;
 
 	/**
 	 * audio2text

@@ -62,7 +62,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/prompt")
 @RequiredArgsConstructor
-public class SpringAiPromptController {
+public class SpringAIPromptController {
 
 	private final ChatClient defaultChatClient;
 

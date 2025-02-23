@@ -38,7 +38,7 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
  * https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.11c67980m5X2VR#/model-market
  */
 @Configuration
-public class SpringAiAlibabaConfig {
+public class SpringAIAlibabaConfig {
 
     private static final String DEFAULT_PROMPT = "你是一个博学的智能聊天助手，请根据用户提问回答！";
 

@@ -29,7 +29,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/demo/airline")
 @RequiredArgsConstructor
-public class SpringAiAirlineController {
+public class SpringAIAirlineController {
 
     private final ChatClient airlineTicketChatClient;
 

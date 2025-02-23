@@ -32,7 +32,7 @@ import lombok.Data;
  */
 @Data
 @Configuration
-public class SpringAiOllamaConfig {
+public class SpringAIOllamaConfig {
 
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
     private String ollamaBaseUrl;

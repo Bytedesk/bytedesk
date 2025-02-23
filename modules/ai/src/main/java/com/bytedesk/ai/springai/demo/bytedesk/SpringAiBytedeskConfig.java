@@ -16,6 +16,6 @@ package com.bytedesk.ai.springai.demo.bytedesk;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class SpringAiBytedeskConfig {
+public class SpringAIBytedeskConfig {
     
 }

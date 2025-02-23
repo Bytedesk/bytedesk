@@ -16,6 +16,6 @@ package com.bytedesk.ai.springai.demo.shopping;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class SpringAiShoppingConfig {
+public class SpringAIShoppingConfig {
     
 }

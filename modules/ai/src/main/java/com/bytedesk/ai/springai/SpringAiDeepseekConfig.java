@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * 复用 openai 的配置
  */
 @Configuration
-public class SpringAiDeepseekConfig {
+public class SpringAIDeepseekConfig {
 
     @Value("${spring.ai.openai.base-url}")
     private String baseUrl;
