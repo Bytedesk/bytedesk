@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 09:54:30
+ * @LastEditTime: 2025-02-24 10:24:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,6 +54,10 @@ public class SpringAIVectorService {
 	private final UploadRestService uploadService;
 
 	private final BytedeskEventPublisher bytedeskEventPublisher;
+
+	// private final FaqRestService faqRestService;
+
+    // private final ZhipuaiChatService zhipuaiChatService;
 
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
@@ -215,7 +219,11 @@ public class SpringAIVectorService {
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
 		// 通知相关组件，文件处理成功
 		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(upload.getKbUid(), upload.getOrgUid(), docList));
+		// 生成问答对
+		// generateQaPairs(docList, upload);
 	}
+
+	
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html

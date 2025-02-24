@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 09:46:49
+ * @LastEditTime: 2025-02-24 10:10:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,10 +14,8 @@
 package com.bytedesk.ai.robot;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.ai.document.Document;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -28,7 +26,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
 import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
-import com.bytedesk.ai.springai.event.VectorSplitEvent;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -47,7 +44,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.ai.provider.LlmProviderConsts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,8 +64,6 @@ public class RobotEventListener {
     private final ThreadRestService threadService;
 
     private final IMessageSendService messageSendService;
-
-    private final FaqRestService faqRestService;
 
     @Order(5)
     @EventListener
@@ -254,19 +248,6 @@ public class RobotEventListener {
         }
     }
 
-    @EventListener
-    public void onVectorSplitEvent(VectorSplitEvent event) {
-        log.info("robot onUploadSplitEvent: {}", event.getDocuments().size());
-        List<Document> documents = event.getDocuments();
-
-        for (Document document : documents) {
-            // 调用模型生成问答对
-            String qaPairs = zhipuaiChatService.generateQaPairsAsync(document.getText());
-            log.info("generateQaPairsAsync qaPairs {}", qaPairs);
-
-            // Save QA pairs to database
-            faqRestService.saveQaPairs(qaPairs, event.getKbUid(), event.getOrgUid(), document.getId());
-        }
-    }
+    
 
 }
