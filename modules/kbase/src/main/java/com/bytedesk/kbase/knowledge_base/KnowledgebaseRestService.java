@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 14:20:59
+ * @LastEditTime: 2025-02-24 16:08:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -213,17 +213,17 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
     public void initKbase(String orgUid) {
 
         // 初始化快捷回复知识库
-        // KnowledgebaseRequest kownledgebaseRequestQuickReplyPlatform = KnowledgebaseRequest.builder()
-        //         .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
-        //         .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-        //         .language(LanguageEnum.ZH_CN.name())
-        //         .level(LevelEnum.PLATFORM.name())
-        //         .build();
-        // kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
-        // kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
-        // // 方便超级管理员加载，避免重新写一个接口拉取
-        // kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
-        // create(kownledgebaseRequestQuickReplyPlatform);
+        KnowledgebaseRequest kownledgebaseRequestQuickReplyPlatform = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .level(LevelEnum.PLATFORM.name())
+                .build();
+        kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
+        kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        // 方便超级管理员加载，避免重新写一个接口拉取
+        kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
+        create(kownledgebaseRequestQuickReplyPlatform);
         
         // 初始化帮助文档知识库
         KnowledgebaseRequest kownledgebaseRequestHelpdoc = KnowledgebaseRequest.builder()
