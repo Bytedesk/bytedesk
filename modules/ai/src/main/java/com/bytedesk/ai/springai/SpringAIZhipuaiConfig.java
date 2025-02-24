@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 23:20:40
+ * @LastEditTime: 2025-02-24 23:43:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,6 @@ import redis.clients.jedis.JedisPooled;
  */
 @Data
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
 public class SpringAIZhipuaiConfig {
 
     @Value("${spring.ai.zhipuai.api-key:}")
@@ -121,10 +120,10 @@ public class SpringAIZhipuaiConfig {
     }
 
     @Bean("zhipuaiClient")
+    @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
     ClientV4 zhipuaiClient() {
         return new ClientV4.Builder(zhipuaiApiKey).build();
     }
-
 
     @Bean("zhipuaiRedisVectorStore")
     @ConditionalOnProperty(name = { "spring.ai.zhipuai.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
