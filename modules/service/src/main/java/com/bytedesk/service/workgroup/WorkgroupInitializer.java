@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 12:31:07
+ * @LastEditTime: 2025-02-24 21:33:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.workgroup;
 
-// import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,8 +22,6 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-// import com.bytedesk.kbase.faq.FaqConsts;
-// import com.bytedesk.service.worktime.WorktimeService;
 import com.bytedesk.service.agent.AgentInitializer;
 import com.bytedesk.team.member.MemberInitializer;
 
@@ -38,7 +35,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
     private final MemberInitializer memberInitializer;
     private final AgentInitializer agentInitializer;
     private final WorkgroupRepository workgroupRepository;
-
     private final WorkgroupRestService workgroupService;
 
     @Override
