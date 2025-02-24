@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.springai;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/image")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIAlibabaImageController {
 
     private final SpringAIAlibabaImageService imageService;

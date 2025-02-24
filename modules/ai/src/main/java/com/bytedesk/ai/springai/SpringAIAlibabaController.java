@@ -23,6 +23,7 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +45,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @RestController
 @RequestMapping("/springai/alibaba")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIAlibabaController {
 
 	// @Qualifier("dashScopeChatClient") // 不起作用？，只能重命名变量名
