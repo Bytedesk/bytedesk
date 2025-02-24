@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 10:24:14
+ * @LastEditTime: 2025-02-24 14:32:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class SpringAIVectorService {
 
 	private final RedisVectorStore ollamaRedisVectorStore;
 
-	private final UploadRestService uploadService;
+	private final UploadRestService uploadRestService;
 
 	private final BytedeskEventPublisher bytedeskEventPublisher;
 
@@ -100,7 +100,7 @@ public class SpringAIVectorService {
 			throw new IllegalArgumentException(String.format("File URL must end with .pdf, got %s", fileName));
 		}
 		//
-		Resource resource = uploadService.loadAsResource(fileName);
+		Resource resource = uploadRestService.loadAsResource(fileName);
 		//
 		PdfDocumentReaderConfig pdfDocumentReaderConfig = PdfDocumentReaderConfig.builder()
 				.withPageTopMargin(0)
@@ -125,7 +125,7 @@ public class SpringAIVectorService {
 			throw new IllegalArgumentException(String.format("File URL must end with .pdf, got %s", fileName));
 		}
 		//
-		Resource resource = uploadService.loadAsResource(fileName);
+		Resource resource = uploadRestService.loadAsResource(fileName);
 		//
 		ParagraphPdfDocumentReader pdfReader = new ParagraphPdfDocumentReader(
 				resource,
@@ -150,7 +150,7 @@ public class SpringAIVectorService {
 			throw new IllegalArgumentException(String.format("File URL must end with .json, got %s", fileName));
 		}
 		//
-		Resource resource = uploadService.loadAsResource(fileName);
+		Resource resource = uploadRestService.loadAsResource(fileName);
 		//
 		JsonReader jsonReader = new JsonReader(resource, "description");
 		//
@@ -168,7 +168,7 @@ public class SpringAIVectorService {
 			throw new IllegalArgumentException(String.format("File URL must end with .txt, got %s", fileName));
 		}
 		//
-		Resource resource = uploadService.loadAsResource(fileName);
+		Resource resource = uploadRestService.loadAsResource(fileName);
 		//
 		TextReader textReader = new TextReader(resource);
 		textReader.getCustomMetadata().put("filename", fileName);
@@ -186,7 +186,7 @@ public class SpringAIVectorService {
 			throw new IllegalArgumentException("File URL must not be empty");
 		}
 		//
-		Resource resource = uploadService.loadAsResource(fileName);
+		Resource resource = uploadRestService.loadAsResource(fileName);
 		//
 		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
 		//
@@ -213,7 +213,7 @@ public class SpringAIVectorService {
 		// FIXME: ObjectOptimisticLockingFailureException: Row was updated or deleted by
 		// another transaction (or unsaved-value mapping was incorrect) :
 		// [com.bytedesk.kbase.upload.Upload#52]
-		uploadService.save(upload);
+		uploadRestService.save(upload);
 		// log.info("Parsing document, this will take a while.");
 		ollamaRedisVectorStore.write(docList);
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");

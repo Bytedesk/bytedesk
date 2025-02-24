@@ -1,0 +1,7 @@
+spring:
+  ai:
+    vectorstore:
+      weaviate:
+        enabled: false  # 禁用 Weaviate
+      redis:
+        enabled: true   # 启用 Redis 

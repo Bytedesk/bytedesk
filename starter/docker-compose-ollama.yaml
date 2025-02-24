@@ -173,6 +173,8 @@ services:
       # mcp
       SPRING_AI_MCP_CLIENT_ENABLED: false
       SPRING_AI_MCP_SERVER_ENABLED: false
+      # weaviate
+      SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: false
       # wechat config
       WECHAT_PAY_ENABLED: false
       # springdoc
