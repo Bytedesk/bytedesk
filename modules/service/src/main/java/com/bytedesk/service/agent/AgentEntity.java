@@ -18,7 +18,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
+import com.bytedesk.kbase.auto_reply_fixed.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
@@ -97,7 +97,7 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private LeaveMsgSettings leaveMsgSettings = new LeaveMsgSettings();
 
-    // 一对一人工客服，不支持机器人接待
+    // 一对一人工客服，不支持机器人接待。通过自动回复设置，可以自动回复访客消息
     // @Embedded
     // @Builder.Default
     // private RobotSettings robotSettings = new RobotSettings();
