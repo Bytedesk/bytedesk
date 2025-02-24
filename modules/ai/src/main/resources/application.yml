@@ -1,5 +1,8 @@
 spring:
   ai:
+    dashscope:
+      chat:
+        enabled: true  # 控制是否启用阿里云百炼相关功能
     vectorstore:
       weaviate:
         enabled: false  # 禁用 Weaviate

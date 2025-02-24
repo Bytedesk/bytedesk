@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:51:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 15:14:29
+ * @LastEditTime: 2025-02-24 15:42:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.springai;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/audio")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIAlibabaAudioController {
 
     private final SpringAIAlibabaAudioService audioService;
