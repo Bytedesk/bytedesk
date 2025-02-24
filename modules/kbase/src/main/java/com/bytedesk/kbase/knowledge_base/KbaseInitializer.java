@@ -23,9 +23,9 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class KnowledgebaseInitializer implements SmartInitializingSingleton {
+public class KbaseInitializer implements SmartInitializingSingleton {
 
-    private final KnowledgebaseRestService knowledgebaseService;
+    private final KbaseRestService kbaseService;
 
     private final QuickReplyRestService quickReplyRestService;
 
@@ -38,7 +38,7 @@ public class KnowledgebaseInitializer implements SmartInitializingSingleton {
         // 
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // 初始化知识库
-        knowledgebaseService.initKbase(orgUid);
+        kbaseService.initKbase(orgUid);
         // 初始化快捷回复分类
         quickReplyRestService.initQuickReplyCategory(orgUid);
         // 初始化快捷回复

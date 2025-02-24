@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-18 17:10:13
+ * @LastEditTime: 2025-02-24 17:19:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/keyword")
+@RequestMapping("/api/v1/autoreply/keyword")
 @AllArgsConstructor
 public class AutoReplyKeywordRestController extends BaseRestController<AutoReplyKeywordRequest> {
 

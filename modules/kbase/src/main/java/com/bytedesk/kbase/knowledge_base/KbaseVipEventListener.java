@@ -41,21 +41,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class KnowledgebaseVipEventListener {
+public class KbaseVipEventListener {
 
-        private final KnowledgebaseRestService knowledgebaseService;
+        private final KbaseRestService kbaseService;
 
         // private final ArticleService articleService;
         // private final CategoryService categoryService;
 
-        private final KnowledgebaseVipStaticService knowledgebaseStaticService;
+        private final KbaseVipStaticService kbaseStaticService;
 
         @EventListener
-        public void onKnowledgebaseCreateEvent(KnowledgebaseCreateEvent event) {
-                // KnowledgebaseCreateEvent knowledgebaseCreateEvent = event.getObject();
-                KnowledgebaseEntity knowledgebase = event.getKnowledgebase();
-                log.info("onKnowledgebaseCreateEvent {}", knowledgebase.getUid());
-                if (!knowledgebase.getType().equals(KnowledgebaseTypeEnum.HELPCENTER.name())) {
+        public void onKbaseCreateEvent(KbaseCreateEvent event) {
+                // KbaseCreateEvent kbaseCreateEvent = event.getObject();
+                KbaseEntity kbase = event.getKbase();
+                log.info("onKbaseCreateEvent {}", kbase.getUid());
+                if (!kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                         return;
                 }
                 // 
@@ -65,20 +65,20 @@ public class KnowledgebaseVipEventListener {
                         PageRequest.of(0, 1),    // 第一页，一页显示1个元素
                         0                        // 总元素数为0
                 );
-                knowledgebaseStaticService.toHtmlKb(knowledgebase, categories, articles, articles, articles);
-                knowledgebaseStaticService.toHtmlSearch(knowledgebase);
+                kbaseStaticService.toHtmlKb(kbase, categories, articles, articles, articles);
+                kbaseStaticService.toHtmlSearch(kbase);
         }
 
         @EventListener
-        public void onKnowledgebaseUpdateEvent(KnowledgebaseUpdateEvent event) {
-                // KnowledgebaseUpdateEvent knowledgebaseUpdateEvent = event.getObject();
-                KnowledgebaseEntity knowledgebase = event.getKnowledgebase();
-                log.info("onKnowledgebaseUpdateEvent {}", knowledgebase.getUid());
-                if (!knowledgebase.getType().equals(KnowledgebaseTypeEnum.HELPCENTER.name())) {
+        public void onKbaseUpdateEvent(KbaseUpdateEvent event) {
+                // KbaseUpdateEvent kbaseUpdateEvent = event.getObject();
+                KbaseEntity kbase = event.getKbase();
+                log.info("onKbaseUpdateEvent {}", kbase.getUid());
+                if (!kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                         return;
                 }
                 // 
-                knowledgebaseStaticService.updateKbase(knowledgebase);
+                kbaseStaticService.updateKbase(kbase);
         }
 
         @EventListener
@@ -91,16 +91,16 @@ public class KnowledgebaseVipEventListener {
                         return;
                 }
                 // 
-                Optional<KnowledgebaseEntity> kbaseOptional = knowledgebaseService.findByUid(kbUid);
+                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(kbUid);
                 if (kbaseOptional.isPresent()) {
-                        if (!kbaseOptional.get().getType().equals(KnowledgebaseTypeEnum.HELPCENTER.name())) {
+                        if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
                         // 
-                        knowledgebaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = knowledgebaseService.getCategories(kbaseOptional.get());
-                        // Page<ArticleResponse> articlesPage = knowledgebaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
-                        // knowledgebaseStaticService.toHtmlCategory(kbaseOptional.get(), categoryService.convertToResponse(category), categoriesPage.getContent(), articlesPage.getContent());
+                        kbaseStaticService.updateKbase(kbaseOptional.get());
+                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
+                        // Page<ArticleResponse> articlesPage = kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
+                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(), categoryService.convertToResponse(category), categoriesPage.getContent(), articlesPage.getContent());
                 } else {
                         log.error("onCategoryCreateEvent kb not found {}", kbUid);
                 }
@@ -115,16 +115,16 @@ public class KnowledgebaseVipEventListener {
                         return;
                 }
                 // 
-                Optional<KnowledgebaseEntity> kbaseOptional = knowledgebaseService.findByUid(category.getKbUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(category.getKbUid());
                 if (kbaseOptional.isPresent()) {
-                        if (!kbaseOptional.get().getType().equals(KnowledgebaseTypeEnum.HELPCENTER.name())) {
+                        if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
                         // 
-                        knowledgebaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = knowledgebaseService.getCategories(kbaseOptional.get());
-                        // Page<ArticleResponse> articlesPage = knowledgebaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
-                        // knowledgebaseStaticService.toHtmlCategory(kbaseOptional.get(), categoryService.convertToResponse(category), categoriesPage.getContent(), articlesPage.getContent());
+                        kbaseStaticService.updateKbase(kbaseOptional.get());
+                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
+                        // Page<ArticleResponse> articlesPage = kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
+                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(), categoryService.convertToResponse(category), categoriesPage.getContent(), articlesPage.getContent());
                 } else {
                         log.error("onCategoryUpdateEvent kb not found {}", category.getKbUid());
                 }
@@ -139,15 +139,15 @@ public class KnowledgebaseVipEventListener {
                         return;
                 }
                 // 
-                Optional<KnowledgebaseEntity> kbaseOptional = knowledgebaseService.findByUid(article.getKbUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbUid());
                 if (kbaseOptional.isPresent()) {
-                        if (!kbaseOptional.get().getType().equals(KnowledgebaseTypeEnum.HELPCENTER.name())) {
+                        if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
                         // 
-                        knowledgebaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = knowledgebaseService.getCategories(kbaseOptional.get());
-                        // knowledgebaseStaticService.toHtmlArticle(kbaseOptional.get(), articleService.convertToResponse(article), categoriesPage.getContent(), new ArrayList<>());
+                        kbaseStaticService.updateKbase(kbaseOptional.get());
+                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
+                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(), articleService.convertToResponse(article), categoriesPage.getContent(), new ArrayList<>());
                 } else {
                         log.error("onArticleCreateEvent kb not found {}", article.getKbUid());
                 }
@@ -162,15 +162,15 @@ public class KnowledgebaseVipEventListener {
                         return;
                 }
                 // 
-                Optional<KnowledgebaseEntity> kbaseOptional = knowledgebaseService.findByUid(article.getKbUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbUid());
                 if (kbaseOptional.isPresent()) {
-                        if (!kbaseOptional.get().getType().equals(KnowledgebaseTypeEnum.HELPCENTER.name())) {
+                        if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
                         // 
-                        knowledgebaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = knowledgebaseService.getCategories(kbaseOptional.get());
-                        // knowledgebaseStaticService.toHtmlArticle(kbaseOptional.get(), articleService.convertToResponse(article), categoriesPage.getContent(), new ArrayList<>());
+                        kbaseStaticService.updateKbase(kbaseOptional.get());
+                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
+                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(), articleService.convertToResponse(article), categoriesPage.getContent(), new ArrayList<>());
                 } else {
                         log.error("onArticleUpdateEvent kb not found {}", article.getKbUid());
                 }

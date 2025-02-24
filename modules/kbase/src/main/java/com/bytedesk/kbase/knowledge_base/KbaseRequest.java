@@ -35,34 +35,34 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class KnowledgebaseRequest extends BaseRequest {
+public class KbaseRequest extends BaseRequest {
 
     private String name;
 
     // headline标头
     @Builder.Default
-    private String headline = KnowledgebaseConsts.HEADLINE;
+    private String headline = KbaseConsts.HEADLINE;
 
     // 自定义副标题
     @Builder.Default
-    private String subHeadline = KnowledgebaseConsts.SUB_HEADLINE;
+    private String subHeadline = KbaseConsts.SUB_HEADLINE;
 
     // 自定义网址
     @Builder.Default
-    private String url = KnowledgebaseConsts.URL;
+    private String url = KbaseConsts.URL;
 
     @Builder.Default
-    private String logoUrl = KnowledgebaseConsts.LOGO_URL;
+    private String logoUrl = KbaseConsts.LOGO_URL;
 
     @Builder.Default
-    private String faviconUrl = KnowledgebaseConsts.FAVICON_URL;
+    private String faviconUrl = KbaseConsts.FAVICON_URL;
 
     // 主题色
     @Builder.Default
     private String primaryColor = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
-    private String theme = KnowledgebaseThemeEnum.DEFAULT.name();
+    private String theme = KbaseThemeEnum.DEFAULT.name();
 
     /**
      * 知识库描述
@@ -71,7 +71,7 @@ public class KnowledgebaseRequest extends BaseRequest {
      */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String descriptionHtml = KnowledgebaseConsts.KB_DESCRIPTION;
+    private String descriptionHtml = KbaseConsts.KB_DESCRIPTION;
 
     // 自定义页眉, 添加显示于页面顶部、位于默认页眉上方的 HTML 代码。
     @Builder.Default
@@ -89,7 +89,7 @@ public class KnowledgebaseRequest extends BaseRequest {
     private String css = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
-    private String embedding = KnowledgebaseConsts.KB_EMBEDDING;
+    private String embedding = KbaseConsts.KB_EMBEDDING;
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
@@ -104,7 +104,7 @@ public class KnowledgebaseRequest extends BaseRequest {
     // private PlatformEnum platform = PlatformEnum.BYTEDESK;
     private String platform = PlatformEnum.BYTEDESK.name();
 
-    // private KnowledgebaseTypeEnum type = KnowledgebaseTypeEnum.HELPCENTER;
+    // private KbaseTypeEnum type = KbaseTypeEnum.HELPCENTER;
     // private String categoryUid;
 
     @Builder.Default

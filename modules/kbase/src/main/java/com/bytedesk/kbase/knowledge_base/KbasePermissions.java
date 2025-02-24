@@ -13,10 +13,10 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
-public class KnowledgebasePermissions {
+public class KbasePermissions {
 
     public static final String KNOWLEDGEBASE_PREFIX = "KNOWLEDGEBASE_";
-    // Knowledgebase permissions
+    // Kbase permissions
     public static final String KNOWLEDGEBASE_CREATE = "hasAuthority('KNOWLEDGEBASE_CREATE')";
     public static final String KNOWLEDGEBASE_READ = "hasAuthority('KNOWLEDGEBASE_READ')";
     public static final String KNOWLEDGEBASE_UPDATE = "hasAuthority('KNOWLEDGEBASE_UPDATE')";

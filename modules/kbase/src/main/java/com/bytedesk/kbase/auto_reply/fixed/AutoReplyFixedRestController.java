@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:39:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 17:06:10
+ * @LastEditTime: 2025-02-24 17:18:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/autoreply")
+@RequestMapping("/api/v1/autoreply/fixed")
 @AllArgsConstructor
 public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFixedRequest> {
 

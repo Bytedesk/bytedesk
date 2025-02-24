@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
-public enum KnowledgebaseTypeEnum {
+public enum KbaseTypeEnum {
     ASSISTANT, // 文档助手，内部文档知识库问答
     HELPCENTER, // 帮助中心
     LLM, // 大模型
@@ -26,12 +26,12 @@ public enum KnowledgebaseTypeEnum {
     TABOO; // 敏感词
 
     // 根据字符串查找对应的枚举常量
-    public static KnowledgebaseTypeEnum fromValue(String value) {
-        for (KnowledgebaseTypeEnum type : KnowledgebaseTypeEnum.values()) {
+    public static KbaseTypeEnum fromValue(String value) {
+        for (KbaseTypeEnum type : KbaseTypeEnum.values()) {
             if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }
         }
-        throw new IllegalArgumentException("No KnowledgebaseTypeEnum constant with value: " + value);
+        throw new IllegalArgumentException("No KbaseTypeEnum constant with value: " + value);
     }
 }

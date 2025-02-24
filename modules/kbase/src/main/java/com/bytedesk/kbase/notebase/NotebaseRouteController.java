@@ -20,8 +20,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseEntity;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseRestService;
+import com.bytedesk.kbase.knowledge_base.KbaseEntity;
+import com.bytedesk.kbase.knowledge_base.KbaseRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class NotebaseRouteController {
 
     private final NotebaseService NotebaseService;
 
-    private final KnowledgebaseRestService knowledgebaseService;
+    private final KbaseRestService knowledgebaseService;
 
     // 
     @RequestMapping("/{kbUid:.+}/{notebaseUid:.+}")
@@ -51,7 +51,7 @@ public class NotebaseRouteController {
             return "redirect:/404";
         }
         // 
-        Optional<KnowledgebaseEntity> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
+        Optional<KbaseEntity> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
         if (knowledgebaseOptional.isPresent()) {
             model.addAttribute("knowledgebase", knowledgebaseOptional.get());
         } else {

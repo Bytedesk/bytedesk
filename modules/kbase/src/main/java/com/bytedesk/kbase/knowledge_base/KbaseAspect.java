@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 18:26:44
+ * @LastEditTime: 2025-02-24 17:13:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,14 +31,14 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 @Component
 @AllArgsConstructor
-public class KnowledgebaseAspect {
+public class KbaseAspect {
 
     /**
      * 处理会话请求前执行
      */
-    @Before(value = "@annotation(knowledgebaseAnnotation)")
-    public void doBefore(JoinPoint joinPoint, KnowledgebaseAnnotation knowledgebaseAnnotation) {
-        log.debug("KnowledgebaseAspect before: model {}, ", knowledgebaseAnnotation.title());
+    @Before(value = "@annotation(kbaseAnnotation)")
+    public void doBefore(JoinPoint joinPoint, KbaseAnnotation kbaseAnnotation) {
+        log.debug("KbaseAspect before: model {}, ", kbaseAnnotation.title());
         // 获取方法签名
     }
 
@@ -47,34 +47,34 @@ public class KnowledgebaseAspect {
      *
      * @param joinPoint 切点
      */
-    @AfterReturning(pointcut = "@annotation(knowledgebaseAnnotation)", returning = "jsonResult")
-    public void doAfterReturning(JoinPoint joinPoint, KnowledgebaseAnnotation knowledgebaseAnnotation, Object jsonResult) {
-        log.debug("KnowledgebaseAspect after returning: title {}, jsonResult {}", knowledgebaseAnnotation.title(), jsonResult);
+    @AfterReturning(pointcut = "@annotation(kbaseAnnotation)", returning = "jsonResult")
+    public void doAfterReturning(JoinPoint joinPoint, KbaseAnnotation kbaseAnnotation, Object jsonResult) {
+        log.debug("KbaseAspect after returning: title {}, jsonResult {}", kbaseAnnotation.title(), jsonResult);
 
     }
 
 
-    @Pointcut("execution(* com.bytedesk.kbase.knowledge_base.KnowledgebaseRouter.*(..))")
-    public void knowledgebaseLog() {};
+    @Pointcut("execution(* com.bytedesk.kbase.knowledge_base.KbaseRouter.*(..))")
+    public void kbaseLog() {};
 
-    @Before("knowledgebaseLog()")
-    public void beforeKnowledgebaseLog() {
-        log.debug("KnowledgebaseAspect beforeKnowledgebaseLog");
+    @Before("kbaseLog()")
+    public void beforeKbaseLog() {
+        log.debug("KbaseAspect beforeKbaseLog");
     }
 
-    @After("knowledgebaseLog()")
-    public void afterKnowledgebaseLog() {
-        log.debug("KnowledgebaseAspect afterKnowledgebaseLog");
+    @After("kbaseLog()")
+    public void afterKbaseLog() {
+        log.debug("KbaseAspect afterKbaseLog");
     }
 
-    @Around("knowledgebaseLog()")
-    public Object aroundKnowledgebaseLog(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.debug("KnowledgebaseAspect aroundKnowledgebaseLog before");
+    @Around("kbaseLog()")
+    public Object aroundKbaseLog(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.debug("KbaseAspect aroundKbaseLog before");
         // 
         long start = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long executionTime = System.currentTimeMillis() - start;
-        log.debug("KnowledgebaseAspect aroundKnowledgebaseLog {} executed in {} ms", joinPoint.getSignature(), executionTime);
+        log.debug("KbaseAspect aroundKbaseLog {} executed in {} ms", joinPoint.getSignature(), executionTime);
         // 
 
         return result;

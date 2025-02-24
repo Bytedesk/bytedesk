@@ -25,25 +25,25 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class KnowledgebaseEntityListener {
+public class KbaseEntityListener {
 
     @PostPersist
-    void postPersist(KnowledgebaseEntity knowledgebase) {
-        log.info("knowledgebase postPersist: {}", knowledgebase);
-        KnowledgebaseEntity clonedKnowledgebase = SerializationUtils.clone(knowledgebase);
+    void postPersist(KbaseEntity kbase) {
+        log.info("kbase postPersist: {}", kbase);
+        KbaseEntity clonedKbase = SerializationUtils.clone(kbase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new KnowledgebaseCreateEvent(this, clonedKnowledgebase));
+        publisher.publishEvent(new KbaseCreateEvent(this, clonedKbase));
     }
 
     // 
     @PostUpdate
-    void postUpdate(KnowledgebaseEntity knowledgebase) {
-        log.info("knowledgebase postUpdate: {}", knowledgebase);
-        KnowledgebaseEntity clonedKnowledgebase = SerializationUtils.clone(knowledgebase);
+    void postUpdate(KbaseEntity kbase) {
+        log.info("kbase postUpdate: {}", kbase);
+        KbaseEntity clonedKbase = SerializationUtils.clone(kbase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new KnowledgebaseUpdateEvent(this, clonedKnowledgebase));
+        publisher.publishEvent(new KbaseUpdateEvent(this, clonedKbase));
     }
 
 

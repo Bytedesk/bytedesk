@@ -42,9 +42,9 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntity, KnowledgebaseRequest, KnowledgebaseResponse> {
+public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest, KbaseResponse> {
 
-    private final KnowledgebaseRepository knowledgebaseRepository;
+    private final KbaseRepository kbaseRepository;
 
     private final ModelMapper modelMapper;
 
@@ -55,40 +55,40 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
     private final ArticleRestService articleService;
 
     @Override
-    public Page<KnowledgebaseResponse> queryByOrg(KnowledgebaseRequest request) {
+    public Page<KbaseResponse> queryByOrg(KbaseRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<KnowledgebaseEntity> spec = KnowledgebaseSpecification.search(request);
-        Page<KnowledgebaseEntity> page = knowledgebaseRepository.findAll(spec, pageable);
+        Specification<KbaseEntity> spec = KbaseSpecification.search(request);
+        Page<KbaseEntity> page = kbaseRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<KnowledgebaseResponse> queryByUser(KnowledgebaseRequest request) {
+    public Page<KbaseResponse> queryByUser(KbaseRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Cacheable(value = "kb", key = "#uid", unless = "#result==null")
     @Override
-    public Optional<KnowledgebaseEntity> findByUid(@NonNull String uid) {
-        return knowledgebaseRepository.findByUid(uid);
+    public Optional<KbaseEntity> findByUid(@NonNull String uid) {
+        return kbaseRepository.findByUid(uid);
     }
 
     @Override
-    public KnowledgebaseResponse create(KnowledgebaseRequest request) {
+    public KbaseResponse create(KbaseRequest request) {
         // 判断uid是否已经存在
         if (StringUtils.hasText(request.getUid()) && findByUid(request.getUid()).isPresent()) {
             return null;
         }
         // 
-        KnowledgebaseEntity entity = KnowledgebaseEntity.builder().build();
+        KbaseEntity entity = KbaseEntity.builder().build();
         if (StringUtils.hasText(request.getUid())) {
             entity.setUid(request.getUid());
         } else {
             entity.setUid(uidUtils.getCacheSerialUid());
         }
         entity.setName(request.getName());
-        entity.setType(KnowledgebaseTypeEnum.fromValue(request.getType()).name());
+        entity.setType(KbaseTypeEnum.fromValue(request.getType()).name());
         entity.setHeadline(request.getHeadline());
         entity.setDescriptionHtml(request.getDescriptionHtml());
         entity.setFooterHtml(request.getFooterHtml());
@@ -98,7 +98,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
         entity.setOrgUid(request.getOrgUid());
         entity.setAgentUid(request.getAgentUid());
         //
-        KnowledgebaseEntity savedKb = save(entity);
+        KbaseEntity savedKb = save(entity);
         if (savedKb == null) {
             throw new RuntimeException("knowledge_base not saved");
         }
@@ -107,11 +107,11 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
     }
 
     @Override
-    public KnowledgebaseResponse update(KnowledgebaseRequest request) {
+    public KbaseResponse update(KbaseRequest request) {
 
-        Optional<KnowledgebaseEntity> optional = findByUid(request.getUid());
+        Optional<KbaseEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
-            KnowledgebaseEntity entity = optional.get();
+            KbaseEntity entity = optional.get();
             entity.setName(request.getName());
             // entity.setType(KownledgebaseTypeEnum.fromValue(request.getType()));
             entity.setHeadline(request.getHeadline());
@@ -126,22 +126,22 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
         }
     }
 
-    public List<KnowledgebaseEntity> findByLevelAndType(LevelEnum level, KnowledgebaseTypeEnum type) {
-        return knowledgebaseRepository.findByLevelAndTypeAndDeleted(level.name(), type.name(), false);
+    public List<KbaseEntity> findByLevelAndType(LevelEnum level, KbaseTypeEnum type) {
+        return kbaseRepository.findByLevelAndTypeAndDeleted(level.name(), type.name(), false);
     }
 
-    public List<KnowledgebaseEntity> findByLevelAndTypeAndOrgUid(LevelEnum level, KnowledgebaseTypeEnum type, String orgUid) {
-        return knowledgebaseRepository.findByLevelAndTypeAndOrgUidAndDeleted(level.name(), type.name(), orgUid, false);
+    public List<KbaseEntity> findByLevelAndTypeAndOrgUid(LevelEnum level, KbaseTypeEnum type, String orgUid) {
+        return kbaseRepository.findByLevelAndTypeAndOrgUidAndDeleted(level.name(), type.name(), orgUid, false);
     }
 
-    public List<KnowledgebaseEntity> findByLevelAndTypeAndAgentUid(LevelEnum level, KnowledgebaseTypeEnum type, String agentUid) {
-        return knowledgebaseRepository.findByLevelAndTypeAndAgentUidAndDeleted(level.name(), type.name(), agentUid, false);
+    public List<KbaseEntity> findByLevelAndTypeAndAgentUid(LevelEnum level, KbaseTypeEnum type, String agentUid) {
+        return kbaseRepository.findByLevelAndTypeAndAgentUidAndDeleted(level.name(), type.name(), agentUid, false);
     }
 
     @Override
-    public KnowledgebaseEntity save(KnowledgebaseEntity entity) {
+    public KbaseEntity save(KbaseEntity entity) {
         try {
-            return knowledgebaseRepository.save(entity);
+            return kbaseRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
         }
@@ -150,7 +150,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<KnowledgebaseEntity> optional = findByUid(uid);
+        Optional<KbaseEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -158,53 +158,53 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
     }
 
     @Override
-    public void delete(KnowledgebaseRequest entity) {
+    public void delete(KbaseRequest entity) {
         deleteByUid(entity.getUid());
     }
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            KnowledgebaseEntity entity) {
+            KbaseEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public KnowledgebaseResponse convertToResponse(KnowledgebaseEntity entity) {
-        return modelMapper.map(entity, KnowledgebaseResponse.class);
+    public KbaseResponse convertToResponse(KbaseEntity entity) {
+        return modelMapper.map(entity, KbaseResponse.class);
     }
 
-    public Page<CategoryResponse> getCategories(KnowledgebaseEntity knowledgebaseEntity) {
+    public Page<CategoryResponse> getCategories(KbaseEntity kbaseEntity) {
         // 
         CategoryRequest categoryRequest = new CategoryRequest();
         categoryRequest.setPageNumber(0);
         categoryRequest.setPageSize(50);
-        categoryRequest.setType(KnowledgebaseTypeEnum.HELPCENTER.name());
-        categoryRequest.setKbUid(knowledgebaseEntity.getUid());
-        categoryRequest.setOrgUid(knowledgebaseEntity.getOrgUid());
+        categoryRequest.setType(KbaseTypeEnum.HELPCENTER.name());
+        categoryRequest.setKbUid(kbaseEntity.getUid());
+        categoryRequest.setOrgUid(kbaseEntity.getOrgUid());
         // 
         return categoryService.queryByOrg(categoryRequest);
     }
 
-    public Page<ArticleResponse> getArticles(KnowledgebaseEntity knowledgebaseEntity) {
+    public Page<ArticleResponse> getArticles(KbaseEntity kbaseEntity) {
         // 
         ArticleRequest articleRequest = new ArticleRequest();
         articleRequest.setPageNumber(0);
         articleRequest.setPageSize(50);
-        articleRequest.setKbUid(knowledgebaseEntity.getUid());
-        articleRequest.setOrgUid(knowledgebaseEntity.getOrgUid());
+        articleRequest.setKbUid(kbaseEntity.getUid());
+        articleRequest.setOrgUid(kbaseEntity.getOrgUid());
         // 
         return articleService.queryByOrg(articleRequest);
     }
     
-    public Page<ArticleResponse> getArticlesByCategory(KnowledgebaseEntity knowledgebaseEntity, String categoryUid) {
+    public Page<ArticleResponse> getArticlesByCategory(KbaseEntity kbaseEntity, String categoryUid) {
         // 
         ArticleRequest articleRequest = new ArticleRequest();
         articleRequest.setPageNumber(0);
         articleRequest.setPageSize(50);
         articleRequest.setCategoryUid(categoryUid);
-        articleRequest.setKbUid(knowledgebaseEntity.getUid());
-        articleRequest.setOrgUid(knowledgebaseEntity.getOrgUid());
+        articleRequest.setKbUid(kbaseEntity.getUid());
+        articleRequest.setOrgUid(kbaseEntity.getOrgUid());
         // 
         return articleService.queryByOrg(articleRequest);
     }
@@ -213,91 +213,91 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
     public void initKbase(String orgUid) {
 
         // 初始化快捷回复知识库
-        KnowledgebaseRequest kownledgebaseRequestQuickReplyPlatform = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestQuickReplyPlatform = KbaseRequest.builder()
+                .name(KbaseConsts.KB_QUICKREPLY_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .level(LevelEnum.PLATFORM.name())
                 .build();
         kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
-        kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequestQuickReplyPlatform.setType(KbaseTypeEnum.QUICKREPLY.name());
         // 方便超级管理员加载，避免重新写一个接口拉取
         kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
         create(kownledgebaseRequestQuickReplyPlatform);
         
         // 初始化帮助文档知识库
-        KnowledgebaseRequest kownledgebaseRequestHelpdoc = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_HELPCENTER_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestHelpdoc = KbaseRequest.builder()
+                .name(KbaseConsts.KB_HELPCENTER_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestHelpdoc.setUid(orgUid + BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
-        kownledgebaseRequestHelpdoc.setType(KnowledgebaseTypeEnum.HELPCENTER.name());
+        kownledgebaseRequestHelpdoc.setType(KbaseTypeEnum.HELPCENTER.name());
         kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
 
         // 初始化AI知识库
-        KnowledgebaseRequest kownledgebaseRequestLlm = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_LLM_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestLlm = KbaseRequest.builder()
+                .name(KbaseConsts.KB_LLM_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestLlm.setUid(orgUid + BytedeskConsts.DEFAULT_KB_LLM_UID);
-        kownledgebaseRequestLlm.setType(KnowledgebaseTypeEnum.LLM.name());
+        kownledgebaseRequestLlm.setType(KbaseTypeEnum.LLM.name());
         kownledgebaseRequestLlm.setOrgUid(orgUid);
         create(kownledgebaseRequestLlm);
 
         // 初始化关键词知识库
-        KnowledgebaseRequest kownledgebaseRequestKeyword = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_KEYWORD_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestKeyword = KbaseRequest.builder()
+                .name(KbaseConsts.KB_KEYWORD_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestKeyword.setUid(orgUid + BytedeskConsts.DEFAULT_KB_KEYWORD_UID);
-        kownledgebaseRequestKeyword.setType(KnowledgebaseTypeEnum.KEYWORD.name());
+        kownledgebaseRequestKeyword.setType(KbaseTypeEnum.KEYWORD.name());
         kownledgebaseRequestKeyword.setOrgUid(orgUid);
         create(kownledgebaseRequestKeyword);
 
         // 初始化FAQ知识库
-        KnowledgebaseRequest kownledgebaseRequestFaq = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_FAQ_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestFaq = KbaseRequest.builder()
+                .name(KbaseConsts.KB_FAQ_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestFaq.setUid(orgUid + BytedeskConsts.DEFAULT_KB_FAQ_UID);
-        kownledgebaseRequestFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
+        kownledgebaseRequestFaq.setType(KbaseTypeEnum.FAQ.name());
         kownledgebaseRequestFaq.setOrgUid(orgUid);
         create(kownledgebaseRequestFaq);
 
         // 初始化自动回复知识库
-        KnowledgebaseRequest kownledgebaseRequestAutoReply = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_AUTOREPLY_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestAutoReply = KbaseRequest.builder()
+                .name(KbaseConsts.KB_AUTOREPLY_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestAutoReply.setUid(orgUid + BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID);
-        kownledgebaseRequestAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
+        kownledgebaseRequestAutoReply.setType(KbaseTypeEnum.AUTOREPLY.name());
         kownledgebaseRequestAutoReply.setOrgUid(orgUid);
         create(kownledgebaseRequestAutoReply);
 
         // 初始化快捷回复知识库
-        KnowledgebaseRequest kownledgebaseRequestQuickReply = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestQuickReply = KbaseRequest.builder()
+                .name(KbaseConsts.KB_QUICKREPLY_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequestQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
         kownledgebaseRequestQuickReply.setUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
         kownledgebaseRequestQuickReply.setOrgUid(orgUid);
         create(kownledgebaseRequestQuickReply);
 
         // 初始化敏感词/屏蔽词知识库
-        KnowledgebaseRequest kownledgebaseRequestTaboo = KnowledgebaseRequest.builder()
-                .name(KnowledgebaseConsts.KB_TABOO_NAME)
-                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        KbaseRequest kownledgebaseRequestTaboo = KbaseRequest.builder()
+                .name(KbaseConsts.KB_TABOO_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestTaboo.setType(KnowledgebaseTypeEnum.TABOO.name());
+        kownledgebaseRequestTaboo.setType(KbaseTypeEnum.TABOO.name());
         kownledgebaseRequestTaboo.setUid(orgUid + BytedeskConsts.DEFAULT_KB_TABOO_UID);
         kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);

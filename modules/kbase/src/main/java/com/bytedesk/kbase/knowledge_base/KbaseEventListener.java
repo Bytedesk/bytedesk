@@ -25,9 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class KnowledgebaseEventListener {
+public class KbaseEventListener {
 
-        private final KnowledgebaseRestService knowledgebaseService;
+        private final KbaseRestService kbaseService;
 
         private final QuickReplyRestService quickReplyRestService;
 
@@ -37,7 +37,7 @@ public class KnowledgebaseEventListener {
                 String orgUid = organization.getUid();
                 log.info("onOrganizationCreateEvent: orgUid {}", orgUid);
                 // 初始化知识库
-                knowledgebaseService.initKbase(orgUid);
+                kbaseService.initKbase(orgUid);
                 // 初始化快捷回复分类
                 quickReplyRestService.initQuickReplyCategory(orgUid);
                 // 初始化快捷回复

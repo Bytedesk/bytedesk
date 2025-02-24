@@ -41,9 +41,9 @@ import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseRequest;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseRestService;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
+import com.bytedesk.kbase.knowledge_base.KbaseRequest;
+import com.bytedesk.kbase.knowledge_base.KbaseRestService;
+import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 
@@ -56,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AgentEventListener {
 
     private final AgentRestService agentService;
-    private final KnowledgebaseRestService knowledgebaseService;
+    private final KbaseRestService knowledgebaseService;
     private final UidUtils uidUtils;
     private final MqttConnectionService mqttConnectionService;
     private final IMessageSendService messageSendService;
@@ -83,13 +83,13 @@ public class AgentEventListener {
         AgentEntity agent = event.getAgent();
         log.info("agent onAgentCreateEvent: {}", agent.getUid());
         // 创建快捷回复知识库
-        KnowledgebaseRequest kownledgebaseRequestQuickReply = KnowledgebaseRequest.builder()
+        KbaseRequest kownledgebaseRequestQuickReply = KbaseRequest.builder()
                 .name(agent.getNickname() +  "Kb")
                 .descriptionHtml(agent.getNickname() + "Kb")
                 .language(LanguageEnum.ZH_CN.name())
                 .level(LevelEnum.AGENT.name())
                 .build();
-        kownledgebaseRequestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequestQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
         kownledgebaseRequestQuickReply.setOrgUid(agent.getOrgUid());
         kownledgebaseRequestQuickReply.setAgentUid(agent.getUid());
         knowledgebaseService.create(kownledgebaseRequestQuickReply);

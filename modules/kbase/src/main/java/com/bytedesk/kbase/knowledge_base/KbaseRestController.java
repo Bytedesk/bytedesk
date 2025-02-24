@@ -31,47 +31,47 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/kbase")
 @AllArgsConstructor
-public class KnowledgebaseRestController extends BaseRestController<KnowledgebaseRequest> {
+public class KbaseRestController extends BaseRestController<KbaseRequest> {
 
-    private final KnowledgebaseRestService knowledgeService;
+    private final KbaseRestService knowledgeService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @GetMapping("/query/org")
     @Override
-    public ResponseEntity<?> queryByOrg(KnowledgebaseRequest request) {
+    public ResponseEntity<?> queryByOrg(KbaseRequest request) {
 
-        Page<KnowledgebaseResponse> page = knowledgeService.queryByOrg(request);
+        Page<KbaseResponse> page = knowledgeService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(KnowledgebaseRequest request) {
+    public ResponseEntity<?> queryByUser(KbaseRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
     @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(@RequestBody KnowledgebaseRequest request) {
+    public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
 
-        KnowledgebaseResponse Faq = knowledgeService.create(request);
+        KbaseResponse Faq = knowledgeService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
     @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(@RequestBody KnowledgebaseRequest request) {
+    public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
 
-        KnowledgebaseResponse Faq = knowledgeService.update(request);
+        KbaseResponse Faq = knowledgeService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
     @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(@RequestBody KnowledgebaseRequest request) {
+    public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
 
         knowledgeService.delete(request);
 

@@ -35,7 +35,7 @@ public class QuickReplyEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         // User user = organization.getUser();
         log.info("quick_reply - organization created: {}", organization.getName());
-        // 为保证执行顺序，迁移到KnowledgebaseEventListener中
+        // 为保证执行顺序，迁移到KbaseEventListener中
         // String orgUid = organization.getUid();
         // 创建快捷用语
         // quickReplyRestService.initQuickReply(orgUid);

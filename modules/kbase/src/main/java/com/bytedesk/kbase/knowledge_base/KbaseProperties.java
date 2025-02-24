@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-04 12:52:49
+ * @Date: 2024-10-29 17:18:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 18:06:02
+ * @LastEditTime: 2024-10-29 23:13:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,23 +13,24 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-/**
- * 
- */
-@Target({ ElementType.PARAMETER, ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface KnowledgebaseAnnotation {
+import lombok.Data;
 
-    public String title() default "";
+@Data
+@Component
+@ConfigurationProperties(KbaseProperties.CONFIG_PREFIX)
+public class KbaseProperties {
 
-    public String action() default "";
+    public static final String CONFIG_PREFIX = "bytedesk.kbase";
 
-    public String description() default "";
+    private String theme;
+
+    private String htmlPath;
+    
+    // private String templatePath;
+
+    private String apiUrl;
+    
 }
