@@ -18,7 +18,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.auto_reply_fixed.settings.AutoReplySettings;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;

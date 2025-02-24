@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 10:07:39
+ * @LastEditTime: 2025-02-24 16:52:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,12 +31,12 @@ import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubService;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.auto_reply_fixed.AutoReplyExcel;
-import com.bytedesk.kbase.auto_reply_fixed.AutoReplyExcelListener;
-import com.bytedesk.kbase.auto_reply_fixed.AutoReplyRestService;
-import com.bytedesk.kbase.auto_reply_keyword.KeywordExcel;
-import com.bytedesk.kbase.auto_reply_keyword.KeywordExcelListener;
-import com.bytedesk.kbase.auto_reply_keyword.KeywordRestService;
+import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedExcel;
+import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedExcelListener;
+import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedRestService;
+import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordExcel;
+import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordExcelListener;
+import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordRestService;
 import com.bytedesk.kbase.faq.FaqExcel;
 import com.bytedesk.kbase.faq.FaqExcelListener;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -59,11 +59,11 @@ public class UploadEventListener {
 
     private final UploadRestService uploadService;
 
-    private final KeywordRestService keywordService;
+    private final AutoReplyKeywordRestService keywordService;
 
     private final FaqRestService faqService;
 
-    private final AutoReplyRestService autoReplyService;
+    private final AutoReplyFixedRestService AutoReplyFixedService;
 
     private final QuickReplyRestService quickReplyService;
 
@@ -93,8 +93,8 @@ public class UploadEventListener {
                 // 导入关键字
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                EasyExcel.read(filePath, KeywordExcel.class,
-                        new KeywordExcelListener(keywordService,
+                EasyExcel.read(filePath, AutoReplyKeywordExcel.class,
+                        new AutoReplyKeywordExcelListener(keywordService,
                                 // upload.getCategoryUid(),
                                 upload.getKbUid(),
                                 upload.getOrgUid()))
@@ -111,8 +111,8 @@ public class UploadEventListener {
                 // 导入自动回复
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                EasyExcel.read(filePath, AutoReplyExcel.class, new AutoReplyExcelListener(
-                        autoReplyService,
+                EasyExcel.read(filePath, AutoReplyFixedExcel.class, new AutoReplyFixedExcelListener(
+                        AutoReplyFixedService,
                         // upload.getCategoryUid(),
                         upload.getKbUid(),
                         upload.getOrgUid())).sheet().doRead();
