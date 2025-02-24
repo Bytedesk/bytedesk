@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 06:43:57
+ * @LastEditTime: 2025-02-24 09:24:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,11 +15,6 @@ package com.bytedesk.kbase.notebase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import org.springframework.ai.document.Document;
-import org.springframework.lang.NonNull;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -103,9 +98,9 @@ public class NotebaseEntity extends BaseEntity {
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     //
-    public Document toDocument(@NonNull NotebaseEntity Notebase) {
-        return new Document(Notebase.getTitle() + Notebase.getContentMarkdown(),
-                Map.of("categoryUid", Notebase.getCategoryUid(), "kbUid", Notebase.getKbUid()));
-    }
+    // public Document toDocument(@NonNull NotebaseEntity Notebase) {
+    //     return new Document(Notebase.getTitle() + Notebase.getContentMarkdown(),
+    //             Map.of("categoryUid", Notebase.getCategoryUid(), "kbUid", Notebase.getKbUid()));
+    // }
 
 }

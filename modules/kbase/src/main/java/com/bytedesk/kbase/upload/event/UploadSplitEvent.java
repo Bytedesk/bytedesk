@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-03 10:18:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:52:21
+ * @LastEditTime: 2025-02-24 09:29:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,9 @@
  */
 package com.bytedesk.kbase.upload.event;
 
-import java.util.List;
+// import java.util.List;
 
-import org.springframework.ai.document.Document;
+// import org.springframework.ai.document.Document;
 import org.springframework.context.ApplicationEvent;
 
 import lombok.Data;
@@ -27,7 +27,7 @@ public class UploadSplitEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final List<Document> documents;
+    // private final List<Document> documents;
 
     // 知识库uid
     private final String kbUid; 
@@ -35,9 +35,9 @@ public class UploadSplitEvent extends ApplicationEvent {
     // 企业uid
     private final String orgUid;
 
-    public UploadSplitEvent(List<Document> documents, String kbUid, String orgUid) {
-        super(documents);
-        this.documents = documents;
+    public UploadSplitEvent(String kbUid, String orgUid) {
+        super(kbUid);
+        // this.documents = documents;
         this.kbUid = kbUid;
         this.orgUid = orgUid;
     }

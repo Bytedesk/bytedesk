@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 18:59:02
+ * @LastEditTime: 2025-02-24 09:23:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.upload;
+package com.bytedesk.ai.springai;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,6 +35,10 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.config.KbaseConst;
+import com.bytedesk.kbase.upload.UploadEntity;
+import com.bytedesk.kbase.upload.UploadRestService;
+import com.bytedesk.kbase.upload.UploadStatusEnum;
+import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadSplitEvent;
 
 import lombok.AllArgsConstructor;
@@ -43,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UploadVectorStore {
+public class SpringAIUploadVectorStore {
 
 	private final RedisVectorStore ollamaRedisVectorStore;
 
