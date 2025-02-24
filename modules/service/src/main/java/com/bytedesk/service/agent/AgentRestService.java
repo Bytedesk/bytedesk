@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 17:02:39
+ * @LastEditTime: 2025-02-24 19:25:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -216,10 +216,13 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 
         ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
         agent.setServiceSettings(serviceSettings);
+        // 
         AutoReplySettings autoReplySettings = serviceSettingsService.formatAgentAutoReplySettings(request);
         agent.setAutoReplySettings(autoReplySettings);
+        // 
         QueueSettings queueSettings = serviceSettingsService.formatAgentQueueSettings(request);
         agent.setQueueSettings(queueSettings);
+        // 
         InviteSettings inviteSettings = serviceSettingsService.formatAgentInviteSettings(request);
         agent.setInviteSettings(inviteSettings);
         // 保存Agent，并检查返回值
