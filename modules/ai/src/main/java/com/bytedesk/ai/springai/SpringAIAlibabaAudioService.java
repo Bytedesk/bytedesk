@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:52:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 15:31:32
+ * @LastEditTime: 2025-02-24 15:40:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,9 +33,11 @@ import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionMode
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @RequiredArgsConstructor
 @Service
+@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIAlibabaAudioService {
 
     private final AudioTranscriptionModel dashScopeAudioTranscriptionModel;
