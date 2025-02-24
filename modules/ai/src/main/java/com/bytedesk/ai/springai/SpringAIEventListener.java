@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 10:23:31
+ * @LastEditTime: 2025-02-24 11:35:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SpringAIEventListener {
     
-    private final SpringAIVectorService vectorService;
+    private final SpringAIVectorService springAiVectorService;
 
     private final ZhipuaiChatService zhipuaiChatService;
 
@@ -48,7 +48,7 @@ public class SpringAIEventListener {
         // etl分块处理
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
             // 通知python ai模块处理
-            vectorService.readSplitWriteToVectorStore(upload);
+            springAiVectorService.readSplitWriteToVectorStore(upload);
             return;
         }
     }
