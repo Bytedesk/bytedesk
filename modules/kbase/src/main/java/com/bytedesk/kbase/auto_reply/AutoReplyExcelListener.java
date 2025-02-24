@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-24 07:45:07
+ * @LastEditTime: 2025-02-24 14:06:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AutoReplyExcelListener implements ReadListener<AutoReplyExcel> {
 
     private final AutoReplyRestService autoreplyService;
-
-    // private final String categoryUid;
 
     private final String kbUid;
 
