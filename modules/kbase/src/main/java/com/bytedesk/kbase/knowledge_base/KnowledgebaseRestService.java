@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 10:42:40
+ * @LastEditTime: 2025-02-24 13:08:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class KnowledgebaseService extends BaseRestService<KnowledgebaseEntity, KnowledgebaseRequest, KnowledgebaseResponse> {
+public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntity, KnowledgebaseRequest, KnowledgebaseResponse> {
 
     private final KnowledgebaseRepository knowledgebaseRepository;
 

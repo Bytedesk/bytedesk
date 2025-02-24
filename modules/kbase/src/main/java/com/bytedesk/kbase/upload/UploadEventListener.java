@@ -42,7 +42,7 @@ import com.bytedesk.kbase.keyword.KeywordExcelListener;
 import com.bytedesk.kbase.keyword.KeywordService;
 import com.bytedesk.kbase.quick_reply.QuickReplyExcel;
 import com.bytedesk.kbase.quick_reply.QuickReplyExcelListener;
-import com.bytedesk.kbase.quick_reply.QuickReplyService;
+import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
 import com.bytedesk.kbase.taboo.TabooExcel;
 import com.bytedesk.kbase.taboo.TabooExcelListener;
 import com.bytedesk.kbase.taboo.TabooService;
@@ -65,7 +65,7 @@ public class UploadEventListener {
 
     private final AutoReplyRestService autoReplyService;
 
-    private final QuickReplyService quickReplyService;
+    private final QuickReplyRestService quickReplyService;
 
     private final TabooService tabooService;
 

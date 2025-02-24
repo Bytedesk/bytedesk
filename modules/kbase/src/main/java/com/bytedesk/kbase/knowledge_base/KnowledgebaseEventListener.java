@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class KnowledgebaseEventListener {
 
-        private final KnowledgebaseService knowledgebaseService;
+        private final KnowledgebaseRestService knowledgebaseService;
 
         @EventListener
         public void onOrganizationCreateEvent(OrganizationCreateEvent event) {

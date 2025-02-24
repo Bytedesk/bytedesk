@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class KnowledgebaseRestController extends BaseRestController<KnowledgebaseRequest> {
 
-    private final KnowledgebaseService knowledgeService;
+    private final KnowledgebaseRestService knowledgeService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @GetMapping("/query/org")
