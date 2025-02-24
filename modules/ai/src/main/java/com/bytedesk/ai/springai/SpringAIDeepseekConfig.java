@@ -35,6 +35,12 @@ public class SpringAIDeepseekConfig {
     @Value("${spring.ai.deepseek.api-key}")
     private String apiKey;
 
+    @Value("${spring.ai.deepseek.chat.options.model}")
+    private String model;
+
+    @Value("${spring.ai.deepseek.chat.options.temperature}")
+    private Double temperature;
+
     @Bean("deepSeekApi")
     OpenAiApi deepSeekApi() {
         return OpenAiApi.builder()
@@ -46,7 +52,8 @@ public class SpringAIDeepseekConfig {
     @Bean("deepSeekChatOptions")
     ChatOptions deepSeekChatOptions() {
         return ChatOptions.builder()
-                .model("deepseek-chat")
+                .model(model)
+                .temperature(temperature)
                 .build();
     }
 
