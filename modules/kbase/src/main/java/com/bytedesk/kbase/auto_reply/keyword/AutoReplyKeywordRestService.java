@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 16:56:15
+ * @LastEditTime: 2025-02-24 19:10:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,8 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -51,6 +53,8 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
     private final UidUtils uidUtils;
 
     private final CategoryRestService categoryService;
+
+    private final AuthService authService;
 
     @Override
     public Page<AutoReplyKeywordResponse> queryByOrg(AutoReplyKeywordRequest request) {
@@ -101,9 +105,15 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
 
     @Override
     public AutoReplyKeywordResponse create(AutoReplyKeywordRequest request) {
-
+        // 获取当前用户
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
         AutoReplyKeywordEntity keyword = modelMapper.map(request, AutoReplyKeywordEntity.class);
-        keyword.setUid(uidUtils.getCacheSerialUid());
+        keyword.setUid(uidUtils.getUid());
         //
         AutoReplyKeywordEntity savedAutoReplyKeyword = save(keyword);
         if (savedAutoReplyKeyword == null) {
