@@ -7,4 +7,7 @@ spring:
       weaviate:
         enabled: false  # 禁用 Weaviate
       redis:
-        enabled: true   # 启用 Redis 
+        enabled: true   # 启用 Redis
+    zhipuai:
+      chat:
+        enabled: true  # 控制是否启用智谱AI相关功能 
