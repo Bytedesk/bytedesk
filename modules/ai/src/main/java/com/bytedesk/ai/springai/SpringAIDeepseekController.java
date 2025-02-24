@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 07:21:42
+ * @LastEditTime: 2025-02-25 07:25:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/deepseek")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.openai.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true")
 public class SpringAIDeepseekController {
     
     // deepseek chat model
