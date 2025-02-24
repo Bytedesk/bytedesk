@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 09:24:00
+ * @LastEditTime: 2025-02-24 09:56:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,13 +13,10 @@
  */
 package com.bytedesk.kbase.upload;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,7 +47,7 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 
 	private final UploadRestService uploadService;
 	
-	private final UploadVectorStore uploadVectorStore;
+	// private final UploadVectorStore uploadVectorStore;
 
 	@ActionAnnotation(title = "upload", action = "uploadFile", description = "upload File")
 	@PostMapping("/file")
@@ -74,21 +71,21 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 		return ResponseEntity.ok(JsonResult.success("upload file success", response));
 	}
 
-	@ActionAnnotation(title = "upload", action = "process", description = "process upload")
-	@PostMapping("/process")
-	public ResponseEntity<?> process(@RequestBody UploadRequest request) {
+	// @ActionAnnotation(title = "upload", action = "process", description = "process upload")
+	// @PostMapping("/process")
+	// public ResponseEntity<?> process(@RequestBody UploadRequest request) {
 
-		Optional<UploadEntity> uploadOptional = uploadService.findByUid(request.getUid());
-		if (uploadOptional.isPresent()) {
-			UploadEntity upload = uploadOptional.get();
-			// uploadVectorStore.readSplitWriteToVectorStore(upload);
-			//
-			return ResponseEntity.ok(JsonResult.success("process success"));
-		} else {
-			log.error("upload not found");
-			return ResponseEntity.badRequest().body(JsonResult.error("upload not found"));
-		}
-	}
+	// 	Optional<UploadEntity> uploadOptional = uploadService.findByUid(request.getUid());
+	// 	if (uploadOptional.isPresent()) {
+	// 		UploadEntity upload = uploadOptional.get();
+	// 		// uploadVectorStore.readSplitWriteToVectorStore(upload);
+	// 		//
+	// 		return ResponseEntity.ok(JsonResult.success("process success"));
+	// 	} else {
+	// 		log.error("upload not found");
+	// 		return ResponseEntity.badRequest().body(JsonResult.error("upload not found"));
+	// 	}
+	// }
 
 	// @PreAuthorize(RolePermissions.ROLE_ADMIN)
 	@Override

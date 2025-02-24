@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 09:24:13
+ * @LastEditTime: 2025-02-24 09:51:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,8 +74,6 @@ public class UploadEventListener {
     private final UidUtils uidUtils;
 
     private final IMessageSendService messageSendService;
-
-    private final UploadVectorStore uploadVectorStore;
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {

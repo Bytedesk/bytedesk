@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 10:14:17
+ * @LastEditTime: 2025-02-24 09:46:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
 import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
+import com.bytedesk.ai.springai.event.VectorSplitEvent;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -46,7 +47,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.upload.event.UploadSplitEvent;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.ai.provider.LlmProviderConsts;
 import lombok.AllArgsConstructor;
@@ -255,7 +255,7 @@ public class RobotEventListener {
     }
 
     @EventListener
-    public void onUploadSplitEvent(UploadSplitEvent event) {
+    public void onVectorSplitEvent(VectorSplitEvent event) {
         log.info("robot onUploadSplitEvent: {}", event.getDocuments().size());
         List<Document> documents = event.getDocuments();
 
