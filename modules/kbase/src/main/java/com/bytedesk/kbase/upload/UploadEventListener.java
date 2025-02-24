@@ -36,7 +36,7 @@ import com.bytedesk.kbase.auto_reply_fixed.AutoReplyExcelListener;
 import com.bytedesk.kbase.auto_reply_fixed.AutoReplyRestService;
 import com.bytedesk.kbase.auto_reply_keyword.KeywordExcel;
 import com.bytedesk.kbase.auto_reply_keyword.KeywordExcelListener;
-import com.bytedesk.kbase.auto_reply_keyword.KeywordService;
+import com.bytedesk.kbase.auto_reply_keyword.KeywordRestService;
 import com.bytedesk.kbase.faq.FaqExcel;
 import com.bytedesk.kbase.faq.FaqExcelListener;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -59,7 +59,7 @@ public class UploadEventListener {
 
     private final UploadRestService uploadService;
 
-    private final KeywordService keywordService;
+    private final KeywordRestService keywordService;
 
     private final FaqRestService faqService;
 
