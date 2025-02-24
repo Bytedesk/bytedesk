@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 13:08:06
+ * @LastEditTime: 2025-02-24 13:37:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -32,6 +30,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.article.ArticleRequest;
@@ -56,14 +56,9 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
 
     @Override
     public Page<KnowledgebaseResponse> queryByOrg(KnowledgebaseRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-
+        Pageable pageable = request.getPageable();
         Specification<KnowledgebaseEntity> spec = KnowledgebaseSpecification.search(request);
-
         Page<KnowledgebaseEntity> page = knowledgebaseRepository.findAll(spec, pageable);
-
         return page.map(this::convertToResponse);
     }
 
@@ -210,92 +205,93 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
         return articleService.queryByOrg(articleRequest);
     }
 
-    // public void initData() {
+    // 初始化知识库
+    public void initKbase(String orgUid) {
 
-    //     if (knowledgebaseRepository.count() > 0) {
-    //         return;
-    //     }
-    //     //
-    //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    //     KnowledgebaseRequest kownledgebaseRequestQuickReplyPlatform = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_PLATFORM_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .level(LevelEnum.PLATFORM.name())
-    //             .build();
-    //     kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
-    //     kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
-    //     // 方便超级管理员加载，避免重新写一个接口拉取
-    //     kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestQuickReplyPlatform);
+        // 初始化快捷回复知识库
+        // KnowledgebaseRequest kownledgebaseRequestQuickReplyPlatform = KnowledgebaseRequest.builder()
+        //         .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
+        //         .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+        //         .language(LanguageEnum.ZH_CN.name())
+        //         .level(LevelEnum.ORGANIZATION.name())
+        //         .build();
+        // kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
+        // kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        // // 方便超级管理员加载，避免重新写一个接口拉取
+        // kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
+        // create(kownledgebaseRequestQuickReplyPlatform);
         
-    //     //
-    //     KnowledgebaseRequest kownledgebaseRequestHelpdoc = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_HELPCENTER_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .build();
-    //     kownledgebaseRequestHelpdoc.setUid(BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
-    //     kownledgebaseRequestHelpdoc.setType(KnowledgebaseTypeEnum.HELPCENTER.name());
-    //     kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestHelpdoc);
-    //     //
-    //     KnowledgebaseRequest kownledgebaseRequestLlm = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_LLM_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .build();
-    //     kownledgebaseRequestLlm.setType(KnowledgebaseTypeEnum.LLM.name());
-    //     kownledgebaseRequestLlm.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestLlm);
-    //     //
-    //     KnowledgebaseRequest kownledgebaseRequestKeyword = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_KEYWORD_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .build();
-    //     kownledgebaseRequestKeyword.setType(KnowledgebaseTypeEnum.KEYWORD.name());
-    //     kownledgebaseRequestKeyword.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestKeyword);
-    //     // 
-    //     KnowledgebaseRequest kownledgebaseRequestFaq = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_FAQ_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .build();
-    //     kownledgebaseRequestFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
-    //     kownledgebaseRequestFaq.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestFaq);
-    //     //
-    //     KnowledgebaseRequest kownledgebaseRequestAutoReply = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_AUTOREPLY_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .build();
-    //     kownledgebaseRequestAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
-    //     kownledgebaseRequestAutoReply.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestAutoReply);
-    //     //
-    //     KnowledgebaseRequest kownledgebaseRequestQuickReply = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .build();
-    //     kownledgebaseRequestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
-    //     kownledgebaseRequestQuickReply.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestQuickReply);
-    //     //
-    //     KnowledgebaseRequest kownledgebaseRequestTaboo = KnowledgebaseRequest.builder()
-    //             .name(KnowledgebaseConsts.KB_TABOO_NAME)
-    //             .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
-    //             .language(LanguageEnum.ZH_CN.name())
-    //             .build();
-    //     kownledgebaseRequestTaboo.setType(KnowledgebaseTypeEnum.TABOO.name());
-    //     kownledgebaseRequestTaboo.setOrgUid(orgUid);
-    //     create(kownledgebaseRequestTaboo);
-    //     // 
-        
+        // 初始化帮助文档知识库
+        KnowledgebaseRequest kownledgebaseRequestHelpdoc = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_HELPCENTER_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestHelpdoc.setUid(BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
+        kownledgebaseRequestHelpdoc.setType(KnowledgebaseTypeEnum.HELPCENTER.name());
+        kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
+        create(kownledgebaseRequestHelpdoc);
 
-    // }
+        // 初始化AI知识库
+        KnowledgebaseRequest kownledgebaseRequestLlm = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_LLM_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestLlm.setType(KnowledgebaseTypeEnum.LLM.name());
+        kownledgebaseRequestLlm.setOrgUid(orgUid);
+        create(kownledgebaseRequestLlm);
+
+        // 初始化关键词知识库
+        KnowledgebaseRequest kownledgebaseRequestKeyword = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_KEYWORD_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestKeyword.setType(KnowledgebaseTypeEnum.KEYWORD.name());
+        kownledgebaseRequestKeyword.setOrgUid(orgUid);
+        create(kownledgebaseRequestKeyword);
+
+        // 初始化FAQ知识库
+        KnowledgebaseRequest kownledgebaseRequestFaq = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_FAQ_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
+        kownledgebaseRequestFaq.setOrgUid(orgUid);
+        create(kownledgebaseRequestFaq);
+
+        // 初始化自动回复知识库
+        KnowledgebaseRequest kownledgebaseRequestAutoReply = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_AUTOREPLY_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
+        kownledgebaseRequestAutoReply.setOrgUid(orgUid);
+        create(kownledgebaseRequestAutoReply);
+
+        // 初始化快捷回复知识库
+        KnowledgebaseRequest kownledgebaseRequestQuickReply = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequestQuickReply.setOrgUid(orgUid);
+        create(kownledgebaseRequestQuickReply);
+
+        // 初始化敏感词/屏蔽词知识库
+        KnowledgebaseRequest kownledgebaseRequestTaboo = KnowledgebaseRequest.builder()
+                .name(KnowledgebaseConsts.KB_TABOO_NAME)
+                .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestTaboo.setType(KnowledgebaseTypeEnum.TABOO.name());
+        kownledgebaseRequestTaboo.setOrgUid(orgUid);
+        create(kownledgebaseRequestTaboo);
+    }
+
 
 }
