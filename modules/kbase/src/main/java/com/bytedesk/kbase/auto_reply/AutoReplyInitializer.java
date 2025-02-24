@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-06 21:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 22:36:40
+ * @LastEditTime: 2025-02-24 14:05:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,6 +35,7 @@ public class AutoReplyInitializer implements SmartInitializingSingleton {
     }
 
     private void init() {
+        // 
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = AutoReplyPermissions.AUTOREPLY_PREFIX + permission.name();
             if (authorityService.existsByValue(permissionValue)) {
