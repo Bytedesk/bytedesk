@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 11:35:06
+ * @LastEditTime: 2025-02-24 23:55:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@ package com.bytedesk.ai.springai;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.ai.document.Document;
 import org.springframework.context.event.EventListener;
@@ -37,7 +38,7 @@ public class SpringAIEventListener {
     
     private final SpringAIVectorService springAiVectorService;
 
-    private final ZhipuaiChatService zhipuaiChatService;
+    private final Optional<ZhipuaiChatService> zhipuaiChatService;
 
     private final FaqRestService faqRestService;
 
