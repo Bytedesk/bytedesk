@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-20 14:31:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 12:55:07
+ * @LastEditTime: 2025-02-24 13:33:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class QuickReplyEventListener {
 
-    private final QuickReplyRestService quickReplyRestService;
+    // private final QuickReplyRestService quickReplyRestService;
 
     @Order(7)
     @EventListener
@@ -37,12 +37,12 @@ public class QuickReplyEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         // User user = organization.getUser();
         log.info("quick_reply - organization created: {}", organization.getName());
-        // 
-        String orgUid = organization.getUid();
+        // 为保证执行顺序，迁移到KnowledgebaseEventListener中
+        // String orgUid = organization.getUid();
         // 创建快捷用语
-        quickReplyRestService.initQuickReply(orgUid);
+        // quickReplyRestService.initQuickReply(orgUid);
         // 创建快捷用语分类
-        quickReplyRestService.initQuickReplyCategory(orgUid);
+        // quickReplyRestService.initQuickReplyCategory(orgUid);
     }
     
 }
