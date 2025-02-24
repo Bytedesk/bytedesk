@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 23:21:30
+ * @LastEditTime: 2025-02-25 07:24:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,16 +24,15 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * https://deepseek.com/
- * 复用 openai 的配置
  */
 @Configuration
 @ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true")
 public class SpringAIDeepseekConfig {
 
-    @Value("${spring.ai.openai.base-url}")
+    @Value("${spring.ai.deepseek.base-url}")
     private String baseUrl;
 
-    @Value("${spring.ai.openai.api-key}")
+    @Value("${spring.ai.deepseek.api-key}")
     private String apiKey;
 
     @Bean("deepSeekApi")

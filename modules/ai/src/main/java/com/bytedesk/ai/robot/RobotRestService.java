@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 08:25:45
+ * @LastEditTime: 2025-02-25 07:15:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,7 +112,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         if (StringUtils.hasText(request.getUid())) {
             robot.setUid(request.getUid());
         } else {
-            robot.setUid(uidUtils.getCacheSerialUid());
+            robot.setUid(uidUtils.getUid());
         }
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
