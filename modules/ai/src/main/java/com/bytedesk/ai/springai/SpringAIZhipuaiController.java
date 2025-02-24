@@ -66,7 +66,11 @@ public class SpringAIZhipuaiController {
     // http://127.0.0.1:9003/springai/zhipuai/chat?message=hello
     @GetMapping("/chat")
     public ResponseEntity<JsonResult<?>> chat(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        return ResponseEntity.ok(JsonResult.success(zhipuaiChatModel.call(message)));
+
+        String response = zhipuaiChatModel.call(message);
+        // 
+        log.info("chat response: {}", response);
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     // http://127.0.0.1:9003/springai/zhipuai/chatStream?message=hello
