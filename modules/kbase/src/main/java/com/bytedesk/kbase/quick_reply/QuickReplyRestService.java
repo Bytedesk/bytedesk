@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 13:05:33
+ * @LastEditTime: 2025-02-24 13:57:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -250,7 +250,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                 .orderNo(0)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryContact.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryContact.setUid(quickReplyCategoryContactUid);
@@ -265,7 +265,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                 .orderNo(1)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryThanks.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryThanks.setUid(quickReplyCategoryThanksUid);
@@ -280,7 +280,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                 .orderNo(2)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryWelcome.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryWelcome.setUid(quickReplyCategoryWelcomeUid);
@@ -295,7 +295,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                 .orderNo(3)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                 .build();
         categoryBye.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryBye.setUid(quickReplyCategoryByeUid);
@@ -315,7 +315,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .title(I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
                     .categoryUid(categoryContact.get().getUid())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .level(LevelEnum.ORGANIZATION.name())
                     .build();
             quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE);
@@ -334,7 +334,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
                     .categoryUid(categoryThanks.get().getUid())
                     .level(LevelEnum.ORGANIZATION.name())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_THANKS_TITLE);
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
@@ -352,7 +352,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
                     .categoryUid(categoryWelcome.get().getUid())
                     .level(LevelEnum.ORGANIZATION.name())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_WELCOME_TITLE);
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
@@ -370,7 +370,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
                     .categoryUid(categoryBye.get().getUid())
                     .level(LevelEnum.ORGANIZATION.name())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
                     .build();
             quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_BYE_TITLE);
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
