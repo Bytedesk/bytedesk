@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 13:40:33
+ * @LastEditTime: 2025-02-24 14:20:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,7 +76,11 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
 
     @Override
     public KnowledgebaseResponse create(KnowledgebaseRequest request) {
-
+        // 判断uid是否已经存在
+        if (StringUtils.hasText(request.getUid()) && findByUid(request.getUid()).isPresent()) {
+            return null;
+        }
+        // 
         KnowledgebaseEntity entity = KnowledgebaseEntity.builder().build();
         if (StringUtils.hasText(request.getUid())) {
             entity.setUid(request.getUid());
@@ -213,7 +217,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
         //         .name(KnowledgebaseConsts.KB_QUICKREPLY_NAME)
         //         .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
         //         .language(LanguageEnum.ZH_CN.name())
-        //         .level(LevelEnum.ORGANIZATION.name())
+        //         .level(LevelEnum.PLATFORM.name())
         //         .build();
         // kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
         // kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
