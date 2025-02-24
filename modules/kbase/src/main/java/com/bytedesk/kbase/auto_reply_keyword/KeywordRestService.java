@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 22:44:16
+ * @LastEditTime: 2025-02-24 16:47:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class KeywordService extends BaseRestService<KeywordEntity, KeywordRequest, KeywordResponse> {
+public class KeywordRestService extends BaseRestService<KeywordEntity, KeywordRequest, KeywordResponse> {
 
     private final KeywordRepository keywordRepository;
 
@@ -53,7 +53,6 @@ public class KeywordService extends BaseRestService<KeywordEntity, KeywordReques
 
     @Override
     public Page<KeywordResponse> queryByOrg(KeywordRequest request) {
-
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
                 "updatedAt");
         Specification<KeywordEntity> spec = KeywordSpecification.search(request);

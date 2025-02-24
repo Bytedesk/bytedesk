@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class KeywordExcelListener implements ReadListener<KeywordExcel> {
 
-    private final KeywordService keywordService;
+    private final KeywordRestService keywordService;
 
     // private final String categoryUid;
 

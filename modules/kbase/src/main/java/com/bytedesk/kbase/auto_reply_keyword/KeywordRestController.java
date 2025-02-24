@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class KeywordRestController extends BaseRestController<KeywordRequest> {
 
-    private final KeywordService keywordService;
+    private final KeywordRestService keywordService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
