@@ -14,7 +14,7 @@
 package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.auto_reply_fixed.settings.AutoReplySettings;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponse;
 import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsResponse;
