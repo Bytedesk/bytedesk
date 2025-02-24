@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:52:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 14:17:51
+ * @LastEditTime: 2025-02-24 15:14:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,10 +31,9 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/image")
 @RequiredArgsConstructor
-public class SpringAIImageController {
+public class SpringAIAlibabaImageController {
 
-    private final SpringAIImageService imageService;
-
+    private final SpringAIAlibabaImageService imageService;
 
 	// http://127.0.0.1:9003/springai/image/image2text
 	@UserIp
