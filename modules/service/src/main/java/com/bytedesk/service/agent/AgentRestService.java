@@ -48,7 +48,7 @@ import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
+import com.bytedesk.kbase.auto_reply_fixed.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.event.AgentUpdateEvent;

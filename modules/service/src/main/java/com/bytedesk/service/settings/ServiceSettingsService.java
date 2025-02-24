@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
+import com.bytedesk.kbase.auto_reply_fixed.settings.AutoReplySettings;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.settings.InviteSettings;
