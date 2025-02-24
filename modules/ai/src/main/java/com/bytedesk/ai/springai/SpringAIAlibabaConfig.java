@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 15:21:09
+ * @LastEditTime: 2025-02-24 15:32:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeAudioTranscriptionApi;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeSpeechSynthesisApi;
+import com.alibaba.cloud.ai.dashscope.audio.DashScopeAudioTranscriptionModel;
+import com.alibaba.cloud.ai.dashscope.audio.DashScopeSpeechSynthesisModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 
@@ -42,7 +46,7 @@ public class SpringAIAlibabaConfig {
 
     private static final String DEFAULT_PROMPT = "你是一个博学的智能聊天助手，请根据用户提问回答！";
 
-    @Value("${spring.ai.dashscope.api-key:}")
+    @Value("${spring.ai.dashscope.api-key:sk-xxx}")
     private String dashScopeApiKey;
 
     @Value("${spring.ai.dashscope.chat.options.model:deepseek-r1}")
@@ -97,14 +101,25 @@ public class SpringAIAlibabaConfig {
         return new DashScopeChatModel(dashScopeApi, dashScopeChatOptions);
     }
 
-    // @Bean("audioTranscriptionModel")
-    // AudioTranscriptionModel audioTranscriptionModel() {
-    //     return new AudioTranscriptionModel();
-    // }
+    @Bean("dashScopeAudioTranscriptionApi")
+    DashScopeAudioTranscriptionApi dashScopeAudioTranscriptionApi(String dashScopeApiKey) {
+        return new DashScopeAudioTranscriptionApi(dashScopeApiKey);
+    }
+    
+    @Bean("dashScopeAudioTranscriptionModel")
+    DashScopeAudioTranscriptionModel dashScopeAudioTranscriptionModel(DashScopeAudioTranscriptionApi dashScopeAudioTranscriptionApi) {
+        return new DashScopeAudioTranscriptionModel(dashScopeAudioTranscriptionApi);
+    }
 
-    // @Bean("speechSynthesisModel")
-    // SpeechSynthesisModel speechSynthesisModel(DashScopeApi dashScopeApi) {
-    //     return new SpeechSynthesisModel(dashScopeApi);
-    // }
+    @Bean("dashScopeSpeechSynthesisApi")
+    DashScopeSpeechSynthesisApi dashScopeSpeechSynthesisApi(String dashScopeApiKey) {
+        return new DashScopeSpeechSynthesisApi(dashScopeApiKey);
+    }
+
+    @Bean("dashScopeSpeechSynthesisModel")
+    DashScopeSpeechSynthesisModel dashScopeSpeechSynthesisModel(DashScopeSpeechSynthesisApi dashScopeSpeechSynthesisApi) {
+        return new DashScopeSpeechSynthesisModel(dashScopeSpeechSynthesisApi);
+    }
+
 
 }

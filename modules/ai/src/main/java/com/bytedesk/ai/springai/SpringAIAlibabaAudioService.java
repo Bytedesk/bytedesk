@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:52:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 15:20:47
+ * @LastEditTime: 2025-02-24 15:31:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,27 +31,23 @@ import com.alibaba.cloud.ai.dashscope.audio.synthesis.SpeechSynthesisPrompt;
 import com.alibaba.cloud.ai.dashscope.audio.synthesis.SpeechSynthesisResponse;
 import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionModel;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
-
+@RequiredArgsConstructor
 @Service
 public class SpringAIAlibabaAudioService {
 
-    private final AudioTranscriptionModel transcriptionModel;
+    private final AudioTranscriptionModel dashScopeAudioTranscriptionModel;
 
-	private final SpeechSynthesisModel speechSynthesisModel;
-
-	public SpringAIAlibabaAudioService(AudioTranscriptionModel transcriptionModel, SpeechSynthesisModel speechSynthesisModel) {
-		this.transcriptionModel = transcriptionModel;
-		this.speechSynthesisModel = speechSynthesisModel;
-	}
-
+	private final SpeechSynthesisModel dashScopeSpeechSynthesisModel;
+	
     /**
 	 * 将文本转为语音
 	 */
 	public byte[] text2audio(String text) {
 
-		Flux<SpeechSynthesisResponse> response = speechSynthesisModel.stream(
+		Flux<SpeechSynthesisResponse> response = dashScopeSpeechSynthesisModel.stream(
 				new SpeechSynthesisPrompt(text)
 		);
 
@@ -101,7 +97,7 @@ public class SpringAIAlibabaAudioService {
 			throw new RuntimeException("Failed to create temporary file " + e.getMessage());
 		}
 
-		Flux<AudioTranscriptionResponse> response = transcriptionModel.stream(
+		Flux<AudioTranscriptionResponse> response = dashScopeAudioTranscriptionModel.stream(
 				new AudioTranscriptionPrompt(
 						new FileSystemResource(tempFile),
 						DashScopeAudioTranscriptionOptions.builder()
