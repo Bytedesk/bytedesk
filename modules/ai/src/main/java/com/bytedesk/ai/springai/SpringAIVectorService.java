@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 09:23:02
+ * @LastEditTime: 2025-02-24 09:54:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,13 +33,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.ai.springai.event.VectorSplitEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadRestService;
 import com.bytedesk.kbase.upload.UploadStatusEnum;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
-import com.bytedesk.kbase.upload.event.UploadSplitEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class SpringAIUploadVectorStore {
+public class SpringAIVectorService {
 
 	private final RedisVectorStore ollamaRedisVectorStore;
 
@@ -214,7 +214,7 @@ public class SpringAIUploadVectorStore {
 		ollamaRedisVectorStore.write(docList);
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
 		// 通知相关组件，文件处理成功
-		bytedeskEventPublisher.publishEvent(new UploadSplitEvent(docList, upload.getKbUid(), upload.getOrgUid()));
+		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(upload.getKbUid(), upload.getOrgUid(), docList));
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html

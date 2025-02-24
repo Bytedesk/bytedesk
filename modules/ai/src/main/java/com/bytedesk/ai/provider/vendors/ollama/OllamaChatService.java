@@ -31,11 +31,11 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotTypeEnum;
+import com.bytedesk.ai.springai.SpringAIVectorService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.kbase.upload.UploadVectorStore;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +56,7 @@ public class OllamaChatService {
     private LlmProviderRestService llmProviderRestService;
 
     @Autowired
-    private UploadVectorStore uploadVectorStore;
+    private SpringAIVectorService uploadVectorStore;
 
     // private final String PROMPT_BLUEPRINT = """
     //         根据提供的文档信息回答问题，文档信息如下:

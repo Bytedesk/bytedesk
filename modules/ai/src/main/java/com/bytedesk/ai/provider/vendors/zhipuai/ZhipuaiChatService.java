@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 00:30:19
+ * @LastEditTime: 2025-02-24 09:44:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotMessage;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotTypeEnum;
+import com.bytedesk.ai.springai.SpringAIVectorService;
 import com.bytedesk.ai.springai.SpringAIZhipuaiConfig;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -43,7 +44,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JsonResultCodeEnum;
-import com.bytedesk.kbase.upload.UploadVectorStore;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
@@ -86,7 +86,7 @@ public class ZhipuaiChatService {
 
     private final MessageRestService messageService;
 
-    private final UploadVectorStore uploadVectorStore;
+    private final SpringAIVectorService uploadVectorStore;
 
     private final IMessageSendService messageSendService;
 
