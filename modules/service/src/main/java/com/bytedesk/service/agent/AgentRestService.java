@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 19:25:56
+ * @LastEditTime: 2025-02-24 20:59:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,6 +110,14 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     public AgentResponse query(AgentRequest request) {
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = findByUserUidAndOrgUid(user.getUid(), request.getOrgUid());
+        if (!agentOptional.isPresent()) {
+            throw new RuntimeException("agent not found");
+        }
+        return convertToResponse(agentOptional.get());
+    }
+
+    public AgentResponse queryDetail(String uid) {
+        Optional<AgentEntity> agentOptional = findByUid(uid);
         if (!agentOptional.isPresent()) {
             throw new RuntimeException("agent not found");
         }

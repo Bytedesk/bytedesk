@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 12:38:08
+ * @LastEditTime: 2025-02-24 21:08:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,8 @@ package com.bytedesk.service.agent;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,14 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
+// import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
 
-/**
- * 
- */
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/agent")
@@ -38,7 +36,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
 
     private final AgentRestService agentService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
@@ -53,6 +51,15 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         AgentResponse agentResponse = agentService.query(request);
         
         return ResponseEntity.ok(JsonResult.success(agentResponse));
+    }
+
+    @ActionAnnotation(title = "agent", action = "detail", description = "query agent profile")
+    @GetMapping("/query/detail")
+    public ResponseEntity<?> queryDetail(AgentRequest request) {
+
+        AgentResponse agent = agentService.queryDetail(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(agent));
     }
 
     @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
@@ -105,12 +112,6 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
     
-    /**
-     * delete
-     *
-     * @param request agent
-     * @return json
-     */
     @ActionAnnotation(title = "agent", action = "delete", description = "delete agent")
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
