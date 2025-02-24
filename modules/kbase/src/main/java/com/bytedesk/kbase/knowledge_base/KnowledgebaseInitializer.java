@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 10:47:45
+ * @LastEditTime: 2025-02-24 13:06:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,15 +28,15 @@ public class KnowledgebaseInitializer implements SmartInitializingSingleton {
 
     private final KnowledgebaseRepository knowledgebaseRepository;
 
-    private final KnowledgebaseService knowledgebaseService;
+    private final KnowledgebaseRestService knowledgebaseService;
 
     @Override
     public void afterSingletonsInstantiated() {
-        init();
+        initKbase();
     }
 
     // @PostConstruct
-    public void init() {
+    public void initKbase() {
         
         if (knowledgebaseRepository.count() > 0) {
             return;
@@ -47,7 +47,7 @@ public class KnowledgebaseInitializer implements SmartInitializingSingleton {
                 .name(KnowledgebaseConsts.KB_PLATFORM_NAME)
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
-                .level(LevelEnum.PLATFORM.name())
+                .level(LevelEnum.ORGANIZATION.name())
                 .build();
         kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
         kownledgebaseRequestQuickReplyPlatform.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-11-22 16:08:38
+ * @Date: 2024-08-27 20:49:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 12:59:55
+ * @LastEditTime: 2024-09-20 13:46:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,13 +13,29 @@
  */
 package com.bytedesk.kbase.quick_reply;
 
-public class QuickReplyConsts {
-    private QuickReplyConsts() {}
-    
-    // public static final String QUICK_REPLY_CATEGORY_DEMO_UID_1 = "quick_reply_category_demo_uid_1";
-    // public static final String QUICK_REPLY_CATEGORY_DEMO_UID_2 = "quick_reply_category_demo_uid_2";
-    // public static final String QUICK_REPLY_CATEGORY_DEMO_UID_3 = "quick_reply_category_demo_uid_3";
-    // public static final String QUICK_REPLY_CATEGORY_DEMO_UID_4 = "quick_reply_category_demo_uid_4";
+import java.util.ArrayList;
+import java.util.List;
 
+import lombok.Builder;
+import lombok.Data;
 
+// 客服端加载
+@Data
+@Builder
+public class QuickReplyResponseAgent {
+
+    private String key;
+
+    private String title;
+
+    private String content;
+
+    private String type;
+
+    private String level;
+
+    private String platform;
+
+    @Builder.Default
+    private List<QuickReplyResponseAgent> children = new ArrayList<>();
 }

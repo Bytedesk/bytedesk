@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-18 17:10:52
+ * @LastEditTime: 2025-02-24 12:47:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.action.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -38,14 +36,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class QuickReplyRestController extends BaseRestController<QuickReplyRequest> {
 
-    private final QuickReplyService quickReplyService;
+    private final QuickReplyRestService quickReplyRestService;
 
     // 管理后台加载
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(QuickReplyRequest request) {
         
-        Page<QuickReplyResponse> page = quickReplyService.queryByOrg(request);
+        Page<QuickReplyResponse> page = quickReplyRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -53,15 +51,26 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     // 客服端加载
     @Override
     public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
+
+        List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
         
-        return ResponseEntity.ok(JsonResult.success(false));
+        return ResponseEntity.ok(JsonResult.success(quickReplyList));
     }
+
+    @GetMapping("/query/list")
+    public ResponseEntity<?> queryList(QuickReplyRequest request) {
+
+        List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
+        
+        return ResponseEntity.ok(JsonResult.success(quickReplyList));
+    }
+
 
     @ActionAnnotation(title = "quick_reply", action = "create", description = "create quick_reply")
     @Override
     public ResponseEntity<?> create(@RequestBody QuickReplyRequest request) {
         
-        QuickReplyResponse quickReply = quickReplyService.create(request);
+        QuickReplyResponse quickReply = quickReplyRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
@@ -70,7 +79,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     @Override
     public ResponseEntity<?> update(@RequestBody QuickReplyRequest request) {
         
-        QuickReplyResponse quickReply = quickReplyService.update(request);
+        QuickReplyResponse quickReply = quickReplyRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
@@ -79,7 +88,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     @Override
     public ResponseEntity<?> delete(@RequestBody QuickReplyRequest request) {
 
-        quickReplyService.delete(request);
+        quickReplyRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
@@ -90,7 +99,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     @GetMapping("/export")
     public Object export(QuickReplyRequest request, HttpServletResponse response) {
         // query data to export
-        Page<QuickReplyResponse> quickReplyPage = quickReplyService.queryByOrg(request);
+        Page<QuickReplyResponse> quickReplyPage = quickReplyRestService.queryByOrg(request);
         // 
         try {
             //
@@ -101,7 +110,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
-            List<QuickReplyExcel> excelList = quickReplyPage.getContent().stream().map(quickReplyResponse -> quickReplyService.convertToExcel(quickReplyResponse)).toList();
+            List<QuickReplyExcel> excelList = quickReplyPage.getContent().stream().map(quickReplyResponse -> quickReplyRestService.convertToExcel(quickReplyResponse)).toList();
 
             // write to excel
             EasyExcel.write(response.getOutputStream(), QuickReplyExcel.class)

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseEntity;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseService;
+import com.bytedesk.kbase.knowledge_base.KnowledgebaseRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class ArticleRouteController {
 
     private final ArticleRestService articleService;
 
-    private final KnowledgebaseService knowledgebaseService;
+    private final KnowledgebaseRestService knowledgebaseService;
 
     // 
     @RequestMapping("/{kbUid:.+}/{articleUid:.+}")

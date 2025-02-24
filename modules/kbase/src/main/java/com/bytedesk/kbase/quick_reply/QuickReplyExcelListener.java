@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class QuickReplyExcelListener implements ReadListener<QuickReplyExcel> {
 
-    private final QuickReplyService quickreplyService;
+    private final QuickReplyRestService quickreplyService;
 
     // private final String categoryUid;
 

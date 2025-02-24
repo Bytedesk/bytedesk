@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class KnowledgebaseController {
     
-    private final KnowledgebaseService knowledgebaseService;
+    private final KnowledgebaseRestService knowledgebaseService;
 
     private final CategoryRestService categoryService;
 
