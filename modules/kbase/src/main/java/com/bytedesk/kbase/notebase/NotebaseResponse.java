@@ -18,7 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
+import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +40,7 @@ public class NotebaseResponse extends BaseResponse {
 
     private String contentHtml;
 
-    private KnowledgebaseTypeEnum type;
+    private KbaseTypeEnum type;
 
     private List<String> tags;
 

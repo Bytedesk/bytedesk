@@ -18,7 +18,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
+import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -62,7 +62,7 @@ public class NotebaseEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "Notebase_type", nullable = false)
-    private String type = KnowledgebaseTypeEnum.HELPCENTER.name();
+    private String type = KbaseTypeEnum.HELPCENTER.name();
 
     // @Builder.Default
     // @ManyToMany

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-08-27 13:58:47
+ * @Date: 2024-10-29 17:23:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 13:59:50
+ * @LastEditTime: 2024-10-30 14:42:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,21 +13,9 @@
  */
 package com.bytedesk.kbase.knowledge_base;
 
-import org.springframework.context.ApplicationEvent;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class KnowledgebaseCreateEvent extends ApplicationEvent {
-
-    private static final long serialVersionUID = 1L;
-
-    private KnowledgebaseEntity knowledgebase;
-
-    public KnowledgebaseCreateEvent(Object source, KnowledgebaseEntity knowledgebase) {
-        super(source);
-        this.knowledgebase = knowledgebase;
-    }
+public enum KbaseThemeEnum {
+    DEFAULT,
+    EDUPORT,
+    KBDOC,
+    SOCIAL, 
 }

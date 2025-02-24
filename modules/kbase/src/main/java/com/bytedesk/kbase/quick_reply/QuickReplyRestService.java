@@ -40,9 +40,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseEntity;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseRestService;
-import com.bytedesk.kbase.knowledge_base.KnowledgebaseTypeEnum;
+import com.bytedesk.kbase.knowledge_base.KbaseEntity;
+import com.bytedesk.kbase.knowledge_base.KbaseRestService;
+import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
 
@@ -58,7 +58,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
 
     private final CategoryRestService categoryService;
 
-    private final KnowledgebaseRestService knowledgebaseService;
+    private final KbaseRestService knowledgebaseService;
 
     @Override
     public Page<QuickReplyResponse> queryByOrg(QuickReplyRequest request) {
@@ -85,21 +85,21 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
 
         // 当前用户快捷回复/常用语
-        List<KnowledgebaseEntity> agentKnowledgebase = knowledgebaseService.findByLevelAndTypeAndAgentUid(LevelEnum.AGENT,
-                KnowledgebaseTypeEnum.QUICKREPLY,
+        List<KbaseEntity> agentKbase = knowledgebaseService.findByLevelAndTypeAndAgentUid(LevelEnum.AGENT,
+                KbaseTypeEnum.QUICKREPLY,
                 request.getAgentUid());
-        quickReplyList.addAll(transformToQuickReplyResponseAgent(agentKnowledgebase));
+        quickReplyList.addAll(transformToQuickReplyResponseAgent(agentKbase));
 
         // 当前组织快捷回复/常用语
-        List<KnowledgebaseEntity> orgKnowledgebase = knowledgebaseService.findByLevelAndTypeAndOrgUid(LevelEnum.ORGANIZATION,
-                KnowledgebaseTypeEnum.QUICKREPLY,
+        List<KbaseEntity> orgKbase = knowledgebaseService.findByLevelAndTypeAndOrgUid(LevelEnum.ORGANIZATION,
+                KbaseTypeEnum.QUICKREPLY,
                 request.getOrgUid());
-        quickReplyList.addAll(transformToQuickReplyResponseAgent(orgKnowledgebase));
+        quickReplyList.addAll(transformToQuickReplyResponseAgent(orgKbase));
 
         // 平台快捷回复/常用语
-        List<KnowledgebaseEntity> platformKnowledgebase = knowledgebaseService.findByLevelAndType(LevelEnum.PLATFORM,
-                KnowledgebaseTypeEnum.QUICKREPLY);
-        quickReplyList.addAll(transformToQuickReplyResponseAgent(platformKnowledgebase));
+        List<KbaseEntity> platformKbase = knowledgebaseService.findByLevelAndType(LevelEnum.PLATFORM,
+                KbaseTypeEnum.QUICKREPLY);
+        quickReplyList.addAll(transformToQuickReplyResponseAgent(platformKbase));
 
         return quickReplyList;
     }
@@ -189,13 +189,13 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         return modelMapper.map(quickReply, QuickReplyExcel.class);
     }
 
-    private List<QuickReplyResponseAgent> transformToQuickReplyResponseAgent(List<KnowledgebaseEntity> kbList) {
+    private List<QuickReplyResponseAgent> transformToQuickReplyResponseAgent(List<KbaseEntity> kbList) {
 
         List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
         //
-        Iterator<KnowledgebaseEntity> kbPlatformIterator = kbList.iterator();
+        Iterator<KbaseEntity> kbPlatformIterator = kbList.iterator();
         while (kbPlatformIterator.hasNext()) {
-            KnowledgebaseEntity kb = kbPlatformIterator.next();
+            KbaseEntity kb = kbPlatformIterator.next();
             //
             QuickReplyResponseAgent quickReplyKb = QuickReplyResponseAgent.builder()
                     .key(kb.getUid())

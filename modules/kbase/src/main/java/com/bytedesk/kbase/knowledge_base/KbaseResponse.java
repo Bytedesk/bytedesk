@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class KnowledgebaseResponse extends BaseResponse {
+public class KbaseResponse extends BaseResponse {
 
     private String name;
 

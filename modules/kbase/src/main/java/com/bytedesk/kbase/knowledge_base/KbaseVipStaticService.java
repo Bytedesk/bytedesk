@@ -36,36 +36,36 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class KnowledgebaseVipStaticService {
+public class KbaseVipStaticService {
 
     private final Configuration configuration;
 
-    private final KnowledgebaseProperties kbaseProperties;
+    private final KbaseProperties kbaseProperties;
 
-    private final KnowledgebaseRestService knowledgebaseService;
+    private final KbaseRestService kbaseService;
 
     // 更新整个知识库
-    public void updateKbase(KnowledgebaseEntity knowledgebase) {
+    public void updateKbase(KbaseEntity kbase) {
         // 静态化首页
-        Page<CategoryResponse> categoriesPage = knowledgebaseService.getCategories(knowledgebase);
-        Page<ArticleResponse> articlesPage = knowledgebaseService.getArticles(knowledgebase);
+        Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbase);
+        Page<ArticleResponse> articlesPage = kbaseService.getArticles(kbase);
         //
-        toHtmlKb(knowledgebase, categoriesPage.getContent(), articlesPage, articlesPage, articlesPage);
-        toHtmlSearch(knowledgebase);
+        toHtmlKb(kbase, categoriesPage.getContent(), articlesPage, articlesPage, articlesPage);
+        toHtmlSearch(kbase);
         // 遍历categoriesPage
         for (CategoryResponse category : categoriesPage.getContent()) {
-            Page<ArticleResponse> articlesCategoryPage = knowledgebaseService.getArticlesByCategory(knowledgebase,
+            Page<ArticleResponse> articlesCategoryPage = kbaseService.getArticlesByCategory(kbase,
                     category.getUid());
-            toHtmlCategory(knowledgebase, category, categoriesPage.getContent(), articlesCategoryPage.getContent());
+            toHtmlCategory(kbase, category, categoriesPage.getContent(), articlesCategoryPage.getContent());
         }
         // 遍历articlesPage
         for (ArticleResponse article : articlesPage.getContent()) {
-            toHtmlArticle(knowledgebase, article, categoriesPage.getContent(), new ArrayList<>());
+            toHtmlArticle(kbase, article, categoriesPage.getContent(), new ArrayList<>());
         }
     }
 
     // 生成知识库首页
-    public void toHtmlKb(KnowledgebaseEntity kbase,
+    public void toHtmlKb(KbaseEntity kbase,
             List<CategoryResponse> categories,
             Page<ArticleResponse> articlesTop,
             Page<ArticleResponse> articlesHot,
@@ -79,7 +79,7 @@ public class KnowledgebaseVipStaticService {
             Template template = configuration.getTemplate("/kbase/themes/" + kbase.getTheme() + "/index.ftl");
             // 数据模型
             Map<String, Object> map = new HashMap<>();
-            map.put("knowledgebase", kbase);
+            map.put("kbase", kbase);
             map.put("categories", categories);
             map.put("articlesTop", articlesTop);
             map.put("articlesHot", articlesHot);
@@ -107,7 +107,7 @@ public class KnowledgebaseVipStaticService {
     }
 
     // 生成知识库分类页
-    public void toHtmlCategory(KnowledgebaseEntity kbase,
+    public void toHtmlCategory(KbaseEntity kbase,
             CategoryResponse category,
             List<CategoryResponse> categories,
             List<ArticleResponse> articles) {
@@ -120,7 +120,7 @@ public class KnowledgebaseVipStaticService {
             Template template = configuration.getTemplate("/kbase/themes/" + kbase.getTheme() + "/category.ftl");
             // 数据模型
             Map<String, Object> map = new HashMap<>();
-            map.put("knowledgebase", kbase);
+            map.put("kbase", kbase);
             map.put("category", category);
             map.put("categories", categories);
             map.put("articles", articles);
@@ -148,7 +148,7 @@ public class KnowledgebaseVipStaticService {
     }
 
     // 生成知识库文章页
-    public void toHtmlArticle(KnowledgebaseEntity kbase,
+    public void toHtmlArticle(KbaseEntity kbase,
             ArticleResponse article,
             List<CategoryResponse> categories,
             List<ArticleResponse> related) {
@@ -161,7 +161,7 @@ public class KnowledgebaseVipStaticService {
             Template template = configuration.getTemplate("/kbase/themes/" + kbase.getTheme() + "/article.ftl");
             // 数据模型
             Map<String, Object> map = new HashMap<>();
-            map.put("knowledgebase", kbase);
+            map.put("kbase", kbase);
             map.put("article", article);
             map.put("categories", categories);
             map.put("related", related);
@@ -189,7 +189,7 @@ public class KnowledgebaseVipStaticService {
     }
 
     // 生成知识库搜索页
-    public void toHtmlSearch(KnowledgebaseEntity kbase) {
+    public void toHtmlSearch(KbaseEntity kbase) {
         //
         try {
             // 设置模板路径: classpath:/templates/ftl/kbase
@@ -200,7 +200,7 @@ public class KnowledgebaseVipStaticService {
             // 数据模型
             Map<String, Object> map = new HashMap<>();
             map.put("apiHost", kbaseProperties.getApiUrl());
-            map.put("knowledgebase", kbase);
+            map.put("kbase", kbase);
             // 静态化页面内容
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");

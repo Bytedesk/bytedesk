@@ -15,9 +15,9 @@ package com.bytedesk.kbase.knowledge_base;
 
 import com.bytedesk.core.constant.I18Consts;
 
-public class KnowledgebaseConsts {
+public class KbaseConsts {
 
-    private KnowledgebaseConsts() {
+    private KbaseConsts() {
     }
 
     public static final String KB_NAME = I18Consts.I18N_PREFIX + "kb.name";

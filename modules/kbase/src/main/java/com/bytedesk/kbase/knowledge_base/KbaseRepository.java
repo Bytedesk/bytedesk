@@ -19,15 +19,15 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface KnowledgebaseRepository
-        extends JpaRepository<KnowledgebaseEntity, Long>, JpaSpecificationExecutor<KnowledgebaseEntity> {
+public interface KbaseRepository
+        extends JpaRepository<KbaseEntity, Long>, JpaSpecificationExecutor<KbaseEntity> {
 
-    Optional<KnowledgebaseEntity> findByUid(String uid);
+    Optional<KbaseEntity> findByUid(String uid);
 
-    List<KnowledgebaseEntity> findByLevelAndTypeAndDeleted(String level, String type, Boolean deleted);
+    List<KbaseEntity> findByLevelAndTypeAndDeleted(String level, String type, Boolean deleted);
 
-    List<KnowledgebaseEntity> findByLevelAndTypeAndOrgUidAndDeleted(String level, String type, String orgUid, Boolean deleted);
+    List<KbaseEntity> findByLevelAndTypeAndOrgUidAndDeleted(String level, String type, String orgUid, Boolean deleted);
 
-    List<KnowledgebaseEntity> findByLevelAndTypeAndAgentUidAndDeleted(String level, String type, String agentUid, Boolean deleted);
+    List<KbaseEntity> findByLevelAndTypeAndAgentUidAndDeleted(String level, String type, String agentUid, Boolean deleted);
 
 }

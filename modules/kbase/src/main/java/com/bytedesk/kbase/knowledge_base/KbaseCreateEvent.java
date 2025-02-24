@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:58:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 17:30:01
+ * @LastEditTime: 2024-08-27 13:59:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,14 +20,14 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class KnowledgebaseUpdateEvent extends ApplicationEvent {
+public class KbaseCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private KnowledgebaseEntity knowledgebase;
+    private KbaseEntity kbase;
 
-    public KnowledgebaseUpdateEvent(Object source, KnowledgebaseEntity knowledgebase) {
+    public KbaseCreateEvent(Object source, KbaseEntity kbase) {
         super(source);
-        this.knowledgebase = knowledgebase;
+        this.kbase = kbase;
     }
 }

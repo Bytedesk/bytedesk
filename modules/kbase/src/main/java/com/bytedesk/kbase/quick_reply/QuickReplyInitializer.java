@@ -26,7 +26,7 @@ public class QuickReplyInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        // 为保证执行顺序，迁移到KnowledgebaseInitializer中
+        // 为保证执行顺序，迁移到KbaseInitializer中
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // 初始化快捷回复分类
         // quickReplyRestService.initQuickReplyCategory(orgUid);
