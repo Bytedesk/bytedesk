@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 23:51:46
+ * @LastEditTime: 2025-02-24 23:54:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,12 +48,8 @@ import com.bytedesk.ai.provider.LlmProviderConsts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-
-
 @Slf4j
 @Component
-@ConditionalOnBean(ZhipuaiChatService.class)
 @AllArgsConstructor
 public class RobotEventListener {
 
@@ -248,7 +244,5 @@ public class RobotEventListener {
             // }
         }
     }
-
-    
 
 }
