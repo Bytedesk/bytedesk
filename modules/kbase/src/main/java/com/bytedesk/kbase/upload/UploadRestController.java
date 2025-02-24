@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 14:47:13
+ * @LastEditTime: 2025-02-24 09:24:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,7 +81,7 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 		Optional<UploadEntity> uploadOptional = uploadService.findByUid(request.getUid());
 		if (uploadOptional.isPresent()) {
 			UploadEntity upload = uploadOptional.get();
-			uploadVectorStore.readSplitWriteToVectorStore(upload);
+			// uploadVectorStore.readSplitWriteToVectorStore(upload);
 			//
 			return ResponseEntity.ok(JsonResult.success("process success"));
 		} else {
