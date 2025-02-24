@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-05 09:37:24
+ * @LastEditTime: 2025-02-24 19:11:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,9 +80,15 @@ public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEnt
 
     @Override
     public AutoReplyFixedResponse create(AutoReplyFixedRequest request) {
-        
+        // 获取当前用户
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
         AutoReplyFixedEntity autoReply = modelMapper.map(request, AutoReplyFixedEntity.class);
-        autoReply.setUid(uidUtils.getCacheSerialUid());
+        autoReply.setUid(uidUtils.getUid());
 
         AutoReplyFixedEntity savedAutoReplyFixed = save(autoReply);
         if (savedAutoReplyFixed == null) {
