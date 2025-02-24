@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 15:32:02
+ * @LastEditTime: 2025-02-24 15:42:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeAudioTranscriptionApi;
@@ -42,6 +43,7 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
  * https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.11c67980m5X2VR#/model-market
  */
 @Configuration
+@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIAlibabaConfig {
 
     private static final String DEFAULT_PROMPT = "你是一个博学的智能聊天助手，请根据用户提问回答！";
@@ -59,16 +61,19 @@ public class SpringAIAlibabaConfig {
     private double dashScopeChatOptionsTopP;
 
     @Bean("dashScopeApi")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
     DashScopeApi dashScopeApi() {
         return new DashScopeApi(dashScopeApiKey);
     }
 
     @Bean("dashScopeChatClientBuilder")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
     ChatClient.Builder dashScopeChatClientBuilder(DashScopeChatModel dashScopeChatModel) {
         return ChatClient.builder(dashScopeChatModel);
     }
 
     @Bean("dashScopeChatClient")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
     ChatClient dashScopeChatClient(ChatClient.Builder dashScopeChatClientBuilder,
             DashScopeChatOptions dashScopeChatOptions) {
         return dashScopeChatClientBuilder
@@ -88,6 +93,7 @@ public class SpringAIAlibabaConfig {
     
 
     @Bean("dashScopeChatOptions")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
     DashScopeChatOptions dashScopeChatOptions() {
         return DashScopeChatOptions.builder()
                 .withModel(dashScopeChatOptionsModel)
@@ -97,26 +103,31 @@ public class SpringAIAlibabaConfig {
     }
 
     @Bean("dashScopeChatModel")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
     DashScopeChatModel dashScopeChatModel(DashScopeApi dashScopeApi, DashScopeChatOptions dashScopeChatOptions) {
         return new DashScopeChatModel(dashScopeApi, dashScopeChatOptions);
     }
 
     @Bean("dashScopeAudioTranscriptionApi")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.audio.transcription.enabled", havingValue = "true")
     DashScopeAudioTranscriptionApi dashScopeAudioTranscriptionApi(String dashScopeApiKey) {
         return new DashScopeAudioTranscriptionApi(dashScopeApiKey);
     }
     
     @Bean("dashScopeAudioTranscriptionModel")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.audio.transcription.enabled", havingValue = "true")
     DashScopeAudioTranscriptionModel dashScopeAudioTranscriptionModel(DashScopeAudioTranscriptionApi dashScopeAudioTranscriptionApi) {
         return new DashScopeAudioTranscriptionModel(dashScopeAudioTranscriptionApi);
     }
 
     @Bean("dashScopeSpeechSynthesisApi")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.audio.synthesis.enabled", havingValue = "true")
     DashScopeSpeechSynthesisApi dashScopeSpeechSynthesisApi(String dashScopeApiKey) {
         return new DashScopeSpeechSynthesisApi(dashScopeApiKey);
     }
 
     @Bean("dashScopeSpeechSynthesisModel")
+    @ConditionalOnProperty(name = "spring.ai.dashscope.audio.synthesis.enabled", havingValue = "true")
     DashScopeSpeechSynthesisModel dashScopeSpeechSynthesisModel(DashScopeSpeechSynthesisApi dashScopeSpeechSynthesisApi) {
         return new DashScopeSpeechSynthesisModel(dashScopeSpeechSynthesisApi);
     }
