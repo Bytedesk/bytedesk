@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 13:57:59
+ * @LastEditTime: 2025-02-24 14:00:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,6 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.knowledge_base.KnowledgebaseEntity;
@@ -411,96 +410,6 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         quickReply.setOrgUid(orgUid);
 
         return quickReply;
-    }
-
-    //
-    public void initData() {
-        //
-        if (quickReplyRepository.count() > 0) {
-            return;
-        }
-
-        // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
-        Optional<CategoryEntity> categoryContact = categoryService.findByNameAndTypeAndLevelAndPlatform(
-                I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT,
-                CategoryTypeEnum.QUICKREPLY.name(),
-                LevelEnum.PLATFORM,
-                PlatformEnum.BYTEDESK);
-        if (categoryContact.isPresent()) {
-            //
-            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
-                    .title(I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE)
-                    .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
-                    .categoryUid(categoryContact.get().getUid())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                    .level(LevelEnum.PLATFORM.name())
-                    .build();
-            quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
-            // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-            create(quickReplyRequest);
-        }
-        //
-        Optional<CategoryEntity> categoryThanks = categoryService.findByNameAndTypeAndLevelAndPlatform(
-                I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS,
-                CategoryTypeEnum.QUICKREPLY.name(),
-                LevelEnum.PLATFORM,
-                PlatformEnum.BYTEDESK);
-        if (categoryThanks.isPresent()) {
-            //
-            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
-                    .title(I18Consts.I18N_QUICK_REPLY_THANKS_TITLE)
-                    .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
-                    .categoryUid(categoryThanks.get().getUid())
-                    .level(LevelEnum.PLATFORM.name())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                    .build();
-            quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
-            // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-            create(quickReplyRequest);
-        }
-        //
-        Optional<CategoryEntity> categoryWelcome = categoryService.findByNameAndTypeAndLevelAndPlatform(
-                I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME,
-                CategoryTypeEnum.QUICKREPLY.name(),
-                LevelEnum.PLATFORM,
-                PlatformEnum.BYTEDESK);
-        if (categoryWelcome.isPresent()) {
-            //
-            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
-                    .title(I18Consts.I18N_QUICK_REPLY_WELCOME_TITLE)
-                    .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
-                    .categoryUid(categoryWelcome.get().getUid())
-                    .level(LevelEnum.PLATFORM.name())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                    .build();
-            quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
-            // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-            create(quickReplyRequest);
-        }
-
-        Optional<CategoryEntity> categoryBye = categoryService.findByNameAndTypeAndLevelAndPlatform(
-                I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE,
-                CategoryTypeEnum.QUICKREPLY.name(),
-                LevelEnum.PLATFORM,
-                PlatformEnum.BYTEDESK);
-        if (categoryBye.isPresent()) {
-            //
-            QuickReplyRequest quickReplyRequest = QuickReplyRequest.builder()
-                    .title(I18Consts.I18N_QUICK_REPLY_BYE_TITLE)
-                    .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
-                    .categoryUid(categoryBye.get().getUid())
-                    .level(LevelEnum.PLATFORM.name())
-                    .kbUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
-                    .build();
-            quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
-            // 此处设置orgUid方便超级管理员加载
-            quickReplyRequest.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-            create(quickReplyRequest);
-        }
-
     }
 
 }
