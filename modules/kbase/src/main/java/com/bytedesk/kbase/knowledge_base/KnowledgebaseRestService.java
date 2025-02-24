@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 13:37:31
+ * @LastEditTime: 2025-02-24 13:40:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -227,7 +227,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestHelpdoc.setUid(BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
+        kownledgebaseRequestHelpdoc.setUid(orgUid + BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
         kownledgebaseRequestHelpdoc.setType(KnowledgebaseTypeEnum.HELPCENTER.name());
         kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
@@ -238,6 +238,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
+        kownledgebaseRequestLlm.setUid(orgUid + BytedeskConsts.DEFAULT_KB_LLM_UID);
         kownledgebaseRequestLlm.setType(KnowledgebaseTypeEnum.LLM.name());
         kownledgebaseRequestLlm.setOrgUid(orgUid);
         create(kownledgebaseRequestLlm);
@@ -248,6 +249,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
+        kownledgebaseRequestKeyword.setUid(orgUid + BytedeskConsts.DEFAULT_KB_KEYWORD_UID);
         kownledgebaseRequestKeyword.setType(KnowledgebaseTypeEnum.KEYWORD.name());
         kownledgebaseRequestKeyword.setOrgUid(orgUid);
         create(kownledgebaseRequestKeyword);
@@ -258,6 +260,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
+        kownledgebaseRequestFaq.setUid(orgUid + BytedeskConsts.DEFAULT_KB_FAQ_UID);
         kownledgebaseRequestFaq.setType(KnowledgebaseTypeEnum.FAQ.name());
         kownledgebaseRequestFaq.setOrgUid(orgUid);
         create(kownledgebaseRequestFaq);
@@ -268,6 +271,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
                 .descriptionHtml(KnowledgebaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
+        kownledgebaseRequestAutoReply.setUid(orgUid + BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID);
         kownledgebaseRequestAutoReply.setType(KnowledgebaseTypeEnum.AUTOREPLY.name());
         kownledgebaseRequestAutoReply.setOrgUid(orgUid);
         create(kownledgebaseRequestAutoReply);
@@ -279,6 +283,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestQuickReply.setType(KnowledgebaseTypeEnum.QUICKREPLY.name());
+        kownledgebaseRequestQuickReply.setUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
         kownledgebaseRequestQuickReply.setOrgUid(orgUid);
         create(kownledgebaseRequestQuickReply);
 
@@ -289,6 +294,7 @@ public class KnowledgebaseRestService extends BaseRestService<KnowledgebaseEntit
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestTaboo.setType(KnowledgebaseTypeEnum.TABOO.name());
+        kownledgebaseRequestTaboo.setUid(orgUid + BytedeskConsts.DEFAULT_KB_TABOO_UID);
         kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);
     }
