@@ -142,7 +142,7 @@ services:
       # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: deepseek-r1:1.5b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen2.5:1.5b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
+      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: true
       SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: qwen2.5:1.5b
       # openai/deepseek
       # https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html
@@ -175,7 +175,7 @@ services:
       SPRING_AI_MCP_SERVER_ENABLED: false
       # weaviate
       SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: false
-      SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: true
+      # SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: true
       # wechat config
       WECHAT_PAY_ENABLED: false
       # springdoc
