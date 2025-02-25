@@ -108,7 +108,7 @@ public class KbaseController {
         if (kbaseOptional.isPresent()) {
             model.addAttribute("kbase", kbaseOptional.get());
         }
-        return "kbase//default/search";
+        return "kbase/themes/" + kbaseOptional.get().getTheme() + "/search";
     }
 
     private String routeCategory(String categoryUid, Model model) {
