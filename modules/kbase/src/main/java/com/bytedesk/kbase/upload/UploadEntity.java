@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 16:01:56
+ * @LastEditTime: 2025-02-25 11:08:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,8 +83,8 @@ public class UploadEntity extends BaseEntity {
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // vector store id
-    @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> docIdList = new ArrayList<>();
+    // @Builder.Default
+    // @Convert(converter = StringListConverter.class)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // private List<String> docIdList = new ArrayList<>();
 }
