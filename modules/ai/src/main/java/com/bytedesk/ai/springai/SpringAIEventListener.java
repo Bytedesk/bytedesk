@@ -57,7 +57,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onFileCreateEvent(FileCreateEvent event) throws IOException {
         FileEntity file = event.getFile();
-        log.info("SpringAIEventListener onFileCreateEvent: {}", file.toString());
+        log.info("SpringAIEventListener onFileCreateEvent: {}", file.getFileName());
         // etl分块处理
         springAiVectorService.readSplitWriteToVectorStore(file);
     }
@@ -65,7 +65,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onFileUpdateEvent(FileUpdateEvent event) {
         FileEntity file = event.getFile();
-        log.info("SpringAIEventListener onFileUpdateEvent: {}", file.toString());
+        log.info("SpringAIEventListener onFileUpdateEvent: {}", file.getFileName());
         // 后台删除文件记录
         if (file.isDeleted()) {
             // 通知python ai模块处理
@@ -78,7 +78,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onTextCreateEvent(TextCreateEvent event) {
         TextEntity text = event.getText();
-        log.info("SpringAIEventListener onTextCreateEvent: {}", text.toString());
+        log.info("SpringAIEventListener onTextCreateEvent: {}", text.getName());
         // 生成document
         springAiVectorService.readText(text);
     }
@@ -86,7 +86,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onTextUpdateEvent(TextUpdateEvent event) {
         TextEntity text = event.getText();
-        log.info("SpringAIEventListener onTextUpdateEvent: {}", text.toString());
+        log.info("SpringAIEventListener onTextUpdateEvent: {}", text.getName());
         // 首先删除text对应的document，以及redis中缓存的document
         springAiVectorService.deleteDoc(text.getDocIdList());
         // 然后重新生成document
@@ -96,7 +96,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onQaCreateEvent(QaCreateEvent event) {
         QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener onQaCreateEvent: {}", qa.toString());
+        log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getName());
         // 生成document
         springAiVectorService.readQa(qa);
     }
@@ -104,7 +104,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onQaUpdateEvent(QaUpdateEvent event) {
         QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.toString());
+        log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.getName());
         // 首先删除text对应的document，以及redis中缓存的document
         springAiVectorService.deleteDoc(qa.getDocIdList());
         // 然后重新生成document
@@ -114,7 +114,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
         WebsiteEntity website = event.getWebsite();
-        log.info("SpringAIEventListener onWebsiteCreateEvent: {}", website.toString());
+        log.info("SpringAIEventListener onWebsiteCreateEvent: {}", website.getName());
         // 生成document
         springAiVectorService.readWebsite(website);
     }
@@ -122,7 +122,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onWebsiteUpdateEvent(WebsiteUpdateEvent event) {
         WebsiteEntity website = event.getWebsite();
-        log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.toString());
+        log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.getName());
         // 首先删除text对应的document，以及redis中缓存的document
         springAiVectorService.deleteDoc(website.getDocIdList());
         // 然后重新生成document
@@ -131,7 +131,7 @@ public class SpringAIEventListener {
 
     @EventListener
     public void onVectorSplitEvent(VectorSplitEvent event) {
-        log.info("SpringAIEventListener onVectorSplitEvent: {}", event.toString());
+        log.info("SpringAIEventListener onVectorSplitEvent: {}", event.getKbUid());
         List<Document> docList = event.getDocuments();
         String kbUid = event.getKbUid();
         String orgUid = event.getOrgUid();

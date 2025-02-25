@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 16:14:01
+ * @LastEditTime: 2025-02-25 16:26:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -285,7 +285,10 @@ public class SpringAIVectorService {
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(textEntity.getName())
 					.docId(doc.getId())
+					.typeUid(textEntity.getUid())
+					.categoryUid(textEntity.getCategoryUid())
 					.kbUid(textEntity.getKbUid())
+					.userUid(textEntity.getUserUid())
 					.build();
 			splitRequest.setType(SplitTypeEnum.TEXT.name());
 			splitRequest.setContent(doc.getText());
@@ -330,7 +333,10 @@ public class SpringAIVectorService {
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(qaEntity.getName())
 					.docId(doc.getId())
+					.typeUid(qaEntity.getUid())
+					.categoryUid(qaEntity.getCategoryUid())
 					.kbUid(qaEntity.getKbUid())
+					.userUid(qaEntity.getUserUid())
 					.build();
 			splitRequest.setType(SplitTypeEnum.QA.name());
 			splitRequest.setContent(doc.getText());
@@ -381,7 +387,10 @@ public class SpringAIVectorService {
 				SplitRequest splitRequest = SplitRequest.builder()
 						.name(websiteEntity.getName())
 						.docId(doc.getId())
+						.typeUid(websiteEntity.getUid())
+						.categoryUid(websiteEntity.getCategoryUid())
 						.kbUid(websiteEntity.getKbUid())
+						.userUid(websiteEntity.getUserUid())
 						.build();
 				splitRequest.setType(SplitTypeEnum.WEBSITE.name());
 				splitRequest.setContent(doc.getText());
@@ -421,8 +430,10 @@ public class SpringAIVectorService {
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(file.getFileName())
 					.docId(doc.getId())
-					.fileUid(file.getUid())
+					.typeUid(file.getUid())
+					.categoryUid(file.getCategoryUid())
 					.kbUid(file.getKbUid())
+					.userUid(file.getUserUid())
 					.build();
 			splitRequest.setType(SplitTypeEnum.FILE.name());
 			splitRequest.setContent(doc.getText());
@@ -437,8 +448,6 @@ public class SpringAIVectorService {
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
 		// 通知相关组件，文件处理成功
 		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
-		// 生成问答对
-		// generateQaPairs(docList, upload);
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
