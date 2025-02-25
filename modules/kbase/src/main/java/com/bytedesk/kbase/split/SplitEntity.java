@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 15:09:40
+ * @LastEditTime: 2025-02-25 16:06:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,6 +67,9 @@ public class SplitEntity extends BaseEntity {
 
     // 对应 websiteEntity 的 uid
     private String websiteUid;
+
+    // 所属分类
+    private String categoryUid;
 
     // kbaseEntity 的 uid
     private String kbUid;

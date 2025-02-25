@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 14:08:18
+ * @LastEditTime: 2025-02-25 16:00:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,8 @@ import java.io.IOException;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.upload.UploadEntity;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
@@ -47,6 +49,8 @@ public class FileEventListener {
                 .kbUid(upload.getKbUid())
                 .build();
             fileRequest.setOrgUid(upload.getOrgUid());
+            UserProtobuf userProtobuf = UserProtobuf.parseFrom(upload.getUser());
+            fileRequest.setUserUid(userProtobuf.getUid());
             // 读取文件内容，写入到content字段，迁移到 ai 模块 SpringAIEventListener中读取
             fileRestService.create(fileRequest);
         }
