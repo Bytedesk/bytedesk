@@ -44,6 +44,10 @@ public class BdDateUtils {
         return formatter.format(date);
     }
 
+    public static String formatDatetimeToString(LocalDateTime localDateTime) {
+        return localDateTime.atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
+    }
+
     public static Date formatStringToDateTime(String date) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat(datetimeFormat);
         try {
