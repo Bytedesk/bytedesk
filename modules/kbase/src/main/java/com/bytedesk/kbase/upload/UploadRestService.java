@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 14:47:37
+ * @LastEditTime: 2025-02-25 15:57:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -161,7 +161,6 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 	}
 
-
 	public Stream<Path> loadAll() {
 		try {
 			return Files.walk(this.uploadDir, 1)
@@ -212,22 +211,22 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 	
 	// TODO: 待删除
-	@Deprecated
-	public Resource loadAsResourceOld(String filename) {
-		try {
-			Path file = uploadDir.resolve(filename);
-			//load(filename);
-			Resource resource = new UrlResource(file.toUri());
-			if (resource.exists() || resource.isReadable()) {
-				return resource;
-			} else {
-				throw new UploadStorageFileNotFoundException(
-						"Could not read file: " + filename);
-			}
-		} catch (MalformedURLException e) {
-			throw new UploadStorageFileNotFoundException("Could not read file: " + filename, e);
-		}
-	}
+	// @Deprecated
+	// public Resource loadAsResourceOld(String filename) {
+	// 	try {
+	// 		Path file = uploadDir.resolve(filename);
+	// 		//load(filename);
+	// 		Resource resource = new UrlResource(file.toUri());
+	// 		if (resource.exists() || resource.isReadable()) {
+	// 			return resource;
+	// 		} else {
+	// 			throw new UploadStorageFileNotFoundException(
+	// 					"Could not read file: " + filename);
+	// 		}
+	// 	} catch (MalformedURLException e) {
+	// 		throw new UploadStorageFileNotFoundException("Could not read file: " + filename, e);
+	// 	}
+	// }
 
 	public void initUploadDir() {
 		try {
