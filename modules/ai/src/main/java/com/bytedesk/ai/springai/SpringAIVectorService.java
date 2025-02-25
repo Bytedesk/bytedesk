@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 13:50:03
+ * @LastEditTime: 2025-02-25 14:34:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,12 +32,16 @@ import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.ai.reader.web.WebDocumentReader;
+import org.springframework.web.util.UriComponentsBuilder;
+import java.net.URI;
 
 import com.bytedesk.ai.springai.event.VectorSplitEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.FileRestService;
+import com.bytedesk.kbase.split.SplitStatusEnum;
 import com.bytedesk.kbase.upload.UploadRestService;
 import com.bytedesk.kbase.upload.UploadStatusEnum;
 import lombok.AllArgsConstructor;
@@ -237,6 +241,111 @@ public class SpringAIVectorService {
 		storeDocuments(docList, file);
 	}
 
+	// 使用reader直接将content字符串，转换成 List<Document> documents
+	public List<Document> readString(String content, String kbUid) {
+		log.info("Converting string content to documents");
+		if (content == null || content.isEmpty()) {
+			throw new IllegalArgumentException("Content must not be empty");
+		}
+		// 创建Document对象
+		Document document = new Document(content);
+		// 使用TokenTextSplitter分割文本
+		var tokenTextSplitter = new TokenTextSplitter();
+		List<Document> docList = tokenTextSplitter.split(List.of(document));
+		List<String> docIdList = new ArrayList<>();
+		Iterator<Document> iterator = docList.iterator();
+		while (iterator.hasNext()) {
+			Document doc = iterator.next();
+			log.info("doc id: {}", doc.getId());
+			docIdList.add(doc.getId());
+			// 添加元数据: 文件file_uid, 知识库kb_uid
+			// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, kbUid);
+		}
+		// file.setDocIdList(docIdList);
+		
+		return docList;
+	}
+
+	// 重载方法，不需要FileEntity的版本
+	public List<Document> readString(String content) {
+		return readString(content, null);
+	}
+
+	// 批量处理字符串列表
+	public List<Document> readStrings(List<String> contents, String kbUid) {
+
+		List<Document> allDocuments = new ArrayList<>();
+		for (String content : contents) {
+			allDocuments.addAll(readString(content, kbUid));
+		}
+		
+		return allDocuments;
+	}
+
+	// 抓取website
+	public List<Document> readWebsite(String url, String kbUid) {
+		log.info("Loading document from website: {}", url);
+		if (url == null || url.isEmpty()) {
+			throw new IllegalArgumentException("URL must not be empty");
+		}
+		if (!url.startsWith("http")) {
+			throw new IllegalArgumentException(String.format("URL must start with http, got %s", url));
+		}
+
+		try {
+			// 构建URI
+			URI uri = UriComponentsBuilder.fromHttpUrl(url).build().toUri();
+			
+			// 创建WebDocumentReader
+			WebDocumentReader webReader = new WebDocumentReader(uri);
+			
+			// 读取网页内容
+			List<Document> documents = webReader.read();
+			
+			// 提取文本内容并添加元数据
+			for (Document doc : documents) {
+				// 添加知识库ID作为元数据
+				doc.getMetadata().put(KbaseConst.KBASE_KB_UID, kbUid);
+				// 可以添加更多元数据，如URL等
+				doc.getMetadata().put("source_url", url);
+			}
+			
+			// 使用TokenTextSplitter分割文本
+			var tokenTextSplitter = new TokenTextSplitter();
+			List<Document> docList = tokenTextSplitter.split(documents);
+			
+			// 如果需要存储到向量数据库
+			if (kbUid != null) {
+				ollamaRedisVectorStore.write(docList);
+				log.info("Website content stored in vector store for kbUid: {}", kbUid);
+			}
+			
+			return docList;
+
+		} catch (Exception e) {
+			log.error("Error reading website content: {}", e.getMessage());
+			throw new RuntimeException("Failed to read website content: " + e.getMessage(), e);
+		}
+	}
+
+	// 批量抓取多个网站
+	public List<Document> readWebsites(List<String> urls, String kbUid) {
+		List<Document> allDocuments = new ArrayList<>();
+		for (String url : urls) {
+			try {
+				List<Document> docs = readWebsite(url, kbUid);
+				allDocuments.addAll(docs);
+			} catch (Exception e) {
+				log.error("Error processing URL {}: {}", url, e.getMessage());
+				// 继续处理其他URL
+				continue;
+			}
+		}
+		return allDocuments;
+	}
+	
+
 	// 存储到vector store
 	private void storeDocuments(List<Document> docList, FileEntity file) {
 		log.info("Parsing document, this will take a while. docList.size={}", docList.size());
@@ -251,7 +360,7 @@ public class SpringAIVectorService {
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
 		}
 		file.setDocIdList(docIdList);
-		file.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
+		file.setStatus(SplitStatusEnum.SUCCESS.name());
 		// 
 		fileRestService.save(file);
 		// log.info("Parsing document, this will take a while.");
