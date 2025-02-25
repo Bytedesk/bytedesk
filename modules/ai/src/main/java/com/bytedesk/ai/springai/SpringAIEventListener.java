@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 15:19:19
+ * @LastEditTime: 2025-02-25 15:42:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -79,7 +79,7 @@ public class SpringAIEventListener {
     public void onTextCreateEvent(TextCreateEvent event) {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextCreateEvent: {}", text.toString());
-        // etl分块处理
+        // 生成document
         springAiVectorService.readText(text);
     }
 
@@ -88,15 +88,16 @@ public class SpringAIEventListener {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextUpdateEvent: {}", text.toString());
         // 首先删除text对应的document，以及redis中缓存的document
+        springAiVectorService.deleteDoc(text.getDocIdList());
         // 然后重新生成document
-        // springAiVectorService.readText(text);
+        springAiVectorService.readText(text);
     }
 
     @EventListener
     public void onQaCreateEvent(QaCreateEvent event) {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener onQaCreateEvent: {}", qa.toString());
-        // etl分块处理
+        // 生成document
         springAiVectorService.readQa(qa);
     }
 
@@ -104,7 +105,9 @@ public class SpringAIEventListener {
     public void onQaUpdateEvent(QaUpdateEvent event) {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.toString());
-        // etl分块处理
+        // 首先删除text对应的document，以及redis中缓存的document
+        springAiVectorService.deleteDoc(qa.getDocIdList());
+        // 然后重新生成document
         springAiVectorService.readQa(qa);
     }
 
@@ -112,7 +115,7 @@ public class SpringAIEventListener {
     public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
         WebsiteEntity website = event.getWebsite();
         log.info("SpringAIEventListener onWebsiteCreateEvent: {}", website.toString());
-        // etl分块处理
+        // 生成document
         springAiVectorService.readWebsite(website);
     }
 
@@ -120,10 +123,11 @@ public class SpringAIEventListener {
     public void onWebsiteUpdateEvent(WebsiteUpdateEvent event) {
         WebsiteEntity website = event.getWebsite();
         log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.toString());
-        // etl分块处理
+        // 首先删除text对应的document，以及redis中缓存的document
+        springAiVectorService.deleteDoc(website.getDocIdList());
+        // 然后重新生成document
         springAiVectorService.readWebsite(website);
     }
-
 
     @EventListener
     public void onVectorSplitEvent(VectorSplitEvent event) {

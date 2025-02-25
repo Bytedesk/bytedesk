@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 15:17:23
+ * @LastEditTime: 2025-02-25 15:42:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,6 @@ import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.FileRestService;
 import com.bytedesk.kbase.qa.QaEntity;
 import com.bytedesk.kbase.qa.QaRestService;
-import com.bytedesk.kbase.split.SplitEntity;
 import com.bytedesk.kbase.split.SplitRequest;
 import com.bytedesk.kbase.split.SplitRestService;
 import com.bytedesk.kbase.split.SplitStatusEnum;
