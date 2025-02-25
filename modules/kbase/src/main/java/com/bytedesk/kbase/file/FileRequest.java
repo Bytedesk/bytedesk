@@ -39,6 +39,13 @@ public class FileRequest extends BaseRequest {
 
     private String fileUrl;
 
+    // 大模型
+    private String loader;
+
+    private String splitter;
+
+    private int docsCount;
+
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
 
@@ -49,4 +56,6 @@ public class FileRequest extends BaseRequest {
     private String uploadUid;
 
     // private String userUid;
+
+    
 }

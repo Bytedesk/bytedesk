@@ -65,6 +65,10 @@ public class FileEntity extends BaseEntity {
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
 
+    private String categoryUid; // 所属分类
+
+    private String kbUid; // 所属知识库
+
     // 对应 uploadEntity 的 uid
     private String uploadUid;
 
