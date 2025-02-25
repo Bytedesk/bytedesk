@@ -1,7 +1,7 @@
 <#--  description  -->
-<meta name="description" content="${knowledgebase.descriptionHtml!''}">
+<meta name="description" content="${kbase.descriptionHtml!''}">
 <#--  TODO: 自定义favicon, https://cdn.bytedesk.com/kb/assets/img/favicon.png  -->
-<link rel="icon" href="${knowledgebase.faviconUrl!''}" type="image/x-icon">
+<link rel="icon" href="${kbase.faviconUrl!''}" type="image/x-icon">
 <!-- 框架 -->
 <link href="/kbase/css/main.css" rel="stylesheet"/>
 <#--  图片放大图  -->

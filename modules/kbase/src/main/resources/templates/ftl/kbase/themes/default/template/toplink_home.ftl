@@ -4,7 +4,7 @@
         <div class="uk-container">
             <div uk-navbar>
                 <div class="uk-navbar-left">
-                    <a id="supporHometTitle" class="uk-navbar-item uk-logo uk-text-uppercase" href="/">${knowledgebase.name!'微语'}</a>
+                    <a id="supporHometTitle" class="uk-navbar-item uk-logo uk-text-uppercase" href="/">${kbase.name!'微语'}</a>
                 </div>
                 <div class="uk-navbar-right">
                     <ul class="uk-navbar-nav uk-text-uppercase uk-visible@m uk-margin-medium-left">
@@ -20,7 +20,7 @@
         </div>
     </nav>
     <div class="uk-container hero">
-        <h1 class="uk-heading-primary uk-text-center uk-margin-large-top uk-light">${knowledgebase.headline!'帮助中心'}</h1>
+        <h1 class="uk-heading-primary uk-text-center uk-margin-large-top uk-light">${kbase.headline!'帮助中心'}</h1>
         <!-- <p class="uk-text-lead uk-text-center uk-light">Lead volutpat nibh ligula gravida. Magna auctor eget venenatis phasellus luctus sodales pulvinar</p> -->
         <div class="uk-flex uk-flex-center">
             <form id="supportSearchForm" class="uk-margin-medium-top uk-margin-xlarge-bottom uk-search uk-search-default">

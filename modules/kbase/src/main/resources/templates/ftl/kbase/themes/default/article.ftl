@@ -6,17 +6,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>${article.title!''} - 文章详情 - ${knowledgebase.headline!'帮助中心'} - ${knowledgebase.name!'微语'}</title>
+    <title>${article.title!''} - 文章详情 - ${kbase.headline!'帮助中心'} - ${kbase.name!'微语'}</title>
 
     <#include "./template/header.ftl"/>
 
     <style>
         .uk-background-primary {
-            background-color: ${knowledgebase.primaryColor!''};
+            background-color: ${kbase.primaryColor!''};
         }
         .uk-button-outline-primary {
-            color: ${knowledgebase.primaryColor!''};
-            border: solid 1px ${knowledgebase.primaryColor!''};
+            color: ${kbase.primaryColor!''};
+            border: solid 1px ${kbase.primaryColor!''};
         }
         /* https://www.runoob.com/try/try.php?filename=tryhtml_js_accordion */
         /* 打开和关闭手风琴面板的样式 */
@@ -67,7 +67,7 @@
             <div uk-grid>
                 <div class="uk-width-2-3@m">
                     <ul id="supportArticleBreadcrumb" class="uk-breadcrumb uk-visible@m">
-                        <li><a href="/helpcenter/${knowledgebase.uid!''}">首页</a></li>
+                        <li><a href="/helpcenter/${kbase.uid!''}">首页</a></li>
                         <#--  <li><a href="category/${article.categories[0].uid}.html">${article.categories[0].name}</a></li>  -->
                         <li><span href="">${article.title!''}</span></li>
                     </ul>
@@ -168,7 +168,7 @@
                                 <ul id="supportArticleRelated" class="uk-list uk-list-large">
                                     <!-- <li><a href="#">Apsum dolor sit amet, consectet tempor inuididunt ut dolore magna aliqua</a></li> -->
                                     <#list related as article>
-                                        <li><a href="/helpcenter/${knowledgebase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
+                                        <li><a href="/helpcenter/${kbase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
                                     </#list>
                                     <#if (related?size == 0)>
                                         <div>
