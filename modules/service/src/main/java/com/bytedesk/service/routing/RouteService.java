@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 13:29:00
+ * @LastEditTime: 2025-02-25 18:08:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,7 +62,7 @@ public class RouteService {
 
     private final QueueService queueService;
 
-    private final QueueMemberRestService queueMemberRestService; ;
+    private final QueueMemberRestService queueMemberRestService;;
 
     private final MessageRestService messageRestService;
 
@@ -75,7 +75,7 @@ public class RouteService {
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.toString());
-        // 
+        //
         thread.setState(ThreadStateEnum.STARTED.name());
         // 使用robot的serviceSettings配置
         String robotString = ConvertAiUtils.convertToUserProtobufString(robot);
@@ -122,10 +122,10 @@ public class RouteService {
                 queueMemberEntity.setAcceptTime(LocalDateTime.now());
                 queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
                 queueMemberRestService.save(queueMemberEntity);
-                // 
+                //
                 thread.setRobot(false);
                 threadService.save(thread);
-                // 
+                //
                 messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             } else {
@@ -135,21 +135,23 @@ public class RouteService {
                 if (queueMemberEntity.getBeforeNumber() == 0) {
                     // 客服接待刚满员，下一个就是他，
                     content = "请稍后，下一个就是您";
-                    // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                    // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(),
+                    // queueMemberEntity.getWaitTime());
                 } else {
                     // 前面有排队人数
-                    content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
+                    content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间："
+                            + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
                 }
-                
+
                 // 进入排队队列
                 thread.setQueuing();
                 thread.setUnreadCount(0);
                 thread.setContent(content);
                 thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-                // 
+                //
                 thread.setRobot(false);
                 threadService.save(thread);
-                // 
+                //
                 messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             }
@@ -168,7 +170,10 @@ public class RouteService {
             // 保存留言消息
             messageRestService.save(message);
             // 返回留言消息
-            return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+            // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+            messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+            messageSendService.sendProtobufMessage(messageProtobuf);
+            return messageProtobuf;
         }
     }
 
@@ -210,16 +215,16 @@ public class RouteService {
                 queueMemberEntity.setAcceptTime(LocalDateTime.now());
                 queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
                 queueMemberRestService.save(queueMemberEntity);
-                // 
+                //
                 thread.setOwner(agent.getMember().getUser());
-                // 
+                //
                 UserProtobuf agentProtobuf = ServiceConvertUtils.convertToUserProtobuf(agent);
                 thread.setAgent(JSON.toJSONString(agentProtobuf));
                 thread.setRobot(false);
-                // 
+                //
                 threadService.save(thread);
                 log.info("routeWorkgroup WelcomeMessage: {}", thread.toString());
-                // 
+                //
                 messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             } else {
@@ -229,26 +234,28 @@ public class RouteService {
                 if (queueMemberEntity.getBeforeNumber() == 0) {
                     // 客服接待刚满员，下一个就是他，
                     content = "请稍后，下一个就是您";
-                    // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(), queueMemberEntity.getWaitTime());
+                    // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(),
+                    // queueMemberEntity.getWaitTime());
                 } else {
                     // 前面有排队人数
-                    content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间：" + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
+                    content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间："
+                            + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
                 }
-                
+
                 // 进入排队队列
                 thread.setQueuing();
                 thread.setUnreadCount(0);
                 thread.setContent(content);
                 thread.setQueueNumber(queueMemberEntity.getQueueNumber());
                 thread.setRobot(false);
-                // 
+                //
                 threadService.save(thread);
                 log.info("routeWorkgroup QueueMessage: {}", thread.toString());
-                // 
+                //
                 messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(agent, thread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
             }
-            // 
+            //
             return messageProtobuf;
         } else {
             // 离线状态永远显示离线提示语，不显示“继续会话”
@@ -266,10 +273,11 @@ public class RouteService {
         MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(workgroup, thread);
         // 保存留言消息
         messageRestService.save(message);
-            // 返回留言消息
-            return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+        // 返回留言消息
+        // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+        messageSendService.sendProtobufMessage(messageProtobuf);
+        return messageProtobuf;
     }
-
-
 
 }

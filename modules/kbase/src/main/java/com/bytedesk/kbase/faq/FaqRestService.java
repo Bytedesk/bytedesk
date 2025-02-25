@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 11:15:22
+ * @LastEditTime: 2025-02-25 18:11:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -189,8 +189,6 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         return modelMapper.map(entity, FaqResponse.class);
     }
 
-    
-
     public FaqExcel convertToExcel(FaqResponse faq) {
         return modelMapper.map(faq, FaqExcel.class);
     }
@@ -227,7 +225,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         return faq;
     }
 
-    public void saveQaPairs(String qaPairs, String kbUid, String orgUid, String docUid) {
+    public void saveFaqPairs(String qaPairs, String kbUid, String orgUid, String docId) {
         if (!StringUtils.hasText(qaPairs)) {
             return;
         }
@@ -272,7 +270,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                         .type(MessageTypeEnum.TEXT.name())
                         .tags(tags)
                         .kbUid(kbUid)
-                        .docUid(docUid)
+                        .docId(docId)
                         .build();
                     
                     faq.setUid(uidUtils.getUid());

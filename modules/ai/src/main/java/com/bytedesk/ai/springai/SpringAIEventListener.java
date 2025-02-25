@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:07:59
+ * @LastEditTime: 2025-02-25 18:12:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,13 +26,16 @@ import com.bytedesk.ai.springai.event.VectorSplitEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
+import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
+import com.bytedesk.kbase.faq.event.FaqCreateEvent;
+import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.event.FileCreateEvent;
 import com.bytedesk.kbase.file.event.FileUpdateEvent;
-// import com.bytedesk.kbase.qa.QaEntity;
-// import com.bytedesk.kbase.qa.event.QaCreateEvent;
-// import com.bytedesk.kbase.qa.event.QaUpdateEvent;
+// import com.bytedesk.kbase.qa.FaqEntity;
+// import com.bytedesk.kbase.qa.event.FaqCreateEvent;
+// import com.bytedesk.kbase.qa.event.FaqUpdateEvent;
 import com.bytedesk.kbase.text.TextEntity;
 import com.bytedesk.kbase.text.event.TextCreateEvent;
 import com.bytedesk.kbase.text.event.TextUpdateEvent;
@@ -68,10 +71,8 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onFileUpdateEvent: {}", file.getFileName());
         // 后台删除文件记录
         if (file.isDeleted()) {
-            // 通知python ai模块处理
-            // redisPubsubService.sendDeleteFileMessage(upload.getUid(), upload.getDocIdList());
-            // 删除redis中缓存的document
-            // uploadVectorStore.deleteDoc(upload.getDocIdList());
+            // 删除文件对应的document
+            springAiVectorService.deleteDoc(file.getDocIdList());
         }
     }
 
@@ -93,23 +94,23 @@ public class SpringAIEventListener {
         springAiVectorService.readText(text);
     }
 
-    // @EventListener
-    // public void onQaCreateEvent(QaCreateEvent event) {
-    //     QaEntity qa = event.getQa();
-    //     log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getName());
-    //     // 生成document
-    //     springAiVectorService.readQa(qa);
-    // }
+    @EventListener
+    public void onFaqCreateEvent(FaqCreateEvent event) {
+        FaqEntity qa = event.getFaq();
+        log.info("SpringAIEventListener onFaqCreateEvent: {}", qa.getQuestion());
+        // 生成document
+        springAiVectorService.readFaq(qa);
+    }
 
-    // @EventListener
-    // public void onQaUpdateEvent(QaUpdateEvent event) {
-    //     QaEntity qa = event.getQa();
-    //     log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.getName());
-    //     // 首先删除text对应的document，以及redis中缓存的document
-    //     springAiVectorService.deleteDoc(qa.getDocIdList());
-    //     // 然后重新生成document
-    //     springAiVectorService.readQa(qa);
-    // }
+    @EventListener
+    public void onFaqUpdateEvent(FaqUpdateEvent event) {
+        FaqEntity qa = event.getFaq();
+        log.info("SpringAIEventListener onFaqUpdateEvent: {}", qa.getQuestion());
+        // 首先删除text对应的document，以及redis中缓存的document
+        // springAiVectorService.deleteDoc(qa.getDocIdList());
+        // 然后重新生成document
+        // springAiVectorService.readFaq(qa);
+    }
 
     @EventListener
     public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
@@ -139,9 +140,9 @@ public class SpringAIEventListener {
 		for (Document document : docList) {
             // 调用模型生成问答对
             zhipuaiChatService.ifPresent(service -> {
-                String qaPairs = service.generateQaPairsAsync(document.getText());
-                // log.info("generateQaPairsAsync qaPairs {}", qaPairs);
-                faqRestService.saveQaPairs(qaPairs, kbUid, orgUid, document.getId());
+                String qaPairs = service.generateFaqPairsAsync(document.getText());
+                // log.info("generateFaqPairsAsync qaPairs {}", qaPairs);
+                faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
             });
         }
     }

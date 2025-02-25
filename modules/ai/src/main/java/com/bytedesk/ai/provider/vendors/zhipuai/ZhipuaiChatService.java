@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 14:01:29
+ * @LastEditTime: 2025-02-25 17:49:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -331,7 +331,7 @@ public class ZhipuaiChatService {
 
     }
 
-    public String generateQaPairsAsync(String chunk) {
+    public String generateFaqPairsAsync(String chunk) {
         log.info("generateQaPairsAsync");
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
         // log.info("generateQaPairs prompt {}", prompt);
@@ -427,7 +427,7 @@ public class ZhipuaiChatService {
         return answer.toString();
     }
 
-    public void generateQaPairsSync(String chunk) {
+    public void generateFaqPairsSync(String chunk) {
         log.info("generateQaPairsSync");
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
         // log.info("generateQaPairs prompt {}", prompt);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:40:22
+ * @LastEditTime: 2025-02-25 17:50:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,11 +14,19 @@
 package com.bytedesk.kbase.faq;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.utils.StringListConverter;
+import com.bytedesk.kbase.split.SplitStatusEnum;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -60,6 +68,15 @@ public class FaqEntity extends BaseEntity {
     @Column(name = "faq_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
 
+    @Builder.Default
+    private String status = SplitStatusEnum.NEW.name();
+
+    @Builder.Default
+    private String level = LevelEnum.ORGANIZATION.name();
+
+    @Builder.Default
+    private String platform = PlatformEnum.BYTEDESK.name();
+
     //  "tags": ["人事考评办公室", "培训机构"]
     @Builder.Default
     private String tags = "[]";
@@ -98,9 +115,12 @@ public class FaqEntity extends BaseEntity {
     private String kbUid;
 
     // used for auto-generate faq
-    private String docUid; // 对应文档
+    private String docId; // 对应文档
 
     private String fileUid; // 对应文件
+
+    private String userUid;
+    
 
     // 是否是常见问题/
     @Builder.Default
@@ -122,7 +142,11 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private boolean isShortcutPath = false;
 
-    
+    // vector store id
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> docIdList = new ArrayList<>();
 
     public void up() {
         this.setUpCount(this.upCount + 1);
@@ -131,5 +155,7 @@ public class FaqEntity extends BaseEntity {
     public void down() {
         this.setDownCount(this.downCount + 1);
     }
+
+    
 
 }

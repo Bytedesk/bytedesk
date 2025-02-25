@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:57:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:39:48
+ * @LastEditTime: 2025-02-25 18:11:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,7 @@ import org.springframework.util.SerializationUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
-import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
+// import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -43,10 +43,10 @@ public class FaqEntityListener {
     public void onPostUpdate(FaqEntity faq) {
         log.info("FaqEntityListener onPostUpdate: {}", faq.getUid());
         // 
-        FaqEntity clonedFaq = SerializationUtils.clone(faq);
-        // 
-        BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new FaqUpdateEvent(clonedFaq));
+        // FaqEntity clonedFaq = SerializationUtils.clone(faq);
+        // // 
+        // BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        // publisher.publishEvent(new FaqUpdateEvent(clonedFaq));
     }
     
 }
