@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-30 14:37:01
+ * @LastEditTime: 2025-02-25 21:15:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,6 +32,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -160,9 +161,7 @@ public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRe
 
     @Override
     public ArticleResponse convertToResponse(ArticleEntity entity) {
-        ArticleResponse articleResponse = modelMapper.map(entity, ArticleResponse.class);
-        articleResponse.setUser(JSON.parseObject(entity.getUser(), UserProtobuf.class));
-        return articleResponse;
+        return KbaseConvertUtils.convertToArticleResponse(entity);
     }
 
 }
