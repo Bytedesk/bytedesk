@@ -24,6 +24,7 @@
 		<spring-ai-alibaba.version>1.0.0-M5.1</spring-ai-alibaba.version>
 		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
 		<mcp.version>0.7.0</mcp.version>
+		<jsonp.version>1.18.3</jsonp.version>
 	</properties>
 
 	<dependencies>
@@ -183,6 +184,13 @@
 			<groupId>io.github.ollama4j</groupId>
 			<artifactId>ollama4j</artifactId>
 			<version>${ollama4j.version}</version>
+		</dependency>
+
+		<!-- https://jsoup.org/download -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>${jsonp.version}</version>
 		</dependency>
 
 
