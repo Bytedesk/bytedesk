@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 12:59:35
+ * @LastEditTime: 2025-02-25 15:19:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,16 @@ import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.event.FileCreateEvent;
 import com.bytedesk.kbase.file.event.FileUpdateEvent;
+import com.bytedesk.kbase.qa.QaEntity;
+import com.bytedesk.kbase.qa.event.QaCreateEvent;
+import com.bytedesk.kbase.qa.event.QaUpdateEvent;
+import com.bytedesk.kbase.text.TextEntity;
+import com.bytedesk.kbase.text.event.TextCreateEvent;
+import com.bytedesk.kbase.text.event.TextUpdateEvent;
+import com.bytedesk.kbase.website.WebsiteEntity;
+import com.bytedesk.kbase.website.event.WebsiteCreateEvent;
+import com.bytedesk.kbase.website.event.WebsiteUpdateEvent;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +74,56 @@ public class SpringAIEventListener {
             // uploadVectorStore.deleteDoc(upload.getDocIdList());
         }
     }
+
+    @EventListener
+    public void onTextCreateEvent(TextCreateEvent event) {
+        TextEntity text = event.getText();
+        log.info("SpringAIEventListener onTextCreateEvent: {}", text.toString());
+        // etl分块处理
+        springAiVectorService.readText(text);
+    }
+
+    @EventListener
+    public void onTextUpdateEvent(TextUpdateEvent event) {
+        TextEntity text = event.getText();
+        log.info("SpringAIEventListener onTextUpdateEvent: {}", text.toString());
+        // 首先删除text对应的document，以及redis中缓存的document
+        // 然后重新生成document
+        // springAiVectorService.readText(text);
+    }
+
+    @EventListener
+    public void onQaCreateEvent(QaCreateEvent event) {
+        QaEntity qa = event.getQa();
+        log.info("SpringAIEventListener onQaCreateEvent: {}", qa.toString());
+        // etl分块处理
+        springAiVectorService.readQa(qa);
+    }
+
+    @EventListener
+    public void onQaUpdateEvent(QaUpdateEvent event) {
+        QaEntity qa = event.getQa();
+        log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.toString());
+        // etl分块处理
+        springAiVectorService.readQa(qa);
+    }
+
+    @EventListener
+    public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
+        WebsiteEntity website = event.getWebsite();
+        log.info("SpringAIEventListener onWebsiteCreateEvent: {}", website.toString());
+        // etl分块处理
+        springAiVectorService.readWebsite(website);
+    }
+
+    @EventListener
+    public void onWebsiteUpdateEvent(WebsiteUpdateEvent event) {
+        WebsiteEntity website = event.getWebsite();
+        log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.toString());
+        // etl分块处理
+        springAiVectorService.readWebsite(website);
+    }
+
 
     @EventListener
     public void onVectorSplitEvent(VectorSplitEvent event) {

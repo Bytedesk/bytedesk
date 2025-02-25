@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 16:49:45
+ * @LastEditTime: 2025-02-25 15:13:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,12 +13,18 @@
  */
 package com.bytedesk.kbase.website;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.utils.StringListConverter;
+import com.bytedesk.kbase.split.SplitStatusEnum;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -57,9 +63,8 @@ public class WebsiteEntity extends BaseEntity {
     // @Column(name = "website_type")
     // private String type = MessageTypeEnum.TEXT.name();
 
-    // @Builder.Default
-    // @Column(nullable = false)
-    // private String color = "red";
+    @Builder.Default
+    private String status = SplitStatusEnum.NEW.name();
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
@@ -67,5 +72,19 @@ public class WebsiteEntity extends BaseEntity {
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
 
+    private String categoryUid; // 所属分类
+
+    private String kbUid; // 所属知识库
+
+    // 对应 uploadEntity 的 uid
+    private String uploadUid;
+
     private String userUid;
+
+    // vector store id
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> docIdList = new ArrayList<>();
+
 }
