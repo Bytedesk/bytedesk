@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 16:52:53
+ * @LastEditTime: 2025-02-25 11:09:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -150,47 +150,6 @@ public class UploadEventListener {
         }
     }
 
-    @EventListener
-    public void onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {
-        RedisPubsubMessageFile messageFile = event.getMessageFile();
-        log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
-        //
-        UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
-                .orElseThrow(() -> new RuntimeException("upload not found by uid: " + messageFile.getFileUid()));
-        upload.setDocIdList(messageFile.getDocIds());
-        upload.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
-        uploadService.save(upload);
-        //
-        String user = upload.getUser();
-        UserProtobuf uploadUser = JSON.parseObject(user, UserProtobuf.class);
-
-        // 通知前端
-        JSONObject contentObject = new JSONObject();
-        contentObject.put(I18Consts.I18N_NOTICE_TITLE, I18Consts.I18N_NOTICE_PARSE_FILE_SUCCESS);
-        //
-        MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
-                JSON.toJSONString(contentObject));
-        messageSendService.sendProtobufMessage(message);
-    }
-
-    @EventListener
-    public void onRedisPubsubParseFileErrorEvent(RedisPubsubParseFileErrorEvent event) {
-        RedisPubsubMessageFile messageFile = event.getMessageFile();
-        log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
-        UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
-                .orElseThrow(() -> new RuntimeException("upload not found by uid: " + messageFile.getFileUid()));
-        upload.setStatus(UploadStatusEnum.PARSE_FILE_ERROR.name());
-        uploadService.save(upload);
-        //
-        String user = upload.getUser();
-        UserProtobuf uploadUser = JSON.parseObject(user, UserProtobuf.class);
-        // 通知前端
-        JSONObject contentObject = new JSONObject();
-        contentObject.put(I18Consts.I18N_NOTICE_TITLE, I18Consts.I18N_NOTICE_PARSE_FILE_ERROR);
-        //
-        MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(), uploadUser.getUid(), upload.getOrgUid(),
-                JSON.toJSONString(contentObject));
-        messageSendService.sendProtobufMessage(message);
-    }
+   
 
 }
