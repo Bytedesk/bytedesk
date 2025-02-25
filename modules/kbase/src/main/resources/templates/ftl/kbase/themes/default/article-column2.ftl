@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <#--  <title>${article.title!''} - 文章详情 - ${knowledgebase.headline!'帮助中心'} - ${knowledgebase.name!'微语'}</title>  -->
+    <#--  <title>${article.title!''} - 文章详情 - ${kbase.headline!'帮助中心'} - ${kbase.name!'微语'}</title>  -->
 
     <#include "./template/header.ftl"/>
 

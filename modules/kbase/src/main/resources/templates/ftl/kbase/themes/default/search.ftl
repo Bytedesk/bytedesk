@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>搜索 - ${knowledgebase.headline!'帮助中心'} - ${knowledgebase.name!'微语'}</title>
+    <title>搜索 - ${kbase.headline!'帮助中心'} - ${kbase.name!'微语'}</title>
 
     <#include "./template/header.ftl"/>
 
@@ -84,7 +84,7 @@
                             // 搜索结果不为空
                             for (var i = 0; i < response.data.content.length; i++) {
                                 var article = response.data.content[i];
-                                $("#supportSearchArticle").append("<li><a href='/helpcenter/${knowledgebase.uid!''}/article/" + article.uid + ".html' target='_blank'>" + article.title + "</a></li>");
+                                $("#supportSearchArticle").append("<li><a href='/helpcenter/${kbase.uid!''}/article/" + article.uid + ".html' target='_blank'>" + article.title + "</a></li>");
                             }
                         }
                     } else {

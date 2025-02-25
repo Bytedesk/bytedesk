@@ -6,13 +6,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>${category.name!''} - 文章分类 - ${knowledgebase.headline!'帮助中心'} - ${knowledgebase.name!'微语'}</title>
+    <title>${category.name!''} - 文章分类 - ${kbase.headline!'帮助中心'} - ${kbase.name!'微语'}</title>
 
     <#include "./template/header.ftl"/>
 
     <style>
         .uk-background-primary {
-            background-color: ${knowledgebase.primaryColor!''};
+            background-color: ${kbase.primaryColor!''};
         }
         .accordion {
             background-color: white;
@@ -38,7 +38,7 @@
             <div uk-grid>
                 <div class="uk-width-2-3@m">
                     <ul class="uk-breadcrumb uk-visible@m">
-                        <li><a href="/helpcenter/${knowledgebase.uid!''}">首页</a></li>
+                        <li><a href="/helpcenter/${kbase.uid!''}">首页</a></li>
                         <li><span href="" id="supportCategoryName">${category.name!''}</span></li>
                     </ul>
                 </div>
@@ -67,7 +67,7 @@
                     <ul id="supportCategory" class="uk-list uk-list-large uk-margin-medium-bottom">
                         <#list categories as category>
                             <button class="accordion">
-                                <a href="/helpcenter/${knowledgebase.uid!''}/category/${category.uid}.html" target="_blank">${category.name!''}</a>
+                                <a href="/helpcenter/${kbase.uid!''}/category/${category.uid}.html" target="_blank">${category.name!''}</a>
                             </button>
                         </#list>
                         <!-- <li><a href="#">Getting Started</a></li> -->
@@ -91,7 +91,7 @@
                         </li> -->
                         <#list articles as article>
                             <li>
-                                <a href="/helpcenter/${knowledgebase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}<span style="float: right;">${article.updatedAt?substring(5, 16)}</span></a>
+                                <a href="/helpcenter/${kbase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}<span style="float: right;">${article.updatedAt?substring(5, 16)}</span></a>
                             </li>
                         </#list>
                         <#if (articles?size == 0)>

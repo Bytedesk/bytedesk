@@ -8,7 +8,7 @@
             <div class="uk-flex-first@m uk-text-left@m">
                     <#--  TODO: 后台自定义  -->
                 <#--  <p class="uk-text-small">北京微语天下科技有限公司, 京ICP备17041763号-2</p>  -->
-                ${knowledgebase.footerHtml!''}
+                ${kbase.footerHtml!''}
             </div>
         </div>
     </div>
@@ -24,9 +24,9 @@
     //
     function searchContent() {
         // 读取变量，注意：添加双引号
-        let kbUid = '${knowledgebase.uid!''}'
+        let kbUid = '${kbase.uid!''}'
         let searchContent = $("#supportSearch").val()
-        window.open("/helpcenter/${knowledgebase.uid!''}/search.html?kbUid=" + kbUid + "&content=" + searchContent);
+        window.open("/helpcenter/${kbase.uid!''}/search.html?kbUid=" + kbUid + "&content=" + searchContent);
     }
     //
     function onKeyUp(event) {
@@ -34,9 +34,9 @@
         // console.log("onKeyUp:", key);
         if (key === 13) {
             // 读取变量，注意：添加双引号
-            let kbUid = '${knowledgebase.uid!''}'
+            let kbUid = '${kbase.uid!''}'
             let searchContent = $("#supportSearch").val()
-             window.open("/helpcenter/${knowledgebase.uid!''}/search.html?kbUid=" + kbUid + "&content=" + searchContent);
+             window.open("/helpcenter/${kbase.uid!''}/search.html?kbUid=" + kbUid + "&content=" + searchContent);
         }
     }
 </script>

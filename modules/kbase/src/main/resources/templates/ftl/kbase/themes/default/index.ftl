@@ -7,7 +7,7 @@
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
-    <title>${knowledgebase.name!'微语'} - ${knowledgebase.headline!'帮助中心'}</title>
+    <title>${kbase.name!'微语'} - ${kbase.headline!'帮助中心'}</title>
 
     <#include "./template/header.ftl"/>
 
@@ -25,7 +25,7 @@
             <div id="supportCategory" class="uk-child-width-1-3@s uk-grid-match uk-grid-medium uk-text-center" uk-grid>
                 <#list categories as category>
                     <div>
-                        <a href="/helpcenter/${knowledgebase.uid!''}/category/${category.uid}.html" target="_blank" class="box uk-border-rounded">
+                        <a href="/helpcenter/${kbase.uid!''}/category/${category.uid}.html" target="_blank" class="box uk-border-rounded">
                             <h3>${category.name!''}</h3>
                         </a>
                     </div>
@@ -47,7 +47,7 @@
                     <h3>置顶问题</h3>
                     <ul id="supportHotArticle" class="uk-list uk-list-large uk-list-divider link-icon-right">
                         <#list articlesTop.content as article>
-                            <li><a href="/helpcenter/${knowledgebase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
+                            <li><a href="/helpcenter/${kbase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
                         </#list>
                         <#if (articlesTop.content?size == 0)>
                             <div>
@@ -60,7 +60,7 @@
                     <h3>热门问题</h3>
                     <ul id="supportHotArticle" class="uk-list uk-list-large uk-list-divider link-icon-right">
                         <#list articlesHot.content as article>
-                            <li><a href="/helpcenter/${knowledgebase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
+                            <li><a href="/helpcenter/${kbase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
                         </#list>
                         <#if (articlesHot.content?size == 0)>
                             <div>
@@ -73,7 +73,7 @@
                     <h3>最近更新</h3>
                     <ul id="supportLatestArtcle" class="uk-list uk-list-large uk-list-divider link-icon-right">
                         <#list articlesRecent.content as article>
-                            <li><a href="/helpcenter/${knowledgebase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
+                            <li><a href="/helpcenter/${kbase.uid!''}/article/${article.uid}.html" target="_blank">${article.title!''}</a><span style="float: right;">${article.updatedAt?substring(5, 16)}</span></li>
                         </#list>
                         <#if (articlesRecent.content?size == 0)>
                             <div>
