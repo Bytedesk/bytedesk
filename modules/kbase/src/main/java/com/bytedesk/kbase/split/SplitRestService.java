@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 16:38:27
+ * @LastEditTime: 2025-02-25 16:57:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,19 +68,20 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
         log.info("SplitRestService create: {}", request);
         SplitEntity entity = SplitEntity.builder()
             .name(request.getName())
-            .content(request.getContent())
-            .type(request.getType())
-            .level(request.getLevel())
-            .platform(request.getPlatform())
-            .docId(request.getDocId())
-            .typeUid(request.getTypeUid())
-            .categoryUid(request.getCategoryUid())
-            .kbUid(request.getKbUid())
-            .userUid(request.getUserUid())
+            // .content(request.getContent())
+            // .type(request.getType())
+            // .level(request.getLevel())
+            // .platform(request.getPlatform())
+            // .docId(request.getDocId())
+            // .typeUid(request.getTypeUid())
+            // .categoryUid(request.getCategoryUid())
+            // .kbUid(request.getKbUid())
+            // .userUid(request.getUserUid())
             .build();
         // SplitEntity entity = modelMapper.map(request, SplitEntity.class);
         entity.setUid(uidUtils.getUid());
-
+        log.info("SplitRestService create: {}", entity);
+        // 
         SplitEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create split failed");
@@ -122,7 +123,6 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // splitRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("Split not found");

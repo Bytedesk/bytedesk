@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 16:26:31
+ * @LastEditTime: 2025-02-25 17:08:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,8 +44,8 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.FileRestService;
-import com.bytedesk.kbase.qa.QaEntity;
-import com.bytedesk.kbase.qa.QaRestService;
+// import com.bytedesk.kbase.qa.QaEntity;
+// import com.bytedesk.kbase.qa.QaRestService;
 import com.bytedesk.kbase.split.SplitRequest;
 import com.bytedesk.kbase.split.SplitRestService;
 import com.bytedesk.kbase.split.SplitStatusEnum;
@@ -74,7 +74,7 @@ public class SpringAIVectorService {
 
 	private final WebsiteRestService websiteRestService;
 
-	private final QaRestService qaRestService;
+	// private final QaRestService qaRestService;
 
 	private final UploadRestService uploadRestService;
 
@@ -302,52 +302,52 @@ public class SpringAIVectorService {
 	}
 
 	// 使用reader直接将qaEntity字符串，转换成 List<Document> documents
-	public List<Document> readQa(QaEntity qaEntity) {
-		log.info("Converting string content to documents");
-		if (qaEntity == null || qaEntity.getContent() == null || qaEntity.getContent().isEmpty()) {
-			throw new IllegalArgumentException("Content must not be empty");
-		}
-		if (qaEntity.getQuestion() == null || qaEntity.getQuestion().isEmpty()) {
-			throw new IllegalArgumentException("Question must not be empty");
-		}
-		if (qaEntity.getContent() == null || qaEntity.getContent().isEmpty()) {
-			throw new IllegalArgumentException("Content must not be empty");
-		}
-		//
-		String content = JSON.toJSONString(qaEntity);
-		// 创建Document对象
-		Document document = new Document(content);
-		// 使用TokenTextSplitter分割文本
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(List.of(document));
-		List<String> docIdList = new ArrayList<>();
-		Iterator<Document> iterator = docList.iterator();
-		while (iterator.hasNext()) {
-			Document doc = iterator.next();
-			log.info("qa doc id: {}", doc.getId());
-			docIdList.add(doc.getId());
-			// 添加元数据: 文件file_uid, 知识库kb_uid
-			// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbUid());
-			// 将doc写入到splitEntity
-			SplitRequest splitRequest = SplitRequest.builder()
-					.name(qaEntity.getName())
-					.docId(doc.getId())
-					.typeUid(qaEntity.getUid())
-					.categoryUid(qaEntity.getCategoryUid())
-					.kbUid(qaEntity.getKbUid())
-					.userUid(qaEntity.getUserUid())
-					.build();
-			splitRequest.setType(SplitTypeEnum.QA.name());
-			splitRequest.setContent(doc.getText());
-			splitRestService.create(splitRequest);
-		}
-		qaEntity.setDocIdList(docIdList);
-		qaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
-		qaRestService.save(qaEntity);
+	// public List<Document> readQa(QaEntity qaEntity) {
+	// 	log.info("Converting string content to documents");
+	// 	if (qaEntity == null || qaEntity.getContent() == null || qaEntity.getContent().isEmpty()) {
+	// 		throw new IllegalArgumentException("Content must not be empty");
+	// 	}
+	// 	if (qaEntity.getQuestion() == null || qaEntity.getQuestion().isEmpty()) {
+	// 		throw new IllegalArgumentException("Question must not be empty");
+	// 	}
+	// 	if (qaEntity.getContent() == null || qaEntity.getContent().isEmpty()) {
+	// 		throw new IllegalArgumentException("Content must not be empty");
+	// 	}
+	// 	//
+	// 	String content = JSON.toJSONString(qaEntity);
+	// 	// 创建Document对象
+	// 	Document document = new Document(content);
+	// 	// 使用TokenTextSplitter分割文本
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(List.of(document));
+	// 	List<String> docIdList = new ArrayList<>();
+	// 	Iterator<Document> iterator = docList.iterator();
+	// 	while (iterator.hasNext()) {
+	// 		Document doc = iterator.next();
+	// 		log.info("qa doc id: {}", doc.getId());
+	// 		docIdList.add(doc.getId());
+	// 		// 添加元数据: 文件file_uid, 知识库kb_uid
+	// 		// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+	// 		doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbUid());
+	// 		// 将doc写入到splitEntity
+	// 		SplitRequest splitRequest = SplitRequest.builder()
+	// 				.name(qaEntity.getName())
+	// 				.docId(doc.getId())
+	// 				.typeUid(qaEntity.getUid())
+	// 				.categoryUid(qaEntity.getCategoryUid())
+	// 				.kbUid(qaEntity.getKbUid())
+	// 				.userUid(qaEntity.getUserUid())
+	// 				.build();
+	// 		splitRequest.setType(SplitTypeEnum.QA.name());
+	// 		splitRequest.setContent(doc.getText());
+	// 		splitRestService.create(splitRequest);
+	// 	}
+	// 	qaEntity.setDocIdList(docIdList);
+	// 	qaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
+	// 	qaRestService.save(qaEntity);
 
-		return docList;
-	}
+	// 	return docList;
+	// }
 
 	// 抓取website
 	public List<Document> readWebsite(WebsiteEntity websiteEntity) {
