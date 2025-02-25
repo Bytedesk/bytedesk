@@ -14,9 +14,6 @@
 package com.bytedesk.kbase.split;
 
 import org.springframework.stereotype.Component;
-import com.bytedesk.kbase.split.event.SplitCreateEvent;
-import com.bytedesk.kbase.split.event.SplitUpdateEvent;
-
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SplitEntityListener {
 
     @PostPersist
-    public void onPostPersist(SplitCreateEvent event) {
-        SplitEntity split = event.getSplit();
+    public void onPostPersist(SplitEntity split) {
         log.info("SplitEntityListener onPostPersist: {}", split.getName());
         // 
         // SplitEntity clonedSplit = SerializationUtils.clone(split);
@@ -37,8 +33,7 @@ public class SplitEntityListener {
     }
 
     @PostUpdate
-    public void onPostUpdate(SplitUpdateEvent event) {
-        SplitEntity split = event.getSplit();
+    public void onPostUpdate(SplitEntity split) {
         log.info("SplitEntityListener onPostUpdate: {}", split.getName());
         // 
         // SplitEntity clonedSplit = SerializationUtils.clone(split);
