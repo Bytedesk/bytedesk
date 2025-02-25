@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 14:34:32
+ * @LastEditTime: 2025-02-25 15:03:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,18 +32,22 @@ import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.ai.reader.web.WebDocumentReader;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.bytedesk.ai.springai.event.VectorSplitEvent;
+import com.bytedesk.ai.springai.reader.WebDocumentReader;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.FileRestService;
+import com.bytedesk.kbase.split.SplitEntity;
+import com.bytedesk.kbase.split.SplitRequest;
+import com.bytedesk.kbase.split.SplitRestService;
 import com.bytedesk.kbase.split.SplitStatusEnum;
 import com.bytedesk.kbase.upload.UploadRestService;
-import com.bytedesk.kbase.upload.UploadStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +59,8 @@ public class SpringAIVectorService {
 	private final RedisVectorStore ollamaRedisVectorStore;
 
 	private final FileRestService fileRestService;
+
+	private final SplitRestService splitRestService;
 
 	private final UploadRestService uploadRestService;
 
@@ -297,19 +303,16 @@ public class SpringAIVectorService {
 			// 构建URI
 			URI uri = UriComponentsBuilder.fromHttpUrl(url).build().toUri();
 			
+			// 创建元数据
+			Map<String, String> metadata = new HashMap<>();
+			metadata.put(KbaseConst.KBASE_KB_UID, kbUid);
+			metadata.put("source_url", url);
+			
 			// 创建WebDocumentReader
-			WebDocumentReader webReader = new WebDocumentReader(uri);
+			WebDocumentReader webReader = new WebDocumentReader(uri, metadata);
 			
 			// 读取网页内容
 			List<Document> documents = webReader.read();
-			
-			// 提取文本内容并添加元数据
-			for (Document doc : documents) {
-				// 添加知识库ID作为元数据
-				doc.getMetadata().put(KbaseConst.KBASE_KB_UID, kbUid);
-				// 可以添加更多元数据，如URL等
-				doc.getMetadata().put("source_url", url);
-			}
 			
 			// 使用TokenTextSplitter分割文本
 			var tokenTextSplitter = new TokenTextSplitter();
@@ -344,7 +347,6 @@ public class SpringAIVectorService {
 		}
 		return allDocuments;
 	}
-	
 
 	// 存储到vector store
 	private void storeDocuments(List<Document> docList, FileEntity file) {
@@ -358,6 +360,15 @@ public class SpringAIVectorService {
 			// 添加元数据: 文件file_uid, 知识库kb_uid
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
+			// 将doc写入到splitEntity
+			SplitRequest splitRequest = SplitRequest.builder()
+				.name(file.getFileName())
+				.docId(doc.getId())
+				.fileUid(file.getUid())
+				.kbUid(file.getKbUid())
+			.build();
+			splitRequest.setContent(doc.getText());
+			splitRestService.create(splitRequest);
 		}
 		file.setDocIdList(docIdList);
 		file.setStatus(SplitStatusEnum.SUCCESS.name());
