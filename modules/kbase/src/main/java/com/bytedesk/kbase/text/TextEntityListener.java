@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 15:48:37
+ * @LastEditTime: 2025-02-25 17:33:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,8 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TextEntityListener {
 
     @PostPersist
-    public void onPostPersist(TextCreateEvent event) {
-        TextEntity text = event.getText();
+    public void onPostPersist(TextEntity text) {
         log.info("TextEntityListener onPostPersist: {}", text.toString());
         // 
         TextEntity clonedText = SerializationUtils.clone(text);
@@ -41,8 +40,7 @@ public class TextEntityListener {
     }
 
     @PostUpdate
-    public void onPostUpdate(TextUpdateEvent event) {
-        TextEntity text = event.getText();
+    public void onPostUpdate(TextEntity text) {
         log.info("TextEntityListener onPostUpdate: {}", text.toString());
         // 
         TextEntity clonedText = SerializationUtils.clone(text);

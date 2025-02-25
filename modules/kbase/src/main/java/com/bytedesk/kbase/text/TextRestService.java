@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 16:55:17
+ * @LastEditTime: 2025-02-25 17:27:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,7 +76,7 @@ public class TextRestService extends BaseRestService<TextEntity, TextRequest, Te
         // 
         TextEntity entity = modelMapper.map(request, TextEntity.class);
         entity.setUid(uidUtils.getUid());
-
+        // 
         TextEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create text failed");
@@ -107,7 +107,7 @@ public class TextRestService extends BaseRestService<TextEntity, TextRequest, Te
         try {
             return textRepository.save(entity);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Save text failed: " + e.getMessage());
         }
     }
 

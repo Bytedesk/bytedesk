@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:08:12
+ * @LastEditTime: 2025-02-25 17:38:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -292,6 +292,7 @@ public class SpringAIVectorService {
 					.build();
 			splitRequest.setType(SplitTypeEnum.TEXT.name());
 			splitRequest.setContent(doc.getText());
+			splitRequest.setOrgUid(textEntity.getOrgUid());
 			splitRestService.create(splitRequest);
 		}
 		textEntity.setDocIdList(docIdList);
@@ -394,6 +395,7 @@ public class SpringAIVectorService {
 						.build();
 				splitRequest.setType(SplitTypeEnum.WEBSITE.name());
 				splitRequest.setContent(doc.getText());
+				splitRequest.setOrgUid(websiteEntity.getOrgUid());
 				splitRestService.create(splitRequest);
 			}
 			// 如果需要存储到向量数据库
@@ -437,6 +439,7 @@ public class SpringAIVectorService {
 					.build();
 			splitRequest.setType(SplitTypeEnum.FILE.name());
 			splitRequest.setContent(doc.getText());
+			splitRequest.setOrgUid(file.getOrgUid());
 			splitRestService.create(splitRequest);
 		}
 		file.setDocIdList(docIdList);
