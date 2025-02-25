@@ -107,6 +107,15 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
+    // updateThreadUnreadCount
+    @PostMapping("/update/unread")
+    public ResponseEntity<?> updateUnreadCount(@RequestBody ThreadRequest request) {
+
+        ThreadResponse threadResponse = threadService.updateUnreadCount(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
     @ActionAnnotation(title = "thread", action = "close", description = "close thread")
     @PostMapping("/close")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
