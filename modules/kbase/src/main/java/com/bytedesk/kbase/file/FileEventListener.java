@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 10:36:45
+ * @LastEditTime: 2025-02-25 10:43:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,13 +36,9 @@ public class FileEventListener {
         // 专门存储大模型上传文件记录
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
             // 转换为 fileEntity，并保存
-            FileEntity fileEntity = new FileEntity();
-            fileEntity.setUpload(upload);
-            fileEntity.setFileName(upload.getFileName());
-            fileEntity.setFileSize(upload.getFileSize());
-            fileEntity.setFileType(upload.getFileType());
-            fileEntity.setFileUrl(upload.getFileUrl());
-            fileEntity.setFileMd5(upload.getFileMd5());
+            FileRequest fileRequest = FileRequest.builder()
+                .uploadUid(upload.getUid())
+                .build();
         }
     }
 }

@@ -88,6 +88,15 @@ ollama pull deepseek-r1:1.5b
 ollama pull qwen2.5:1.5b
 ```
 
+### 如果不需要知识库AI问答功能，可以修改 `docker-compose.yaml` 或 `docker-compose-ollama.yaml` 关闭ollama对话和嵌入功能，以节省资源
+
+```bash
+# 关闭ollama对话
+SPRING_AI_OLLAMA_CHAT_ENABLED: false
+# 关闭ollama嵌入
+SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
+```
+
 ### 停止容器
 
 ```bash
