@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 16:11:02
+ * @LastEditTime: 2025-02-25 16:38:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,12 +28,12 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest, SplitResponse> {
 
     private final SplitRepository splitRepository;
@@ -66,8 +66,19 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
     @Override
     public SplitResponse create(SplitRequest request) {
         log.info("SplitRestService create: {}", request);
-        
-        SplitEntity entity = modelMapper.map(request, SplitEntity.class);
+        SplitEntity entity = SplitEntity.builder()
+            .name(request.getName())
+            .content(request.getContent())
+            .type(request.getType())
+            .level(request.getLevel())
+            .platform(request.getPlatform())
+            .docId(request.getDocId())
+            .typeUid(request.getTypeUid())
+            .categoryUid(request.getCategoryUid())
+            .kbUid(request.getKbUid())
+            .userUid(request.getUserUid())
+            .build();
+        // SplitEntity entity = modelMapper.map(request, SplitEntity.class);
         entity.setUid(uidUtils.getUid());
 
         SplitEntity savedEntity = save(entity);
@@ -79,6 +90,7 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
 
     @Override
     public SplitResponse update(SplitRequest request) {
+        // 
         Optional<SplitEntity> optional = splitRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             SplitEntity entity = optional.get();
@@ -100,7 +112,7 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
         try {
             return splitRepository.save(entity);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Save split failed: " + e.getMessage());
         }
     }
 
