@@ -44,8 +44,26 @@ public class BdDateUtils {
         return formatter.format(date);
     }
 
+    /**
+     * 将 LocalDateTime 转换为格式化的日期时间字符串
+     * @param localDateTime LocalDateTime对象
+     * @return 格式化的日期时间字符串 (yyyy-MM-dd HH:mm:ss)
+     */
     public static String formatDatetimeToString(LocalDateTime localDateTime) {
-        return localDateTime.atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
+        if (localDateTime == null) {
+            return null;
+        }
+        // 使用 DateTimeFormatter 直接格式化 LocalDateTime
+        return localDateTime.format(DateTimeFormatter.ofPattern(datetimeFormat));
+        
+        // 或者如果一定要使用 SimpleDateFormat，可以这样转换：
+        // try {
+        //     Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        //     SimpleDateFormat formatter = new SimpleDateFormat(datetimeFormat);
+        //     return formatter.format(date);
+        // } catch (Exception e) {
+        //     return null;
+        // }
     }
 
     public static Date formatStringToDateTime(String date) {
