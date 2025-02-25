@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-08-27 13:58:47
+ * @Date: 2024-10-29 17:18:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 13:59:50
+ * @LastEditTime: 2024-10-29 23:13:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,23 +11,26 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.knowledge_base;
+package com.bytedesk.kbase.kbase;
 
-import org.springframework.context.ApplicationEvent;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class KbaseCreateEvent extends ApplicationEvent {
+@Component
+@ConfigurationProperties(KbaseProperties.CONFIG_PREFIX)
+public class KbaseProperties {
 
-    private static final long serialVersionUID = 1L;
+    public static final String CONFIG_PREFIX = "bytedesk.kbase";
 
-    private KbaseEntity kbase;
+    private String theme;
 
-    public KbaseCreateEvent(Object source, KbaseEntity kbase) {
-        super(source);
-        this.kbase = kbase;
-    }
+    private String htmlPath;
+    
+    // private String templatePath;
+
+    private String apiUrl;
+    
 }

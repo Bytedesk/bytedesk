@@ -41,9 +41,9 @@ import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.knowledge_base.KbaseRequest;
-import com.bytedesk.kbase.knowledge_base.KbaseRestService;
-import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
+import com.bytedesk.kbase.kbase.KbaseRequest;
+import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 

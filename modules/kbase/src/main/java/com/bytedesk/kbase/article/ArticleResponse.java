@@ -18,7 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
+import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

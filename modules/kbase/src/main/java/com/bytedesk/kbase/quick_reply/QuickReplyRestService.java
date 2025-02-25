@@ -40,9 +40,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.knowledge_base.KbaseEntity;
-import com.bytedesk.kbase.knowledge_base.KbaseRestService;
-import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
 
