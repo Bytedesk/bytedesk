@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 09:49:37
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-25 22:53:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,6 +41,21 @@ public class BytedeskProperties {
         if (instance == null) {
             synchronized (BytedeskProperties.class) {
                 if (instance == null) {
+                    // 处理中文编码
+                    if (StringUtils.hasText(this.name)) {
+                        try {
+                            this.name = new String(this.name.getBytes("ISO-8859-1"), "UTF-8");
+                        } catch (Exception e) {
+                            // 记录错误但继续执行
+                        }
+                    }
+                    if (StringUtils.hasText(this.description)) {
+                        try {
+                            this.description = new String(this.description.getBytes("ISO-8859-1"), "UTF-8");
+                        } catch (Exception e) {
+                            // 记录错误但继续执行
+                        }
+                    }
                     instance = this;
                 }
             }
