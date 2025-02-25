@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 14:04:13
+ * @LastEditTime: 2025-02-25 14:08:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class FileRequest extends BaseRequest {
 
-    private String name;
+    private String fileName;
 
     // baseRequest 的 content
     // private String content;
