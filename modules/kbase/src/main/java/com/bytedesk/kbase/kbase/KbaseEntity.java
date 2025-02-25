@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-22 22:59:48
+ * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 14:42:34
+ * @LastEditTime: 2024-12-18 17:24:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,33 +11,52 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.knowledge_base;
+package com.bytedesk.kbase.kbase;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
-import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+/**
+ * 将文档知识库跟AI知识库合并一个库，方便统一知识
+ */
+@Entity
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class KbaseRequest extends BaseRequest {
+@EntityListeners({ KbaseEntityListener.class })
+@Table(name = "bytedesk_kbase")
+public class KbaseEntity extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
+
+    @Builder.Default
+    @Column(name = "kb_type", nullable = false)
+    private String type = KbaseTypeEnum.HELPCENTER.name();
 
     // headline标头
     @Builder.Default
@@ -45,6 +64,7 @@ public class KbaseRequest extends BaseRequest {
 
     // 自定义副标题
     @Builder.Default
+    @Column(name = "sub_headline")
     private String subHeadline = KbaseConsts.SUB_HEADLINE;
 
     // 自定义网址
@@ -92,30 +112,33 @@ public class KbaseRequest extends BaseRequest {
     private String embedding = KbaseConsts.KB_EMBEDDING;
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private LanguageEnum language = LanguageEnum.ZH_CN;
     private String language = LanguageEnum.ZH_CN.name();
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
     private String platform = PlatformEnum.BYTEDESK.name();
 
-    // private KbaseTypeEnum type = KbaseTypeEnum.HELPCENTER;
-    // private String categoryUid;
+    // @Builder.Default
+    // @ManyToMany
+    // private List<Tag> tags = new ArrayList<>();
 
     @Builder.Default
+    @ElementCollection
+    @CollectionTable(name = "bytedesk_kbase_base_tags")
     private List<String> tags = new ArrayList<>();
 
     @Builder.Default
     private boolean showChat = false;
 
     @Builder.Default
-    private Boolean published = true;
+    private boolean published = true;
 
+    // 某人工客服快捷回复知识库
     private String agentUid;
 
+    public String getTheme() {
+        return this.theme.toLowerCase();
+    }
 }

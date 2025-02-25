@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.knowledge_base;
+package com.bytedesk.kbase.kbase;
 
 public enum KbaseTypeEnum {
     ASSISTANT, // 文档助手，内部文档知识库问答

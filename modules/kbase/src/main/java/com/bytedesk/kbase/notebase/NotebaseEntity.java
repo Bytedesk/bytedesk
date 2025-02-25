@@ -18,7 +18,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.kbase.knowledge_base.KbaseTypeEnum;
+import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;

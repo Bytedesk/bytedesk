@@ -20,8 +20,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.bytedesk.kbase.knowledge_base.KbaseEntity;
-import com.bytedesk.kbase.knowledge_base.KbaseRestService;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

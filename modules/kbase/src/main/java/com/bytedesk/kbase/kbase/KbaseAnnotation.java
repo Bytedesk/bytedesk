@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.knowledge_base;
+package com.bytedesk.kbase.kbase;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
