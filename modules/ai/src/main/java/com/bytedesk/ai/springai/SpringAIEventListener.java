@@ -21,10 +21,20 @@ import org.springframework.ai.document.Document;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.ai.springai.event.VectorSplitEvent;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
+import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
+import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.upload.UploadEntity;
+import com.bytedesk.kbase.upload.UploadStatusEnum;
 import com.bytedesk.kbase.upload.UploadTypeEnum;
 import com.bytedesk.kbase.upload.event.UploadCreateEvent;
 

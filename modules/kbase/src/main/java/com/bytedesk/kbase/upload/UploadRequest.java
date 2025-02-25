@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-18 12:06:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 22:27:29
+ * @LastEditTime: 2025-02-25 11:20:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,11 +41,11 @@ public class UploadRequest extends BaseRequest {
     private String user;
 
     // 大模型
-    private String loader;
+    // private String loader;
 
-    private String splitter;
+    // private String splitter;
 
-    private int docsCount;
+    // private int docsCount;
 
     // private boolean isLlm;
     // private UploadTypeEnum type;
