@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-29 13:52:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 18:13:15
+ * @LastEditTime: 2025-02-25 19:49:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,7 +70,7 @@ public class KbaseController {
             model.addAttribute("articlesHot", articlesPage);
             model.addAttribute("articlesRecent", articlesPage);
             // 
-            return "kbase/" + kbaseOptional.get().getTheme() + "/index";
+            return "kbase/themes/" + kbaseOptional.get().getTheme() + "/index";
         }
         
         return "redirect:/404";
@@ -147,7 +147,7 @@ public class KbaseController {
                 // 
                 model.addAttribute("related", new ArrayList<>());
 
-                return "kbase/" + kbaseOptional.get().getTheme() + "/article";
+                return "kbase/themes/" + kbaseOptional.get().getTheme() + "/article";
             }
         }
         // error
@@ -159,36 +159,36 @@ public class KbaseController {
 	// http://127.0.0.1:9003/helpcenter/edu
 	@GetMapping("/edu")
 	public String kbEduIndex() {
-		return "kbase/eduport/index";
+		return "kbase/themes/eduport/index";
 	}
 
 	// http://127.0.0.1:9003/helpcenter/edu/detail
 	public String kbEduDetail() {
-		return "kbase/eduport/detail";
+		return "kbase/themes/eduport/detail";
 	}
 
 	// http://127.0.0.1:9003/helpcenter/social
 	@GetMapping("/social")
 	public String kbSocialIndexS() {
-		return "kbase/social/index";
+		return "kbase/themes/social/index";
 	}
 
 	// http://127.0.0.1:9003/helpcenter/social/detail
 	public String kbSocialDetail() {
-		return "kbase/social/detail";
+		return "kbase/themes/social/detail";
 	}
 
 	// 
 	// http://127.0.0.1:9003/helpcenter/default
 	@GetMapping("/default")
 	public String kbZdIndex() {
-		return "kbase/default/index";
+		return "kbase/themes/default/index";
 	}
 
 	// http://127.0.0.1:9003/helpcenter/default/article
 	@GetMapping("/default/{path:[^\\.]*}")
 	public String kbZdRedirect(@PathVariable String path) {
 		log.info("kbZdRedirect path: {}", path);
-		return "forward:/kbase/default/" + path; // 默认路径
+		return "forward:/kbase/themes/default/" + path; // 默认路径
 	}
 }
