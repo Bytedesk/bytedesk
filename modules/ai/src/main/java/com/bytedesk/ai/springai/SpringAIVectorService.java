@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 14:32:59
+ * @LastEditTime: 2025-02-25 13:26:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,11 +36,10 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.ai.springai.event.VectorSplitEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.config.KbaseConst;
-import com.bytedesk.kbase.upload.UploadEntity;
+import com.bytedesk.kbase.file.FileEntity;
+import com.bytedesk.kbase.file.FileRestService;
 import com.bytedesk.kbase.upload.UploadRestService;
 import com.bytedesk.kbase.upload.UploadStatusEnum;
-import com.bytedesk.kbase.upload.UploadTypeEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,24 +50,18 @@ public class SpringAIVectorService {
 
 	private final RedisVectorStore ollamaRedisVectorStore;
 
+	private final FileRestService fileRestService;
+
 	private final UploadRestService uploadRestService;
 
 	private final BytedeskEventPublisher bytedeskEventPublisher;
 
-	// private final FaqRestService faqRestService;
-
-    // private final ZhipuaiChatService zhipuaiChatService;
-
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
-	 * 
-	 * @param fileUrl
 	 */
-	public void readSplitWriteToVectorStore(@NonNull UploadEntity upload) {
-		if (!upload.getType().equals(UploadTypeEnum.LLM.name())) {
-			return;
-		}
-		String fileUrl = upload.getFileUrl();
+	public void readSplitWriteToVectorStore(@NonNull FileEntity file) {
+		// 
+		String fileUrl = file.getFileUrl();
 		log.info("Loading document from URL: {}", fileUrl);
 		if (fileUrl == null || fileUrl.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -81,17 +74,17 @@ public class SpringAIVectorService {
 		log.info("fileName {}", fileName);
 		//
 		if (fileName.toLowerCase().endsWith(".pdf")) {
-			readPdfPage(fileName, upload);
+			readPdfPage(fileName, file);
 		} else if (fileName.toLowerCase().endsWith(".json")) {
-			readJson(fileName, upload);
+			readJson(fileName, file);
 		} else if (fileName.toLowerCase().endsWith(".txt")) {
-			readTxt(fileName, upload);
+			readTxt(fileName, file);
 		} else {
-			readByTika(fileName, upload);
+			readByTika(fileName, file);
 		}
 	}
 
-	public void readPdfPage(String fileName, UploadEntity upload) {
+	public void readPdfPage(String fileName, FileEntity file) {
 		log.info("Loading document from pdfPage: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -113,10 +106,10 @@ public class SpringAIVectorService {
 		//
 		var tokenTextSplitter = new TokenTextSplitter();
 		List<Document> docList = tokenTextSplitter.split(pdfReader.read());
-		storeDocuments(docList, upload);
+		storeDocuments(docList, file);
 	}
 
-	public void readPdfParagraph(String fileName, UploadEntity upload) {
+	public void readPdfParagraph(String fileName, FileEntity file) {
 		log.info("Loading document from pdfParagraph: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -138,10 +131,10 @@ public class SpringAIVectorService {
 						.build());
 		var tokenTextSplitter = new TokenTextSplitter();
 		List<Document> docList = tokenTextSplitter.split(pdfReader.read());
-		storeDocuments(docList, upload);
+		storeDocuments(docList, file);
 	}
 
-	public void readJson(String fileName, UploadEntity upload) {
+	public void readJson(String fileName, FileEntity file) {
 		log.info("Loading document from json: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -156,10 +149,10 @@ public class SpringAIVectorService {
 		//
 		var tokenTextSplitter = new TokenTextSplitter();
 		List<Document> docList = tokenTextSplitter.split(jsonReader.read());
-		storeDocuments(docList, upload);
+		storeDocuments(docList, file);
 	}
 
-	public void readTxt(String fileName, UploadEntity upload) {
+	public void readTxt(String fileName, FileEntity file) {
 		log.info("Loading document from txt: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -175,12 +168,12 @@ public class SpringAIVectorService {
 		//
 		var tokenTextSplitter = new TokenTextSplitter();
 		List<Document> docList = tokenTextSplitter.split(textReader.read());
-		storeDocuments(docList, upload);
+		storeDocuments(docList, file);
 	}
 
 	// https://tika.apache.org/2.9.0/formats.html
 	// PDF, DOC/DOCX, PPT/PPTX, and HTML
-	public void readByTika(String fileName, UploadEntity upload) {
+	public void readByTika(String fileName, FileEntity file) {
 		log.info("Loading document from tika: {}", fileName);
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
@@ -192,11 +185,11 @@ public class SpringAIVectorService {
 		//
 		var tokenTextSplitter = new TokenTextSplitter();
 		List<Document> docList = tokenTextSplitter.split(tikaDocumentReader.read());
-		storeDocuments(docList, upload);
+		storeDocuments(docList, file);
 	}
 
 	// 存储到vector store
-	private void storeDocuments(List<Document> docList, UploadEntity upload) {
+	private void storeDocuments(List<Document> docList, FileEntity file) {
 		log.info("Parsing document, this will take a while. docList.size={}", docList.size());
 		List<String> docIdList = new ArrayList<>();
 		Iterator<Document> iterator = docList.iterator();
@@ -205,20 +198,20 @@ public class SpringAIVectorService {
 			log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 文件file_uid, 知识库kb_uid
-			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, upload.getUid());
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, upload.getKbUid());
+			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
 		}
-		upload.setDocIdList(docIdList);
-		upload.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
+		file.setDocIdList(docIdList);
+		file.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
 		// FIXME: ObjectOptimisticLockingFailureException: Row was updated or deleted by
 		// another transaction (or unsaved-value mapping was incorrect) :
 		// [com.bytedesk.kbase.upload.Upload#52]
-		uploadRestService.save(upload);
+		fileRestService.save(file);
 		// log.info("Parsing document, this will take a while.");
 		ollamaRedisVectorStore.write(docList);
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
 		// 通知相关组件，文件处理成功
-		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(upload.getKbUid(), upload.getOrgUid(), docList));
+		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
 		// 生成问答对
 		// generateQaPairs(docList, upload);
 	}
