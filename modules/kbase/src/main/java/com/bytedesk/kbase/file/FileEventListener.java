@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 12:53:11
+ * @LastEditTime: 2025-02-25 14:03:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ public class FileEventListener {
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
         UploadEntity upload = event.getUpload();
-        log.info("UploadEventListener create: {}", upload.toString());
+        log.info("UploadEventListener create: {}", upload.getFileName());
         // 专门存储大模型上传文件记录
         if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
             // 转换为 fileEntity，并保存
@@ -46,6 +46,7 @@ public class FileEventListener {
                 .categoryUid(upload.getCategoryUid())
                 .kbUid(upload.getKbUid())
                 .build();
+            fileRequest.setOrgUid(upload.getOrgUid());
             // 读取文件内容，写入到content字段，迁移到 ai 模块 SpringAIEventListener中读取
             fileRestService.create(fileRequest);
         }
@@ -54,7 +55,7 @@ public class FileEventListener {
     @EventListener
     public void onUploadUpdateEvent(UploadUpdateEvent event) {
         UploadEntity upload = event.getUpload();
-        log.info("UploadEventListener update: {}", upload.toString());
+        log.info("UploadEventListener update: {}", upload.getFileName());
         // 后台删除文件记录
         if (upload.isDeleted()) {
             // 通知python ai模块处理

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 13:26:29
+ * @LastEditTime: 2025-02-25 13:50:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,9 +92,9 @@ public class SpringAIVectorService {
 		if (!fileName.endsWith(".pdf")) {
 			throw new IllegalArgumentException(String.format("File URL must end with .pdf, got %s", fileName));
 		}
-		//
+		
 		Resource resource = uploadRestService.loadAsResource(fileName);
-		//
+		
 		PdfDocumentReaderConfig pdfDocumentReaderConfig = PdfDocumentReaderConfig.builder()
 				.withPageTopMargin(0)
 				.withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
@@ -103,9 +103,20 @@ public class SpringAIVectorService {
 				.withPagesPerDocument(1)
 				.build();
 		PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource, pdfDocumentReaderConfig);
-		//
+		
+		// 读取所有文档
+		List<Document> documents = pdfReader.read();
+		// 提取文本内容
+		StringBuilder contentBuilder = new StringBuilder();
+		for (Document doc : documents) {
+			contentBuilder.append(doc.getText()).append("\n");
+		}
+		// 保存文本内容到file
+		file.setContent(contentBuilder.toString());
+		
+		// 继续原有的分割和存储逻辑
 		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(pdfReader.read());
+		List<Document> docList = tokenTextSplitter.split(documents);
 		storeDocuments(docList, file);
 	}
 
@@ -129,8 +140,19 @@ public class SpringAIVectorService {
 								.build())
 						.withPagesPerDocument(1)
 						.build());
+		// 读取所有文档
+		List<Document> documents = pdfReader.read();
+		// 提取文本内容
+		StringBuilder contentBuilder = new StringBuilder();
+		for (Document doc : documents) {
+			contentBuilder.append(doc.getText()).append("\n");
+		}
+		// 保存文本内容到file
+		file.setContent(contentBuilder.toString());
+		
+		// 继续原有的分割和存储逻辑
 		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(pdfReader.read());
+		List<Document> docList = tokenTextSplitter.split(documents);
 		storeDocuments(docList, file);
 	}
 
@@ -142,13 +164,22 @@ public class SpringAIVectorService {
 		if (!fileName.endsWith(".json")) {
 			throw new IllegalArgumentException(String.format("File URL must end with .json, got %s", fileName));
 		}
-		//
+		
 		Resource resource = uploadRestService.loadAsResource(fileName);
-		//
 		JsonReader jsonReader = new JsonReader(resource, "description");
-		//
+		
+		// 读取所有文档
+		List<Document> documents = jsonReader.read();
+		// 提取文本内容
+		StringBuilder contentBuilder = new StringBuilder();
+		for (Document doc : documents) {
+			contentBuilder.append(doc.getText()).append("\n");
+		}
+		// 保存文本内容到file
+		file.setContent(contentBuilder.toString());
+		
 		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(jsonReader.read());
+		List<Document> docList = tokenTextSplitter.split(documents);
 		storeDocuments(docList, file);
 	}
 
@@ -160,14 +191,23 @@ public class SpringAIVectorService {
 		if (!fileName.endsWith(".txt")) {
 			throw new IllegalArgumentException(String.format("File URL must end with .txt, got %s", fileName));
 		}
-		//
+		
 		Resource resource = uploadRestService.loadAsResource(fileName);
-		//
 		TextReader textReader = new TextReader(resource);
 		textReader.getCustomMetadata().put("filename", fileName);
-		//
+		
+		// 读取所有文档
+		List<Document> documents = textReader.read();
+		// 提取文本内容
+		StringBuilder contentBuilder = new StringBuilder();
+		for (Document doc : documents) {
+			contentBuilder.append(doc.getText()).append("\n");
+		}
+		// 保存文本内容到file
+		file.setContent(contentBuilder.toString());
+		
 		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(textReader.read());
+		List<Document> docList = tokenTextSplitter.split(documents);
 		storeDocuments(docList, file);
 	}
 
@@ -178,13 +218,22 @@ public class SpringAIVectorService {
 		if (fileName == null || fileName.isEmpty()) {
 			throw new IllegalArgumentException("File URL must not be empty");
 		}
-		//
+		
 		Resource resource = uploadRestService.loadAsResource(fileName);
-		//
 		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
-		//
+		
+		// 读取所有文档
+		List<Document> documents = tikaDocumentReader.read();
+		// 提取文本内容
+		StringBuilder contentBuilder = new StringBuilder();
+		for (Document doc : documents) {
+			contentBuilder.append(doc.getText()).append("\n");
+		}
+		// 保存文本内容到file
+		file.setContent(contentBuilder.toString());
+		
 		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(tikaDocumentReader.read());
+		List<Document> docList = tokenTextSplitter.split(documents);
 		storeDocuments(docList, file);
 	}
 
@@ -203,9 +252,7 @@ public class SpringAIVectorService {
 		}
 		file.setDocIdList(docIdList);
 		file.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
-		// FIXME: ObjectOptimisticLockingFailureException: Row was updated or deleted by
-		// another transaction (or unsaved-value mapping was incorrect) :
-		// [com.bytedesk.kbase.upload.Upload#52]
+		// 
 		fileRestService.save(file);
 		// log.info("Parsing document, this will take a while.");
 		ollamaRedisVectorStore.write(docList);
@@ -216,7 +263,6 @@ public class SpringAIVectorService {
 		// generateQaPairs(docList, upload);
 	}
 
-	
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
