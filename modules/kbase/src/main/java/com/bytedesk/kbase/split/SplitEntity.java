@@ -20,6 +20,7 @@ import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +36,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({SplitEntityListener.class})
 @Table(name = "bytedesk_kbase_split")
 public class SplitEntity extends BaseEntity {
 

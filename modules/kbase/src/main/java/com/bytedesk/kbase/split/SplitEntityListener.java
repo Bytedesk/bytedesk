@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 09:58:11
+ * @LastEditTime: 2025-02-25 15:47:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,40 @@
 package com.bytedesk.kbase.split;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.kbase.split.event.SplitCreateEvent;
+import com.bytedesk.kbase.split.event.SplitUpdateEvent;
+
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostUpdate;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class SplitEntityListener {
-    
+
+    @PostPersist
+    public void onPostPersist(SplitCreateEvent event) {
+        SplitEntity split = event.getSplit();
+        log.info("SplitEntityListener onPostPersist: {}", split.toString());
+        // 
+        SplitEntity clonedSplit = SerializationUtils.clone(split);
+        // 
+        BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        publisher.publishEvent(new SplitCreateEvent(clonedSplit));
+    }
+
+    @PostUpdate
+    public void onPostUpdate(SplitUpdateEvent event) {
+        SplitEntity split = event.getSplit();
+        log.info("SplitEntityListener onPostUpdate: {}", split.toString());
+        // 
+        SplitEntity clonedSplit = SerializationUtils.clone(split);
+        // 
+        BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        publisher.publishEvent(new SplitUpdateEvent(clonedSplit));
+    }
 }
