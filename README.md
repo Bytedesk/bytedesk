@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 10:49:32
+ * @LastEditTime: 2025-02-25 11:04:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,19 +76,10 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 
 ## Docker Quick Start
 
-### clone project and start docker compose container
+### method 1: clone project and start docker compose container，need ollama
 
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose.yaml up -d
-```
-
-### or run docker compose with ollama
-
-```bash
-git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
-# run ollama deepseek-r1 model
-# docker exec ollama-bytedesk ollama pull deepseek-r1
-docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 ```
 
 ### ollama
@@ -96,6 +87,15 @@ docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 ```bash
 ollama pull deepseek-r1:1.5b
 ollama pull qwen2.5:1.5b
+```
+
+### or method 2: run docker compose with ollama
+
+```bash
+git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
+# run ollama deepseek-r1 model
+# docker exec ollama-bytedesk ollama pull deepseek-r1
+docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 ```
 
 ### if don't need ollama, you can change `docker-compose.yaml` or `docker-compose-ollama.yaml`
@@ -115,7 +115,7 @@ docker compose -p bytedesk -f docker-compose.yaml stop
 
 ### change config, otherwise upload image, file and knowledge base cannot be displayed normally
 
-- change `docker-compose.yaml` file
+- change `docker-compose.yaml` file or `docker-compose-ollama.yaml`
 
 ```bash
 # please replace 127.0.0.1 with your server ip

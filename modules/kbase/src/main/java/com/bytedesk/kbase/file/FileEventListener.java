@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 10:43:51
+ * @LastEditTime: 2025-02-25 10:59:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class FileEventListener {
+
+    private final FileRestService fileRestService;
     
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
@@ -38,7 +40,10 @@ public class FileEventListener {
             // 转换为 fileEntity，并保存
             FileRequest fileRequest = FileRequest.builder()
                 .uploadUid(upload.getUid())
+                .name(upload.getFileName())
+                .fileUrl(upload.getFileUrl())
                 .build();
+            fileRestService.create(fileRequest);
         }
     }
 }
