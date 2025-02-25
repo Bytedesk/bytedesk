@@ -47,9 +47,11 @@ services:
       # bytedesk config
       BYTEDESK_DEBUG: true
       BYTEDESK_EDITION: enterprise
+      # enable custom config: name, logo, description
+      BYTEDESK_CUSTOM_ENABLED: false
       BYTEDESK_NAME: 
       BYTEDESK_LOGO: 
-      BYTEDESK_DESCRIPTION: bytedesk description
+      BYTEDESK_DESCRIPTION: 
       BYTEDESK_VERSION: 0.6.4
       # Admin config
       BYTEDESK_ADMIN_EMAIL: admin@email.com
