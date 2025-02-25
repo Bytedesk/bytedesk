@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 15:42:36
+ * @LastEditTime: 2025-02-25 17:07:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,9 +30,9 @@ import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.event.FileCreateEvent;
 import com.bytedesk.kbase.file.event.FileUpdateEvent;
-import com.bytedesk.kbase.qa.QaEntity;
-import com.bytedesk.kbase.qa.event.QaCreateEvent;
-import com.bytedesk.kbase.qa.event.QaUpdateEvent;
+// import com.bytedesk.kbase.qa.QaEntity;
+// import com.bytedesk.kbase.qa.event.QaCreateEvent;
+// import com.bytedesk.kbase.qa.event.QaUpdateEvent;
 import com.bytedesk.kbase.text.TextEntity;
 import com.bytedesk.kbase.text.event.TextCreateEvent;
 import com.bytedesk.kbase.text.event.TextUpdateEvent;
@@ -93,23 +93,23 @@ public class SpringAIEventListener {
         springAiVectorService.readText(text);
     }
 
-    @EventListener
-    public void onQaCreateEvent(QaCreateEvent event) {
-        QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getName());
-        // 生成document
-        springAiVectorService.readQa(qa);
-    }
+    // @EventListener
+    // public void onQaCreateEvent(QaCreateEvent event) {
+    //     QaEntity qa = event.getQa();
+    //     log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getName());
+    //     // 生成document
+    //     springAiVectorService.readQa(qa);
+    // }
 
-    @EventListener
-    public void onQaUpdateEvent(QaUpdateEvent event) {
-        QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.getName());
-        // 首先删除text对应的document，以及redis中缓存的document
-        springAiVectorService.deleteDoc(qa.getDocIdList());
-        // 然后重新生成document
-        springAiVectorService.readQa(qa);
-    }
+    // @EventListener
+    // public void onQaUpdateEvent(QaUpdateEvent event) {
+    //     QaEntity qa = event.getQa();
+    //     log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.getName());
+    //     // 首先删除text对应的document，以及redis中缓存的document
+    //     springAiVectorService.deleteDoc(qa.getDocIdList());
+    //     // 然后重新生成document
+    //     springAiVectorService.readQa(qa);
+    // }
 
     @EventListener
     public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
