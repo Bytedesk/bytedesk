@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:48:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 11:09:29
+ * @LastEditTime: 2025-02-25 12:46:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,18 +19,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageUtils;
-import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
-import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
-import com.bytedesk.core.redis.pubsub.RedisPubsubService;
-import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedExcel;
 import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedExcelListener;
 import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedRestService;
@@ -69,11 +57,11 @@ public class UploadEventListener {
 
     private final TabooService tabooService;
 
-    private final RedisPubsubService redisPubsubService;
+    // private final RedisPubsubService redisPubsubService;
 
-    private final UidUtils uidUtils;
+    // private final UidUtils uidUtils;
 
-    private final IMessageSendService messageSendService;
+    // private final IMessageSendService messageSendService;
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
@@ -144,7 +132,7 @@ public class UploadEventListener {
         // 后台删除文件记录
         if (upload.isDeleted()) {
             // 通知python ai模块处理
-            redisPubsubService.sendDeleteFileMessage(upload.getUid(), upload.getDocIdList());
+            // redisPubsubService.sendDeleteFileMessage(upload.getUid(), upload.getDocIdList());
             // 删除redis中缓存的document
             // uploadVectorStore.deleteDoc(upload.getDocIdList());
         }

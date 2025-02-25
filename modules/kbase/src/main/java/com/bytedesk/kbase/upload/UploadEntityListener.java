@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-28 06:40:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:57:09
+ * @LastEditTime: 2025-02-25 12:26:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,8 @@
  */
 package com.bytedesk.kbase.upload;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
