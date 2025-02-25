@@ -108,7 +108,7 @@ public class KbaseController {
         if (kbaseOptional.isPresent()) {
             model.addAttribute("kbase", kbaseOptional.get());
         }
-        return "kbase/default/search";
+        return "kbase//default/search";
     }
 
     private String routeCategory(String categoryUid, Model model) {
@@ -126,7 +126,7 @@ public class KbaseController {
                 Page<ArticleResponse> articlesPage = kbaseService.getArticlesByCategory(kbaseOptional.get(), categoryOptional.get().getUid());
                 model.addAttribute("articles", articlesPage.getContent());
 
-                return "kbase/" + kbaseOptional.get().getTheme() + "/category";
+                return "kbase/themes/" + kbaseOptional.get().getTheme() + "/category";
             }
         }
         // error

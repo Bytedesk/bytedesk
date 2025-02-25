@@ -128,8 +128,8 @@
                                         </div>
                                         <div class="uk-width-expand">
                                             <#--  <h5 id="supportArticleUserNickname" class="uk-card-title">${article.user.nickname!''}</h5>  -->
-                                            <p id="supportArticleUpdatedAt" class="uk-article-meta uk-margin-remove-top">${(article.createdAt)?string("yyyy-MM-dd HH:mm:ss")}</p>
-                                            <#--  <p id="supportArticleUpdatedAt" class="uk-article-meta uk-margin-remove-top">${article.createdAt}</p>  -->
+                                            <#--  <p id="supportArticleUpdatedAt" class="uk-article-meta uk-margin-remove-top">${(article.createdAt)?string("yyyy-MM-dd HH:mm:ss")}</p>  -->
+                                            <p id="supportArticleUpdatedAt" class="uk-article-meta uk-margin-remove-top">${article.createdAt}</p>
                                         </div>
                                         <!-- <a href="#" class="uk-button uk-button-outline-primary uk-button-small uk-visible@m">关注</a> -->
                                         <#--  <a id="supportArticleReadCount" href="#" class="uk-button uk-button-outline-primary uk-button-small uk-visible@m">阅读次数：${article.readCount}</a>  -->
@@ -142,7 +142,7 @@
                         <div class="entry-content uk-margin-medium-top">
                             <p id="supportArticleSummary" class="uk-text-lead">${article.summary!''}</p>
                             <div id="supportArticleContent">${article.content!''}</div>
-                            <span class="uk-article-meta uk-margin-remove-top">最近更新：${(article.updatedAt)?string("yyyy-MM-dd HH:mm:ss")}</span>
+                            <span class="uk-article-meta uk-margin-remove-top">最近更新：${article.updatedAt}</span>
                         </div>
 
                         <!-- 评价 -->
