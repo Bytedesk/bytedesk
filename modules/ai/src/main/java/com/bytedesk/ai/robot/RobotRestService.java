@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 18:06:50
+ * @LastEditTime: 2025-02-26 18:51:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -156,7 +156,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
         // robot.setKbEnabled(request.getIsKbEnabled());
-        robot.setKbUid(request.getKbUid());
+        // robot.setKbUid(request.getKbUid());
+        robot.setKbEnabled(true);
+        robot.setKbUid(Utils.formatUid(request.getOrgUid(), BytedeskConsts.DEFAULT_KB_LLM_UID));
         //
         // Set common settings
         setRobotSettings(robot, request);
@@ -450,17 +452,17 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     }
 
     // 为每一个组织创建一个客服助手
-    public RobotResponse createDefaultAgentAssistantRobot(String orgUid, String uid) {
-        //
-        RobotRequest robotRequest = RobotRequest.builder()
-                .nickname(I18Consts.I18N_ROBOT_AGENT_ASSISTANT_NICKNAME)
-                .build();
-        robotRequest.setUid(uid);
-        robotRequest.setType(RobotTypeEnum.LLM.name());
-        robotRequest.setOrgUid(orgUid);
-        //
-        return create(robotRequest);
-    }
+    // public RobotResponse createDefaultAgentAssistantRobot(String orgUid, String uid) {
+    //     //
+    //     RobotRequest robotRequest = RobotRequest.builder()
+    //             .nickname(I18Consts.I18N_ROBOT_AGENT_ASSISTANT_NICKNAME)
+    //             .build();
+    //     robotRequest.setUid(uid);
+    //     robotRequest.setType(RobotTypeEnum.LLM.name());
+    //     robotRequest.setOrgUid(orgUid);
+    //     //
+    //     return create(robotRequest);
+    // }
     
     public void initRobotJson(String orgUid, String level) {
         //
