@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:08:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 18:36:53
+ * @LastEditTime: 2025-02-26 18:22:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,6 +43,10 @@ public class LlmModelSpecification extends BaseSpecification {
             // 
             if (StringUtils.hasText(request.getProviderUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("providerUid"), request.getProviderUid()));
+            }
+            // providerName
+            if (StringUtils.hasText(request.getProviderName())) {
+                predicates.add(criteriaBuilder.equal(root.get("providerName"), request.getProviderName()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

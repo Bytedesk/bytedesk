@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:10:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 15:57:07
+ * @LastEditTime: 2025-02-26 18:19:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,7 +71,7 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                 List<ModelJson> modelJsons = entry.getValue();
                 for (ModelJson modelJson : modelJsons) {
                     if (!llmModelService.existsByNameAndProviderUid(modelJson.getName(), providerUid)) {
-                        llmModelService.createFromModelJson(providerUid, modelJson);
+                        llmModelService.createFromModelJson(providerUid, providerName, modelJson);
                     }
                 }
             } else {

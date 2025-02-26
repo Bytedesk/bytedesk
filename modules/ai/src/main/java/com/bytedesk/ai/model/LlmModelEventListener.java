@@ -52,6 +52,7 @@ public class LlmModelEventListener {
                 // 
                 LlmModelRequest request = LlmModelRequest.builder()
                     .providerUid(lpmEntity.getUid())
+                    .providerName(lpmEntity.getName())
                     .name(llmModel.getName())
                     .nickname(llmModel.getNickname())
                     .level(LevelEnum.ORGANIZATION.name())
