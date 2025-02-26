@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 12:06:37
+ * @LastEditTime: 2025-02-26 11:58:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,22 +68,22 @@ public class SpringAIPromptController {
 
 	private final VectorStore ollamaRedisVectorStore;
 
-	@Value("classpath:/prompts/joke-prompt.st")
+	@Value("classpath:/aidemo/prompts/joke-prompt.st")
 	private Resource jokeResource;
 
-	@Value("classpath:/prompts/system-message.st")
+	@Value("classpath:/aidemo/prompts/system-message.st")
 	private Resource systemResource;
 
-	@Value("classpath:/rag/wikipedia-curling.md")
+	@Value("classpath:/aidemo/rag/wikipedia-curling.md")
 	private Resource docsToStuffResource;
 
-	@Value("classpath:/prompts/qa-prompt.st")
+	@Value("classpath:/aidemo/prompts/qa-prompt.st")
 	private Resource qaPromptResource;
 
-	@Value("classpath:/rag/bikes.json")
+	@Value("classpath:/aidemo/rag/bikes.json")
 	private Resource bikesResource;
 
-	@Value("classpath:/prompts/system-qa.st")
+	@Value("classpath:/aidemo/prompts/system-qa.st")
 	private Resource systemBikePrompt;
 
 	// http://127.0.0.1:9003/springai/prompt/templating?adjective=funny&topic=cows

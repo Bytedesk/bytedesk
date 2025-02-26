@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 16:21:35
+ * @LastEditTime: 2025-02-26 11:51:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,12 +34,12 @@ public class MessageUtils {
         return MessageExtra.builder().orgUid(orgUid).build();
     }
 
-    public static MessageProtobuf createNoticeMessage(String messageUid, String userUid, String orgUid, String content) {
+    public static MessageProtobuf createNoticeMessage(String messageUid, ThreadEntity thread, String orgUid, String content) {
         // 
         UserProtobuf sender = UserUtils.getSystemChannelUser();
         // 
-        String topic = TopicUtils.getSystemTopic(userUid);
-        ThreadProtobuf thread = ThreadUtils.getThreadProtobuf(topic, ThreadTypeEnum.CHANNEL, sender);
+        // String topic = TopicUtils.getSystemTopic(userUid);
+        // ThreadProtobuf thread = ThreadUtils.getThreadProtobuf(topic, ThreadTypeEnum.CHANNEL, sender);
         // 
         MessageExtra messageExtra = MessageUtils.getMessageExtra(orgUid);
         String extra = JSON.toJSONString(messageExtra);
@@ -51,7 +51,7 @@ public class MessageUtils {
                 .status(MessageStatusEnum.SUCCESS)
                 .createdAt(LocalDateTime.now())
                 .client(ClientEnum.SYSTEM)
-                .thread(thread)
+                .thread(thread.toProtobuf())
                 .user(sender)
                 .extra(extra)
                 .build();

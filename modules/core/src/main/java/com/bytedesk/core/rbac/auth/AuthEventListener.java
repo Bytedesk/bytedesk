@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-19 11:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 14:13:24
+ * @LastEditTime: 2025-02-26 11:50:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.rbac.auth;
+
+import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,9 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -39,6 +44,8 @@ public class AuthEventListener {
     private final IMessageSendService messageSendService;
 
     private final UidUtils uidUtils;
+
+    private final ThreadRestService threadRestService;
 
     @EventListener
     public void onActionCreateEvent(ActionCreateEvent event) {
@@ -61,8 +68,14 @@ public class AuthEventListener {
             contentObject.put(I18Consts.I18N_NOTICE_IP_LOCATION, action.getIpLocation());
             String content = JSON.toJSONString(contentObject);
             // 
-            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), user.getUid(), user.getOrgUid(), content);
-            messageSendService.sendProtobufMessage(message);
+            String userUid = user.getUid();
+            String topic = TopicUtils.getSystemTopic(userUid);
+            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+            if (threadOptional.isPresent()) {
+                ThreadEntity thread = threadOptional.get();
+                MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread, user.getOrgUid(), content);
+                messageSendService.sendProtobufMessage(message);
+            }
         }
     }
 
