@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 13:38:02
+ * @LastEditTime: 2025-02-26 21:00:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -227,8 +227,8 @@ public class TopicService {
     private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
     private final Queue<TopicEntity> retryQueue = new LinkedList<>();
 
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TopicEntity topic) {
-        retryQueue.add(topic);
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TopicEntity entity) {
+        retryQueue.add(entity);
         processRetryQueue();
     }
 
@@ -274,8 +274,8 @@ public class TopicService {
         }
     }
 
-    private void handleFailedRetries(TopicEntity topic) {
-        String topicJSON = JSONObject.toJSONString(topic);
+    private void handleFailedRetries(TopicEntity entity) {
+        String topicJSON = JSONObject.toJSONString(entity);
         ActionRequest actionRequest = ActionRequest.builder()
                 .title("topic")
                 .action("save")
@@ -285,7 +285,7 @@ public class TopicService {
         actionRequest.setType(ActionTypeEnum.FAILED.name());
         actionService.create(actionRequest);
         // bytedeskEventPublisher.publishActionEvent(actionRequest);
-        log.error("All retry attempts failed for optimistic locking of topic: {}", topic.getUserUid());
+        log.error("All retry attempts failed for optimistic locking of topic: {}", entity.getUid());
         // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
         // notifyUserOfFailure(topic);
     }
