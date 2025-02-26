@@ -1,169 +1,147 @@
-<#import "layout/base.ftl" as base>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>客户之声 - 微语</title>
+    <meta name="description" content="微语客户之声-意见反馈平台">
+    <link href="/assets/vendor/bootstrap5/css/bootstrap.min.css" rel="stylesheet">
+    <#--  <link href="/css/ticket/index.css" rel="stylesheet">  -->
+    <style>
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+        .feature-box {
+            padding: 2rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .feature-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">微语客户之声</a>
+        </div>
+    </nav>
 
-<@base.base title="ByteDesk VOC - 首页">
-    <!-- 顶部统计信息 -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">待处理</h5>
-                    <p class="card-text display-6">${pendingCount!'0'}</p>
-                </div>
+    <div class="container my-5">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h1 class="display-4 mb-3">客户之声意见反馈平台</h1>
+                <p class="lead">多渠道收集客户反馈，智能分析处理，持续改进产品与服务质量</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">处理中</h5>
-                    <p class="card-text display-6">${processingCount!'0'}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">已解决</h5>
-                    <p class="card-text display-6">${resolvedCount!'0'}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">已关闭</h5>
-                    <p class="card-text display-6">${closedCount!'0'}</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- 反馈列表 -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <form class="d-flex me-3" method="GET">
-                            <input type="text" class="form-control form-control-sm me-2" 
-                                name="keyword" value="${keyword!''}" placeholder="搜索反馈...">
-                            <input type="hidden" name="type" value="${type!''}">
-                            <input type="hidden" name="status" value="${status!''}">
-                            <input type="hidden" name="sort" value="${sort!'createdAt'}">
-                            <input type="hidden" name="direction" value="${direction!'desc'}">
-                            <button type="submit" class="btn btn-outline-primary btn-sm">搜索</button>
-                        </form>
-                        
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" 
-                                data-bs-toggle="dropdown">
-                                ${type!'全部类型'}
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=&status=${status!''}&sort=${sort!''}&direction=${direction!''}">全部类型</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=suggestion&status=${status!''}&sort=${sort!''}&direction=${direction!''}">建议</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=bug&status=${status!''}&sort=${sort!''}&direction=${direction!''}">Bug</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=complaint&status=${status!''}&sort=${sort!''}&direction=${direction!''}">投诉</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=other&status=${status!''}&sort=${sort!''}&direction=${direction!''}">其他</a></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" 
-                                data-bs-toggle="dropdown">
-                                ${status!'全部状态'}
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=&sort=${sort!''}&direction=${direction!''}">全部状态</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=pending&sort=${sort!''}&direction=${direction!''}">待处理</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=processing&sort=${sort!''}&direction=${direction!''}">处理中</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=resolved&sort=${sort!''}&direction=${direction!''}">已解决</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=closed&sort=${sort!''}&direction=${direction!''}">已关闭</a></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" 
-                                data-bs-toggle="dropdown">
-                                排序: ${sort=='createdAt'?'创建时间':
-                                    (sort=='likeCount'?'点赞数':
-                                    (sort=='replyCount'?'回复数':'未知'))}
-                                ${direction=='asc'?'↑':'↓'}
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=${status!''}&sort=createdAt&direction=desc">创建时间 ↓</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=${status!''}&sort=createdAt&direction=asc">创建时间 ↑</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=${status!''}&sort=likeCount&direction=desc">点赞数 ↓</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=${status!''}&sort=likeCount&direction=asc">点赞数 ↑</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=${status!''}&sort=replyCount&direction=desc">回复数 ↓</a></li>
-                                <li><a class="dropdown-item" href="?keyword=${keyword!''}&type=${type!''}&status=${status!''}&sort=replyCount&direction=asc">回复数 ↑</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <a href="/voc/feedback/create" class="btn btn-primary btn-sm">提交反馈</a>
-                </div>
-                <div class="list-group list-group-flush">
-                    <#if feedbacks.totalElements == 0>
-                        <div class="list-group-item text-center text-muted">
-                            暂无反馈
-                        </div>
-                    <#else>
-                        <#list feedbacks.content as feedback>
-                            <div class="list-group-item">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">
-                                        <a href="/voc/feedback/${feedback.id}" class="text-decoration-none">
-                                            <span class="badge bg-${feedback.type=='bug'?'danger':
-                                                (feedback.type=='suggestion'?'primary':'secondary')}">${feedback.type}</span>
-                                            ${feedback.content?truncate(50)}
-                                        </a>
-                                    </h5>
-                                    <small>${feedback.createdAt?string('yyyy-MM-dd HH:mm')}</small>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mt-2">
-                                    <small>
-                                        <span class="me-2">
-                                            <i class="bi bi-chat"></i> ${feedback.replyCount}
-                                        </span>
-                                        <span>
-                                            <i class="bi bi-heart"></i> ${feedback.likeCount}
-                                        </span>
-                                    </small>
-                                    <small>
-                                        <span class="badge bg-${feedback.status=='pending'?'warning':
-                                            (feedback.status=='processing'?'info':
-                                            (feedback.status=='resolved'?'success':'secondary'))}">${feedback.status}</span>
-                                    </small>
-                                </div>
-                            </div>
-                        </#list>
-                    </#if>
-                </div>
-            </div>
-
-            <!-- 分页 -->
-            <#if feedbacks.totalElements gt 0>
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <#if feedbacks.hasPrevious()>
-                            <li class="page-item">
-                                <a class="page-link" href="?page=${feedbacks.number - 1}">上一页</a>
-                            </li>
-                        </#if>
-                        
-                        <#list 0..feedbacks.totalPages-1 as i>
-                            <li class="page-item ${(i == feedbacks.number)?string('active', '')}">
-                                <a class="page-link" href="?page=${i}">${i + 1}</a>
-                            </li>
-                        </#list>
-                        
-                        <#if feedbacks.hasNext()>
-                            <li class="page-item">
-                                <a class="page-link" href="?page=${feedbacks.number + 1}">下一页</a>
-                            </li>
-                        </#if>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">📝</div>
+                    <h3>多渠道反馈收集</h3>
+                    <ul class="list-unstyled">
+                        <li>内部表单收集</li>
+                        <li>社交媒体评论抓取</li>
+                        <li>邮件反馈通道</li>
+                        <li>第三方平台同步</li>
+                        <li>小程序/APP内嵌入口</li>
+                        <li>全方位覆盖反馈来源</li>
                     </ul>
-                </nav>
-            </#if>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🎯</div>
+                    <h3>反馈类型管理</h3>
+                    <ul class="list-unstyled">
+                        <li>产品建议收集</li>
+                        <li>服务投诉处理</li>
+                        <li>功能需求管理</li>
+                        <li>技术支持对接</li>
+                        <li>分类智能推荐</li>
+                        <li>灵活扩展类型</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">⚡</div>
+                    <h3>智能处理流程</h3>
+                    <ul class="list-unstyled">
+                        <li>自动分类分发</li>
+                        <li>产品经理评审</li>
+                        <li>客服快速跟进</li>
+                        <li>技术团队评估</li>
+                        <li>全程状态跟踪</li>
+                        <li>闭环处理反馈</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">📢</div>
+                    <h3>智能通知机制</h3>
+                    <ul class="list-unstyled">
+                        <li>邮件实时通知</li>
+                        <li>站内消息提醒</li>
+                        <li>企业微信通知</li>
+                        <li>钉钉机器人集成</li>
+                        <li>自定义通知规则</li>
+                        <li>多渠道触达</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🤖</div>
+                    <h3>高级智能特性</h3>
+                    <ul class="list-unstyled">
+                        <li>敏感词智能过滤</li>
+                        <li>AI自动分类</li>
+                        <li>智能路由分配</li>
+                        <li>满意度跟踪</li>
+                        <li>数据分析报表</li>
+                        <li>持续优化改进</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>安全性能保障</h3>
+                    <ul class="list-unstyled">
+                        <li>异步处理机制</li>
+                        <li>智能限流控制</li>
+                        <li>数据安全脱敏</li>
+                        <li>访问权限管理</li>
+                        <li>系统性能监控</li>
+                        <li>安全防护体系</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
-</@base.base>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">© 2025 微语. All rights reserved.</p>
+            <p class="text-muted">北京微语天下科技有限公司</p>
+        </div>
+    </footer>
+
+    <script src="/assets/vendor/jquery-3.7.1.min.js"></script>
+    <script src="/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+    <#--  <script src="/js/ticket/index.js"></script>  -->
+</body>
+</html>
