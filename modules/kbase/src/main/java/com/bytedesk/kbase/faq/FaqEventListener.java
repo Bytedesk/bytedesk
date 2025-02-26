@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 12:37:46
+ * @LastEditTime: 2025-02-26 12:54:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.Utils;
 
 @Slf4j
 @Component
@@ -42,23 +43,23 @@ public class FaqEventListener {
         String orgUid = organization.getUid();
         log.info("faq - organization created: {}", organization.getName());
         //
-        String faqDemoUid1 = orgUid + FaqConsts.FAQ_DEMO_UID_1;
+        String faqDemoUid1 = Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_1);
         FaqRequest faqDemo1 = FaqRequest.builder()
                 .question(I18Consts.I18N_FAQ_DEMO_QUESTION_1)
                 .answer(I18Consts.I18N_FAQ_DEMO_ANSWER_1)
                 .type(MessageTypeEnum.TEXT.name())
-                .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1)
+                .categoryUid(Utils.formatUid(orgUid, I18Consts.I18N_FAQ_CATEGORY_DEMO_1))
                 .build();
-        faqDemo1.setUid(faqDemoUid1);
+        faqDemo1.setUid(faqDemoUid1);       
         faqDemo1.setOrgUid(orgUid);
         faqService.create(faqDemo1);
         //
-        String faqDemoUid2 = orgUid + FaqConsts.FAQ_DEMO_UID_2;
+        String faqDemoUid2 = Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_2);
         FaqRequest faqDemo2 = FaqRequest.builder()
                 .question(I18Consts.I18N_FAQ_DEMO_QUESTION_2)
                 .answer(I18Consts.I18N_FAQ_DEMO_ANSWER_2)
                 .type(MessageTypeEnum.IMAGE.name())
-                .categoryUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2)
+                .categoryUid(Utils.formatUid(orgUid, I18Consts.I18N_FAQ_CATEGORY_DEMO_2))
                 .build();
         faqDemo2.setUid(faqDemoUid2);
         faqDemo2.setOrgUid(orgUid);

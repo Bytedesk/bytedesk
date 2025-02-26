@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 16:08:17
+ * @LastEditTime: 2025-02-26 12:53:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.article.ArticleRequest;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.ArticleRestService;
@@ -231,7 +232,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestHelpdoc.setUid(orgUid + BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
+        kownledgebaseRequestHelpdoc.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID));
         kownledgebaseRequestHelpdoc.setType(KbaseTypeEnum.HELPCENTER.name());
         kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
@@ -242,7 +243,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestLlm.setUid(orgUid + BytedeskConsts.DEFAULT_KB_LLM_UID);
+        kownledgebaseRequestLlm.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
         kownledgebaseRequestLlm.setType(KbaseTypeEnum.LLM.name());
         kownledgebaseRequestLlm.setOrgUid(orgUid);
         create(kownledgebaseRequestLlm);
@@ -253,7 +254,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestKeyword.setUid(orgUid + BytedeskConsts.DEFAULT_KB_KEYWORD_UID);
+        kownledgebaseRequestKeyword.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_KEYWORD_UID));
         kownledgebaseRequestKeyword.setType(KbaseTypeEnum.KEYWORD.name());
         kownledgebaseRequestKeyword.setOrgUid(orgUid);
         create(kownledgebaseRequestKeyword);
@@ -264,7 +265,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestFaq.setUid(orgUid + BytedeskConsts.DEFAULT_KB_FAQ_UID);
+        kownledgebaseRequestFaq.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID));
         kownledgebaseRequestFaq.setType(KbaseTypeEnum.FAQ.name());
         kownledgebaseRequestFaq.setOrgUid(orgUid);
         create(kownledgebaseRequestFaq);
@@ -275,7 +276,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
-        kownledgebaseRequestAutoReply.setUid(orgUid + BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID);
+        kownledgebaseRequestAutoReply.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID));
         kownledgebaseRequestAutoReply.setType(KbaseTypeEnum.AUTOREPLY.name());
         kownledgebaseRequestAutoReply.setOrgUid(orgUid);
         create(kownledgebaseRequestAutoReply);
@@ -287,7 +288,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
-        kownledgebaseRequestQuickReply.setUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
+        kownledgebaseRequestQuickReply.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID));
         kownledgebaseRequestQuickReply.setOrgUid(orgUid);
         create(kownledgebaseRequestQuickReply);
 
@@ -298,7 +299,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .build();
         kownledgebaseRequestTaboo.setType(KbaseTypeEnum.TABOO.name());
-        kownledgebaseRequestTaboo.setUid(orgUid + BytedeskConsts.DEFAULT_KB_TABOO_UID);
+        kownledgebaseRequestTaboo.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID));
         kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);
     }

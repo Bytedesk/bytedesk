@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 14:00:41
+ * @LastEditTime: 2025-02-26 12:55:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
@@ -242,14 +243,14 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
     // 快捷回复分类
     public void initQuickReplyCategory(String orgUid) {
         // 
-        String quickReplyCategoryContactUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT;
+        String quickReplyCategoryContactUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT);
         // 快捷回复-询问联系方式
         CategoryRequest categoryContact = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
                 .orderNo(0)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                 .build();
         categoryContact.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryContact.setUid(quickReplyCategoryContactUid);
@@ -258,13 +259,13 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         categoryService.create(categoryContact);
 
         // 快捷回复-感谢
-        String quickReplyCategoryThanksUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS;
+        String quickReplyCategoryThanksUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS);
         CategoryRequest categoryThanks = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
                 .orderNo(1)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                 .build();
         categoryThanks.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryThanks.setUid(quickReplyCategoryThanksUid);
@@ -273,13 +274,13 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         categoryService.create(categoryThanks);
 
         // 快捷回复-问候
-        String quickReplyCategoryWelcomeUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME;
+        String quickReplyCategoryWelcomeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME);
         CategoryRequest categoryWelcome = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
                 .orderNo(2)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                 .build();
         categoryWelcome.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryWelcome.setUid(quickReplyCategoryWelcomeUid);
@@ -288,13 +289,13 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         categoryService.create(categoryWelcome);
 
         // 快捷回复-告别
-        String quickReplyCategoryByeUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE;
+        String quickReplyCategoryByeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE);
         CategoryRequest categoryBye = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
                 .orderNo(3)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                 .build();
         categoryBye.setType(CategoryTypeEnum.QUICKREPLY.name());
         categoryBye.setUid(quickReplyCategoryByeUid);
@@ -306,7 +307,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
     public void initQuickReply(String orgUid) {
 
         // level = platform, 不需要设置orgUid，此处设置orgUid方便超级管理员加载
-        String quickReplyCategoryContactUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT;
+        String quickReplyCategoryContactUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT);
         Optional<CategoryEntity> categoryContact = categoryService.findByUid(quickReplyCategoryContactUid);
         if (categoryContact.isPresent()) {
             //
@@ -314,17 +315,17 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .title(I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE)
                     .content(I18Consts.I18N_QUICK_REPLY_CONTACT_CONTENT)
                     .categoryUid(categoryContact.get().getUid())
-                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                     .level(LevelEnum.ORGANIZATION.name())
                     .build();
-            quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE);
+            quickReplyRequest.setUid(Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CONTACT_TITLE));
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);
             create(quickReplyRequest);
         }
         //
-        String quickReplyCategoryThanksUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS;
+        String quickReplyCategoryThanksUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS);
         Optional<CategoryEntity> categoryThanks = categoryService.findByUid(quickReplyCategoryThanksUid);
         if (categoryThanks.isPresent()) {
             //
@@ -333,16 +334,16 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .content(I18Consts.I18N_QUICK_REPLY_THANKS_CONTENT)
                     .categoryUid(categoryThanks.get().getUid())
                     .level(LevelEnum.ORGANIZATION.name())
-                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                     .build();
-            quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_THANKS_TITLE);
+            quickReplyRequest.setUid(Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_THANKS_TITLE));
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);
             create(quickReplyRequest);
         }
         //
-        String quickReplyCategoryWelcomeUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME;
+        String quickReplyCategoryWelcomeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME);
         Optional<CategoryEntity> categoryWelcome = categoryService.findByUid(quickReplyCategoryWelcomeUid);
         if (categoryWelcome.isPresent()) {
             //
@@ -351,16 +352,16 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .content(I18Consts.I18N_QUICK_REPLY_WELCOME_CONTENT)
                     .categoryUid(categoryWelcome.get().getUid())
                     .level(LevelEnum.ORGANIZATION.name())
-                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                     .build();
-            quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_WELCOME_TITLE);
+            quickReplyRequest.setUid(Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_WELCOME_TITLE));
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);
             create(quickReplyRequest);
         }
 
-        String quickReplyCategoryByeUid = orgUid + I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE;
+        String quickReplyCategoryByeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE);
         Optional<CategoryEntity> categoryBye = categoryService.findByUid(quickReplyCategoryByeUid);
         if (categoryBye.isPresent()) {
             //
@@ -369,9 +370,9 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
                     .content(I18Consts.I18N_QUICK_REPLY_BYE_CONTENT)
                     .categoryUid(categoryBye.get().getUid())
                     .level(LevelEnum.ORGANIZATION.name())
-                    .kbUid(orgUid + BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID)
+                    .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                     .build();
-            quickReplyRequest.setUid(orgUid + I18Consts.I18N_QUICK_REPLY_BYE_TITLE);
+            quickReplyRequest.setUid(Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_BYE_TITLE));
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);

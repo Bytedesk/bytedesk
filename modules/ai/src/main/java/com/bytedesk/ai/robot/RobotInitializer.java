@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:30:29
+ * @LastEditTime: 2025-02-26 12:40:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,5 +38,8 @@ public class RobotInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // 为初始组织创建一个机器人
         robotService.initDefaultRobot(orgUid);
+        // TODO: 默认使用演示文档内容，填充且只填充超级管理员演示机器人
+
+        
     }   
 }
