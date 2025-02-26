@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 15:41:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 08:49:48
+ * @LastEditTime: 2025-02-26 09:01:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,6 @@ public class MemberSpecification extends BaseSpecification {
             // 
             if (StringUtils.hasText(request.getDeptUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("deptUid"), request.getDeptUid()));
-                // predicates.add(criteriaBuilder.like(root.get("deptUid"), "%" + request.getDeptUid() + "%"));
             }
             //
             if (StringUtils.hasText(request.getNickname())) {
@@ -50,10 +49,9 @@ public class MemberSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("mobile"), "%" + request.getMobile() + "%"));
             }
             // status
-            if (StringUtils.hasText(request.getStatus())) {
-                // predicates.add(criteriaBuilder.like(root.get("status"), "%" + request.getStatus() + "%"));
-                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
-            }
+            // if (StringUtils.hasText(request.getStatus())) {
+            //     predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            // }
             // jobNo
             if (StringUtils.hasText(request.getJobNo())) {
                 predicates.add(criteriaBuilder.like(root.get("jobNo"), "%" + request.getJobNo() + "%"));
