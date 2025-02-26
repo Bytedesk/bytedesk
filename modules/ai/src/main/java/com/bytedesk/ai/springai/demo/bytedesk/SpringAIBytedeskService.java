@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 11:37:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 12:07:01
+ * @LastEditTime: 2025-02-26 13:28:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
-import lombok.Data;
+import com.bytedesk.ai.springai.demo.utils.FileContent;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -80,16 +81,7 @@ public class SpringAIBytedeskService {
         return folders;
     }
 
-    @Data
-    class FileContent {
-        private String filename;
-        private String content;
-        
-        public FileContent(String filename, String content) {
-            this.filename = filename;
-            this.content = content;
-        }
-    }
+    
 
 
     
