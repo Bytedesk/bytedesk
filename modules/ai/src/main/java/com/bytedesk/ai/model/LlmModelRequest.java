@@ -41,6 +41,8 @@ public class LlmModelRequest extends BaseRequest {
 
     private String providerUid;
 
+    private String providerName;
+
     @Builder.Default
     private String level = LevelEnum.PLATFORM.name();
 }
