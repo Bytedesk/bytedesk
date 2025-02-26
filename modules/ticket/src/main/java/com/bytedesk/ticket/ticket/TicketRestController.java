@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.action.ActionAnnotation;
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
