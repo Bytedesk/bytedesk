@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 13:04:46
+ * @LastEditTime: 2025-02-26 13:56:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -437,19 +437,21 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     // 为每个组织创建一个机器人
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
-        List<String> faqUids = Arrays.asList(
-                Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_1),
-                Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_2));
         //
         RobotRequest robotRequest = RobotRequest.builder()
                 .nickname(I18Consts.I18N_ROBOT_NICKNAME)
+                .name(I18Consts.I18N_ROBOT_NAME)
                 .build();
         robotRequest.setUid(uid);
         robotRequest.setType(RobotTypeEnum.SERVICE.name());
         robotRequest.setOrgUid(orgUid);
         //
-        robotRequest.getServiceSettings().setFaqUids(faqUids);
-        robotRequest.getServiceSettings().setQuickFaqUids(faqUids);
+        robotRequest.setKbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
+        robotRequest.getServiceSettings().setShowFaqs(true);
+        robotRequest.getServiceSettings().setShowQuickFaqs(true);
+        robotRequest.getServiceSettings().setShowGuessFaqs(true);
+        robotRequest.getServiceSettings().setShowHotFaqs(true);
+        robotRequest.getServiceSettings().setShowShortcutFaqs(true);
         //
         return create(robotRequest);
     }

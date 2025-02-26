@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 10:39:26
+ * @LastEditTime: 2025-02-26 13:57:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class RobotRequest extends BaseRequest {
 
+    @Builder.Default
+    private String name = I18Consts.I18N_ROBOT_NAME;
+    
     @Builder.Default
     private String nickname = I18Consts.I18N_ROBOT_NICKNAME;
     
