@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-27 14:58:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 21:27:38
+ * @LastEditTime: 2025-02-26 15:02:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,14 +58,6 @@ public class OllamaChatService {
     @Autowired
     private SpringAIVectorService uploadVectorStore;
 
-    // private final String PROMPT_BLUEPRINT = """
-    //         根据提供的文档信息回答问题，文档信息如下:
-    //         {context}
-    //         问题:
-    //         {query}
-    //         当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
-    //         """;
-
     // RAG智能客服提示模板
     private final String PROMPT_TEMPLATE = """
               任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。
@@ -89,54 +81,54 @@ public class OllamaChatService {
               }
             """;
 
-    // private final String PROMPT_QA_TEMPLATE = """
-    //         基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
-
-    //         1. 问题部分：
-    //         - 为同一个主题创建多个不同表述的问题，确保问题的多样性
-    //         - 每个问题应考虑用户可能的多种问法，例如：
-    //           - 直接询问（如"什么是...？"）
-    //           - 请求确认（如"是否可以说...？"）
-    //           - 如何做（如"如何实现...？"）
-    //           - 为什么（如"为什么需要...？"）
-    //           - 比较类（如"...和...有什么区别？"）
-
-    //         2. 答案部分：
-    //         - 答案应该准确、完整且易于理解
-    //         - 使用简洁清晰的语言
-    //         - 适当添加示例说明
-    //         - 可以包含关键步骤或要点
-    //         - 必要时提供相关概念解释
-
-    //         3. 格式要求：
-    //         - 以JSON数组形式输出
-    //         - 每个问答对包含question和answer字段
-    //         - 可选添加type字段标识问题类型
-    //         - 可选添加tags字段标识相关标签
-
-    //         4. 质量控制：
-    //         - 确保问答对之间不重复
-    //         - 问题应该有实际意义和价值
-    //         - 答案需要准确且有帮助
-    //         - 覆盖文本中的重要信息点
-
-    //         5. 示例格式：
-    //         {
-    //           "qaPairs": [
-    //             {
-    //               "id": "1",
-    //               "question": "问题描述",
-    //               "answer": "答案内容",
-    //               "tags": ["标签1", "标签2"]
-    //             }
-    //           ]
-    //         }
-
-    //         给定文本：
-    //         {chunk}
-
-    //         请基于这个文本生成问答对
-    //         """;
+    private final String PROMPT_QA_TEMPLATE = """
+                基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
+    
+                1. 问题部分：
+                - 为同一个主题创建多个不同表述的问题，确保问题的多样性
+                - 每个问题应考虑用户可能的多种问法，例如：
+                  - 直接询问（如"什么是...？"）
+                  - 请求确认（如"是否可以说...？"）
+                  - 如何做（如"如何实现...？"）
+                  - 为什么（如"为什么需要...？"）
+                  - 比较类（如"...和...有什么区别？"）
+    
+                2. 答案部分：
+                - 答案应该准确、完整且易于理解
+                - 使用简洁清晰的语言
+                - 适当添加示例说明
+                - 可以包含关键步骤或要点
+                - 必要时提供相关概念解释
+    
+                3. 格式要求：
+                - 以JSON数组形式输出
+                - 每个问答对包含question和answer字段
+                - 可选添加type字段标识问题类型
+                - 可选添加tags字段标识相关标签
+    
+                4. 质量控制：
+                - 确保问答对之间不重复
+                - 问题应该有实际意义和价值
+                - 答案需要准确且有帮助
+                - 覆盖文本中的重要信息点
+    
+                5. 示例格式：
+                {
+                  "qaPairs": [
+                    {
+                      "id": "1",
+                      "question": "问题描述",
+                      "answer": "答案内容",
+                      "tags": ["标签1", "标签2"]
+                    }
+                  ]
+                }
+    
+                给定文本：
+                {chunk}
+    
+                请基于这个文本生成问答对
+                """;
 
     public void sendSseMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
         //
@@ -231,8 +223,61 @@ public class OllamaChatService {
                 log.info("ollama aiMessage.getStatus() == END");
             }
         });
-
-    
     }
     
+
+    public String generateFaqPairsAsync(String chunk) {
+        log.info("generateQaPairsAsync");
+        String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
+        // log.info("generateQaPairs prompt {}", prompt);
+        // 
+        OllamaLlmConfig config = new OllamaLlmConfig();
+        config.setEndpoint(ollamaBaseUrl);
+        config.setModel(ollamaDefaultModel);
+        config.setDebug(true);
+
+        StringBuilder answer = new StringBuilder();
+        Llm llm = new OllamaLlm(config);
+        llm.chatStream(prompt, (context, response) -> {
+            // {"content":"有一","fullContent":"有一","messageContent":"有一","status":"MIDDLE"}
+            // {"completionTokens":11,"content":"","fullContent":"有一只深海鱼，每天都自由地游来游去，但它却一点也不开心。\n为什么呢？\n因为它压力很大。","messageContent":"有一只深海鱼，每天都自由地游来游去，但它却一点也不开心。\n为什么呢？\n因为它压力很大。","status":"END","totalTokens":27}
+            // log.info(JSON.toJSONString(response.getMessage()));
+            // AiMessage aiMessage = response.getMessage();
+            answer.append(response.getMessage());
+        });
+        return answer.toString();
+        // {"code":200,"data":{"array":false,"bigDecimal":false,"bigInteger":false,"binary":false,"boolean":false,"choices":[],"containerNode":true,"created":1735878897,"double":false,"empty":false,"float":false,"floatingPointNumber":false,"id":"202501031234572bc205aee4ee42d2","int":false,"integralNumber":false,"long":false,"missingNode":false,"nodeType":"OBJECT","null":false,"number":false,"object":true,"pojo":false,"request_id":"1554299146469504","short":false,"textual":false,"usage":{"completion_tokens":401,"prompt_tokens":493,"total_tokens":894},"valueNode":false},"msg":"成功","success":true}
+        /** 
+         以下是根据文本生成的问答对：
+        ```json
+        {
+            "qaPairs": [
+                {
+                    "question": "什么是北京市人事考评办公室的监督举报渠道？",
+                    "answer": "北京市人事考评办公室的监督举报渠道是纪检监察监督举报，可以通过访问网站https://beijing.12388.gov.cn/进行举报。",
+                    "tags": ["监督举报", "人事考评办公室"]
+                },
+                {
+                    "question": "北京市人事考评办公室是否与任何培训机构有合作关系？",
+                    "answer": "不是，北京市人事考评办公室不指定任何培训，并且与任何培训机构无合作关系。",
+                    "tags": ["人事考评办公室", "培训机构"]
+                },
+                {
+                    "question": "北京市人事考评办公室的文件是由哪个部门印发的？",
+                    "answer": "北京市人事考评办公室的文件是由其自身于2023年9月19日印发。",
+                    "tags": ["文件印发", "人事考评办公室"]
+                },
+                {
+                    "question": "北京市人事考评办公室的文件抄送给了哪些部门？",
+                    "answer": "北京市人事考评办公室的文件抄送给了市人力资源和社会保障局办公室、事业单位人事管理处。",
+                    "tags": ["文件抄送", "政府部门"]
+                }
+            ]
+        }
+        ```
+        */
+    }
+
+ 
+
 }

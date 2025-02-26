@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:57:47
+ * @LastEditTime: 2025-02-26 14:41:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -263,6 +263,42 @@ public class SpringAIVectorService {
 		storeDocuments(docList, file);
 	}
 
+	// string content 转换成 List<Document> documents
+	public List<Document> readText(String name, String content, String kbUid, String orgUid) {
+		log.info("Converting string content to documents");
+		if (content == null || content.isEmpty()) {
+			throw new IllegalArgumentException("Content must not be empty");
+		}
+		// 创建Document对象
+		Document document = new Document(content);
+		// 使用TokenTextSplitter分割文本
+		var tokenTextSplitter = new TokenTextSplitter();
+		List<Document> docList = tokenTextSplitter.split(List.of(document));
+		// 添加元数据: 文件file_uid, 知识库kb_uid
+		docList.forEach(doc -> {
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, kbUid);
+			// doc.getMetadata().put(KbaseConst.KBASE_ORG_UID, orgUid);
+			// 将doc写入到splitEntity
+			SplitRequest splitRequest = SplitRequest.builder()
+					.name(name)
+					.docId(doc.getId())
+					// .typeUid(textEntity.getUid())
+					// .categoryUid(textEntity.getCategoryUid())
+					.kbUid(kbUid)
+					// .userUid(textEntity.getUserUid())
+					.build();
+			splitRequest.setType(SplitTypeEnum.TEXT.name());
+			splitRequest.setContent(doc.getText());
+			splitRequest.setOrgUid(orgUid);
+			splitRestService.create(splitRequest);
+		});
+		// log.info("Parsing document, this will take a while.");
+		ollamaRedisVectorStore.write(docList);
+		//
+		return docList;
+	}
+
+
 	// 使用reader直接将content字符串，转换成 List<Document> documents
 	public List<Document> readText(TextEntity textEntity) {
 		log.info("Converting string content to documents");
@@ -300,6 +336,8 @@ public class SpringAIVectorService {
 		textEntity.setDocIdList(docIdList);
 		textEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 		textRestService.save(textEntity);
+		// log.info("Parsing document, this will take a while.");
+		ollamaRedisVectorStore.write(docList);
 
 		return docList;
 	}
@@ -349,6 +387,8 @@ public class SpringAIVectorService {
 		fqaEntity.setDocIdList(docIdList);
 		fqaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 		faqRestService.save(fqaEntity);
+		// log.info("Parsing document, this will take a while.");
+		ollamaRedisVectorStore.write(docList);
 
 		return docList;
 	}
@@ -410,6 +450,8 @@ public class SpringAIVectorService {
 			websiteEntity.setDocIdList(docIdList);
 			websiteEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 			websiteRestService.save(websiteEntity);
+			// log.info("Parsing document, this will take a while.");
+			ollamaRedisVectorStore.write(docList);
 
 			return docList;
 
