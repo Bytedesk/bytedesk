@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-03 12:49:18
+ * @LastEditTime: 2025-02-26 13:05:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,6 +96,16 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
         RobotResponse robotResponse = robotService.update(request);
 
+        return ResponseEntity.ok(JsonResult.success(robotResponse));
+    }
+
+    // update avatar
+    @ActionAnnotation(title = "robot", action = "update", description = "update robot avatar")
+    @PostMapping("/update/avatar")
+    public ResponseEntity<?> updateAvatar(@RequestBody RobotRequest request) {
+
+        RobotResponse robotResponse = robotService.updateAvatar(request);
+        
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
