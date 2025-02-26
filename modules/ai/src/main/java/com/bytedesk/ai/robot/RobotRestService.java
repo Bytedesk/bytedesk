@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 17:40:12
+ * @LastEditTime: 2025-02-26 18:06:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -155,7 +155,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
-        robot.setKbEnabled(request.getIsKbEnabled());
+        // robot.setKbEnabled(request.getIsKbEnabled());
         robot.setKbUid(request.getKbUid());
         //
         // Set common settings
@@ -246,7 +246,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setDescription(request.getDescription());
         robot.setPublished(request.getPublished());
         robot.setDefaultReply(request.getDefaultReply());
-        robot.setKbEnabled(request.getIsKbEnabled());
+        // robot.setKbEnabled(request.getIsKbEnabled());
         robot.setKbUid(request.getKbUid());
         //
         // Set common settings
@@ -357,7 +357,12 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
 
         // Set LLM
-        robot.setLlm(request.getLlm());
+        if (request.getLlm() == null) {
+            RobotLlm robotLlm = RobotLlm.builder().build();
+            robot.setLlm(robotLlm);
+        } else {
+            robot.setLlm(request.getLlm());
+        }
     }
 
     // update avatar
