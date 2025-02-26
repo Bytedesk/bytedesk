@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:54:46
+ * @LastEditTime: 2025-02-26 13:04:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
@@ -105,6 +106,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
     }
 
+    @Transactional
     @Override
     public RobotResponse create(RobotRequest request) {
         // 如果uid不为空，判断是否存在
@@ -231,6 +233,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return threadService.convertToResponse(savedThread);
     }
 
+    @Transactional
     @Override
     public RobotResponse update(RobotRequest request) {
 
@@ -353,6 +356,24 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
         return convertToResponse(updateRobot);
     }
+
+    // update avatar
+    @Transactional
+    public RobotResponse updateAvatar(RobotRequest request) {
+        Optional<RobotEntity> robotOptional = findByUid(request.getUid());
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot " + request.getUid() + " not found");
+        }
+        RobotEntity robot = robotOptional.get();
+        robot.setAvatar(request.getAvatar());
+        
+        RobotEntity updateRobot = save(robot);
+        if (updateRobot == null) {
+            throw new RuntimeException("update robot failed");
+        }
+        return convertToResponse(updateRobot);
+    }
+
 
     @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
     @Override
