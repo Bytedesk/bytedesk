@@ -225,7 +225,6 @@ public class OllamaChatService {
         });
     }
     
-
     public String generateFaqPairsAsync(String chunk) {
         log.info("generateQaPairsAsync");
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
@@ -278,6 +277,5 @@ public class OllamaChatService {
         */
     }
 
- 
-
+    
 }
