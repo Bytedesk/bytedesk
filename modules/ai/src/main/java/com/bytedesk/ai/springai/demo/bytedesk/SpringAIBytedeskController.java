@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 10:54:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 12:08:21
+ * @LastEditTime: 2025-02-26 12:26:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SpringAIBytedeskController {
 
-    private final SpringAIBytedeskService service;
+    private final SpringAIBytedeskService springAIBytedeskService;
     
     @GetMapping("/chat")
     public String chat() {
@@ -44,7 +44,7 @@ public class SpringAIBytedeskController {
     @GetMapping("/files")
     public ResponseEntity<JsonResult<?>> getFiles() {
 
-        List<FileContent> files = service.getAllFiles();
+        List<FileContent> files = springAIBytedeskService.getAllFiles();
         
         return ResponseEntity.ok(JsonResult.success(files));
     }
@@ -54,7 +54,7 @@ public class SpringAIBytedeskController {
     @GetMapping("/folders")
     public ResponseEntity<JsonResult<?>> getFolders() {
 
-        List<String> folders = service.getAllFolders();
+        List<String> folders = springAIBytedeskService.getAllFolders();
         
         return ResponseEntity.ok(JsonResult.success(folders));
     }
