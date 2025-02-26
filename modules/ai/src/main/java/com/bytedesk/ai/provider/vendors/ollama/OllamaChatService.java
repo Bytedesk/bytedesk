@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-27 14:58:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 15:02:07
+ * @LastEditTime: 2025-02-26 16:13:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -226,14 +226,14 @@ public class OllamaChatService {
     }
     
     public String generateFaqPairsAsync(String chunk) {
-        log.info("generateQaPairsAsync");
+        // log.info("generateQaPairsAsync");
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
         // log.info("generateQaPairs prompt {}", prompt);
         // 
         OllamaLlmConfig config = new OllamaLlmConfig();
         config.setEndpoint(ollamaBaseUrl);
         config.setModel(ollamaDefaultModel);
-        config.setDebug(true);
+        // config.setDebug(true);
 
         StringBuilder answer = new StringBuilder();
         Llm llm = new OllamaLlm(config);
@@ -244,37 +244,8 @@ public class OllamaChatService {
             // AiMessage aiMessage = response.getMessage();
             answer.append(response.getMessage());
         });
+        
         return answer.toString();
-        // {"code":200,"data":{"array":false,"bigDecimal":false,"bigInteger":false,"binary":false,"boolean":false,"choices":[],"containerNode":true,"created":1735878897,"double":false,"empty":false,"float":false,"floatingPointNumber":false,"id":"202501031234572bc205aee4ee42d2","int":false,"integralNumber":false,"long":false,"missingNode":false,"nodeType":"OBJECT","null":false,"number":false,"object":true,"pojo":false,"request_id":"1554299146469504","short":false,"textual":false,"usage":{"completion_tokens":401,"prompt_tokens":493,"total_tokens":894},"valueNode":false},"msg":"成功","success":true}
-        /** 
-         以下是根据文本生成的问答对：
-        ```json
-        {
-            "qaPairs": [
-                {
-                    "question": "什么是北京市人事考评办公室的监督举报渠道？",
-                    "answer": "北京市人事考评办公室的监督举报渠道是纪检监察监督举报，可以通过访问网站https://beijing.12388.gov.cn/进行举报。",
-                    "tags": ["监督举报", "人事考评办公室"]
-                },
-                {
-                    "question": "北京市人事考评办公室是否与任何培训机构有合作关系？",
-                    "answer": "不是，北京市人事考评办公室不指定任何培训，并且与任何培训机构无合作关系。",
-                    "tags": ["人事考评办公室", "培训机构"]
-                },
-                {
-                    "question": "北京市人事考评办公室的文件是由哪个部门印发的？",
-                    "answer": "北京市人事考评办公室的文件是由其自身于2023年9月19日印发。",
-                    "tags": ["文件印发", "人事考评办公室"]
-                },
-                {
-                    "question": "北京市人事考评办公室的文件抄送给了哪些部门？",
-                    "answer": "北京市人事考评办公室的文件抄送给了市人力资源和社会保障局办公室、事业单位人事管理处。",
-                    "tags": ["文件抄送", "政府部门"]
-                }
-            ]
-        }
-        ```
-        */
     }
 
     

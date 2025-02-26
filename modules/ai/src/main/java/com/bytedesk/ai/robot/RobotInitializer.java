@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 15:42:12
+ * @LastEditTime: 2025-02-26 16:13:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ import com.bytedesk.ai.springai.demo.bytedesk.SpringAIBytedeskService;
 import com.bytedesk.ai.springai.demo.utils.FileContent;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.kbase.faq.FaqRestService;
+// import com.bytedesk.kbase.faq.FaqRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,16 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RobotInitializer implements SmartInitializingSingleton {
 
     private final RobotRestService robotService;
-
-    private final SpringAIBytedeskService springAIBytedeskService;
-
-    private final StringRedisTemplate stringRedisTemplate;
-
-    private final SpringAIVectorService springAIVectorService;
-
-    private final Optional<OllamaChatService> ollamaChatService;
-
-    // private final FaqRestService faqRestService;
     
     @Override
     public void afterSingletonsInstantiated() {
@@ -59,28 +49,5 @@ public class RobotInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // 为初始组织创建一个机器人
         robotService.initDefaultRobot(orgUid);
-        
-        // 首先redis中是否已经初始化此数据，如果没有，继续执行演示数据初始化
-        String isInit = stringRedisTemplate.opsForValue().get(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY);
-        if (isInit == null) {
-            String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
-            // 默认使用演示文档内容，填充且只填充超级管理员演示机器人
-            List<FileContent> files = springAIBytedeskService.getAllFiles();
-            // 写入到redis vector 中
-            for (FileContent file : files) {
-                springAIVectorService.readText(file.getFilename(), file.getContent(), kbUid, orgUid);
-                // 根据文档内容，生成问答对
-                ollamaChatService.ifPresent(service -> {
-                    String qaPairs = service.generateFaqPairsAsync(file.getContent());
-                    log.info("ollamaChatService generateFaqPairsAsync qaPairs {}", qaPairs);
-                    // faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
-                });
-            }
-            // 设置redis key 为已初始化
-            stringRedisTemplate.opsForValue().set(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY, "true");
-            // 删除 redis key
-            // redisTemplate.delete(RobotConsts.ROBOT_INIT_DEMO_KEY);
-        }
-        
     }   
 }

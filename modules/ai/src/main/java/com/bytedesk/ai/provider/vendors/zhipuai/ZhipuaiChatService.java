@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:49:23
+ * @LastEditTime: 2025-02-26 16:27:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,6 +58,7 @@ import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 
 /**
  * https://open.bigmodel.cn/dev/api#sdk_install
@@ -72,7 +73,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
-public class ZhipuaiChatService {
+public class ZhipuaiChatService implements DisposableBean {
 
     private final SpringAIZhipuaiConfig springAiZhipuaiConfig;
 
@@ -332,98 +333,78 @@ public class ZhipuaiChatService {
     }
 
     public String generateFaqPairsAsync(String chunk) {
+        if (!StringUtils.hasText(chunk)) {
+            return "";
+        }
+
         log.info("generateQaPairsAsync");
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        // log.info("generateQaPairs prompt {}", prompt);
-        //
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
         messages.add(chatMessage);
-        //
+
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                // 模型名称
                 .model(springAiZhipuaiConfig.getZhipuaiApiModel())
                 .stream(Boolean.TRUE)
                 .messages(messages)
                 .requestId(uidUtils.getUid())
                 .build();
-        //
+
         StringBuilder answer = new StringBuilder();
-        ModelApiResponse sseModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
-        if (sseModelApiResp.isSuccess()) {
-            AtomicBoolean isFirst = new AtomicBoolean(true);
-            List<Choice> choices = new ArrayList<>();
-            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
-                    .doOnNext(accumulator -> {
-                        {
+        ModelApiResponse sseModelApiResp = null;
+        try {
+            sseModelApiResp = zhipuaiClient.invokeModelApi(chatCompletionRequest);
+            if (sseModelApiResp != null && sseModelApiResp.isSuccess()) {
+                AtomicBoolean isFirst = new AtomicBoolean(true);
+                List<Choice> choices = new ArrayList<>();
+                ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+                        .doOnNext(accumulator -> {
                             if (isFirst.getAndSet(false)) {
                                 log.info("answer start: ");
                             }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
-                                String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
-                                log.info("tool_calls: " + jsonString);
-                            }
-                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                                String answerContent = accumulator.getDelta().getContent();
-                                // log.info("answerContent {}", answerContent);
-                                if (StringUtils.hasText(answerContent)) {
-                                    answer.append(answerContent);
+                            if (accumulator.getDelta() != null) {
+                                if (accumulator.getDelta().getTool_calls() != null) {
+                                    String jsonString = JSON.toJSONString(accumulator.getDelta().getTool_calls());
+                                    log.info("tool_calls: " + jsonString);
+                                }
+                                if (accumulator.getDelta().getContent() != null) {
+                                    String answerContent = accumulator.getDelta().getContent();
+                                    if (StringUtils.hasText(answerContent)) {
+                                        answer.append(answerContent);
+                                    }
                                 }
                             }
-                        }
-                    })
-                    .doOnComplete(() -> {
-                        log.info("answer end");
-                    })
-                    .lastElement()
-                    .blockingGet();
+                        })
+                        .doOnComplete(() -> {
+                            log.info("answer end");
+                        })
+                        .lastElement()
+                        .blockingGet();
 
-            ModelData data = new ModelData();
-            data.setChoices(choices);
-            data.setUsage(chatMessageAccumulator.getUsage());
-            data.setId(chatMessageAccumulator.getId());
-            data.setCreated(chatMessageAccumulator.getCreated());
-            data.setRequestId(chatCompletionRequest.getRequestId());
-            sseModelApiResp.setFlowable(null);// 打印前置空
-            sseModelApiResp.setData(data);
-            // 存储到数据库
-            // robotMessage.setPromptTokens(chatMessageAccumulator.getUsage().getPromptTokens());
-            // robotMessage.setCompletionTokens(chatMessageAccumulator.getUsage().getCompletionTokens());
-            // robotMessage.setTotalTokens(chatMessageAccumulator.getUsage().getTotalTokens());
-        }
-
-        // {"code":200,"data":{"array":false,"bigDecimal":false,"bigInteger":false,"binary":false,"boolean":false,"choices":[],"containerNode":true,"created":1735878897,"double":false,"empty":false,"float":false,"floatingPointNumber":false,"id":"202501031234572bc205aee4ee42d2","int":false,"integralNumber":false,"long":false,"missingNode":false,"nodeType":"OBJECT","null":false,"number":false,"object":true,"pojo":false,"request_id":"1554299146469504","short":false,"textual":false,"usage":{"completion_tokens":401,"prompt_tokens":493,"total_tokens":894},"valueNode":false},"msg":"成功","success":true}
-        log.info("generateQaPairsAsync result {}", JSON.toJSONString(sseModelApiResp));
-        /** 
-         以下是根据文本生成的问答对：
-        ```json
-        {
-            "qaPairs": [
-                {
-                    "question": "什么是北京市人事考评办公室的监督举报渠道？",
-                    "answer": "北京市人事考评办公室的监督举报渠道是纪检监察监督举报，可以通过访问网站https://beijing.12388.gov.cn/进行举报。",
-                    "tags": ["监督举报", "人事考评办公室"]
-                },
-                {
-                    "question": "北京市人事考评办公室是否与任何培训机构有合作关系？",
-                    "answer": "不是，北京市人事考评办公室不指定任何培训，并且与任何培训机构无合作关系。",
-                    "tags": ["人事考评办公室", "培训机构"]
-                },
-                {
-                    "question": "北京市人事考评办公室的文件是由哪个部门印发的？",
-                    "answer": "北京市人事考评办公室的文件是由其自身于2023年9月19日印发。",
-                    "tags": ["文件印发", "人事考评办公室"]
-                },
-                {
-                    "question": "北京市人事考评办公室的文件抄送给了哪些部门？",
-                    "answer": "北京市人事考评办公室的文件抄送给了市人力资源和社会保障局办公室、事业单位人事管理处。",
-                    "tags": ["文件抄送", "政府部门"]
+                if (chatMessageAccumulator != null) {
+                    ModelData data = new ModelData();
+                    data.setChoices(choices);
+                    data.setUsage(chatMessageAccumulator.getUsage());
+                    data.setId(chatMessageAccumulator.getId());
+                    data.setCreated(chatMessageAccumulator.getCreated());
+                    data.setRequestId(chatCompletionRequest.getRequestId());
+                    sseModelApiResp.setFlowable(null);
+                    sseModelApiResp.setData(data);
                 }
-            ]
+            }
+        } catch (Exception e) {
+            log.error("Error in generateFaqPairsAsync", e);
+            throw new RuntimeException("Failed to generate FAQ pairs", e);
+        } finally {
+            if (sseModelApiResp != null && sseModelApiResp.getFlowable() != null) {
+                try {
+                    sseModelApiResp.getFlowable().blockingSubscribe();
+                } catch (Exception e) {
+                    log.error("Error closing flowable", e);
+                }
+            }
         }
-        ```
-        */
-        // log.info("generateQaPairsAsync answer {}", answer.toString());
+
         return answer.toString();
     }
 
@@ -695,5 +676,17 @@ public class ZhipuaiChatService {
     // additionalQAPairs.add("Q: 相关问题2 A: 相关答案2");
     // return additionalQAPairs;
     // }
+
+    @Override
+    public void destroy() throws Exception {
+        // Cleanup any resources if needed
+        if (zhipuaiClient != null) {
+            try {
+                // Add any necessary cleanup for zhipuaiClient
+            } catch (Exception e) {
+                log.error("Error during cleanup", e);
+            }
+        }
+    }
 
 }
