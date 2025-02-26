@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 00:22:53
+ * @LastEditTime: 2025-02-26 15:04:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -303,9 +303,9 @@ public class SpringAIController {
                 return ResponseEntity.ok(JsonResult.success(answer));
         }
 
-
         // 多查询扩写 MultiQueryExpander
-        // A MultiQueryExpander uses a large language model to expand a query into multiple
+        // A MultiQueryExpander uses a large language model to expand a query into
+        // multiple
         // semantically diverse variations to capture different perspectives
         // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_multiqueryexpander
         // http://127.0.0.1:9003/spring/ai/multi-query-expander?message=什么时间考试？
@@ -332,9 +332,9 @@ public class SpringAIController {
                 return ResponseEntity.ok(JsonResult.success(answer));
         }
 
-
         // VectorStoreDocumentRetriever
-        // A VectorStoreDocumentRetriever retrieves documents from a vector store that are semantically similar to the input query. 
+        // A VectorStoreDocumentRetriever retrieves documents from a vector store that
+        // are semantically similar to the input query.
         // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_vectorstoredocumentretriever
         // http://127.0.0.1:9003/spring/ai/vector-store-document-retriever?message=什么时间考试？
         @GetMapping("/vector-store-document-retriever")
@@ -353,21 +353,21 @@ public class SpringAIController {
                 List<Document> documents = retriever.retrieve(new Query("What is the main character of the story?"));
                 log.info("documents: {}", documents);
 
-                // 使用chatClient       
+                // 使用chatClient
                 // String answer = ChatClient.builder(ollamaChatModel)
-                //                 // .defaultAdvisors(retrievalAugmentationAdvisor)
-                //                 .build()
-                //                 .prompt()
-                //                 .user(message)
-                //                 .call()
-                //                 .content();
+                // // .defaultAdvisors(retrievalAugmentationAdvisor)
+                // .build()
+                // .prompt()
+                // .user(message)
+                // .call()
+                // .content();
 
                 return ResponseEntity.ok(JsonResult.success(documents));
         }
 
-
         // 上下文扩展 ContextualQueryAugmenter
-        // The ContextualQueryAugmenter augments the user query with contextual data from the content of the provided documents.
+        // The ContextualQueryAugmenter augments the user query with contextual data
+        // from the content of the provided documents.
         // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_contextualqueryaugmenter
         // http://127.0.0.1:9003/spring/ai/contextual-query-augmenter?message=什么时间考试？
         @GetMapping("/contextual-query-augmenter")
@@ -375,15 +375,14 @@ public class SpringAIController {
                         @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
 
                 ContextualQueryAugmenter queryAugmenter = ContextualQueryAugmenter.builder()
-                // .allowEmptyContext(true)
-                .build();
+                                // .allowEmptyContext(true)
+                                .build();
 
                 // Query query = new Query("What is the capital of Denmark?");
                 // Query augmentedQuery = queryAugmenter.augment(query);
 
                 return ResponseEntity.ok(JsonResult.success(queryAugmenter));
         }
-
 
         // 聊天
         // http://127.0.0.1:9003/spring/ai/chat?chatId=1&userMessageContent=什么时间考试？
@@ -393,12 +392,11 @@ public class SpringAIController {
                         @RequestParam(value = "userMessageContent", defaultValue = "什么时间考试？") String userMessageContent) {
 
                 return this.customerSupportAssistant.prompt()
-                        .user(userMessageContent)
-                        .advisors(advisor -> advisor
-                                .param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-                                .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
-                        .stream().content();
-            }
-        
+                                .user(userMessageContent)
+                                .advisors(advisor -> advisor
+                                                .param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                                                .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
+                                .stream().content();
+        }
 
 }
