@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 15:04:03
+ * @LastEditTime: 2025-02-26 17:26:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,7 @@ import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 // import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +60,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/spring/ai")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIController {
 
         private final ChatClient defaultChatClient;

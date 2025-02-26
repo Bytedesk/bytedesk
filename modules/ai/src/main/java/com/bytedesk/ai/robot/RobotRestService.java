@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 16:55:16
+ * @LastEditTime: 2025-02-26 17:40:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -414,11 +414,11 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     }
 
     // 初始化
-    public void initDefaultRobot(String orgUid) {
+    public void initDefaultRobot(String orgUid, String uid) {
         // 为每个组织创建一个机器人
-        createDefaultRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.DEFAULT_ROBOT_DEMO_UID));
+        createDefaultRobot(orgUid, uid);
         // 为每个组织创建一个客服助手
-        createDefaultAgentAssistantRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.DEFAULT_ROBOT_DEMO_UID));
+        // createDefaultAgentAssistantRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.DEFAULT_ROBOT_DEMO_UID));
         // 为每个组织自动导入智能体
         initRobotJson(orgUid, LevelEnum.ORGANIZATION.name());
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 11:58:34
+ * @LastEditTime: 2025-02-26 17:29:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,6 +63,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/prompt")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIPromptController {
 
 	private final ChatClient defaultChatClient;
