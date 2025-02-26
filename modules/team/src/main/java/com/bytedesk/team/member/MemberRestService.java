@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 10:40:45
+ * @LastEditTime: 2025-02-26 09:15:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,8 +67,6 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
     private final AuthService authService;
 
     private final ThreadRestService threadService;
-
-    // private final IMessageSendService messageSendService;
 
     public Page<MemberResponse> queryByOrg(MemberRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC, "id");
