@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 18:11:45
+ * @LastEditTime: 2025-02-26 21:12:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,10 @@
  */
 package com.bytedesk.kbase.faq;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,6 +31,9 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.action.ActionRequest;
+import com.bytedesk.core.action.ActionRestService;
+import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -53,6 +58,8 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
     private final UidUtils uidUtils;
 
     private final CategoryRestService categoryService;
+
+    private final ActionRestService actionRestService;
 
     @Override
     public Page<FaqResponse> queryByOrg(FaqRequest request) {
@@ -178,10 +185,72 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         deleteByUid(entity.getUid());
     }
 
+    private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
+    private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
+    private final Queue<FaqEntity> retryQueue = new LinkedList<>();
+
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        retryQueue.add(entity);
+        processRetryQueue();
+    }
+
+    private void processRetryQueue() {
+        while (!retryQueue.isEmpty()) {
+            FaqEntity entity = retryQueue.poll(); // 从队列中取出一个元素
+            if (entity == null) {
+                break; // 队列为空，跳出循环
+            }
+
+            int retryCount = 0;
+            while (retryCount < MAX_RETRY_ATTEMPTS) {
+                try {
+                    // 尝试更新Topic对象
+                    faqRepository.save(entity);
+                    // 更新成功，无需进一步处理
+                    log.info("Optimistic locking succeeded for faq: {}", entity.getUid());
+                    break; // 跳出内部循环
+                } catch (ObjectOptimisticLockingFailureException ex) {
+                    // 捕获乐观锁异常
+                    log.error("Optimistic locking failure for faq: {}, retry count: {}", entity.getUid(),
+                            retryCount + 1);
+                    // 等待一段时间后重试
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("Interrupted while waiting for retry", ie);
+                        return;
+                    }
+                    retryCount++; // 增加重试次数
+
+                    // 如果还有重试机会，则将faq放回队列末尾
+                    if (retryCount < MAX_RETRY_ATTEMPTS) {
+                        // FIXME: 发现会一直失败，暂时不重复处理
+                        // retryQueue.add(faq);
+                    } else {
+                        // 所有重试都失败了
+                        handleFailedRetries(entity);
+                    }
+                }
+            }
+        }
+    }
+
+    private void handleFailedRetries(FaqEntity faq) {
+        String faqJSON = JSONObject.toJSONString(faq);
+        ActionRequest actionRequest = ActionRequest.builder()
+                .title("faq")
+                .action("save")
+                .description("All retry attempts failed for optimistic locking")
+                .extra(faqJSON)
+                .build();
+        actionRequest.setType(ActionTypeEnum.FAILED.name());
+        actionRestService.create(actionRequest);
+        // bytedeskEventPublisher.publishActionEvent(actionRequest);
+        log.error("All retry attempts failed for optimistic locking of faq: {}", faq.getUid());
+        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
+        // notifyUserOfFailure(robot);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 18:48:53
+ * @LastEditTime: 2025-02-26 21:08:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,21 +80,21 @@ public class RobotEventListener {
         FaqEntity qa = event.getFaq();
         log.info("RobotEventListener onFaqCreateEvent: {}", qa.getQuestion());
         // 填充 bytedesk demo 热门问题、常见问题，只填充演示demo robot，且最多5条
-        Optional<RobotEntity> robotOptional = robotRestService.findByUid(BytedeskConsts.DEFAULT_ROBOT_UID);
-        if (robotOptional.isPresent()) {
-            RobotEntity robot = robotOptional.get();
-            // 填充机器人知识库
-            robot.getServiceSettings().setShowHotFaqs(true);
-            if (robot.getServiceSettings().getHotFaqs().size() < 5) {
-                robot.getServiceSettings().getHotFaqs().add(qa);
-            }
-            robot.getServiceSettings().setShowFaqs(true);
-            if (robot.getServiceSettings().getFaqs().size() < 5) {
-                robot.getServiceSettings().getFaqs().add(qa);
-            }
-            // 保存
-            robotRestService.save(robot);
-        }
+        // Optional<RobotEntity> robotOptional = robotRestService.findByUid(BytedeskConsts.DEFAULT_ROBOT_UID);
+        // if (robotOptional.isPresent()) {
+        //     RobotEntity robot = robotOptional.get();
+        //     // 填充机器人知识库
+        //     robot.getServiceSettings().setShowHotFaqs(true);
+        //     if (robot.getServiceSettings().getHotFaqs().size() < 5) {
+        //         robot.getServiceSettings().getHotFaqs().add(qa);
+        //     }
+        //     robot.getServiceSettings().setShowFaqs(true);
+        //     if (robot.getServiceSettings().getFaqs().size() < 5) {
+        //         robot.getServiceSettings().getFaqs().add(qa);
+        //     }
+        //     // 保存
+        //     robotRestService.save(robot);
+        // }
         
     }
 
