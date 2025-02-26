@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 13:10:34
+ * @LastEditTime: 2025-02-26 12:14:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,7 +70,11 @@ public class PageRouteController {
 			en.put("service", "Service");
 			en.put("kbase", "Kbase");
 			en.put("ai", "AI");
+			en.put("demo", "Demo");
 			en.put("social", "Social");
+			en.put("airline", "Airline");
+			en.put("bytedesk", "BytedeskAI");
+			en.put("shopping", "Shopping");
 			
 			// 简体中文
 			Map<String, String> zh = new HashMap<>();
@@ -97,6 +101,10 @@ public class PageRouteController {
 			zh.put("kbase", "知识库模块");
 			zh.put("ai", "AI模块");
 			zh.put("social", "社交IM模块");
+			zh.put("demo", "演示");
+			zh.put("airline", "机票购票/退改签演示");
+			zh.put("bytedesk", "微语文档问答演示");
+			zh.put("shopping", "购物商品推荐/退换货演示");
 			// 繁体中文
 			Map<String, String> zhTW = new HashMap<>();
 			zhTW.put("title", "微語");
@@ -122,6 +130,12 @@ public class PageRouteController {
 			zhTW.put("kbase", "知識庫模組");
 			zhTW.put("ai", "AI模組");
 			zhTW.put("social", "社交IM模組");
+			zhTW.put("demo", "演示");
+			zhTW.put("airline", "機票購票/退改簽演示");
+			zhTW.put("bytedesk", "微語文檔問答演示");
+			zhTW.put("shopping", "購物商品推薦/退換貨演示");
+
+			// 添加多语言文本
 			i18n.put("en", en);
 			i18n.put("zh", zh);
 			i18n.put("zh-TW", zhTW);
@@ -186,6 +200,9 @@ public class PageRouteController {
 	@GetMapping({
 		"/chat", 
 		"/chat/", 
+		"/chat/demo/airline",
+		"/chat/demo/bytedesk",
+		"/chat/demo/shopping",
 		"/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|server|config}"})
 	public String chat(@PathVariable(required = false) String type) {
 		return "forward:/chat/index.html";

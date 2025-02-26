@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 10:22:32
+ * @LastEditTime: 2025-02-26 12:32:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,11 +67,7 @@ public class RobotEventListener {
         String orgUid = organization.getUid();
         log.info("robot - organization created: {}", organization.getName());
         // 为每个组织创建一个机器人
-        robotService.createDefaultRobot(orgUid, uidUtils.getUid());
-        // 为每个组织创建一个客服助手
-        robotService.createDefaultAgentAssistantRobot(orgUid, uidUtils.getUid());
-        // 为每个组织自动导入智能体
-        robotService.initRobotJson(orgUid, LevelEnum.ORGANIZATION.name());
+        robotService.initDefaultRobot(orgUid);
     }
 
     @EventListener
