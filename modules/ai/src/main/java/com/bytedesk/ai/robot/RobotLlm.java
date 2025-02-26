@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-27 12:18:02
+ * @LastEditTime: 2025-02-26 13:50:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot;
+
+import org.springframework.beans.factory.annotation.Value;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -31,6 +33,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RobotLlm {
 
+    @Value("${spring.ai.ollama.chat.options.model:qwen2.5:1.5b}")
+    private static String defaultModel;
+
+    @Value("${spring.ai.ollama.embedding.options.model:qwen2.5:1.5b}")
+    private static String defaultEmbeddingModel;
+
     // 默认启用llm问答
     @Builder.Default
     @Column(name = "is_llm_enabled")
@@ -46,15 +54,18 @@ public class RobotLlm {
 
     @Builder.Default
     @Column(name = "llm_provider")
-    private String provider = "zhipu";
+    // private String provider = "zhipu";
+    private String provider = "ollama";
     
     @Builder.Default
     @Column(name = "llm_model")
-    private String model = "glm-4-flash";
+    // private String model = "glm-4-flash";
+    private String model = defaultModel;
     
     @Builder.Default
-    @Column(name = "llm_embedding")
-    private String embedding = "m3e_base";
+    @Column(name = "llm_embedding_model")
+    // private String embedding = "m3e_base";
+    private String embeddingModel = defaultEmbeddingModel;
 
     @Builder.Default
     @Column(name = "llm_temperature")
