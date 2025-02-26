@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 15:24:23
+ * @LastEditTime: 2025-02-26 17:42:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,8 +19,6 @@ import com.bytedesk.core.redis.RedisConsts;
 public class RobotConsts {
     private RobotConsts() {}
 
-    // 
-    public static final String DEFAULT_ROBOT_DEMO_UID = "robot_demo";
     // airline key
     public static final String ROBOT_INIT_DEMO_AIRLINE_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX + "robot:init:demo:airline";
     // bytedesk key

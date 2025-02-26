@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-26 16:59:14
+ * @Date: 2025-02-26 17:04:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 17:33:45
+ * @LastEditTime: 2025-02-26 17:33:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,10 @@
 package com.bytedesk.ai.springai;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
-@Service
+@RestController
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
-public class SpringAIOllamaService {
+public class SpringAIOllamaController {
     
 }
