@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 17:02:02
+ * @LastEditTime: 2025-02-26 09:30:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,7 +44,7 @@ import com.bytedesk.core.rbac.authority.AuthorityEntity;
 @NoArgsConstructor
 @EntityListeners({ RoleEntityListener.class })
 @Table(name = "bytedesk_core_role", uniqueConstraints = {
-	@UniqueConstraint(columnNames = { "name", "orgUid" }),
+	// @UniqueConstraint(columnNames = { "name", "orgUid" }), // is_deleted=false 时不加限定
 })
 public class RoleEntity extends BaseEntity {
 

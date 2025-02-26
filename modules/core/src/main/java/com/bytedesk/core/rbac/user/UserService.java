@@ -41,7 +41,7 @@ import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.role.RoleEntity;
-import com.bytedesk.core.rbac.role.RoleService;
+import com.bytedesk.core.rbac.role.RoleRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -59,7 +59,7 @@ public class UserService {
 
     private final ModelMapper modelMapper;
 
-    private final RoleService roleService;
+    private final RoleRestService roleService;
 
     private final BytedeskProperties bytedeskProperties;
 

@@ -43,6 +43,8 @@ import com.bytedesk.kbase.upload.event.UploadCreateEvent;
 import com.bytedesk.team.department.DepartmentConsts;
 import com.bytedesk.team.department.DepartmentEntity;
 import com.bytedesk.team.department.DepartmentService;
+import com.bytedesk.team.member.event.MemberCreateEvent;
+import com.bytedesk.team.member.event.MemberUpdateEvent;
 
 import jakarta.transaction.Transactional;
 
