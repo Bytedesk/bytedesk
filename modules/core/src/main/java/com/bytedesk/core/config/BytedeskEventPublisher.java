@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:42:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:52:13
+ * @LastEditTime: 2025-02-26 11:20:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,8 +17,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.action.ActionEntity;
-import com.bytedesk.core.action.ActionCreateEvent;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzDay8Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
@@ -165,10 +163,6 @@ public class BytedeskEventPublisher {
     // public void publishThreadUpdateStatusEvent(Thread thread, String status) {
     //     applicationEventPublisher.publishEvent(new ThreadUpdateStatusEvent(this, thread, status));
     // }
-
-    public void publishActionCreateEvent(ActionEntity action) {
-        applicationEventPublisher.publishEvent(new ActionCreateEvent(this, action));
-    }
 
     public void publishOrganizationCreateEvent(OrganizationEntity organization) {
         applicationEventPublisher.publishEvent(new OrganizationCreateEvent(organization));

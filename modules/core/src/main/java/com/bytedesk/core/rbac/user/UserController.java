@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.bytedesk.core.action.ActionAnnotation;
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.authority.AuthorityPermissions;
