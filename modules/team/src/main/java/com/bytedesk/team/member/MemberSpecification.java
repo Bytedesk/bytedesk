@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 15:41:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 10:42:15
+ * @LastEditTime: 2025-02-26 08:46:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,11 +34,31 @@ public class MemberSpecification extends BaseSpecification {
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             // 
             if (StringUtils.hasText(request.getDeptUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("deptUid"), request.getDeptUid()));
+                predicates.add(criteriaBuilder.like(root.get("deptUid"), "%" + request.getDeptUid() + "%"));
             }
             //
             if (StringUtils.hasText(request.getNickname())) {
-                predicates.add(criteriaBuilder.and(root.get("nickname").in(request.getNickname())));
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
+            }
+            // email
+            if (StringUtils.hasText(request.getEmail())) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + request.getEmail() + "%"));
+            }
+            // mobile
+            if (StringUtils.hasText(request.getMobile())) {
+                predicates.add(criteriaBuilder.like(root.get("mobile"), "%" + request.getMobile() + "%"));
+            }
+            // status
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.like(root.get("status"), "%" + request.getStatus() + "%"));
+            }
+            // jobNo
+            if (StringUtils.hasText(request.getJobNo())) {
+                predicates.add(criteriaBuilder.like(root.get("jobNo"), "%" + request.getJobNo() + "%"));
+            }
+            // jobTitle
+            if (StringUtils.hasText(request.getJobTitle())) {
+                predicates.add(criteriaBuilder.like(root.get("jobTitle"), "%" + request.getJobTitle() + "%"));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
