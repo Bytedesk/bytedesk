@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:49:01
+ * @LastEditTime: 2025-02-26 10:05:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -104,6 +104,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         return convertToResponse(updatedWorkgroup);
     }
 
+    @Transactional
     public WorkgroupResponse update(WorkgroupRequest request) {
 
         Optional<WorkgroupEntity> workgroupOptional = findByUid(request.getUid());
@@ -153,6 +154,32 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             throw new RuntimeException("save workgroup failed.");
         }
 
+        return convertToResponse(updatedWorkgroup);
+    }
+
+    // updateAvatar
+    @Transactional
+    public WorkgroupResponse updateAvatar(WorkgroupRequest request) {
+        WorkgroupEntity workgroup = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("workgroup not found with uid: " + request.getUid()));
+        workgroup.setAvatar(request.getAvatar());
+        //
+        WorkgroupEntity updatedWorkgroup = save(workgroup);
+        if (updatedWorkgroup == null) {
+            throw new RuntimeException("save workgroup failed.");
+        }
+        
+        return convertToResponse(updatedWorkgroup);
+    }
+
+    @Transactional
+    public WorkgroupResponse updateStatus(WorkgroupRequest request) {
+        WorkgroupEntity workgroup = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("workgroup not found with uid: " + request.getUid()));
+        workgroup.setStatus(request.getStatus());
+
+        WorkgroupEntity updatedWorkgroup = save(workgroup);
+        if (updatedWorkgroup == null) {
+            throw new RuntimeException("save workgroup failed.");
+        }
         return convertToResponse(updatedWorkgroup);
     }
 

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-25 22:53:43
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-26 10:20:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,16 +42,16 @@ public class BytedeskProperties {
             synchronized (BytedeskProperties.class) {
                 if (instance == null) {
                     // 处理中文编码
-                    if (StringUtils.hasText(this.name)) {
+                    if (StringUtils.hasText(this.custom.getName())) {
                         try {
-                            this.name = new String(this.name.getBytes("ISO-8859-1"), "UTF-8");
+                            this.custom.setName(new String(this.custom.getName().getBytes("ISO-8859-1"), "UTF-8"));
                         } catch (Exception e) {
                             // 记录错误但继续执行
                         }
                     }
-                    if (StringUtils.hasText(this.description)) {
+                    if (StringUtils.hasText(this.custom.getDescription())) {
                         try {
-                            this.description = new String(this.description.getBytes("ISO-8859-1"), "UTF-8");
+                            this.custom.setDescription(new String(this.custom.getDescription().getBytes("ISO-8859-1"), "UTF-8"));
                         } catch (Exception e) {
                             // 记录错误但继续执行
                         }
@@ -71,16 +71,22 @@ public class BytedeskProperties {
 
     private String edition = Edition.COMMUNITY.name().toLowerCase();
 
-    // 是否启用自定义配置：name, logo, description
-    private Boolean customEnabled = false;
+    // // 是否启用自定义配置：name, logo, description
+    // private Boolean customEnabled = false;
 
-    private String name;
+    // private String name;
 
-    private String version;
+    // private String version;
 
-    private String logo;
+    // private String logo;
 
-    private String description;
+    // private String description;
+
+    // // 是否启用右下角聊天
+    // private Boolean rightCornerChatEnabled = true;
+
+    // 自定义配置
+    private Custom custom = new Custom();
 
     // 管理员配置
     private Admin admin = new Admin();
@@ -122,6 +128,17 @@ public class BytedeskProperties {
         COMMUNITY, // 社区版-免费, 功能受限，人数不限
         ENTERPRISE, // 企业版-200人，付费，功能不限
         ULTIMATE // 旗舰版-不限人数，付费，功能不限
+    }
+
+    private String version; 
+
+    @Data
+    public static class Custom {
+        private Boolean enabled = false;
+        private String name;
+        private String logo;
+        private String description;
+        private Boolean showRightCornerChat = true;
     }
 
     @Data
