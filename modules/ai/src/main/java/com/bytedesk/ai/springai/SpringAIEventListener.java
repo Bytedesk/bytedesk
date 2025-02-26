@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 15:18:58
+ * @LastEditTime: 2025-02-26 15:42:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -144,7 +144,7 @@ public class SpringAIEventListener {
             // 调用模型生成问答对
             zhipuaiChatService.ifPresent(service -> {
                 String qaPairs = service.generateFaqPairsAsync(document.getText());
-                // log.info("generateFaqPairsAsync qaPairs {}", qaPairs);
+                // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
                 faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
             });
             // ollamaChatService.ifPresent(service -> {

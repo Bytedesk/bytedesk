@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 15:08:01
+ * @LastEditTime: 2025-02-26 15:42:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
 
     private final Optional<OllamaChatService> ollamaChatService;
 
-    private final FaqRestService faqRestService;
+    // private final FaqRestService faqRestService;
     
     @Override
     public void afterSingletonsInstantiated() {
@@ -72,7 +72,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
                 // 根据文档内容，生成问答对
                 ollamaChatService.ifPresent(service -> {
                     String qaPairs = service.generateFaqPairsAsync(file.getContent());
-                    log.info("generateFaqPairsAsync qaPairs {}", qaPairs);
+                    log.info("ollamaChatService generateFaqPairsAsync qaPairs {}", qaPairs);
                     // faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
                 });
             }
