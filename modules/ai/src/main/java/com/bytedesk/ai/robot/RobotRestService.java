@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 14:08:38
+ * @LastEditTime: 2025-02-26 15:21:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,7 +52,6 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.settings.InviteSettings;
@@ -97,12 +96,22 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
+    @Override
+    public Optional<RobotEntity> findByUid(String uid) {
+        return robotRepository.findByUid(uid);
+    }
+
+    public Boolean existsByUid(String uid) {
+        return robotRepository.existsByUidAndDeleted(uid, false);
+    }
+
     public RobotResponse queryByUid(String uid) {
         Optional<RobotEntity> robotOptional = robotRepository.findByUid(uid);
         if (robotOptional.isPresent()) {
             return convertToResponse(robotOptional.get());
         } else {
-            throw new RuntimeException("robot not found");
+            throw new RuntimeException("robot not found by uid: " + uid);
         }
     }
 
@@ -346,16 +355,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return convertToResponse(updateRobot);
     }
 
-    @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
-    @Override
-    public Optional<RobotEntity> findByUid(String uid) {
-        return robotRepository.findByUid(uid);
-    }
-
-    public Boolean existsByUid(String uid) {
-        return robotRepository.existsByUidAndDeleted(uid, false);
-    }
-
+    
     @Override
     public RobotEntity save(RobotEntity entity) {
         try {

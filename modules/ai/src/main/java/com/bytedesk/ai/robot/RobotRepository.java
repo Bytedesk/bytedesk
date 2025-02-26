@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-24 16:26:05
+ * @LastEditTime: 2025-02-26 15:21:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,15 +21,15 @@ import org.springframework.stereotype.Repository;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- *
- */
 @Repository
 @Tag(name = "robot info")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface RobotRepository extends JpaRepository<RobotEntity, Long>, JpaSpecificationExecutor<RobotEntity> {
 
     Optional<RobotEntity> findByUid(String uid);
+
+    Optional<RobotEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
+    
     // Boolean existsByNicknameAndLevel(String nickname, String level);
     Boolean existsByUidAndDeleted(String uid, Boolean deleted);
 
