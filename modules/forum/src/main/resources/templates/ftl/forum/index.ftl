@@ -1,82 +1,166 @@
-<#import "layout/base.ftl" as base>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>微语用户社区/论坛</title>
+    <meta name="description" content="微语用户社区是一个面向开发者和用户的交流平台，提供优质的技术讨论、问答和知识分享环境">
+    <link href="/assets/vendor/bootstrap5/css/bootstrap.min.css" rel="stylesheet">
+    <#--  <link href="/css/ticket/index.css" rel="stylesheet">  -->
+    <style>
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+        .feature-box {
+            padding: 2rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .feature-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">微语社区</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#技术交流">技术交流</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#问答社区">问答社区</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#最佳实践">最佳实践</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#官方公告">官方公告</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<@base.base title="ByteDesk Forum - 首页">
-    <div class="row">
-        <!-- 左侧分类列表 -->
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-header">
-                    分类
-                </div>
-                <div class="list-group list-group-flush">
-                    <#list categories as category>
-                        <a href="/forum/category/${category.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            ${category.name}
-                            <span class="badge bg-primary rounded-pill">${category.postCount}</span>
-                        </a>
-                    </#list>
-                </div>
+    <div class="container my-5">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h1 class="display-4 mb-3">微语开发者社区</h1>
+                <p class="lead">面向开发者和用户的优质技术交流平台，提供技术讨论、问答和知识分享</p>
             </div>
         </div>
 
-        <!-- 右侧帖子列表 -->
-        <div class="col-md-9">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>最新帖子</span>
-                    <a href="/forum/posts/create" class="btn btn-primary btn-sm">发布帖子</a>
-                </div>
-                <div class="list-group list-group-flush">
-                    <#list posts.content as post>
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">
-                                    <a href="/forum/posts/${post.id}" class="text-decoration-none">${post.title}</a>
-                                </h5>
-                                <small>${post.createdAt?string('yyyy-MM-dd HH:mm')}</small>
-                            </div>
-                            <p class="mb-1 text-truncate">${post.content}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small>
-                                    <span class="me-2">
-                                        <i class="bi bi-eye"></i> ${post.viewCount}
-                                    </span>
-                                    <span class="me-2">
-                                        <i class="bi bi-chat"></i> ${post.commentCount}
-                                    </span>
-                                    <span>
-                                        <i class="bi bi-heart"></i> ${post.likeCount}
-                                    </span>
-                                </small>
-                                <small>作者: ${post.userId}</small>
-                            </div>
-                        </div>
-                    </#list>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">💬</div>
+                    <h3>技术交流</h3>
+                    <ul class="list-unstyled">
+                        <li>技术讨论版块</li>
+                        <li>产品反馈通道</li>
+                        <li>使用教程分享</li>
+                        <li>最佳实践案例</li>
+                        <li>问答社区互助</li>
+                        <li>官方公告发布</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- 分页 -->
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <#if posts.hasPrevious()>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=${posts.number - 1}">上一页</a>
-                        </li>
-                    </#if>
-                    
-                    <#list 0..posts.totalPages-1 as i>
-                        <li class="page-item ${(i == posts.number)?string('active', '')}">
-                            <a class="page-link" href="?page=${i}">${i + 1}</a>
-                        </li>
-                    </#list>
-                    
-                    <#if posts.hasNext()>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=${posts.number + 1}">下一页</a>
-                        </li>
-                    </#if>
-                </ul>
-            </nav>
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">✨</div>
+                    <h3>内容特性</h3>
+                    <ul class="list-unstyled">
+                        <li>Markdown支持</li>
+                        <li>富文本编辑器</li>
+                        <li>代码高亮显示</li>
+                        <li>图片智能上传</li>
+                        <li>附件管理系统</li>
+                        <li>多媒体内容支持</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🌟</div>
+                    <h3>社区互动</h3>
+                    <ul class="list-unstyled">
+                        <li>点赞与收藏</li>
+                        <li>评论与回复</li>
+                        <li>内容分享</li>
+                        <li>用户关注</li>
+                        <li>话题订阅</li>
+                        <li>积分奖励</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🎯</div>
+                    <h3>用户中心</h3>
+                    <ul class="list-unstyled">
+                        <li>个人资料管理</li>
+                        <li>发帖历史记录</li>
+                        <li>收藏内容管理</li>
+                        <li>等级成长体系</li>
+                        <li>专家认证</li>
+                        <li>贡献榜单</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🔍</div>
+                    <h3>智能搜索</h3>
+                    <ul class="list-unstyled">
+                        <li>全文内容检索</li>
+                        <li>高级筛选功能</li>
+                        <li>标签智能匹配</li>
+                        <li>相关推荐</li>
+                        <li>热门排序</li>
+                        <li>精准导航</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>安全保障</h3>
+                    <ul class="list-unstyled">
+                        <li>内容审核</li>
+                        <li>垃圾信息过滤</li>
+                        <li>敏感词屏蔽</li>
+                        <li>XSS/CSRF防护</li>
+                        <li>访问频率控制</li>
+                        <li>数据安全加密</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
-</@base.base>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">© 2024 微语. All rights reserved.</p>
+            <p class="text-muted">微语开发者社区</p>
+        </div>
+    </footer>
+
+    <script src="/assets/vendor/jquery-3.7.1.min.js"></script>
+    <script src="/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+    <#--  <script src="/js/ticket/index.js"></script>  -->
+</body>
+</html>

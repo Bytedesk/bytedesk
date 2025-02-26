@@ -187,17 +187,17 @@
                 <li><a href="/ai/" target="_blank">${i18n[lang]["ai"]}</a></li>
                 <li><a href="/ticket/" target="_blank">${i18n[lang]["ticket"]}</a></li>
                 <li><a href="/social/" target="_blank">${i18n[lang]["social"]}</a></li>                
-                <#--  <li><a href="/voc/" target="_blank">${i18n[lang]["voiceOfCustomer"]}</a></li>  -->
-                <#--  <li><a href="/forum/" target="_blank">${i18n[lang]["forum"]}</a></li>  -->
+                <li><a href="/voc/" target="_blank">${i18n[lang]["voiceOfCustomer"]}</a></li>
+                <li><a href="/forum/" target="_blank">${i18n[lang]["forum"]}</a></li>
             </ul>
 
             <#--  demo  -->
-            <#--  <h2>${i18n[lang]["demo"]}</h2>  -->
-            <#--  <ul>
+            <h2>${i18n[lang]["demo"]}</h2>
+            <ul>
                 <li><a href="/chat/demo/airline" target="_blank">${i18n[lang]["airline"]}</a></li>
                 <li><a href="/chat/demo/bytedesk" target="_blank">${i18n[lang]["bytedesk"]}</a></li>
                 <li><a href="/chat/demo/shopping" target="_blank">${i18n[lang]["shopping"]}</a></li>
-            </ul>  -->
+            </ul>
         </div>
     </#list>
 

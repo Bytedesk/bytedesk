@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 12:10:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-12 10:41:40
+ * @LastEditTime: 2025-02-26 22:46:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,26 +48,31 @@ public class VocController {
     // VOC首页
     // http://127.0.0.1:9003/voc/
     @GetMapping({"", "/"})
-    public String index(Model model,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String status,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        
-        Page<FeedbackEntity> feedbacks;
-        if (keyword != null || type != null || status != null) {
-            feedbacks = feedbackService.search(keyword, type, status, pageable);
-        } else {
-            feedbacks = feedbackService.getFeedbacks(pageable);
-        }
-        
-        model.addAttribute("feedbacks", feedbacks);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("type", type);
-        model.addAttribute("status", status);
-        
+    public String index() {
         return "voc/index";
     }
+
+    // @GetMapping({"", "/"})
+    // public String index(Model model,
+    //         @RequestParam(required = false) String keyword,
+    //         @RequestParam(required = false) String type,
+    //         @RequestParam(required = false) String status,
+    //         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        
+    //     Page<FeedbackEntity> feedbacks;
+    //     if (keyword != null || type != null || status != null) {
+    //         feedbacks = feedbackService.search(keyword, type, status, pageable);
+    //     } else {
+    //         feedbacks = feedbackService.getFeedbacks(pageable);
+    //     }
+        
+    //     model.addAttribute("feedbacks", feedbacks);
+    //     model.addAttribute("keyword", keyword);
+    //     model.addAttribute("type", type);
+    //     model.addAttribute("status", status);
+        
+    //     return "voc/index";
+    // }
 
     // 创建反馈页面
     @GetMapping("/feedback/create")

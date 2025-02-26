@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 11:51:21
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 10:42:05
+ * @LastEditors: jack ning github@bytedesk.com
+ * @LastEditTime: 2025-02-26 22:45:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,12 +54,18 @@ public class ForumViewController {
     // http://127.0.0.1:9003/forum/
     // 论坛首页
     @GetMapping({"", "/"})
-    public String index(Model model, 
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        model.addAttribute("categories", categoryRepository.findAll());
-        model.addAttribute("posts", postService.getPosts(pageable));
+    public String index() {
         return "forum/index";
     }
+
+
+    // @GetMapping({"", "/"})
+    // public String index(Model model, 
+    //         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    //     model.addAttribute("categories", categoryRepository.findAll());
+    //     model.addAttribute("posts", postService.getPosts(pageable));
+    //     return "forum/index";
+    // }
 
     // 分类页面
     @GetMapping("/category/{categoryId}")
