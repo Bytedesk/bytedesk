@@ -243,6 +243,20 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
+    // updateAvatar
+    @Transactional
+    public AgentResponse updateAvatar(AgentRequest request) {
+        AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        agent.setAvatar(request.getAvatar());
+        //
+        AgentEntity updatedAgent = save(agent);
+        if (updatedAgent == null) {
+            throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
+        }
+        return convertToResponse(updatedAgent);
+    }
+
+
     @Transactional
     public AgentResponse updateStatus(AgentRequest request) {
         // agentRepository.updateStatusByUid(request.getStatus(), request.getUid());

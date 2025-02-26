@@ -61,12 +61,13 @@ services:
       # bytedesk config
       BYTEDESK_DEBUG: true
       BYTEDESK_EDITION: enterprise
+      BYTEDESK_VERSION: 0.6.4
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: false
-      BYTEDESK_NAME: 
-      BYTEDESK_LOGO: 
-      BYTEDESK_DESCRIPTION: 
-      BYTEDESK_VERSION: 0.6.4
+      BYTEDESK_CUSTOM_NAME: 
+      BYTEDESK_CUSTOM_LOGO: 
+      BYTEDESK_CUSTOM_DESCRIPTION: 
+      BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: true
       # Admin config
       BYTEDESK_ADMIN_EMAIL: admin@email.com
       BYTEDESK_ADMIN_PASSWORD: admin

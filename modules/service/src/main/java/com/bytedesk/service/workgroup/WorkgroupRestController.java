@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-04 12:09:14
+ * @LastEditTime: 2025-02-26 10:10:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.service.workgroup;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,6 +61,26 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest request) {
 
         WorkgroupResponse workgroup = workgroupService.update(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(workgroup));
+    }
+
+    // updateAvatar
+    @ActionAnnotation(title = "workgroup", action = "updateAvatar", description = "update workgroup avatar")
+    @PostMapping("/update/avatar")
+    public ResponseEntity<?> updateAvatar(@RequestBody WorkgroupRequest request) {
+
+        WorkgroupResponse workgroup = workgroupService.updateAvatar(request);
+
+        return ResponseEntity.ok(JsonResult.success(workgroup));
+    }
+
+    // updateStatus
+    @ActionAnnotation(title = "workgroup", action = "updateStatus", description = "update workgroup status")
+    @PostMapping("/update/status")
+    public ResponseEntity<?> updateStatus(@RequestBody WorkgroupRequest request) {
+
+        WorkgroupResponse workgroup = workgroupService.updateStatus(request);
         //
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
