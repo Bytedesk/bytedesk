@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 15:39:09
+ * @LastEditTime: 2025-02-26 16:55:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.ai.robot;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,13 +23,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
+// import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
+import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotJson;
+import com.bytedesk.ai.springai.SpringAIVectorService;
+import com.bytedesk.ai.springai.demo.bytedesk.SpringAIBytedeskService;
+import com.bytedesk.ai.springai.demo.utils.FileContent;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -80,6 +84,18 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     private final RobotJsonLoader robotJsonService;
 
     private final CategoryRestService categoryService;
+
+    private final SpringAIBytedeskService springAIBytedeskService;
+
+    private final StringRedisTemplate stringRedisTemplate;
+
+    private final SpringAIVectorService springAIVectorService;
+
+    // private final Optional<OllamaChatService> ollamaChatService;
+
+    private final Optional<ZhipuaiChatService> zhipuaiChatService;
+
+    private final FaqRestService faqRestService;
 
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
@@ -412,7 +428,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         //
         RobotRequest robotRequest = RobotRequest.builder()
                 .nickname(I18Consts.I18N_ROBOT_NICKNAME)
-                .name(I18Consts.I18N_ROBOT_NAME)
                 .build();
         robotRequest.setUid(uid);
         robotRequest.setType(RobotTypeEnum.SERVICE.name());
@@ -441,7 +456,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         //
         return create(robotRequest);
     }
-
+    
     public void initRobotJson(String orgUid, String level) {
         //
         List<RobotJson> robotJsons = robotJsonService.loadRobots();
@@ -544,5 +559,41 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         return convertToResponse(savedRobot);
     }
+
+    public void initDemoBytedesk() {
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // 首先redis中是否已经初始化此数据，如果没有，继续执行演示数据初始化
+        String isInit = stringRedisTemplate.opsForValue().get(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY);
+
+        if (isInit == null) {
+            String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
+            // 默认使用演示文档内容，填充且只填充超级管理员演示机器人
+            List<FileContent> files = springAIBytedeskService.getAllFiles();
+            // 计数器
+            final int[] count = {0};
+            final int MAX_CALLS = 1;
+            
+            // 写入到redis vector 中
+            for (FileContent file : files) {
+                springAIVectorService.readText(file.getFilename(), file.getContent(), kbUid, orgUid);
+                
+                // 只在前两次调用zhipuaiChatService
+                if (count[0] < MAX_CALLS) {
+                    zhipuaiChatService.ifPresent(service -> {
+                        String qaPairs = service.generateFaqPairsAsync(file.getContent());
+                        log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
+                        faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
+                        count[0]++;
+                    });
+                }
+            }
+            // 设置redis key 为已初始化
+            stringRedisTemplate.opsForValue().set(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY, "true");
+            // 删除 redis key
+            // redisTemplate.delete(RobotConsts.ROBOT_INIT_DEMO_KEY);
+        }
+        
+    }
+
 
 }
