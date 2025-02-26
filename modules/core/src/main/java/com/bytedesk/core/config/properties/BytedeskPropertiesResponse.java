@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 20:45:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 10:21:02
+ * @LastEditTime: 2025-02-26 10:25:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,6 +35,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     // private String version;
     // // 是否启用右下角聊天
     // private Boolean rightCornerChatEnabled;
+    
     // 
     private Custom custom;
     private Admin admin;
