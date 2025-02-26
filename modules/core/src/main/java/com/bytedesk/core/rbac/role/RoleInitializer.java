@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class RoleInitializer {
 
-    private final RoleService roleService;
+    private final RoleRestService roleService;
 
     // 初始化角色, 在 OrganizationInitializer 中调用
     public void init() {

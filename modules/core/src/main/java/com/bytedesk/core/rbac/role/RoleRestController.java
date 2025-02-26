@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/role")
 public class RoleRestController extends BaseRestController<RoleRequest> {
 
-    private final RoleService roleService;
+    private final RoleRestService roleService;
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @GetMapping("/query/super")

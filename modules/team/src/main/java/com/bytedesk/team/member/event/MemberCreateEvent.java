@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-11-07 16:30:49
+ * @Date: 2024-07-04 10:41:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 16:30:52
+ * @LastEditTime: 2024-07-04 10:41:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,22 +11,23 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.role;
+package com.bytedesk.team.member.event;
 
 import org.springframework.context.ApplicationEvent;
+
+import com.bytedesk.team.member.MemberEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RoleCreateEvent extends ApplicationEvent {
+public class MemberCreateEvent extends ApplicationEvent {
 
-    private RoleEntity roleEntity;
+    private MemberEntity member;
 
-    public RoleCreateEvent(Object source, RoleEntity roleEntity) {
+    public MemberCreateEvent(Object source, MemberEntity member) {
         super(source);
-        this.roleEntity = roleEntity;
+        this.member = member;
     }
-    
 }

@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.rbac.role.event.RoleCreateEvent;
+import com.bytedesk.core.rbac.role.event.RoleUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
