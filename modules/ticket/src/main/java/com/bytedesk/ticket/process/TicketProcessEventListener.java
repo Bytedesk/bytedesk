@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-17 15:26:30
+ * @LastEditTime: 2025-02-26 12:57:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.process.event.TicketProcessCreateEvent;
 
@@ -75,7 +76,7 @@ public class TicketProcessEventListener {
             }
 
             // 生成 processUid 并创建流程记录
-            String processUid = (orgUid + "_" + TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE).toLowerCase();
+            String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE);
             TicketProcessRequest processRequest = TicketProcessRequest.builder()
                     .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                     .key(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)

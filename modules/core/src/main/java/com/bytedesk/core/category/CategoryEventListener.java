@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-21 14:28:06
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 15:34:31
+ * @LastEditTime: 2025-02-26 12:58:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 
 import lombok.AllArgsConstructor;
@@ -48,7 +49,7 @@ public class CategoryEventListener {
                 // .orgUid(orgUid)
                 .build();
         categoryFaqDemoRequest1.setType(CategoryTypeEnum.FAQ.name());
-        categoryFaqDemoRequest1.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_1);
+        categoryFaqDemoRequest1.setUid(Utils.formatUid(orgUid, I18Consts.I18N_FAQ_CATEGORY_DEMO_1));
         categoryFaqDemoRequest1.setOrgUid(orgUid);
         categoryService.create(categoryFaqDemoRequest1);
         //
@@ -60,8 +61,8 @@ public class CategoryEventListener {
                 // .orgUid(orgUid)
                 .build();
         categoryFaqDemoRequest2.setType(CategoryTypeEnum.FAQ.name());
-        categoryFaqDemoRequest2.setUid(orgUid + I18Consts.I18N_FAQ_CATEGORY_DEMO_2);
-        categoryFaqDemoRequest1.setOrgUid(orgUid);
+        categoryFaqDemoRequest2.setUid(Utils.formatUid(orgUid, I18Consts.I18N_FAQ_CATEGORY_DEMO_2));
+        categoryFaqDemoRequest2.setOrgUid(orgUid);
         categoryService.create(categoryFaqDemoRequest2);
 
     }

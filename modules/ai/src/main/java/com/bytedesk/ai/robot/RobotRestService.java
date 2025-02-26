@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:33:14
+ * @LastEditTime: 2025-02-26 12:54:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,6 +50,7 @@ import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -406,9 +407,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     // 初始化
     public void initDefaultRobot(String orgUid) {
         // 为每个组织创建一个机器人
-        createDefaultRobot(orgUid, uidUtils.getUid());
+        createDefaultRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.DEFAULT_ROBOT_DEMO_UID));
         // 为每个组织创建一个客服助手
-        createDefaultAgentAssistantRobot(orgUid, uidUtils.getUid());
+        createDefaultAgentAssistantRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.DEFAULT_ROBOT_DEMO_UID));
         // 为每个组织自动导入智能体
         initRobotJson(orgUid, LevelEnum.ORGANIZATION.name());
     }
@@ -416,8 +417,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     // 为每个组织创建一个机器人
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
         List<String> faqUids = Arrays.asList(
-                orgUid + FaqConsts.FAQ_DEMO_UID_1,
-                orgUid + FaqConsts.FAQ_DEMO_UID_2);
+                Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_1),
+                Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_2));
         //
         RobotRequest robotRequest = RobotRequest.builder()
                 .nickname(I18Consts.I18N_ROBOT_NICKNAME)
@@ -449,7 +450,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         //
         List<RobotJson> robotJsons = robotJsonService.loadRobots();
         for (RobotJson robotJson : robotJsons) {
-            String uid = orgUid + "_" + robotJson.getUid();
+            String uid = Utils.formatUid(orgUid, robotJson.getUid());
             if (!existsByUid(uid)) {
                 String categoryUid = null;
                 Optional<CategoryEntity> categoryOptional = categoryService
@@ -482,7 +483,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     public RobotResponse createPromptRobotFromJson(String orgUid, RobotJson robotJson, String categoryUid,
             String level) {
         log.info("robotJson {}", robotJson.getNickname());
-        String uid = orgUid + "_" + robotJson.getUid();
+        String uid = Utils.formatUid(orgUid, robotJson.getUid());
         RobotLlm llm = RobotLlm.builder().prompt(robotJson.getPrompt()).build();
         //
         RobotEntity robot = RobotEntity.builder()

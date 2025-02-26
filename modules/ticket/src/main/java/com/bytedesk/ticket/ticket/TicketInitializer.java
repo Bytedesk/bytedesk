@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:34:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 22:33:03
+ * @LastEditTime: 2025-02-26 12:57:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRequest;
 import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +76,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .build();
             categoryRequest.setType(CategoryTypeEnum.TICKET.name());
-            categoryRequest.setUid(orgUid + category);
+            categoryRequest.setUid(Utils.formatUid(orgUid, category));
             categoryRequest.setOrgUid(orgUid);
             categoryService.create(categoryRequest);
             // } else { // 子类

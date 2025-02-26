@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 10:22:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 16:12:31
+ * @LastEditTime: 2025-02-26 12:56:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,6 +57,23 @@ public class Utils {
 
     public static String getUid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
+    public static String formatUid(String orgUid, String uid) {
+        // 如果都为空，则调用getUid
+        if ((orgUid == null || orgUid.isEmpty()) && (uid == null || uid.isEmpty())) {
+            return getUid();
+        }
+        // 如果orgUid为空，则返回uid
+        if (orgUid == null || orgUid.isEmpty()) {
+            return uid;
+        }   
+        // 如果uid为空，则返回orgUid
+        if (uid == null || uid.isEmpty()) {
+            return orgUid;
+        }
+        // 如果orgUid和uid都不为空，则返回orgUid_uid
+        return orgUid + "_" + uid.toLowerCase();
     }
 
 
