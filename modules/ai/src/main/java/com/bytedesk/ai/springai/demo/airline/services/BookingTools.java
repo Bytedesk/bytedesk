@@ -1,3 +1,16 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-02-27 11:18:12
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-27 12:32:50
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.ai.springai.demo.airline.services;
 
 import java.time.LocalDate;
@@ -6,8 +19,8 @@ import java.util.function.Function;
 import com.bytedesk.ai.springai.demo.airline.data.BookingStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,10 +28,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.core.NestedExceptionUtils;
 
+@Slf4j
 @Configuration
 public class BookingTools {
-
-	private static final Logger logger = LoggerFactory.getLogger(BookingTools.class);
 
 	@Autowired
 	private FlightBookingService flightBookingService;
@@ -45,7 +57,7 @@ public class BookingTools {
 				return flightBookingService.getBookingDetails(request.bookingNumber(), request.name());
 			}
 			catch (Exception e) {
-				logger.warn("Booking details: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
+				log.warn("Booking details: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
 				return new BookingDetails(request.bookingNumber(), request.name(), null, null, null, null, null);
 			}
 		};
