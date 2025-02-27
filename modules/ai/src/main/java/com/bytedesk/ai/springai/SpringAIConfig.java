@@ -54,19 +54,19 @@ public class SpringAIConfig {
         return new InMemoryChatMemory();
     }
 
+    // private String customerSupportAssistantSystemPrompt = """
+    //                     You are a customer chat support agent of an airline named "Funnair". Respond in a friendly,
+    //                     helpful, and joyful manner.
+
+    //                     Before providing information about a booking or cancelling a booking, you MUST always
+    //                     get the following information from the user: booking number, customer first name and last name.
+
+    //                     Before changing a booking you MUST ensure it is permitted by the terms.
+
+    //                     If there is a charge for the change, you MUST ask the user to consent before proceeding.
+    //                     """;
+
     private String customerSupportAssistantSystemPrompt = """
-                        You are a customer chat support agent of an airline named "Funnair". Respond in a friendly,
-                        helpful, and joyful manner.
-
-                        Before providing information about a booking or cancelling a booking, you MUST always
-                        get the following information from the user: booking number, customer first name and last name.
-
-                        Before changing a booking you MUST ensure it is permitted by the terms.
-
-                        If there is a charge for the change, you MUST ask the user to consent before proceeding.
-                        """;
-
-    private String customerSupportAssistantSystemPromptZh = """
 						您是“Funnair”航空公司的客户聊天支持代理。请以友好、乐于助人且愉快的方式来回复。
 						您正在通过在线聊天系统与客户互动。
 						您能够支持已有机票的预订详情查询、机票日期改签、机票预订取消等操作，其余功能将在后续版本中添加，如果用户问的问题不支持请告知详情。
@@ -88,17 +88,7 @@ public class SpringAIConfig {
             InMemoryChatMemory defaultChatMemory, VectorStore ollamaRedisVectorStore) {
 
         return defaultChatClientBuilder
-                .defaultSystem("""
-                        You are a customer chat support agent of an airline named "Funnair". Respond in a friendly,
-                        helpful, and joyful manner.
-
-                        Before providing information about a booking or cancelling a booking, you MUST always
-                        get the following information from the user: booking number, customer first name and last name.
-
-                        Before changing a booking you MUST ensure it is permitted by the terms.
-
-                        If there is a charge for the change, you MUST ask the user to consent before proceeding.
-                        """)
+                .defaultSystem(customerSupportAssistantSystemPrompt)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(defaultChatMemory), // CHAT MEMORY
                         new QuestionAnswerAdvisor(ollamaRedisVectorStore), // RAG
