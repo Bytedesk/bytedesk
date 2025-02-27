@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 16:18:42
+ * @LastEditTime: 2025-02-27 13:20:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,6 +32,19 @@ public class QueueMemberSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+
+            if (request.getStartTime() != null && request.getEndTime() != null) {
+                predicates.add(criteriaBuilder.between(root.get("createdAt"), request.getStartTime(), request.getEndTime()));
+            }
+
+            // 可选条件
+            if (StringUtils.hasText(request.getWorkgroupUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("workgroupUid"), request.getWorkgroupUid()));
+            }
+            if (StringUtils.hasText(request.getAgentUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("agentUid"), request.getAgentUid()));
+            }
+
             // 根据visitorNickname查询
             if (StringUtils.hasText(request.getVisitorNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("visitorNickname"), "%" + request.getVisitorNickname() + "%"));
@@ -48,6 +61,30 @@ public class QueueMemberSpecification extends BaseSpecification {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    // private Specification<QueueMemberEntity> createQueueMemberSpecification(
+    //         String orgUid, String workgroupUid, String agentUid, 
+    //         LocalDateTime startTime, LocalDateTime endTime) {
+        
+    //     return (root, query, criteriaBuilder) -> {
+    //         List<Predicate> predicates = new ArrayList<>();
+            
+    //         // 必填条件
+    //         predicates.add(criteriaBuilder.equal(root.get("orgUid"), orgUid));
+    //         predicates.add(criteriaBuilder.between(root.get("createdAt"), startTime, endTime));
+            
+    //         // 可选条件
+    //         if (workgroupUid != null) {
+    //             predicates.add(criteriaBuilder.equal(root.get("workgroupUid"), workgroupUid));
+    //         }
+    //         if (agentUid != null) {
+    //             predicates.add(criteriaBuilder.equal(root.get("agentUid"), agentUid));
+    //         }
+            
+    //         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+    //     };
+    // }
+
 
     // public static Specification<QueueMemberEntity> hasUserUid(String uid, String dbType) {
     //     return (Root<QueueMemberEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {

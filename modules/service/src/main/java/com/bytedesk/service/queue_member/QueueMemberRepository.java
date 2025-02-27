@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 16:41:39
+ * @LastEditTime: 2025-02-27 13:18:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,7 +48,7 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 
 //     List<QueueMemberEntity> findByAgentUidAndCreatedAtBetween(String agentUid, LocalDateTime startTime, LocalDateTime endTime);
 
-    List<QueueMemberEntity> findByOrgUidAndWorkgroupUidAndAgentUidAndCreatedAtBetween(String orgUid, String workgroupUid, String agentUid, LocalDateTime startTime, LocalDateTime endTime);
+//     List<QueueMemberEntity> findByOrgUidAndWorkgroupUidAndAgentUidAndCreatedAtBetween(String orgUid, String workgroupUid, String agentUid, LocalDateTime startTime, LocalDateTime endTime);
 
 
     int countByQueueUidAndStatus(String queueUid, String status);
