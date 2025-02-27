@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-27 14:58:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 16:13:00
+ * @LastEditTime: 2025-02-27 09:23:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.agentsflex.core.llm.Llm;
@@ -41,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class OllamaChatService {
 
     @Value("${spring.ai.ollama.base-url}")

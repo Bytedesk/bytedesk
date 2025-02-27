@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 21:02:51
+ * @LastEditTime: 2025-02-27 09:38:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,8 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 // import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
 import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
-import com.bytedesk.ai.robot.RobotJsonLoader.RobotJson;
+import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
+import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.springai.SpringAIVectorService;
 import com.bytedesk.ai.springai.demo.bytedesk.SpringAIBytedeskService;
 import com.bytedesk.ai.springai.demo.utils.FileContent;
@@ -87,7 +88,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final ThreadRestService threadService;
 
-    private final RobotJsonLoader robotJsonService;
+    private final RobotJsonLoader robotJsonLoader;
 
     private final CategoryRestService categoryService;
 
@@ -95,7 +96,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    private final SpringAIVectorService springAIVectorService;
+    private final Optional<SpringAIVectorService> springAIVectorService;
 
     // private final Optional<OllamaChatService> ollamaChatService;
 
@@ -536,8 +537,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     
     public void initRobotJson(String orgUid, String level) {
         //
-        List<RobotJson> robotJsons = robotJsonService.loadRobots();
-        for (RobotJson robotJson : robotJsons) {
+        RobotConfiguration config = robotJsonLoader.loadRobots();
+        List<Robot> robots = config.getRobots();
+        for (Robot robotJson : robots) {
             String uid = Utils.formatUid(orgUid, robotJson.getUid());
             if (!existsByUid(uid)) {
                 String categoryUid = null;
@@ -568,17 +570,26 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     }
 
     // 从json创建平台智能体
-    public RobotResponse createPromptRobotFromJson(String orgUid, RobotJson robotJson, String categoryUid,
+    public RobotResponse createPromptRobotFromJson(String orgUid, Robot robotJson, String categoryUid,
             String level) {
-        log.info("robotJson {}", robotJson.getNickname());
+        log.info("robotJson {}", robotJson.getName());
         String uid = Utils.formatUid(orgUid, robotJson.getUid());
-        RobotLlm llm = RobotLlm.builder().prompt(robotJson.getPrompt()).build();
-        //
+
+        // Get locale data (default to zh_cn if available, fallback to en)
+        RobotJsonLoader.LocaleData localeData = robotJson.getI18n().getZh_cn() != null ? 
+            robotJson.getI18n().getZh_cn() : robotJson.getI18n().getEn();
+
+        // Create RobotLlm with prompt from locale data
+        RobotLlm llm = RobotLlm.builder()
+            .prompt(localeData.getPrompt())
+            .build();
+
+        // Create RobotEntity with data from both Robot and LocaleData
         RobotEntity robot = RobotEntity.builder()
                 .name(robotJson.getName())
-                .nickname(robotJson.getNickname())
+                .nickname(localeData.getNickname())
                 .avatar(AvatarConsts.getDefaultRobotAvatar())
-                .description(robotJson.getDescription())
+                .description(localeData.getDescription())
                 .type(robotJson.getType())
                 .categoryUid(categoryUid)
                 .level(level)
@@ -652,8 +663,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             
             // 写入到redis vector 中
             for (FileContent file : files) {
-                springAIVectorService.readText(file.getFilename(), file.getContent(), kbUid, orgUid);
-                
+                springAIVectorService.ifPresent(service -> {
+                    service.readText(file.getFilename(), file.getContent(), kbUid, orgUid);
+                });
                 // 只在前两次调用zhipuaiChatService
                 if (count[0] < MAX_CALLS) {
                     zhipuaiChatService.ifPresent(service -> {
@@ -668,6 +680,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             stringRedisTemplate.opsForValue().set(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY, "true");
             // 删除 redis key
             // redisTemplate.delete(RobotConsts.ROBOT_INIT_DEMO_KEY);
+        } else {
+            log.info("initDemoBytedesk already initialized");
         }
         
     }

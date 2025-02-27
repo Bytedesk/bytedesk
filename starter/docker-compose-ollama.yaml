@@ -148,7 +148,7 @@ services:
       SPRING_AI_OLLAMA_EMBEDDING_ENABLED: true
       SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: qwen2.5:1.5b
       # deepseek
-      # https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html
+      # 申请key https://api-docs.deepseek.com/zh-cn/
       SPRING_AI_DEEPSEEK_API_KEY: 'sk-xxx'
       SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com
       SPRING_AI_DEEPSEEK_CHAT_ENABLED: false

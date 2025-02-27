@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 10:54:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 11:28:19
+ * @LastEditTime: 2025-02-27 09:29:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.springai.demo.airline;
 import java.time.LocalDate;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/demo/airline")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIAirlineController {
 
     private final ChatClient airlineTicketChatClient;

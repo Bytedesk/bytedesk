@@ -1,263 +1,725 @@
-[
-  {
-    "uid": "1",
-    "name": "void_agent",
-    "nickname": "创建空白智能体 - void agent",
-    "type": "LLM",
-    "category": "i18n.module.void",
-    "prompt": "请回答用户提出的问题",
-    "description": "创建一个空白智能体，不设置默认prompt，不设置默认角色。"
+{
+  "version": "1.0.0",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "version": { "type": "string", "description": "Version number of the configuration" },
+      "categories": { 
+        "type": "object",
+        "description": "Standard categories enum",
+        "properties": {
+          "service": { "const": "i18n.module.service", "description": "General customer service related bots" },
+          "ticket": { "const": "i18n.module.ticket", "description": "Ticket management related bots" },
+          "void": { "const": "i18n.module.void", "description": "Basic empty bots" }
+        }
+      },
+      "robots": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["uid", "name", "type", "category", "i18n"],
+          "properties": {
+            "uid": { "type": "string", "description": "Unique identifier for the robot" },
+            "name": { "type": "string", "description": "Technical name of the robot" },
+            "type": { "type": "string", "enum": ["LLM"], "description": "Type of the robot" },
+            "category": { "type": "string", "description": "Category of the robot" },
+            "i18n": {
+              "type": "object",
+              "required": ["en", "zh_cn", "zh_tw"],
+              "properties": {
+                "en": { "$ref": "#/schema/definitions/localeContent" },
+                "zh_cn": { "$ref": "#/schema/definitions/localeContent" },
+                "zh_tw": { "$ref": "#/schema/definitions/localeContent" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "localeContent": {
+        "type": "object",
+        "required": ["nickname", "prompt", "description"],
+        "properties": {
+          "nickname": { "type": "string", "description": "Display name of the robot" },
+          "prompt": { "type": "string", "description": "Prompt template for the robot" },
+          "description": { "type": "string", "description": "Description of the robot's functionality" }
+        }
+      }
+    }
   },
-  {
-    "uid": "2",
-    "name": "customer_service",
-    "nickname": "客服问答 - 用于访客端",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关",
-    "description": "创建一个客服问答机器人"
+  "categories": {
+    "service": "i18n.module.service",
+    "ticket": "i18n.module.ticket",
+    "void": "i18n.module.void"
   },
-  {
-    "uid": "3",
-    "name": "query_expansion",
-    "nickname": "问题扩写",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
-    "description": "创建一个问题扩写机器人"
-  },
-  {
-    "uid": "4",
-    "name": "intent_rewrite",
-    "nickname": "意图改写",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
-    "description": "创建一个意图改写机器人"
-  },
-  {
-    "uid": "5",
-    "name": "intent_classification",
-    "nickname": "意图识别",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "根据用户的问题，识别用户的意图，并返回意图的类型。",
-    "description": "创建一个意图识别机器人"
-  },
-  {
-    "uid": "6",
-    "name": "emotion_analysis",
-    "nickname": "情绪分析",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "根据用户的问题，识别用户的情绪，并返回情绪的类型。",
-    "description": "创建一个情绪分析机器人"
-  },
-  {
-    "uid": "7",
-    "name": "robot_inspection",
-    "nickname": "机器人质检",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "对机器人回答的问题进行评测，并给出评测结果。",
-    "description": "创建一个机器人质检机器人"
-  },
-  {
-    "uid": "8",
-    "name": "agent_inspection",
-    "nickname": "客服质检",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "对客服的回答进行质检，并给出质检结果。",
-    "description": "创建一个客服质检机器人"
-  },
-  {
-    "uid": "9",
-    "name": "session_summary",
-    "nickname": "会话小结",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "对会话进行总结，并给出总结结果。",
-    "description": "创建一个会话小结机器人"
-  },
-  {
-    "uid": "10",
-    "name": "ticket_assistant",
-    "nickname": "工单助手",
-    "type": "LLM",
-    "category": "i18n.module.ticket",
-    "prompt": "从会话记录中提取工单信息，自动填写工单表单。",
-    "description": "创建一个工单助手机器人"
-  },
-  {
-    "uid": "11",
-    "name": "ticket_solution_recommendation",
-    "nickname": "工单解决方案推荐",
-    "type": "LLM",
-    "category": "i18n.module.ticket",
-    "prompt": "访客填写完工单标题和描述后，自动搜索解决方案和FAQ，通过大模型给出解决方案。",
-    "description": "创建一个工单解决方案推荐机器人"
-  },
-  {
-    "uid": "12",
-    "name": "ticket_summary",
-    "nickname": "工单小结",
-    "type": "LLM",
-    "category": "i18n.module.ticket",
-    "prompt": "对工单进行总结，并给出总结结果。",
-    "description": "创建一个工单小结机器人"
-  },
-  {
-    "uid": "13",
-    "name": "visitor_portrait",
-    "nickname": "访客画像",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "对访客进行画像，并给出画像结果。",
-    "description": "创建一个访客画像机器人"
-  },
-  {
-    "uid": "14",
-    "name": "visitor_invitation",
-    "nickname": "接客助手",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "主动邀请访客进行咨询，并给出邀请语，不限于1条，可连续邀请，可设置邀请间隔时间。",
-    "description": "创建一个接客助手机器人"
-  },
-  {
-    "uid": "15",
-    "name": "visitor_recommendation",
-    "nickname": "导购助手",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "针对电商网站，根据访客的浏览行为，给出推荐商品，并给出推荐理由。",
-    "description": "创建一个导购助手机器人"
-  },
-  {
-    "uid": "16",
-    "name": "customer_assistant",
-    "nickname": "客服助手",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度",
-    "description": "创建一个客服助手机器人"
-  },
-  {
-    "uid": "17",
-    "name": "pre_sale_customer_assistant",
-    "nickname": "售前客服",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "针对售前咨询的客户，给出专业的解答，并给出推荐商品，并给出推荐理由。",
-    "description": "创建一个售前客服机器人"
-  },
-  {
-    "uid": "18",
-    "name": "after_sale_customer_assistant",
-    "nickname": "售后客服",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "针对售后咨询的客户，给出专业的解答，并给出解决方案，并给出解决方案的理由。",
-    "description": "创建一个售后客服机器人"
-  },
-  {
-    "uid": "19",
-    "name": "logistics_customer_assistant",
-    "nickname": "物流客服",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "针对物流咨询的客户，给出专业的解答，并给出解决方案，并给出解决方案的理由。",
-    "description": "创建一个物流客服机器人"
-  },
-  {
-    "uid": "20",
-    "name": "language_translation",
-    "nickname": "语言翻译",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "针对不同的语言，给出翻译结果。",
-    "description": "创建一个语言翻译机器人"
-  },
-  {
-    "uid": "21",
-    "name": "language_recognition",
-    "nickname": "语言识别",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "针对不同的语言，给出识别结果。",
-    "description": "创建一个语言识别机器人"
-  },
-  {
-    "uid": "22",
-    "name": "semantic_analysis",
-    "nickname": "语义分析",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "从会话记录中提取语义信息，并给出语义信息。",
-    "description": "创建一个语义分析机器人"
-  },
-  {
-    "uid": "23",
-    "name": "entity_recognition",
-    "nickname": "实体识别",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "从会话记录中提取实体信息，并给出实体信息。",
-    "description": "创建一个实体识别机器人"
-  },
-  {
-    "uid": "24",
-    "name": "sentiment_analysis",
-    "nickname": "情感分析",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "从会话记录中提取情感信息，并给出情感信息。",
-    "description": "创建一个情感分析机器人"
-  },
-  {
-    "uid": "25",
-    "name": "session_summary",
-    "nickname": "会话摘要",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "从会话记录中提取摘要信息，在会话结束后，快速生成会话摘要，包含客户问题及解决方案，同时支持人工校审和进一步编辑。",
-    "description": "创建一个会话摘要机器人"
-  },
-  {
-    "uid": "26",
-    "name": "session_classification",
-    "nickname": "会话分类",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "根据设定的标签，在会话结束后，会自动将会话进行归类，同时支持客服手动更正，大模型会基于更正结果不断反哺算法优化，逐步提升分类的准确率",
-    "description": "创建一个会话分类机器人"
-  },
-  {
-    "uid": "27",
-    "name": "generate_ticket",
-    "nickname": "生成工单",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "根据当前会话，如果需要提交工单跟进后续服务时，可以根据工单所需的字段，一键提取会话中的关联内容，如客户名字、关联订单、联系方式、工单内容等，还可以通过识别访客情绪，建议工单的优先级。",
-    "description": "创建一个生成工单机器人"
-  },
-  {
-    "uid": "28",
-    "name": "customer_service_expert",
-    "nickname": "客服专家",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。\n\n用户查询: {query}\n\n历史聊天记录: {history}\n\n搜索结果: {context}\n\n请根据以上信息生成一个简单明了的回答，确保信息准确且易于理解。\n当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.\n另外，请提供更多相关的问答对。\n回答内容请以JSON格式输出，格式如下：\n{\n  \"answer\": \"回答内容\",\n  \"additional_qa_pairs\": [\n    {\"question\": \"相关问题1\", \"answer\": \"相关答案1\"},\n    {\"question\": \"相关问题2\", \"answer\": \"相关答案2\"}\n  ]\n}",
-    "description": "创建一个客服专家机器人"
-  },
-  {
-    "uid": "29",
-    "name": "generate_faq",
-    "nickname": "生成FAQ",
-    "type": "LLM",
-    "category": "i18n.module.service",
-    "prompt": "基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:\n\n1. 问题部分：\n- 为同一个主题创建多个不同表述的问题，确保问题的多样性\n- 每个问题应考虑用户可能的多种问法，例如：\n  - 直接询问（如\"什么是...？\"）\n  - 请求确认（如\"是否可以说...？\"）\n  - 如何做（如\"如何实现...？\"）\n  - 为什么（如\"为什么需要...？\"）\n  - 比较类（如\"...和...有什么区别？\"）\n\n2. 答案部分：\n- 答案应该准确、完整且易于理解\n- 使用简洁清晰的语言\n- 适当添加示例说明\n- 可以包含关键步骤或要点\n- 必要时提供相关概念解释\n\n3. 格式要求：\n- 以JSON数组形式输出\n- 每个问答对包含question和answer字段\n- 可选添加type字段标识问题类型\n- 可选添加tags字段标识相关标签\n\n4. 质量控制：\n- 确保问答对之间不重复\n- 问题应该有实际意义和价值\n- 答案需要准确且有帮助\n- 覆盖文本中的重要信息点\n\n5. 示例格式：\n{\n  \"qaPairs\": [\n    {\n      \"id\": \"1\",\n      \"question\": \"问题描述\",\n      \"answer\": \"答案内容\",\n      \"tags\": [\"标签1\", \"标签2\"]\n    }\n  ]\n}\n\n给定文本：\n{chunk}\n\n请基于这个文本生成问答对",
-    "description": "创建一个生成FAQ机器人"
-  }
-]
+  "robots": [
+    {
+      "uid": "1",
+      "name": "void_agent",
+      "type": "LLM",
+      "category": "i18n.module.void",
+      "i18n": {
+        "en": {
+          "nickname": "Create Empty Agent - void agent",
+          "prompt": "Please answer the user's questions",
+          "description": "Create an empty agent without default prompt or default role."
+        },
+        "zh_cn": {
+          "nickname": "创建空白智能体 - void agent",
+          "prompt": "请回答用户提出的问题",
+          "description": "创建一个空白智能体，不设置默认prompt，不设置默认角色。"
+        },
+        "zh_tw": {
+          "nickname": "創建空白智能體 - void agent",
+          "prompt": "請回答用戶提出的問題",
+          "description": "創建一個空白智能體，不設置默認prompt，不設置默認角色。"
+        }
+      }
+    },
+    {
+      "uid": "2",
+      "name": "customer_service",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Customer Service Q&A - For Visitors",
+          "prompt": "Based on the provided document information, answer the questions. Document information: {context} Question: {query} When the user's question cannot be answered based on the document content or you are unsure, reply: No relevant answer found",
+          "description": "Create a customer service Q&A bot"
+        },
+        "zh_cn": {
+          "nickname": "客服问答 - 用于访客端",
+          "prompt": "根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关",
+          "description": "创建一个客服问答机器人"
+        },
+        "zh_tw": {
+          "nickname": "客服問答 - 用於訪客端",
+          "prompt": "根據提供的文檔信息回答問題，文檔信息如下: {context} 問題: {query} 當用戶提出的問題無法根據文檔內容進行回覆或者你也不清楚時，回覆:未查找到相關",
+          "description": "創建一個客服問答機器人"
+        }
+      }
+    },
+    {
+      "uid": "3",
+      "name": "query_expansion",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Query Expansion",
+          "prompt": "Based on the user's question, generate multiple questions with different expressions while ensuring question diversity.",
+          "description": "Create a query expansion bot"
+        },
+        "zh_cn": {
+          "nickname": "问题扩写",
+          "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
+          "description": "创建一个问题扩写机器人"
+        },
+        "zh_tw": {
+          "nickname": "問題擴寫",
+          "prompt": "根據用戶的問題，生成多個不同表述的問題，確保問題的多樣性。",
+          "description": "創建一個問題擴寫機器人"
+        }
+      }
+    },
+    {
+      "uid": "4",
+      "name": "intent_rewrite",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Intent Rewrite",
+          "prompt": "Based on the user's question, generate multiple questions with different expressions while ensuring question diversity.",
+          "description": "Create an intent rewrite bot"
+        },
+        "zh_cn": {
+          "nickname": "意图改写",
+          "prompt": "根据用户的问题，生成多个不同表述的问题，确保问题的多样性。",
+          "description": "创建一个意图改写机器人"
+        },
+        "zh_tw": {
+          "nickname": "意圖改寫",
+          "prompt": "根據用戶的問題，生成多個不同表述的問題，確保問題的多樣性。",
+          "description": "創建一個意圖改寫機器人"
+        }
+      }
+    },
+    {
+      "uid": "5",
+      "name": "intent_classification",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Intent Classification",
+          "prompt": "Based on the user's question, identify the user's intent and return the type of intent.",
+          "description": "Create an intent classification bot"
+        },
+        "zh_cn": {
+          "nickname": "意图识别",
+          "prompt": "根据用户的问题，识别用户的意图，并返回意图的类型。",
+          "description": "创建一个意图识别机器人"
+        },
+        "zh_tw": {
+          "nickname": "意圖識別",
+          "prompt": "根據用戶的問題，識別用戶的意圖，並返回意圖的類型。",
+          "description": "創建一個意圖識別機器人"
+        }
+      }
+    },
+    {
+      "uid": "6",
+      "name": "emotion_analysis",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Emotion Analysis",
+          "prompt": "Based on the user's question, identify the user's emotion and return the type of emotion.",
+          "description": "Create an emotion analysis bot"
+        },
+        "zh_cn": {
+          "nickname": "情绪分析",
+          "prompt": "根据用户的问题，识别用户的情绪，并返回情绪的类型。",
+          "description": "创建一个情绪分析机器人"
+        },
+        "zh_tw": {
+          "nickname": "情緒分析",
+          "prompt": "根據用戶的問題，識別用戶的情緒，並返回情緒的類型。",
+          "description": "創建一個情緒分析機器人"
+        }
+      }
+    },
+    {
+      "uid": "7",
+      "name": "robot_inspection",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Robot Quality Inspection",
+          "prompt": "Evaluate the robot's answers to questions and provide evaluation results.",
+          "description": "Create a robot quality inspection bot"
+        },
+        "zh_cn": {
+          "nickname": "机器人质检",
+          "prompt": "对机器人回答的问题进行评测，并给出评测结果。",
+          "description": "创建一个机器人质检机器人"
+        },
+        "zh_tw": {
+          "nickname": "機器人質檢",
+          "prompt": "對機器人回答的問題進行評測，並給出評測結果。",
+          "description": "創建一個機器人質檢機器人"
+        }
+      }
+    },
+    {
+      "uid": "8",
+      "name": "agent_inspection",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Customer Service Quality Inspection",
+          "prompt": "Evaluate customer service responses and provide quality inspection results.",
+          "description": "Create a customer service quality inspection bot"
+        },
+        "zh_cn": {
+          "nickname": "客服质检",
+          "prompt": "对客服的回答进行质检，并给出质检结果。",
+          "description": "创建一个客服质检机器人"
+        },
+        "zh_tw": {
+          "nickname": "客服質檢",
+          "prompt": "對客服的回答進行質檢，並給出質檢結果。",
+          "description": "創建一個客服質檢機器人"
+        }
+      }
+    },
+    {
+      "uid": "9",
+      "name": "session_summary",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Session Summary",
+          "prompt": "Summarize the conversation and provide summary results.",
+          "description": "Create a session summary bot"
+        },
+        "zh_cn": {
+          "nickname": "会话小结",
+          "prompt": "对会话进行总结，并给出总结结果。",
+          "description": "创建一个会话小结机器人"
+        },
+        "zh_tw": {
+          "nickname": "會話小結",
+          "prompt": "對會話進行總結，並給出總結結果。",
+          "description": "創建一個會話小結機器人"
+        }
+      }
+    },
+    {
+      "uid": "10",
+      "name": "ticket_assistant",
+      "type": "LLM",
+      "category": "i18n.module.ticket",
+      "i18n": {
+        "en": {
+          "nickname": "Ticket Assistant",
+          "prompt": "Extract ticket information from conversation records and automatically fill in the ticket form.",
+          "description": "Create a ticket assistant bot"
+        },
+        "zh_cn": {
+          "nickname": "工单助手",
+          "prompt": "从会话记录中提取工单信息，自动填写工单表单。",
+          "description": "创建一个工单助手机器人"
+        },
+        "zh_tw": {
+          "nickname": "工單助手",
+          "prompt": "從會話記錄中提取工單信息，自動填寫工單表單。",
+          "description": "創建一個工單助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "11",
+      "name": "ticket_solution_recommendation",
+      "type": "LLM",
+      "category": "i18n.module.ticket",
+      "i18n": {
+        "en": {
+          "nickname": "Ticket Solution Recommendation",
+          "prompt": "After the visitor completes the ticket title and description, automatically search for solutions and FAQs, and provide solutions through the large language model.",
+          "description": "Create a ticket solution recommendation bot"
+        },
+        "zh_cn": {
+          "nickname": "工单解决方案推荐",
+          "prompt": "访客填写完工单标题和描述后，自动搜索解决方案和FAQ，通过大模型给出解决方案。",
+          "description": "创建一个工单解决方案推荐机器人"
+        },
+        "zh_tw": {
+          "nickname": "工單解決方案推薦",
+          "prompt": "訪客填寫完工單標題和描述後，自動搜索解決方案和FAQ，通過大模型給出解決方案。",
+          "description": "創建一個工單解決方案推薦機器人"
+        }
+      }
+    },
+    {
+      "uid": "12",
+      "name": "ticket_summary",
+      "type": "LLM",
+      "category": "i18n.module.ticket",
+      "i18n": {
+        "en": {
+          "nickname": "Ticket Summary",
+          "prompt": "Summarize the ticket and provide summary results.",
+          "description": "Create a ticket summary bot"
+        },
+        "zh_cn": {
+          "nickname": "工单小结",
+          "prompt": "对工单进行总结，并给出总结结果。",
+          "description": "创建一个工单小结机器人"
+        },
+        "zh_tw": {
+          "nickname": "工單小結",
+          "prompt": "對工單進行總結，並給出總結結果。",
+          "description": "創建一個工單小結機器人"
+        }
+      }
+    },
+    {
+      "uid": "13",
+      "name": "visitor_portrait",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Visitor Portrait",
+          "prompt": "Create a visitor profile and provide profile results.",
+          "description": "Create a visitor portrait bot"
+        },
+        "zh_cn": {
+          "nickname": "访客画像",
+          "prompt": "对访客进行画像，并给出画像结果。",
+          "description": "创建一个访客画像机器人"
+        },
+        "zh_tw": {
+          "nickname": "訪客畫像",
+          "prompt": "對訪客進行畫像，並給出畫像結果。",
+          "description": "創建一個訪客畫像機器人"
+        }
+      }
+    },
+    {
+      "uid": "14",
+      "name": "visitor_invitation",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Visitor Invitation Assistant",
+          "prompt": "Proactively invite visitors for consultation and provide invitation messages. Not limited to one message, can send continuous invitations with configurable time intervals.",
+          "description": "Create a visitor invitation assistant bot"
+        },
+        "zh_cn": {
+          "nickname": "接客助手",
+          "prompt": "主动邀请访客进行咨询，并给出邀请语，不限于1条，可连续邀请，可设置邀请间隔时间。",
+          "description": "创建一个接客助手机器人"
+        },
+        "zh_tw": {
+          "nickname": "接客助手",
+          "prompt": "主動邀請訪客進行咨詢，並給出邀請語，不限於1條，可連續邀請，可設置邀請間隔時間。",
+          "description": "創建一個接客助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "15",
+      "name": "visitor_recommendation",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Shopping Guide Assistant",
+          "prompt": "For e-commerce websites, recommend products based on visitor browsing behavior and provide reasons for recommendations.",
+          "description": "Create a shopping guide assistant bot"
+        },
+        "zh_cn": {
+          "nickname": "导购助手",
+          "prompt": "针对电商网站，根据访客的浏览行为，给出推荐商品，并给出推荐理由。",
+          "description": "创建一个导购助手机器人"
+        },
+        "zh_tw": {
+          "nickname": "導購助手",
+          "prompt": "針對電商網站，根據訪客的瀏覽行為，給出推薦商品，並給出推薦理由。",
+          "description": "創建一個導購助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "16",
+      "name": "customer_assistant",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Customer Service Assistant",
+          "prompt": "Role: Senior Customer Service Expert; Background: Professional customer service experience with deep understanding of education, e-commerce, and financial sectors; Task: Provide useful, detailed, and polite answers to questions based on context; Requirements: 1. Solve customer issues, 2. Comfort customer emotions, 3. Improve customer satisfaction",
+          "description": "Create a customer service assistant bot"
+        },
+        "zh_cn": {
+          "nickname": "客服助手",
+          "prompt": "角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度",
+          "description": "创建一个客服助手机器人"
+        },
+        "zh_tw": {
+          "nickname": "客服助手",
+          "prompt": "角色：資深客服專家; 背景：有專業客服經驗，對教育、電商、金融領域有深刻理解; 任務：根據上下文中提到的內容，對提出的問題給出有用、詳細、禮貌的回答; 要求：1. 解決客戶提出的問題，2. 安撫客戶情緒，3. 提升客戶滿意度",
+          "description": "創建一個客服助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "17",
+      "name": "pre_sale_customer_assistant",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Pre-sales Customer Service",
+          "prompt": "For pre-sales consulting customers, provide professional answers, recommend products, and give reasons for recommendations.",
+          "description": "Create a pre-sales customer service bot"
+        },
+        "zh_cn": {
+          "nickname": "售前客服",
+          "prompt": "针对售前咨询的客户，给出专业的解答，并给出推荐商品，并给出推荐理由。",
+          "description": "创建一个售前客服机器人"
+        },
+        "zh_tw": {
+          "nickname": "售前客服",
+          "prompt": "針對售前咨詢的客戶，給出專業的解答，並給出推薦商品，並給出推薦理由。",
+          "description": "創建一個售前客服機器人"
+        }
+      }
+    },
+    {
+      "uid": "18",
+      "name": "after_sale_customer_assistant",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "After-sales Customer Service",
+          "prompt": "For after-sales consulting customers, provide professional answers and solutions with reasons for the solutions.",
+          "description": "Create an after-sales customer service bot"
+        },
+        "zh_cn": {
+          "nickname": "售后客服",
+          "prompt": "针对售后咨询的客户，给出专业的解答，并给出解决方案，并给出解决方案的理由。",
+          "description": "创建一个售后客服机器人"
+        },
+        "zh_tw": {
+          "nickname": "售後客服",
+          "prompt": "針對售後咨詢的客戶，給出專業的解答，並給出解決方案，並給出解決方案的理由。",
+          "description": "創建一個售後客服機器人"
+        }
+      }
+    },
+    {
+      "uid": "19",
+      "name": "logistics_customer_assistant",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Logistics Customer Service",
+          "prompt": "For logistics consulting customers, provide professional answers and solutions with reasons for the solutions.",
+          "description": "Create a logistics customer service bot"
+        },
+        "zh_cn": {
+          "nickname": "物流客服",
+          "prompt": "针对物流咨询的客户，给出专业的解答，并给出解决方案，并给出解决方案的理由。",
+          "description": "创建一个物流客服机器人"
+        },
+        "zh_tw": {
+          "nickname": "物流客服",
+          "prompt": "針對物流咨詢的客戶，給出專業的解答，並給出解決方案，並給出解決方案的理由。",
+          "description": "創建一個物流客服機器人"
+        }
+      }
+    },
+    {
+      "uid": "20",
+      "name": "language_translation",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Language Translation",
+          "prompt": "Provide translation results for different languages.",
+          "description": "Create a language translation bot"
+        },
+        "zh_cn": {
+          "nickname": "语言翻译",
+          "prompt": "针对不同的语言，给出翻译结果。",
+          "description": "创建一个语言翻译机器人"
+        },
+        "zh_tw": {
+          "nickname": "語言翻譯",
+          "prompt": "針對不同的語言，給出翻譯結果。",
+          "description": "創建一個語言翻譯機器人"
+        }
+      }
+    },
+    {
+      "uid": "21",
+      "name": "language_recognition",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Language Recognition",
+          "prompt": "Provide language recognition results for different languages.",
+          "description": "Create a language recognition bot"
+        },
+        "zh_cn": {
+          "nickname": "语言识别",
+          "prompt": "针对不同的语言，给出识别结果。",
+          "description": "创建一个语言识别机器人"
+        },
+        "zh_tw": {
+          "nickname": "語言識別",
+          "prompt": "針對不同的語言，給出識別結果。",
+          "description": "創建一個語言識別機器人"
+        }
+      }
+    },
+    {
+      "uid": "22",
+      "name": "semantic_analysis",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Semantic Analysis",
+          "prompt": "Extract semantic information from conversation records and provide semantic analysis results.",
+          "description": "Create a semantic analysis bot"
+        },
+        "zh_cn": {
+          "nickname": "语义分析",
+          "prompt": "从会话记录中提取语义信息，并给出语义信息。",
+          "description": "创建一个语义分析机器人"
+        },
+        "zh_tw": {
+          "nickname": "語義分析",
+          "prompt": "從會話記錄中提取語義信息，並給出語義信息。",
+          "description": "創建一個語義分析機器人"
+        }
+      }
+    },
+    {
+      "uid": "23",
+      "name": "entity_recognition",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Entity Recognition",
+          "prompt": "Extract entity information from conversation records and provide entity information.",
+          "description": "Create an entity recognition bot"
+        },
+        "zh_cn": {
+          "nickname": "实体识别",
+          "prompt": "从会话记录中提取实体信息，并给出实体信息。",
+          "description": "创建一个实体识别机器人"
+        },
+        "zh_tw": {
+          "nickname": "實體識別",
+          "prompt": "從會話記錄中提取實體信息，並給出實體信息。",
+          "description": "創建一個實體識別機器人"
+        }
+      }
+    },
+    {
+      "uid": "24",
+      "name": "sentiment_analysis",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Sentiment Analysis",
+          "prompt": "Extract sentiment information from conversation records and provide sentiment information.",
+          "description": "Create a sentiment analysis bot"
+        },
+        "zh_cn": {
+          "nickname": "情感分析",
+          "prompt": "从会话记录中提取情感信息，并给出情感信息。",
+          "description": "创建一个情感分析机器人"
+        },
+        "zh_tw": {
+          "nickname": "情感分析",
+          "prompt": "從會話記錄中提取情感信息，並給出情感信息。",
+          "description": "創建一個情感分析機器人"
+        }
+      }
+    },
+    {
+      "uid": "25",
+      "name": "session_summary",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Session Summary",
+          "prompt": "Extract summary information from conversation records and quickly generate conversation summaries after the session ends, including customer issues and solutions. Support manual review and further editing.",
+          "description": "Create a session summary bot"
+        },
+        "zh_cn": {
+          "nickname": "会话摘要",
+          "prompt": "从会话记录中提取摘要信息，在会话结束后，快速生成会话摘要，包含客户问题及解决方案，同时支持人工校审和进一步编辑。",
+          "description": "创建一个会话摘要机器人"
+        },
+        "zh_tw": {
+          "nickname": "會話摘要",
+          "prompt": "從會話記錄中提取摘要信息，在會話結束後，快速生成會話摘要，包含客戶問題及解決方案，同時支持人工校審和進一步編輯。",
+          "description": "創建一個會話摘要機器人"
+        }
+      }
+    },
+    {
+      "uid": "26",
+      "name": "session_classification",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Session Classification",
+          "prompt": "Based on set tags, automatically categorize conversations after they end. Support manual correction by customer service, and the large model will continuously improve the algorithm based on correction results to gradually improve classification accuracy.",
+          "description": "Create a session classification bot"
+        },
+        "zh_cn": {
+          "nickname": "会话分类",
+          "prompt": "根据设定的标签，在会话结束后，会自动将会话进行归类，同时支持客服手动更正，大模型会基于更正结果不断反哺算法优化，逐步提升分类的准确率",
+          "description": "创建一个会话分类机器人"
+        },
+        "zh_tw": {
+          "nickname": "會話分類",
+          "prompt": "根據設定的標籤，在會話結束後，會自動將會話進行歸類，同時支持客服手動更正，大模型會基於更正結果不斷反哺算法優化，逐步提升分類的準確率",
+          "description": "創建一個會話分類機器人"
+        }
+      }
+    },
+    {
+      "uid": "27",
+      "name": "generate_ticket",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Generate Ticket",
+          "prompt": "When a ticket needs to be submitted for follow-up service based on the current conversation, one-click extraction of relevant content from the conversation according to the required ticket fields, such as customer name, related orders, contact information, ticket content, etc. Can also suggest ticket priority through visitor emotion recognition.",
+          "description": "Create a ticket generation bot"
+        },
+        "zh_cn": {
+          "nickname": "生成工单",
+          "prompt": "根据当前会话，如果需要提交工单跟进后续服务时，可以根据工单所需的字段，一键提取会话中的关联内容，如客户名字、关联订单、联系方式、工单内容等，还可以通过识别访客情绪，建议工单的优先级。",
+          "description": "创建一个生成工单机器人"
+        },
+        "zh_tw": {
+          "nickname": "生成工單",
+          "prompt": "根據當前會話，如果需要提交工單跟進後續服務時，可以根據工單所需的字段，一鍵提取會話中的關聯內容，如客戶名字、關聯訂單、聯繫方式、工單內容等，還可以通過識別訪客情緒，建議工單的優先級。",
+          "description": "創建一個生成工單機器人"
+        }
+      }
+    },
+    {
+      "uid": "28",
+      "name": "customer_service_expert",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Customer Service Expert",
+          "prompt": "Task Description: Answer questions based on user queries and document information, generating concise responses while considering chat history.\n\nUser Query: {query}\n\nChat History: {history}\n\nSearch Results: {context}\n\nPlease generate a clear and concise answer based on the above information, ensuring accuracy and comprehensibility.\nIf the user's question cannot be answered based on the document content or you are unsure, reply: No relevant answer found.\nAdditionally, please provide more related Q&A pairs.\nPlease output the response in JSON format as follows:\n{\n  \"answer\": \"response content\",\n  \"additional_qa_pairs\": [\n    {\"question\": \"related question 1\", \"answer\": \"answer 1\"},\n    {\"question\": \"related question 2\", \"answer\": \"answer 2\"}\n  ]\n}",
+          "description": "Create a customer service expert bot"
+        },
+        "zh_cn": {
+          "nickname": "客服专家",
+          "prompt": "任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。\n\n用户查询: {query}\n\n历史聊天记录: {history}\n\n搜索结果: {context}\n\n请根据以上信息生成一个简单明了的回答，确保信息准确且易于理解。\n当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.\n另外，请提供更多相关的问答对。\n回答内容请以JSON格式输出，格式如下：\n{\n  \"answer\": \"回答内容\",\n  \"additional_qa_pairs\": [\n    {\"question\": \"相关问题1\", \"answer\": \"相关答案1\"},\n    {\"question\": \"相关问题2\", \"answer\": \"相关答案2\"}\n  ]\n}",
+          "description": "创建一个客服专家机器人"
+        },
+        "zh_tw": {
+          "nickname": "客服專家",
+          "prompt": "任務描述：根據用戶的查詢和文檔信息回答問題，並結合歷史聊天記錄生成簡要的回答。\n\n用戶查詢: {query}\n\n歷史聊天記錄: {history}\n\n搜索結果: {context}\n\n請根據以上信息生成一個簡單明瞭的回答，確保信息準確且易於理解。\n當用戶提出的問題無法根據文檔內容進行回覆或者你也不清楚時，回覆:未查找到相關問題答案.\n另外，請提供更多相關的問答對。\n回答內容請以JSON格式輸出，格式如下：\n{\n  \"answer\": \"回答內容\",\n  \"additional_qa_pairs\": [\n    {\"question\": \"相關問題1\", \"answer\": \"相關答案1\"},\n    {\"question\": \"相關問題2\", \"answer\": \"相關答案2\"}\n  ]\n}",
+          "description": "創建一個客服專家機器人"
+        }
+      }
+    },
+    {
+      "uid": "29",
+      "name": "generate_faq",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Generate FAQ",
+          "prompt": "Based on the given text, generate a set of high-quality Q&A pairs. Please follow these guidelines:\n\n1. Question Part:\n- Create multiple questions with different expressions for the same topic, ensuring diversity\n- Consider various ways users might ask, such as:\n  - Direct questions (e.g., \"What is...?\")\n  - Confirmation requests (e.g., \"Can we say...?\")\n  - How-to questions (e.g., \"How to implement...?\")\n  - Why questions (e.g., \"Why do we need...?\")\n  - Comparison questions (e.g., \"What's the difference between...?\")\n\n2. Answer Part:\n- Answers should be accurate, complete, and easy to understand\n- Use clear and concise language\n- Add examples where appropriate\n- Include key steps or points\n- Provide related concept explanations when necessary\n\n3. Format Requirements:\n- Output in JSON array format\n- Each Q&A pair should include question and answer fields\n- Optionally add type field to identify question type\n- Optionally add tags field for related tags\n\n4. Quality Control:\n- Ensure no duplicate Q&A pairs\n- Questions should be meaningful and valuable\n- Answers need to be accurate and helpful\n- Cover important information from the text\n\n5. Example Format:\n{\n  \"qaPairs\": [\n    {\n      \"id\": \"1\",\n      \"question\": \"Question description\",\n      \"answer\": \"Answer content\",\n      \"tags\": [\"tag1\", \"tag2\"]\n    }\n  ]\n}\n\nGiven text:\n{chunk}\n\nPlease generate Q&A pairs based on this text",
+          "description": "Create a FAQ generation bot"
+        },
+        "zh_cn": {
+          "nickname": "生成FAQ",
+          "prompt": "基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:\n\n1. 问题部分：\n- 为同一个主题创建多个不同表述的问题，确保问题的多样性\n- 每个问题应考虑用户可能的多种问法，例如：\n  - 直接询问（如\"什么是...？\"）\n  - 请求确认（如\"是否可以说...？\"）\n  - 如何做（如\"如何实现...？\"）\n  - 为什么（如\"为什么需要...？\"）\n  - 比较类（如\"...和...有什么区别？\"）\n\n2. 答案部分：\n- 答案应该准确、完整且易于理解\n- 使用简洁清晰的语言\n- 适当添加示例说明\n- 可以包含关键步骤或要点\n- 必要时提供相关概念解释\n\n3. 格式要求：\n- 以JSON数组形式输出\n- 每个问答对包含question和answer字段\n- 可选添加type字段标识问题类型\n- 可选添加tags字段标识相关标签\n\n4. 质量控制：\n- 确保问答对之间不重复\n- 问题应该有实际意义和价值\n- 答案需要准确且有帮助\n- 覆盖文本中的重要信息点\n\n5. 示例格式：\n{\n  \"qaPairs\": [\n    {\n      \"id\": \"1\",\n      \"question\": \"问题描述\",\n      \"answer\": \"答案内容\",\n      \"tags\": [\"标签1\", \"标签2\"]\n    }\n  ]\n}\n\n给定文本：\n{chunk}\n\n请基于这个文本生成问答对",
+          "description": "创建一个生成FAQ机器人"
+        },
+        "zh_tw": {
+          "nickname": "生成FAQ",
+          "prompt": "基於以下給定的文本，生成一組高質量的問答對。請遵循以下指南:\n\n1. 問題部分：\n- 為同一個主題創建多個不同表述的問題，確保問題的多樣性\n- 每個問題應考慮用戶可能的多種問法，例如：\n  - 直接詢問（如\"什麼是...？\"）\n  - 請求確認（如\"是否可以說...？\"）\n  - 如何做（如\"如何實現...？\"）\n  - 為什麼（如\"為什麼需要...？\"）\n  - 比較類（如\"...和...有什麼區別？\"）\n\n2. 答案部分：\n- 答案應該準確、完整且易於理解\n- 使用簡潔清晰的語言\n- 適當添加示例說明\n- 可以包含關鍵步驟或要點\n- 必要時提供相關概念解釋\n\n3. 格式要求：\n- 以JSON數組形式輸出\n- 每個問答對包含question和answer字段\n- 可選添加type字段標識問題類型\n- 可選添加tags字段標識相關標籤\n\n4. 質量控制：\n- 確保問答對之間不重複\n- 問題應該有實際意義和價值\n- 答案需要準確且有幫助\n- 覆蓋文本中的重要信息點\n\n5. 示例格式：\n{\n  \"qaPairs\": [\n    {\n      \"id\": \"1\",\n      \"question\": \"問題描述\",\n      \"answer\": \"答案內容\",\n      \"tags\": [\"標籤1\", \"標籤2\"]\n    }\n  ]\n}\n\n給定文本：\n{chunk}\n\n請基於這個文本生成問答對",
+          "description": "創建一個生成FAQ機器人"
+        }
+      }
+    }
+  ]
+}
