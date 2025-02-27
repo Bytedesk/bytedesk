@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-27 11:18:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 11:50:02
+ * @LastEditTime: 2025-02-27 12:04:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,11 +11,18 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.demo.airline.client;
+package com.bytedesk.ai.springai.demo.airline.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.bytedesk.ai.springai.demo.airline.services.BookingTools.BookingDetails;
+import com.bytedesk.ai.springai.demo.airline.services.FlightBookingService;
+import com.bytedesk.core.utils.JsonResult;
+
 import reactor.core.publisher.Flux;
 
 import lombok.RequiredArgsConstructor;
@@ -23,17 +30,24 @@ import lombok.RequiredArgsConstructor;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
+import java.util.List;
+
 import org.springframework.ai.chat.client.ChatClient;
 
-@RequestMapping("/spring/ai/demo/airline/assistant")
+/**
+ * https://github.com/springaialibaba/spring-ai-alibaba-examples
+ */
+@RequestMapping("/spring/ai/demo/airline")
 @RestController
 @RequiredArgsConstructor
-public class AirlineCustomerServiceController {
+public class AirlineController {
 
 	private final ChatClient customerSupportAssistant;
 
+	private final FlightBookingService flightBookingService;
+
 	// http://127.0.0.1:9003/spring/ai/demo/airline/assistant/chat?chatId=1&userMessage=什么时间考试？
-	@RequestMapping(path="/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(path="/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<String> chat(String chatId, String userMessage) {
 		return customerSupportAssistant.prompt()
 				.user(userMessage)
@@ -41,6 +55,15 @@ public class AirlineCustomerServiceController {
 						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
 						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
 				.stream().content();
+	}
+
+	// http://127.0.0.1:9003/spring/ai/demo/airline/bookings
+	@GetMapping("/bookings")
+	public ResponseEntity<JsonResult<?>> getBookings() {
+
+		List<BookingDetails> bookings = flightBookingService.getBookings();
+
+		return ResponseEntity.ok(JsonResult.success(bookings));
 	}
 
 }
