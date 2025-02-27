@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 16:37:18
+ * @LastEditTime: 2025-02-27 17:05:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,8 +61,15 @@ public class BytedeskProperties {
                                 }
                                 this.custom.setName(sb.toString());
                             } else {
-                                // 如果是直接的中文字符串，尝试 ISO-8859-1 到 UTF-8 的转换
-                                this.custom.setName(new String(name.getBytes("ISO-8859-1"), "UTF-8"));
+                                // 检查是否来自环境变量（Docker）
+                                String source = System.getenv("BYTEDESK_CUSTOM_NAME");
+                                if (source != null && source.equals(name)) {
+                                    // 如果是来自Docker环境变量，使用UTF-8解码
+                                    this.custom.setName(new String(name.getBytes(), "UTF-8"));
+                                } else {
+                                    // 如果是来自properties文件，使用ISO-8859-1到UTF-8的转换
+                                    this.custom.setName(new String(name.getBytes("ISO-8859-1"), "UTF-8"));
+                                }
                             }
                         } catch (Exception e) {
                             // 记录错误但继续执行
@@ -89,8 +96,15 @@ public class BytedeskProperties {
                                 }
                                 this.custom.setDescription(sb.toString());
                             } else {
-                                // 如果是直接的中文字符串，尝试 ISO-8859-1 到 UTF-8 的转换
-                                this.custom.setDescription(new String(description.getBytes("ISO-8859-1"), "UTF-8"));
+                                // 检查是否来自环境变量（Docker）
+                                String source = System.getenv("BYTEDESK_CUSTOM_DESCRIPTION");
+                                if (source != null && source.equals(description)) {
+                                    // 如果是来自Docker环境变量，使用UTF-8解码
+                                    this.custom.setDescription(new String(description.getBytes(), "UTF-8"));
+                                } else {
+                                    // 如果是来自properties文件，使用ISO-8859-1到UTF-8的转换
+                                    this.custom.setDescription(new String(description.getBytes("ISO-8859-1"), "UTF-8"));
+                                }
                             }
                         } catch (Exception e) {
                             // 记录错误但继续执行
