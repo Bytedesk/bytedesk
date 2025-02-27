@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 10:20:41
+ * @LastEditTime: 2025-02-27 16:37:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,16 +44,57 @@ public class BytedeskProperties {
                     // 处理中文编码
                     if (StringUtils.hasText(this.custom.getName())) {
                         try {
-                            this.custom.setName(new String(this.custom.getName().getBytes("ISO-8859-1"), "UTF-8"));
+                            String name = this.custom.getName();
+                            // 检查是否包含 Unicode 转义序列
+                            if (name.contains("\\u")) {
+                                // 处理 Unicode 转义序列
+                                StringBuilder sb = new StringBuilder();
+                                int len = name.length();
+                                for (int i = 0; i < len; i++) {
+                                    char c = name.charAt(i);
+                                    if (c == '\\' && i + 1 < len && name.charAt(i + 1) == 'u') {
+                                        String hex = name.substring(i + 2, i + 6);
+                                        c = (char) Integer.parseInt(hex, 16);
+                                        i += 5;
+                                    }
+                                    sb.append(c);
+                                }
+                                this.custom.setName(sb.toString());
+                            } else {
+                                // 如果是直接的中文字符串，尝试 ISO-8859-1 到 UTF-8 的转换
+                                this.custom.setName(new String(name.getBytes("ISO-8859-1"), "UTF-8"));
+                            }
                         } catch (Exception e) {
                             // 记录错误但继续执行
+                            e.printStackTrace();
                         }
                     }
+                    
                     if (StringUtils.hasText(this.custom.getDescription())) {
                         try {
-                            this.custom.setDescription(new String(this.custom.getDescription().getBytes("ISO-8859-1"), "UTF-8"));
+                            String description = this.custom.getDescription();
+                            // 检查是否包含 Unicode 转义序列
+                            if (description.contains("\\u")) {
+                                // 处理 Unicode 转义序列
+                                StringBuilder sb = new StringBuilder();
+                                int len = description.length();
+                                for (int i = 0; i < len; i++) {
+                                    char c = description.charAt(i);
+                                    if (c == '\\' && i + 1 < len && description.charAt(i + 1) == 'u') {
+                                        String hex = description.substring(i + 2, i + 6);
+                                        c = (char) Integer.parseInt(hex, 16);
+                                        i += 5;
+                                    }
+                                    sb.append(c);
+                                }
+                                this.custom.setDescription(sb.toString());
+                            } else {
+                                // 如果是直接的中文字符串，尝试 ISO-8859-1 到 UTF-8 的转换
+                                this.custom.setDescription(new String(description.getBytes("ISO-8859-1"), "UTF-8"));
+                            }
                         } catch (Exception e) {
                             // 记录错误但继续执行
+                            e.printStackTrace();
                         }
                     }
                     instance = this;
