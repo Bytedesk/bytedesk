@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-27 11:18:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 12:53:35
+ * @LastEditTime: 2025-02-27 13:51:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -37,24 +38,25 @@ import org.springframework.ai.chat.client.ChatClient;
 /**
  * https://github.com/springaialibaba/spring-ai-alibaba-examples
  */
-@RequestMapping("/spring/ai/demo/airline")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/spring/ai/demo/airline")
 public class AirlineController {
 
 	private final ChatClient customerSupportAssistant;
 
 	private final FlightBookingService flightBookingService;
 
-	// http://127.0.0.1:9003/spring/ai/demo/airline/assistant/chat?chatId=1&userMessage=什么时间考试？
-	@GetMapping(path="/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	// http://127.0.0.1:9003/spring/ai/demo/airline/chat?chatId=1&userMessage=退票？
+	@GetMapping(path = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<String> chat(String chatId, String userMessage) {
-		return customerSupportAssistant.prompt()
+		return this.customerSupportAssistant.prompt()
+				.system(s -> s.param("current_date", LocalDate.now().toString()))
 				.user(userMessage)
-				.advisors(advisor -> advisor
-						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
-				.stream().content();
+				.advisors(
+						a -> a.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
+				.stream()
+				.content();
 	}
 
 	// http://127.0.0.1:9003/spring/ai/demo/airline/bookings
