@@ -27,7 +27,7 @@ services:
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
     # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
-    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:0.6.3.8 # aliyun enterprise
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:0.6.3.9 # aliyun enterprise
     # mage: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest # aliyun community
     container_name: bytedesk
     depends_on:
@@ -50,8 +50,8 @@ services:
       BYTEDESK_EDITION: enterprise
       BYTEDESK_VERSION: 0.6.4
       # enable custom config: name, logo, description
-      BYTEDESK_CUSTOM_ENABLED: false
-      BYTEDESK_CUSTOM_NAME: 
+      BYTEDESK_CUSTOM_ENABLED: true
+      BYTEDESK_CUSTOM_NAME: 全景云客服
       BYTEDESK_CUSTOM_LOGO: 
       BYTEDESK_CUSTOM_DESCRIPTION: 
       BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: true
