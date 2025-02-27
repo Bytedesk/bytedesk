@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 15:50:08
+ * @LastEditTime: 2025-02-27 15:53:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,13 +70,7 @@ public class RobotEventListener {
     private final UidUtils uidUtils;
     private final ThreadRestService threadService;
     private final IMessageSendService messageSendService;
-    private final RedisTemplate<String, FaqEntity> redisTemplateFaqEntity;
     private final RobotFaqProcessor robotFaqProcessor;
-    
-    // 批量处理的大小
-    private static final int BATCH_SIZE = 10;
-    // 处理间隔（毫秒）
-    private static final long PROCESS_INTERVAL = 5000;
 
     @Order(5)
     @EventListener
@@ -85,14 +79,7 @@ public class RobotEventListener {
         String orgUid = organization.getUid();
         log.info("robot - organization created: {}", organization.getName());
         String robotUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
-        // 为每个组织创建一个机器人
         robotRestService.initDefaultRobot(orgUid, robotUid);
-    }
-
-    @PostConstruct
-    public void init() {
-        // 启动后台处理线程
-        startFaqProcessor();
     }
 
     @EventListener
@@ -100,127 +87,29 @@ public class RobotEventListener {
         robotFaqProcessor.addFaqToQueue(event.getFaq());
     }
 
-    private void startFaqProcessor() {
-        Thread processorThread = new Thread(() -> {
-            while (true) {
-                try {
-                    processFaqBatch();
-                    Thread.sleep(PROCESS_INTERVAL);
-                } catch (InterruptedException e) {
-                    log.error("FAQ processor interrupted: {}", e.getMessage());
-                    Thread.currentThread().interrupt();
-                    break;
-                } catch (Exception e) {
-                    log.error("Error processing FAQ batch: {}", e.getMessage());
-                }
-            }
-        }, "FAQ-Processor");
-        
-        processorThread.setDaemon(true);
-        processorThread.start();
-    }
-
-    @Transactional
-    private void processFaqBatch() {
-        Optional<RobotEntity> robotOptional = robotRestService.findByUid(BytedeskConsts.DEFAULT_ROBOT_UID);
-        if (!robotOptional.isPresent()) {
-            return;
-        }
-
-        RobotEntity robot = robotOptional.get();
-        boolean updated = false;
-        int retryCount = 0;
-        int maxRetries = 3;
-
-        while (retryCount < maxRetries) {
-            try {
-                // 从队列中获取一批 FAQ
-                List<FaqEntity> faqs = new ArrayList<>();
-                for (int i = 0; i < BATCH_SIZE; i++) {
-                    FaqEntity faq = redisTemplateFaqEntity.opsForList().leftPop(RobotConsts.ROBOT_FAQ_QUEUE_KEY);
-                    if (faq == null) {
-                        break;
-                    }
-                    faqs.add(faq);
-                }
-
-                if (faqs.isEmpty()) {
-                    break;
-                }
-
-                // 更新机器人知识库
-                for (FaqEntity faq : faqs) {
-                    if (robot.getServiceSettings().getHotFaqs().size() < 5) {
-                        robot.getServiceSettings().getHotFaqs().add(faq);
-                        updated = true;
-                    }
-                    if (robot.getServiceSettings().getFaqs().size() < 5) {
-                        robot.getServiceSettings().getFaqs().add(faq);
-                        updated = true;
-                    }
-                }
-
-                if (updated) {
-                    robot.getServiceSettings().setShowHotFaqs(true);
-                    robot.getServiceSettings().setShowFaqs(true);
-                    robotRestService.save(robot);
-                }
-
-                // 如果成功，跳出重试循环
-                break;
-
-            } catch (OptimisticLockingFailureException e) {
-                retryCount++;
-                if (retryCount >= maxRetries) {
-                    log.error("Failed to update robot after {} retries", maxRetries);
-                    // 可以选择将失败的 FAQ 重新放回队列
-                    // redisTemplate.opsForList().rightPushAll(FAQ_QUEUE_KEY, faqs);
-                } else {
-                    log.warn("Optimistic locking failure, retry attempt {}", retryCount);
-                    try {
-                        // 指数退避
-                        Thread.sleep((long) (Math.pow(2, retryCount) * 100));
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
-        // log.info("MessageJsonEvent {}", event.getJson());
-        String messageJson = event.getJson();
-        //
-        processMessage(messageJson);
+        processMessage(event.getJson());
     }
 
     private void processMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
         if (messageType.equals(MessageTypeEnum.STREAM)) {
-            // ai回答暂不处理
             return;
         }
         String query = messageProtobuf.getContent();
         log.info("robot processMessage {}", query);
-        //
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         if (threadProtobuf == null) {
             throw new RuntimeException("thread is null");
         }
-        // 仅针对文本类型自动回复
         if (!messageType.equals(MessageTypeEnum.TEXT)) {
             return;
         }
-        //
         String threadTopic = threadProtobuf.getTopic();
         if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
-            // 内部大模型对话: 如客服AI助手，内部客服人员使用
             log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
-            // 机器人消息 org/robot/df_robot_uid/1420995827073219
             String[] splits = threadTopic.split("/");
             if (splits.length < 4) {
                 throw new RuntimeException("robot topic format error");
@@ -234,30 +123,17 @@ public class RobotEventListener {
                 RobotEntity robot = robotOptional.get();
 
                 if (robot.getLlm().isEnabled()) {
-                    // 调用大模型
                     if (robot.isKbEnabled()) {
-                        // 搜索知识库
                     }
-
-                    // 调用大模型
-
-                } 
-                // else if (robot.getFlow().isEnabled()) {
-                //     // 调用流程引擎
-                // } 
-                else if (robot.isKbEnabled()) {
-                    // 搜索知识库
+                } else if (robot.isKbEnabled()) {
                 } else {
-                    // 默认回复
                 }
-                // 大模型对话，无知识库
                 Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
                 if (!threadOptional.isPresent()) {
                     throw new RuntimeException("thread with topic " + threadTopic + " not found");
                 }
                 ThreadEntity thread = threadOptional.get();
                 MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
-                //
                 String agent = thread.getAgent();
                 RobotProtobuf robotProtobuf = JSON.parseObject(agent, RobotProtobuf.class);
                 UserProtobuf user = UserProtobuf.builder()
@@ -266,7 +142,6 @@ public class RobotEventListener {
                         .type(UserTypeEnum.ROBOT.name())
                         .build();
                 user.setUid(robotProtobuf.getUid());
-                //
                 String messageUid = uidUtils.getUid();
                 MessageProtobuf message = MessageProtobuf.builder()
                         .uid(messageUid)
@@ -277,12 +152,10 @@ public class RobotEventListener {
                         .extra(JSONObject.toJSONString(extraObject))
                         .createdAt(LocalDateTime.now())
                         .build();
-                // 返回一个输入中消息，让访客端显示输入中
                 MessageProtobuf clonedMessage = SerializationUtils.clone(message);
                 clonedMessage.setUid(uidUtils.getUid());
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                 messageSendService.sendProtobufMessage(clonedMessage);
-                //
                 if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
                     ollamaChatService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
@@ -297,26 +170,20 @@ public class RobotEventListener {
             return;
         }
 
-        // 机器人客服对话，如果会话的agent是机器人，则处理
         log.info("robot robot threadTopic {}, thread.type {}", threadTopic,
                 threadProtobuf.getType());
         ThreadEntity thread = threadService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                         " not found"));
-        // thread.getAgent()为空，则不处理
         if (!StringUtils.hasText(thread.getAgent())) {
             return;
         }
-        // 
         UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        // 当前会话为机器人接待，而且是访客发送的消息
         if (agent.getType().equals(UserTypeEnum.ROBOT.name())
                 && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())) {
-            // 机器人回复
             log.info("robot thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            //
             MessageExtra extra = MessageUtils.getMessageExtra(robot.getOrgUid());
             String messageUid = uidUtils.getUid();
             MessageProtobuf message = MessageProtobuf.builder()
@@ -329,7 +196,6 @@ public class RobotEventListener {
                     .createdAt(LocalDateTime.now())
                     .build();
 
-            // 返回一个输入中消息，让访客端显示输入中
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
             clonedMessage.setUid(uidUtils.getUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
@@ -342,23 +208,8 @@ public class RobotEventListener {
                 zhipuaiChatService.ifPresent(service -> 
                     service.sendWsKbMessage(query, robot, message));
             }
-
-            // 知识库
-            // if (bytedeskProperties.getJavaAi()) {
-            // log.info("robot java ai kb");
-            // zhipuaiService.sendWsKbMessage(query, robot.getKbUid(), robot, message);
-            // }
-
-            // 通知python ai模块处理回答
-            // if (bytedeskProperties.getPythonAi()) {
-            // log.info("robot python");
-            // messageCache.put(messageUid, message);
-            // redisPubsubService.sendQuestionMessage(messageUid, threadTopic,
-            // robot.getKbUid(),
-            // query);
-            // }
         }
     }
 
-    
 }
+
