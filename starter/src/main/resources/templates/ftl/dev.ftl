@@ -172,6 +172,7 @@
 
             <h2>${i18n[lang]["systemDevelopment"]}</h2>
             <ul>
+                <li><a href="/apidocs/index.html" target="_blank">${i18n[lang]["javaDoc"]}</a></li>
                 <li><a href="/swagger-ui/index.html" target="_blank">${i18n[lang]["apiDoc"]}</a></li>
                 <li><a href="/doc.html" target="_blank">${i18n[lang]["knife4jDoc"]}</a></li>
                 <li><a href="/druid" target="_blank">Druid</a></li>
