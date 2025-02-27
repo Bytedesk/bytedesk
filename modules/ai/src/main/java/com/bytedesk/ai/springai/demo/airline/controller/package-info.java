@@ -12,6 +12,6 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 @NonNullApi
-package com.bytedesk.ai.springai.demo.airline.client;
+package com.bytedesk.ai.springai.demo.airline.controller;
 
 import org.springframework.lang.NonNullApi;
