@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 17:41:49
+ * @LastEditTime: 2025-02-27 09:37:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,21 +13,10 @@
  */
 package com.bytedesk.ai.robot;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
-import com.bytedesk.ai.springai.SpringAIVectorService;
-import com.bytedesk.ai.springai.demo.bytedesk.SpringAIBytedeskService;
-import com.bytedesk.ai.springai.demo.utils.FileContent;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.utils.Utils;
-// import com.bytedesk.kbase.faq.FaqRestService;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
