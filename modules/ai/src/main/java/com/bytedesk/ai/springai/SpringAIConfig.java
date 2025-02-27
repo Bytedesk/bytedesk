@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:09:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 11:41:01
+ * @LastEditTime: 2025-02-27 14:43:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,7 @@ public class SpringAIConfig {
     private OllamaChatModel ollamaChatModel;
 
     @Bean("defaultChatClientBuilder")
-    ChatClient.Builder chatClientBuilder() {
+    ChatClient.Builder defaultChatClientBuilder() {
         return ChatClient.builder(ollamaChatModel);
     }
 
@@ -67,7 +67,7 @@ public class SpringAIConfig {
     //                     """;
 
     private String customerSupportAssistantSystemPrompt = """
-						您是“Funnair”航空公司的客户聊天支持代理。请以友好、乐于助人且愉快的方式来回复。
+						您是"Funnair"航空公司的客户聊天支持代理。请以友好、乐于助人且愉快的方式来回复。
 						您正在通过在线聊天系统与客户互动。
 						您能够支持已有机票的预订详情查询、机票日期改签、机票预订取消等操作，其余功能将在后续版本中添加，如果用户问的问题不支持请告知详情。
 					   在提供有关机票预订详情查询、机票日期改签、机票预订取消等操作之前，您必须始终从用户处获取以下信息：预订号、客户姓名。
@@ -84,16 +84,17 @@ public class SpringAIConfig {
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html#_chat_memory
     // The bean 'vectorStore', defined in class path resource [org/springframework/ai/autoconfigure/vectorstore/weaviate/WeaviateVectorStoreAutoConfiguration.class], could not be registered. A bean with that name has already been defined in class path resource [org/springframework/ai/autoconfigure/vectorstore/redis/RedisVectorStoreAutoConfiguration.class] and overriding is disabled.
     @Bean("customerSupportAssistant")
-    public ChatClient customerSupportAssistant(ChatClient.Builder defaultChatClientBuilder,
+    public ChatClient customerSupportAssistant(ChatClient.Builder dashScopeChatClientBuilder,
             InMemoryChatMemory defaultChatMemory, VectorStore ollamaRedisVectorStore) {
 
-        return defaultChatClientBuilder
+        return dashScopeChatClientBuilder
                 .defaultSystem(customerSupportAssistantSystemPrompt)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(defaultChatMemory), // CHAT MEMORY
                         new QuestionAnswerAdvisor(ollamaRedisVectorStore), // RAG
                         new SimpleLoggerAdvisor())
-                .defaultTools("getBookingDetails", "changeBooking", "cancelBooking") // FUNCTION CALLING
+                // .defaultTools("getBookingDetails", "changeBooking", "cancelBooking") // FIXME: "No ToolCallback found for tool name: getBookingDetails"
+                .defaultFunctions("getBookingDetails", "changeBooking", "cancelBooking") // FUNCTION CALLING
                 .build();
     }
 
