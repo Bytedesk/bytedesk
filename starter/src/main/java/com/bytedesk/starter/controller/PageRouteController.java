@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:14:10
+ * @LastEditTime: 2025-02-27 11:13:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,6 +58,7 @@ public class PageRouteController {
 			en.put("knowledgeBase", "Knowledge Base(Internal)");
 			en.put("helpCenter", "Help Center(External)");
 			en.put("kanban", "Project Management");
+			en.put("javaDoc", "Java Docs");
 			en.put("apiDoc", "Swagger API Docs");
 			en.put("knife4jDoc", "Knife4j API Docs");
 			en.put("docs", "Docs");
@@ -88,6 +89,7 @@ public class PageRouteController {
 			zh.put("knowledgeBase", "对内知识库");
 			zh.put("helpCenter", "帮助中心(对外知识库)");
 			zh.put("kanban", "项目管理");
+			zh.put("javaDoc", "Java 文档");
 			zh.put("apiDoc", "Swagger API 文档");
 			zh.put("knife4jDoc", "Knife4j API 文档");
 			zh.put("docs", "文档");
@@ -117,6 +119,7 @@ public class PageRouteController {
 			zhTW.put("knowledgeBase", "對內知識庫");
 			zhTW.put("helpCenter", "幫助中心(對外知識庫)");
 			zhTW.put("kanban", "項目管理");
+			zhTW.put("javaDoc", "Java 文檔");
 			zhTW.put("apiDoc", "Swagger API 文檔");
 			zhTW.put("knife4jDoc", "Knife4j API 文檔");
 			zhTW.put("docs", "文檔");
