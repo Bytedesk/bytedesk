@@ -54,6 +54,8 @@ deploy/server/bytedesk-starter-0.4.4.jar
 .env.dev
 .env.prod
 statistic/
+statistic_thread/
+statistic_message/
 微语-产品报价单.xlsx
 private/
 vip/
