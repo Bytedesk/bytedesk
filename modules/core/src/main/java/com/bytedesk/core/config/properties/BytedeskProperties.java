@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 17:05:20
+ * @LastEditTime: 2025-02-27 17:25:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,79 +37,30 @@ public class BytedeskProperties {
 
     @PostConstruct
     public void init() {
-        // 这里我们使用双重检查锁定来确保线程安全地初始化instance变量
         if (instance == null) {
             synchronized (BytedeskProperties.class) {
                 if (instance == null) {
-                    // 处理中文编码
-                    if (StringUtils.hasText(this.custom.getName())) {
-                        try {
-                            String name = this.custom.getName();
-                            // 检查是否包含 Unicode 转义序列
-                            if (name.contains("\\u")) {
-                                // 处理 Unicode 转义序列
-                                StringBuilder sb = new StringBuilder();
-                                int len = name.length();
-                                for (int i = 0; i < len; i++) {
-                                    char c = name.charAt(i);
-                                    if (c == '\\' && i + 1 < len && name.charAt(i + 1) == 'u') {
-                                        String hex = name.substring(i + 2, i + 6);
-                                        c = (char) Integer.parseInt(hex, 16);
-                                        i += 5;
-                                    }
-                                    sb.append(c);
-                                }
-                                this.custom.setName(sb.toString());
-                            } else {
-                                // 检查是否来自环境变量（Docker）
-                                String source = System.getenv("BYTEDESK_CUSTOM_NAME");
-                                if (source != null && source.equals(name)) {
-                                    // 如果是来自Docker环境变量，使用UTF-8解码
-                                    this.custom.setName(new String(name.getBytes(), "UTF-8"));
-                                } else {
-                                    // 如果是来自properties文件，使用ISO-8859-1到UTF-8的转换
-                                    this.custom.setName(new String(name.getBytes("ISO-8859-1"), "UTF-8"));
-                                }
-                            }
-                        } catch (Exception e) {
-                            // 记录错误但继续执行
-                            e.printStackTrace();
+                    // 处理所有可能包含中文的字段
+                    try {
+                        // 处理 Custom 相关字段
+                        if (this.custom != null) {
+                            this.custom.setName(handleChineseText(this.custom.getName(), "BYTEDESK_CUSTOM_NAME"));
+                            this.custom.setDescription(handleChineseText(this.custom.getDescription(), "BYTEDESK_CUSTOM_DESCRIPTION"));
+                            this.custom.setLogo(handleChineseText(this.custom.getLogo(), "BYTEDESK_CUSTOM_LOGO"));
                         }
-                    }
-                    
-                    if (StringUtils.hasText(this.custom.getDescription())) {
-                        try {
-                            String description = this.custom.getDescription();
-                            // 检查是否包含 Unicode 转义序列
-                            if (description.contains("\\u")) {
-                                // 处理 Unicode 转义序列
-                                StringBuilder sb = new StringBuilder();
-                                int len = description.length();
-                                for (int i = 0; i < len; i++) {
-                                    char c = description.charAt(i);
-                                    if (c == '\\' && i + 1 < len && description.charAt(i + 1) == 'u') {
-                                        String hex = description.substring(i + 2, i + 6);
-                                        c = (char) Integer.parseInt(hex, 16);
-                                        i += 5;
-                                    }
-                                    sb.append(c);
-                                }
-                                this.custom.setDescription(sb.toString());
-                            } else {
-                                // 检查是否来自环境变量（Docker）
-                                String source = System.getenv("BYTEDESK_CUSTOM_DESCRIPTION");
-                                if (source != null && source.equals(description)) {
-                                    // 如果是来自Docker环境变量，使用UTF-8解码
-                                    this.custom.setDescription(new String(description.getBytes(), "UTF-8"));
-                                } else {
-                                    // 如果是来自properties文件，使用ISO-8859-1到UTF-8的转换
-                                    this.custom.setDescription(new String(description.getBytes("ISO-8859-1"), "UTF-8"));
-                                }
-                            }
-                        } catch (Exception e) {
-                            // 记录错误但继续执行
-                            e.printStackTrace();
+
+                        // 处理 Admin 相关字段
+                        if (this.admin != null) {
+                            this.admin.setNickname(handleChineseText(this.admin.getNickname(), "BYTEDESK_ADMIN_NICKNAME"));
                         }
+
+                        // 处理 Organization 相关字段
+                        if (this.organization != null) {
+                            this.organization.setName(handleChineseText(this.organization.getName(), "BYTEDESK_ORGANIZATION_NAME"));
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     instance = this;
                 }
@@ -117,8 +68,53 @@ public class BytedeskProperties {
         }
     }
 
+    /**
+     * 处理可能包含中文的文本
+     * 
+     * @param text 原始文本
+     * @param envKey 对应的环境变量key
+     * @return 处理后的文本
+     */
+    private String handleChineseText(String text, String envKey) {
+        if (!StringUtils.hasText(text)) {
+            return text;
+        }
+
+        try {
+            // 检查是否包含 Unicode 转义序列
+            if (text.contains("\\u")) {
+                // 处理 Unicode 转义序列
+                StringBuilder sb = new StringBuilder();
+                int len = text.length();
+                for (int i = 0; i < len; i++) {
+                    char c = text.charAt(i);
+                    if (c == '\\' && i + 1 < len && text.charAt(i + 1) == 'u') {
+                        String hex = text.substring(i + 2, i + 6);
+                        c = (char) Integer.parseInt(hex, 16);
+                        i += 5;
+                    }
+                    sb.append(c);
+                }
+                return sb.toString();
+            }
+
+            // 检查是否来自环境变量（Docker）
+            String envValue = System.getenv(envKey);
+            if (envValue != null && envValue.equals(text)) {
+                // 如果是来自Docker环境变量，使用UTF-8解码
+                return new String(text.getBytes(), "UTF-8");
+            }
+
+            // 如果是来自properties文件，使用ISO-8859-1到UTF-8的转换
+            return new String(text.getBytes("ISO-8859-1"), "UTF-8");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return text;
+        }
+    }
+
     public static BytedeskProperties getInstance() {
-        // 如果instance尚未初始化，将调用init方法进行初始化（由Spring的@PostConstruct保证）
         return instance;
     }
 
