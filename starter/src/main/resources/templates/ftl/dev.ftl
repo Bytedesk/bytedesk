@@ -193,7 +193,7 @@
             </ul>
 
             <#--  demo  -->
-            <h2>${i18n[lang]["demo"]}</h2>
+            <h2>${i18n[lang]["demo"]}[TODO]</h2>
             <ul>
                 <li><a href="/chat/demo/airline" target="_blank">${i18n[lang]["airline"]}</a></li>
                 <li><a href="/chat/demo/bytedesk" target="_blank">${i18n[lang]["bytedesk"]}</a></li>
