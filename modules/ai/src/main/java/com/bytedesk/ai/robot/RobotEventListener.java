@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 14:38:23
+ * @LastEditTime: 2025-02-27 15:50:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,11 +14,15 @@
 package com.bytedesk.ai.robot;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 
@@ -47,9 +51,13 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
+
+import jakarta.annotation.PostConstruct;
+
 import com.bytedesk.ai.provider.LlmProviderConsts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 @Slf4j
 @Component
@@ -62,6 +70,13 @@ public class RobotEventListener {
     private final UidUtils uidUtils;
     private final ThreadRestService threadService;
     private final IMessageSendService messageSendService;
+    private final RedisTemplate<String, FaqEntity> redisTemplateFaqEntity;
+    private final RobotFaqProcessor robotFaqProcessor;
+    
+    // 批量处理的大小
+    private static final int BATCH_SIZE = 10;
+    // 处理间隔（毫秒）
+    private static final long PROCESS_INTERVAL = 5000;
 
     @Order(5)
     @EventListener
@@ -74,27 +89,104 @@ public class RobotEventListener {
         robotRestService.initDefaultRobot(orgUid, robotUid);
     }
 
+    @PostConstruct
+    public void init() {
+        // 启动后台处理线程
+        startFaqProcessor();
+    }
+
     @EventListener
     public void onFaqCreateEvent(FaqCreateEvent event) {
-        FaqEntity qa = event.getFaq();
-        log.info("RobotEventListener onFaqCreateEvent: {}", qa.getQuestion());
-        // 填充 bytedesk demo 热门问题、常见问题，只填充演示demo robot，且最多5条
-        Optional<RobotEntity> robotOptional = robotRestService.findByUid(BytedeskConsts.DEFAULT_ROBOT_UID);
-        if (robotOptional.isPresent()) {
-            RobotEntity robot = robotOptional.get();
-            // 填充机器人知识库
-            robot.getServiceSettings().setShowHotFaqs(true);
-            if (robot.getServiceSettings().getHotFaqs().size() < 5) {
-                robot.getServiceSettings().getHotFaqs().add(qa);
+        robotFaqProcessor.addFaqToQueue(event.getFaq());
+    }
+
+    private void startFaqProcessor() {
+        Thread processorThread = new Thread(() -> {
+            while (true) {
+                try {
+                    processFaqBatch();
+                    Thread.sleep(PROCESS_INTERVAL);
+                } catch (InterruptedException e) {
+                    log.error("FAQ processor interrupted: {}", e.getMessage());
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    log.error("Error processing FAQ batch: {}", e.getMessage());
+                }
             }
-            robot.getServiceSettings().setShowFaqs(true);
-            if (robot.getServiceSettings().getFaqs().size() < 5) {
-                robot.getServiceSettings().getFaqs().add(qa);
-            }
-            // 保存
-            robotRestService.save(robot);
-        }
+        }, "FAQ-Processor");
         
+        processorThread.setDaemon(true);
+        processorThread.start();
+    }
+
+    @Transactional
+    private void processFaqBatch() {
+        Optional<RobotEntity> robotOptional = robotRestService.findByUid(BytedeskConsts.DEFAULT_ROBOT_UID);
+        if (!robotOptional.isPresent()) {
+            return;
+        }
+
+        RobotEntity robot = robotOptional.get();
+        boolean updated = false;
+        int retryCount = 0;
+        int maxRetries = 3;
+
+        while (retryCount < maxRetries) {
+            try {
+                // 从队列中获取一批 FAQ
+                List<FaqEntity> faqs = new ArrayList<>();
+                for (int i = 0; i < BATCH_SIZE; i++) {
+                    FaqEntity faq = redisTemplateFaqEntity.opsForList().leftPop(RobotConsts.ROBOT_FAQ_QUEUE_KEY);
+                    if (faq == null) {
+                        break;
+                    }
+                    faqs.add(faq);
+                }
+
+                if (faqs.isEmpty()) {
+                    break;
+                }
+
+                // 更新机器人知识库
+                for (FaqEntity faq : faqs) {
+                    if (robot.getServiceSettings().getHotFaqs().size() < 5) {
+                        robot.getServiceSettings().getHotFaqs().add(faq);
+                        updated = true;
+                    }
+                    if (robot.getServiceSettings().getFaqs().size() < 5) {
+                        robot.getServiceSettings().getFaqs().add(faq);
+                        updated = true;
+                    }
+                }
+
+                if (updated) {
+                    robot.getServiceSettings().setShowHotFaqs(true);
+                    robot.getServiceSettings().setShowFaqs(true);
+                    robotRestService.save(robot);
+                }
+
+                // 如果成功，跳出重试循环
+                break;
+
+            } catch (OptimisticLockingFailureException e) {
+                retryCount++;
+                if (retryCount >= maxRetries) {
+                    log.error("Failed to update robot after {} retries", maxRetries);
+                    // 可以选择将失败的 FAQ 重新放回队列
+                    // redisTemplate.opsForList().rightPushAll(FAQ_QUEUE_KEY, faqs);
+                } else {
+                    log.warn("Optimistic locking failure, retry attempt {}", retryCount);
+                    try {
+                        // 指数退避
+                        Thread.sleep((long) (Math.pow(2, retryCount) * 100));
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @EventListener
