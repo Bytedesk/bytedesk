@@ -108,6 +108,9 @@ services:
       # BYTEDESK_PUSH_APNS_BUNDLE_ID: com.kefux.im
       # BYTEDESK_PUSH_APNS_P12_URL: 123.p12
       # BYTEDESK_PUSH_APNS_P12_PASSWORD: 123456
+      # druid
+      SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_USERNAME: admin@email.com
+      SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_PASSWORD: admin
       # Actuator security configuration
       MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT: false
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ''
@@ -120,7 +123,7 @@ services:
       # ai config
       # zhipuai
       # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
-      SPRING_AI_ZHIPUAI_API_KEY: ''
+      SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
       SPRING_AI_ZHIPUAI_CHAT_ENABLED: false
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
