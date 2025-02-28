@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-22 22:59:32
+ * @Date: 2024-07-31 16:33:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-23 11:46:38
+ * @LastEditTime: 2024-07-31 16:38:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,15 +11,25 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.notebase;
+package com.bytedesk.kbase.article.event;
 
-import java.util.Optional;
+import org.springframework.context.ApplicationEvent;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import com.bytedesk.kbase.article.ArticleEntity;
 
-public interface NotebaseRepository extends JpaRepository<NotebaseEntity, Long>, JpaSpecificationExecutor<NotebaseEntity> {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-    Optional<NotebaseEntity> findByUid(String uid);
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class ArticleUpdateEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
+    private ArticleEntity article;
+
+    public ArticleUpdateEvent(Object source, ArticleEntity article) {
+        super(source);
+        this.article = article;
+    }
 }
