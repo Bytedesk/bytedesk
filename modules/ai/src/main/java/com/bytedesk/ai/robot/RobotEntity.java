@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 17:04:21
+ * @LastEditTime: 2025-02-28 14:48:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,10 +66,6 @@ public class RobotEntity extends BaseEntity {
     @Embedded
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
-    
-    // @Embedded
-    // @Builder.Default
-    // private RobotFlow flow = new RobotFlow();
 
     @Embedded
     @Builder.Default
@@ -94,11 +90,6 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
 
-    // @Builder.Default
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSONB)
-    // @JdbcTypeCode(SqlTypes.JSON)
-    // private String flow = BytedeskConsts.EMPTY_JSON_STRING;
-
     @Builder.Default
     private boolean published = false;
 
@@ -110,6 +101,7 @@ public class RobotEntity extends BaseEntity {
     // @Builder.Default
     // @Column(name = "robot_category")
     // private String category = RobotCategoryEnum.DEFAULT.name();
+    
     // 机器人分类
     private String categoryUid;
 
