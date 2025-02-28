@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 12:54:24
+ * @LastEditTime: 2025-02-28 14:27:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,6 @@ import java.util.List;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
-
 import com.bytedesk.kbase.faq.FaqResponseVisitor;
 
 import lombok.AllArgsConstructor;
@@ -85,6 +84,10 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     // 是否显示预搜索
     private Boolean showPreSearch;
+
+    // 欢迎问题
+    @Builder.Default
+    private List<FaqResponseVisitor> welcomeFaqs = new ArrayList<>();
 
     @Builder.Default
     private Boolean showFaqs = true;
