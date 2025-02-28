@@ -28,7 +28,6 @@ com.bytedesk.ai.settings
 com.bytedesk.ai.springai
 com.bytedesk.ai.springai.advisor
 com.bytedesk.ai.springai.demo.airline
-com.bytedesk.ai.springai.demo.airline.controller
 com.bytedesk.ai.springai.demo.airline.data
 com.bytedesk.ai.springai.demo.airline.services
 com.bytedesk.ai.springai.demo.bytedesk
