@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 16:54:06
+ * @LastEditTime: 2025-02-28 17:38:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,13 +49,19 @@ public class KbaseRequest extends BaseRequest {
 
     // 自定义网址
     @Builder.Default
-    private String url = KbaseConsts.URL;
+    private String url = KbaseConsts.KBASE_URL;
 
     @Builder.Default
-    private String logoUrl = KbaseConsts.LOGO_URL;
+    private String logoUrl = KbaseConsts.KBASE_LOGO_URL;
 
     @Builder.Default
-    private String faviconUrl = KbaseConsts.FAVICON_URL;
+    private String faviconUrl = KbaseConsts.KBASE_FAVICON_URL;
+
+    @Builder.Default
+    private String coverImageUrl = KbaseConsts.KBASE_COVER_IMAGE_URL;
+
+    @Builder.Default
+    private String backgroundImageUrl = KbaseConsts.KBASE_BACKGROUND_IMAGE_URL;
 
     // 主题色
     @Builder.Default

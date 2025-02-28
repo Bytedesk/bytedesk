@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-24 11:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-07 11:06:20
+ * @LastEditTime: 2025-02-28 17:38:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,9 +46,13 @@ public class KbaseConsts {
 
     public static final String KB_EMBEDDING = "M3E_BASE";
 
-    public static final String URL = "https://www.weiyuai.cn";
+    public static final String KBASE_URL = "https://www.weiyuai.cn";
 
-    public static final String LOGO_URL = "https://www.weiyuai.cn/logo.png";
+    public static final String KBASE_LOGO_URL = "https://www.weiyuai.cn/logo.png";
 
-    public static final String FAVICON_URL = "https://www.weiyuai.cn/favicon.ico";
+    public static final String KBASE_FAVICON_URL = "https://www.weiyuai.cn/favicon.ico";
+
+    public static final String KBASE_COVER_IMAGE_URL = "https://www.weiyuai.cn/cover.jpg";
+
+    public static final String KBASE_BACKGROUND_IMAGE_URL = "https://www.weiyuai.cn/background.jpg";
 }
