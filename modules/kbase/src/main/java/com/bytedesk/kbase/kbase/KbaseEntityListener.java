@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.kbase.kbase.event.KbaseCreateEvent;
+import com.bytedesk.kbase.kbase.event.KbaseUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;

@@ -34,6 +34,8 @@ import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.event.ArticleCreateEvent;
 import com.bytedesk.kbase.article.event.ArticleUpdateEvent;
+import com.bytedesk.kbase.kbase.event.KbaseCreateEvent;
+import com.bytedesk.kbase.kbase.event.KbaseUpdateEvent;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
 
 import lombok.AllArgsConstructor;

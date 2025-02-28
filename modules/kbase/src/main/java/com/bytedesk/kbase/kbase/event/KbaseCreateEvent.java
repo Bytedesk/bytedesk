@@ -11,9 +11,11 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.kbase;
+package com.bytedesk.kbase.kbase.event;
 
 import org.springframework.context.ApplicationEvent;
+
+import com.bytedesk.kbase.kbase.KbaseEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
