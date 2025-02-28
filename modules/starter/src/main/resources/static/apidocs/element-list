@@ -28,7 +28,6 @@ com.bytedesk.ai.settings
 com.bytedesk.ai.springai
 com.bytedesk.ai.springai.advisor
 com.bytedesk.ai.springai.demo.airline
-com.bytedesk.ai.springai.demo.airline.controller
 com.bytedesk.ai.springai.demo.airline.data
 com.bytedesk.ai.springai.demo.airline.services
 com.bytedesk.ai.springai.demo.bytedesk
@@ -139,6 +138,7 @@ com.bytedesk.forum.post
 com.bytedesk.forum.user
 com.bytedesk.kbase
 com.bytedesk.kbase.article
+com.bytedesk.kbase.article.event
 com.bytedesk.kbase.auto_reply.fixed
 com.bytedesk.kbase.auto_reply.keyword
 com.bytedesk.kbase.auto_reply.settings
@@ -150,7 +150,7 @@ com.bytedesk.kbase.faq.event
 com.bytedesk.kbase.file
 com.bytedesk.kbase.file.event
 com.bytedesk.kbase.kbase
-com.bytedesk.kbase.notebase
+com.bytedesk.kbase.kbase.event
 com.bytedesk.kbase.quick_reply
 com.bytedesk.kbase.settings
 com.bytedesk.kbase.split
