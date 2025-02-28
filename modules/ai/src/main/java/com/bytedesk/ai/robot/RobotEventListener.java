@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 11:39:40
+ * @LastEditTime: 2025-02-28 12:02:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
 import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
+import com.bytedesk.ai.springai.SpringAIDeepseekService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -67,6 +68,7 @@ public class RobotEventListener {
     private final RobotRestService robotRestService;
     private final Optional<ZhipuaiChatService> zhipuaiChatService;
     private final Optional<OllamaChatService> ollamaChatService;
+    private final Optional<SpringAIDeepseekService> springAIDeepseekService;
     private final UidUtils uidUtils;
     private final ThreadRestService threadService;
     private final IMessageSendService messageSendService;
@@ -159,7 +161,10 @@ public class RobotEventListener {
                 if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
                     ollamaChatService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
-                } else if () else {
+                } else if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
+                    springAIDeepseekService.ifPresent(service -> 
+                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                } else {
                     zhipuaiChatService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 }

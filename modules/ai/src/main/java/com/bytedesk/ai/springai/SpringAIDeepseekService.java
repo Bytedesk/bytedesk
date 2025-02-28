@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-26 16:58:56
+ * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 11:48:56
+ * @LastEditTime: 2025-02-28 12:09:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,13 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotTypeEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -31,16 +34,13 @@ import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
-public class SpringAIZhipuaiService {
+@ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIDeepseekService {
 
-    private final ZhiPuAiChatModel zhipuaiChatModel;
+    private final OpenAiChatModel deepSeekChatModel;
     private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
 
@@ -121,7 +121,7 @@ public class SpringAIZhipuaiService {
         messages.add(new UserMessage(prompt));
 
         Prompt aiPrompt = new Prompt(messages);
-        zhipuaiChatModel.stream(aiPrompt).subscribe(
+        deepSeekChatModel.stream(aiPrompt).subscribe(
             response -> {
                 if (response != null) {
                     messageProtobuf.setType(MessageTypeEnum.STREAM);
@@ -134,13 +134,60 @@ public class SpringAIZhipuaiService {
         );
     }
 
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
+        
+        deepSeekChatModel.stream(aiPrompt).subscribe(
+            response -> {
+                if (response != null) {
+                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                    messageProtobuf.setContent(response.toString());
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                }
+            },
+            error -> log.error("Error in chat stream", error),
+            () -> log.info("Chat stream completed")
+        );
+
+        try {
+            String prompt = robotLlm.getPrompt() + "\n" + query;
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(robotLlm.getPrompt()));
+        messages.add(new UserMessage(prompt));
+
+        Prompt aiPrompt = new Prompt(messages);
+        
+            deepSeekChatClient.stream(aiPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        messageProtobuf.setType(MessageTypeEnum.STREAM);
+                        messageProtobuf.setContent(response.toString());
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                    }
+                },
+                error -> {
+                    log.error("DeepSeek API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed")
+            );
+        } catch (Exception e) {
+            log.error("Error in DeepSeek chat: ", e);
+            messageProtobuf.setType(MessageTypeEnum.ERROR);
+            messageProtobuf.setContent("服务异常，请稍后重试");
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        }
+    }
+
+    
     public String generateFaqPairsAsync(String chunk) {
         if (!StringUtils.hasText(chunk)) {
             return "";
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        return zhipuaiChatModel.call(prompt);
+        return deepSeekChatModel.call(prompt);
     }
 
     public void generateFaqPairsSync(String chunk) {
@@ -156,7 +203,7 @@ public class SpringAIZhipuaiService {
 
         while (retryCount < maxRetries) {
             try {
-                String result = zhipuaiChatModel.call(prompt);
+                String result = deepSeekChatModel.call(prompt);
                 log.info("FAQ generation result: {}", result);
                 return;
             } catch (Exception e) {
@@ -175,6 +222,5 @@ public class SpringAIZhipuaiService {
             }
         }
     }
-
 
 }

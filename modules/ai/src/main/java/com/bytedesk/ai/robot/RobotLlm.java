@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 17:59:42
+ * @LastEditTime: 2025-02-28 12:00:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,8 +12,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot;
-
-import org.springframework.beans.factory.annotation.Value;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
