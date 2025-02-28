@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 12:39:34
+ * @LastEditTime: 2025-02-28 12:53:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,10 +16,13 @@ package com.bytedesk.ai.springai;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.ai.chat.messages.AssistantMessage;
 // import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -149,10 +152,28 @@ public class SpringAIDeepseekService {
         deepSeekChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("DeepSeek API response: {}", response);
-                        // messageProtobuf.setType(MessageTypeEnum.STREAM);
-                        // messageProtobuf.setContent(response.toString());
-                        // messageSendService.sendProtobufMessage(messageProtobuf);
+                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        // generations
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
+                            
+                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage, textContent);
+                            ChatGenerationMetadata metadata = generation.getMetadata();
+
+                            // finishReason: STOP
+                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata, metadata.getFinishReason());
+
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
+
+                            // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
+                            //     messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            //     messageSendService.sendProtobufMessage(messageProtobuf);
+                            // }
+                        }
                     }
                 },
                 error -> {
