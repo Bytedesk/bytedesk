@@ -129,5 +129,6 @@ public class SpringAIDashscopeConfig {
         return new DashScopeSpeechSynthesisModel(dashScopeSpeechSynthesisApi());
     }
 
+    
 
 }

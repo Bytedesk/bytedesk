@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 10:54:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:23:11
+ * @LastEditTime: 2025-02-28 23:24:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @RestController
 @RequestMapping("/springai/demo/airline")
@@ -40,10 +41,9 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIAirlineController {
 
-    // private final ChatClient ollamaCustomerSupportAssistant;
-
+	@Qualifier("dashScopeCustomerSupportAssistant")
 	private final ChatClient dashScopeCustomerSupportAssistant;
-
+	
 	private final FlightBookingService flightBookingService;
 
 	// http://127.0.0.1:9003/springai/demo/airline/chat?chatId=1&userMessage=退票？

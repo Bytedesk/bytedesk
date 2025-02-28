@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:09:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 10:14:16
+ * @LastEditTime: 2025-02-28 23:11:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,6 +40,7 @@ public class SpringAIConfig {
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
     @Bean("defaultChatClient")
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     ChatClient defaultChatClient(ChatClient.Builder defaultChatClientBuilder) {
         return defaultChatClientBuilder
                 .defaultSystem("You are a friendly chat bot that answers question in the voice of a {voice}")
