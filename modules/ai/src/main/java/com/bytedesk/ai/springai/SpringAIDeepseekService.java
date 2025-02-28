@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 12:09:49
+ * @LastEditTime: 2025-02-28 12:39:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.springai;
 import java.util.ArrayList;
 import java.util.List;
 
+// import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -34,12 +35,14 @@ import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDeepseekService {
 
+    // private final ChatClient deepSeekChatClient;
     private final OpenAiChatModel deepSeekChatModel;
     private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
@@ -108,10 +111,10 @@ public class SpringAIDeepseekService {
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
             List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
-            String history = ""; 
+            String history = "";
             prompt = PROMPT_TEMPLATE.replace("{context}", context)
-                                 .replace("{query}", query)
-                                 .replace("{history}", history);
+                    .replace("{query}", query)
+                    .replace("{history}", history);
         } else {
             prompt = robot.getLlm().getPrompt() + "\n" + query;
         }
@@ -122,46 +125,34 @@ public class SpringAIDeepseekService {
 
         Prompt aiPrompt = new Prompt(messages);
         deepSeekChatModel.stream(aiPrompt).subscribe(
-            response -> {
-                if (response != null) {
-                    messageProtobuf.setType(MessageTypeEnum.STREAM);
-                    messageProtobuf.setContent(response.toString());
-                    messageSendService.sendProtobufMessage(messageProtobuf);
-                }
-            },
-            error -> log.error("Error in chat stream", error),
-            () -> log.info("Chat stream completed")
-        );
-    }
-
-    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
-        
-        deepSeekChatModel.stream(aiPrompt).subscribe(
-            response -> {
-                if (response != null) {
-                    messageProtobuf.setType(MessageTypeEnum.STREAM);
-                    messageProtobuf.setContent(response.toString());
-                    messageSendService.sendProtobufMessage(messageProtobuf);
-                }
-            },
-            error -> log.error("Error in chat stream", error),
-            () -> log.info("Chat stream completed")
-        );
-
-        try {
-            String prompt = robotLlm.getPrompt() + "\n" + query;
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(robotLlm.getPrompt()));
-        messages.add(new UserMessage(prompt));
-
-        Prompt aiPrompt = new Prompt(messages);
-        
-            deepSeekChatClient.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         messageProtobuf.setType(MessageTypeEnum.STREAM);
                         messageProtobuf.setContent(response.toString());
                         messageSendService.sendProtobufMessage(messageProtobuf);
+                    }
+                },
+                error -> log.error("Error in chat stream", error),
+                () -> log.info("Chat stream completed"));
+    }
+
+    // TODO：历史聊天记录
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
+
+        String prompt = robotLlm.getPrompt() + "\n" + query;
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(robotLlm.getPrompt()));
+        messages.add(new UserMessage(prompt));
+
+        Prompt aiPrompt = new Prompt(messages);
+
+        deepSeekChatModel.stream(aiPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        log.info("DeepSeek API response: {}", response);
+                        // messageProtobuf.setType(MessageTypeEnum.STREAM);
+                        // messageProtobuf.setContent(response.toString());
+                        // messageSendService.sendProtobufMessage(messageProtobuf);
                     }
                 },
                 error -> {
@@ -170,17 +161,9 @@ public class SpringAIDeepseekService {
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
                 },
-                () -> log.info("Chat stream completed")
-            );
-        } catch (Exception e) {
-            log.error("Error in DeepSeek chat: ", e);
-            messageProtobuf.setType(MessageTypeEnum.ERROR);
-            messageProtobuf.setContent("服务异常，请稍后重试");
-            messageSendService.sendProtobufMessage(messageProtobuf);
-        }
+                () -> log.info("Chat stream completed"));
     }
 
-    
     public String generateFaqPairsAsync(String chunk) {
         if (!StringUtils.hasText(chunk)) {
             return "";
@@ -196,7 +179,7 @@ public class SpringAIDeepseekService {
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        
+
         int maxRetries = 3;
         int retryCount = 0;
         int retryDelay = 1000;
@@ -212,7 +195,7 @@ public class SpringAIDeepseekService {
                     log.error("Failed to generate FAQ pairs after {} retries", maxRetries, e);
                     throw new RuntimeException("Failed to generate FAQ pairs", e);
                 }
-                
+
                 try {
                     Thread.sleep(retryDelay * (1 << (retryCount - 1)));
                 } catch (InterruptedException ie) {
