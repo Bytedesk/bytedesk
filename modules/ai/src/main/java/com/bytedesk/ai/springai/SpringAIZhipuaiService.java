@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 11:48:56
+ * @LastEditTime: 2025-02-28 12:57:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,14 +16,18 @@ package com.bytedesk.ai.springai;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotTypeEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -133,6 +137,53 @@ public class SpringAIZhipuaiService {
             () -> log.info("Chat stream completed")
         );
     }
+
+
+    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
+
+        String prompt = robotLlm.getPrompt() + "\n" + query;
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(robotLlm.getPrompt()));
+        messages.add(new UserMessage(prompt));
+
+        Prompt aiPrompt = new Prompt(messages);
+
+        zhipuaiChatModel.stream(aiPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        log.info("Zhipuai API response metadata: {}", response.getMetadata());
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
+                            
+                            log.info("Zhipuai API response assistantMessage: {}, textContent: {}", assistantMessage, textContent);
+                            ChatGenerationMetadata metadata = generation.getMetadata();
+
+                            // finishReason: STOP
+                            log.info("Zhipuai API response metadata {}, finishReason: {}", metadata, metadata.getFinishReason());
+
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
+
+                            // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
+                            //     messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            //     messageSendService.sendProtobufMessage(messageProtobuf);
+                            // }
+                        }
+                        
+                    }
+                },
+                error -> {
+                    log.error("Zhipuai API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed"));
+    }
+
 
     public String generateFaqPairsAsync(String chunk) {
         if (!StringUtils.hasText(chunk)) {

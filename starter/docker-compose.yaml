@@ -142,6 +142,7 @@ services:
       SPRING_AI_DEEPSEEK_API_KEY: 'sk-xxx'
       SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com
       SPRING_AI_DEEPSEEK_CHAT_ENABLED: false
+      # deepseek-reasoner or deepseek-chat
       SPRING_AI_DEEPSEEK_CHAT_OPTIONS_MODEL: deepseek-chat
       SPRING_AI_DEEPSEEK_CHAT_OPTIONS_TEMPERATURE: 0.7
       SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED: false

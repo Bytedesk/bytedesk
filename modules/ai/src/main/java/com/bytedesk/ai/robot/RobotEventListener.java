@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 12:02:24
+ * @LastEditTime: 2025-02-28 12:55:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,15 +14,11 @@
 package com.bytedesk.ai.robot;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 
@@ -31,6 +27,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
 import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.ai.springai.SpringAIDeepseekService;
+import com.bytedesk.ai.springai.SpringAIZhipuaiService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -50,15 +47,11 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
-
-import jakarta.annotation.PostConstruct;
 
 import com.bytedesk.ai.provider.LlmProviderConsts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.OptimisticLockingFailureException;
 
 @Slf4j
 @Component
@@ -69,6 +62,7 @@ public class RobotEventListener {
     private final Optional<ZhipuaiChatService> zhipuaiChatService;
     private final Optional<OllamaChatService> ollamaChatService;
     private final Optional<SpringAIDeepseekService> springAIDeepseekService;
+    private final Optional<SpringAIZhipuaiService> springAIZhipuaiService;
     private final UidUtils uidUtils;
     private final ThreadRestService threadService;
     private final IMessageSendService messageSendService;
@@ -165,8 +159,10 @@ public class RobotEventListener {
                     springAIDeepseekService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 } else {
-                    zhipuaiChatService.ifPresent(service -> 
+                    springAIZhipuaiService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                    // zhipuaiChatService.ifPresent(service -> 
+                    //     service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 }
             } else {
                 log.error("robot not found");
