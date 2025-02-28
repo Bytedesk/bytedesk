@@ -89,7 +89,7 @@ public class ZhipuaiChatService implements DisposableBean {
 
     private final MessageRestService messageService;
 
-    private final SpringAIVectorService uploadVectorStore;
+    private final SpringAIVectorService springAIVectorService;
 
     private final IMessageSendService messageSendService;
 
@@ -179,7 +179,7 @@ public class ZhipuaiChatService implements DisposableBean {
         //
         String prompt = robot.getLlm().getPrompt();
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = uploadVectorStore.searchText(query, robot.getKbUid());
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
             String history = ""; // TODO: 历史对话上下文，此处暂不使用
             prompt = PROMPT_TEMPLATE.replace("{context}", context).replace("{query}", query).replace("{history}",
@@ -259,7 +259,7 @@ public class ZhipuaiChatService implements DisposableBean {
 
     public void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
         //
-        List<String> contentList = uploadVectorStore.searchText(query, kbUid);
+        List<String> contentList = springAIVectorService.searchText(query, kbUid);
         String context = String.join("\n", contentList);
         String prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
         log.info("sendWsAutoReply prompt {}", prompt);

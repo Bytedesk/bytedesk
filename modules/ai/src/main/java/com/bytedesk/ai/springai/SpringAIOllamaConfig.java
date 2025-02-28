@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 09:24:51
+ * @LastEditTime: 2025-02-28 09:38:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.JedisPooled;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -52,7 +51,7 @@ import java.util.stream.IntStream;
 @Slf4j
 @Data
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
 public class SpringAIOllamaConfig {
 
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
@@ -70,12 +69,41 @@ public class SpringAIOllamaConfig {
     @Autowired
     private JedisProperties jedisProperties;
 
+    /**
+     * 检查 Ollama 服务是否可用
+     * @return true if Ollama service is available
+     */
+    private boolean isOllamaServiceAvailable() {
+        try {
+            var restClient = org.springframework.web.client.RestClient.builder()
+                .baseUrl(ollamaBaseUrl)
+                .build();
+            
+            restClient.get()
+                .uri("/api/tags")
+                .retrieve()
+                .toBodilessEntity();
+            
+            log.info("Ollama service is available at {}", ollamaBaseUrl);
+            return true;
+        } catch (Exception e) {
+            log.warn("Ollama service is not available at {}: {}", ollamaBaseUrl, e.getMessage());
+            return false;
+        }
+    }
+
     @Bean("ollamaApi")
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
     OllamaApi ollamaApi() {
+        if (!isOllamaServiceAvailable()) {
+            log.warn("Ollama service is not available, some features may not work properly");
+            return null;
+        }
         return new OllamaApi(ollamaBaseUrl);
     }
 
     @Bean("ollamaChatOptions")
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
     OllamaOptions ollamaChatOptions() {
         return OllamaOptions.builder()
                 .model(ollamaChatModel)
@@ -83,6 +111,7 @@ public class SpringAIOllamaConfig {
     }
 
     @Bean("ollamaEmbeddingOptions")
+    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = true)
     OllamaOptions ollamaEmbeddingOptions() {
         return OllamaOptions.builder()
                 .model(ollamaEmbeddingModel)
@@ -91,7 +120,11 @@ public class SpringAIOllamaConfig {
 
     @Primary
     @Bean("ollamaChatModel")
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
     OllamaChatModel ollamaChatModel(OllamaApi ollamaApi, OllamaOptions ollamaChatOptions) {
+        if (ollamaApi == null) {
+            return null;
+        }
         return OllamaChatModel.builder()
                 .ollamaApi(ollamaApi)
                 .defaultOptions(ollamaChatOptions)
@@ -100,35 +133,46 @@ public class SpringAIOllamaConfig {
 
     @Primary
     @Bean("ollamaEmbeddingModel")
-    OllamaEmbeddingModel ollamaEmbeddingModel(OllamaApi ollamaApi, OllamaOptions ollamaEmbeddingOptions) {
+    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = true)
+    EmbeddingModel ollamaEmbeddingModel(OllamaApi ollamaApi, OllamaOptions ollamaEmbeddingOptions) {
+        if (!isOllamaServiceAvailable()) {
+            log.warn("Creating fallback embedding model");
+            return createFallbackEmbeddingModel();
+        }
         return OllamaEmbeddingModel.builder()
                 .ollamaApi(ollamaApi)
                 .defaultOptions(ollamaEmbeddingOptions)
                 .build();
     }
 
-    @Primary
-    @Bean("ollamaChatClientBuilder")
-    ChatClient.Builder ollamaChatClientBuilder(OllamaChatModel ollamaChatModel) {
-        return ChatClient.builder(ollamaChatModel);
+    private EmbeddingModel createFallbackEmbeddingModel() {
+        return new EmbeddingModel() {
+            private static final int VECTOR_DIMENSIONS = 1536;
+
+            @Override
+            public EmbeddingResponse call(EmbeddingRequest request) {
+                log.debug("Using fallback embedding model");
+                List<Embedding> embeddings = IntStream.range(0, request.getInstructions().size())
+                    .mapToObj(i -> new Embedding(new float[VECTOR_DIMENSIONS], i))
+                    .collect(Collectors.toList());
+                return new EmbeddingResponse(embeddings);
+            }
+
+            @Override
+            public float[] embed(Document document) {
+                log.debug("Using fallback embedding for document: {}", document.getId());
+                float[] vector = new float[VECTOR_DIMENSIONS];
+                Arrays.fill(vector, 0.0f);
+                return vector;
+            }
+        };
     }
 
-    @Primary
-    @Bean("ollamaChatClient")
-    ChatClient ollamaChatClient(ChatClient.Builder ollamaChatClientBuilder, OllamaOptions ollamaChatOptions) {
-        return ollamaChatClientBuilder
-                .defaultOptions(ollamaChatOptions)
-                .build();
-    }
-
-    // https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
-    // https://redis.io/docs/interact/search-and-query/
-    // 初始化向量库, 创建索引
     @Primary
     @Bean("ollamaRedisVectorStore")
-    @ConditionalOnProperty(name = { "spring.ai.ollama.embedding.enabled",
-            "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
-    public RedisVectorStore ollamaRedisVectorStore(EmbeddingModel ollamaEmbeddingModel,
+    @ConditionalOnProperty(name = { "spring.ai.ollama.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, 
+        havingValue = "true", matchIfMissing = true)
+    public RedisVectorStore ollamaRedisVectorStore(EmbeddingModel embeddingModel,
             RedisVectorStoreProperties properties) {
         
         try {
@@ -140,15 +184,13 @@ public class SpringAIOllamaConfig {
                     null,
                     jedisProperties.getPassword());
 
-            // 创建一个带有重试机制的 RedisVectorStore
-            RedisVectorStore vectorStore = RedisVectorStore.builder(jedisPooled, ollamaEmbeddingModel)
+            RedisVectorStore vectorStore = RedisVectorStore.builder(jedisPooled, embeddingModel)
                     .indexName(properties.getIndex())
                     .prefix(properties.getPrefix())
                     .metadataFields(kbUid, fileUid)
                     .initializeSchema(true)
                     .build();
 
-            // 添加初始化检查
             try {
                 vectorStore.afterPropertiesSet();
                 log.info("Successfully initialized RedisVectorStore");
@@ -160,7 +202,6 @@ public class SpringAIOllamaConfig {
 
         } catch (Exception e) {
             log.error("Failed to create RedisVectorStore: {}", e.getMessage());
-            // 返回一个降级的 VectorStore 实现
             return createFallbackVectorStore(new JedisPooled(jedisProperties.getHost(),
                     jedisProperties.getPort(),
                     null,

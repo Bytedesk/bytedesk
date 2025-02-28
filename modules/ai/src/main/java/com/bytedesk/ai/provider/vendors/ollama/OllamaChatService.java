@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-27 14:58:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 09:23:14
+ * @LastEditTime: 2025-02-28 09:55:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,7 +58,7 @@ public class OllamaChatService {
     private LlmProviderRestService llmProviderRestService;
 
     @Autowired
-    private SpringAIVectorService uploadVectorStore;
+    private SpringAIVectorService springAIVectorService;
 
     // RAG智能客服提示模板
     private final String PROMPT_TEMPLATE = """
@@ -194,7 +194,7 @@ public class OllamaChatService {
         //
         String prompt = robot.getLlm().getPrompt();
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = uploadVectorStore.searchText(query, robot.getKbUid());
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
             String history = ""; // TODO: 历史对话上下文，此处暂不使用
             prompt = PROMPT_TEMPLATE.replace("{context}", context).replace("{query}", query).replace("{history}",
