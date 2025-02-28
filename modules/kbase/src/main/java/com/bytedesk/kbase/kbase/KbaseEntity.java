@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 17:19:48
+ * @LastEditTime: 2025-02-28 17:38:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,6 @@
  */
 package com.bytedesk.kbase.kbase;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -23,9 +20,7 @@ import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -69,13 +64,21 @@ public class KbaseEntity extends BaseEntity {
 
     // 自定义网址
     @Builder.Default
-    private String url = KbaseConsts.URL;
+    private String url = KbaseConsts.KBASE_URL;
 
     @Builder.Default
-    private String logoUrl = KbaseConsts.LOGO_URL;
+    private String logoUrl = KbaseConsts.KBASE_LOGO_URL;
 
     @Builder.Default
-    private String faviconUrl = KbaseConsts.FAVICON_URL;
+    private String faviconUrl = KbaseConsts.KBASE_FAVICON_URL;
+
+    // 自定义封面图片
+    @Builder.Default
+    private String coverImageUrl = KbaseConsts.KBASE_COVER_IMAGE_URL;
+
+    // 自定义背景图片
+    @Builder.Default
+    private String backgroundImageUrl = KbaseConsts.KBASE_BACKGROUND_IMAGE_URL;
 
     // 主题色
     @Builder.Default
