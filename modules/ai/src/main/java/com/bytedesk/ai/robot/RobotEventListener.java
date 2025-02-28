@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 17:03:28
+ * @LastEditTime: 2025-02-28 18:15:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,9 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
+import com.bytedesk.ai.springai.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.SpringAIDeepseekService;
+import com.bytedesk.ai.springai.SpringAIOllamaService;
 import com.bytedesk.ai.springai.SpringAIZhipuaiService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
@@ -59,9 +61,11 @@ public class RobotEventListener {
 
     private final RobotRestService robotRestService;
     // private final Optional<ZhipuaiChatService> zhipuaiChatService;
-    private final Optional<OllamaChatService> ollamaChatService;
+    // private final Optional<OllamaChatService> ollamaChatService;
     private final Optional<SpringAIDeepseekService> springAIDeepseekService;
     private final Optional<SpringAIZhipuaiService> springAIZhipuaiService;
+    private final Optional<SpringAIDashscopeService> springAIDashscopeService;
+    private final Optional<SpringAIOllamaService> springAIOllamaService;
     private final UidUtils uidUtils;
     private final ThreadRestService threadService;
     private final IMessageSendService messageSendService;
@@ -151,13 +155,21 @@ public class RobotEventListener {
                 clonedMessage.setUid(uidUtils.getUid());
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                 messageSendService.sendProtobufMessage(clonedMessage);
+                // 
                 if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                    ollamaChatService.ifPresent(service -> 
+                    springAIOllamaService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 } else if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
                     springAIDeepseekService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
-                } else {
+                } else if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
+                    springAIDashscopeService.ifPresent(service -> 
+                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                } else if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
+                    springAIZhipuaiService.ifPresent(service -> 
+                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                } else  {
+                    // 默认使用智谱AI
                     springAIZhipuaiService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 }
@@ -193,19 +205,25 @@ public class RobotEventListener {
                     .extra(JSONObject.toJSONString(extra))
                     .createdAt(LocalDateTime.now())
                     .build();
-
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
             clonedMessage.setUid(uidUtils.getUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
             messageSendService.sendProtobufMessage(clonedMessage);
-
+            // 
             if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                ollamaChatService.ifPresent(service -> 
+                springAIOllamaService.ifPresent(service -> 
                     service.sendWsKbMessage(query, robot, message));
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
                 springAIDeepseekService.ifPresent(service -> 
                     service.sendWsKbMessage(query, robot, message));
+            } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
+                springAIDashscopeService.ifPresent(service -> 
+                    service.sendWsKbMessage(query, robot, message));
+            } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
+                springAIZhipuaiService.ifPresent(service ->
+                  service.sendWsKbMessage(query, robot, messageProtobuf));
             } else {
+                // 默认使用智谱AI
                 springAIZhipuaiService.ifPresent(service ->
                   service.sendWsKbMessage(query, robot, messageProtobuf));
             }
