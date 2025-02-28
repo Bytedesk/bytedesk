@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 06:44:04
+ * @LastEditTime: 2025-02-28 13:38:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,6 +112,10 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
+
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<FaqEntity> welcomeFaqs = new ArrayList<>();
 
     /** auto close time in minutes */
     @NotBlank
