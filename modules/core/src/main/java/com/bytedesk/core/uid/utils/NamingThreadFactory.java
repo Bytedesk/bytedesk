@@ -136,7 +136,7 @@ public class NamingThreadFactory implements ThreadFactory {
     }
 
     /**
-     * Getters & Setters
+     * Getters and Setters
      */
     public String getName() {
         return name;

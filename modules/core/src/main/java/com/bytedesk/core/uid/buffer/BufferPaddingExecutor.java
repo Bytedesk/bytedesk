@@ -49,7 +49,7 @@ public class BufferPaddingExecutor {
     /** We can borrow UIDs from the future, here store the last second we have consumed */
     private final PaddedAtomicLong lastSecond;
 
-    /** RingBuffer & BufferUidProvider */
+    /** RingBuffer and BufferUidProvider */
     private final RingBuffer ringBuffer;
     private final BufferedUidProvider uidProvider;
 

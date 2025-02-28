@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"com.bytedesk.dingtalk","c":"DingtalkApplication","l":"DingtalkApplication()","u":"%3Cinit%3E()"}];updateSearchResults();

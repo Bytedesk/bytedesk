@@ -39,7 +39,7 @@ import lombok.experimental.Accessors;
  * 通常用于描述两个或多个人之间的口头或书面的交流活动，更强调交流的互动性和即时性，使用的场景较为广泛，包括日常对话、商务谈判、电话交流等
  * 综上考虑，此处使用 thread 表示会话更为合适
  * 
- * every visitor <-> agent thread should only be one,
+ * every visitor to agent thread should only be one,
  * history records are stored in thread_log table
  */
 @Entity
