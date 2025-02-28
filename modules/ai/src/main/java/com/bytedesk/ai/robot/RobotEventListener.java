@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 12:55:35
+ * @LastEditTime: 2025-02-28 13:06:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -161,8 +161,6 @@ public class RobotEventListener {
                 } else {
                     springAIZhipuaiService.ifPresent(service -> 
                         service.sendWsMessage(query, robotProtobuf.getLlm(), message));
-                    // zhipuaiChatService.ifPresent(service -> 
-                    //     service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 }
             } else {
                 log.error("robot not found");
@@ -205,9 +203,14 @@ public class RobotEventListener {
             if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
                 ollamaChatService.ifPresent(service -> 
                     service.sendWsKbMessage(query, robot, message));
-            } else {
-                zhipuaiChatService.ifPresent(service -> 
+            } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
+                springAIDeepseekService.ifPresent(service -> 
                     service.sendWsKbMessage(query, robot, message));
+            } else {
+                springAIZhipuaiService.ifPresent(service ->
+                  service.sendWsKbMessage(query, robot, messageProtobuf));
+                // zhipuaiChatService.ifPresent(service -> 
+                //     service.sendWsKbMessage(query, robot, message));
             }
         }
     }

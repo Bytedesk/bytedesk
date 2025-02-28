@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 12:57:11
+ * @LastEditTime: 2025-02-28 13:07:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -112,10 +112,10 @@ public class SpringAIZhipuaiService {
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
             List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
-            String history = ""; 
+            String history = "";
             prompt = PROMPT_TEMPLATE.replace("{context}", context)
-                                 .replace("{query}", query)
-                                 .replace("{history}", history);
+                    .replace("{query}", query)
+                    .replace("{history}", history);
         } else {
             prompt = robot.getLlm().getPrompt() + "\n" + query;
         }
@@ -125,19 +125,45 @@ public class SpringAIZhipuaiService {
         messages.add(new UserMessage(prompt));
 
         Prompt aiPrompt = new Prompt(messages);
-        zhipuaiChatModel.stream(aiPrompt).subscribe(
-            response -> {
-                if (response != null) {
-                    messageProtobuf.setType(MessageTypeEnum.STREAM);
-                    messageProtobuf.setContent(response.toString());
-                    messageSendService.sendProtobufMessage(messageProtobuf);
-                }
-            },
-            error -> log.error("Error in chat stream", error),
-            () -> log.info("Chat stream completed")
-        );
-    }
 
+        zhipuaiChatModel.stream(aiPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        log.info("Zhipuai API response metadata: {}", response.getMetadata());
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
+
+                            log.info("Zhipuai API response assistantMessage: {}, textContent: {}", assistantMessage,
+                                    textContent);
+                            ChatGenerationMetadata metadata = generation.getMetadata();
+
+                            // finishReason: STOP
+                            log.info("Zhipuai API response metadata {}, finishReason: {}", metadata,
+                                    metadata.getFinishReason());
+
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
+
+                            // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
+                            // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            // messageSendService.sendProtobufMessage(messageProtobuf);
+                            // }
+                        }
+
+                    }
+                },
+                error -> {
+                    log.error("Zhipuai API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed"));
+
+    }
 
     public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
 
@@ -156,23 +182,25 @@ public class SpringAIZhipuaiService {
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
-                            
-                            log.info("Zhipuai API response assistantMessage: {}, textContent: {}", assistantMessage, textContent);
+
+                            log.info("Zhipuai API response assistantMessage: {}, textContent: {}", assistantMessage,
+                                    textContent);
                             ChatGenerationMetadata metadata = generation.getMetadata();
 
                             // finishReason: STOP
-                            log.info("Zhipuai API response metadata {}, finishReason: {}", metadata, metadata.getFinishReason());
+                            log.info("Zhipuai API response metadata {}, finishReason: {}", metadata,
+                                    metadata.getFinishReason());
 
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
                             messageProtobuf.setContent(textContent);
                             messageSendService.sendProtobufMessage(messageProtobuf);
 
                             // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
-                            //     messageProtobuf.setType(MessageTypeEnum.SUCCESS);
-                            //     messageSendService.sendProtobufMessage(messageProtobuf);
+                            // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            // messageSendService.sendProtobufMessage(messageProtobuf);
                             // }
                         }
-                        
+
                     }
                 },
                 error -> {
@@ -183,7 +211,6 @@ public class SpringAIZhipuaiService {
                 },
                 () -> log.info("Chat stream completed"));
     }
-
 
     public String generateFaqPairsAsync(String chunk) {
         if (!StringUtils.hasText(chunk)) {
@@ -200,7 +227,7 @@ public class SpringAIZhipuaiService {
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        
+
         int maxRetries = 3;
         int retryCount = 0;
         int retryDelay = 1000;
@@ -216,7 +243,7 @@ public class SpringAIZhipuaiService {
                     log.error("Failed to generate FAQ pairs after {} retries", maxRetries, e);
                     throw new RuntimeException("Failed to generate FAQ pairs", e);
                 }
-                
+
                 try {
                     Thread.sleep(retryDelay * (1 << (retryCount - 1)));
                 } catch (InterruptedException ie) {
@@ -226,6 +253,5 @@ public class SpringAIZhipuaiService {
             }
         }
     }
-
 
 }
