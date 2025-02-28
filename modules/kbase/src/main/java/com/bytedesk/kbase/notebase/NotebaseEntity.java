@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 09:24:40
+ * @LastEditTime: 2025-02-28 11:10:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,7 +70,7 @@ public class NotebaseEntity extends BaseEntity {
 
     @Builder.Default
     @ElementCollection
-    @CollectionTable(name = "bytedesk_kbase_Notebase_tags")
+    @CollectionTable(name = "bytedesk_kbase_notebase_tags")
     private List<String> tags = new ArrayList<>();
 
     @Builder.Default
