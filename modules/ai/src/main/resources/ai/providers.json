@@ -20,18 +20,18 @@
         "webUrl": "https://deepseek.com/",
         "status": "PRODUCTION"
     },
+    "dashscope": {
+        "nickname": "通义千问",
+        "logo": "dashscope.png",
+        "apiUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1/",
+        "webUrl": "https://dashscope.aliyun.com/",
+        "status": "PRODUCTION"
+    },
     "yiyan": {
         "nickname": "文心一言",
         "logo": "yiyan.png",
         "apiUrl": "https://yiyan.baidu.com/",
         "webUrl": "https://yiyan.baidu.com/",
-        "status": "DEVELOPMENT"
-    },
-    "qwen": {
-        "nickname": "通义千问",
-        "logo": "dashscope.png",
-        "apiUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1/",
-        "webUrl": "https://dashscope.aliyun.com/",
         "status": "DEVELOPMENT"
     },
     "hunyuan": {

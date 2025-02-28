@@ -44,6 +44,20 @@
             "nickname": "GLM-4-AllTools"
         }
     ],
+    "dashscope": [
+        {
+            "name": "qwen-turbo",
+            "nickname": "Qwen Turbo"
+        },
+        {
+            "name": "qwen-plus",
+            "nickname": "Qwen Plus"
+        },
+        {
+            "name": "qwen-max",
+            "nickname": "Qwen Max"
+        }
+    ],
     "silicon": [
         {
             "name": "Qwen/Qwen2-7B-Instruct",
@@ -167,20 +181,7 @@
             "nickname": "Baichuan3 Turbo 128k"
         }
     ],
-    "qwen": [
-        {
-            "name": "qwen-turbo",
-            "nickname": "Qwen Turbo"
-        },
-        {
-            "name": "qwen-plus",
-            "nickname": "Qwen Plus"
-        },
-        {
-            "name": "qwen-max",
-            "nickname": "Qwen Max"
-        }
-    ],
+   
     "stepfun": [
         {
             "name": "step-1-8k",
