@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:53:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 15:45:40
+ * @LastEditTime: 2025-02-28 17:55:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,7 +45,7 @@ import reactor.core.publisher.Flux;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
-public class SpringAIAlibabaImageService {
+public class SpringAIDashscopeImageService {
 
     private final ImageModel dashScopeImageModel;
 
