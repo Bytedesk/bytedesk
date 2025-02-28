@@ -65,7 +65,7 @@ public class FileEventListener {
             // 通知python ai模块处理
             // redisPubsubService.sendDeleteFileMessage(upload.getUid(), upload.getDocIdList());
             // 删除redis中缓存的document
-            // uploadVectorStore.deleteDoc(upload.getDocIdList());
+            // springAIVectorService.deleteDoc(upload.getDocIdList());
         }
     }
 }

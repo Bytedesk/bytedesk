@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-27 15:55:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 15:55:00
+ * @LastEditTime: 2025-02-28 09:45:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,8 @@ import java.util.Optional;
 
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +59,7 @@ public class RobotFaqProcessor {
             log.info("Adding FAQ to queue: {}", faq.getQuestion());
             redisTemplateFaqEntity.opsForList().rightPush(RobotConsts.ROBOT_FAQ_QUEUE_KEY, faq);
         } catch (Exception e) {
-            log.error("Failed to add FAQ to queue: {}", e.getMessage());
+            log.error("Failed to add FAQ to queue: {}", e.getMessage(), e);
         }
     }
 
@@ -72,7 +74,7 @@ public class RobotFaqProcessor {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    log.error("Error processing FAQ batch: {}", e.getMessage());
+                    log.error("Error processing FAQ batch: {}", e.getMessage(), e);
                 }
             }
         }, "FAQ-Processor");
@@ -113,12 +115,16 @@ public class RobotFaqProcessor {
 
     private List<FaqEntity> fetchFaqBatch() {
         List<FaqEntity> faqs = new ArrayList<>();
-        for (int i = 0; i < BATCH_SIZE; i++) {
-            FaqEntity faq = redisTemplateFaqEntity.opsForList().leftPop(RobotConsts.ROBOT_FAQ_QUEUE_KEY);
-            if (faq == null) {
-                break;
+        try {
+            for (int i = 0; i < BATCH_SIZE; i++) {
+                FaqEntity faq = redisTemplateFaqEntity.opsForList().leftPop(RobotConsts.ROBOT_FAQ_QUEUE_KEY);
+                if (faq == null) {
+                    break;
+                }
+                faqs.add(faq);
             }
-            faqs.add(faq);
+        } catch (Exception e) {
+            log.error("Error fetching FAQ batch: {}", e.getMessage(), e);
         }
         return faqs;
     }

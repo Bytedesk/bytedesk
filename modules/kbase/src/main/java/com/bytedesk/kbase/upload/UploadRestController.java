@@ -76,7 +76,7 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 	// 	Optional<UploadEntity> uploadOptional = uploadService.findByUid(request.getUid());
 	// 	if (uploadOptional.isPresent()) {
 	// 		UploadEntity upload = uploadOptional.get();
-	// 		// uploadVectorStore.readSplitWriteToVectorStore(upload);
+	// 		// springAIVectorService.readSplitWriteToVectorStore(upload);
 	// 		//
 	// 		return ResponseEntity.ok(JsonResult.success("process success"));
 	// 	} else {

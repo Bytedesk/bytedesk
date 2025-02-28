@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-27 15:45:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 07:57:59
+ * @LastEditTime: 2025-02-28 09:48:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,33 +25,38 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @Configuration
 public class RobotConfig {
 
     @Bean
-    ObjectMapper redisObjectMapper() {
-        return JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .build();
-    }
-    
-
-    @Bean
-    public RedisTemplate<String, FaqEntity> redisTemplateFaqEntity(RedisConnectionFactory connectionFactory, ObjectMapper redisObjectMapper) {
+    public RedisTemplate<String, FaqEntity> redisTemplateFaqEntity(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, FaqEntity> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-         // 使用 GenericJackson2JsonRedisSerializer，它更适合处理泛型
-         GenericJackson2JsonRedisSerializer serializer = 
-         new GenericJackson2JsonRedisSerializer(redisObjectMapper);
+        // Create base ObjectMapper
+        ObjectMapper objectMapper = new ObjectMapper();
         
-        // 设置序列化器
-        // Jackson2JsonRedisSerializer<FaqEntity> serializer = new Jackson2JsonRedisSerializer<>(FaqEntity.class);
+        // Configure ObjectMapper with JavaTimeModule and type handling
+        objectMapper = JsonMapper.builder()
+            .addModule(new JavaTimeModule())
+            .activateDefaultTyping(
+                objectMapper.getPolymorphicTypeValidator(),
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY)
+            .build();
+
+        // Configure GenericJackson2JsonRedisSerializer with custom ObjectMapper
+        GenericJackson2JsonRedisSerializer serializer = 
+            new GenericJackson2JsonRedisSerializer(objectMapper);
+        
+        // Set serializers
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
+        template.setDefaultSerializer(serializer);
         
         template.afterPropertiesSet();
         return template;

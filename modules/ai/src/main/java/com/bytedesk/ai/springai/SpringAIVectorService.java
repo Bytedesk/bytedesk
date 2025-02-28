@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 09:29:47
+ * @LastEditTime: 2025-02-28 09:58:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,7 +66,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
 public class SpringAIVectorService {
 
 	private final Optional<RedisVectorStore> ollamaRedisVectorStore;
@@ -84,6 +84,19 @@ public class SpringAIVectorService {
 	private final UploadRestService uploadRestService;
 
 	private final BytedeskEventPublisher bytedeskEventPublisher;
+
+	private void handleVectorStoreOperation(String operation, Runnable action) {
+		if (!ollamaRedisVectorStore.isPresent()) {
+			log.warn("Vector store is not available, skipping {}", operation);
+			return;
+		}
+		try {
+			action.run();
+			log.debug("Successfully completed {}", operation);
+		} catch (Exception e) {
+			log.error("Failed to execute {}: {}", operation, e.getMessage(), e);
+		}
+	}
 
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
@@ -466,6 +479,11 @@ public class SpringAIVectorService {
 
 	// 存储到vector store
 	private void storeDocuments(List<Document> docList, FileEntity file) {
+		if (!ollamaRedisVectorStore.isPresent()) {
+			log.warn("Vector store is not available, skipping document storage for file: {}", file.getFileName());
+			return;
+		}
+
 		log.info("Parsing document, this will take a while. docList.size={}", docList.size());
 		List<String> docIdList = new ArrayList<>();
 		Iterator<Document> iterator = docList.iterator();
@@ -473,10 +491,9 @@ public class SpringAIVectorService {
 			Document doc = iterator.next();
 			log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
-			// 添加元数据: 文件file_uid, 知识库kb_uid
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
-			// 将doc写入到splitEntity
+			
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(file.getFileName())
 					.docId(doc.getId())
@@ -492,18 +509,28 @@ public class SpringAIVectorService {
 		}
 		file.setDocIdList(docIdList);
 		file.setStatus(SplitStatusEnum.SUCCESS.name());
-		//
 		fileRestService.save(file);
-		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
-		// 通知相关组件，文件处理成功
+		
+		ollamaRedisVectorStore.ifPresent(redisVectorStore -> {
+			try {
+				redisVectorStore.write(docList);
+				log.info("Successfully stored documents in vector store");
+			} catch (Exception e) {
+				log.error("Failed to store documents in vector store: {}", e.getMessage());
+			}
+		});
+
 		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
 	public List<String> searchText(String query) {
+		if (!ollamaRedisVectorStore.isPresent()) {
+			log.warn("Vector store is not available");
+			return List.of();
+		}
+
 		SearchRequest searchRequest = SearchRequest.builder()
 				.query(query)
 				.topK(2)
@@ -515,24 +542,24 @@ public class SpringAIVectorService {
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	public List<String> searchText(String query, String kbUid) {
+		if (!ollamaRedisVectorStore.isPresent()) {
+			log.warn("Vector store is not available for kbUid: {}", kbUid);
+			return List.of();
+		}
+
 		log.info("searchText kbUid {}, query: {}", kbUid, query);
-		// Retrieve documents similar to a query
 		FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
 		Expression expression = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
 		log.info("expression: {}", expression.toString());
-		//
+
 		SearchRequest searchRequest = SearchRequest.builder()
 				.query(query)
 				.filterExpression(expression)
 				.build();
-		// .withTopK(2);
-		// .withSimilarityThreshold(0.5)
-		// .withFilterExpression(expression);
 		List<Document> similarDocuments = ollamaRedisVectorStore.map(redisVectorStore -> 
 			redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
-		//
 		return contentList;
 	}
 

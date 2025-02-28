@@ -41,7 +41,7 @@ import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 public class SpringAIZhipuaiService {
 
     private final ZhiPuAiChatModel zhipuaiChatModel;
-    private final SpringAIVectorService uploadVectorStore;
+    private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
 
     private final String PROMPT_TEMPLATE = """
@@ -106,7 +106,7 @@ public class SpringAIZhipuaiService {
     public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
         String prompt;
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = uploadVectorStore.searchText(query, robot.getKbUid());
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
             String history = ""; 
             prompt = PROMPT_TEMPLATE.replace("{context}", context)
