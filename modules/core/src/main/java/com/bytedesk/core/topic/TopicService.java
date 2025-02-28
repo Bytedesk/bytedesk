@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 21:00:44
+ * @LastEditTime: 2025-02-28 14:45:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,7 @@
  */
 package com.bytedesk.core.topic;
 
-import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,11 +24,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.action.ActionRestService;
-import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.OptimisticLockingHandler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +41,9 @@ public class TopicService {
 
     private final UidUtils uidUtils;
 
-    private final ActionRestService actionService;
+    // private final ActionRestService actionService;
+
+    private final OptimisticLockingHandler optimisticLockingHandler;
 
     // private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
 
@@ -215,81 +212,18 @@ public class TopicService {
     })
     public TopicEntity save(TopicEntity topic) {
         try {
-            return topicRepository.save(topic);
+            return optimisticLockingHandler.executeWithRetry(
+                () -> topicRepository.save(topic),
+                "topic",
+                topic.getUid(),
+                topic
+            );
         } catch (ObjectOptimisticLockingFailureException e) {
-            // 乐观锁冲突处理逻辑
-            handleOptimisticLockingFailureException(e, topic);
-        }
-        return null;
-    }
-
-    private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
-    private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
-    private final Queue<TopicEntity> retryQueue = new LinkedList<>();
-
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TopicEntity entity) {
-        retryQueue.add(entity);
-        processRetryQueue();
-    }
-
-    private void processRetryQueue() {
-        while (!retryQueue.isEmpty()) {
-            TopicEntity topic = retryQueue.poll(); // 从队列中取出一个元素
-            if (topic == null) {
-                break; // 队列为空，跳出循环
-            }
-
-            int retryCount = 0;
-            while (retryCount < MAX_RETRY_ATTEMPTS) {
-                try {
-                    // 尝试更新Topic对象
-                    topicRepository.save(topic);
-                    // 更新成功，无需进一步处理
-                    log.info("Optimistic locking succeeded for topic: {}", topic.getUserUid());
-                    break; // 跳出内部循环
-                } catch (ObjectOptimisticLockingFailureException ex) {
-                    // 捕获乐观锁异常
-                    log.error("Optimistic locking failure for topic: {}, retry count: {}", topic.getUserUid(),
-                            retryCount + 1);
-                    // 等待一段时间后重试
-                    try {
-                        Thread.sleep(RETRY_DELAY_MS);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        log.error("Interrupted while waiting for retry", ie);
-                        return;
-                    }
-                    retryCount++; // 增加重试次数
-
-                    // 如果还有重试机会，则将topic放回队列末尾
-                    if (retryCount < MAX_RETRY_ATTEMPTS) {
-                        // FIXME: 发现会一直失败，暂时不重复处理
-                        // retryQueue.add(topic);
-                    } else {
-                        // 所有重试都失败了
-                        handleFailedRetries(topic);
-                    }
-                }
-            }
+            log.error("Failed to save topic after retries", e);
+            return null;
         }
     }
 
-    private void handleFailedRetries(TopicEntity entity) {
-        String topicJSON = JSONObject.toJSONString(entity);
-        ActionRequest actionRequest = ActionRequest.builder()
-                .title("topic")
-                .action("save")
-                .description("All retry attempts failed for optimistic locking")
-                .extra(topicJSON)
-                .build();
-        actionRequest.setType(ActionTypeEnum.FAILED.name());
-        actionService.create(actionRequest);
-        // bytedeskEventPublisher.publishActionEvent(actionRequest);
-        log.error("All retry attempts failed for optimistic locking of topic: {}", entity.getUid());
-        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
-        // notifyUserOfFailure(topic);
-    }
-    
     // TODO: 需要从原先uid的缓存列表中删除，然后添加到新的uid的换成列表中
     // @CachePut(value = "topic", key = "#uid")
     public void update(String uid, String userUid) {
