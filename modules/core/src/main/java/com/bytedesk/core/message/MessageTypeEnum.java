@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-02 12:38:16
+ * @LastEditTime: 2025-02-28 12:10:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,6 +88,7 @@ public enum MessageTypeEnum {
     GROUP_CREATE,
     GROUP_INVITE,
     GROUP_DISMISS,
+    ERROR,
     ;
 
     // 根据字符串查找对应的枚举常量

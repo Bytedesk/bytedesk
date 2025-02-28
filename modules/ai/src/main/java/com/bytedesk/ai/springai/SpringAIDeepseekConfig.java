@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 11:46:49
+ * @LastEditTime: 2025-02-28 12:34:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,8 @@
 package com.bytedesk.ai.springai;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -48,29 +48,25 @@ public class SpringAIDeepseekConfig {
     }
 
     @Bean("deepSeekChatOptions")
-    ChatOptions deepSeekChatOptions() {
-        return ChatOptions.builder()
+    OpenAiChatOptions deepSeekChatOptions() {
+        return OpenAiChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
     }
 
     @Bean("deepSeekChatModel")
-    OpenAiChatModel deepSeekChatModel(OpenAiApi openAiApi) {
+    OpenAiChatModel deepSeekChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(openAiApi)
+                .openAiApi(deepSeekApi())
+                .defaultOptions(deepSeekChatOptions())
                 .build();
     }
 
-    @Bean("deepSeekChatClientBuilder")
-    ChatClient.Builder deepSeekChatClientBuilder(OpenAiChatModel deepSeekChatModel) {
-        return ChatClient.builder(deepSeekChatModel);
-    }
-
     @Bean("deepSeekChatClient")
-    ChatClient deepSeekChatClient(ChatClient.Builder deepSeekChatClientBuilder, ChatOptions deepSeekChatOptions) {
-        return deepSeekChatClientBuilder
-                .defaultOptions(deepSeekChatOptions)
+    ChatClient deepSeekChatClient() {
+        return  ChatClient.builder(deepSeekChatModel())
+                .defaultOptions(deepSeekChatOptions())
                 .build();
     }
 

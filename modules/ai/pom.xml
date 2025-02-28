@@ -19,7 +19,7 @@
 
 	<properties>
 		<langchain4j.version>1.0.0-beta1</langchain4j.version>
-		<agentsflex.version>1.0.0-rc.4</agentsflex.version>
+		<agentsflex.version>1.0.0-rc.6</agentsflex.version>
 		<ollama4j.version>1.0.93</ollama4j.version>
 		<spring-ai-alibaba.version>1.0.0-M5.1</spring-ai-alibaba.version>
 		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
