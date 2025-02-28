@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-24 11:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 17:38:05
+ * @LastEditTime: 2025-02-28 23:45:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,8 @@ public class KbaseConsts {
     public static final String KB_PLATFORM_NAME = I18Consts.I18N_PREFIX + "kb.platform.name";
 
     public static final String KB_HELPCENTER_NAME = I18Consts.I18N_PREFIX + "kb.helpcenter.name";
+
+    public static final String KB_NOTEBASE_NAME = I18Consts.I18N_PREFIX + "kb.notebase.name";
 
     public static final String HEADLINE = I18Consts.I18N_PREFIX + "kb.helpcenter.headline";
 

@@ -237,6 +237,17 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
 
+        // 初始化内部知识库 NOTEBASE
+        KbaseRequest kownledgebaseRequestNotebase = KbaseRequest.builder()
+                .name(KbaseConsts.KB_NOTEBASE_NAME)
+                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
+                .language(LanguageEnum.ZH_CN.name())
+                .build();
+        kownledgebaseRequestNotebase.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_NOTEBASE_UID));
+        kownledgebaseRequestNotebase.setType(KbaseTypeEnum.NOTEBASE.name());
+        kownledgebaseRequestNotebase.setOrgUid(orgUid);
+        create(kownledgebaseRequestNotebase);
+
         // 初始化AI知识库
         KbaseRequest kownledgebaseRequestLlm = KbaseRequest.builder()
                 .name(KbaseConsts.KB_LLM_NAME)
