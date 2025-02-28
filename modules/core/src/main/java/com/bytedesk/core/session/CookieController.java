@@ -75,13 +75,13 @@ public class CookieController {
     /**
      * http://127.0.0.1:9003/cookie/all
      * 
-     * @param request
+     * @param httpRequest The HTTP request object
      * @return
      */
     @GetMapping("/all")
-    public ResponseEntity<?> getAllCookies(HttpServletRequest request) {
+    public ResponseEntity<?> getAllCookies(HttpServletRequest httpRequest) {
 
-        Cookie[] cookies = request.getCookies();
+        Cookie[] cookies = httpRequest.getCookies();
         if (cookies != null) {
             JSONObject jsonObject = new JSONObject();
 
@@ -99,7 +99,6 @@ public class CookieController {
     /**
      * http://127.0.0.1:9003/cookie/delete
      * 
-     * @param request
      * @param response
      * @return
      */

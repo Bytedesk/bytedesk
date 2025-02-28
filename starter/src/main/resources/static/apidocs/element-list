@@ -211,11 +211,6 @@ com.bytedesk.liangshibao.controller
 com.bytedesk.liangshibao.course
 com.bytedesk.liangshibao.media
 com.bytedesk.liangshibao.runner
-com.bytedesk.meiyu
-com.bytedesk.meiyu.model
-com.bytedesk.meiyu.quartz
-com.bytedesk.meiyu.runner
-com.bytedesk.meiyu.spider
 com.bytedesk.service
 com.bytedesk.service.agent
 com.bytedesk.service.agent_message
@@ -308,10 +303,6 @@ com.bytedesk.ticket.ticket
 com.bytedesk.ticket.ticket.dto
 com.bytedesk.ticket.ticket.event
 com.bytedesk.ticket.utils
-com.bytedesk.tiku
-com.bytedesk.tiku.model
-com.bytedesk.tiku.qa
-com.bytedesk.tiku.runner
 com.bytedesk.translate
 com.bytedesk.voc
 com.bytedesk.voc.config
@@ -358,12 +349,3 @@ com.bytedesk.wechat.pay.sdk
 com.bytedesk.wechat.work
 com.bytedesk.whatsapp
 com.bytedesk.youprimer
-com.bytedesk.yuejuan
-com.bytedesk.zhaobiao
-com.bytedesk.zhaobiao.model
-com.bytedesk.zhaobiao.monitor
-com.bytedesk.zhaobiao.quartz
-com.bytedesk.zhaobiao.runner
-com.bytedesk.zhaobiao.spider
-com.bytedesk.zhaobiao.subscribe
-com.bytedesk.zhaobiao.summary

@@ -38,11 +38,10 @@ import com.bytedesk.core.uid.buffer.RingBuffer;
  * <p>
  * The spring properties you can specified as below:<br>
  * <li><b>boostPower:</b> RingBuffer size boost for a power of 2, Sample: boostPower is 3, it means the buffer size
- * will be <code>({@link BitsAllocator#getMaxSequence()} + 1) &lt;&lt;
- * {@link #boostPower}</code>, Default as {@value #DEFAULT_BOOST_POWER}
+ * will be {@code getMaxSequence() + 1}
  * <li><b>paddingFactor:</b> Represents a percent value of (0 - 100). When the count of rest available UIDs reach the
  * threshold, it will trigger padding buffer. Default as{@link RingBuffer#DEFAULT_PADDING_PERCENT}
- * Sample: paddingFactor=20, bufferSize=1000 -> threshold=1000 * 20 /100, padding buffer will be triggered when tail-cursor<threshold
+ * Sample: paddingFactor=20, bufferSize=1000 -&gt; threshold=1000 * 20 /100, padding buffer will be triggered when tail-cursor &lt; threshold
  * <li><b>scheduleInterval:</b> Padding buffer in a schedule, specify padding buffer interval, Unit as second
  * <li><b>rejectedPutBufferHandler:</b> Policy for rejected put buffer. Default as discard put request, just do logging
  * <li><b>rejectedTakeBufferHandler:</b> Policy for rejected take buffer. Default as throwing up an exception
@@ -58,13 +57,13 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
     // --------------------- 配置属性 begin ---------------------
     /**
      * RingBuffer size扩容参数, 可提高UID生成的吞吐量.
-     * 默认:3， 原bufferSize=8192, 扩容后bufferSize= 8192 << 3 = 65536
+     * 默认:3， 原bufferSize=8192, 扩容后bufferSize= 8192 &lt;&lt; 3 = 65536
      */
     private int boostPower = DEFAULT_BOOST_POWER;
     /**
      * 指定何时向RingBuffer中填充UID, 取值为百分比(0, 100), 默认为50
      * 举例: bufferSize=1024, paddingFactor=50 -> threshold=1024 * 50 / 100 = 512.
-     * 当环上可用UID数量 < 512时, 将自动对RingBuffer进行填充补全
+     * 当环上可用UID数量 &lt; 512时, 将自动对RingBuffer进行填充补全
      */
     private int paddingFactor = RingBuffer.DEFAULT_PADDING_PERCENT;
     /**

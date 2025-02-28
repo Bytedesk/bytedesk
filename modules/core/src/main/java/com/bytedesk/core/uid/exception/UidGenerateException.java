@@ -35,7 +35,7 @@ public class UidGenerateException extends RuntimeException {
     }
 
     /**
-     * Constructor with message & cause
+     * Constructor with message and cause
      * 
      * @param message
      * @param cause

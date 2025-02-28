@@ -65,7 +65,7 @@ public class StompController {
      * 测试发布消息接口
      * 
      * @param principal principal
-     * @param uid       adminUid
+     * @param adminUid  The unique identifier for the admin user
      * @param message   msg
      */
     @MessageMapping("/test.{topic}")
