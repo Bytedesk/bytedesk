@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 17:28:10
+ * @LastEditTime: 2025-02-28 09:29:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 import java.util.HashMap;
 
 import com.alibaba.fastjson2.JSON;
@@ -68,7 +69,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIVectorService {
 
-	private final RedisVectorStore ollamaRedisVectorStore;
+	private final Optional<RedisVectorStore> ollamaRedisVectorStore;
 
 	private final FileRestService fileRestService;
 
@@ -295,7 +296,7 @@ public class SpringAIVectorService {
 			splitRestService.create(splitRequest);
 		});
 		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.write(docList);
+		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		//
 		return docList;
 	}
@@ -339,7 +340,7 @@ public class SpringAIVectorService {
 		textEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 		textRestService.save(textEntity);
 		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.write(docList);
+		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 
 		return docList;
 	}
@@ -390,7 +391,7 @@ public class SpringAIVectorService {
 		fqaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 		faqRestService.save(fqaEntity);
 		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.write(docList);
+		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 
 		return docList;
 	}
@@ -445,7 +446,7 @@ public class SpringAIVectorService {
 			}
 			// 如果需要存储到向量数据库
 			if (websiteEntity.getKbUid() != null) {
-				ollamaRedisVectorStore.write(docList);
+				ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 				log.info("Website content stored in vector store for kbUid: {}", websiteEntity.getKbUid());
 			}
 			//
@@ -453,7 +454,7 @@ public class SpringAIVectorService {
 			websiteEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 			websiteRestService.save(websiteEntity);
 			// log.info("Parsing document, this will take a while.");
-			ollamaRedisVectorStore.write(docList);
+			ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 
 			return docList;
 
@@ -494,7 +495,7 @@ public class SpringAIVectorService {
 		//
 		fileRestService.save(file);
 		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.write(docList);
+		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		log.info("Done parsing document, splitting, creating embeddings and storing in vector store");
 		// 通知相关组件，文件处理成功
 		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
@@ -503,16 +504,13 @@ public class SpringAIVectorService {
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
 	public List<String> searchText(String query) {
-		// Retrieve documents similar to a query
 		SearchRequest searchRequest = SearchRequest.builder()
 				.query(query)
 				.topK(2)
 				.build();
-		List<Document> similarDocuments = ollamaRedisVectorStore.similaritySearch(searchRequest);
-		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
-		// TODO: 将 query, kbUid 对应的 contentList 缓存到Redis中，下次直接从Redis中取
-		//
-		return contentList;
+		List<Document> similarDocuments = ollamaRedisVectorStore.map(redisVectorStore -> 
+			redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
+		return similarDocuments.stream().map(Document::getText).toList();
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
@@ -530,7 +528,8 @@ public class SpringAIVectorService {
 		// .withTopK(2);
 		// .withSimilarityThreshold(0.5)
 		// .withFilterExpression(expression);
-		List<Document> similarDocuments = ollamaRedisVectorStore.similaritySearch(searchRequest);
+		List<Document> similarDocuments = ollamaRedisVectorStore.map(redisVectorStore -> 
+			redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		//
@@ -538,7 +537,7 @@ public class SpringAIVectorService {
 	}
 
 	public void deleteDoc(List<String> docIdList) {
-		ollamaRedisVectorStore.delete(docIdList);
+		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
 	}
 
 }
