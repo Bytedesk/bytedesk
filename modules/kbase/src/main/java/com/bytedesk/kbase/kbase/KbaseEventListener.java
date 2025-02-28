@@ -30,10 +30,10 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryUpdateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.kbase.article.ArticleCreateEvent;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleResponse;
-import com.bytedesk.kbase.article.ArticleUpdateEvent;
+import com.bytedesk.kbase.article.event.ArticleCreateEvent;
+import com.bytedesk.kbase.article.event.ArticleUpdateEvent;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
 
 import lombok.AllArgsConstructor;
