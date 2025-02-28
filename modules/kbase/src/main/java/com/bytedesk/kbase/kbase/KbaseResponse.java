@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 17:49:24
+ * @LastEditTime: 2025-02-28 16:54:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,6 +48,15 @@ public class KbaseResponse extends BaseResponse {
     private String primaryColor;
 
     private String theme;
+
+    // 成员数量
+    private Integer memberCount;
+
+    // 文章数量
+    private Integer articleCount;
+
+    // 是否收藏
+    private Boolean favorite;
 
     /**
      * 知识库描述

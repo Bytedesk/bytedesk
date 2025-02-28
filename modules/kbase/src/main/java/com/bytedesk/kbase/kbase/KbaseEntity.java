@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 17:24:21
+ * @LastEditTime: 2025-02-28 16:53:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 将文档知识库跟AI知识库合并一个库，方便统一知识
+ * kbase + space
  */
 @Entity
 @Data
@@ -83,6 +83,19 @@ public class KbaseEntity extends BaseEntity {
 
     @Builder.Default
     private String theme = KbaseThemeEnum.DEFAULT.name();
+
+    // 成员数量
+    @Builder.Default
+    private int memberCount = 0;
+
+    // 文章数量
+    @Builder.Default
+    private int articleCount = 0;
+
+    // 是否收藏
+    @Builder.Default
+    @Column(name = "is_favorite")
+    private boolean favorite = false;
 
     /**
      * 知识库描述
@@ -134,6 +147,9 @@ public class KbaseEntity extends BaseEntity {
 
     @Builder.Default
     private boolean published = true;
+
+    // parentUid 父知识库uid
+    // private String parentUid;
 
     // 某人工客服快捷回复知识库
     private String agentUid;
