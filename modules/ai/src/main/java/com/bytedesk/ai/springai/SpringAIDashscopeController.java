@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:02:32
+ * @LastEditTime: 2025-02-28 18:03:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,7 +61,9 @@ public class SpringAIDashscopeController {
 
 	private final Optional<SpringAIDashscopeImageService> imageService;
 
-	// @ConditionalOnProperty(name = {"spring.ai.dashscope.audio.transcription.enabled", "spring.ai.dashscope.audio.synthesis.enabled"}, havingValue = "true")
+	// @ConditionalOnProperty(name =
+	// {"spring.ai.dashscope.audio.transcription.enabled",
+	// "spring.ai.dashscope.audio.synthesis.enabled"}, havingValue = "true")
 	private final Optional<SpringAIDashscopeAudioService> audioService;
 
 	/**
@@ -114,9 +116,6 @@ public class SpringAIDashscopeController {
 				.stream().content();
 	}
 
-
-	
-
 	// http://127.0.0.1:9003/springai/image/image2text
 	@UserIp
 	@PostMapping("/image2text")
@@ -127,29 +126,35 @@ public class SpringAIDashscopeController {
 			return Flux.just(JsonResult.error("No image file provided"));
 		}
 
-		return imageService.map(service -> service.image2Text(image)).;
+		if (imageService.isPresent()) {
+			return imageService.get().image2Text(image).map(JsonResult::success);
+		} else {
+			return Flux.just(JsonResult.error("Image service not enabled"));
+		}
+
 	}
 
-
-	// http://127.0.0.1:9003/springai/image/text2Image?prompt=A beautiful sunset over a calm ocean
+	// http://127.0.0.1:9003/springai/image/text2Image?prompt=A beautiful sunset
+	// over a calm ocean
 	@UserIp
 	@GetMapping("/text2Image")
 	@Operation(summary = "DashScope Image Generation")
 	public JsonResult<?> text2Image(
 			@RequestParam(value = "prompt", defaultValue = "A beautiful sunset over a calm ocean") String prompt,
-			HttpServletResponse response
-	) {
+			HttpServletResponse response) {
 
 		if (prompt == null || prompt.isEmpty()) {
 			return JsonResult.error("Prompt is required");
 		}
 
-		imageService.text2Image(prompt, response);
+		if (imageService.isPresent()) {
+			imageService.get().text2Image(prompt, response);
+		} else {
+			return JsonResult.error("Image service not enabled");
+		}
 
 		return JsonResult.success();
 	}
-
-	
 
 	/**
 	 * audio2text
@@ -165,7 +170,11 @@ public class SpringAIDashscopeController {
 			return Flux.just(JsonResult.error("No audio file provided"));
 		}
 
-		return audioService.audio2text(audio).map(JsonResult::success);
+		if (audioService.isPresent()) {
+			return audioService.get().audio2text(audio).map(JsonResult::success);
+		} else {
+			return Flux.just(JsonResult.error("Audio service not enabled"));
+		}
 	}
 
 	/**
@@ -176,22 +185,27 @@ public class SpringAIDashscopeController {
 	@UserIp
 	@GetMapping("/text2audio")
 	@Operation(summary = "DashScope Speech Synthesis")
-	public JsonResult<?> textToAudio(@RequestParam(value = "prompt", defaultValue = "Hello, how are you?") String prompt) {
+	public JsonResult<?> textToAudio(
+			@RequestParam(value = "prompt", defaultValue = "Hello, how are you?") String prompt) {
 
 		if (prompt == null || prompt.isEmpty()) {
 			return JsonResult.error("Prompt is required");
 		}
 
-		byte[] audioData = audioService.text2audio(prompt);
+		if (audioService.isPresent()) {
+			byte[] audioData = audioService.get().text2audio(prompt);
 
-		// 测试验证音频数据是否为空
-		try (FileOutputStream fos = new FileOutputStream("audio.wav")) {
-			fos.write(audioData);
-		} catch (IOException e) {
-			return JsonResult.error("Failed to save audio file: " + e.getMessage());
+			// 测试验证音频数据是否为空
+			try (FileOutputStream fos = new FileOutputStream("audio.wav")) {
+				fos.write(audioData);
+			} catch (IOException e) {
+				return JsonResult.error("Failed to save audio file: " + e.getMessage());
+			}
+
+			return JsonResult.success(audioData);
+		} else {
+			return JsonResult.error("Audio service not enabled");
 		}
-
-		return JsonResult.success(audioData);
 	}
 
 }
