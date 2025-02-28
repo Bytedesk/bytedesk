@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 12:53:54
+ * @LastEditTime: 2025-02-28 13:39:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,6 +64,8 @@ public class ServiceSettingsResponse implements Serializable {
     private boolean showCaptcha;
 
     private String welcomeTip;
+
+    private List<FaqResponse> welcomeFaqs;
 
     private String queueTip;
 
