@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 10:54:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 09:29:05
+ * @LastEditTime: 2025-02-28 10:20:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,13 +33,13 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIAirlineController {
 
-    private final ChatClient airlineTicketChatClient;
+    private final ChatClient ollamaCustomerSupportAssistant;
 
     // http://127.0.0.1:9003/springai/demo/airline/chat?chatId=1&userMessageContent=你好
     @GetMapping("/chat")
     public Flux<String> chat(String chatId, String userMessageContent) {
 
-		return this.airlineTicketChatClient.prompt()
+		return this.ollamaCustomerSupportAssistant.prompt()
 			.system(s -> s.param("current_date", LocalDate.now().toString()))
 			.user(userMessageContent)
 			.advisors(a -> a.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))

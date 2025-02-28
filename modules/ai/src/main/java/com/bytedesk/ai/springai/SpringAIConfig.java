@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:09:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 15:21:20
+ * @LastEditTime: 2025-02-28 10:14:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,27 +13,29 @@
  */
 package com.bytedesk.ai.springai;
 
+import java.util.Optional;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
+@RequiredArgsConstructor
 public class SpringAIConfig {
 
-    @Autowired
-    private OllamaChatModel ollamaChatModel;
+    private final Optional<OllamaChatModel> ollamaChatModel;
 
     @Bean("defaultChatClientBuilder")
     ChatClient.Builder defaultChatClientBuilder() {
-        return ChatClient.builder(ollamaChatModel);
+        return ChatClient.builder(ollamaChatModel.get());
     }
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
