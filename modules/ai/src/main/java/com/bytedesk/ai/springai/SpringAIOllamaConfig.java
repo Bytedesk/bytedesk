@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 09:38:54
+ * @LastEditTime: 2025-02-28 10:29:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai;
 
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.Embedding;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -92,6 +91,7 @@ public class SpringAIOllamaConfig {
         }
     }
 
+    @Primary
     @Bean("ollamaApi")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
     OllamaApi ollamaApi() {
@@ -100,6 +100,34 @@ public class SpringAIOllamaConfig {
             return null;
         }
         return new OllamaApi(ollamaBaseUrl);
+    }
+
+    @Primary
+    @Bean("ollamaChatModel")
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
+    OllamaChatModel ollamaChatModel() {
+        if (!isOllamaServiceAvailable()) {
+            log.warn("Ollama service is not available, some features may not work properly");
+            return null;
+        }
+        return OllamaChatModel.builder()
+                .ollamaApi(ollamaApi())
+                .defaultOptions(ollamaChatOptions())
+                .build();
+    }
+
+    @Primary
+    @Bean("ollamaEmbeddingModel")
+    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = true)
+    EmbeddingModel ollamaEmbeddingModel() {
+        if (!isOllamaServiceAvailable()) {
+            log.warn("Creating fallback embedding model");
+            return createFallbackEmbeddingModel();
+        }
+        return OllamaEmbeddingModel.builder()
+                .ollamaApi(ollamaApi())
+                .defaultOptions(ollamaEmbeddingOptions())
+                .build();
     }
 
     @Bean("ollamaChatOptions")
@@ -115,33 +143,6 @@ public class SpringAIOllamaConfig {
     OllamaOptions ollamaEmbeddingOptions() {
         return OllamaOptions.builder()
                 .model(ollamaEmbeddingModel)
-                .build();
-    }
-
-    @Primary
-    @Bean("ollamaChatModel")
-    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
-    OllamaChatModel ollamaChatModel(OllamaApi ollamaApi, OllamaOptions ollamaChatOptions) {
-        if (ollamaApi == null) {
-            return null;
-        }
-        return OllamaChatModel.builder()
-                .ollamaApi(ollamaApi)
-                .defaultOptions(ollamaChatOptions)
-                .build();
-    }
-
-    @Primary
-    @Bean("ollamaEmbeddingModel")
-    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = true)
-    EmbeddingModel ollamaEmbeddingModel(OllamaApi ollamaApi, OllamaOptions ollamaEmbeddingOptions) {
-        if (!isOllamaServiceAvailable()) {
-            log.warn("Creating fallback embedding model");
-            return createFallbackEmbeddingModel();
-        }
-        return OllamaEmbeddingModel.builder()
-                .ollamaApi(ollamaApi)
-                .defaultOptions(ollamaEmbeddingOptions)
                 .build();
     }
 
@@ -170,10 +171,10 @@ public class SpringAIOllamaConfig {
 
     @Primary
     @Bean("ollamaRedisVectorStore")
-    @ConditionalOnProperty(name = { "spring.ai.ollama.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, 
+    @ConditionalOnProperty(name = {"spring.ai.ollama.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema"}, 
         havingValue = "true", matchIfMissing = true)
-    public RedisVectorStore ollamaRedisVectorStore(EmbeddingModel embeddingModel,
-            RedisVectorStoreProperties properties) {
+    public RedisVectorStore ollamaRedisVectorStore(EmbeddingModel ollamaEmbeddingModel,
+    RedisVectorStoreProperties properties) {
         
         try {
             var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
@@ -184,7 +185,7 @@ public class SpringAIOllamaConfig {
                     null,
                     jedisProperties.getPassword());
 
-            RedisVectorStore vectorStore = RedisVectorStore.builder(jedisPooled, embeddingModel)
+            RedisVectorStore vectorStore = RedisVectorStore.builder(jedisPooled, ollamaEmbeddingModel)
                     .indexName(properties.getIndex())
                     .prefix(properties.getPrefix())
                     .metadataFields(kbUid, fileUid)

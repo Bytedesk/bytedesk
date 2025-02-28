@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javadocOptions>
+  <docletArtifacts>
+    <docletArtifact />
+  </docletArtifacts>
+  <tagletArtifacts>
+    <tagletArtifact />
+  </tagletArtifacts>
+  <excludePackageNames>
+    <excludePackageName>*.test.*</excludePackageName>
+    <excludePackageName>*.tests.*</excludePackageName>
+    <excludePackageName>com.bytedesk.projects.*</excludePackageName>
+  </excludePackageNames>
+  <javadocResourcesDirectory>src/main/javadoc</javadocResourcesDirectory>
+</javadocOptions>

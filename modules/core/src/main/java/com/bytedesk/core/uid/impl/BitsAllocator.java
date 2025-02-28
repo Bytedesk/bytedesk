@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2021-02-24 15:52:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-07 15:37:54
+ * @LastEditTime: 2025-02-28 10:26:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -10,21 +10,6 @@
  *  contact: 270580156@qq.com 
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
- */
-/*
- * Copyright (c) 2017 Baidu, Inc. All Rights Reserve.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package com.bytedesk.core.uid.impl;
 
@@ -56,14 +41,14 @@ public class BitsAllocator {
     private final int sequenceBits;
 
     /**
-     * Max value for workId & sequence
+     * Max value for workId  sequence
      */
     private final long maxDeltaSeconds;
     private final long maxWorkerId;
     private final long maxSequence;
 
     /**
-     * Shift for timestamp & workerId
+     * Shift for timestamp  workerId
      */
     private final int timestampShift;
     private final int workerIdShift;
@@ -93,7 +78,7 @@ public class BitsAllocator {
     }
 
     /**
-     * Allocate bits for UID according to delta seconds & workerId & sequence<br>
+     * Allocate bits for UID according to delta seconds  workerId  sequence<br>
      * <b>Note that: </b>The highest bit will always be 0 for sign
      * 
      * @param deltaSeconds
