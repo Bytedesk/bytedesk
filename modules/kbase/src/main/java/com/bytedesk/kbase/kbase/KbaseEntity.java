@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 16:53:59
+ * @LastEditTime: 2025-02-28 17:19:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -134,13 +134,11 @@ public class KbaseEntity extends BaseEntity {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     // @Builder.Default
-    // @ManyToMany
-    // private List<Tag> tags = new ArrayList<>();
-
+    // @ElementCollection
+    // @CollectionTable(name = "bytedesk_kbase_tags")
+    // private List<String> tags = new ArrayList<>();
     @Builder.Default
-    @ElementCollection
-    @CollectionTable(name = "bytedesk_kbase_base_tags")
-    private List<String> tags = new ArrayList<>();
+    private String tags = "[]";
 
     @Builder.Default
     private boolean showChat = false;
@@ -153,6 +151,9 @@ public class KbaseEntity extends BaseEntity {
 
     // 某人工客服快捷回复知识库
     private String agentUid;
+
+    // 创建者
+    private String userUid;
 
     public String getTheme() {
         return this.theme.toLowerCase();

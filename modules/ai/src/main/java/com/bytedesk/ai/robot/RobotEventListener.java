@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 13:06:27
+ * @LastEditTime: 2025-02-28 17:03:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
-import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.ai.springai.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.SpringAIZhipuaiService;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -59,14 +58,14 @@ import lombok.extern.slf4j.Slf4j;
 public class RobotEventListener {
 
     private final RobotRestService robotRestService;
-    private final Optional<ZhipuaiChatService> zhipuaiChatService;
+    // private final Optional<ZhipuaiChatService> zhipuaiChatService;
     private final Optional<OllamaChatService> ollamaChatService;
     private final Optional<SpringAIDeepseekService> springAIDeepseekService;
     private final Optional<SpringAIZhipuaiService> springAIZhipuaiService;
     private final UidUtils uidUtils;
     private final ThreadRestService threadService;
     private final IMessageSendService messageSendService;
-    private final RobotFaqProcessor robotFaqProcessor;
+    // private final RobotFaqProcessor robotFaqProcessor;
 
     @Order(5)
     @EventListener
@@ -80,7 +79,7 @@ public class RobotEventListener {
 
     @EventListener
     public void onFaqCreateEvent(FaqCreateEvent event) {
-        robotFaqProcessor.addFaqToQueue(event.getFaq());
+        // robotFaqProcessor.addFaqToQueue(event.getFaq());
     }
 
     @EventListener
@@ -209,8 +208,6 @@ public class RobotEventListener {
             } else {
                 springAIZhipuaiService.ifPresent(service ->
                   service.sendWsKbMessage(query, robot, messageProtobuf));
-                // zhipuaiChatService.ifPresent(service -> 
-                //     service.sendWsKbMessage(query, robot, message));
             }
         }
     }
