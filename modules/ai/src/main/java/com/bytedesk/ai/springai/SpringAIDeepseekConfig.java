@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 07:24:00
+ * @LastEditTime: 2025-02-28 11:46:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,23 +22,21 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * https://deepseek.com/
- */
+
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDeepseekConfig {
 
-    @Value("${spring.ai.deepseek.base-url}")
+    @Value("${spring.ai.deepseek.base-url:https://api.deepseek.com}")
     private String baseUrl;
 
-    @Value("${spring.ai.deepseek.api-key}")
+    @Value("${spring.ai.deepseek.api-key:sk-xxx}")
     private String apiKey;
 
-    @Value("${spring.ai.deepseek.chat.options.model}")
+    @Value("${spring.ai.deepseek.chat.options.model:deepseek-chat}")
     private String model;
 
-    @Value("${spring.ai.deepseek.chat.options.temperature}")
+    @Value("${spring.ai.deepseek.chat.options.temperature:0.7}")
     private Double temperature;
 
     @Bean("deepSeekApi")
