@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 12:53:36
+ * @LastEditTime: 2025-02-28 13:07:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -127,15 +127,42 @@ public class SpringAIDeepseekService {
         messages.add(new UserMessage(prompt));
 
         Prompt aiPrompt = new Prompt(messages);
+
         deepSeekChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
-                        messageProtobuf.setType(MessageTypeEnum.STREAM);
-                        messageProtobuf.setContent(response.toString());
-                        messageSendService.sendProtobufMessage(messageProtobuf);
+                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        // generations
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
+
+                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                                    textContent);
+                            ChatGenerationMetadata metadata = generation.getMetadata();
+
+                            // finishReason: STOP
+                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                                    metadata.getFinishReason());
+
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
+
+                            // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
+                            // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            // messageSendService.sendProtobufMessage(messageProtobuf);
+                            // }
+                        }
                     }
                 },
-                error -> log.error("Error in chat stream", error),
+                error -> {
+                    log.error("DeepSeek API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
                 () -> log.info("Chat stream completed"));
     }
 
@@ -158,20 +185,22 @@ public class SpringAIDeepseekService {
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
-                            
-                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage, textContent);
+
+                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                                    textContent);
                             ChatGenerationMetadata metadata = generation.getMetadata();
 
                             // finishReason: STOP
-                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata, metadata.getFinishReason());
+                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                                    metadata.getFinishReason());
 
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
                             messageProtobuf.setContent(textContent);
                             messageSendService.sendProtobufMessage(messageProtobuf);
 
                             // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
-                            //     messageProtobuf.setType(MessageTypeEnum.SUCCESS);
-                            //     messageSendService.sendProtobufMessage(messageProtobuf);
+                            // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            // messageSendService.sendProtobufMessage(messageProtobuf);
                             // }
                         }
                     }
