@@ -75,12 +75,10 @@ public class KbaseEntity extends BaseEntity {
     private String faviconUrl = KbaseConsts.KBASE_FAVICON_URL;
 
     // 自定义封面图片
-    @Builder.Default
-    private String coverImageUrl = KbaseConsts.KBASE_COVER_IMAGE_URL;
+    private String coverImageUrl;
 
     // 自定义背景图片
-    @Builder.Default
-    private String backgroundImageUrl = KbaseConsts.KBASE_BACKGROUND_IMAGE_URL;
+    private String backgroundImageUrl;
 
     // 主题色
     @Builder.Default
