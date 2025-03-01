@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 21:15:23
+ * @LastEditTime: 2025-03-01 10:45:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,9 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -50,21 +48,23 @@ public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRe
 
     @Override
     public Page<ArticleResponse> queryByOrg(ArticleRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
-
+        Pageable pageable = request.getPageable();
         Specification<ArticleEntity> spec = ArticleSpecification.search(request);
-
         Page<ArticleEntity> page = articleRepository.findAll(spec, pageable);
-
         return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<ArticleResponse> queryByUser(ArticleRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        String userUid = user.getUid();
+        //
+        request.setUserUid(userUid);
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "article", key="#uid", unless = "#result == null")
