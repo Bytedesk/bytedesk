@@ -146,8 +146,8 @@ public class PageRouteController {
 			model.addAttribute("i18n", i18n);
 
 			// 添加调试信息
-			log.info("Languages: {}", languages);
-			log.info("I18n: {}", i18n);
+			// log.info("Languages: {}", languages);
+			// log.info("I18n: {}", i18n);
 
 			return "dev";
 		} catch (Exception e) {

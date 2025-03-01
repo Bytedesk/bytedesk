@@ -144,6 +144,10 @@ public class KbaseRequest extends BaseRequest {
 
     private String userUid;
 
+    // 从 notebase 查询, 同时查询 HELPCENTER 和 NOTEBASE 两种类型
+    @Builder.Default
+    private Boolean queryNotebase = false;
+
     @NotEmpty(message = "memberUids must not be empty")
     @Builder.Default
     private List<String> memberUids = new ArrayList<String>();
