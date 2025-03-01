@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 11:18:34
+ * @LastEditTime: 2025-03-01 09:54:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,9 @@
  */
 package com.bytedesk.kbase.article;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bytedesk.core.base.BaseRequest;
+
+import com.bytedesk.core.constant.BytedeskConsts;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,19 +45,47 @@ public class ArticleRequest extends BaseRequest {
     // private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
 
     @Builder.Default
-    private List<String> tags = new ArrayList<>();
+    // private List<String> tags = new ArrayList<>();
+    private String tags = "[]";
 
     @Builder.Default
-    private boolean top = false;
+    private Boolean top = false;
 
     @Builder.Default
-    private boolean published = false;
+    private Boolean published = false;
 
     @Builder.Default
-    private boolean markdown = false;
+    private Boolean markdown = false;
 
     @Builder.Default
-    private int readCount = 0;
+    private Integer readCount = 0;
+
+    @Builder.Default
+    private Integer likeCount = 0;
+
+    // status 状态
+    @Builder.Default
+    private String status = ArticleStatusEnum.DRAFT.name();
+
+    // editor 编辑者
+    @Builder.Default
+    private String editor = BytedeskConsts.EMPTY_STRING;
+
+    // 是否需要审核
+    @Builder.Default
+    private Boolean needAudit = false;
+
+    // 审核状态
+    @Builder.Default
+    private String auditStatus = ArticleAuditStatusEnum.PENDING.name();
+
+    // 审核意见
+    @Builder.Default
+    private String auditOpinion = BytedeskConsts.EMPTY_STRING;
+
+    // 审核人
+    @Builder.Default
+    private String auditUser = BytedeskConsts.EMPTY_STRING;
 
     private String categoryUid;
 

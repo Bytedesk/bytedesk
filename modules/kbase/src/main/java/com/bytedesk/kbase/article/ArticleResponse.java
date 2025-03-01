@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 21:49:11
+ * @LastEditTime: 2025-03-01 09:55:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.article;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -43,7 +42,8 @@ public class ArticleResponse extends BaseResponse {
 
     private KbaseTypeEnum type;
 
-    private List<String> tags;
+    // private List<String> tags;
+    private String tags;
 
     private Boolean top;
 
@@ -52,6 +52,26 @@ public class ArticleResponse extends BaseResponse {
     private Boolean markdown;
 
     private Integer readCount;
+
+    private Integer likeCount = 0;
+
+    // status 状态
+    private String status;
+
+    // editor 编辑者
+    private String editor;
+
+    // 是否需要审核
+    private Boolean needAudit;
+
+    // 审核状态
+    private String auditStatus;
+
+    // 审核意见
+    private String auditOpinion;
+
+    // 审核人
+    private String auditUser;
 
     private String categoryUid;
 

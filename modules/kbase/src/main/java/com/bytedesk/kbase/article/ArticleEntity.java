@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 17:16:50
+ * @LastEditTime: 2025-03-01 09:54:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,16 +13,12 @@
  */
 package com.bytedesk.kbase.article;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -91,15 +87,36 @@ public class ArticleEntity extends BaseEntity {
     @Builder.Default
     private int readCount = 0;
 
+    @Builder.Default
+    private int likeCount = 0;
+
+    // status 状态
+    @Builder.Default
+    private String status = ArticleStatusEnum.DRAFT.name();
+
+    // editor 编辑者
+    @Builder.Default
+    private String editor = BytedeskConsts.EMPTY_STRING;
+
     // 是否需要审核
     @Builder.Default
-    @Column(name = "is_audit")
-    private boolean isAudit = false;
+    @Column(name = "need_audit")
+    private boolean needAudit = false;
 
     // 审核状态
     @Builder.Default
     @Column(name = "audit_status")
     private String auditStatus = ArticleAuditStatusEnum.PENDING.name();
+
+    // 审核意见
+    @Builder.Default
+    @Column(name = "audit_opinion")
+    private String auditOpinion = BytedeskConsts.EMPTY_STRING;
+
+    // 审核人
+    @Builder.Default
+    @Column(name = "audit_user")
+    private String auditUser = BytedeskConsts.EMPTY_STRING;
 
     // 是否需要密码访问
     @Builder.Default
@@ -108,13 +125,12 @@ public class ArticleEntity extends BaseEntity {
 
     private String password;
 
-    // 
     private String categoryUid; // 文章分类。生成页面时，先查询分类，后通过分类查询相关文章。
 
     private String kbUid; // 对应知识库
 
     @Builder.Default
-    @Column(name = "create_user", length = 512)
+    @Column(name = "create_user", length = 1024)
     // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
