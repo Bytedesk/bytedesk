@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 12:53:21
+ * @LastEditTime: 2025-03-01 14:54:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -107,7 +107,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
             entity.setUid(uidUtils.getUid());
         }
         entity.setName(request.getName());
-        // entity.setType(KbaseTypeEnum.fromValue(request.getType()).name());
+        entity.setDescription(request.getDescription());
         entity.setType(request.getType());
         entity.setHeadline(request.getHeadline());
         entity.setDescriptionHtml(request.getDescriptionHtml());
@@ -133,7 +133,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         if (optional.isPresent()) {
             KbaseEntity entity = optional.get();
             entity.setName(request.getName());
-            // entity.setType(KownledgebaseTypeEnum.fromValue(request.getType()));
+            entity.setDescription(request.getDescription());
             entity.setHeadline(request.getHeadline());
             entity.setDescriptionHtml(request.getDescriptionHtml());
             entity.setFooterHtml(request.getFooterHtml());
