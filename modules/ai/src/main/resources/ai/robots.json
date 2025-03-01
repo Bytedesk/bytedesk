@@ -720,6 +720,52 @@
           "description": "創建一個生成FAQ機器人"
         }
       }
+    },
+    {
+      "uid": "30",
+      "name": "generate_wechat_article",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Generate Wechat Article",
+          "prompt": "Based on the given text, generate an article.",
+          "description": "Create a article generation bot"
+        },
+        "zh_cn": {  
+          "nickname": "生成公众号文章",
+          "prompt": "给定一段文本，生成一篇公众号文章。",
+          "description": "创建一个公众号写作助手机器人"
+        },
+        "zh_tw": {
+          "nickname": "生成公眾號文章",
+          "prompt": "給定一段文本，生成一篇公眾號文章。",
+          "description": "創建一個公眾號寫作助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "31",
+      "name": "generate_xiaohongshu_article",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Generate Xiaohongshu Article",
+          "prompt": "Based on the given text, generate an article.",
+          "description": "Create a article generation bot"
+        },  
+        "zh_cn": {
+          "nickname": "生成小红书文章",
+          "prompt": "给定一段文本，生成一篇小红书文章。",
+          "description": "创建一个小红书写作助手机器人"
+        },
+        "zh_tw": {
+          "nickname": "生成小紅書文章",
+          "prompt": "給定一段文本，生成一篇小紅書文章。",
+          "description": "創建一個小紅書寫作助手機器人"
+        }
+      }
     }
   ]
 }
