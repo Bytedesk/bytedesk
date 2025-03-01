@@ -102,7 +102,7 @@ public class KbaseEntity extends BaseEntity {
     @Column(name = "is_favorite")
     private boolean favorite = false;
 
-    // 是否公开
+    // 是否公开: 内部知识库可设置为公开，外部知识库可设置为不公开
     @Builder.Default
     @Column(name = "is_public")
     private boolean isPublic = false;
