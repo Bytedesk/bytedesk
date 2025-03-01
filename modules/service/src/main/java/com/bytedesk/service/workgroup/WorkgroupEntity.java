@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 11:47:12
+ * @LastEditTime: 2025-03-01 17:01:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true, exclude = { "routingWorkgroups", "agents" })
+@EqualsAndHashCode(callSuper = true, exclude = { "agents" })
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(value = { WorkgroupEntityListener.class })
@@ -98,13 +98,13 @@ public class WorkgroupEntity extends BaseEntity {
     private InviteSettings inviteSettings = new InviteSettings();
 
     // 是否统一入口
-    @Builder.Default
-    private boolean isUnifiedEntry = false;
+    // @Builder.Default
+    // private boolean isUnifiedEntry = false;
 
     // 路由技能组，仅用于统一入口技能组
-    @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<WorkgroupEntity> routingWorkgroups = new ArrayList<>();
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // private List<WorkgroupEntity> routingWorkgroups = new ArrayList<>();
     
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
