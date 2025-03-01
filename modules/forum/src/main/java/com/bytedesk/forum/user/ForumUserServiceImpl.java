@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.forum.post.PostEntity;
 import com.bytedesk.forum.post.PostRepository;
-import com.bytedesk.forum.comment.CommentRepository;
+// import com.bytedesk.forum.comment.CommentRepository;
 
 // import com.bytedesk.core.rbac.user.UserService;
 
@@ -18,8 +18,8 @@ public class ForumUserServiceImpl implements ForumUserService {
     @Autowired
     private PostRepository postRepository;
 
-    @Autowired
-    private CommentRepository commentRepository;
+    // @Autowired
+    // private CommentRepository commentRepository;
 
     // @Autowired
     // private UserService userService; // 注入core模块的UserService
@@ -29,7 +29,7 @@ public class ForumUserServiceImpl implements ForumUserService {
         ForumUserStats stats = new ForumUserStats();
         stats.setUserId(userId);
         stats.setPostCount(postRepository.countByUserId(userId));
-        stats.setCommentCount(commentRepository.countByUserId(userId));
+        // stats.setCommentCount(commentRepository.countByUserId(userId));
         // TODO: 实现获赞数统计
         return stats;
     }

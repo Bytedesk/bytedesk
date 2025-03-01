@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 11:51:21
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-26 22:45:55
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-01 15:42:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.forum.controller;
 
 import com.bytedesk.core.category.CategoryRepository;
-import com.bytedesk.forum.comment.CommentService;
 import com.bytedesk.forum.post.PostService;
 import com.bytedesk.forum.user.ForumUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +33,6 @@ public class ForumViewController {
     @Autowired
     private PostService postService;
 
-    @Autowired
-    private CommentService commentService;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -85,7 +82,7 @@ public class ForumViewController {
         postService.incrementViewCount(postId);
         
         model.addAttribute("post", postService.getPost(postId));
-        model.addAttribute("comments", commentService.getCommentsByPost(postId, pageable));
+        // model.addAttribute("comments", commentService.getCommentsByPost(postId, pageable));
         return "forum/post";
     }
 
@@ -129,7 +126,7 @@ public class ForumViewController {
     @GetMapping("/user/comments")
     public String userComments(@AuthenticationPrincipal UserDetails userDetails, Model model,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        model.addAttribute("comments", commentService.getCommentsByUser(Long.valueOf(userDetails.getUsername()), pageable));
+        // model.addAttribute("comments", commentService.getCommentsByUser(Long.valueOf(userDetails.getUsername()), pageable));
         return "forum/user-comments";
     }
 

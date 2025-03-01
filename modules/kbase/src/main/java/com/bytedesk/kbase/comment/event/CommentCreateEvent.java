@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 10:00:34
+ * @LastEditTime: 2025-03-01 15:29:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@ package com.bytedesk.kbase.comment.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.comment.CommentEntity;
+import com.bytedesk.kbase.comment.CommentEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
