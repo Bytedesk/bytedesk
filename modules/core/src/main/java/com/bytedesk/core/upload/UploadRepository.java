@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-09-07 16:19:24
+ * @Date: 2024-03-18 12:06:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 10:10:59
+ * @LastEditTime: 2024-10-23 18:18:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,9 +11,19 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.auto_reply.keyword;
+package com.bytedesk.core.upload;
 
+import java.util.Optional;
 
-public class AutoReplyKeywordEventListener {
-    
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+// import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Repository
+// @Tag(name = "upload - 上传")
+public interface UploadRepository extends JpaRepository<UploadEntity, Long>, JpaSpecificationExecutor<UploadEntity> {
+
+    Optional<UploadEntity> findByUid(String uid);
 }

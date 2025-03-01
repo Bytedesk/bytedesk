@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-09-07 16:19:24
+ * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 10:10:59
+ * @LastEditTime: 2024-03-18 11:44:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,9 +11,15 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.auto_reply.keyword;
+package com.bytedesk.core.upload.storage;
 
+public class UploadStorageException extends RuntimeException {
 
-public class AutoReplyKeywordEventListener {
-    
+	public UploadStorageException(String message) {
+		super(message);
+	}
+
+	public UploadStorageException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ticket.attachment;
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.kbase.upload.UploadEntity;
+import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.ticket.TicketEntity;
 

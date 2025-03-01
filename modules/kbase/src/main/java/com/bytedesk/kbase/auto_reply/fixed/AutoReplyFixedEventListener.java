@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 16:17:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 16:42:46
+ * @LastEditTime: 2025-03-01 10:11:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.auto_reply.fixed;
 
-// 迁移至 AutoReplyFixedVipEventListener 事件监听器
 public class AutoReplyFixedEventListener {
 
 

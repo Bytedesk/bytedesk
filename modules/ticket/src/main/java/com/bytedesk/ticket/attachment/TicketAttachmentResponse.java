@@ -14,9 +14,7 @@
 package com.bytedesk.ticket.attachment;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.upload.UploadResponse;
-// import com.bytedesk.ticket.comment.TicketCommentResponse;
-// import com.bytedesk.ticket.ticket.TicketResponse;
+import com.bytedesk.core.upload.UploadResponse;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
