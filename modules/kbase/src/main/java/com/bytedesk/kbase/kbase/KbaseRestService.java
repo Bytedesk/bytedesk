@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:53:46
+ * @LastEditTime: 2025-03-01 09:40:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,6 +33,8 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.article.ArticleRequest;
@@ -55,6 +57,8 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     private final ArticleRestService articleService;
 
+    private final AuthService authService;
+
     @Override
     public Page<KbaseResponse> queryByOrg(KbaseRequest request) {
         Pageable pageable = request.getPageable();
@@ -65,8 +69,22 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     @Override
     public Page<KbaseResponse> queryByUser(KbaseRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
+    }
+
+    // query detail
+    public KbaseResponse queryDetail(KbaseRequest request) {
+        Optional<KbaseEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
+        }
+        return null;
     }
 
     @Cacheable(value = "kb", key = "#uid", unless = "#result==null")
