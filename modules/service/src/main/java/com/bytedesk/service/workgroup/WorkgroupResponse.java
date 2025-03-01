@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:18:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 15:23:28
+ * @LastEditTime: 2025-03-01 11:47:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,6 +59,12 @@ public class WorkgroupResponse extends BaseResponse {
     private QueueSettingsResponse queueSettings;
 
     private InviteSettings inviteSettings;
+
+    // 是否统一入口
+    private Boolean isUnifiedEntry;
+
+    // 路由技能组，仅用于统一入口技能组
+    private List<WorkgroupResponse> routingWorkgroups;
 
     // 
     private List<UserProtobuf> agents;

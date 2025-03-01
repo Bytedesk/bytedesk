@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 10:46:58
+ * @LastEditTime: 2025-03-01 11:29:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +32,15 @@ public class KbaseSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            //
+            
+            // 添加类型条件：HELPCENTER 或 NOTEBASE
+            // predicates.add(
+            //     criteriaBuilder.or(
+            //         criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.HELPCENTER.name()),
+            //         criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.NOTEBASE.name())
+            //     )
+            // );
+
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             }
@@ -41,7 +50,7 @@ public class KbaseSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
-            //
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

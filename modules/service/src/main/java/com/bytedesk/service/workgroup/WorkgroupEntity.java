@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 09:18:30
+ * @LastEditTime: 2025-03-01 11:47:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "routingWorkgroups", "agents" })
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(value = { WorkgroupEntityListener.class })
@@ -97,13 +97,24 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
 
+    // 是否统一入口
+    @Builder.Default
+    private boolean isUnifiedEntry = false;
+
+    // 路由技能组，仅用于统一入口技能组
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<WorkgroupEntity> routingWorkgroups = new ArrayList<>();
     
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list
     private List<AgentEntity> agents = new ArrayList<>();
 
-    // TODO: 监控管理员agent
+    // 监控管理员agents
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // private List<AgentEntity> monitorAgents = new ArrayList<>();
 
     /** 存储下一个待分配的客服等信息 */
     @Builder.Default
