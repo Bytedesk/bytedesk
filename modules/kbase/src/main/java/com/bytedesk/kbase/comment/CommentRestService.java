@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 15:32:49
+ * @LastEditTime: 2025-03-01 16:03:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,8 +25,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -39,6 +44,8 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final AuthService authService;
 
     @Override
     public Page<CommentResponse> queryByOrg(CommentRequest request) {
@@ -62,9 +69,17 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
 
     @Override
     public CommentResponse create(CommentRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
         
         CommentEntity entity = modelMapper.map(request, CommentEntity.class);
         entity.setUid(uidUtils.getUid());
+        // 
+        UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
+        entity.setUser(JSON.toJSONString(userProtobuf));
+        entity.setOrgUid(user.getOrgUid());
 
         CommentEntity savedEntity = save(entity);
         if (savedEntity == null) {

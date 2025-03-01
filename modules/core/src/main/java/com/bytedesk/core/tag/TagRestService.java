@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 11:17:49
+ * @LastEditTime: 2025-03-01 16:04:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -39,6 +40,8 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final AuthService authService;
 
     @Override
     public Page<TagResponse> queryByOrg(TagRequest request) {
@@ -63,9 +66,16 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
 
     @Override
     public TagResponse create(TagRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(user.getUid());
         
         TagEntity entity = modelMapper.map(request, TagEntity.class);
         entity.setUid(uidUtils.getUid());
+        // 
+        entity.setOrgUid(user.getOrgUid());
 
         TagEntity savedEntity = save(entity);
         if (savedEntity == null) {
