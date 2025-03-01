@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 13:44:28
+ * @LastEditTime: 2025-03-01 14:47:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,21 +84,17 @@ public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRe
 
     @Override
     public ArticleResponse create(ArticleRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
 
         ArticleEntity entity = modelMapper.map(request, ArticleEntity.class);
-        entity.setUid(uidUtils.getCacheSerialUid());
+        entity.setUid(uidUtils.getUid());
         // 
-        UserEntity user = authService.getUser();
         UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
         entity.setUser(JSON.toJSONString(userProtobuf));
-        // 
         entity.setOrgUid(user.getOrgUid());
-        //
-        // category
-        // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
-        // if (categoryOptional.isPresent()) {
-        //     entity.setCategory(categoryOptional.get());
-        // }
         //
         ArticleEntity savedArticle = save(entity);
         if (savedArticle == null) {
@@ -116,15 +112,10 @@ public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRe
             ArticleEntity entity = optional.get();
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
+            entity.setSummary(request.getSummary());
             entity.setContentHtml(request.getContentHtml());
             entity.setContentMarkdown(request.getContentMarkdown());
-            // entity.setCategoryUid(request.getCategoryUid());
-            // 
-            // category
-            // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
-            // if (categoryOptional.isPresent()) {
-            //     entity.setCategory(categoryOptional.get());
-            // }
+            entity.setCategoryUid(request.getCategoryUid());
             //
             ArticleEntity savedArticle = save(entity);
             if (savedArticle == null) {
