@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-01-24 23:15:13
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-01 08:46:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,13 @@
  */
 package com.bytedesk.starter.runner;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.core.util.NetworkUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,9 +38,19 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // log.debug("application started, initiating data...");
+        String localIP = NetworkUtils.getFirstNonLoopbackIP();
+        List<String> allIPs = NetworkUtils.getLocalIPs();
 
-        log.debug("bytedesk.im v{} started at: http://127.0.0.1:{}", version, port);
+        log.info("bytedesk.im v{} started at:", version);
+        log.info("Local Access:  http://127.0.0.1:{}", port);
+        log.info("Network Access: http://{}:{}", localIP, port);
+        
+        if (allIPs.size() > 1) {
+            log.info("Other Network IPs:");
+            allIPs.stream()
+                .filter(ip -> !ip.equals(localIP))
+                .forEach(ip -> log.info("                http://{}:{}", ip, port));
+        }
     }
 
 }
