@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 11:29:07
+ * @LastEditTime: 2025-03-01 13:08:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,20 +33,21 @@ public class KbaseSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             
-            // 添加类型条件：HELPCENTER 或 NOTEBASE
-            // predicates.add(
-            //     criteriaBuilder.or(
-            //         criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.HELPCENTER.name()),
-            //         criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.NOTEBASE.name())
-            //     )
-            // );
+            if (request.getQueryNotebase()) {
+                predicates.add(
+                    criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.HELPCENTER.name()),
+                        criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.NOTEBASE.name())
+                    )
+                );
+            } else if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
 
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             }
-            if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
-            }
+            
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
