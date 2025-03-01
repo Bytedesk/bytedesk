@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 10:05:28
+ * @LastEditTime: 2025-03-01 11:49:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -193,7 +193,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         try {
             return workgroupRepository.save(workgroup);
         } catch (Exception e) {
-            // TODO: handle exception
+            log.error("save workgroup failed", e);
+            handleOptimisticLockingFailureException(null, workgroup);
         }
         return null;
     }
@@ -222,61 +223,5 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     public WorkgroupResponse convertToResponse(WorkgroupEntity entity) {
         return modelMapper.map(entity, WorkgroupResponse.class);
     }
-
-            // if (request.getServiceSettings() == null
-        //         || request.getServiceSettings().getWorktimeUids() == null
-        //         || request.getServiceSettings().getWorktimeUids().isEmpty()) {
-        //     ServiceSettingsRequest serviceSettings = ServiceSettingsRequest.builder().build();
-        //     List<String> worktimeUids = new ArrayList<>();
-        //     String worktimeUid = worktimeService.createDefault();
-        //     worktimeUids.add(worktimeUid);
-        //     serviceSettings.setWorktimeUids(worktimeUids);
-        //     request.setServiceSettings(serviceSettings);
-        // }
-        // //
-        // Iterator<String> worktimeIterator = request.getServiceSettings().getWorktimeUids().iterator();
-        // while (worktimeIterator.hasNext()) {
-        //     String worktimeUid = worktimeIterator.next();
-        //     Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
-        //     if (worktimeOptional.isPresent()) {
-        //         WorktimeEntity worktimeEntity = worktimeOptional.get();
-
-        //         workgroup.getServiceSettings().getWorktimes().add(worktimeEntity);
-        //     } else {
-        //         throw new RuntimeException(worktimeUid + " is not found.");
-        //     }
-        // }
-        // //
-        // if (request.getServiceSettings() != null
-        //         && request.getServiceSettings().getFaqUids() != null
-        //         && request.getServiceSettings().getFaqUids().size() > 0) {
-        //     Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
-        //     while (iterator.hasNext()) {
-        //         String faqUid = iterator.next();
-        //         Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
-        //         if (faqOptional.isPresent()) {
-        //             FaqEntity faqEntity = faqOptional.get();
-        //             workgroup.getServiceSettings().getFaqs().add(faqEntity);
-        //         } else {
-        //             throw new RuntimeException("faq " + faqUid + " not found");
-        //         }
-        //     }
-        // }
-        // if (request.getServiceSettings() != null
-        //         && request.getServiceSettings().getQuickFaqUids() != null
-        //         && request.getServiceSettings().getQuickFaqUids().size() > 0) {
-        //     Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
-        //     while (iterator.hasNext()) {
-        //         String quickFaqUid = iterator.next();
-        //         Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
-        //         if (quickFaqOptional.isPresent()) {
-        //             FaqEntity quickFaqEntity = quickFaqOptional.get();
-        //             log.info("quickFaqUid added {}", quickFaqUid);
-        //             workgroup.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
-        //         } else {
-        //             throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
-        //         }
-        //     }
-        // }
 
 }

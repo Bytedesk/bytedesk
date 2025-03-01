@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 10:40:10
+ * @LastEditTime: 2025-03-01 11:47:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,6 +67,14 @@ public class WorkgroupRequest extends BaseRequest {
 
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
+
+    // 是否统一入口
+    @Builder.Default
+    private Boolean isUnifiedEntry = false;
+
+    // 路由技能组，仅用于统一入口技能组
+    @Builder.Default
+    private List<String> routingWorkgroupUids = new ArrayList<>();
 
     // 注意：此处不能命名为agents，因与agent中agents类型不同, 否则会报错
     @NotEmpty(message = "agentUids must not be empty")
