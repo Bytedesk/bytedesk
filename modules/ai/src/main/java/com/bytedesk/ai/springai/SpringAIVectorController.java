@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.upload.UploadEntity;
+import com.bytedesk.core.upload.UploadRequest;
+import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.kbase.upload.UploadEntity;
-import com.bytedesk.kbase.upload.UploadRequest;
-import com.bytedesk.kbase.upload.UploadRestService;
 
 import lombok.RequiredArgsConstructor;
 

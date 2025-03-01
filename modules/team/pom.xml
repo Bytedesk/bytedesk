@@ -33,20 +33,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-kbase</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-ai</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<dependency>

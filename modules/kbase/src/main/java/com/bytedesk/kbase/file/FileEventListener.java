@@ -19,10 +19,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.kbase.upload.UploadEntity;
-import com.bytedesk.kbase.upload.UploadTypeEnum;
-import com.bytedesk.kbase.upload.event.UploadCreateEvent;
-import com.bytedesk.kbase.upload.event.UploadUpdateEvent;
+import com.bytedesk.core.upload.UploadEntity;
+import com.bytedesk.core.upload.UploadTypeEnum;
+import com.bytedesk.core.upload.event.UploadCreateEvent;
+import com.bytedesk.core.upload.event.UploadUpdateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

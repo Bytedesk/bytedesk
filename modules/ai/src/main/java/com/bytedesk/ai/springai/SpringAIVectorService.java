@@ -43,6 +43,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.springai.event.VectorSplitEvent;
 import com.bytedesk.ai.springai.reader.WebDocumentReader;
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -56,7 +57,6 @@ import com.bytedesk.kbase.split.SplitStatusEnum;
 import com.bytedesk.kbase.split.SplitTypeEnum;
 import com.bytedesk.kbase.text.TextEntity;
 import com.bytedesk.kbase.text.TextRestService;
-import com.bytedesk.kbase.upload.UploadRestService;
 import com.bytedesk.kbase.website.WebsiteEntity;
 import com.bytedesk.kbase.website.WebsiteRestService;
 

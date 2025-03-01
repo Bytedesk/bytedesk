@@ -32,8 +32,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bytedesk.kbase.upload.UploadEntity;
-import com.bytedesk.kbase.upload.UploadTypeEnum;
+import com.bytedesk.core.upload.UploadEntity;
+import com.bytedesk.core.upload.UploadTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
 

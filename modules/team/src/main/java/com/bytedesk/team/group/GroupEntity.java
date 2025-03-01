@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 10:27:41
+ * @LastEditTime: 2025-03-01 10:11:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.team.member.MemberEntity;
-import com.bytedesk.ai.robot.RobotEntity;
+// import com.bytedesk.ai.robot.RobotEntity;
 
 
 import jakarta.persistence.*;
@@ -87,9 +87,9 @@ public class GroupEntity extends BaseEntity {
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<UserEntity> admins = new ArrayList<>();
 
-    @Builder.Default
-    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
-    private List<RobotEntity> robots = new ArrayList<>();
+    // @Builder.Default
+    // @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    // private List<RobotEntity> robots = new ArrayList<>();
 
     
     @ManyToOne(fetch = FetchType.LAZY)
