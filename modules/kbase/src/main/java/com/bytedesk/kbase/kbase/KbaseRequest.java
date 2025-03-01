@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 10:22:18
+ * @LastEditTime: 2025-03-01 12:36:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -111,8 +111,8 @@ public class KbaseRequest extends BaseRequest {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String css = BytedeskConsts.EMPTY_STRING;
 
-    @Builder.Default
-    private String embedding = KbaseConsts.KB_EMBEDDING;
+    // @Builder.Default
+    // private String embedding = KbaseConsts.KB_EMBEDDING;
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
