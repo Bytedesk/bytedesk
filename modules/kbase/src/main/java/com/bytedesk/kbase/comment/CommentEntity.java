@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 15:37:36
+ * @LastEditTime: 2025-03-01 16:02:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,7 +46,7 @@ public class CommentEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "comment_type", nullable = false)
-    private String type = CommentTypeEnum.CUSTOMER.name();
+    private String type = KbaseTypeEnum.HELPCENTER.name();
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
