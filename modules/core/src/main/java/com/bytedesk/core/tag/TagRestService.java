@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
