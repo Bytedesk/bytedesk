@@ -165,8 +165,8 @@
                 <li><a href="/agent/chat" target="_blank">${i18n[lang]["agentClient"]}</a></li>
                 <li><a href="/chat/demo" target="_blank">${i18n[lang]["visitorChat"]}</a></li>
                 <li><a href="/agenticflow/" target="_blank">${i18n[lang]["workFlow"]}</a></li>
-                <li><a href="/notebase/spaces" target="_blank">${i18n[lang]["knowledgeBase"]}</a></li>
-                <li><a href="/kbase/" target="_blank">${i18n[lang]["helpCenter"]}</a></li>
+                <li><a href="/notebase/" target="_blank">${i18n[lang]["knowledgeBase"]}</a></li>
+                <li><a href="/helpcenter/df_org_uid_df_kb_hc_uid" target="_blank">${i18n[lang]["helpCenter"]}</a></li>
                 <li><a href="/kanban/" target="_blank">${i18n[lang]["kanban"]}</a></li>
             </ul>
 
