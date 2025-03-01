@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:18:57
+ * @LastEditTime: 2025-03-01 15:58:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,11 +32,31 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class CommentResponse extends BaseResponse {
 
-    private String name;
+    private String content;
 
     private String type;
 
-    private String color;
+    private String level;
+
+    private String platform;
+
+    // replyTo comment uid
+    private String replyToUid;
+
+    // replyTo comment content
+    private String replyToContent;
+
+    // replyTo comment user
+    private String replyToUser;
+
+    // 评论文章
+    private String articleUid;
+
+    // 评论者
+    private String user;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
 }

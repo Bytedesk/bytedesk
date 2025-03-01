@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 17:33:21
+ * @LastEditTime: 2025-03-01 15:37:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,8 @@
 package com.bytedesk.kbase.comment;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -34,18 +36,16 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_core_comment")
+@Table(name = "bytedesk_kbase_comment")
 public class CommentEntity extends BaseEntity {
 
-    private String name;
+    // 评论内容
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String content;
 
     @Builder.Default
     @Column(name = "comment_type", nullable = false)
     private String type = CommentTypeEnum.CUSTOMER.name();
-
-    @Builder.Default
-    @Column(nullable = false)
-    private String color = "red";
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
@@ -53,5 +53,23 @@ public class CommentEntity extends BaseEntity {
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
 
-    private String userUid;
+    // replyTo comment uid
+    private String replyToUid;
+
+    // replyTo comment content
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String replyToContent;
+
+    // replyTo comment user
+    @Column(name = "reply_to_user", length = 1024)
+    private String replyToUser;
+
+    // 评论文章
+    private String articleUid;
+
+    // 评论者
+    @Builder.Default
+    @Column(name = "create_user", length = 1024)
+    // @JdbcTypeCode(SqlTypes.JSON)
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
 }

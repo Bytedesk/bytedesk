@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 11:17:49
+ * @LastEditTime: 2025-03-01 15:32:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,8 +42,7 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
 
     @Override
     public Page<CommentResponse> queryByOrg(CommentRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<CommentEntity> spec = CommentSpecification.search(request);
         Page<CommentEntity> page = commentRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
