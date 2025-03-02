@@ -72,7 +72,7 @@
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose.yaml up -d
 ```
 
-### 因项目默认使用ollama qwen2.5:1.5b模型，所以需要提前拉取模型
+#### 因项目默认使用ollama qwen2.5:1.5b模型，所以需要提前拉取模型。配置文件中可以配置其他模型，如deepseek-r1等
 
 ```bash
 ollama pull deepseek-r1:1.5b
@@ -83,7 +83,11 @@ ollama pull qwen2.5:1.5b
 
 ```bash
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose-ollama.yaml up -d
-# 运行模型
+```
+
+#### docker 拉取ollama模型。配置文件中可以配置其他模型，如deepseek-r1等
+
+```bash
 docker exec ollama-bytedesk ollama pull deepseek-r1
 docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 ```
