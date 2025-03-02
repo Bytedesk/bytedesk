@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 11:47:23
+ * @LastEditTime: 2025-03-02 20:38:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
 package com.bytedesk.ai.springai;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
@@ -21,9 +22,9 @@ import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
 import org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpander;
@@ -58,11 +59,11 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIController {
 
-        private final ChatClient defaultChatClient;
+        private final Optional<ChatClient> defaultChatClient;
 
         private final VectorStore ollamaRedisVectorStore;
 
-        private final ChatModel ollamaChatModel;
+        private final Optional<OllamaChatModel> ollamaChatModel;
 
         // http://127.0.0.1:9003/spring/ai/completion?message=hello&voice=agent
         // https://docs.spring.io/spring-ai/reference/api/chatclient.html
@@ -71,7 +72,7 @@ public class SpringAIController {
                         @RequestParam(value = "message", defaultValue = "Tell me a joke") String message,
                         String voice) {
 
-                String completion = this.defaultChatClient.prompt()
+                String completion = this.defaultChatClient.get().prompt()
                                 .system(sp -> sp.param("voice", voice))
                                 .user(message)
                                 .call()
@@ -102,7 +103,7 @@ public class SpringAIController {
                                                 .topK(6)
                                                 .build());
                 // 使用chatClient
-                ChatResponse response = ChatClient.builder(ollamaChatModel)
+                ChatResponse response = ChatClient.builder(ollamaChatModel.get())
                                 .build()
                                 .prompt()
                                 .advisors(qaAdvisor)
@@ -121,7 +122,7 @@ public class SpringAIController {
         ResponseEntity<JsonResult<?>> filter(
                         @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
 
-                ChatClient chatClient = ChatClient.builder(ollamaChatModel)
+                ChatClient chatClient = ChatClient.builder(ollamaChatModel.get())
                                 .defaultAdvisors(new QuestionAnswerAdvisor(ollamaRedisVectorStore,
                                                 SearchRequest.builder().build()))
                                 .build();
@@ -154,7 +155,7 @@ public class SpringAIController {
                                 // .build())
                                 .build();
 
-                String answer = ChatClient.builder(ollamaChatModel)
+                String answer = ChatClient.builder(ollamaChatModel.get())
                                 .defaultAdvisors(retrievalAugmentationAdvisor)
                                 .build()
                                 .prompt()
@@ -174,7 +175,7 @@ public class SpringAIController {
 
                 Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                                 .queryTransformers(RewriteQueryTransformer.builder()
-                                                .chatClientBuilder(ChatClient.builder(ollamaChatModel).build().mutate())
+                                                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
                                                 .build())
                                 .documentRetriever(VectorStoreDocumentRetriever.builder()
                                                 .similarityThreshold(0.50)
@@ -182,7 +183,7 @@ public class SpringAIController {
                                                 .build())
                                 .build();
 
-                String answer = ChatClient.builder(ollamaChatModel)
+                String answer = ChatClient.builder(ollamaChatModel.get())
                                 .defaultAdvisors(retrievalAugmentationAdvisor)
                                 .build()
                                 .prompt()
@@ -216,13 +217,13 @@ public class SpringAIController {
                 // conversation history and a follow-up query into a standalone query that
                 // captures the essence of the conversation.
                 CompressionQueryTransformer queryTransformer = CompressionQueryTransformer.builder()
-                                .chatClientBuilder(ChatClient.builder(ollamaChatModel).build().mutate())
+                                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
                                 .build();
 
                 Query transformedQuery = queryTransformer.transform(query);
 
                 // 使用chatClient
-                String answer = ChatClient.builder(ollamaChatModel)
+                String answer = ChatClient.builder(ollamaChatModel.get())
                                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                                 .build()
                                 .prompt()
@@ -250,13 +251,13 @@ public class SpringAIController {
                 // to provide better results when querying a target system, such as a vector
                 // store or a web search engine.
                 QueryTransformer queryTransformer = RewriteQueryTransformer.builder()
-                                .chatClientBuilder(ChatClient.builder(ollamaChatModel).build().mutate())
+                                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
                                 .build();
 
                 Query transformedQuery = queryTransformer.transform(query);
 
                 // 使用chatClient
-                String answer = ChatClient.builder(ollamaChatModel)
+                String answer = ChatClient.builder(ollamaChatModel.get())
                                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                                 .build()
                                 .prompt()
@@ -280,14 +281,14 @@ public class SpringAIController {
                 Query query = new Query("Hvad er Danmarks hovedstad?");
 
                 QueryTransformer queryTransformer = TranslationQueryTransformer.builder()
-                                .chatClientBuilder(ChatClient.builder(ollamaChatModel).build().mutate())
+                                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
                                 .targetLanguage("english")
                                 .build();
 
                 Query transformedQuery = queryTransformer.transform(query);
 
                 // 使用chatClient
-                String answer = ChatClient.builder(ollamaChatModel)
+                String answer = ChatClient.builder(ollamaChatModel.get())
                                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                                 .build()
                                 .prompt()
@@ -309,14 +310,14 @@ public class SpringAIController {
                         @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
 
                 MultiQueryExpander queryExpander = MultiQueryExpander.builder()
-                                .chatClientBuilder(ChatClient.builder(ollamaChatModel).build().mutate())
+                                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
                                 .numberOfQueries(3)
                                 // .includeOriginal(false)
                                 .build();
                 List<Query> queries = queryExpander.expand(new Query("How to run a Spring Boot app?"));
 
                 // 使用chatClient
-                String answer = ChatClient.builder(ollamaChatModel)
+                String answer = ChatClient.builder(ollamaChatModel.get())
                                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                                 .build()
                                 .prompt()
