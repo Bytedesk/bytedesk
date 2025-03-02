@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-28 17:56:26
+ * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:11:06
+ * @LastEditTime: 2025-02-28 13:07:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,14 +11,13 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai;
+package com.bytedesk.ai.springai.zhipuai;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.Generation;
@@ -27,24 +26,26 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotTypeEnum;
+import com.bytedesk.ai.springai.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIDashscopeService {
+@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
+public class SpringAIZhipuaiService {
 
-    private final DashScopeChatModel dashScopeChatModel;
+    private final ZhiPuAiChatModel zhipuaiChatModel;
     private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
 
@@ -126,22 +127,21 @@ public class SpringAIDashscopeService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        dashScopeChatModel.stream(aiPrompt).subscribe(
+        zhipuaiChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
-                        // generations
+                        log.info("Zhipuai API response metadata: {}", response.getMetadata());
                         List<Generation> generations = response.getResults();
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                            log.info("Zhipuai API response assistantMessage: {}, textContent: {}", assistantMessage,
                                     textContent);
                             ChatGenerationMetadata metadata = generation.getMetadata();
 
                             // finishReason: STOP
-                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                            log.info("Zhipuai API response metadata {}, finishReason: {}", metadata,
                                     metadata.getFinishReason());
 
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
@@ -153,18 +153,19 @@ public class SpringAIDashscopeService {
                             // messageSendService.sendProtobufMessage(messageProtobuf);
                             // }
                         }
+
                     }
                 },
                 error -> {
-                    log.error("DeepSeek API error: ", error);
+                    log.error("Zhipuai API error: ", error);
                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
                 },
                 () -> log.info("Chat stream completed"));
+
     }
 
-    // TODO：历史聊天记录
     public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
 
         String prompt = robotLlm.getPrompt() + "\n" + query;
@@ -174,22 +175,21 @@ public class SpringAIDashscopeService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        dashScopeChatModel.stream(aiPrompt).subscribe(
+        zhipuaiChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
-                        // generations
+                        log.info("Zhipuai API response metadata: {}", response.getMetadata());
                         List<Generation> generations = response.getResults();
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                            log.info("Zhipuai API response assistantMessage: {}, textContent: {}", assistantMessage,
                                     textContent);
                             ChatGenerationMetadata metadata = generation.getMetadata();
 
                             // finishReason: STOP
-                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                            log.info("Zhipuai API response metadata {}, finishReason: {}", metadata,
                                     metadata.getFinishReason());
 
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
@@ -201,10 +201,11 @@ public class SpringAIDashscopeService {
                             // messageSendService.sendProtobufMessage(messageProtobuf);
                             // }
                         }
+
                     }
                 },
                 error -> {
-                    log.error("DeepSeek API error: ", error);
+                    log.error("Zhipuai API error: ", error);
                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
@@ -218,7 +219,7 @@ public class SpringAIDashscopeService {
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        return dashScopeChatModel.call(prompt);
+        return zhipuaiChatModel.call(prompt);
     }
 
     public void generateFaqPairsSync(String chunk) {
@@ -234,7 +235,7 @@ public class SpringAIDashscopeService {
 
         while (retryCount < maxRetries) {
             try {
-                String result = dashScopeChatModel.call(prompt);
+                String result = zhipuaiChatModel.call(prompt);
                 log.info("FAQ generation result: {}", result);
                 return;
             } catch (Exception e) {
@@ -253,5 +254,5 @@ public class SpringAIDashscopeService {
             }
         }
     }
-    
+
 }

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-26 16:59:14
+ * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:11:39
+ * @LastEditTime: 2025-02-28 13:07:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,19 +11,20 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai;
+package com.bytedesk.ai.springai.deepseek;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
+// import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -31,6 +32,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotTypeEnum;
+import com.bytedesk.ai.springai.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -41,10 +43,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
-public class SpringAIOllamaService {
-    
-    private final OllamaChatModel ollamaChatModel;
+@ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIDeepseekService {
+
+    // private final ChatClient deepSeekChatClient;
+    private final OpenAiChatModel deepSeekChatModel;
     private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
 
@@ -126,7 +129,7 @@ public class SpringAIOllamaService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        ollamaChatModel.stream(aiPrompt).subscribe(
+        deepSeekChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("DeepSeek API response metadata: {}", response.getMetadata());
@@ -174,7 +177,7 @@ public class SpringAIOllamaService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        ollamaChatModel.stream(aiPrompt).subscribe(
+        deepSeekChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("DeepSeek API response metadata: {}", response.getMetadata());
@@ -218,7 +221,7 @@ public class SpringAIOllamaService {
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        return ollamaChatModel.call(prompt);
+        return deepSeekChatModel.call(prompt);
     }
 
     public void generateFaqPairsSync(String chunk) {
@@ -234,7 +237,7 @@ public class SpringAIOllamaService {
 
         while (retryCount < maxRetries) {
             try {
-                String result = ollamaChatModel.call(prompt);
+                String result = deepSeekChatModel.call(prompt);
                 log.info("FAQ generation result: {}", result);
                 return;
             } catch (Exception e) {
@@ -253,4 +256,5 @@ public class SpringAIOllamaService {
             }
         }
     }
+
 }
