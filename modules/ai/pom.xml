@@ -62,18 +62,23 @@
 			<artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
 		</dependency>
 
-		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
-		<!-- https://tika.apache.org/2.9.0/formats.html -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-tika-document-reader</artifactId>
-		</dependency>
-
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-markdown-document-reader</artifactId>
+		</dependency>
+		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
+		<!-- https://tika.apache.org/2.9.0/formats.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-tika-document-reader</artifactId>
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
@@ -98,10 +103,10 @@
 		</dependency> -->
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-docker-compose -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-spring-boot-docker-compose</artifactId>
-		</dependency>
+		</dependency> -->
 
 		<!-- mcp -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-client-spring-boot-starter -->
