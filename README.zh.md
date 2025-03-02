@@ -79,7 +79,7 @@ ollama pull deepseek-r1:1.5b
 ollama pull qwen2.5:1.5b
 ```
 
-### 或者 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen2.5:1.5b 模型
+### 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen2.5:1.5b 模型
 
 ```bash
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose-ollama.yaml up -d
@@ -92,7 +92,7 @@ docker exec ollama-bytedesk ollama pull deepseek-r1
 docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 ```
 
-### 如果不需要知识库AI问答功能，可以修改 `docker-compose.yaml` 或 `docker-compose-ollama.yaml` 关闭ollama对话和嵌入功能，以节省资源
+#### 如果不需要知识库AI问答功能，可以修改 `docker-compose.yaml` 或 `docker-compose-ollama.yaml` 关闭ollama对话和嵌入功能，以节省资源
 
 ```bash
 # 关闭ollama对话
@@ -101,13 +101,13 @@ SPRING_AI_OLLAMA_CHAT_ENABLED: false
 SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
 ```
 
-### 停止容器
+#### 停止容器
 
 ```bash
 docker compose -p weiyu -f docker-compose.yaml stop
 ```
 
-### 修改配置，否则上传图片、文件和知识库无法正常显示
+#### 修改配置，否则上传图片、文件和知识库无法正常显示
 
 - 修改 `docker-compose.yaml` 文件 或 `docker-compose-ollama.yaml` 文件，修改以下配置项：
 
