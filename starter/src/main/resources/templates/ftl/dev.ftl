@@ -158,6 +158,7 @@
                 username: admin@email.com<br>
                 password: admin
             </p>
+            <p>线上演示环境需要自己手机号+验证码登录</p>
 
             <h2>${i18n[lang]["systemEntrance"]}</h2>
             <ul>
