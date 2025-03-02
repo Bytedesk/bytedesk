@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:08:04
+ * @LastEditTime: 2025-03-02 21:03:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,12 +44,13 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class SpringAIOllamaController {
 
-    private final Optional<OllamaChatModel> ollamaChatModel;
+    @Qualifier("bytedeskOllamaChatModel")
+    private final Optional<OllamaChatModel> bytedeskOllamaChatModel;
 
     // http://127.0.0.1:9003/ollama/generate?message=Tell%20me%20a%20joke
     @GetMapping("/generate")
     public ResponseEntity<?> generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        ChatResponse response = ollamaChatModel.get().call(
+        ChatResponse response = bytedeskOllamaChatModel.get().call(
         new Prompt(
             message,
             OllamaOptions.builder()
@@ -65,7 +67,7 @@ public class SpringAIOllamaController {
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<ChatResponse> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return ollamaChatModel.get().stream(prompt);
+        return bytedeskOllamaChatModel.get().stream(prompt);
     }
 
 

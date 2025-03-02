@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:11:06
+ * @LastEditTime: 2025-03-02 21:24:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -45,7 +46,8 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeService {
 
-    private final DashScopeChatModel dashScopeChatModel;
+    @Qualifier("bytedeskDashScopeChatModel")
+    private final DashScopeChatModel bytedeskDashScopeChatModel;
     private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
 
@@ -127,7 +129,7 @@ public class SpringAIDashscopeService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        dashScopeChatModel.stream(aiPrompt).subscribe(
+        bytedeskDashScopeChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("DeepSeek API response metadata: {}", response.getMetadata());
@@ -175,7 +177,7 @@ public class SpringAIDashscopeService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        dashScopeChatModel.stream(aiPrompt).subscribe(
+        bytedeskDashScopeChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("DeepSeek API response metadata: {}", response.getMetadata());
@@ -219,7 +221,7 @@ public class SpringAIDashscopeService {
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        return dashScopeChatModel.call(prompt);
+        return bytedeskDashScopeChatModel.call(prompt);
     }
 
     public void generateFaqPairsSync(String chunk) {
@@ -235,7 +237,7 @@ public class SpringAIDashscopeService {
 
         while (retryCount < maxRetries) {
             try {
-                String result = dashScopeChatModel.call(prompt);
+                String result = bytedeskDashScopeChatModel.call(prompt);
                 log.info("FAQ generation result: {}", result);
                 return;
             } catch (Exception e) {

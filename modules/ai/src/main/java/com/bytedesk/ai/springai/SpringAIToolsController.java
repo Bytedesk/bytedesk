@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 17:28:42
+ * @LastEditTime: 2025-03-02 21:11:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.ai.tool.method.MethodToolCallback;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
@@ -51,7 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIToolsController {
 
     // private final ChatClient defaultChatClient;
-    private final ChatClient zhipuaiChatClient;
+    @Qualifier("bytedeskZhipuaiChatClient")
+    private final ChatClient bytedeskZhipuaiChatClient;
 
     // ollama deepseek-r1 does not support tools:
     // registry.ollama.ai/library/deepseek-r1:latest does not support tools
@@ -67,7 +69,7 @@ public class SpringAIToolsController {
     public ResponseEntity<JsonResult<?>> time(
             @RequestParam(value = "message", defaultValue = "What day is tomorrow?") String message) {
 
-        String response = zhipuaiChatClient
+        String response = bytedeskZhipuaiChatClient
                 .prompt(message)
                 .tools(new DateTimeTools())
                 .call()
@@ -90,7 +92,7 @@ public class SpringAIToolsController {
     public ResponseEntity<JsonResult<?>> alarm(
             @RequestParam(value = "message", defaultValue = "Can you set an alarm 10 minutes from now?") String message) {
 
-        String response = zhipuaiChatClient
+        String response = bytedeskZhipuaiChatClient
                 .prompt(message)
                 .tools(new DateTimeTools())
                 .call()
@@ -115,7 +117,7 @@ public class SpringAIToolsController {
                 .toolObject(new DateTimeTools())
                 .build();
 
-        String response = zhipuaiChatClient
+        String response = bytedeskZhipuaiChatClient
                 .prompt(message)
                 .tools(toolCallback)
                 .call()
@@ -138,7 +140,7 @@ public class SpringAIToolsController {
                 .inputType(WeatherRequest.class)
                 .build();
 
-        String response = zhipuaiChatClient
+        String response = bytedeskZhipuaiChatClient
                 .prompt(message)
                 .tools(toolCallback)
                 // .tools("currentWeather")

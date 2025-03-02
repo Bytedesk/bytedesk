@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:11:39
+ * @LastEditTime: 2025-03-02 21:02:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -46,7 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIOllamaService {
     
-    private final Optional<OllamaChatModel> ollamaChatModel;
+    @Qualifier("bytedeskOllamaChatModel")
+    private final Optional<OllamaChatModel> bytedeskOllamaChatModel;
     private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
 
@@ -128,7 +130,7 @@ public class SpringAIOllamaService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        ollamaChatModel.ifPresent(model -> model.stream(aiPrompt).subscribe(
+        bytedeskOllamaChatModel.ifPresent(model -> model.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("DeepSeek API response metadata: {}", response.getMetadata());
@@ -176,7 +178,7 @@ public class SpringAIOllamaService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        ollamaChatModel.ifPresent(model -> model.stream(aiPrompt).subscribe(
+        bytedeskOllamaChatModel.ifPresent(model -> model.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("DeepSeek API response metadata: {}", response.getMetadata());
@@ -220,8 +222,8 @@ public class SpringAIOllamaService {
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        if (ollamaChatModel.isPresent()) {
-            return ollamaChatModel.get().call(prompt);
+        if (bytedeskOllamaChatModel.isPresent()) {
+            return bytedeskOllamaChatModel.get().call(prompt);
         }
         return "";
     }
@@ -239,7 +241,7 @@ public class SpringAIOllamaService {
 
         while (retryCount < maxRetries) {
             try {
-                String result = ollamaChatModel.get().call(prompt);
+                String result = bytedeskOllamaChatModel.get().call(prompt);
                 log.info("FAQ generation result: {}", result);
                 return;
             } catch (Exception e) {

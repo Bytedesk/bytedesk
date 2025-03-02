@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:53:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 17:55:53
+ * @LastEditTime: 2025-03-02 21:25:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.model.Media;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -47,9 +48,11 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIDashscopeImageService {
 
-    private final ImageModel dashScopeImageModel;
+	@Qualifier("bytedeskDashScopeImageModel")
+    private final ImageModel bytedeskDashScopeImageModel;
 
-	private final ChatClient dashScopeChatClient;  
+	@Qualifier("bytedeskDashScopeChatClient")
+	private final ChatClient bytedeskDashScopeChatClient;  
 
     public Flux<String> image2Text(MultipartFile file) {
 
@@ -62,7 +65,7 @@ public class SpringAIDashscopeImageService {
 		);
 		message.getMetadata().put(DashScopeChatModel.MESSAGE_FORMAT, MessageFormat.IMAGE);
 
-		List<ChatResponse> response = dashScopeChatClient.prompt(
+		List<ChatResponse> response = bytedeskDashScopeChatClient.prompt(
 				new Prompt(message)
 		).stream().chatResponse().collectList().block();
 
@@ -79,7 +82,7 @@ public class SpringAIDashscopeImageService {
 
 	public void text2Image(String prompt, HttpServletResponse response) {
 
-		ImageResponse imageResponse = dashScopeImageModel.call(new ImagePrompt(prompt));
+		ImageResponse imageResponse = bytedeskDashScopeImageModel.call(new ImagePrompt(prompt));
 		String imageUrl = imageResponse.getResult().getOutput().getUrl();
 
 		try {

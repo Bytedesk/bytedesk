@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:52:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-02 20:43:17
+ * @LastEditTime: 2025-03-02 21:24:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,16 +41,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @ConditionalOnProperty(name = {"spring.ai.dashscope.audio.transcription.enabled", "spring.ai.dashscope.audio.synthesis.enabled"}, havingValue = "true")
 public class SpringAIDashscopeAudioService {
 
-    private final AudioTranscriptionModel dashScopeAudioTranscriptionModel;
+    @Qualifier("bytedeskDashScopeAudioTranscriptionModel")
+    private final AudioTranscriptionModel bytedeskDashScopeAudioTranscriptionModel;
 
-	private final SpeechSynthesisModel dashScopeSpeechSynthesisModel;
+    @Qualifier("bytedeskDashScopeSpeechSynthesisModel")
+	private final SpeechSynthesisModel bytedeskDashScopeSpeechSynthesisModel;
 	
     /**
 	 * 将文本转为语音
 	 */
 	public byte[] text2audio(String text) {
 
-		Flux<SpeechSynthesisResponse> response = dashScopeSpeechSynthesisModel.stream(
+		Flux<SpeechSynthesisResponse> response = bytedeskDashScopeSpeechSynthesisModel.stream(
 				new SpeechSynthesisPrompt(text)
 		);
 
@@ -99,7 +102,7 @@ public class SpringAIDashscopeAudioService {
 			throw new RuntimeException("Failed to create temporary file " + e.getMessage());
 		}
 
-		Flux<AudioTranscriptionResponse> response = dashScopeAudioTranscriptionModel.stream(
+		Flux<AudioTranscriptionResponse> response = bytedeskDashScopeAudioTranscriptionModel.stream(
 				new AudioTranscriptionPrompt(
 						new FileSystemResource(tempFile),
 						DashScopeAudioTranscriptionOptions.builder()

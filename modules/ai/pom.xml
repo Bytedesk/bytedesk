@@ -226,41 +226,41 @@
 
 		<!-- https://agentsflex.com/intro/getting-started.html -->
 		<!-- https://central.sonatype.com/artifact/com.agentsflex/agents-flex-bom -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-spring-boot-starter</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-llm-chatglm</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-llm-coze</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-llm-gitee</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-llm-moonshot</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-llm-ollama</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
@@ -268,17 +268,17 @@
 			<version>${agentsflex.version}</version>
 		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-llm-qwen</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.agentsflex</groupId>
 			<artifactId>agents-flex-llm-spark</artifactId>
 			<version>${agentsflex.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 

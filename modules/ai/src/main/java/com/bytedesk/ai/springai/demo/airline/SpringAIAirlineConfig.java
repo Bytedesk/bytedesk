@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 11:15:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 23:24:19
+ * @LastEditTime: 2025-03-02 21:29:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,12 +30,9 @@ public class SpringAIAirlineConfig {
      // private String customerSupportAssistantSystemPrompt = """
     //                     You are a customer chat support agent of an airline named "Funnair". Respond in a friendly,
     //                     helpful, and joyful manner.
-
     //                     Before providing information about a booking or cancelling a booking, you MUST always
     //                     get the following information from the user: booking number, customer first name and last name.
-
     //                     Before changing a booking you MUST ensure it is permitted by the terms.
-
     //                     If there is a charge for the change, you MUST ask the user to consent before proceeding.
     //                     """;
 
@@ -76,11 +73,11 @@ public class SpringAIAirlineConfig {
     @Bean("dashScopeCustomerSupportAssistant")
     @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
     public ChatClient dashScopeCustomerSupportAssistant(
-            ChatClient.Builder dashScopeChatClientBuilder,
+            ChatClient.Builder bytedeskDashScopeChatClientBuilder,
             InMemoryChatMemory defaultChatMemory, 
             VectorStore ollamaRedisVectorStore) {
 
-        return dashScopeChatClientBuilder
+        return bytedeskDashScopeChatClientBuilder
                 .defaultSystem(customerSupportAssistantSystemPrompt)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(defaultChatMemory),
