@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:15:44
+ * @LastEditTime: 2025-03-02 21:13:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,6 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
 import com.bytedesk.ai.springai.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;

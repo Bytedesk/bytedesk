@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 09:58:37
+ * @LastEditTime: 2025-03-02 21:21:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,19 +84,6 @@ public class SpringAIVectorService {
 	private final UploadRestService uploadRestService;
 
 	private final BytedeskEventPublisher bytedeskEventPublisher;
-
-	private void handleVectorStoreOperation(String operation, Runnable action) {
-		if (!ollamaRedisVectorStore.isPresent()) {
-			log.warn("Vector store is not available, skipping {}", operation);
-			return;
-		}
-		try {
-			action.run();
-			log.debug("Successfully completed {}", operation);
-		} catch (Exception e) {
-			log.error("Failed to execute {}: {}", operation, e.getMessage(), e);
-		}
-	}
 
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html

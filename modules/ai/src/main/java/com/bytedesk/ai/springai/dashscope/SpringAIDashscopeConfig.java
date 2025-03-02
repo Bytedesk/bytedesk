@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:30:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:19:54
+ * @LastEditTime: 2025-03-02 21:23:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,21 +60,21 @@ public class SpringAIDashscopeConfig {
     @Value("${spring.ai.dashscope.chat.options.topP:3}")
     private double dashScopeChatOptionsTopP;
 
-    @Bean("dashScopeApi")
+    @Bean("bytedeskDashScopeApi")
     @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
-    DashScopeApi dashScopeApi() {
+    DashScopeApi bytedeskDashScopeApi() {
         return new DashScopeApi(dashScopeApiKey);
     }
 
-    @Bean("dashScopeChatClientBuilder")
+    @Bean("bytedeskDashScopeChatClientBuilder")
     @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
-    ChatClient.Builder dashScopeChatClientBuilder() {
-        return ChatClient.builder(dashScopeChatModel());
+    ChatClient.Builder bytedeskDashScopeChatClientBuilder() {
+        return ChatClient.builder(bytedeskDashScopeChatModel());
     }
 
-    @Bean("dashScopeChatOptions")
+    @Bean("bytedeskDashScopeChatOptions")
     @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
-    DashScopeChatOptions dashScopeChatOptions() {
+    DashScopeChatOptions bytedeskDashScopeChatOptions() {
         return DashScopeChatOptions.builder()
                 .withModel(dashScopeChatOptionsModel)
                 .withTopP(dashScopeChatOptionsTopP)
@@ -82,10 +82,10 @@ public class SpringAIDashscopeConfig {
                 .build();
     }
 
-    @Bean("dashScopeChatClient")
+    @Bean("bytedeskDashScopeChatClient")
     @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
-    ChatClient dashScopeChatClient() {
-        return ChatClient.builder(dashScopeChatModel())
+    ChatClient bytedeskDashScopeChatClient() {
+        return ChatClient.builder(bytedeskDashScopeChatModel())
                 .defaultSystem(DEFAULT_PROMPT)
                 // 实现 Chat Memory 的 Advisor
                 // 在使用 Chat Memory 时，需要指定对话 ID，以便 Spring AI 处理上下文。
@@ -95,38 +95,38 @@ public class SpringAIDashscopeConfig {
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor())
                 // 设置 ChatClient 中 ChatModel 的 Options 参数
-                .defaultOptions(dashScopeChatOptions())
+                .defaultOptions(bytedeskDashScopeChatOptions())
                 .build();
     }
     
-    @Bean("dashScopeChatModel")
+    @Bean("bytedeskDashScopeChatModel")
     @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
-    DashScopeChatModel dashScopeChatModel() {
-        return new DashScopeChatModel(dashScopeApi(), dashScopeChatOptions());
+    DashScopeChatModel bytedeskDashScopeChatModel() {
+        return new DashScopeChatModel(bytedeskDashScopeApi(), bytedeskDashScopeChatOptions());
     }
 
-    @Bean("dashScopeAudioTranscriptionApi")
+    @Bean("bytedeskDashScopeAudioTranscriptionApi")
     @ConditionalOnProperty(name = "spring.ai.dashscope.audio.transcription.enabled", havingValue = "true")
-    DashScopeAudioTranscriptionApi dashScopeAudioTranscriptionApi() {
+    DashScopeAudioTranscriptionApi bytedeskDashScopeAudioTranscriptionApi() {
         return new DashScopeAudioTranscriptionApi(dashScopeApiKey);
     }
     
-    @Bean("dashScopeAudioTranscriptionModel")
+    @Bean("bytedeskDashScopeAudioTranscriptionModel")
     @ConditionalOnProperty(name = "spring.ai.dashscope.audio.transcription.enabled", havingValue = "true")
-    DashScopeAudioTranscriptionModel dashScopeAudioTranscriptionModel() {
-        return new DashScopeAudioTranscriptionModel(dashScopeAudioTranscriptionApi());
+    DashScopeAudioTranscriptionModel bytedeskDashScopeAudioTranscriptionModel() {
+        return new DashScopeAudioTranscriptionModel(bytedeskDashScopeAudioTranscriptionApi());
     }
 
-    @Bean("dashScopeSpeechSynthesisApi")
+    @Bean("bytedeskDashScopeSpeechSynthesisApi")
     @ConditionalOnProperty(name = "spring.ai.dashscope.audio.synthesis.enabled", havingValue = "true")
-    DashScopeSpeechSynthesisApi dashScopeSpeechSynthesisApi() {
+    DashScopeSpeechSynthesisApi bytedeskDashScopeSpeechSynthesisApi() {
         return new DashScopeSpeechSynthesisApi(dashScopeApiKey);
     }
 
-    @Bean("dashScopeSpeechSynthesisModel")
+    @Bean("bytedeskDashScopeSpeechSynthesisModel")
     @ConditionalOnProperty(name = "spring.ai.dashscope.audio.synthesis.enabled", havingValue = "true")
-    DashScopeSpeechSynthesisModel dashScopeSpeechSynthesisModel() {
-        return new DashScopeSpeechSynthesisModel(dashScopeSpeechSynthesisApi());
+    DashScopeSpeechSynthesisModel bytedeskDashScopeSpeechSynthesisModel() {
+        return new DashScopeSpeechSynthesisModel(bytedeskDashScopeSpeechSynthesisApi());
     }
 
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-02 20:43:45
+ * @LastEditTime: 2025-03-02 21:08:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,13 +65,13 @@ public class SpringAIZhipuaiConfig {
     @Autowired
     private JedisProperties jedisProperties;
 
-    @Bean("zhipuaiApi")
-    ZhiPuAiApi zhipuaiApi() {
+    @Bean("bytedeskZhipuaiApi")
+    ZhiPuAiApi bytedeskZhipuaiApi() {
         return new ZhiPuAiApi(zhipuaiApiKey);
     }
 
-    @Bean("zhipuaiChatOptions")
-    ZhiPuAiChatOptions zhipuaiChatOptions() {
+    @Bean("bytedeskZhipuaiChatOptions")
+    ZhiPuAiChatOptions bytedeskZhipuaiChatOptions() {
         return ZhiPuAiChatOptions.builder()
                 .model(zhipuaiApiModel)
                 .temperature(zhipuaiApiTemperature)
@@ -80,55 +80,55 @@ public class SpringAIZhipuaiConfig {
 
     // https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
     // https://open.bigmodel.cn/overview
-    @Bean("zhipuaiEmbeddingOptions")
-    ZhiPuAiEmbeddingOptions ZhiPuAiEmbeddingOptions() {
+    @Bean("bytedeskZhipuaiEmbeddingOptions")
+    ZhiPuAiEmbeddingOptions bytedeskZhipuaiEmbeddingOptions() {
         return ZhiPuAiEmbeddingOptions.builder()
                 .model(zhipuaiEmbeddingModel)
                 .build();
     }
 
     // https://open.bigmodel.cn/dev/api/normal-model/glm-4
-    @Bean("zhipuaiChatModel")
-    ZhiPuAiChatModel zhipuaiChatModel(ZhiPuAiApi zhipuaiApi, ZhiPuAiChatOptions zhipuaiChatOptions) {
-        return new ZhiPuAiChatModel(zhipuaiApi, zhipuaiChatOptions);
+    @Bean("bytedeskZhipuaiChatModel")
+    ZhiPuAiChatModel bytedeskZhipuaiChatModel() {
+        return new ZhiPuAiChatModel(bytedeskZhipuaiApi(), bytedeskZhipuaiChatOptions());
     }
 
-    @Bean("zhipuaiEmbeddingModel")
-    ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel(ZhiPuAiApi zhipuaiApi, ZhiPuAiEmbeddingOptions zhipuaiEmbeddingOptions) {
-        return new ZhiPuAiEmbeddingModel(zhipuaiApi, MetadataMode.EMBED, zhipuaiEmbeddingOptions);
+    @Bean("bytedeskZhipuaiEmbeddingModel")
+    ZhiPuAiEmbeddingModel bytedeskZhipuaiEmbeddingModel(ZhiPuAiEmbeddingOptions zhipuaiEmbeddingOptions) {
+        return new ZhiPuAiEmbeddingModel(bytedeskZhipuaiApi(), MetadataMode.EMBED, zhipuaiEmbeddingOptions);
     }
 
-    @Bean("zhipuaiChatClientBuilder")
-    ChatClient.Builder zhipuaiChatClientBuilder(ZhiPuAiChatModel zhipuaiChatModel) {
-        return ChatClient.builder(zhipuaiChatModel);
+    @Bean("bytedeskZhipuaiChatClientBuilder")
+    ChatClient.Builder bytedeskZhipuaiChatClientBuilder() {
+        return ChatClient.builder(bytedeskZhipuaiChatModel());
     }
 
-    @Bean("zhipuaiChatClient")
-    ChatClient zhipuaiChatClient(ChatClient.Builder zhipuaiChatClientBuilder, ZhiPuAiChatOptions zhipuaiChatOptions) {
-        return zhipuaiChatClientBuilder
-                .defaultOptions(zhipuaiChatOptions)
+    @Bean("bytedeskZhipuaiChatClient")
+    ChatClient bytedeskZhipuaiChatClient() {
+        return bytedeskZhipuaiChatClientBuilder()
+                .defaultOptions(bytedeskZhipuaiChatOptions())
                 .build();
     }
 
-    @Bean("zhipuaiImageApi")
-    ZhiPuAiImageApi zhipuaiImageApi() {
+    @Bean("bytedeskZhipuaiImageApi")
+    ZhiPuAiImageApi bytedeskZhipuaiImageApi() {
         return new ZhiPuAiImageApi(zhipuaiApiKey);
     }
 
-    @Bean("zhipuaiImageModel")
-    ZhiPuAiImageModel zhipuaiImageModel(ZhiPuAiImageApi zhipuaiImageApi) {
-        return new ZhiPuAiImageModel(zhipuaiImageApi);
+    @Bean("bytedeskZhipuaiImageModel")
+    ZhiPuAiImageModel bytedeskZhipuaiImageModel() {
+        return new ZhiPuAiImageModel(bytedeskZhipuaiImageApi());
     }
 
-    @Bean("zhipuaiClient")
+    @Bean("bytedeskZhipuaiClient")
     @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
-    ClientV4 zhipuaiClient() {
+    ClientV4 bytedeskZhipuaiClient() {
         return new ClientV4.Builder(zhipuaiApiKey).build();
     }
 
-    @Bean("zhipuaiRedisVectorStore")
+    @Bean("bytedeskZhipuaiRedisVectorStore")
     @ConditionalOnProperty(name = { "spring.ai.zhipuai.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
-    public RedisVectorStore zhipuaiRedisVectorStore(EmbeddingModel zhipuaiEmbeddingModel, RedisVectorStoreProperties properties) {
+    public RedisVectorStore bytedeskZhipuaiRedisVectorStore(EmbeddingModel zhipuaiEmbeddingModel, RedisVectorStoreProperties properties) {
 
             var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
             var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);

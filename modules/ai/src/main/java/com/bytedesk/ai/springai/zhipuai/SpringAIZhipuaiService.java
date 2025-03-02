@@ -38,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Slf4j
 @Service
@@ -45,7 +46,9 @@ import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
 public class SpringAIZhipuaiService {
 
-    private final ZhiPuAiChatModel zhipuaiChatModel;
+    @Qualifier("bytedeskZhipuaiChatModel")
+    private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
+    // 
     private final SpringAIVectorService springAIVectorService;
     private final IMessageSendService messageSendService;
 
@@ -127,7 +130,7 @@ public class SpringAIZhipuaiService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        zhipuaiChatModel.stream(aiPrompt).subscribe(
+        bytedeskZhipuaiChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Zhipuai API response metadata: {}", response.getMetadata());
@@ -175,7 +178,7 @@ public class SpringAIZhipuaiService {
 
         Prompt aiPrompt = new Prompt(messages);
 
-        zhipuaiChatModel.stream(aiPrompt).subscribe(
+        bytedeskZhipuaiChatModel.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Zhipuai API response metadata: {}", response.getMetadata());
@@ -219,7 +222,7 @@ public class SpringAIZhipuaiService {
         }
 
         String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
-        return zhipuaiChatModel.call(prompt);
+        return bytedeskZhipuaiChatModel.call(prompt);
     }
 
     public void generateFaqPairsSync(String chunk) {
@@ -235,7 +238,7 @@ public class SpringAIZhipuaiService {
 
         while (retryCount < maxRetries) {
             try {
-                String result = zhipuaiChatModel.call(prompt);
+                String result = bytedeskZhipuaiChatModel.call(prompt);
                 log.info("FAQ generation result: {}", result);
                 return;
             } catch (Exception e) {

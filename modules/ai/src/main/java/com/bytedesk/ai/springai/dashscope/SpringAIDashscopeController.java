@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 18:03:40
+ * @LastEditTime: 2025-03-02 21:25:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,8 +57,8 @@ import java.util.Optional;
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIDashscopeController {
 
-	// @Qualifier("dashScopeChatClient") // 不起作用？，只能重命名变量名
-	private final ChatClient dashScopeChatClient;
+	@Qualifier("bytedeskDashScopeChatClient")
+	private final ChatClient bytedeskDashScopeChatClient;
 
 	private final Optional<SpringAIDashscopeImageService> imageService;
 
@@ -74,7 +75,7 @@ public class SpringAIDashscopeController {
 	public ResponseEntity<?> simpleChat(
 			@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？") String query) {
 
-		String result = dashScopeChatClient.prompt(query).call().content();
+		String result = bytedeskDashScopeChatClient.prompt(query).call().content();
 
 		return ResponseEntity.ok(JsonResult.success(result));
 	}
@@ -89,7 +90,7 @@ public class SpringAIDashscopeController {
 
 		response.setCharacterEncoding("UTF-8");
 
-		return dashScopeChatClient.prompt(query).stream().content();
+		return bytedeskDashScopeChatClient.prompt(query).stream().content();
 	}
 
 	/**
@@ -108,7 +109,7 @@ public class SpringAIDashscopeController {
 
 		response.setCharacterEncoding("UTF-8");
 
-		return this.dashScopeChatClient.prompt(query)
+		return this.bytedeskDashScopeChatClient.prompt(query)
 				.advisors(
 						a -> a
 								.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id)

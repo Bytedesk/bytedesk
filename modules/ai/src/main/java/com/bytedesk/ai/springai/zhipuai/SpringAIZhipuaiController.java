@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 23:58:21
+ * @LastEditTime: 2025-03-02 21:09:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +60,11 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
 public class SpringAIZhipuaiController {
 
-    private final ZhiPuAiChatModel zhipuaiChatModel;
+    @Qualifier("bytedeskZhipuaiChatModel")
+    private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
 
-    private final ZhiPuAiImageModel zhiPuAiImageModel;
+    @Qualifier("bytedeskZhipuaiImageModel")
+    private final ZhiPuAiImageModel bytedeskZhipuaiImageModel;
 
     private final ZhipuaiChatService zhipuaiChatService;
 
@@ -69,7 +72,7 @@ public class SpringAIZhipuaiController {
     @GetMapping("/chat")
     public ResponseEntity<JsonResult<?>> chat(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
 
-        String response = zhipuaiChatModel.call(message);
+        String response = bytedeskZhipuaiChatModel.call(message);
         // 
         log.info("chat response: {}", response);
         return ResponseEntity.ok(JsonResult.success(response));
@@ -79,14 +82,14 @@ public class SpringAIZhipuaiController {
     @GetMapping("/chatStream")
     public Flux<ChatResponse> chatStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return zhipuaiChatModel.stream(prompt);
+        return bytedeskZhipuaiChatModel.stream(prompt);
     }
 
     //自定义chat model
     // http://127.0.0.1:9003/springai/zhipuai/chat/model?message=hello
     @GetMapping("/chat/model")
     public ResponseEntity<JsonResult<?>> chatModel(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        ChatResponse response = zhipuaiChatModel.call(
+        ChatResponse response = bytedeskZhipuaiChatModel.call(
         new Prompt(
             message,
             ZhiPuAiChatOptions.builder()
@@ -100,7 +103,7 @@ public class SpringAIZhipuaiController {
     // http://127.0.0.1:9003/springai/zhipuai/image
     @GetMapping("/image")
     public ResponseEntity<?> image() {
-        ImageResponse response = zhiPuAiImageModel.call(new ImagePrompt("A light cream colored mini golden doodle"));
+        ImageResponse response = bytedeskZhipuaiImageModel.call(new ImagePrompt("A light cream colored mini golden doodle"));
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
