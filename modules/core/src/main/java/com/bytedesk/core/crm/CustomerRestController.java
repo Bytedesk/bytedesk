@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 22:09:06
+ * @LastEditTime: 2025-03-03 23:12:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,14 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/crm")
 @AllArgsConstructor
-public class CustomerController extends BaseRestController<CustomerRequest> {
+public class CustomerRestController extends BaseRestController<CustomerRequest> {
 
-    private final CustomerService customerService;
+    private final CustomerRestService customerService;
 
     @Override
     public ResponseEntity<?> queryByOrg(CustomerRequest request) {
@@ -68,6 +69,12 @@ public class CustomerController extends BaseRestController<CustomerRequest> {
         customerService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
+    }
+
+    @Override
+    public Object export(CustomerRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 09:43:22
+ * @LastEditTime: 2025-03-03 23:19:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -121,6 +122,12 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 		uploadService.deleteFile(request.getFileName());
 		
 		return ResponseEntity.ok(JsonResult.success("delete success"));
+	}
+
+	@Override
+	public Object export(UploadRequest request, HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'export'");
 	}
 
 }

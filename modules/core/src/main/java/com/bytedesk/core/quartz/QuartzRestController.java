@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:40:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 13:50:02
+ * @LastEditTime: 2025-03-03 23:17:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 /**
@@ -36,10 +37,6 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
 
     private QuartzService quartzService;
 
-    /**
-     * query acrooding to orgUid
-     */
-    @GetMapping("/org")
     @Override
     public ResponseEntity<?> queryByOrg(QuartzRequest request) {
 
@@ -48,10 +45,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
 
-    /**
-     * query accroding to user uid
-     */
-    @GetMapping("/query")
+
     @Override
     public ResponseEntity<?> queryByUser(QuartzRequest request) {
 
@@ -60,7 +54,6 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
 
-    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody QuartzRequest request) {
 
@@ -72,7 +65,6 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody QuartzRequest request) {
 
@@ -84,7 +76,6 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuartzRequest request) {
 
@@ -116,6 +107,12 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     public ResponseEntity<?> deleteJob(@RequestBody QuartzRequest request) {
         quartzService.deleteJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
+    }
+
+    @Override
+    public Object export(QuartzRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 11:42:10
+ * @LastEditTime: 2025-03-03 23:17:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -67,6 +68,12 @@ public class PushRestController extends BaseRestController<PushRequest> {
         pushService.delete(request);
         
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @Override
+    public Object export(PushRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
     
     

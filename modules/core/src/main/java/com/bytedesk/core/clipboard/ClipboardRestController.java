@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 22:19:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-18 23:25:19
+ * @LastEditTime: 2025-03-03 23:11:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/vip/clipboard")
+@RequestMapping("/api/v1/clipboard")
 @AllArgsConstructor
 public class ClipboardRestController extends BaseRestController<ClipboardRequest> {
 
@@ -65,6 +67,12 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         clipboardService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @Override
+    public Object export(ClipboardRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
 }

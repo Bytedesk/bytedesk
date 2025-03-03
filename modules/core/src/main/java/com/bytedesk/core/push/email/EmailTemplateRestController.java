@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-28 10:40:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 10:40:30
+ * @LastEditTime: 2025-03-03 23:17:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api/v1/email-template")
-public class EmailTemplateController extends BaseRestController<EmailTemplateRequest> {
+public class EmailTemplateRestController extends BaseRestController<EmailTemplateRequest> {
 
     @Override
     public ResponseEntity<?> queryByOrg(EmailTemplateRequest request) {
@@ -51,6 +53,12 @@ public class EmailTemplateController extends BaseRestController<EmailTemplateReq
     public ResponseEntity<?> delete(EmailTemplateRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public Object export(EmailTemplateRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
     
 }

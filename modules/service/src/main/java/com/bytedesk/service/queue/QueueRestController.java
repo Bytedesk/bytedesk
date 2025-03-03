@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 19:37:35
+ * @LastEditTime: 2025-03-03 23:21:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -65,6 +66,12 @@ public class QueueRestController extends BaseRestController <QueueRequest> {
         queueService.delete(request);
         
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @Override
+    public Object export(QueueRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     
