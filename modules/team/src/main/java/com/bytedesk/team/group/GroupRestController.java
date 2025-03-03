@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:21:59
+ * @LastEditTime: 2025-03-03 18:17:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,11 +35,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("/api/v1/group")
 @Tag(name = "group", description = "group apis")
-public class GroupController extends BaseRestController<GroupRequest> {
+public class GroupRestController extends BaseRestController<GroupRequest> {
     
-    private final GroupService groupService;
+    private final GroupRestService groupService;
     
-    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(GroupRequest request) {
         
@@ -48,7 +47,6 @@ public class GroupController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @GetMapping("/query")
     @Override
     public ResponseEntity<?> queryByUser(GroupRequest request) {
 
@@ -66,7 +64,6 @@ public class GroupController extends BaseRestController<GroupRequest> {
     }
 
     @ActionAnnotation(title = "group", action = "create", description = "create group")
-    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody GroupRequest request) {
         
@@ -76,7 +73,6 @@ public class GroupController extends BaseRestController<GroupRequest> {
     }
 
     @ActionAnnotation(title = "group", action = "update", description = "update group")
-    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody GroupRequest request) {
 
@@ -127,7 +123,6 @@ public class GroupController extends BaseRestController<GroupRequest> {
     }
 
     @ActionAnnotation(title = "group", action = "delete", description = "delete group")
-    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody GroupRequest request) {
         

@@ -35,7 +35,7 @@ public class GroupEventListener {
 
     private final ThreadRestService threadService;
 
-    private final GroupService groupService;
+    private final GroupRestService groupService;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
