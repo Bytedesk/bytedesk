@@ -129,6 +129,8 @@ BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
 # 请将127.0.0.1替换为你的服务器ip
 http://127.0.0.1:9003/
 # 开放端口：9003, 9885
+默认用户名: admin@email.com
+默认密码: admin
 ```
 
 - [线上预览](https://www.weiyuai.cn/admin/)
