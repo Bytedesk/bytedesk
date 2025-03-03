@@ -94,8 +94,6 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // https://github.com/alibaba/easyexcel
-    // https://easyexcel.opensource.alibaba.com/docs/current/
     @ActionAnnotation(title = "member", action = "export", description = "export member")
     @GetMapping("/export")
     public Object export(MemberRequest request, HttpServletResponse response) {

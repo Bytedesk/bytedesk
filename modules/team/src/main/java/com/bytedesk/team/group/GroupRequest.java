@@ -59,4 +59,6 @@ public class GroupRequest extends BaseRequest {
 
     @Builder.Default
     private List<String> robotUids = new ArrayList<>();
+
+    private String userUid;
 }

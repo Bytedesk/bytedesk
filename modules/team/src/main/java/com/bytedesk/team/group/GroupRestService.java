@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 18:18:12
+ * @LastEditTime: 2025-03-03 18:37:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,40 +32,41 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberRestService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 // @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest, GroupResponse> {
 
-    private GroupRepository groupRepository;
+    private final GroupRepository groupRepository;
 
-    private AuthService authService;
+    private final AuthService authService;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    private UidUtils uidUtils;
+    private final UidUtils uidUtils;
 
-    private MemberRestService memberService;
-
-    // private ThreadService threadService;
+    private final MemberRestService memberService;
 
     @Override
     public Page<GroupResponse> queryByOrg(GroupRequest request) {
-        
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
-
+        Pageable pageable = request.getPageable();
         Specification<GroupEntity> specification = GroupSpecification.search(request);
         Page<GroupEntity> page = groupRepository.findAll(specification, pageable);
-
         return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<GroupResponse> queryByUser(GroupRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("null");
+        }
+        request.setUserUid(user.getUid());
+        request.setOrgUid(user.getOrgUid());
+        //
+        return queryByOrg(request);
     }
 
     public GroupResponse queryByUid(GroupRequest request) {
@@ -175,6 +176,9 @@ public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest,
         return modelMapper.map(entity, GroupResponse.class);
     }
 
+    public GroupExcel convertToExcel(GroupResponse group) {
+        return modelMapper.map(group, GroupExcel.class);
+    }   
     
 
 }
