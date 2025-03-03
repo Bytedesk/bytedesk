@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 13:22:59
+ * @LastEditTime: 2025-03-03 17:40:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,34 +44,21 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     private final AuthService authService;
 
     public Page<MessageResponse> queryByOrg(MessageRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "createdAt");
-
+        Pageable pageable = request.getPageable();
         Specification<MessageEntity> specs = MessageSpecification.search(request);
-
         Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-
         return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
 
     @Override
     public Page<MessageResponse> queryByUser(MessageRequest request) {
-
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("User not found");
         }
         request.setUserUid(user.getUid());
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "createdAt");
-
-        Specification<MessageEntity> specs = MessageSpecification.search(request);
-
-        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-
-        return messagePage.map(ConvertUtils::convertToMessageResponse);
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "message", key = "#request.threadTopic", unless = "#result == null")
