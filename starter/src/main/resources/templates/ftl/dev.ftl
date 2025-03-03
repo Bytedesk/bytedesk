@@ -293,8 +293,8 @@
             const config = {
                 placement: 'bottom-right',
                 autoPopup: false,
-                inviteParams: {
-                    show: false,
+                inviteConfig: {
+                    show: true,
                     text: texts.inviteText,
                 },
                 bubbleConfig: {
@@ -311,10 +311,10 @@
                 window: {
                     width: 380
                 },
-                chatParams: {
+                chatConfig: {
                     org: 'df_org_uid',
-                    t: '2',
-                    sid: 'df_rt_uid'
+                    t: '1',
+                    sid: 'df_wg_uid'
                 }
             };
 

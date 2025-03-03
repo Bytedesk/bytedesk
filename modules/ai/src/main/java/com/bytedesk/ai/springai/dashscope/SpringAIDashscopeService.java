@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 12:32:51
+ * @LastEditTime: 2025-03-03 13:15:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -111,108 +111,108 @@ public class SpringAIDashscopeService {
             """;
 
     public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
-        // String prompt;
-        // if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-        //     List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
-        //     String context = String.join("\n", contentList);
-        //     String history = "";
-        //     prompt = PROMPT_TEMPLATE.replace("{context}", context)
-        //             .replace("{query}", query)
-        //             .replace("{history}", history);
-        // } else {
-        //     prompt = robot.getLlm().getPrompt() + "\n" + query;
-        // }
+        String prompt;
+        if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
+            String context = String.join("\n", contentList);
+            String history = "";
+            prompt = PROMPT_TEMPLATE.replace("{context}", context)
+                    .replace("{query}", query)
+                    .replace("{history}", history);
+        } else {
+            prompt = robot.getLlm().getPrompt() + "\n" + query;
+        }
 
-        // List<Message> messages = new ArrayList<>();
-        // messages.add(new SystemMessage(robot.getLlm().getPrompt()));
-        // messages.add(new UserMessage(prompt));
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(robot.getLlm().getPrompt()));
+        messages.add(new UserMessage(prompt));
 
-        // Prompt aiPrompt = new Prompt(messages);
+        Prompt aiPrompt = new Prompt(messages);
 
-        // bytedeskDashScopeChatModel.stream(aiPrompt).subscribe(
-        //         response -> {
-        //             if (response != null) {
-        //                 log.info("DeepSeek API response metadata: {}", response.getMetadata());
-        //                 // generations
-        //                 List<Generation> generations = response.getResults();
-        //                 for (Generation generation : generations) {
-        //                     AssistantMessage assistantMessage = generation.getOutput();
-        //                     String textContent = assistantMessage.getText();
+        bytedeskDashScopeChatModel.stream(aiPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        // generations
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
 
-        //                     log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
-        //                             textContent);
-        //                     ChatGenerationMetadata metadata = generation.getMetadata();
+                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                                    textContent);
+                            ChatGenerationMetadata metadata = generation.getMetadata();
 
-        //                     // finishReason: STOP
-        //                     log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
-        //                             metadata.getFinishReason());
+                            // finishReason: STOP
+                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                                    metadata.getFinishReason());
 
-        //                     messageProtobuf.setType(MessageTypeEnum.STREAM);
-        //                     messageProtobuf.setContent(textContent);
-        //                     messageSendService.sendProtobufMessage(messageProtobuf);
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
 
-        //                     // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
-        //                     // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
-        //                     // messageSendService.sendProtobufMessage(messageProtobuf);
-        //                     // }
-        //                 }
-        //             }
-        //         },
-        //         error -> {
-        //             log.error("DeepSeek API error: ", error);
-        //             messageProtobuf.setType(MessageTypeEnum.ERROR);
-        //             messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-        //             messageSendService.sendProtobufMessage(messageProtobuf);
-        //         },
-        //         () -> log.info("Chat stream completed"));
+                            // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
+                            // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            // messageSendService.sendProtobufMessage(messageProtobuf);
+                            // }
+                        }
+                    }
+                },
+                error -> {
+                    log.error("DeepSeek API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed"));
     }
 
     // TODO：历史聊天记录
     public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
 
-        // String prompt = robotLlm.getPrompt() + "\n" + query;
-        // List<Message> messages = new ArrayList<>();
-        // messages.add(new SystemMessage(robotLlm.getPrompt()));
-        // messages.add(new UserMessage(prompt));
+        String prompt = robotLlm.getPrompt() + "\n" + query;
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(robotLlm.getPrompt()));
+        messages.add(new UserMessage(prompt));
 
-        // Prompt aiPrompt = new Prompt(messages);
+        Prompt aiPrompt = new Prompt(messages);
 
-        // bytedeskDashScopeChatModel.stream(aiPrompt).subscribe(
-        //         response -> {
-        //             if (response != null) {
-        //                 log.info("DeepSeek API response metadata: {}", response.getMetadata());
-        //                 // generations
-        //                 List<Generation> generations = response.getResults();
-        //                 for (Generation generation : generations) {
-        //                     AssistantMessage assistantMessage = generation.getOutput();
-        //                     String textContent = assistantMessage.getText();
+        bytedeskDashScopeChatModel.stream(aiPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        // generations
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
 
-        //                     log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
-        //                             textContent);
-        //                     ChatGenerationMetadata metadata = generation.getMetadata();
+                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                                    textContent);
+                            ChatGenerationMetadata metadata = generation.getMetadata();
 
-        //                     // finishReason: STOP
-        //                     log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
-        //                             metadata.getFinishReason());
+                            // finishReason: STOP
+                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                                    metadata.getFinishReason());
 
-        //                     messageProtobuf.setType(MessageTypeEnum.STREAM);
-        //                     messageProtobuf.setContent(textContent);
-        //                     messageSendService.sendProtobufMessage(messageProtobuf);
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
 
-        //                     // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
-        //                     // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
-        //                     // messageSendService.sendProtobufMessage(messageProtobuf);
-        //                     // }
-        //                 }
-        //             }
-        //         },
-        //         error -> {
-        //             log.error("DeepSeek API error: ", error);
-        //             messageProtobuf.setType(MessageTypeEnum.ERROR);
-        //             messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-        //             messageSendService.sendProtobufMessage(messageProtobuf);
-        //         },
-        //         () -> log.info("Chat stream completed"));
+                            // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
+                            // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            // messageSendService.sendProtobufMessage(messageProtobuf);
+                            // }
+                        }
+                    }
+                },
+                error -> {
+                    log.error("DeepSeek API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed"));
     }
 
     public String generateFaqPairsAsync(String chunk) {
