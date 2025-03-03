@@ -15,7 +15,7 @@
 	<version>${revision}</version>
 
 	<name>bytedesk-module-ai</name>
-	<description>https://ai.bytedesk.com</description>
+	<description>https://www.bytedesk.com</description>
 
 	<properties>
 		<langchain4j.version>1.0.0-beta1</langchain4j.version>
