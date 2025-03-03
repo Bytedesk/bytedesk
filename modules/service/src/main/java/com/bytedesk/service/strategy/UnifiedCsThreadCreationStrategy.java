@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:36:36
+ * @LastEditTime: 2025-03-03 15:43:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class UnifiedCsThreadCreationStrategy implements CsThreadCreationStrategy
         UnifiedEntity unified = unifiedService.findByUid(unifiedUid)
                 .orElseThrow(() -> new RuntimeException("Unified uid " + unifiedUid + " not found"));
         //  
-        String topic = TopicUtils.formatOrgRobotThreadTopic(unified.getUid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgUnifiedThreadTopic(unified.getUid(), visitorRequest.getUid());
         // 
         ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
@@ -69,20 +69,20 @@ public class UnifiedCsThreadCreationStrategy implements CsThreadCreationStrategy
             thread = threadOptional.get();
             // 
             if (thread.isStarted()) {
-                thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
+                thread = visitorThreadService.reInitUnifiedThreadExtra(thread, unified); // 方便测试
                 // 返回未关闭，或 非留言状态的会话
-                log.info("Already have a processing robot thread {}", topic);
+                log.info("Already have a processing unified thread {}", topic);
                 return getUnifiedContinueMessage(visitorRequest, thread);
             } else {
                 // 重新初始化
                 thread = threadOptional.get().reInitRobot();
             }
         } else {
-            thread = visitorThreadService.createRobotThread(visitorRequest, robot, topic);
+            thread = visitorThreadService.createUnifiedThread(visitorRequest, unified, topic);
         }
-        thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
+        thread = visitorThreadService.reInitUnifiedThreadExtra(thread, unified);
 
-        return routeService.routeToRobot(visitorRequest, thread, robot);
+        return routeService.routeToUnified(visitorRequest, unified);
     }
 
     private MessageProtobuf getUnifiedContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
@@ -90,7 +90,7 @@ public class UnifiedCsThreadCreationStrategy implements CsThreadCreationStrategy
         // UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         // log.info("getRobotContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
         // 
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(thread);
+        return ThreadMessageUtil.getThreadUnifiedWelcomeMessage(thread);
     }
 
 }
