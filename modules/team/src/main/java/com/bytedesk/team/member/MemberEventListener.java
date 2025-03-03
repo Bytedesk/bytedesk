@@ -42,7 +42,7 @@ import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.team.department.DepartmentConsts;
 import com.bytedesk.team.department.DepartmentEntity;
-import com.bytedesk.team.department.DepartmentService;
+import com.bytedesk.team.department.DepartmentRestService;
 import com.bytedesk.team.member.event.MemberCreateEvent;
 import com.bytedesk.team.member.event.MemberUpdateEvent;
 
@@ -57,7 +57,7 @@ public class MemberEventListener {
 
     private final ModelMapper modelMapper;
 
-    private final DepartmentService departmentService;
+    private final DepartmentRestService departmentService;
 
     private final UidUtils uidUtils;
 

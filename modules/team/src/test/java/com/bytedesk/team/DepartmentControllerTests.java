@@ -13,8 +13,8 @@
  */
 package com.bytedesk.team;
 
-import com.bytedesk.team.department.DepartmentController;
-import com.bytedesk.team.department.DepartmentService;
+import com.bytedesk.team.department.DepartmentRestController;
+import com.bytedesk.team.department.DepartmentRestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,10 +27,10 @@ import org.mockito.MockitoAnnotations;
 public class DepartmentControllerTests {
 
     @InjectMocks
-    private DepartmentController departmentController;
+    private DepartmentRestController departmentController;
 
     @Mock
-    private DepartmentService departmentService;
+    private DepartmentRestService departmentService;
 
     @BeforeEach
     public void setUp() {

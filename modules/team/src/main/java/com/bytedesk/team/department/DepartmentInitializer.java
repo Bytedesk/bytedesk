@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class DepartmentInitializer implements SmartInitializingSingleton {
 
-    private final DepartmentService departmentService;
+    private final DepartmentRestService departmentService;
 
     private final DepartmentRepository departmentRepository;
 
