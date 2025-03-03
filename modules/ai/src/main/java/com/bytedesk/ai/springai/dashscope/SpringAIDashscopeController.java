@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-02 21:25:32
+ * @LastEditTime: 2025-03-03 12:10:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,7 @@ public class SpringAIDashscopeController {
 	// @ConditionalOnProperty(name =
 	// {"spring.ai.dashscope.audio.transcription.enabled",
 	// "spring.ai.dashscope.audio.synthesis.enabled"}, havingValue = "true")
-	private final Optional<SpringAIDashscopeAudioService> audioService;
+	// private final Optional<SpringAIDashscopeAudioService> audioService;
 
 	/**
 	 * ChatClient 简单调用
@@ -162,51 +162,51 @@ public class SpringAIDashscopeController {
 	 * http://127.0.0.1:9003/springai/audio/audio2text
 	 * 用于将音频转换为文本输出
 	 */
-	@UserIp
-	@PostMapping("/audio2text")
-	@Operation(summary = "DashScope Audio Transcription")
-	public Flux<JsonResult<?>> audioToText(@RequestParam("audio") MultipartFile audio) {
+	// @UserIp
+	// @PostMapping("/audio2text")
+	// @Operation(summary = "DashScope Audio Transcription")
+	// public Flux<JsonResult<?>> audioToText(@RequestParam("audio") MultipartFile audio) {
 
-		if (audio.isEmpty()) {
-			return Flux.just(JsonResult.error("No audio file provided"));
-		}
+	// 	if (audio.isEmpty()) {
+	// 		return Flux.just(JsonResult.error("No audio file provided"));
+	// 	}
 
-		if (audioService.isPresent()) {
-			return audioService.get().audio2text(audio).map(JsonResult::success);
-		} else {
-			return Flux.just(JsonResult.error("Audio service not enabled"));
-		}
-	}
+	// 	if (audioService.isPresent()) {
+	// 		return audioService.get().audio2text(audio).map(JsonResult::success);
+	// 	} else {
+	// 		return Flux.just(JsonResult.error("Audio service not enabled"));
+	// 	}
+	// }
 
 	/**
 	 * text2audio
 	 * http://127.0.0.1:9003/springai/audio/text2audio?prompt=Hello, how are you?
 	 * 用于将文本转换为语音输出
 	 */
-	@UserIp
-	@GetMapping("/text2audio")
-	@Operation(summary = "DashScope Speech Synthesis")
-	public JsonResult<?> textToAudio(
-			@RequestParam(value = "prompt", defaultValue = "Hello, how are you?") String prompt) {
+	// @UserIp
+	// @GetMapping("/text2audio")
+	// @Operation(summary = "DashScope Speech Synthesis")
+	// public JsonResult<?> textToAudio(
+	// 		@RequestParam(value = "prompt", defaultValue = "Hello, how are you?") String prompt) {
 
-		if (prompt == null || prompt.isEmpty()) {
-			return JsonResult.error("Prompt is required");
-		}
+	// 	if (prompt == null || prompt.isEmpty()) {
+	// 		return JsonResult.error("Prompt is required");
+	// 	}
 
-		if (audioService.isPresent()) {
-			byte[] audioData = audioService.get().text2audio(prompt);
+	// 	if (audioService.isPresent()) {
+	// 		byte[] audioData = audioService.get().text2audio(prompt);
 
-			// 测试验证音频数据是否为空
-			try (FileOutputStream fos = new FileOutputStream("audio.wav")) {
-				fos.write(audioData);
-			} catch (IOException e) {
-				return JsonResult.error("Failed to save audio file: " + e.getMessage());
-			}
+	// 		// 测试验证音频数据是否为空
+	// 		try (FileOutputStream fos = new FileOutputStream("audio.wav")) {
+	// 			fos.write(audioData);
+	// 		} catch (IOException e) {
+	// 			return JsonResult.error("Failed to save audio file: " + e.getMessage());
+	// 		}
 
-			return JsonResult.success(audioData);
-		} else {
-			return JsonResult.error("Audio service not enabled");
-		}
-	}
+	// 		return JsonResult.success(audioData);
+	// 	} else {
+	// 		return JsonResult.error("Audio service not enabled");
+	// 	}
+	// }
 
 }

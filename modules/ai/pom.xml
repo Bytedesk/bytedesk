@@ -134,8 +134,6 @@
 			<artifactId>spring-ai-mcp-server-webflux-spring-boot-starter</artifactId>
 		</dependency> -->
 
-
-
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<dependency>
@@ -158,12 +156,11 @@
 		<!-- https://java2ai.com/docs/1.0.0-M5.1/overview/?spm=5176.29160081.0.0.2856aa5cNBNg4X -->
 		<!-- https://github.com/alibaba/spring-ai-alibaba/blob/main/README-zh.md -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
-
+		</dependency> -->
 
 		<!-- TODO: deepseek ai -->
 		<!-- https://javaai.pig4cloud.com/deepseek -->
