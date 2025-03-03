@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 16:04:23
+ * @LastEditTime: 2025-03-03 14:25:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,8 +46,7 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
 
     @Override
     public Page<TagResponse> queryByOrg(TagRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<TagEntity> spec = TagSpecification.search(request);
         Page<TagEntity> page = tagRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
@@ -55,8 +54,13 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
 
     @Override
     public Page<TagResponse> queryByUser(TagRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:18:57
+ * @LastEditTime: 2025-03-03 14:20:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,8 +14,10 @@
 package com.bytedesk.service.unified;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,11 +34,27 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class UnifiedResponse extends BaseResponse {
 
-    private String name;
+    private String nickname;
+
+    private String avatar;
+
+    private String description;
 
     private String type;
 
-    private String color;
+    private String status;
+
+    private String language;
+
+    private String welcomeTip;
+
+    private List<UserProtobuf> workgroups;
+
+    private List<UserProtobuf> agents;
+
+    private List<UserProtobuf> robots;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

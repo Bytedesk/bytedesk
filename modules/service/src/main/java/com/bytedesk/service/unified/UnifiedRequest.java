@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 14:31:02
+ * @LastEditTime: 2025-03-03 14:34:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.service.unified;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.enums.LevelEnum;
@@ -32,19 +35,36 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class UnifiedRequest extends BaseRequest {
 
-    private String name;
+    private String nickname;
+
+    private String avatar;
+
+    private String description;        
 
     // @Builder.Default
     // private String type = UnifiedTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    private String color = "red";
+    private String status = UnifiedStateEnum.AVAILABLE.name();
+
+    private String language;
+
+    private String welcomeTip;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
+
+    @Builder.Default
+    private List<String> workgroupUids = new ArrayList<String>();
+
+    @Builder.Default
+    private List<String> agentUids = new ArrayList<String>();
+
+    @Builder.Default
+    private List<String> robotUids = new ArrayList<String>();
 
     private String userUid;
 }
