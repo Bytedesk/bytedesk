@@ -293,7 +293,7 @@
                 placement: 'bottom-right',
                 autoPopup: false,
                 inviteConfig: {
-                    show: true,
+                    show: false,
                     text: texts.inviteText,
                     delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
                     loop: true, // 是否启用循环
