@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 16:55:41
+ * @LastEditTime: 2025-03-03 15:38:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,6 +41,7 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.unified.UnifiedEntity;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -64,12 +65,9 @@ public class VisitorThreadService
 
     @Override
     public Page<VisitorThreadResponse> queryByOrg(VisitorThreadRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<VisitorThreadEntity> spec = VisitorThreadSpecification.search(request);
         Page<VisitorThreadEntity> threads = visitorThreadRepository.findAll(spec, pageable);
-
         return threads.map(this::convertToResponse);
     }
 
@@ -203,6 +201,26 @@ public class VisitorThreadService
         thread.setAgent(robotString);
         // 保存
         threadService.save(thread);
+        //
+        return thread;
+    }
+
+    // create unified thread
+    public ThreadEntity createUnifiedThread(VisitorRequest visitorRequest, UnifiedEntity unified, String topic) {
+        //
+        ThreadEntity thread = ThreadEntity.builder()
+                .topic(topic)
+                .type(ThreadTypeEnum.UNIFIED.name())
+                .build();
+
+        return thread;
+    }
+
+    public ThreadEntity reInitUnifiedThreadExtra(ThreadEntity thread, UnifiedEntity unified) {
+        //
+        // String extra = ServiceConvertUtils
+        //         .convertToServiceSettingsResponseVisitorJSONString(unified.getServiceSettings());
+        // thread.setExtra(extra);
         //
         return thread;
     }
