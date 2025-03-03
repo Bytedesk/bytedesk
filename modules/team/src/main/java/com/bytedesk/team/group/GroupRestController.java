@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:07:48
+ * @LastEditTime: 2025-03-04 00:02:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -140,7 +140,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public Object export(GroupRequest request, HttpServletResponse response) {
         // query data to export
-        Page<GroupResponse> groupPage = groupService.queryByOrg(request);
+        Page<GroupEntity> groupPage = groupService.queryForExport(request);
         // 
         try {
             //
@@ -155,7 +155,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
             // write to excel
             EasyExcel.write(response.getOutputStream(), GroupExcel.class)
                     .autoCloseStream(Boolean.FALSE)
-                    .sheet("member")
+                    .sheet("group")
                     .doWrite(excelList);
 
         } catch (Exception e) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:27:49
+ * @LastEditTime: 2025-03-04 00:00:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,6 +67,12 @@ public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest,
         return queryByOrg(request);
     }
 
+    public Page<GroupEntity> queryForExport(GroupRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<GroupEntity> specification = GroupSpecification.search(request);
+        return groupRepository.findAll(specification, pageable);
+    }
+
     public GroupResponse queryByUid(GroupRequest request) {
         Optional<GroupEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
@@ -83,12 +89,14 @@ public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest,
 
     @Override
     public GroupResponse create(GroupRequest request) {
-
         UserEntity creator = authService.getUser();
+        if (creator == null) {
+            throw new RuntimeException("group creator is null");
+        }
         // 
         GroupEntity group = GroupEntity.builder().build();
         group.setName(request.getName());
-        group.setUid(uidUtils.getCacheSerialUid());
+        group.setUid(uidUtils.getUid());
         group.setType(GroupTypeEnum.fromValue(request.getType()).name());
         // 
         group.getAdmins().add(creator);
@@ -174,9 +182,36 @@ public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest,
         return modelMapper.map(entity, GroupResponse.class);
     }
 
-    public GroupExcel convertToExcel(GroupResponse group) {
-        return modelMapper.map(group, GroupExcel.class);
-    }   
+    // public GroupExcel convertToExcel(GroupResponse group) {
+    //     return modelMapper.map(group, GroupExcel.class);
+    // }   
     
+    /**
+     * 将群组实体转换为Excel导出对象
+     */
+    public GroupExcel convertToExcel(GroupEntity group) {
+        GroupExcel excel = new GroupExcel();
+        
+        excel.setUid(group.getUid());
+        excel.setName(group.getName());
+        excel.setAvatar(group.getAvatar());
+        excel.setDescription(group.getDescription());
+        excel.setType(group.getType());
+        excel.setStatus(group.getStatus());
+        excel.setIsExternal(group.isExternal());
+        excel.setCreator(group.getCreator() != null ? group.getCreator().getNickname() : "");
+        excel.setMemberCount(group.getMembers().size());
+        excel.setAdminCount(group.getAdmins().size());
+        excel.setMaxMembers(group.getMaxMembers());
+        excel.setNeedApproval(group.getNeedApproval());
+        excel.setAllowInvite(group.getAllowInvite());
+        excel.setMuteAll(group.getMuteAll());
+        excel.setShowTopTip(group.isShowTopTip());
+        excel.setTopTip(group.getTopTip());
+        excel.setCreatedAt(group.getCreatedAt().toString());
+        excel.setUpdatedAt(group.getUpdatedAt().toString());
+        
+        return excel;
+    }
 
 }
