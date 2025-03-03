@@ -16,8 +16,12 @@ chatUrl: 'https://www.weiyuai.cn/chat?org=df_org_uid&t=1&sid=df_wg_uid&',
     placement: 'bottom-right',
     autoPopup: false,
     inviteConfig: {
-      show: false,
+      show: true,
       text: '需要帮助么',
+      delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
+      loop: true, // 是否启用循环
+      loopDelay: 10000, // 循环间隔, 单位: 毫秒
+      loopCount: 3, // 循环次数, 设置为0表示无限循环
     },
     bubbleConfig: {
       show: true,

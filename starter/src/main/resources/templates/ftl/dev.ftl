@@ -206,40 +206,77 @@
 
     <script src="https://www.weiyuai.cn/embed/bytedesk-web.js"></script>
     <script>
-        // 默认显示英文并高亮英文按钮
-        document.querySelector('[lang="en"]').style.display = 'block';
-        document.querySelector('button[onclick*="en"]').classList.add('active');
+        // DOM 加载完成后执行初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLanguage();
+            initializeTheme();
+            initializeChatConfig();
+        });
 
-        function setLanguage(lang) {
-            // 隐藏所有语言
+        // 语言切换相关
+        function initializeLanguage() {
+            const savedLang = localStorage.getItem('preferred-language') || 'en';
+            setLanguage(savedLang, false); // false表示不更新chat配置
+        }
+
+        function setLanguage(lang, updateChat = true) {
+            // 防止无效的语言值
+            if (!document.querySelector(`[lang="${lang}"]`)) {
+                console.warn('Invalid language:', lang);
+                lang = 'en'; // 默认回退到英语
+            }
+
+            // 更新DOM
             document.querySelectorAll('[lang]').forEach(el => {
                 el.style.display = 'none';
             });
-            
-            // 显示选中的语言
-            document.querySelector('[lang="' + lang + '"]').style.display = 'block';
+            const selectedLang = document.querySelector(`[lang="${lang}"]`);
+            if (selectedLang) {
+                selectedLang.style.display = 'block';
+            }
 
             // 更新按钮状态
-            document.querySelectorAll('button').forEach(btn => {
+            document.querySelectorAll('.language-switcher button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            // 修改按钮选择器以确保准确匹配
-            document.querySelector('button[onclick="setLanguage(\'' + lang + '\')"]').classList.add('active');
+            const langButton = document.querySelector(`button[onclick="setLanguage('${lang}')"]`);
+            if (langButton) {
+                langButton.classList.add('active');
+            }
 
             // 保存语言偏好
             localStorage.setItem('preferred-language', lang);
 
-            // 更新客服配置
-            updateChatConfig(lang);
+            // 更新客服配置（如果需要）
+            if (updateChat) {
+                updateChatConfig(lang);
+            }
         }
 
-        // 恢复保存的语言偏好
-        const savedLang = localStorage.getItem('preferred-language');
-        if (savedLang) {
-            setLanguage(savedLang);
+        // 主题切换相关
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('preferred-theme') || 'system';
+            setTheme(savedTheme);
+
+            // 监听系统主题变化
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addEventListener('change', handleSystemThemeChange);
+        }
+
+        function handleSystemThemeChange(e) {
+            if (localStorage.getItem('preferred-theme') === 'system') {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+            }
         }
 
         function setTheme(theme) {
+            // 验证主题值
+            if (!['light', 'dark', 'system'].includes(theme)) {
+                console.warn('Invalid theme:', theme);
+                theme = 'system';
+            }
+
+            // 设置主题
             if (theme === 'system') {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
@@ -251,24 +288,21 @@
             document.querySelectorAll('.theme-switcher button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector('.theme-switcher button[onclick*="' + theme + '"]').classList.add('active');
+            const themeButton = document.querySelector(`.theme-switcher button[onclick*="${theme}"]`);
+            if (themeButton) {
+                themeButton.classList.add('active');
+            }
 
             // 保存主题偏好
             localStorage.setItem('preferred-theme', theme);
         }
 
-        // 监听系统主题变化
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (localStorage.getItem('preferred-theme') === 'system') {
-                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-            }
-        });
+        // 客服配置相关
+        function initializeChatConfig() {
+            const initialLang = localStorage.getItem('preferred-language') || 'en';
+            updateChatConfig(initialLang);
+        }
 
-        // 初始化主题
-        const savedTheme = localStorage.getItem('preferred-theme') || 'system';
-        setTheme(savedTheme);
-
-        // 客服配置
         function updateChatConfig(lang) {
             const i18nConfig = {
                 'en': {
@@ -290,50 +324,53 @@
 
             const texts = i18nConfig[lang] || i18nConfig['en'];
 
-            const config = {
-                placement: 'bottom-right',
-                autoPopup: false,
-                inviteConfig: {
-                    show: true,
-                    text: texts.inviteText,
-                },
-                bubbleConfig: {
-                    show: true,
-                    icon: '👋',
-                    title: texts.bubbleTitle,
-                    subtitle: texts.bubbleSubtitle
-                },
-                theme: {
-                    mode: 'system',
-                    backgroundColor: '#0066FF',
-                    textColor: '#ffffff'
-                },
-                window: {
-                    width: 380
-                },
-                chatConfig: {
-                    org: 'df_org_uid',
-                    t: '1',
-                    sid: 'df_wg_uid'
+            try {
+                // 如果已存在实例，先清理
+                if (window.bytedesk) {
+                    window.bytedesk.hideBubble();
+                    window.bytedesk.hideButton();
+                    window.bytedesk.hideChat();
                 }
-            };
 
-            // 如果已存在实例，先销毁
-            if (window.bytedesk) {
-                // 假设有销毁方法
-                window.bytedesk.hideBubble();
-                window.bytedesk.hideButton();
-                window.bytedesk.hideChat();
+                const config = {
+                    placement: 'bottom-right',
+                    autoPopup: false,
+                    inviteConfig: {
+                        show: false,
+                        text: texts.inviteText,
+                        delay: 1000,
+                        loop: true,
+                        loopDelay: 10000,
+                        loopCount: 3,
+                    },
+                    bubbleConfig: {
+                        show: true,
+                        icon: '👋',
+                        title: texts.bubbleTitle,
+                        subtitle: texts.bubbleSubtitle
+                    },
+                    theme: {
+                        mode: 'system',
+                        backgroundColor: '#0066FF',
+                        textColor: '#ffffff'
+                    },
+                    window: {
+                        width: 380
+                    },
+                    chatConfig: {
+                        org: 'df_org_uid',
+                        t: '1',
+                        sid: 'df_wg_uid'
+                    }
+                };
+
+                // 创建新实例
+                window.bytedesk = new BytedeskWeb(config);
+                window.bytedesk.init();
+            } catch (error) {
+                console.error('Error updating chat config:', error);
             }
-
-            // 创建新实例
-            window.bytedesk = new BytedeskWeb(config);
-            window.bytedesk.init();
         }
-
-        // 初始化时也要设置客服配置
-        const initialLang = localStorage.getItem('preferred-language') || 'en';
-        updateChatConfig(initialLang);
     </script>
 
     
