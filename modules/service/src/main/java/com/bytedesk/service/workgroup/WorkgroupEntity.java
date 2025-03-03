@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 17:01:40
+ * @LastEditTime: 2025-03-03 15:04:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
 
-
+import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,6 +62,7 @@ public class WorkgroupEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    @NotBlank
     private String nickname;
 
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 23:03:01
+ * @LastEditTime: 2025-03-03 14:41:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,29 +22,26 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.service.agent.AgentInitializer;
-import com.bytedesk.team.member.MemberInitializer;
-
 import lombok.AllArgsConstructor;
 
-@Component
+@Component("workgroupInitializer")
 @DependsOn("agentInitializer")
 @AllArgsConstructor
 public class WorkgroupInitializer implements SmartInitializingSingleton {
 
-    private final MemberInitializer memberInitializer;
-    private final AgentInitializer agentInitializer;
+    // private final MemberInitializer memberInitializer;
+    // private final AgentInitializer agentInitializer;
     private final WorkgroupRepository workgroupRepository;
     private final WorkgroupRestService workgroupService;
 
     @Override
     public void afterSingletonsInstantiated() {
         // 确保 MemberInitializer 先执行完成
-        memberInitializer.init();
-        // 确保 AgentInitializer 先执行完成
-        agentInitializer.init();
-        // 
-        init();
+        // memberInitializer.init();
+        // // 确保 AgentInitializer 先执行完成
+        // agentInitializer.init();
+        // // 
+        // init();
     }
 
     // @PostConstruct

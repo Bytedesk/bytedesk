@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:28:30
+ * @LastEditTime: 2025-03-03 14:49:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,13 +51,14 @@ import lombok.experimental.Accessors;
 @Table(name = "bytedesk_service_unified")
 public class UnifiedEntity extends BaseEntity {
 
-    private String nickname;
+    @Builder.Default
+    private String nickname = I18Consts.I18N_UNIFIED_NICKNAME;
 
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultWorkGroupAvatarUrl();
 
     @Builder.Default
-    private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
+    private String description = I18Consts.I18N_UNIFIED_DESCRIPTION;
     
     @Builder.Default
     @Column(name = "unified_type", nullable = false)
