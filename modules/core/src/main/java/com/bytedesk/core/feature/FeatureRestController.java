@@ -1,3 +1,16 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-12-19 10:17:26
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-03 23:13:02
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.core.feature;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.base.BaseRestController;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -80,6 +95,12 @@ public class FeatureRestController extends BaseRestController<FeatureRequest> {
             @RequestBody Map<String, Object> config) {
         featureService.updateFeatureConfig(code, config);
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public Object export(FeatureRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
 } 

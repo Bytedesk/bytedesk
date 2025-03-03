@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 20:47:05
+ * @LastEditTime: 2025-03-03 23:12:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,12 +28,9 @@ import com.bytedesk.core.base.BaseRestService;
 
 import lombok.AllArgsConstructor;
 
-/**
- * 
- */
 @Service
 @AllArgsConstructor
-public class CustomerService extends BaseRestService<CustomerEntity, CustomerRequest, CustomerResponse> {
+public class CustomerRestService extends BaseRestService<CustomerEntity, CustomerRequest, CustomerResponse> {
     
     private final CustomerRepository customerRepository;
 

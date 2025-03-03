@@ -11,6 +11,7 @@ import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -60,6 +61,12 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
     public ResponseEntity<?> delete(MessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public Object export(MessageRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
     
 }
