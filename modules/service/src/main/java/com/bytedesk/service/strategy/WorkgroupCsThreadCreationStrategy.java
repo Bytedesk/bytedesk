@@ -82,7 +82,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
             } else {
                 // 关闭或者离线状态，返回初始化状态的会话
-                thread = threadOptional.get().reInitWorkgroup();
+                thread = threadOptional.get().reInit(false);
                 workgroup = workgroupService.findByUid(workgroupUid)
                         .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
             }
