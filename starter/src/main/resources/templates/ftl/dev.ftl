@@ -154,10 +154,10 @@
     <#list languages?keys as lang>
         <div class="container" lang="${lang}">
             <h1>${i18n[lang]["title"]}</h1>
-            <p>
-                username: admin@email.com<br>
-                password: admin
-            </p>
+            <#--  <p>
+                demo username: admin@email.com<br>
+                demo password: admin
+            </p>  -->
             <#--  <p>线上演示环境需要自己手机号+验证码登录</p>  -->
 
             <h2>${i18n[lang]["systemEntrance"]}</h2>
