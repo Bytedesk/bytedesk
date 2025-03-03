@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 14:44:19
+ * @LastEditTime: 2025-03-03 09:11:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,8 @@
  */
 package com.bytedesk.ai.robot;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -32,18 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-// import com.bytedesk.ai.provider.vendors.ollama.OllamaChatService;
-import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.springai.SpringAIVectorService;
 import com.bytedesk.ai.springai.demo.bytedesk.SpringAIBytedeskService;
 import com.bytedesk.ai.springai.demo.utils.FileContent;
+import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.action.ActionRestService;
-import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
@@ -101,11 +93,11 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     // private final Optional<OllamaChatService> ollamaChatService;
 
-    private final Optional<ZhipuaiChatService> zhipuaiChatService;
+    private final Optional<SpringAIZhipuaiService> springAIZhipuaiChatService;
 
     private final FaqRestService faqRestService;
 
-    private final ActionRestService actionRestService;
+    // private final ActionRestService actionRestService;
 
     private final OptimisticLockingHandler optimisticLockingHandler;
 
@@ -624,7 +616,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 });
                 // 只在前两次调用zhipuaiChatService
                 if (count[0] < MAX_CALLS) {
-                    zhipuaiChatService.ifPresent(service -> {
+                    springAIZhipuaiChatService.ifPresent(service -> {
                         String qaPairs = service.generateFaqPairsAsync(file.getContent());
                         log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
                         faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");

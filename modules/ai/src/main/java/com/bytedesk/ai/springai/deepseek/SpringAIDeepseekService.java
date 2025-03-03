@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 13:07:20
+ * @LastEditTime: 2025-03-03 09:31:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@ package com.bytedesk.ai.springai.deepseek;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 // import org.springframework.ai.chat.client.ChatClient;
@@ -48,7 +49,7 @@ public class SpringAIDeepseekService {
 
     // private final ChatClient deepSeekChatClient;
     private final OpenAiChatModel deepSeekChatModel;
-    private final SpringAIVectorService springAIVectorService;
+    private final Optional<SpringAIVectorService> springAIVectorService;
     private final IMessageSendService messageSendService;
 
     private final String PROMPT_TEMPLATE = """
@@ -111,9 +112,10 @@ public class SpringAIDeepseekService {
             """;
 
     public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
+        
         String prompt;
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
+            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
             String history = "";
             prompt = PROMPT_TEMPLATE.replace("{context}", context)

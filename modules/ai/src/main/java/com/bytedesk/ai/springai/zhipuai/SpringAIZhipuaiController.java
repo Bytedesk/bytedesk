@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-02 21:09:49
+ * @LastEditTime: 2025-03-03 09:13:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.ServletException;
@@ -66,7 +65,7 @@ public class SpringAIZhipuaiController {
     @Qualifier("bytedeskZhipuaiImageModel")
     private final ZhiPuAiImageModel bytedeskZhipuaiImageModel;
 
-    private final ZhipuaiChatService zhipuaiChatService;
+    private final SpringAIZhipuaiService springAIZhipuaiChatService;
 
     // http://127.0.0.1:9003/springai/zhipuai/chat?message=hello
     @GetMapping("/chat")
@@ -111,36 +110,36 @@ public class SpringAIZhipuaiController {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     // http://127.0.0.1:9003/springai/zhipuai/sse?uid=&sid=&content=hi
-    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> sseEndpoint(
-            @RequestParam(value = "uid", required = true) String uid,
-            @RequestParam(value = "sid", required = true) String sid,
-            @RequestParam(value = "q", defaultValue = "讲个笑话") String question) {
-        // TODO: 根据uid和ip判断此visitor是否骚扰用户，如果骚扰则拒绝响应
+    // @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    // public ResponseEntity<SseEmitter> sseEndpoint(
+    //         @RequestParam(value = "uid", required = true) String uid,
+    //         @RequestParam(value = "sid", required = true) String sid,
+    //         @RequestParam(value = "q", defaultValue = "讲个笑话") String question) {
+    //     // TODO: 根据uid和ip判断此visitor是否骚扰用户，如果骚扰则拒绝响应
 
-        log.info("sseEndpoint sid: {}, uid: {}, question {}", sid, uid, question);
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    //     log.info("sseEndpoint sid: {}, uid: {}, question {}", sid, uid, question);
+    //     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
-        executorService.submit(() -> {
-            try {
-                // 调用你的服务方法来获取SSE数据
-                zhipuaiChatService.getSseAnswer(uid, sid, question, emitter);
-                // 将数据作为SSE事件发送
-                // emitter.send(SseEmitter.event().data(sseData));
-                // 完成后完成SSE流
-                // emitter.complete();
-            } catch (Exception e) {
-                // 如果发生错误，则发送错误事件
-                // emitter.send(SseEmitter.event().error(e));
-                emitter.completeWithError(e);
-            } finally {
-                // 确保清理资源
-                emitter.complete();
-            }
-        });
+    //     executorService.submit(() -> {
+    //         try {
+    //             // 调用你的服务方法来获取SSE数据
+    //             springAIZhipuaiChatService.getSseAnswer(uid, sid, question, emitter);
+    //             // 将数据作为SSE事件发送
+    //             // emitter.send(SseEmitter.event().data(sseData));
+    //             // 完成后完成SSE流
+    //             // emitter.complete();
+    //         } catch (Exception e) {
+    //             // 如果发生错误，则发送错误事件
+    //             // emitter.send(SseEmitter.event().error(e));
+    //             emitter.completeWithError(e);
+    //         } finally {
+    //             // 确保清理资源
+    //             emitter.complete();
+    //         }
+    //     });
 
-        return ResponseEntity.ok().body(emitter);
-    }
+    //     return ResponseEntity.ok().body(emitter);
+    // }
 
     // http://127.0.0.1:9003/springai/zhipuai/sse/test
     @GetMapping(value = "/sse/test", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

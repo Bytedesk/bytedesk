@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-02 21:21:28
+ * @LastEditTime: 2025-03-03 10:00:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,10 +66,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+    name = {
+        "spring.ai.ollama.embedding.enabled",  // Ollama embedding 配置
+    },
+    havingValue = "true",                      // 期望值为 true
+    matchIfMissing = false                     // 如果配置不存在则不匹配
+)
 public class SpringAIVectorService {
 
-	private final Optional<RedisVectorStore> ollamaRedisVectorStore;
+	private final Optional<RedisVectorStore> bytedeskOllamaRedisVectorStore;
+
+	private final Optional<RedisVectorStore> bytedeskZhipuaiRedisVectorStore;
 
 	private final FileRestService fileRestService;
 
@@ -296,11 +304,14 @@ public class SpringAIVectorService {
 			splitRestService.create(splitRequest);
 		});
 		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		}
 		//
 		return docList;
 	}
-
 
 	// 使用reader直接将content字符串，转换成 List<Document> documents
 	public List<Document> readText(TextEntity textEntity) {
@@ -340,7 +351,11 @@ public class SpringAIVectorService {
 		textEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 		textRestService.save(textEntity);
 		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		}
 
 		return docList;
 	}
@@ -391,7 +406,11 @@ public class SpringAIVectorService {
 		fqaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 		faqRestService.save(fqaEntity);
 		// log.info("Parsing document, this will take a while.");
-		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		}
 
 		return docList;
 	}
@@ -446,7 +465,7 @@ public class SpringAIVectorService {
 			}
 			// 如果需要存储到向量数据库
 			if (websiteEntity.getKbUid() != null) {
-				ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+				bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 				log.info("Website content stored in vector store for kbUid: {}", websiteEntity.getKbUid());
 			}
 			//
@@ -454,7 +473,11 @@ public class SpringAIVectorService {
 			websiteEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 			websiteRestService.save(websiteEntity);
 			// log.info("Parsing document, this will take a while.");
-			ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+			bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+			// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		}
 
 			return docList;
 
@@ -466,7 +489,7 @@ public class SpringAIVectorService {
 
 	// 存储到vector store
 	private void storeDocuments(List<Document> docList, FileEntity file) {
-		if (!ollamaRedisVectorStore.isPresent()) {
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			log.warn("Vector store is not available, skipping document storage for file: {}", file.getFileName());
 			return;
 		}
@@ -498,7 +521,7 @@ public class SpringAIVectorService {
 		file.setStatus(SplitStatusEnum.SUCCESS.name());
 		fileRestService.save(file);
 		
-		ollamaRedisVectorStore.ifPresent(redisVectorStore -> {
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
 			try {
 				redisVectorStore.write(docList);
 				log.info("Successfully stored documents in vector store");
@@ -506,6 +529,10 @@ public class SpringAIVectorService {
 				log.error("Failed to store documents in vector store: {}", e.getMessage());
 			}
 		});
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		}
 
 		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
 	}
@@ -513,7 +540,7 @@ public class SpringAIVectorService {
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
 	public List<String> searchText(String query) {
-		if (!ollamaRedisVectorStore.isPresent()) {
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			log.warn("Vector store is not available");
 			return List.of();
 		}
@@ -522,14 +549,14 @@ public class SpringAIVectorService {
 				.query(query)
 				.topK(2)
 				.build();
-		List<Document> similarDocuments = ollamaRedisVectorStore.map(redisVectorStore -> 
+		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore.map(redisVectorStore -> 
 			redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
 		return similarDocuments.stream().map(Document::getText).toList();
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	public List<String> searchText(String query, String kbUid) {
-		if (!ollamaRedisVectorStore.isPresent()) {
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			log.warn("Vector store is not available for kbUid: {}", kbUid);
 			return List.of();
 		}
@@ -543,7 +570,7 @@ public class SpringAIVectorService {
 				.query(query)
 				.filterExpression(expression)
 				.build();
-		List<Document> similarDocuments = ollamaRedisVectorStore.map(redisVectorStore -> 
+		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore.map(redisVectorStore -> 
 			redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
@@ -551,7 +578,11 @@ public class SpringAIVectorService {
 	}
 
 	public void deleteDoc(List<String> docIdList) {
-		ollamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
+		}
 	}
 
 }
