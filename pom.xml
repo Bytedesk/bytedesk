@@ -39,10 +39,8 @@
         <querydsl.version>5.1.0</querydsl.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <binarywang.weixin.version>4.7.0</binarywang.weixin.version>
-        <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 		<jackson.version>2.18.2</jackson.version>
         <flowable.version>7.1.0</flowable.version>
-        <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
         <revision>0.6.5</revision>
     </properties>
 
@@ -87,6 +85,32 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Javadoc 插件配置 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <charset>UTF-8</charset>
+                    <docencoding>UTF-8</docencoding>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                    <source>${java.version}</source>
+                    <failOnError>false</failOnError>
+                    <additionalOptions>
+                        <additionalOption>-Xdoclint:none</additionalOption>
+                    </additionalOptions>
+                    <excludePackageNames>*.test.*:*.tests.*:com.bytedesk.projects.*</excludePackageNames>
+                    <outputDirectory>${project.basedir}/starter/src/main/resources/static</outputDirectory>
+                    <reportOutputDirectory>${project.basedir}/starter/src/main/resources/static</reportOutputDirectory>
+                    <destDir>apidoc</destDir>
+                    <minmemory>128m</minmemory>
+                    <maxmemory>512m</maxmemory>
+                    <fork>true</fork>
+                    <detectJavaApiLink>false</detectJavaApiLink>
+                </configuration>
             </plugin>
         </plugins>
     </build>

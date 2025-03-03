@@ -18,7 +18,7 @@
 	<description>Start project for Bytedesk IM/CustomerService/AI</description>
 
 	<properties>
-		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
+		<!-- <jackson.version>2.18.2</jackson.version> -->
 	</properties>
 
 	<dependencies>
@@ -120,6 +120,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-artemis</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.retry</groupId>
+			<artifactId>spring-retry</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
@@ -173,52 +178,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- //////////////Spring AI 模块////////////// -->
-
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
-		</dependency>
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
-		<!-- https://tika.apache.org/2.9.0/formats.html -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-tika-document-reader</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-pdf-document-reader</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-moonshot-spring-boot-starter</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
-		</dependency>
-
-		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-redis-store-spring-boot-starter</artifactId>
-		</dependency>
-
-		<!-- ERROR: column cannot have more than 2000 dimensions for hnsw index -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
 		<!-- /////////////////////////////////////开源模块//////////////////////////////////////// -->
 
 		<!--  -->
@@ -254,6 +213,12 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-social</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-ticket</artifactId>
 			<version>${revision}</version>
 		</dependency>
@@ -270,7 +235,9 @@
 			<version>${revision}</version>
 		</dependency>
 
-		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
+		<!--
+		//////////////////////////////////Plugin模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
+
 
 		<!-- spring statemachine - 迁移到 cola statemachine -->
 		 <!-- https://github.com/spring-projects/spring-statemachine -->
@@ -313,26 +280,57 @@
 			<artifactId>fastjson2</artifactId>
 			<version>2.0.53</version>
 		</dependency>
+
 		<!-- for transforming LocalDateTime -->
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.18.1</version>
-		</dependency>
+			<version>${jackson.version}</version>
+		</dependency> -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <!-- <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency> -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <!-- <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency> -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+        <!-- <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency> -->
+
+		<!-- https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-openapi3-jakarta-spring-boot-starter -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>4.5.0</version>
+        </dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.6.0</version>
-		</dependency>
+		</dependency> -->
+		<!-- <dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webflux-api</artifactId>
+			<version>2.6.0</version>
+		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-security -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-security</artifactId>
 			<version>1.8.0</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://github.com/codecentric/spring-boot-admin -->
 		<!-- https://docs.spring-boot-admin.com/current/server.html -->
@@ -387,28 +385,26 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<!-- <version>3.25.2</version> -->
 			<version>4.28.2</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java-util</artifactId>
-			<!-- <version>3.25.2</version> -->
 			<version>4.28.2</version>
-		</dependency>
+		</dependency> -->
 
 		<!--
 		https://mvnrepository.com/artifact/com.googlecode.protobuf-java-format/protobuf-java-format -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.googlecode.protobuf-java-format</groupId>
 			<artifactId>protobuf-java-format</artifactId>
 			<version>1.4</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<!-- https://wizardforcel.gitbooks.io/guava-tutorial/content/1.html -->
@@ -514,6 +510,22 @@
 			<version>5.2.0</version>
 		</dependency>
 
+		<!-- redis search https://github.com/redis/lettucemod -->
+		<!-- https://mvnrepository.com/artifact/com.redis/lettucemod-spring -->
+		<!-- <dependency>
+			<groupId>com.redis</groupId>
+			<artifactId>lettucemod-spring</artifactId>
+			<version>4.1.0</version>
+		</dependency> -->
+
+		<!-- https://github.com/redis/redis-om-spring?tab=readme-ov-file -->
+		<!-- https://mvnrepository.com/artifact/com.redis.om/redis-om-spring -->
+		<!-- <dependency>
+			<groupId>com.redis.om</groupId>
+			<artifactId>redis-om-spring</artifactId>
+			<version>0.9.7</version>
+		</dependency> -->
+
 		<!-- jedis pool config -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -578,19 +590,15 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.ai</groupId>
-				<artifactId>spring-ai-bom</artifactId>
-				<version>${spring-ai.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+		<!-- 添加 okhttp 依赖，确保版本兼容 -->
+		<!-- <dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.12.0</version>
+		</dependency> -->
+		
+	</dependencies>
 
 
 	<build>
@@ -650,24 +658,5 @@
 			<url>https://jitpack.io</url>
 		</repository>
 	</repositories> -->
-
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>spring-snapshots</id>
-			<name>Spring Snapshots</name>
-			<url>https://repo.spring.io/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-	</repositories>
 
 </project>
