@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 22:54:24
+ * @LastEditTime: 2025-03-03 15:41:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,7 @@ public class TopicUtils {
     public static final String TOPIC_ORG_ROBOT_PREFIX = "org/robot/";
     public static final String TOPIC_ORG_AGENT_PREFIX = "org/agent/";
     public static final String TOPIC_ORG_WORKGROUP_PREFIX = "org/workgroup/";
+    public static final String TOPIC_ORG_UNIFIED_PREFIX = "org/unified/";
     public static final String TOPIC_ORG_KB_PREFIX = "org/kb/";
     public static final String TOPIC_ORG_KBDOC_PREFIX = "org/kbdoc/";
     public static final String TOPIC_ORG_QUEUE_PREFIX = "org/queue/";
@@ -89,14 +90,15 @@ public class TopicUtils {
     // 用户默认订阅客服uid：org/agent/{agent_uid}
     // 一对一客服会话：org/agent/{agent_uid}/{visitor_uid}
     // 用户默认订阅技能组uid：org/workgroup/{workgroup_uid}
-    // 废弃：技能组客服会话：org/workgroup/{workgroup_uid}/{agent_uid}/{visitor_uid}
     // 技能组客服会话：org/workgroup/{workgroup_uid}/{visitor_uid}
+    // 统一客服入口：org/unified/{unified_uid}/{visitor_uid}
     // 一对一工单会话：org/ticket/agent/{agent_uid}/{user_uid}
     // 技能组工单会话：org/ticket/workgroup/{workgroup_uid}/{user_uid}
     private static final String TOPIC_ORG_AGENT_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s"; // "org/agent/%s";
     private static final String TOPIC_ORG_AGENT_THREAD_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s/%s"; // "org/agent/%s/%s";
     private static final String TOPIC_ORG_WORKGROUP_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s"; // "org/workgroup/%s";
     private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s"; // "org/workgroup/%s/%s";
+    private static final String TOPIC_ORG_UNIFIED_THREAD_PATTERN = TOPIC_ORG_UNIFIED_PREFIX + "%s/%s"; // "org/unified/%s/%s";
     private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
     private static final String TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN = TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/agent/%s/%s";
     private static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/workgroup/%s/%s";
@@ -265,5 +267,18 @@ public class TopicUtils {
     public static String formatOrgWorkgroupTicketThreadTopic(String workgroupUid, String ticketUid) {
         return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid);
     }
+
+
+    //////////////////////////////////////////////////////////////////////////
+    // 统一客服入口
+
+    public static Boolean isOrgUnifiedTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_UNIFIED_PREFIX);
+    }
+
+    public static String formatOrgUnifiedThreadTopic(String unifiedUid, String visitorUid) {    
+        return String.format(TOPIC_ORG_UNIFIED_THREAD_PATTERN, unifiedUid, visitorUid);
+    }
+    
 
 }

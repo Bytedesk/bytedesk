@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 18:08:30
+ * @LastEditTime: 2025-03-03 15:39:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,6 +35,7 @@ import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
+import com.bytedesk.service.unified.UnifiedEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
@@ -262,6 +263,11 @@ public class RouteService {
             // 客服离线 或 非接待状态
             return getOfflineMessage(visitorRequest, thread, workgroup);
         }
+    }
+
+    public MessageProtobuf routeToUnified(VisitorRequest visitorRequest, UnifiedEntity unified) {
+        //
+        return null;
     }
 
     public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity thread,
