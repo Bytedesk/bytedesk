@@ -141,7 +141,7 @@ http://127.0.0.1:9003/
 - [桌面客户端](https://github.com/Bytedesk/bytedesk-desktop)
 - [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
 
-## 开源SDK
+## 开源Demo + SDK
 
 | Project     | Description           | Forks          | Stars             |
 |-------------|-----------------------|----------------|-------------------|
