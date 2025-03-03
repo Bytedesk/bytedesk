@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:34:09
+ * @LastEditTime: 2025-03-03 15:03:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,9 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,21 +39,26 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class UnifiedRequest extends BaseRequest {
 
+    @NotBlank
     private String nickname;
 
-    private String avatar;
+    @Builder.Default
+    private String avatar = AvatarConsts.getDefaultWorkGroupAvatarUrl();
 
-    private String description;        
+    @Builder.Default
+    private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;   
 
     // @Builder.Default
-    // private String type = UnifiedTypeEnum.CUSTOMER.name();
+    // private String type = ThreadTypeEnum.WORKGROUP.name();
 
     @Builder.Default
     private String status = UnifiedStateEnum.AVAILABLE.name();
 
-    private String language;
+    @Builder.Default
+    private String language = LanguageEnum.ZH_CN.name();
 
-    private String welcomeTip;
+    @Builder.Default
+    private String welcomeTip = I18Consts.I18N_WELCOME_TIP;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();

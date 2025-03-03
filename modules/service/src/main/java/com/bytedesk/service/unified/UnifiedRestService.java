@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:23:40
+ * @LastEditTime: 2025-03-03 14:51:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -43,6 +45,8 @@ public class UnifiedRestService extends BaseRestService<UnifiedEntity, UnifiedRe
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final WorkgroupRestService workgroupRestService;
 
     @Override
     public Page<UnifiedResponse> queryByOrg(UnifiedRequest request) {
@@ -72,16 +76,23 @@ public class UnifiedRestService extends BaseRestService<UnifiedEntity, UnifiedRe
     @Override
     public UnifiedResponse create(UnifiedRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("user not found");
+        if (user != null) {
+            request.setUserUid(user.getUid());
+            request.setOrgUid(user.getOrgUid());
         }
-        request.setUserUid(user.getUid());
-        
+        // 
         UnifiedEntity entity = modelMapper.map(request, UnifiedEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
-        entity.setOrgUid(user.getOrgUid());
-
+        if (request.getWorkgroupUids() != null) {
+            for (String workgroupUid : request.getWorkgroupUids()) {
+                Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+                if (workgroupOptional.isPresent()) {
+                    entity.getWorkgroups().add(workgroupOptional.get());
+                }
+            }
+        }
+        // 
         UnifiedEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create unified failed");
@@ -95,6 +106,18 @@ public class UnifiedRestService extends BaseRestService<UnifiedEntity, UnifiedRe
         if (optional.isPresent()) {
             UnifiedEntity entity = optional.get();
             modelMapper.map(request, entity);
+
+            // 更新技能组, 首先清理原先的
+            entity.getWorkgroups().clear();
+            if (request.getWorkgroupUids() != null) {
+                for (String workgroupUid : request.getWorkgroupUids()) {
+                    Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+                    if (workgroupOptional.isPresent()) {
+                        entity.getWorkgroups().add(workgroupOptional.get());
+                    }
+                }
+            }
+
             //
             UnifiedEntity savedEntity = save(entity);
             if (savedEntity == null) {
