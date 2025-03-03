@@ -327,6 +327,7 @@
                 window.bytedesk.hideBubble();
                 window.bytedesk.hideButton();
                 window.bytedesk.hideChat();
+                window.bytedesk.hideInviteDialog();
             }
 
             // 创建新实例
