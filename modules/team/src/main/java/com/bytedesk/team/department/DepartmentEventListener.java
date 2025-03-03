@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class DepartmentEventListener {
 
-    private final DepartmentService departmentService;
+    private final DepartmentRestService departmentService;
 
     private final UidUtils uidUtils;
 
