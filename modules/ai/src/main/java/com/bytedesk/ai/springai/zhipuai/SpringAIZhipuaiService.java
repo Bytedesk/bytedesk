@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 13:07:40
+ * @LastEditTime: 2025-03-03 09:23:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import java.util.Optional;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
@@ -48,9 +49,18 @@ public class SpringAIZhipuaiService {
 
     @Qualifier("bytedeskZhipuaiChatModel")
     private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
-    // 
-    private final SpringAIVectorService springAIVectorService;
+    //
+    private final Optional<SpringAIVectorService> springAIVectorService;
+    
     private final IMessageSendService messageSendService;
+
+        private final String PROMPT_BLUEPRINT = """
+            根据提供的文档信息回答问题，文档信息如下:
+            {context}
+            问题:
+            {query}
+            当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
+            """;
 
     private final String PROMPT_TEMPLATE = """
               任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。
@@ -112,9 +122,13 @@ public class SpringAIZhipuaiService {
             """;
 
     public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
+        if (!springAIVectorService.isPresent()) {
+            return;
+        }
+
         String prompt;
         if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
+            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
             String context = String.join("\n", contentList);
             String history = "";
             prompt = PROMPT_TEMPLATE.replace("{context}", context)
@@ -193,6 +207,60 @@ public class SpringAIZhipuaiService {
 
                             // finishReason: STOP
                             log.info("Zhipuai API response metadata {}, finishReason: {}", metadata,
+                                    metadata.getFinishReason());
+
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
+
+                            // if (metadata.getFinishReason().equals(FinishReason.STOP)) {
+                            // messageProtobuf.setType(MessageTypeEnum.SUCCESS);
+                            // messageSendService.sendProtobufMessage(messageProtobuf);
+                            // }
+                        }
+
+                    }
+                },
+                error -> {
+                    log.error("Zhipuai API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed"));
+    }
+
+    public void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
+        if (!springAIVectorService.isPresent()) {
+            return;
+        }
+        // 
+        List<String> contentList = springAIVectorService.get().searchText(query, kbUid);
+        String context = String.join("\n", contentList);
+        String prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
+        log.info("sendWsAutoReply prompt {}", prompt);
+
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(prompt));
+        messages.add(new UserMessage(prompt));
+
+        Prompt aiPrompt = new Prompt(messages);
+
+        bytedeskZhipuaiChatModel.stream(aiPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        log.info("Zhipuai API auto_reply metadata: {}", response.getMetadata());
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
+
+                            log.info("Zhipuai API auto_reply assistantMessage: {}, textContent: {}", assistantMessage,
+                                    textContent);
+                            ChatGenerationMetadata metadata = generation.getMetadata();
+
+                            // finishReason: STOP
+                            log.info("Zhipuai API auto_reply metadata {}, finishReason: {}", metadata,
                                     metadata.getFinishReason());
 
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
