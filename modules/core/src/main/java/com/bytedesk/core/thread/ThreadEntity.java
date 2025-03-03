@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 06:41:59
+ * @LastEditTime: 2025-03-03 16:04:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -195,29 +195,49 @@ public class ThreadEntity extends BaseEntity {
     //     return Arrays.asList(requiredSkills.split(","));
     // }
 
-    public ThreadEntity reInitAgent() {
-        this.state = ThreadStateEnum.QUEUING.name();
+    public ThreadEntity reInit(Boolean isRobot) {
+        if (isRobot) {
+            this.state = ThreadStateEnum.STARTED.name();
+        } else {
+            this.state = ThreadStateEnum.QUEUING.name();
+        }
         this.hide = false;
         this.autoClose = false;
         this.robot = false;
         return this;
     }
 
-    public ThreadEntity reInitWorkgroup() {
-        this.state = ThreadStateEnum.QUEUING.name();
-        this.hide = false;
-        this.autoClose = false;
-        this.robot = false;
-        return this;
-    }
+    // public ThreadEntity reInitAgent() {
+    //     this.state = ThreadStateEnum.QUEUING.name();
+    //     this.hide = false;
+    //     this.autoClose = false;
+    //     this.robot = false;
+    //     return this;
+    // }
 
-    public ThreadEntity reInitRobot() {
-        this.state = ThreadStateEnum.STARTED.name();
-        this.hide = false;
-        this.autoClose = false;
-        this.robot = false;
-        return this;
-    }
+    // public ThreadEntity reInitWorkgroup() {
+    //     this.state = ThreadStateEnum.QUEUING.name();
+    //     this.hide = false;
+    //     this.autoClose = false;
+    //     this.robot = false;
+    //     return this;
+    // }
+
+    // public ThreadEntity reInitRobot() {
+    //     this.state = ThreadStateEnum.STARTED.name();
+    //     this.hide = false;
+    //     this.autoClose = false;
+    //     this.robot = false;
+    //     return this;
+    // }
+
+    // public ThreadEntity reInitUnified() {
+    //     this.state = ThreadStateEnum.QUEUING.name();
+    //     this.hide = false;
+    //     this.autoClose = false;
+    //     this.robot = false;
+    //     return this;
+    // }
 
     //
     public Boolean isClosed() {
@@ -238,7 +258,8 @@ public class ThreadEntity extends BaseEntity {
 
     public Boolean isCustomerService() {
         return this.type.equals(ThreadTypeEnum.AGENT.name())
-                || this.type.equals(ThreadTypeEnum.WORKGROUP.name());
+                || this.type.equals(ThreadTypeEnum.WORKGROUP.name())
+                || this.type.equals(ThreadTypeEnum.UNIFIED.name());
     }
 
     public Boolean isRobotType() {
@@ -251,6 +272,10 @@ public class ThreadEntity extends BaseEntity {
 
     public Boolean isAgentType() {
         return this.type.equals(ThreadTypeEnum.AGENT.name());
+    }
+
+    public Boolean isUnifiedType() {
+        return this.type.equals(ThreadTypeEnum.UNIFIED.name());
     }
 
     public ThreadProtobuf toProtobuf() {

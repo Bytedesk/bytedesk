@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 12:05:13
+ * @LastEditTime: 2025-03-03 16:01:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,7 +72,7 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
                 return getRobotContinueMessage(visitorRequest, thread);
             } else {
                 // 重新初始化
-                thread = threadOptional.get().reInitRobot();
+                thread = threadOptional.get().reInit(true);
             }
         } else {
             thread = visitorThreadService.createRobotThread(visitorRequest, robot, topic);

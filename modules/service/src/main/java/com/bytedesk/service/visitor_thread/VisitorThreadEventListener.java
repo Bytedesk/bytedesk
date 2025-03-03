@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-19 14:49:12
+ * @LastEditTime: 2025-03-03 15:57:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ public class VisitorThreadEventListener {
         log.info("visitor ThreadCreateEvent: {}, type {}", thread.getUid(), thread.getType());
         // 仅同步客服会话
         if (thread.isCustomerService()) {
-            visitorThreadService.create(event.getThread());
+            visitorThreadService.copyFromThread(event.getThread());
         } else {
             log.info("visitor ThreadCreateEvent not isCustomerService: {}, type {}", thread.getUid(), thread.getType());
         }

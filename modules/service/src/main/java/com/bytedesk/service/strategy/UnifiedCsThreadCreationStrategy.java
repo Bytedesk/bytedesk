@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:43:30
+ * @LastEditTime: 2025-03-03 16:05:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -75,11 +75,12 @@ public class UnifiedCsThreadCreationStrategy implements CsThreadCreationStrategy
                 return getUnifiedContinueMessage(visitorRequest, thread);
             } else {
                 // 重新初始化
-                thread = threadOptional.get().reInitRobot();
+                thread = threadOptional.get().reInit(false);
             }
         } else {
             thread = visitorThreadService.createUnifiedThread(visitorRequest, unified, topic);
         }
+        // 重新初始化会话额外信息，例如客服状态等
         thread = visitorThreadService.reInitUnifiedThreadExtra(thread, unified);
 
         return routeService.routeToUnified(visitorRequest, unified);

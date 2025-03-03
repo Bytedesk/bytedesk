@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:43:47
+ * @LastEditTime: 2025-03-03 16:07:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,8 +35,23 @@ import java.time.LocalDateTime;
 public class ThreadMessageUtil {
 
     public static MessageProtobuf getThreadUnifiedWelcomeMessage(ThreadEntity thread) {
-        // ... 方法的实现保持不变 ...
-        return null;
+        MessageEntity message = MessageEntity.builder()
+                .content(thread.getContent())
+                .type(MessageTypeEnum.WELCOME.name())
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(thread.getAgent())
+                .build();
+        message.setUid(UidUtils.getInstance().getUid());
+        message.setOrgUid(thread.getOrgUid());
+        message.setCreatedAt(LocalDateTime.now());
+        message.setUpdatedAt(LocalDateTime.now());
+        message.setThreadTopic(thread.getTopic());
+        //
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        message.setExtra(JSON.toJSONString(extra));
+        //
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadRobotWelcomeMessage(ThreadEntity thread) {
@@ -195,5 +210,4 @@ public class ThreadMessageUtil {
         return message;
     }
 
-    
 }

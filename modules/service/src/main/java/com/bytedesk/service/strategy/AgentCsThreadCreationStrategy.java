@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 15:19:47
+ * @LastEditTime: 2025-03-03 16:01:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
                 return getAgentQueuingMessage(visitorRequest, threadOptional.get());
             } else {
                 // 关闭或者离线状态，返回初始化状态的会话
-                thread = threadOptional.get().reInitAgent();
+                thread = threadOptional.get().reInit(false);
                 agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
             }
         } else {
