@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:12:43
+ * @LastEditTime: 2025-03-04 15:52:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
@@ -37,6 +38,9 @@ import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -44,6 +48,9 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
+import com.bytedesk.kbase.faq.FaqJsonLoader.Faq;
+import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +68,8 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
 
     private final CategoryRestService categoryService;
 
-    private final ActionRestService actionRestService;
+    // private final ActionRestService actionRestService;
+    private final FaqJsonLoader faqJsonLoader;
 
     private final AuthService authService;
 
@@ -108,11 +116,6 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         }
         entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
         //
-        // category
-        // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
-        // if (categoryOptional.isPresent()) {
-        //     entity.setCategory(categoryOptional.get());
-        // }
         return convertToResponse(save(entity));
     }
 
@@ -189,72 +192,9 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         deleteByUid(entity.getUid());
     }
 
-    private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
-    private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
-    private final Queue<FaqEntity> retryQueue = new LinkedList<>();
-
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqEntity entity) {
-        retryQueue.add(entity);
-        processRetryQueue();
-    }
-
-    private void processRetryQueue() {
-        while (!retryQueue.isEmpty()) {
-            FaqEntity entity = retryQueue.poll(); // 从队列中取出一个元素
-            if (entity == null) {
-                break; // 队列为空，跳出循环
-            }
-
-            int retryCount = 0;
-            while (retryCount < MAX_RETRY_ATTEMPTS) {
-                try {
-                    // 尝试更新Topic对象
-                    faqRepository.save(entity);
-                    // 更新成功，无需进一步处理
-                    log.info("Optimistic locking succeeded for faq: {}", entity.getUid());
-                    break; // 跳出内部循环
-                } catch (ObjectOptimisticLockingFailureException ex) {
-                    // 捕获乐观锁异常
-                    log.error("Optimistic locking failure for faq: {}, retry count: {}", entity.getUid(),
-                            retryCount + 1);
-                    // 等待一段时间后重试
-                    try {
-                        Thread.sleep(RETRY_DELAY_MS);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        log.error("Interrupted while waiting for retry", ie);
-                        return;
-                    }
-                    retryCount++; // 增加重试次数
-
-                    // 如果还有重试机会，则将faq放回队列末尾
-                    if (retryCount < MAX_RETRY_ATTEMPTS) {
-                        // FIXME: 发现会一直失败，暂时不重复处理
-                        // retryQueue.add(faq);
-                    } else {
-                        // 所有重试都失败了
-                        handleFailedRetries(entity);
-                    }
-                }
-            }
-        }
-    }
-
-    private void handleFailedRetries(FaqEntity faq) {
-        String faqJSON = JSONObject.toJSONString(faq);
-        ActionRequest actionRequest = ActionRequest.builder()
-                .title("faq")
-                .action("save")
-                .description("All retry attempts failed for optimistic locking")
-                .extra(faqJSON)
-                .build();
-        actionRequest.setType(ActionTypeEnum.FAILED.name());
-        actionRestService.create(actionRequest);
-        // bytedeskEventPublisher.publishActionEvent(actionRequest);
-        log.error("All retry attempts failed for optimistic locking of faq: {}", faq.getUid());
-        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
-        // notifyUserOfFailure(robot);
+  
     }
 
     @Override
@@ -354,6 +294,47 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         } catch (Exception e) {
             log.error("Error parsing and saving QA pairs: {} \nContent: {}", e.getMessage(), qaPairs);
             throw new RuntimeException("Failed to save QA pairs", e);
+        }
+    }
+
+    /**
+     * 导入FAQ数据
+     * 从JSON文件加载数据并存储到数据库
+     * 
+     * @return 导入的FAQ数量
+     */
+    @Transactional
+    public int importFaqs(String orgUid, String kbUid) {
+        try {
+            // 加载JSON文件中的FAQ数据
+            FaqConfiguration config = faqJsonLoader.loadFaqs();
+            int count = 0;
+
+            // 遍历并保存每个FAQ
+            for (Faq faq : config.getFaqs()) {
+                String uid = Utils.formatUid(orgUid, faq.getUid());
+                // 检查FAQ是否已存在
+                if (!faqRepository.existsByUid(uid)) {
+                    FaqRequest request = FaqRequest.builder()
+                        .question(faq.getQuestion())
+                        .answer(faq.getAnswer())
+                        .build();
+                    request.setUid(uid);
+                    request.setOrgUid(orgUid);
+                    request.setKbUid(kbUid);
+                    request.setType(MessageTypeEnum.TEXT.name());
+                    create(request);
+                    count++;
+                } else {
+                    log.info("FAQ already exists: {}", faq.getUid());
+                }
+            }
+
+            log.info("Successfully imported {} FAQs", count);
+            return count;
+        } catch (Exception e) {
+            log.error("Failed to import FAQs", e);
+            throw new RuntimeException("Failed to import FAQs", e);
         }
     }
 

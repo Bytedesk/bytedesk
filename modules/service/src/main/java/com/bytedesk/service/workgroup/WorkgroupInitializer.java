@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:41:54
+ * @LastEditTime: 2025-03-04 16:09:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.utils.Utils;
+
 import lombok.AllArgsConstructor;
 
 @Component("workgroupInitializer")
@@ -44,7 +46,8 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         // init();
     }
 
-    // @PostConstruct
+
+    // 迁移到 unifiedInitializer 执行
     public void init() {
         
         if (workgroupRepository.count() > 0) {
@@ -61,6 +64,14 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .build();
         workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
         workgroupRequest.setOrgUid(orgUid);
+        // 写入 faq uid 到 welcomeFaqUids
+        if (orgUid.equals(BytedeskConsts.DEFAULT_ORGANIZATION_UID)) {
+            // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
+            for (int i = 1; i <= 5; i++) {
+                String faqUid = Utils.formatUid(orgUid, "faq_00" + i);
+                workgroupRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
+            }
+        }
         //
         workgroupService.create(workgroupRequest);
     }
