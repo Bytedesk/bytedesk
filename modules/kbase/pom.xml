@@ -16,14 +16,10 @@
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>
-		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
 	</properties>
 
 	<dependencies>
 		
-
-		<!-- //////////////////////////////////////////////////////////////// -->
-
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-core</artifactId>
