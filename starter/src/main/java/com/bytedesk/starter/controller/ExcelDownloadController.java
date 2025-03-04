@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-04 21:14:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 21:28:38
+ * @LastEditTime: 2025-03-04 21:51:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
 package com.bytedesk.starter.controller;
 
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +23,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,25 +34,28 @@ import java.util.stream.Collectors;
 @RequestMapping("/excel")
 public class ExcelDownloadController {
 
-    private final Path excelStorageLocation = Paths.get("starter/src/main/resources/static/excel");
+    private final ResourceLoader resourceLoader;
+    private static final String EXCEL_PATH = "classpath:static/excel/";
+
+    public ExcelDownloadController(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
 
     // open: http://127.0.0.1:9003/excel/kbase_auto_reply_keyword.xlsx
     // download: http://127.0.0.1:9003/excel/download/kbase_auto_reply_keyword.xlsx
     @GetMapping("/download/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
-            Path filePath = excelStorageLocation.resolve(filename).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-            
+            Resource resource = resourceLoader.getResource(EXCEL_PATH + filename);
             if (resource.exists()) {
                 return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                     .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (MalformedURLException ex) {
+        } catch (Exception ex) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -63,24 +64,26 @@ public class ExcelDownloadController {
     @GetMapping({"/download", "/download/"})
     public String listFiles(Model model) {
         try {
-            List<FileInfo> files = Files.list(excelStorageLocation)
-                .filter(path -> !Files.isDirectory(path))
-                .filter(path -> !path.getFileName().toString().startsWith(".")) // 排除隐藏文件
-                .map(path -> {
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+            Resource[] resources = resolver.getResources(EXCEL_PATH + "**/*.xlsx");
+            
+            List<FileInfo> files = Arrays.stream(resources)
+                .filter(resource -> !resource.getFilename().startsWith("."))
+                .map(resource -> {
                     try {
                         return new FileInfo(
-                            path.getFileName().toString(),
-                            Files.size(path),
-                            Files.getLastModifiedTime(path).toMillis()
+                            resource.getFilename(),
+                            resource.contentLength(),
+                            resource.lastModified()
                         );
                     } catch (IOException e) {
-                        return new FileInfo(path.getFileName().toString(), 0, 0);
+                        return new FileInfo(resource.getFilename(), 0, 0);
                     }
                 })
                 .collect(Collectors.toList());
             
             model.addAttribute("files", files);
-            return "excel/list"; // 对应 templates/excel/list.html
+            return "excel/list";
         } catch (IOException e) {
             model.addAttribute("error", "无法读取文件列表");
             return "error";
