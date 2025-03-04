@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:23:06
+ * @LastEditTime: 2025-03-04 14:53:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,8 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.TextReader;
+import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
+import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
@@ -116,6 +118,8 @@ public class SpringAIVectorService {
 			readJson(fileName, file);
 		} else if (fileName.toLowerCase().endsWith(".txt")) {
 			readTxt(fileName, file);
+		} else if (fileName.toLowerCase().endsWith(".md")) {
+			readMarkdown(fileName, file);
 		} else {
 			readByTika(fileName, file);
 		}
@@ -207,6 +211,32 @@ public class SpringAIVectorService {
 
 		// 读取所有文档
 		List<Document> documents = jsonReader.read();
+		// 提取文本内容
+		StringBuilder contentBuilder = new StringBuilder();
+		for (Document doc : documents) {
+			contentBuilder.append(doc.getText()).append("\n");
+		}
+		// 保存文本内容到file
+		file.setContent(contentBuilder.toString());
+
+		var tokenTextSplitter = new TokenTextSplitter();
+		List<Document> docList = tokenTextSplitter.split(documents);
+		storeDocuments(docList, file);
+	}
+
+	// 使用spring ai markdown reader
+	public void readMarkdown(String fileName, FileEntity file) {
+		log.info("Loading document from markdown: {}", fileName);
+		if (fileName == null || fileName.isEmpty()) {
+			throw new IllegalArgumentException("File URL must not be empty");
+		}
+		if (!fileName.endsWith(".md")) {
+			throw new IllegalArgumentException(String.format("File URL must end with .md, got %s", fileName));
+		}
+
+		Resource resource = uploadRestService.loadAsResource(fileName);
+		MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource, MarkdownDocumentReaderConfig.builder().build());
+		List<Document> documents = markdownReader.read();
 		// 提取文本内容
 		StringBuilder contentBuilder = new StringBuilder();
 		for (Document doc : documents) {
