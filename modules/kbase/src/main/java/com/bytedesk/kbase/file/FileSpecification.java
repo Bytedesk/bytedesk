@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:49:36
+ * @LastEditTime: 2025-03-04 17:47:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,6 +32,11 @@ public class FileSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+
+            // fileName
+            if (StringUtils.hasText(request.getFileName())) {
+                predicates.add(criteriaBuilder.like(root.get("fileName"), "%" + request.getFileName() + "%"));
+            }
 
             // categoryUid
             if (StringUtils.hasText(request.getCategoryUid())) {

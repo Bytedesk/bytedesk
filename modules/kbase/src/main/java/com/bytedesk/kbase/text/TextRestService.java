@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 17:19:45
+ * @LastEditTime: 2025-03-04 17:54:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,9 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -46,8 +44,7 @@ public class TextRestService extends BaseRestService<TextEntity, TextRequest, Te
 
     @Override
     public Page<TextResponse> queryByOrg(TextRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<TextEntity> spec = TextSpecification.search(request);
         Page<TextEntity> page = textRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
@@ -55,8 +52,12 @@ public class TextRestService extends BaseRestService<TextEntity, TextRequest, Te
 
     @Override
     public Page<TextResponse> queryByUser(TextRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "text", key = "#uid", unless="#result==null")
@@ -141,8 +142,7 @@ public class TextRestService extends BaseRestService<TextEntity, TextRequest, Te
     }
 
     public Page<TextEntity> queryByOrgExcel(TextRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<TextEntity> spec = TextSpecification.search(request);
         return textRepository.findAll(spec, pageable);
     }
