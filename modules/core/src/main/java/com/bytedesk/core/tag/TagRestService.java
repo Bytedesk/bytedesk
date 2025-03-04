@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:25:22
+ * @LastEditTime: 2025-03-04 14:35:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,12 +18,13 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -31,10 +32,14 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @AllArgsConstructor
 public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagResponse> {
+
+    private static final Logger log = LoggerFactory.getLogger(TagRestService.class);
 
     private final TagRepository tagRepository;
 
@@ -107,13 +112,31 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
         }
     }
 
+    /**
+     * 保存标签，失败时自动重试
+     * maxAttempts: 最大重试次数（包括第一次尝试）
+     * backoff: 重试延迟，multiplier是延迟倍数
+     * recover: 当重试次数用完后的回调方法
+     */
+    @Retryable(
+        value = { Exception.class },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
     @Override
     public TagEntity save(TagEntity entity) {
-        try {
-            return tagRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        log.info("Attempting to save tag: {}", entity.getName());
+        return tagRepository.save(entity);
+    }
+
+    /**
+     * 重试失败后的回调方法
+     */
+    @Recover
+    public TagEntity recover(Exception e, TagEntity entity) {
+        log.error("Failed to save tag after 3 attempts: {}", entity.getName(), e);
+        // 可以在这里添加告警通知
+        throw new RuntimeException("Failed to save tag after retries: " + e.getMessage());
     }
 
     @Override
