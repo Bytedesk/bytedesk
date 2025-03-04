@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 07:12:10
+ * @LastEditTime: 2025-03-04 10:56:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,7 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 
 - Internal Docs
 - HelpCenter
-- ...
+- FAQ
 
 ### Ticket
 
@@ -60,7 +60,8 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 
 - Chat with Ollama/DeepSeek/ZhipuAI/...
 - Chat with Knowledge base(RAG)
-- ...
+- Function calling
+- Mcp
 
 ### Social Group
 
