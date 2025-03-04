@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 18:35:04
+ * @LastEditTime: 2025-03-04 08:34:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -32,15 +33,35 @@ public class ThreadSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             // 
+            if (StringUtils.hasText(request.getComponentType())) {
+                // predicates.add(criteriaBuilder.equal(root.get("componentType"), request.getComponentType()));
+                if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
+                    // type == 'group' or type == 'member'
+                    predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.GROUP.getValue()),
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.MEMBER.getValue())
+                    ));
+                } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {  
+                    // type == 'agent' or type == 'workgroup'
+                    predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.AGENT.getValue()),
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.getValue())
+                    ));
+                } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
+                    // type == 'robot'
+                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.ROBOT.getValue()));
+                }
+            } else if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            // 
             if (StringUtils.hasText(request.getUid())) {
                 predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
             }
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
-            if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
-            }
+            
             if (StringUtils.hasText(request.getOwnerUid())) {
                 // 个人查询时，不显示隐藏的会话
                 predicates.add(criteriaBuilder.equal(root.get("hide"), false));
