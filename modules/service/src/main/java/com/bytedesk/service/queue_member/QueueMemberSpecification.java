@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 13:20:21
+ * @LastEditTime: 2025-03-04 10:06:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,11 @@ public class QueueMemberSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.between(root.get("createdAt"), request.getStartTime(), request.getEndTime()));
             }
 
+            // queueNickname
+            if (StringUtils.hasText(request.getQueueNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("queueNickname"), "%" + request.getQueueNickname() + "%"));
+            }
+
             // 可选条件
             if (StringUtils.hasText(request.getWorkgroupUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("workgroupUid"), request.getWorkgroupUid()));
@@ -62,51 +67,4 @@ public class QueueMemberSpecification extends BaseSpecification {
         };
     }
 
-    // private Specification<QueueMemberEntity> createQueueMemberSpecification(
-    //         String orgUid, String workgroupUid, String agentUid, 
-    //         LocalDateTime startTime, LocalDateTime endTime) {
-        
-    //     return (root, query, criteriaBuilder) -> {
-    //         List<Predicate> predicates = new ArrayList<>();
-            
-    //         // 必填条件
-    //         predicates.add(criteriaBuilder.equal(root.get("orgUid"), orgUid));
-    //         predicates.add(criteriaBuilder.between(root.get("createdAt"), startTime, endTime));
-            
-    //         // 可选条件
-    //         if (workgroupUid != null) {
-    //             predicates.add(criteriaBuilder.equal(root.get("workgroupUid"), workgroupUid));
-    //         }
-    //         if (agentUid != null) {
-    //             predicates.add(criteriaBuilder.equal(root.get("agentUid"), agentUid));
-    //         }
-            
-    //         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-    //     };
-    // }
-
-
-    // public static Specification<QueueMemberEntity> hasUserUid(String uid, String dbType) {
-    //     return (Root<QueueMemberEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
-    //         String jsonExtractFunction;
-    //         switch (dbType.toLowerCase()) {
-    //             case "mysql":
-    //                 jsonExtractFunction = "JSON_EXTRACT";
-    //                 break;
-    //             case "postgresql":
-    //                 jsonExtractFunction = "JSONB_EXTRACT_PATH_TEXT";
-    //                 break;
-    //             case "oracle":
-    //                 jsonExtractFunction = "JSON_VALUE";
-    //                 break;
-    //             default:
-    //                 throw new IllegalArgumentException("Unsupported database type: " + dbType);
-    //         }
-
-    //         String jsonPath = "$.uid";
-    //         String jsonQuery = String.format("%s(v.user, '%s')", jsonExtractFunction, jsonPath);
-
-    //         return criteriaBuilder.equal(criteriaBuilder.function(jsonQuery, String.class), uid);
-    //     };
-    // }
 }

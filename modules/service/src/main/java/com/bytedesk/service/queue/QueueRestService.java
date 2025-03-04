@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 12:45:24
+ * @LastEditTime: 2025-03-04 09:57:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -158,6 +158,10 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
 
     public Optional<QueueEntity> findLatestByQueueTopicAndDay(String queueTopic, String day) {
         return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(queueTopic, day);
+    }
+
+    public QueueExcel convertToExcel(QueueResponse response) {
+        return modelMapper.map(response, QueueExcel.class);
     }
 
 }

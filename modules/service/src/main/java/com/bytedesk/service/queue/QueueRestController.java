@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:21:33
+ * @LastEditTime: 2025-03-04 09:56:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,12 +13,16 @@
  */
 package com.bytedesk.service.queue;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -70,8 +74,35 @@ public class QueueRestController extends BaseRestController <QueueRequest> {
 
     @Override
     public Object export(QueueRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+         // query data to export
+         Page<QueueResponse> queuePage = queueService.queryByOrg(request);
+         // 
+         try {
+             //
+             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+             response.setCharacterEncoding("utf-8");
+             // download filename
+             String fileName = "service-queue-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
+ 
+             // 转换数据
+             List<QueueExcel> excelList = queuePage.getContent().stream().map(queueResponse -> queueService.convertToExcel(queueResponse)).toList();
+             // write to excel
+             EasyExcel.write(response.getOutputStream(), QueueExcel.class)
+                     .autoCloseStream(Boolean.FALSE)
+                     .sheet("queue")
+                     .doWrite(excelList);
+ 
+         } catch (Exception e) {
+             // reset response
+             response.reset();
+             response.setContentType("application/json");
+             response.setCharacterEncoding("utf-8");
+             //
+             return JsonResult.error(e.getMessage());
+         }
+ 
+         return "";
     }
 
     
