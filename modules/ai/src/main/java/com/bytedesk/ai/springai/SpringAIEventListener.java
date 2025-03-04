@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 17:40:12
+ * @LastEditTime: 2025-03-04 18:15:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -99,14 +99,15 @@ public class SpringAIEventListener {
     public void onTextUpdateEvent(TextUpdateEvent event) {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextUpdateEvent: {}", text.getName());
+        // FIXME: Text->split->Text 循环更新
         // 首先删除text对应的document，以及redis中缓存的document
-        springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(text.getDocIdList());
-        });
-        // 然后重新生成document
-        springAiVectorService.ifPresent(service -> {
-            service.readText(text);
-        });
+        // springAiVectorService.ifPresent(service -> {
+        //     service.deleteDoc(text.getDocIdList());
+        // });
+        // // 然后重新生成document
+        // springAiVectorService.ifPresent(service -> {
+        //     service.readText(text);
+        // });
     }
 
     @EventListener
