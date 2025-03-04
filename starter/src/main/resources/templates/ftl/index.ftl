@@ -53,9 +53,9 @@ Listed course START -->
 						<img src="assets/images/element/data-science.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weikefu.net" class="stretched-link" target="_blank">在线客服</a></h5>
-					<span class="mb-0">支持数十项在线客服通用功能，支持私有部署在线客服系统，
-						来自<a href="https://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
+					<h5 class="mb-1"><a href="http://www.weikefu.net" class="stretched-link" target="_blank">在线客服</a></h5>
+					<span class="mb-0">支持人工坐席兜底，AI客服助手，AI意图识别，AI智能质检等数十项在线客服通用功能。
+						来自<a href="http://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
 					</span>
 				</div>
 			</div>
@@ -82,7 +82,7 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="#" class="stretched-link">企业知识库</a></h5>
-					<span class="mb-0">内部知识库管理、文档管理、AI问答</span>
+					<span class="mb-0">AI写作助手，自动撰写内容，内部知识库管理、文档管理、AI问答</span>
 				</div>
 			</div>
 
@@ -94,7 +94,7 @@ Listed course START -->
 						<img src="assets/images/element/profit.svg" alt="">
 					</div>
 					<h5 class="mb-1"><a href="#" class="stretched-link">帮助中心</a></h5>
-					<span class="mb-0">对外知识库、帮助文档、内容公告</span>
+					<span class="mb-0">AI知识库问答，对外知识库、帮助文档、内容公告</span>
 				</div>
 			</div>
 
@@ -105,7 +105,18 @@ Listed course START -->
 						<img src="assets/images/element/medical.svg" alt="">
 					</div>
 					<h5 class="mb-1"><a href="#" class="stretched-link">工单系统</a></h5>
-					<span class="mb-0">工单系统</span>
+					<span class="mb-0">AI工单助手，自动创建工单，自动分配工单，自动关闭工单</span>
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="assets/images/element/artist.svg" alt="">
+					</div>
+					<h5 class="mb-1"><a href="#" class="stretched-link">工作流</a></h5>
+					<span class="mb-0">AI智能体，自动执行数据操作，自定义工作流、流程编排，Function Calling/Mcp</span>
 				</div>
 			</div>
 
@@ -119,17 +130,7 @@ Listed course START -->
 					<span class="mb-0">看板、日报、任务管理</span>
 				</div>
 			</div>
-
-			<!-- Item -->
-			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
-					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/artist.svg" alt="">
-					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">工作流</a></h5>
-					<span class="mb-0">自定义工作流、流程编排</span>
-				</div>
-			</div>
+			
 		</div>
 	</div>
 </section>

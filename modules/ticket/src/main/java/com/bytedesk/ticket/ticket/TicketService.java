@@ -41,8 +41,6 @@ import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
-import com.bytedesk.ticket.ticket.dto.TicketRequest;
-import com.bytedesk.ticket.ticket.dto.TicketResponse;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 
 import java.util.Date;
