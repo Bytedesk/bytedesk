@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:27:04
+ * @LastEditTime: 2025-03-04 17:19:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -139,5 +139,15 @@ public class TextRestService extends BaseRestService<TextEntity, TextRequest, Te
     public TextResponse convertToResponse(TextEntity entity) {
         return modelMapper.map(entity, TextResponse.class);
     }
+
+    public Page<TextEntity> queryByOrgExcel(TextRequest request) {
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
+                "updatedAt");
+        Specification<TextEntity> spec = TextSpecification.search(request);
+        return textRepository.findAll(spec, pageable);
+    }
     
+    public TextExcel convertToExcel(TextEntity text) {
+        return modelMapper.map(text, TextExcel.class);
+    }
 }

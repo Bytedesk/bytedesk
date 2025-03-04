@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 15:52:37
+ * @LastEditTime: 2025-03-04 17:22:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,17 +13,12 @@
  */
 package com.bytedesk.kbase.faq;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -32,15 +27,9 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.action.ActionRestService;
-import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -202,7 +191,13 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         return modelMapper.map(entity, FaqResponse.class);
     }
 
-    public FaqExcel convertToExcel(FaqResponse faq) {
+    public Page<FaqEntity> queryByOrgExcel(FaqRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<FaqEntity> spec = FaqSpecification.search(request);
+        return faqRepository.findAll(spec, pageable);
+    }
+
+    public FaqExcel convertToExcel(FaqEntity faq) {
         return modelMapper.map(faq, FaqExcel.class);
     }
 
