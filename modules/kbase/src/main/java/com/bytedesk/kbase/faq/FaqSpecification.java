@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-03 08:26:04
+ * @LastEditTime: 2025-03-04 12:49:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,6 @@ public class FaqSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("answer"), "%" + request.getAnswer() + "%"));
             }
             if (StringUtils.hasText(request.getCategoryUid())) {
-                // predicates.add(criteriaBuilder.equal(root.get("category").get("uid"), request.getCategoryUid()));
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
             if (StringUtils.hasText(request.getKbUid())) {
