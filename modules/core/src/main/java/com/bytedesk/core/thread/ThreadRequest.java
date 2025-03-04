@@ -82,4 +82,7 @@ public class ThreadRequest extends BaseRequest {
     private List<String> memberUids = new ArrayList<>();
 
     private String searchText;
+
+    // used for client query
+    private String componentType;
 }
