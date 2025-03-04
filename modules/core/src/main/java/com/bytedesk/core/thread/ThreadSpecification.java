@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 08:42:25
+ * @LastEditTime: 2025-03-04 09:05:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.thread;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
 
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Subquery;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +38,14 @@ public class ThreadSpecification extends BaseSpecification {
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
 
             // 创建子查询获取每个topic的最新记录的updatedAt时间
-            Subquery<java.time.LocalDateTime> maxDateSubquery = query.subquery(java.time.LocalDateTime.class);
+            Subquery<LocalDateTime> maxDateSubquery = query.subquery(LocalDateTime.class);
             var subRoot = maxDateSubquery.from(ThreadEntity.class);
-            maxDateSubquery.select(criteriaBuilder.greatest(subRoot.get("updatedAt")))
+            
+            // 明确指定类型为 LocalDateTime
+            Path<LocalDateTime> updatedAtPath = subRoot.get("updatedAt");
+            Expression<LocalDateTime> maxExpression = criteriaBuilder.greatest(updatedAtPath);
+            
+            maxDateSubquery.select(maxExpression)
                 .where(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
 
             // 添加条件：当前记录的updatedAt等于该topic下的最大updatedAt
