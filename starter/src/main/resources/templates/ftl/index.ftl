@@ -41,7 +41,7 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="#" class="stretched-link">企业IM + </a></h5>
-					<span class="mb-0">按照中大型团队架构使用规模设计，支持数万人同时在线</span>
+					<span class="mb-0">AI群聊助手，AI会话总结，聊天记录监控。按照中大型团队架构使用规模设计，支持数万人同时在线</span>
 				</div>
 			</div>
 
