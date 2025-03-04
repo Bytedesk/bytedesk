@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 09:05:26
+ * @LastEditTime: 2025-03-04 09:28:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,16 +55,16 @@ public class ThreadSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getComponentType())) {
                 if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
                     predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.GROUP.getValue()),
-                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.MEMBER.getValue())
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.GROUP.toString()),
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.MEMBER.toString())
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {  
                     predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.AGENT.getValue()),
-                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.getValue())
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.AGENT.toString()),
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.toString())
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
-                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.ROBOT.getValue()));
+                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.ROBOT.toString()));
                 }
             } else if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
@@ -74,31 +74,42 @@ public class ThreadSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getUid())) {
                 predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
             }
+            // 
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
-            
+            // 
             if (StringUtils.hasText(request.getOwnerUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("hide"), false));
                 predicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
             }
+            // 
             if (StringUtils.hasText(request.getOwnerNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("owner").get("nickname"),
                         "%" + request.getOwnerNickname() + "%"));
             }
+            // user 使用 string 存储，此处暂时用like查询
+            if (StringUtils.hasText(request.getUserNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUserNickname() + "%"));
+            }
+            // 
             if (StringUtils.hasText(request.getClient())) {
                 predicates.add(criteriaBuilder.equal(root.get("client"), request.getClient()));
             }
+            // content
+            if (StringUtils.hasText(request.getContent())) {
+                predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
+            }
+            // 
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
                 orPredicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getSearchText() + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getSearchText() + "%"));
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
-
             // 按更新时间排序
             query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
-
+            // 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
