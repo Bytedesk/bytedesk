@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 10:23:32
+ * @LastEditTime: 2025-03-04 09:39:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,13 +13,12 @@
  */
 package com.bytedesk.core.rbac.user;
 
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseResponse;
+import java.io.Serializable;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
@@ -31,10 +30,11 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class UserProtobuf extends BaseResponse {
+public class UserProtobuf implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+	private String uid;
 
     private String nickname;
 
