@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 22:32:41
+ * @LastEditTime: 2025-03-04 12:21:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class ThreadEventListener {
         if (user == null) {
             return;
         }
-        
+
         // 创建客服会话之后，需要订阅topic
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
@@ -60,15 +60,17 @@ public class ThreadEventListener {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
-                    .userUid(user.getUid())
+                    // .userUid(user.getUid())
                     .build();
+            request.setUserUid(user.getUid());
             topicService.create(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
-                    .userUid(user.getUid())
+                    // .userUid(user.getUid())
                     .build();
+            request.setUserUid(user.getUid());
             topicCacheService.pushRequest(request);
         }
     }
@@ -79,18 +81,19 @@ public class ThreadEventListener {
         UserEntity user = thread.getOwner();
         log.info("thread onThreadUpdateEvent: {}", thread.getUid());
         // TODO: 会话关闭之后，需要取消订阅
-        
+
         // 机器人接待的会话存在user == null的情况，不需要订阅topic
         if (thread == null || user == null) {
             return;
         }
-        
+
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
             // 防止首次消息延迟，立即订阅
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
-                    .userUid(user.getUid())
+                    // .userUid(user.getUid())
                     .build();
+            request.setUserUid(user.getUid());
             topicService.create(request);
         } else if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             // 工作组会话，需要订阅topic
@@ -99,30 +102,34 @@ public class ThreadEventListener {
             if (thread.isClosed()) {
                 TopicRequest request = TopicRequest.builder()
                         .topic(thread.getTopic())
-                        .userUid(user.getUid())
+                        // .userUid(user.getUid())
                         .build();
+                request.setUserUid(user.getUid());
                 topicService.remove(request);
             } else {
                 // 重新订阅
                 TopicRequest request = TopicRequest.builder()
                         .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
+                        // .userUid(user.getUid())
+                        .build();
+                request.setUserUid(user.getUid());
                 topicService.create(request);
             }
         } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
             // 会员会话，需要订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
-                    .userUid(user.getUid())
+                    // .userUid(user.getUid())
                     .build();
+            request.setUserUid(user.getUid());
             topicService.create(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
-                    .userUid(user.getUid())
+                    // .userUid(user.getUid())
                     .build();
+            request.setUserUid(user.getUid());
             topicCacheService.pushRequest(request);
         }
     }
@@ -131,15 +138,16 @@ public class ThreadEventListener {
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
         log.info("thread event listener onThreadCloseEvent: {}", thread.getAgent());
-        // 
+        //
         if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             // 工作组会话
             if (thread.isClosed()) {
                 // 取消订阅
                 TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(thread.getOwner().getUid())
-                    .build();
+                        .topic(thread.getTopic())
+                        // .userUid(thread.getOwner().getUid())
+                        .build();
+                request.setUserUid(thread.getOwner().getUid());
                 topicService.remove(request);
             }
         }
@@ -151,13 +159,14 @@ public class ThreadEventListener {
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
-        // Optional<Thread> threadOptional = threadService.findFirstByTopic(message.getThreadTopic());
+        // Optional<Thread> threadOptional =
+        // threadService.findFirstByTopic(message.getThreadTopic());
         // if (threadOptional.isPresent()) {
-        //     Thread thread = threadOptional.get();
-        //     thread.setHide(false);
-        //     thread.setContent(message.getContent());
-        //     // threadService.save(thread);
-        //     threadPersistCache.pushForPersist(thread);
+        // Thread thread = threadOptional.get();
+        // thread.setHide(false);
+        // thread.setContent(message.getContent());
+        // // threadService.save(thread);
+        // threadPersistCache.pushForPersist(thread);
         // }
     }
 
@@ -165,9 +174,9 @@ public class ThreadEventListener {
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
         // List<ThreadEntity> threadList = threadPersistCache.getListForPersist();
         // if (threadList != null) {
-        //     threadList.forEach(thread -> {
-        //         threadService.save(thread);
-        //     });
+        // threadList.forEach(thread -> {
+        // threadService.save(thread);
+        // });
         // }
     }
 
@@ -177,5 +186,4 @@ public class ThreadEventListener {
         // update member thread avatar
     }
 
-    
 }

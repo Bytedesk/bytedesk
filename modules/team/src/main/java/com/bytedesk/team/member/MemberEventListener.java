@@ -116,8 +116,9 @@ public class MemberEventListener {
         // 默认订阅成员主题
         TopicRequest request = TopicRequest.builder()
                 .topic(TopicUtils.formatOrgMemberTopic(member.getUid()))
-                .userUid(user.getUid())
+                // .userUid(user.getUid())
                 .build();
+            request.setUserUid(user.getUid());
         topicCacheService.pushRequest(request);
     }
 
