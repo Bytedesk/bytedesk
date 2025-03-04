@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 09:12:36
+ * @LastEditTime: 2025-03-04 17:40:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,9 @@ import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.event.FileCreateEvent;
 import com.bytedesk.kbase.file.event.FileUpdateEvent;
+import com.bytedesk.kbase.split.SplitEntity;
+import com.bytedesk.kbase.split.event.SplitCreateEvent;
+import com.bytedesk.kbase.split.event.SplitUpdateEvent;
 // import com.bytedesk.kbase.qa.FaqEntity;
 // import com.bytedesk.kbase.qa.event.FaqCreateEvent;
 // import com.bytedesk.kbase.qa.event.FaqUpdateEvent;
@@ -151,25 +154,48 @@ public class SpringAIEventListener {
     }
 
     @EventListener
+    public void onSplitCreateEvent(SplitCreateEvent event) {
+        SplitEntity split = event.getSplit();
+        log.info("SpringAIEventListener onSplitCreateEvent: {}", split.getName());
+    }
+
+    @EventListener
+    public void onSplitUpdateEvent(SplitUpdateEvent event) {
+        SplitEntity split = event.getSplit();
+        log.info("SpringAIEventListener onSplitUpdateEvent: {}", split.getName());
+        if (split.isDeleted()) {
+            // 删除向量库
+            springAiVectorService.ifPresent(service -> {
+                service.deleteDoc(split.getDocId());
+            });
+        } else {
+            // 更新向量库
+            springAiVectorService.ifPresent(service -> {
+                service.updateDoc(split.getDocId(), split.getContent(), split.getKbUid());
+            });
+        }
+    }
+
+    @EventListener
     public void onVectorSplitEvent(VectorSplitEvent event) {
         log.info("SpringAIEventListener onVectorSplitEvent: {}", event.getKbUid());
-        List<Document> docList = event.getDocuments();
-        String kbUid = event.getKbUid();
-        String orgUid = event.getOrgUid();
-        // 生成问答对
-		for (Document document : docList) {
-            // 调用模型生成问答对
-            springAIZhipuaiChatService.ifPresent(service -> {
-                String qaPairs = service.generateFaqPairsAsync(document.getText());
-                // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
-                faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
-            });
-            // ollamaChatService.ifPresent(service -> {
-            //     String qaPairs = service.generateFaqPairsAsync(document.getText());
-            //     log.info("generateFaqPairsAsync qaPairs {}", qaPairs);
-            //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
-            // });
-        }
+        // List<Document> docList = event.getDocuments();
+        // String kbUid = event.getKbUid();
+        // String orgUid = event.getOrgUid();
+        // // 生成问答对
+		// for (Document document : docList) {
+        //     // 调用模型生成问答对
+        //     // springAIZhipuaiChatService.ifPresent(service -> {
+        //     //     String qaPairs = service.generateFaqPairsAsync(document.getText());
+        //     //     // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
+        //     //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
+        //     // });
+        //     // ollamaChatService.ifPresent(service -> {
+        //     //     String qaPairs = service.generateFaqPairsAsync(document.getText());
+        //     //     log.info("generateFaqPairsAsync qaPairs {}", qaPairs);
+        //     //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
+        //     // });
+        // }
     }
 
     @EventListener

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:10:15
+ * @LastEditTime: 2025-03-04 17:18:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,7 +106,11 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
         Optional<SplitEntity> optional = splitRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             SplitEntity entity = optional.get();
-            modelMapper.map(request, entity);
+            // modelMapper.map(request, entity);
+            entity.setName(request.getName());
+            entity.setContent(request.getContent());
+            // entity.setType(request.getType());
+            // entity.setDocId(request.getDocId());
             //
             SplitEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -155,5 +159,14 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
     public SplitResponse convertToResponse(SplitEntity entity) {
         return modelMapper.map(entity, SplitResponse.class);
     }
+
+    public Page<SplitEntity> queryByOrgExcel(SplitRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<SplitEntity> spec = SplitSpecification.search(request);
+        return splitRepository.findAll(spec, pageable);
+    }
     
+    public SplitExcel convertToExcel(SplitEntity split) {
+        return modelMapper.map(split, SplitExcel.class);
+    }
 }

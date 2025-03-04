@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 11:17:49
+ * @LastEditTime: 2025-03-04 17:20:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,8 +42,7 @@ public class WebsiteRestService extends BaseRestService<WebsiteEntity, WebsiteRe
 
     @Override
     public Page<WebsiteResponse> queryByOrg(WebsiteRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<WebsiteEntity> spec = WebsiteSpecification.search(request);
         Page<WebsiteEntity> page = websiteRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
@@ -128,6 +127,16 @@ public class WebsiteRestService extends BaseRestService<WebsiteEntity, WebsiteRe
     @Override
     public WebsiteResponse convertToResponse(WebsiteEntity entity) {
         return modelMapper.map(entity, WebsiteResponse.class);
+    }
+
+    public Page<WebsiteEntity> queryByOrgExcel(WebsiteRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<WebsiteEntity> spec = WebsiteSpecification.search(request);
+        return websiteRepository.findAll(spec, pageable);
+    }
+
+    public WebsiteExcel convertToExcel(WebsiteEntity website) {
+        return modelMapper.map(website, WebsiteExcel.class);
     }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 11:17:49
+ * @LastEditTime: 2025-03-04 17:21:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,8 +42,7 @@ public class FileRestService extends BaseRestService<FileEntity, FileRequest, Fi
 
     @Override
     public Page<FileResponse> queryByOrg(FileRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<FileEntity> spec = FileSpecification.search(request);
         Page<FileEntity> page = fileRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
@@ -128,6 +127,16 @@ public class FileRestService extends BaseRestService<FileEntity, FileRequest, Fi
     @Override
     public FileResponse convertToResponse(FileEntity entity) {
         return modelMapper.map(entity, FileResponse.class);
+    }
+
+    public Page<FileEntity> queryByOrgExcel(FileRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<FileEntity> spec = FileSpecification.search(request);
+        return fileRepository.findAll(spec, pageable);
+    }
+
+    public FileExcel convertToExcel(FileEntity file) {
+        return modelMapper.map(file, FileExcel.class);
     }
     
 }

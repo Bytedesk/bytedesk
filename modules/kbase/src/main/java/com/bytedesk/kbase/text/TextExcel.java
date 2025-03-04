@@ -18,24 +18,53 @@ import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
 import lombok.Data;
 
-
+/**
+ * 文本导出Excel实体类
+ */
 @Data
 public class TextExcel {
 
-    @ExcelProperty(index = 0, value = "分类")
-    @ColumnWidth(20)
-    private String category;
+    @ExcelProperty(value = "名称")
+    @ColumnWidth(30)
+    private String name;
 
-    @ExcelProperty(index = 1, value = "类型")
-    @ColumnWidth(20)
-    private String type;
+    @ExcelProperty(value = "内容")
+    @ColumnWidth(50)
+    private String content;
 
-    @ExcelProperty(index = 2, value = "问题")
-    @ColumnWidth(20)
-    private String question;
+    @ExcelProperty(value = "状态")
+    @ColumnWidth(15)
+    private String status;
 
-    @ExcelProperty(index = 3, value = "答案")
-    @ColumnWidth(20)
-    private String answer;
+    @ExcelProperty(value = "级别")
+    @ColumnWidth(15)
+    private String level;
 
+    @ExcelProperty(value = "平台")
+    @ColumnWidth(15)
+    private String platform;
+
+    @ExcelProperty(value = "分类")
+    @ColumnWidth(20)
+    private String categoryUid;
+
+    @ExcelProperty(value = "知识库")
+    @ColumnWidth(20)
+    private String kbUid;
+
+    @ExcelProperty(value = "用户ID")
+    @ColumnWidth(32)
+    private String userUid;
+
+    @ExcelProperty(value = "文档ID列表")
+    @ColumnWidth(50)
+    private String docIdList;
+
+    @ExcelProperty(value = "创建时间")
+    @ColumnWidth(20)
+    private String createdAt;
+
+    @ExcelProperty(value = "更新时间")
+    @ColumnWidth(20)
+    private String updatedAt;
 }

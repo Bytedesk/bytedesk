@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 17:06:29
+ * @LastEditTime: 2025-03-04 17:01:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.split;
+package com.bytedesk.kbase.file;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
@@ -19,22 +19,26 @@ import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import lombok.Data;
 
 /**
- * Split导出Excel实体类
+ * 文件导出Excel实体类
  */
 @Data
-public class SplitExcel {
+public class FileExcel {
 
-    @ExcelProperty(value = "名称")
+    @ExcelProperty(value = "文件名")
     @ColumnWidth(30)
-    private String name;
+    private String fileName;
 
-    @ExcelProperty(value = "内容")
+    @ExcelProperty(value = "文件内容")
     @ColumnWidth(50)
     private String content;
 
-    @ExcelProperty(value = "类型")
+    @ExcelProperty(value = "文件URL")
+    @ColumnWidth(50)
+    private String fileUrl;
+
+    @ExcelProperty(value = "状态")
     @ColumnWidth(15)
-    private String type;
+    private String status;
 
     @ExcelProperty(value = "级别")
     @ColumnWidth(15)
@@ -44,14 +48,6 @@ public class SplitExcel {
     @ColumnWidth(15)
     private String platform;
 
-    @ExcelProperty(value = "文档ID")
-    @ColumnWidth(32)
-    private String docId;
-
-    @ExcelProperty(value = "类型UID")
-    @ColumnWidth(32)
-    private String typeUid;
-
     @ExcelProperty(value = "分类")
     @ColumnWidth(20)
     private String categoryUid;
@@ -60,9 +56,17 @@ public class SplitExcel {
     @ColumnWidth(20)
     private String kbUid;
 
+    @ExcelProperty(value = "上传ID")
+    @ColumnWidth(32)
+    private String uploadUid;
+
     @ExcelProperty(value = "用户ID")
     @ColumnWidth(32)
     private String userUid;
+
+    @ExcelProperty(value = "文档ID列表")
+    @ColumnWidth(50)
+    private String docIdList;
 
     @ExcelProperty(value = "创建时间")
     @ColumnWidth(20)

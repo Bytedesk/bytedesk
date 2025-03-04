@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 14:53:24
+ * @LastEditTime: 2025-03-04 17:39:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 
 import com.alibaba.fastjson2.JSON;
@@ -404,7 +405,7 @@ public class SpringAIVectorService {
 			throw new IllegalArgumentException("Answer must not be empty");
 		}
 		//
-		String content = JSON.toJSONString(fqaEntity);
+		String content = fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
 		// 创建Document对象
 		Document document = new Document(content);
 		// 使用TokenTextSplitter分割文本
@@ -609,6 +610,65 @@ public class SpringAIVectorService {
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		return contentList;
+	}
+
+	/**
+	 * 更新向量存储中的文档内容
+	 * 
+	 * @param docId 文档ID
+	 * @param content 新的文档内容
+	 */
+	public void updateDoc(String docId, String content, String kbUid) {
+		log.info("updateDoc docId: {}, content: {}", docId, content);
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
+			try {
+				// 创建新的Document对象
+				Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
+				// 更新向量存储
+				redisVectorStore.delete(List.of(docId));  // 先删除旧的
+				redisVectorStore.add(List.of(document));  // 再添加新的
+				
+				log.info("Successfully updated document: {}", docId);
+			} catch (Exception e) {
+				log.error("Failed to update document: {}", docId, e);
+				throw new RuntimeException("Failed to update document", e);
+			}
+		});
+	}
+
+	/**
+	 * 批量更新向量存储中的文档内容
+	 * List<Document> documents = List.of(
+     * new Document("doc1", "内容1", null),
+     * new Document("doc2", "内容2", null)
+     * );
+	 * 
+	 * @param documents 要更新的文档列表
+	 */
+	public void updateDocs(List<Document> documents) {
+		log.info("Updating {} documents", documents.size());
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
+			try {
+				List<String> docIds = documents.stream()
+					.map(Document::getId)
+					.collect(Collectors.toList());
+				
+				// 先删除旧的文档
+				redisVectorStore.delete(docIds);
+				// 添加新的文档
+				redisVectorStore.add(documents);
+				
+				log.info("Successfully updated {} documents", documents.size());
+			} catch (Exception e) {
+				log.error("Failed to update documents", e);
+				throw new RuntimeException("Failed to update documents", e);
+			}
+		});
+	}
+
+	// 删除一个docId
+	public void deleteDoc(String docId) {
+		deleteDoc(List.of(docId));
 	}
 
 	public void deleteDoc(List<String> docIdList) {
