@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:54:54
+ * @LastEditTime: 2025-03-04 14:46:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,12 +65,6 @@ public class FaqEventListener {
         faqDemo2.setOrgUid(orgUid);
         faqService.create(faqDemo2);
     }
-
-    // @EventListener
-    // public void onMessageCreateEvent(MessageCreateEvent event) {
-    // Message message = event.getMessage();
-    // log.info("message faq create event: {}", message.getContent());
-    // }
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
