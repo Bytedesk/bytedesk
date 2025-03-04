@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-04 15:02:09
+ * @LastEditTime: 2025-03-04 09:36:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,12 +52,13 @@ public class MessageResponse extends BaseResponse {
 	// private String client;
 	private ClientEnum client;
 
-	private LocalDateTime createdAt;
-
-	// private ThreadProtobuf thread;
 	private String threadTopic;
 
 	private UserProtobuf user;
 
 	private String extra;
+
+	private LocalDateTime createdAt;
+
+	private LocalDateTime updatedAt;
 }
