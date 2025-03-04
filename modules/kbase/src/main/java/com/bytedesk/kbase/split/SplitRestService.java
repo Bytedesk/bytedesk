@@ -26,6 +26,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,8 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
 
     private final UidUtils uidUtils;
 
+    private final AuthService authService;
+
     @Override
     public Page<SplitResponse> queryByOrg(SplitRequest request) {
         Pageable pageable = request.getPageable();
@@ -52,8 +56,13 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
 
     @Override
     public Page<SplitResponse> queryByUser(SplitRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        //
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "split", key = "#uid", unless="#result==null")
