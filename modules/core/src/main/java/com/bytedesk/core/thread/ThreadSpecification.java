@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 08:34:04
+ * @LastEditTime: 2025-03-04 08:42:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,29 +33,36 @@ public class ThreadSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            // 
+
+            // 创建子查询获取每个topic的最新记录的updatedAt时间
+            Subquery<java.time.LocalDateTime> maxDateSubquery = query.subquery(java.time.LocalDateTime.class);
+            var subRoot = maxDateSubquery.from(ThreadEntity.class);
+            maxDateSubquery.select(criteriaBuilder.greatest(subRoot.get("updatedAt")))
+                .where(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
+
+            // 添加条件：当前记录的updatedAt等于该topic下的最大updatedAt
+            predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
+            
+            // 根据组件类型过滤
             if (StringUtils.hasText(request.getComponentType())) {
-                // predicates.add(criteriaBuilder.equal(root.get("componentType"), request.getComponentType()));
                 if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
-                    // type == 'group' or type == 'member'
                     predicates.add(criteriaBuilder.or(
                         criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.GROUP.getValue()),
                         criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.MEMBER.getValue())
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {  
-                    // type == 'agent' or type == 'workgroup'
                     predicates.add(criteriaBuilder.or(
                         criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.AGENT.getValue()),
                         criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.getValue())
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
-                    // type == 'robot'
                     predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.ROBOT.getValue()));
                 }
             } else if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
-            // 
+
+            // 其他条件
             if (StringUtils.hasText(request.getUid())) {
                 predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
             }
@@ -63,7 +71,6 @@ public class ThreadSpecification extends BaseSpecification {
             }
             
             if (StringUtils.hasText(request.getOwnerUid())) {
-                // 个人查询时，不显示隐藏的会话
                 predicates.add(criteriaBuilder.equal(root.get("hide"), false));
                 predicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
             }
@@ -76,14 +83,14 @@ public class ThreadSpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
-                // content
                 orPredicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getSearchText() + "%"));
-                // user json字符串 中的 nickname
                 orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getSearchText() + "%"));
-                // 组合or条件
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
-            //
+
+            // 按更新时间排序
+            query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

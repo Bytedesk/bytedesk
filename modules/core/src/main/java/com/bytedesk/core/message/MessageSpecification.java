@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 18:15:06
+ * @LastEditTime: 2025-03-04 08:47:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.topic.TopicUtils;
 
 import jakarta.persistence.criteria.Predicate;
@@ -30,6 +31,26 @@ public class MessageSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // 
+            if (StringUtils.hasText(request.getComponentType())) {
+                // 
+                if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
+                    // threadTopic like '%group%' or threadTopic like '%member%'
+                    predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("threadTopic"), "%group%"),
+                        criteriaBuilder.like(root.get("threadTopic"), "%member%")
+                    ));
+                } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
+                    // threadTopic like '%agent%' or threadTopic like '%workgroup%'
+                    predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("threadTopic"), "%agent%"),
+                        criteriaBuilder.like(root.get("threadTopic"), "%workgroup%")
+                    ));
+                } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
+                    // threadTopic like '%robot%'
+                    predicates.add(criteriaBuilder.like(root.get("threadTopic"), "%robot%"));
+                }
+            }
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             // 
             if (StringUtils.hasText(request.getOrgUid())) {
