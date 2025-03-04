@@ -11,14 +11,13 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket.dto;
+package com.bytedesk.ticket.ticket;
 
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentResponse;
-import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 
 import lombok.Data;

@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.ticket.TicketEntity;
-import com.bytedesk.ticket.ticket.dto.TicketResponse;
+import com.bytedesk.ticket.ticket.TicketResponse;
 
 public class TicketConvertUtils {
 
