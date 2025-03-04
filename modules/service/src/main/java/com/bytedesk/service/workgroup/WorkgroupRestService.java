@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 11:49:13
+ * @LastEditTime: 2025-03-04 16:11:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -30,6 +31,8 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.faq.FaqEntity;
+import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
@@ -55,6 +58,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     private final UidUtils uidUtils;
 
     private final ServiceSettingsService serviceSettingsService;
+
+    private final FaqRestService faqRestService;
 
     public Page<WorkgroupResponse> queryByOrg(WorkgroupRequest workgroupRequest) {
         Pageable pageable = PageRequest.of(workgroupRequest.getPageNumber(),
@@ -93,6 +98,20 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 workgroup.getAgents().add(agentEntity);
             } else {
                 throw new RuntimeException(agentUid + " is not found.");
+            }
+        }
+        // 读取 welcomeFaqUids
+        List<String> welcomeFaqUids = request.getServiceSettings().getWelcomeFaqUids();
+        if (welcomeFaqUids.size() > 0) {
+            // 读取 faq
+            for (String faqUid : welcomeFaqUids) {
+                Optional<FaqEntity> faqOptional = faqRestService.findByUid(faqUid);
+                if (faqOptional.isPresent()) {
+                    FaqEntity faqEntity = faqOptional.get();
+                    workgroup.getServiceSettings().getWelcomeFaqs().add(faqEntity);
+                } else {
+                    throw new RuntimeException(faqUid + " is not found.");
+                }
             }
         }
         //

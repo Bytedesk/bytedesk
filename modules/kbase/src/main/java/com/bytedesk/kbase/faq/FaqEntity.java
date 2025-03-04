@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:50:39
+ * @LastEditTime: 2025-03-04 15:35:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,9 +53,15 @@ public class FaqEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 问题
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String question;
 
+    /**
+     * 答案
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String answer;
 
@@ -77,7 +83,9 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
 
-    //  "tags": ["人事考评办公室", "培训机构"]
+    /**
+     * 标签，多个标签用逗号分隔
+     */
     @Builder.Default
     private String tags = "[]";
 
@@ -120,7 +128,6 @@ public class FaqEntity extends BaseEntity {
     private String fileUid; // 对应文件
 
     private String userUid;
-    
 
     // 是否是常见问题/
     @Builder.Default
@@ -156,6 +163,21 @@ public class FaqEntity extends BaseEntity {
         this.setDownCount(this.downCount + 1);
     }
 
-    
+    /**
+     * 状态：启用/禁用
+     */
+    @Builder.Default
+    private boolean enabled = true;
 
+    /**
+     * 排序权重
+     */
+    @Builder.Default
+    private int weight = 0;
+
+    /**
+     * 点击次数
+     */
+    @Builder.Default
+    private int hits = 0;
 }
