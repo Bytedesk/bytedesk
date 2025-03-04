@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 11:04:11
+ * @LastEditTime: 2025-03-04 09:59:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,6 +132,10 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     @Override
     public QueueMemberResponse convertToResponse(QueueMemberEntity entity) {
         return modelMapper.map(entity, QueueMemberResponse.class);
+    }
+
+    public QueueMemberExcel convertToExcel(QueueMemberResponse response) {
+        return modelMapper.map(response, QueueMemberExcel.class);
     }
 
 }
