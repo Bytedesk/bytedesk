@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 10:00:24
+ * @LastEditTime: 2025-03-04 12:23:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -340,8 +340,9 @@ public class SpringAIVectorService {
 					.typeUid(textEntity.getUid())
 					.categoryUid(textEntity.getCategoryUid())
 					.kbUid(textEntity.getKbUid())
-					.userUid(textEntity.getUserUid())
+					// .userUid(textEntity.getUserUid())
 					.build();
+			splitRequest.setUserUid(textEntity.getUserUid());
 			splitRequest.setType(SplitTypeEnum.TEXT.name());
 			splitRequest.setContent(doc.getText());
 			splitRequest.setOrgUid(textEntity.getOrgUid());
@@ -395,8 +396,9 @@ public class SpringAIVectorService {
 					.typeUid(fqaEntity.getUid())
 					.categoryUid(fqaEntity.getCategoryUid())
 					.kbUid(fqaEntity.getKbUid())
-					.userUid(fqaEntity.getUserUid())
+					// .userUid(fqaEntity.getUserUid())
 					.build();
+			splitRequest.setUserUid(fqaEntity.getUserUid());
 			splitRequest.setType(SplitTypeEnum.QA.name());
 			splitRequest.setContent(doc.getText());
 			splitRequest.setOrgUid(fqaEntity.getOrgUid());
@@ -456,8 +458,9 @@ public class SpringAIVectorService {
 						.typeUid(websiteEntity.getUid())
 						.categoryUid(websiteEntity.getCategoryUid())
 						.kbUid(websiteEntity.getKbUid())
-						.userUid(websiteEntity.getUserUid())
+						// .userUid(websiteEntity.getUserUid())
 						.build();
+					splitRequest.setUserUid(websiteEntity.getUserUid());
 				splitRequest.setType(SplitTypeEnum.WEBSITE.name());
 				splitRequest.setContent(doc.getText());
 				splitRequest.setOrgUid(websiteEntity.getOrgUid());
@@ -510,8 +513,9 @@ public class SpringAIVectorService {
 					.typeUid(file.getUid())
 					.categoryUid(file.getCategoryUid())
 					.kbUid(file.getKbUid())
-					.userUid(file.getUserUid())
+					// .userUid(file.getUserUid())
 					.build();
+					splitRequest.setUserUid(file.getUserUid());
 			splitRequest.setType(SplitTypeEnum.FILE.name());
 			splitRequest.setContent(doc.getText());
 			splitRequest.setOrgUid(file.getOrgUid());

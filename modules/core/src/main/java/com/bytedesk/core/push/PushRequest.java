@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 14:37:45
+ * @LastEditTime: 2025-03-04 12:18:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,5 +56,5 @@ public class PushRequest extends BaseRequest {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     // 修改邮箱、手机号需要记录用户uid和组织uid
-    private String userUid;
+    // private String userUid;
 }

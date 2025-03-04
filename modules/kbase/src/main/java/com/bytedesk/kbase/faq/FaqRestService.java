@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 21:12:15
+ * @LastEditTime: 2025-03-04 12:12:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,8 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -61,23 +63,25 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
 
     private final ActionRestService actionRestService;
 
+    private final AuthService authService;
+
     @Override
     public Page<FaqResponse> queryByOrg(FaqRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-
+        Pageable pageable = request.getPageable();
         Specification<FaqEntity> spec = FaqSpecification.search(request);
-
         Page<FaqEntity> page = faqRepository.findAll(spec, pageable);
-
         return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<FaqResponse> queryByUser(FaqRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "faq", key="#uid", unless = "#result == null")

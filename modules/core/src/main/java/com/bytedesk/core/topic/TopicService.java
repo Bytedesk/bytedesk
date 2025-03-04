@@ -50,8 +50,9 @@ public class TopicService {
     public void create(String topic, String uid) {
         TopicRequest topicRequest = TopicRequest.builder()
                 .topic(topic)
-                .userUid(uid)
+                // .userUid(uid)
                 .build();
+        topicRequest.setUserUid(uid);
         create(topicRequest);
     }
 
@@ -115,9 +116,10 @@ public class TopicService {
             final String uid = clientId.split("/")[0];
             TopicRequest topicRequest = TopicRequest.builder()
                     .topic(topic)
-                    .userUid(uid)
+                    // .userUid(uid)
                     // .qos(qos)
                     .build();
+            topicRequest.setUserUid(uid);
             topicRequest.getClientIds().add(clientId);
             create(topicRequest);
         }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:52:22
+ * @LastEditTime: 2025-03-04 12:10:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,8 +44,7 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
 
     @Override
     public Page<SplitResponse> queryByOrg(SplitRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<SplitEntity> spec = SplitSpecification.search(request);
         Page<SplitEntity> page = splitRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);

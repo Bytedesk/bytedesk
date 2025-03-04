@@ -72,7 +72,7 @@ public class MemberRequest extends BaseRequest {
     @Builder.Default
 	private Set<String> roleUids = new HashSet<>(); 
 
-    private String userUid;
+    // private String userUid;
 
     @NotBlank
     private String deptUid;
