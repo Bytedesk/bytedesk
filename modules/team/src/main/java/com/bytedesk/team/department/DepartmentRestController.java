@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:08:10
+ * @LastEditTime: 2025-03-05 16:45:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,6 +82,12 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     public Object export(DepartmentRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(DepartmentRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 11:58:04
+ * @LastEditTime: 2025-03-05 16:39:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -128,6 +128,12 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         }
 
         return "";
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(QuickReplyRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
 }

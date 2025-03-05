@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:22:37
+ * @LastEditTime: 2025-03-05 16:34:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,12 @@ public class VisitorThreadController extends BaseRestController<VisitorThreadReq
     public Object export(VisitorThreadRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(VisitorThreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
     
 }
