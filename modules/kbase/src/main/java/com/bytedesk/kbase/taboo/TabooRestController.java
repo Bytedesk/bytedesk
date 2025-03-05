@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:34:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:48:21
+ * @LastEditTime: 2025-03-05 13:20:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,7 +88,7 @@ public class TabooRestController extends BaseRestController<TabooRequest> {
     @Override
     public Object export(TabooRequest request, HttpServletResponse response) {
         // query data to export
-        Page<TabooResponse> tabooPage = tabooService.queryByOrg(request);
+        Page<TabooEntity> tabooPage = tabooService.queryByOrgExcel(request);
         // 
         try {
             //
