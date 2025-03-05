@@ -153,42 +153,42 @@
 		</dependency>
 
 		<!-- Excel导出 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>5.2.3</version>
-		</dependency>
-		<dependency>
+		</dependency> -->
+		<!-- <dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.3</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- PDF导出 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 			<version>5.5.13.3</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- CSV导出 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.10.0</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- Email -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
+		</dependency> -->
 
 		<!-- Thymeleaf for email templates -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+		</dependency> -->
 
 	</dependencies>
 

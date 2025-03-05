@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 16:01:48
+ * @LastEditTime: 2025-03-04 23:45:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,7 +69,7 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
                 thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
                 // 返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing robot thread {}", topic);
-                return getRobotContinueMessage(visitorRequest, thread);
+                return getRobotContinueMessage(robot, thread);
             } else {
                 // 重新初始化
                 thread = threadOptional.get().reInit(true);
@@ -82,12 +82,12 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return routeService.routeToRobot(visitorRequest, thread, robot);
     }
 
-    private MessageProtobuf getRobotContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
+    private MessageProtobuf getRobotContinueMessage(RobotEntity robot, @Nonnull ThreadEntity thread) {
         //
         // UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         // log.info("getRobotContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
         // 
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(thread);
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
     }
 
 }
