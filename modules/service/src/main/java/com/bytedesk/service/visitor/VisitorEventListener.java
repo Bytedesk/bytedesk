@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 18:28:04
+ * @LastEditTime: 2025-03-05 18:46:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,12 +47,11 @@ public class VisitorEventListener {
     //     log.info("VisitorEventListener onVisitorCreateEvent: " + event);
     // }
 
-    @EventListener
-    public void onVisitorUpdateEvent(VisitorUpdateEvent event) {
-        log.info("VisitorEventListener onVisitorUpdateEvent: " + event);
-        // VisitorEntity visitor = event.getVisitor();
-
-    }
+    // @EventListener
+    // public void onVisitorUpdateEvent(VisitorUpdateEvent event) {
+    //     log.info("VisitorEventListener onVisitorUpdateEvent: " + event);
+    //     // VisitorEntity visitor = event.getVisitor();
+    // }
 
     @EventListener
     public void onBlackCreateEvent(BlackCreateEvent event) {
