@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-18 15:59:22
+ * @LastEditTime: 2025-03-05 15:21:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -75,6 +75,9 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             thread = threadOptional.get();
             // 
             if (thread.isStarted()) {
+                // 重新初始化会话，包括重置机器人状态等
+                thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
+                // 返回继续会话消息
                 log.info("Already have a processing thread {}", topic);
                 return getWorkgroupProcessingMessage(visitorRequest, thread);
             } else if (thread.isQueuing()) {
@@ -82,7 +85,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
             } else {
                 // 关闭或者离线状态，返回初始化状态的会话
-                thread = threadOptional.get().reInit(false);
+                thread = thread.reInit(false);
                 workgroup = workgroupService.findByUid(workgroupUid)
                         .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
             }
