@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:55:14
+ * @LastEditTime: 2025-03-05 12:03:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,8 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
@@ -61,23 +63,24 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
 
     private final KbaseRestService knowledgebaseService;
 
+    private final AuthService authService;
+
     @Override
     public Page<QuickReplyResponse> queryByOrg(QuickReplyRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-
+        Pageable pageable = request.getPageable();
         Specification<QuickReplyEntity> spec = QuickReplySpecification.search(request);
-
         Page<QuickReplyEntity> page = quickReplyRepository.findAll(spec, pageable);
-
         return page.map(this::convertToResponse);
     }
     
     @Override
     public Page<QuickReplyResponse> queryByUser(QuickReplyRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "quickreply", key = "#request.agentUid", unless = "#result == null")
@@ -186,7 +189,13 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         return modelMapper.map(entity, QuickReplyResponse.class);
     }
 
-    public QuickReplyExcel convertToExcel(QuickReplyResponse quickReply) {
+    public Page<QuickReplyEntity> queryByOrgExcel(QuickReplyRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<QuickReplyEntity> spec = QuickReplySpecification.search(request);
+        return quickReplyRepository.findAll(spec, pageable);
+    }
+
+    public QuickReplyExcel convertToExcel(QuickReplyEntity quickReply) {
         return modelMapper.map(quickReply, QuickReplyExcel.class);
     }
 
@@ -384,7 +393,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
     public QuickReplyEntity convertExcelToQuickReply(QuickReplyExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, QuickReply.class);
         QuickReplyEntity quickReply = QuickReplyEntity.builder().build();
-        quickReply.setUid(uidUtils.getCacheSerialUid());
+        quickReply.setUid(uidUtils.getUid());
         quickReply.setTitle(excel.getTitle());
         quickReply.setContent(excel.getContent());
         // quickReply.setType(MessageTypeEnum.TEXT); // TODO: 根据实际类型设置
