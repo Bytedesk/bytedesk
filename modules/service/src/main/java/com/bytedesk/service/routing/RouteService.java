@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:39:49
+ * @LastEditTime: 2025-03-04 23:46:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,7 +95,7 @@ public class RouteService {
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         //
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(thread);
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
     }
 
     public MessageProtobuf routeToAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread,

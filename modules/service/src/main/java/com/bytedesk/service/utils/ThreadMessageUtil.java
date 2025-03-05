@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 16:07:41
+ * @LastEditTime: 2025-03-04 23:44:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.service.utils;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
@@ -54,10 +55,10 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageProtobuf getThreadRobotWelcomeMessage(ThreadEntity thread) {
+    public static MessageProtobuf getThreadRobotWelcomeMessage(RobotEntity robot, ThreadEntity thread) {
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
-                .content(thread.getContent())
+                .content(robot.getServiceSettings().getWelcomeTip())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
