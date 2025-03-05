@@ -11,7 +11,7 @@
 - [English](./README.md)
 - [中文](./README.zh.md)
 
-![weiyu](./images/weiyu.png)
+![weiyu](./images/8in1.png)
 <!-- ![statistics](./images/admin/statistics_zh.png) -->
 ![chat](./images/admin/chat_zh.png)
 
