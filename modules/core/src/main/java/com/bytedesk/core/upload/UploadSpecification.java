@@ -31,14 +31,22 @@ public class UploadSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+
+            // nickname 查询 user
+            if (StringUtils.hasText(request.getNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getNickname() + "%"));
+            }
+
             // 文件名
             if (StringUtils.hasText(request.getFileName())) {
                 predicates.add(criteriaBuilder.like(root.get("fileName"), "%" + request.getFileName() + "%"));
             }
+
             // 分类
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
+            
             // 知识库
             if (StringUtils.hasText(request.getKbUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
