@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 16:11:45
+ * @LastEditTime: 2025-03-05 15:05:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -61,19 +63,23 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     private final FaqRestService faqRestService;
 
-    public Page<WorkgroupResponse> queryByOrg(WorkgroupRequest workgroupRequest) {
-        Pageable pageable = PageRequest.of(workgroupRequest.getPageNumber(),
-                workgroupRequest.getPageSize(), Sort.Direction.DESC,
-                "id");
-        Specification<WorkgroupEntity> specs = WorkgroupSpecification.search(workgroupRequest);
+    private final AuthService authService;
+
+    public Page<WorkgroupResponse> queryByOrg(WorkgroupRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<WorkgroupEntity> specs = WorkgroupSpecification.search(request);
         Page<WorkgroupEntity> workgroupPage = workgroupRepository.findAll(specs, pageable);
         return workgroupPage.map(this::convertToResponse);
     }
 
     @Override
     public Page<WorkgroupResponse> queryByUser(WorkgroupRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user should not be null");
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Transactional
@@ -88,6 +94,21 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             workgroup.setUid(request.getUid());
         }
         workgroup.setOrgUid(request.getOrgUid());
+        // 
+        LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatWorkgroupLeaveMsgSettings(request);
+        workgroup.setLeaveMsgSettings(leaveMsgSettings);
+        //
+        RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
+        workgroup.setRobotSettings(robotSettings);
+        //
+        ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
+        workgroup.setServiceSettings(serviceSettings);
+        //
+        QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
+        workgroup.setQueueSettings(queueSettings);
+        //
+        InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
+        workgroup.setInviteSettings(inviteSettings);
         //
         Iterator<String> agentIterator = request.getAgentUids().iterator();
         while (agentIterator.hasNext()) {
@@ -98,20 +119,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 workgroup.getAgents().add(agentEntity);
             } else {
                 throw new RuntimeException(agentUid + " is not found.");
-            }
-        }
-        // 读取 welcomeFaqUids
-        List<String> welcomeFaqUids = request.getServiceSettings().getWelcomeFaqUids();
-        if (welcomeFaqUids.size() > 0) {
-            // 读取 faq
-            for (String faqUid : welcomeFaqUids) {
-                Optional<FaqEntity> faqOptional = faqRestService.findByUid(faqUid);
-                if (faqOptional.isPresent()) {
-                    FaqEntity faqEntity = faqOptional.get();
-                    workgroup.getServiceSettings().getWelcomeFaqs().add(faqEntity);
-                } else {
-                    throw new RuntimeException(faqUid + " is not found.");
-                }
             }
         }
         //
