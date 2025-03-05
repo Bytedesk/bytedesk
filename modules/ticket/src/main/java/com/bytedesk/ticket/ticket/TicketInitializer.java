@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:34:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:57:48
+ * @LastEditTime: 2025-03-05 09:13:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = TicketPermissions.TICKET_PREFIX + permission.name();
             if (authorityService.existsByValue(permissionValue)) {
-                log.info("Ticket authority {} already exists", permissionValue);
+                // log.info("Ticket authority {} already exists", permissionValue);
                 continue;
             }
             AuthorityRequest authRequest = AuthorityRequest.builder()
@@ -66,7 +66,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
         log.info("initTicketCategory");
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         for (String category : TicketCategories.getAllCategories()) {
-            log.info("initTicketCategory: {}", category);
+            // log.info("initTicketCategory: {}", category);
 
             // if (TicketCategories.isParentCategory(category)) { // 父类
             CategoryRequest categoryRequest = CategoryRequest.builder()
