@@ -115,7 +115,8 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 }
             }
         }
-        // 
+        
+        // 返回工作组会话
         return routeService.routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
     }
 
