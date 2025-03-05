@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 10:41:35
+ * @LastEditTime: 2025-03-05 11:46:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,18 +58,21 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
 
     @Override
     public Page<AutoReplyKeywordResponse> queryByOrg(AutoReplyKeywordRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
         Page<AutoReplyKeywordEntity> page = keywordRepository.findAll(spec, pageable);
-
         return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<AutoReplyKeywordResponse> queryByUser(AutoReplyKeywordRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "keyword", key = "#uid", unless = "#result == null")
@@ -186,10 +189,21 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
         return keywordResponse;
     }
 
-    public AutoReplyKeywordExcel convertToExcel(AutoReplyKeywordResponse entity) {
+    public Page<AutoReplyKeywordEntity> queryByOrgExcel(AutoReplyKeywordRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
+        return keywordRepository.findAll(spec, pageable);
+    }
+
+    public AutoReplyKeywordExcel convertToExcel(AutoReplyKeywordEntity entity) {
+        // categoryUid
+        Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());
         AutoReplyKeywordExcel keywordExcel = modelMapper.map(entity, AutoReplyKeywordExcel.class);
         keywordExcel.setKeywordList(String.join("|", entity.getKeywordList()));
         keywordExcel.setReplyList(String.join("|", entity.getReplyList()));
+        if (categoryOptional.isPresent()) {
+            keywordExcel.setCategory(categoryOptional.get().getName());
+        }
         return keywordExcel;
     }
 

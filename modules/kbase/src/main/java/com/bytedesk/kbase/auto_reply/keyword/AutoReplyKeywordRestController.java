@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 18:05:27
+ * @LastEditTime: 2025-03-05 11:45:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,14 +90,14 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
     @GetMapping("/export")
     public Object export(AutoReplyKeywordRequest request, HttpServletResponse response) {
         // query data to export
-        Page<AutoReplyKeywordResponse> keywordPage = keywordService.queryByOrg(request);
+        Page<AutoReplyKeywordEntity> keywordPage = keywordService.queryByOrgExcel(request);
         // 
         try {
             //
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "AutoReplyKeyword-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "kbase-auto_reply-keyword-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 19:11:02
+ * @LastEditTime: 2025-03-05 11:43:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -158,8 +158,21 @@ public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEnt
         return modelMapper.map(entity, AutoReplyFixedResponse.class);
     }
 
-    public AutoReplyFixedExcel convertToExcel(AutoReplyFixedResponse autoReply) {
-        return modelMapper.map(autoReply, AutoReplyFixedExcel.class);
+    public Page<AutoReplyFixedEntity> queryByOrgExcel(AutoReplyFixedRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<AutoReplyFixedEntity> specification = AutoReplyFixedSpecification.search(request);
+        return autoReplyRepository.findAll(specification, pageable);
+    }
+
+    public AutoReplyFixedExcel convertToExcel(AutoReplyFixedEntity autoReply) {
+        // categoryUid
+        Optional<CategoryEntity> categoryOptional = categoryService.findByUid(autoReply.getCategoryUid());
+        // 
+        AutoReplyFixedExcel excel = modelMapper.map(autoReply, AutoReplyFixedExcel.class);
+        if (categoryOptional.isPresent()) {
+            excel.setCategory(categoryOptional.get().getName());
+        }
+        return excel;
     }
 
     // String categoryUid,
