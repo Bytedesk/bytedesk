@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 09:42:30
+ * @LastEditTime: 2025-03-05 13:12:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class FaqEventListener {
-    
+
     private final FaqRestService faqRestService;
 
     private final UploadRestService uploadRestService;
@@ -68,30 +68,28 @@ public class FaqEventListener {
         }
     }
 
-    
-
-
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
         log.info("FaqEventListener UploadEventListener create: {}", upload.toString());
 
-        try {
-            Resource resource = uploadRestService.loadAsResource(upload.getFileName());
-        if (resource.exists()) {
-            String filePath = resource.getFile().getAbsolutePath();
-            log.info("UploadEventListener loadAsResource: {}", filePath);
-            if (upload.getType().equalsIgnoreCase(UploadTypeEnum.FAQ.name())) {
-                // 导入自动回复
-                // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
-                // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-            EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
-                        upload.getKbUid(),
-                        upload.getOrgUid())).sheet().doRead();
+        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.FAQ.name())) {
+            try {
+                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+                if (resource.exists()) {
+                    String filePath = resource.getFile().getAbsolutePath();
+                    log.info("UploadEventListener loadAsResource: {}", filePath);
+                    // 导入自动回复
+                    // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
+                    // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
+                    EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
+                            upload.getKbUid(),
+                            upload.getOrgUid())).sheet().doRead();
+                }
+
+            } catch (Exception e) {
+                log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage());
             }
-        }
-        } catch (Exception e) {
-            log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage());
         }
     }
 }

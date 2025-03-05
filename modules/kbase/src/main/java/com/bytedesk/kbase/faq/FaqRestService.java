@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 09:13:07
+ * @LastEditTime: 2025-03-05 13:13:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -225,7 +225,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                     .name(excel.getCategory())
                     .kbUid(kbUid)
                     .build();
-            categoryRequest.setType(CategoryTypeEnum.FAQ.name());
+            categoryRequest.setType(CategoryTypeEnum.LLM.name());
             categoryRequest.setOrgUid(orgUid);
             // 
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
