@@ -1,4 +1,4 @@
-package com.bytedesk.core.util;
+package com.bytedesk.core.utils;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
