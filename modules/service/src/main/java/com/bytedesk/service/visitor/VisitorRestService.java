@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-10 20:10:41
+ * @LastEditTime: 2025-03-05 16:32:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,12 +55,18 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     @Override
     public Page<VisitorResponse> queryByOrg(VisitorRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<VisitorEntity> spec = VisitorSpecification.search(request);
         Page<VisitorEntity> page = visitorRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
+
+    @Override
+    public Page<VisitorResponse> queryByUser(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
 
     public VisitorResponse query(VisitorRequest visitorRequest) {
         Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
@@ -83,7 +89,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
                 visitor.setIpLocation(visitorRequest.getIpLocation());
                 save(visitor);
             }
-            // 
+            //
             return convertToResponse(visitor);
         }
         if (!StringUtils.hasText(uid)) {
@@ -108,6 +114,26 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         }
         //
         return convertToResponse(savedVisitor);
+    }
+
+    @Override
+    public VisitorResponse update(VisitorRequest request) {
+        Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
+        // 
+        if (!visitorOptional.isPresent()) {
+            throw new RuntimeException("visitor not found");
+        }
+        // 
+        VisitorEntity visitor = visitorOptional.get();
+        visitor.setNickname(request.getNickname());
+        visitor.setAvatar(request.getAvatar());
+        // visitor.setLang(request.getLang());
+        // visitor.setDevice(request.getDevice());
+        visitor.setMobile(request.getMobile());
+        visitor.setEmail(request.getEmail());
+        visitor.setNote(request.getNote());
+        // 
+        return convertToResponse(save(visitor));
     }
 
     /** 策略模式 */
@@ -142,55 +168,24 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         return null;
     }
 
-    // TODO: 模拟压力测试：随机生成 10000 个访客，分配给1个技能组中10个客服账号，并随机分配给1个客服账号，每秒发送1条消息
-    public void prepareStressTest() {
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // // 随机生成10000个访客
-        // List<Visitor> visitors = new ArrayList<>();
-        // for (int i = 0; i < 10000; i++) {
-        // String uid = uidUtils.getCacheSerialUid();
-        // // visitors.add(new Visitor(uid, "visitor" + i));
-        // }
-        // 随机分配给1个技能组中10个客服账号
-        // List<Robot> robots = robotService.findAllByOrgUidAndDeleted(orgUid, false);
-        // if (robots == null || robots.isEmpty()) {
-        // return;
-        // }
-        // Random random = new Random();
-        // for (Visitor visitor : visitors) {
-        // Robot robot = robots.get(random.nextInt(robots.size()));
-        // visitor.setAgentUid(robot.getUid());
-        // save(visitor);
-        // }
-    }
-
-    @Override
-    public Page<VisitorResponse> queryByUser(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-
-    @Override
-    public VisitorResponse update(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<VisitorEntity> visitorOptional = findByUid(uid);
+        if (visitorOptional.isPresent()) {
+            VisitorEntity visitor = visitorOptional.get();
+            visitor.setDeleted(true);
+            save(visitor);
+        }
     }
 
     @Override
     public void delete(VisitorRequest entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(entity.getUid());
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, VisitorEntity entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            VisitorEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
@@ -209,7 +204,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         } else if (client.toUpperCase().contains(ClientEnum.ANDROID.name())) {
             return AvatarConsts.getDefaultAndroidAvatarUrl();
         } else if (client.toUpperCase().contains(ClientEnum.IOS.name())) {
-           return AvatarConsts.getDefaultIosAvatarUrl();
+            return AvatarConsts.getDefaultIosAvatarUrl();
         } else if (client.toUpperCase().contains(ClientEnum.UNIAPP.name())) {
             return AvatarConsts.getDefaultUniappAvatarUrl();
         }

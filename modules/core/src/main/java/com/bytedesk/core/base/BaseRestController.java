@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:16:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:07:28
+ * @LastEditTime: 2025-03-05 16:33:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,15 @@ public abstract class BaseRestController<T> {
      */
     @GetMapping("/query")
     abstract public ResponseEntity<?> queryByUser(T request);
+
+    /**
+     * query by uid
+     *
+     * @param request role
+     * @return json
+     */
+    @GetMapping("/query/uid")
+    abstract public ResponseEntity<?> queryByUid(T request);
 
     /**
      * create

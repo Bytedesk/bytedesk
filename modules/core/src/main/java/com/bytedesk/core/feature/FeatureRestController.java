@@ -103,4 +103,10 @@ public class FeatureRestController extends BaseRestController<FeatureRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Override
+    public ResponseEntity<?> queryByUid(FeatureRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
 } 

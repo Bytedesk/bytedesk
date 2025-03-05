@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:22:24
+ * @LastEditTime: 2025-03-05 16:49:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,8 +47,6 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    // query visitor info by uid
-    @GetMapping("/query")
     @Override
     public ResponseEntity<?> queryByUser(VisitorRequest visitorRequest) {
         //
@@ -58,19 +56,31 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     }
 
     @Override
-    public ResponseEntity<?> create(VisitorRequest request) {
+    public ResponseEntity<?> queryByUid(VisitorRequest request) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @Override
+    public ResponseEntity<?> create(VisitorRequest request) {
+        
+        VisitorResponse visitorResponse = visitorService.create(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
+
+        VisitorResponse visitorResponse = visitorService.update(visitorRequest);
         //
-        return ResponseEntity.ok(JsonResult.success("update success"));
+        return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
+
+        visitorService.delete(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success("delete success"));
     }
@@ -80,5 +90,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
+
+    
 
 }
