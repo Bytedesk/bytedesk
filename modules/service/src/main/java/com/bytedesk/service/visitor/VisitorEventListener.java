@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 17:11:47
+ * @LastEditTime: 2025-03-05 18:28:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import com.bytedesk.core.black.event.BlackUpdateEvent;
 import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
+import com.bytedesk.service.visitor.event.VisitorUpdateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,18 @@ public class VisitorEventListener {
     private final VisitorRestService visitorService;
 
     private final IpBlacklistRestService ipBlacklistService;
+
+    // @EventListener
+    // public void onVisitorCreateEvent(VisitorCreateEvent event) {
+    //     log.info("VisitorEventListener onVisitorCreateEvent: " + event);
+    // }
+
+    @EventListener
+    public void onVisitorUpdateEvent(VisitorUpdateEvent event) {
+        log.info("VisitorEventListener onVisitorUpdateEvent: " + event);
+        // VisitorEntity visitor = event.getVisitor();
+
+    }
 
     @EventListener
     public void onBlackCreateEvent(BlackCreateEvent event) {
