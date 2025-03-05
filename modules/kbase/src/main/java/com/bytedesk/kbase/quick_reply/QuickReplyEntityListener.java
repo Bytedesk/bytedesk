@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-25 15:51:51
+ * @Date: 2025-03-05 12:45:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:44:33
+ * @LastEditTime: 2025-03-05 12:45:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,14 +11,14 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.taboo;
+package com.bytedesk.kbase.quick_reply;
 
 import org.springframework.stereotype.Component;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class TabooEntityListener {
+public class QuickReplyEntityListener {
 
-    
 }

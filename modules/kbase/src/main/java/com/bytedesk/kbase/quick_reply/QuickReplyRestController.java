@@ -96,6 +96,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @ActionAnnotation(title = "quickReply", action = "export", description = "export quickReply")
+    @Override
     public Object export(QuickReplyRequest request, HttpServletResponse response) {
         // query data to export
         Page<QuickReplyEntity> quickReplyPage = quickReplyRestService.queryByOrgExcel(request);

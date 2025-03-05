@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:34:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-18 17:11:08
+ * @LastEditTime: 2025-03-05 12:48:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TabooRestController extends BaseRestController<TabooRequest> {
 
-    private final TabooService tabooService;
+    private final TabooRestService tabooService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
@@ -49,8 +49,10 @@ public class TabooRestController extends BaseRestController<TabooRequest> {
 
     @Override
     public ResponseEntity<?> queryByUser(TabooRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+        
+        Page<TabooResponse> page = tabooService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @ActionAnnotation(title = "taboo", action = "create", description = "create taboo")
@@ -83,7 +85,7 @@ public class TabooRestController extends BaseRestController<TabooRequest> {
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @ActionAnnotation(title = "taboo", action = "export", description = "export taboo")
-    @GetMapping("/export")
+    @Override
     public Object export(TabooRequest request, HttpServletResponse response) {
         // query data to export
         Page<TabooResponse> tabooPage = tabooService.queryByOrg(request);
@@ -93,7 +95,7 @@ public class TabooRestController extends BaseRestController<TabooRequest> {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "Taboo-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "kbase-taboo-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
