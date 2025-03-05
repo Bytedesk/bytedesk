@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-02 21:02:45
+ * @LastEditTime: 2025-03-05 15:45:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -133,19 +133,19 @@ public class SpringAIOllamaService {
         bytedeskOllamaChatModel.ifPresent(model -> model.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        log.info("Ollama API response metadata: {}", response.getMetadata());
                         // generations
                         List<Generation> generations = response.getResults();
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                            log.info("Ollama API response assistantMessage: {}, textContent: {}", assistantMessage,
                                     textContent);
                             ChatGenerationMetadata metadata = generation.getMetadata();
 
                             // finishReason: STOP
-                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                            log.info("Ollama API response metadata {}, finishReason: {}", metadata,
                                     metadata.getFinishReason());
 
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
@@ -160,7 +160,7 @@ public class SpringAIOllamaService {
                     }
                 },
                 error -> {
-                    log.error("DeepSeek API error: ", error);
+                    log.error("Ollama API error: ", error);
                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
@@ -181,19 +181,19 @@ public class SpringAIOllamaService {
         bytedeskOllamaChatModel.ifPresent(model -> model.stream(aiPrompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        log.info("Ollama API response metadata: {}", response.getMetadata());
                         // generations
                         List<Generation> generations = response.getResults();
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            log.info("DeepSeek API response assistantMessage: {}, textContent: {}", assistantMessage,
+                            log.info("Ollama API response assistantMessage: {}, textContent: {}", assistantMessage,
                                     textContent);
                             ChatGenerationMetadata metadata = generation.getMetadata();
 
                             // finishReason: STOP
-                            log.info("DeepSeek API response metadata {}, finishReason: {}", metadata,
+                            log.info("Ollama API response metadata {}, finishReason: {}", metadata,
                                     metadata.getFinishReason());
 
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
@@ -208,7 +208,7 @@ public class SpringAIOllamaService {
                     }
                 },
                 error -> {
-                    log.error("DeepSeek API error: ", error);
+                    log.error("Ollama API error: ", error);
                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
