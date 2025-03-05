@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 09:15:41
+ * @LastEditTime: 2025-03-05 19:44:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,7 +105,11 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         }
         //
         MemberEntity member = modelMapper.map(request, MemberEntity.class);
-        member.setUid(uidUtils.getUid());
+        if (StringUtils.hasText(request.getUid())) {
+            member.setUid(request.getUid());
+        } else {
+            member.setUid(uidUtils.getUid());
+        }
         member.setDeptUid(request.getDeptUid());
         member.setOrgUid(request.getOrgUid());
         member.setRoleUids(request.getRoleUids());
