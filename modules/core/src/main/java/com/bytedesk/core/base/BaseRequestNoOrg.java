@@ -22,15 +22,15 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public abstract class BaseRequestNoOrg implements Serializable {
 
-    public String uid;
+    protected String uid;
 
-    public int pageNumber;
+    protected int pageNumber;
 
-    public int pageSize;
+    protected int pageSize;
 
-    public String type;
+    protected String type;
 
-    public String content;
+    protected String content;
 
-    public String client;
+    protected String client;
 }
