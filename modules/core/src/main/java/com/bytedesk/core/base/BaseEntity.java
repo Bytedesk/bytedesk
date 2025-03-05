@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:12:51
+ * @LastEditTime: 2025-03-05 15:35:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,13 +86,5 @@ public abstract class BaseEntity implements Serializable {
 
     // organization uid
     private String orgUid;
-
-    // // 添加受保护的方法用于子类特殊处理
-    // protected void prePersist() {
-    //     // 子类可以重写此方法以在保存前进行处理
-    // }
-
-    // protected void preUpdate() {
-    //     // 子类可以重写此方法以在更新前进行处理
-    // }
+    
 }

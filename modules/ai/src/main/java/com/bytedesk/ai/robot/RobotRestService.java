@@ -15,7 +15,9 @@ package com.bytedesk.ai.robot;
 
 import java.util.List;
 import java.util.Optional;
+import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -101,6 +103,22 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final OptimisticLockingHandler optimisticLockingHandler;
 
+    @PostConstruct
+    public void setupModelMapper() {
+        modelMapper.getConfiguration()
+            .setMatchingStrategy(MatchingStrategies.STRICT)
+            .setSkipNullEnabled(true);
+            
+        // 配置 ThreadRequest 到 ThreadEntity 的映射
+        modelMapper.createTypeMap(ThreadRequest.class, ThreadEntity.class)
+            .addMappings(mapper -> {
+                mapper.skip(ThreadEntity::setUser);  // 跳过自动映射
+                // 添加其他需要的映射
+                mapper.map(ThreadRequest::getTopic, ThreadEntity::setTopic);
+                mapper.map(ThreadRequest::getType, ThreadEntity::setType);
+            });
+    }
+
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
@@ -176,44 +194,43 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     }
 
     public ThreadResponse createThread(ThreadRequest request) {
-        //
         UserEntity owner = authService.getUser();
         String topic = request.getTopic();
-        //
+
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
         if (threadOptional.isPresent()) {
             return threadService.convertToResponse(threadOptional.get());
         }
-        //
-        ThreadEntity thread = modelMapper.map(request, ThreadEntity.class);
+
+        // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
+        ThreadEntity thread = new ThreadEntity();
         thread.setUid(uidUtils.getUid());
+        thread.setTopic(request.getTopic());
+        thread.setType(request.getType());
         thread.setState(ThreadStateEnum.STARTED.name());
-        //
-        String user = JSON.toJSONString(request.getUser());
-        // log.info("request {}, user {}", request.toString(), user);
-        thread.setUser(user);
-        //
+        thread.setUser(JSON.toJSONString(request.getUser()));
+        thread.setOwner(owner);
+        thread.setOrgUid(owner.getOrgUid());
+
         String[] splits = topic.split("/");
         if (splits.length < 4) {
             throw new RuntimeException("robot topic format error");
         }
+        
         // org/robot/robotUid/userUid
         String robotUid = splits[2];
         Optional<RobotEntity> robotOptional = findByUid(robotUid);
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
             robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
-            // 更新机器人配置+大模型相关信息
             thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         }
-        thread.setOwner(owner);
-        thread.setOrgUid(owner.getOrgUid());
-        //
+
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
         }
-        //
+
         return threadService.convertToResponse(savedThread);
     }
 
