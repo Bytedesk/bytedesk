@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 23:01:26
+ * @LastEditTime: 2025-03-05 23:56:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ public class BytedeskConsts {
     public static final String ACTION_LOGIN_SCAN = "loginWithScanCode";
 
     // 
-    public static final int COLUMN_EXTRA_LENGTH = 4096;
+    public static final int COLUMN_EXTRA_LENGTH = 2048;
 
     // 
     // public static final String STATISTIC_FILTER_TYPE_ORG = "ORG";
