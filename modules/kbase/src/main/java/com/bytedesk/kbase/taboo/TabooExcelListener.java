@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TabooExcelListener implements ReadListener<TabooExcel> {
 
-    private final TabooService tabooService;
+    private final TabooRestService tabooService;
 
     private final String kbUid;
 

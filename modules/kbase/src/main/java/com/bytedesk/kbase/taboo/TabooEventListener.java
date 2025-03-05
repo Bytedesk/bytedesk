@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 16:20:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 09:47:06
+ * @LastEditTime: 2025-03-05 12:45:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,23 +33,19 @@ public class TabooEventListener {
 
     private final UploadRestService uploadRestService;
 
-    private final TabooService tabooService;
+    private final TabooRestService tabooService;
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
         log.info("UploadEventListener create: {}", upload.toString());
-        // etl分块处理
-        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
-            return;
-        }
-        try {
-            // 导入Excel文件
-            Resource resource = uploadRestService.loadAsResource(upload.getFileName());
-            if (resource.exists()) {
-                String filePath = resource.getFile().getAbsolutePath();
-                log.info("UploadEventListener loadAsResource: {}", filePath);
-                if (upload.getType().equalsIgnoreCase(UploadTypeEnum.TABOO.name())) {
+        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.TABOO.name())) {
+            try {
+                // 导入Excel文件
+                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+                if (resource.exists()) {
+                    String filePath = resource.getFile().getAbsolutePath();
+                    log.info("UploadEventListener loadAsResource: {}", filePath);
                     // 导入敏感词
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
@@ -58,9 +54,9 @@ public class TabooEventListener {
                             upload.getKbUid(),
                             upload.getOrgUid())).sheet().doRead();
                 }
+            } catch (Exception e) {
+                log.error("TabooEventListener onUploadCreateEvent error: {}", e.getMessage());
             }
-        } catch (Exception e) {
-            log.error("TabooEventListener onUploadCreateEvent error: {}", e.getMessage());
         }
     }
 

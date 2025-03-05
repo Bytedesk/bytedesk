@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 15:38:45
+ * @LastEditTime: 2025-03-05 12:47:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,8 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -38,7 +40,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TabooService extends BaseRestService<TabooEntity, TabooRequest, TabooResponse> {
+public class TabooRestService extends BaseRestService<TabooEntity, TabooRequest, TabooResponse> {
 
     private final TabooRepository tabooRepository;
 
@@ -46,25 +48,27 @@ public class TabooService extends BaseRestService<TabooEntity, TabooRequest, Tab
 
     private final UidUtils uidUtils;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
+
+    private final AuthService authService;
 
     @Override
     public Page<TabooResponse> queryByOrg(TabooRequest request) {
-        
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-
+        Pageable pageable = request.getPageable();
         Specification<TabooEntity> specification = TabooSpecification.search(request);
-        
         Page<TabooEntity> page = tabooRepository.findAll(specification, pageable);
-
         return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<TabooResponse> queryByUser(TabooRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "taboo", key="#uid", unless = "#result == null")
@@ -75,9 +79,9 @@ public class TabooService extends BaseRestService<TabooEntity, TabooRequest, Tab
 
     @Override
     public TabooResponse create(TabooRequest request) {
-        
+        // 
         TabooEntity taboo = modelMapper.map(request, TabooEntity.class);
-        taboo.setUid(uidUtils.getCacheSerialUid());
+        taboo.setUid(uidUtils.getUid());
 
         TabooEntity savedTaboo = save(taboo);
         if (savedTaboo == null) {
@@ -151,11 +155,11 @@ public class TabooService extends BaseRestService<TabooEntity, TabooRequest, Tab
     public TabooEntity convertExcelToTaboo(TabooExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Taboo.class); // String categoryUid,
         TabooEntity taboo = TabooEntity.builder().build();
-        taboo.setUid(uidUtils.getCacheSerialUid());
+        taboo.setUid(uidUtils.getUid());
         taboo.setContent(excel.getContent());
         // 
         // taboo.setCategoryUid(categoryUid);
-         Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+         Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             taboo.setCategoryUid(categoryOptional.get().getUid());
         } else {
@@ -167,7 +171,7 @@ public class TabooService extends BaseRestService<TabooEntity, TabooRequest, Tab
             categoryRequest.setType(CategoryTypeEnum.TABOO.name());
             categoryRequest.setOrgUid(orgUid);
             // 
-            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
             taboo.setCategoryUid(categoryResponse.getUid());
         }
         // 
