@@ -65,4 +65,3 @@ thread_monitor/
 thread_summary/
 rating/
 taboo/
-git rm -r --cached "modules/kbase/src/main/java/com/bytedesk/kbase/taboo"
