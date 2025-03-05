@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 19:10:09
+ * @LastEditTime: 2025-03-05 09:54:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -188,16 +188,16 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
 
     public AutoReplyKeywordExcel convertToExcel(AutoReplyKeywordResponse entity) {
         AutoReplyKeywordExcel keywordExcel = modelMapper.map(entity, AutoReplyKeywordExcel.class);
-        keywordExcel.setKeyword(String.join("|", entity.getKeywordList()));
-        keywordExcel.setReply(String.join("|", entity.getReplyList()));
+        keywordExcel.setKeywordList(String.join("|", entity.getKeywordList()));
+        keywordExcel.setReplyList(String.join("|", entity.getReplyList()));
         return keywordExcel;
     }
 
     public AutoReplyKeywordEntity convertExcelToAutoReplyKeyword(AutoReplyKeywordExcel excel, String kbUid, String orgUid) {
-        List<String> keywordList = Arrays.asList(excel.getKeyword().split("\\|")); // 使用正则表达式匹配 "|"
-        List<String> replyList = Arrays.asList(excel.getReply().split("\\|")); // 使用正则表达式匹配 "|"
-        log.info("keyword {} keywordList: {}", excel.getKeyword(), keywordList);
-        log.info("reply {} replyList: {}", excel.getReply(), replyList);
+        List<String> keywordList = Arrays.asList(excel.getKeywordList().split("\\|")); // 使用正则表达式匹配 "|"
+        List<String> replyList = Arrays.asList(excel.getReplyList().split("\\|")); // 使用正则表达式匹配 "|"
+        log.info("keyword {} keywordList: {}", excel.getKeywordList(), keywordList);
+        log.info("reply {} replyList: {}", excel.getReplyList(), replyList);
         // 
         AutoReplyKeywordEntity keyword = AutoReplyKeywordEntity.builder().build();
         keyword.setUid(uidUtils.getCacheSerialUid());
