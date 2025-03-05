@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 12:47:08
+ * @LastEditTime: 2025-03-05 11:58:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,17 +96,16 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @ActionAnnotation(title = "quickReply", action = "export", description = "export quickReply")
-    @GetMapping("/export")
     public Object export(QuickReplyRequest request, HttpServletResponse response) {
         // query data to export
-        Page<QuickReplyResponse> quickReplyPage = quickReplyRestService.queryByOrg(request);
+        Page<QuickReplyEntity> quickReplyPage = quickReplyRestService.queryByOrgExcel(request);
         // 
         try {
             //
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "QuickReply-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "kbase-quick_reply-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
