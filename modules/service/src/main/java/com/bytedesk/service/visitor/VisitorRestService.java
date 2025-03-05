@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:32:50
+ * @LastEditTime: 2025-03-05 17:04:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,13 +68,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
     }
 
     // @Override
-    public Optional<VisitorResponse> queryByUid(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
-
-    public VisitorResponse query(VisitorRequest visitorRequest) {
+    public VisitorResponse queryByUid(VisitorRequest visitorRequest) {
         Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
         if (!visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
@@ -125,7 +119,6 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
     @Override
     public VisitorResponse update(VisitorRequest request) {
         Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
-        // 
         if (!visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
         }

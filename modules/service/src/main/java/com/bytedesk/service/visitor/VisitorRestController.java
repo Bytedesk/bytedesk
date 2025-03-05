@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:49:13
+ * @LastEditTime: 2025-03-05 17:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,8 +16,6 @@ package com.bytedesk.service.visitor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,15 +48,17 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> queryByUser(VisitorRequest visitorRequest) {
         //
-        VisitorResponse visitorResponse = visitorService.query(visitorRequest);
+        Page<VisitorResponse> visitorResponse = visitorService.queryByUser(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
     @Override
     public ResponseEntity<?> queryByUid(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        VisitorResponse visitorResponse = visitorService.queryByUid(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
-    @PostMapping("/update")
+    @Override
     public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
 
         VisitorResponse visitorResponse = visitorService.update(visitorRequest);
@@ -77,7 +77,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
-    @PostMapping("/delete")
+    @Override
     public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
 
         visitorService.delete(visitorRequest);
