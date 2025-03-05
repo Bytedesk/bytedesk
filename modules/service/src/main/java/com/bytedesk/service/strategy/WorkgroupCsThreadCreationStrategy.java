@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:04:46
+ * @LastEditTime: 2025-03-05 22:56:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -99,6 +99,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         }
         // 重新初始化会话，包括重置机器人状态等
         thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
+        log.info("createWorkgroupCsThread: {}", thread.toString());
 
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
