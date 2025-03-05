@@ -67,6 +67,12 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    // @Override
+    public Optional<VisitorResponse> queryByUid(VisitorRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
 
     public VisitorResponse query(VisitorRequest visitorRequest) {
         Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
