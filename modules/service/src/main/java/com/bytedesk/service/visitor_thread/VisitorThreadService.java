@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:57:08
+ * @LastEditTime: 2025-03-05 17:24:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,9 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
@@ -41,7 +39,6 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.unified.UnifiedEntity;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -205,32 +202,7 @@ public class VisitorThreadService
         return thread;
     }
 
-    // create unified thread
-    public ThreadEntity createUnifiedThread(VisitorRequest visitorRequest, UnifiedEntity unified, String topic) {
-        //
-        ThreadEntity thread = ThreadEntity.builder()
-                .topic(topic)
-                .type(ThreadTypeEnum.UNIFIED.name())
-                .client(visitorRequest.getClient())
-                .build();
-        thread.setUid(uidUtils.getUid());
-        thread.setOrgUid(unified.getOrgUid());
-        //
-        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
-        thread.setUser(visitor);
-        threadService.save(thread);
-        //
-        return thread;
-    }
 
-    public ThreadEntity reInitUnifiedThreadExtra(ThreadEntity thread, UnifiedEntity unified) {
-        //
-        // String extra = ServiceConvertUtils
-        //         .convertToServiceSettingsResponseVisitorJSONString(unified.getServiceSettings());
-        // thread.setExtra(extra);
-        //
-        return thread;
-    }
 
     public VisitorThreadEntity update(ThreadEntity thread) {
         Optional<VisitorThreadEntity> visitorThreadOpt = findByUid(thread.getUid());
