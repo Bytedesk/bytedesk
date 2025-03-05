@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 09:54:29
+ * @LastEditTime: 2025-03-05 10:41:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -217,7 +217,7 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
                     .name(excel.getCategory())
                     .kbUid(kbUid)
                     .build();
-            categoryRequest.setType(CategoryTypeEnum.KEYWORD.name());
+            categoryRequest.setType(CategoryTypeEnum.AUTOREPLY.name());
             categoryRequest.setOrgUid(orgUid);
             //
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
