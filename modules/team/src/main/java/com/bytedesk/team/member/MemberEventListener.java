@@ -154,7 +154,7 @@ public class MemberEventListener {
             String filePath = resource.getFile().getAbsolutePath();
             log.info("UploadEventListener loadAsResource: {}", filePath);
             // 
-            if (upload.getType().equals(UploadTypeEnum.MEMBER.name())) {
+            if (upload.getType().equalsIgnoreCase(UploadTypeEnum.MEMBER.name())) {
                 // 导入成员
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read

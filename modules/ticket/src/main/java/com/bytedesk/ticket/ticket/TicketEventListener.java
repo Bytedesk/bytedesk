@@ -191,7 +191,7 @@ public class TicketEventListener {
         UploadEntity upload = event.getUpload();
         log.info("TicketEventListener upload bpmn create: {}", upload.toString());
         // 上传BPMN流程图
-        if (upload.getType().equals(UploadTypeEnum.BPMN.name())) {
+        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.BPMN.name())) {
             // 启动流程
             // ProcessInstance processInstance =
             // runtimeService.startProcessInstanceByKey(upload.getFileName());
