@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 07:32:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 22:24:29
+ * @LastEditTime: 2025-03-05 10:01:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,9 +16,7 @@ package com.bytedesk.kbase.auto_reply.keyword;
 public enum AutoReplyKeywordMatchEnum {
     EXACT, // 精确匹配
     FUZZY, // 模糊匹配
-    REGULAR, // 正则匹配
-    VECTOR, // 向量匹配
-    ELASTIC; // ElasticSearch搜索引擎匹配
+    REGULAR; // 正则匹配
 
     // 根据字符串查找对应的枚举常量
     public static AutoReplyKeywordMatchEnum fromValue(String value) {
