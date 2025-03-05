@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 13:20:17
+ * @LastEditTime: 2025-03-05 13:29:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,7 +82,12 @@ public class TabooRestService extends BaseRestService<TabooEntity, TabooRequest,
         // 
         TabooEntity taboo = modelMapper.map(request, TabooEntity.class);
         taboo.setUid(uidUtils.getUid());
-
+        // categoryUid
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
+        if (categoryOptional.isPresent()) {
+            taboo.setCategoryUid(categoryOptional.get().getUid());
+        }
+        // 
         TabooEntity savedTaboo = save(taboo);
         if (savedTaboo == null) {
             throw new RuntimeException("create taboo failed");
@@ -97,6 +102,11 @@ public class TabooRestService extends BaseRestService<TabooEntity, TabooRequest,
         if (optional.isPresent()) {
             TabooEntity taboo = optional.get();
             taboo.setContent(request.getContent());
+            // categoryUid
+            Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
+            if (categoryOptional.isPresent()) {
+                taboo.setCategoryUid(categoryOptional.get().getUid());
+            }
             // 
             TabooEntity savedTaboo = save(taboo);
             if (savedTaboo == null) {
