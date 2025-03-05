@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 16:20:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-07 16:20:05
+ * @LastEditTime: 2025-03-05 09:47:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,55 @@
  */
 package com.bytedesk.kbase.taboo;
 
-/**
- * 迁移至 TabooVipEventListener
- * 此处不做实现
- */
+import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+
+import com.alibaba.excel.EasyExcel;
+import com.bytedesk.core.upload.UploadEntity;
+import com.bytedesk.core.upload.UploadRestService;
+import com.bytedesk.core.upload.UploadTypeEnum;
+import com.bytedesk.core.upload.event.UploadCreateEvent;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class TabooEventListener {
-    
+
+    private final UploadRestService uploadRestService;
+
+    private final TabooService tabooService;
+
+    @EventListener
+    public void onUploadCreateEvent(UploadCreateEvent event) {
+        UploadEntity upload = event.getUpload();
+        log.info("UploadEventListener create: {}", upload.toString());
+        // etl分块处理
+        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
+            return;
+        }
+        try {
+            // 导入Excel文件
+            Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+            if (resource.exists()) {
+                String filePath = resource.getFile().getAbsolutePath();
+                log.info("UploadEventListener loadAsResource: {}", filePath);
+                if (upload.getType().equalsIgnoreCase(UploadTypeEnum.TABOO.name())) {
+                    // 导入敏感词
+                    // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
+                    // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
+                    EasyExcel.read(filePath, TabooExcel.class, new TabooExcelListener(tabooService,
+                            // upload.getCategoryUid(),
+                            upload.getKbUid(),
+                            upload.getOrgUid())).sheet().doRead();
+                }
+            }
+        } catch (Exception e) {
+            log.error("TabooEventListener onUploadCreateEvent error: {}", e.getMessage());
+        }
+    }
+
 }

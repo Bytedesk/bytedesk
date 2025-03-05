@@ -71,7 +71,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		upload.setClient(request.getClient());
 		// upload.setType(UploadTypeEnum.fromValue(request.getType()).name());
 		upload.setType(request.getType());
-		if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
+		if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
 			upload.setStatus(UploadStatusEnum.PARSING.name());
 		} else {
 			upload.setStatus(UploadStatusEnum.UPLOADED.name());

@@ -39,7 +39,7 @@ public class FileEventListener {
         UploadEntity upload = event.getUpload();
         log.info("UploadEventListener create: {}", upload.getFileName());
         // 专门存储大模型上传文件记录
-        if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
+        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
             // 转换为 fileEntity，并保存
             FileRequest fileRequest = FileRequest.builder()
                 .uploadUid(upload.getUid())

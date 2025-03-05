@@ -36,7 +36,7 @@ public class UploadEventListener {
         UploadEntity upload = event.getUpload();
         log.info("UploadEventListener create: {}", upload.toString());
         // etl分块处理
-        if (upload.getType().equals(UploadTypeEnum.LLM.name())) {
+        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
             // ai 模块处理
             return;
         }
