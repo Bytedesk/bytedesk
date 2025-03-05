@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:03:05
+ * @LastEditTime: 2025-03-05 12:15:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,9 +21,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -196,7 +194,13 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
     }
 
     public QuickReplyExcel convertToExcel(QuickReplyEntity quickReply) {
-        return modelMapper.map(quickReply, QuickReplyExcel.class);
+        // categoryUid
+        Optional<CategoryEntity> categoryOptional = categoryService.findByUid(quickReply.getCategoryUid());
+        QuickReplyExcel quickReplyExcel = modelMapper.map(quickReply, QuickReplyExcel.class);
+        if (categoryOptional.isPresent()) {
+            quickReplyExcel.setCategory(categoryOptional.get().getName());
+        }
+        return quickReplyExcel;
     }
 
     private List<QuickReplyResponseAgent> transformToQuickReplyResponseAgent(List<KbaseEntity> kbList) {
