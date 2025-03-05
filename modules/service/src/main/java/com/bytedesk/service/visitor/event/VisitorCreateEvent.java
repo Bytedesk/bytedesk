@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-25 09:52:34
+ * @Date: 2025-03-05 18:21:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 18:22:38
+ * @LastEditTime: 2025-03-05 18:23:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,27 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.tag;
+package com.bytedesk.service.visitor.event;
 
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationEvent;
 
-import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostUpdate;
+import com.bytedesk.service.visitor.VisitorEntity;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Slf4j
-@Component
-public class TagEntityListener {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class VisitorCreateEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
-    @PostPersist
-    public void onPostPersist(TagEntity tag) {
-        log.info("onPostPersist: {}", tag);
-    }
+    private VisitorEntity visitor;
 
-    @PostUpdate
-    public void onPostUpdate(TagEntity tag) {
-        log.info("onPostUpdate: {}", tag);
+    public VisitorCreateEvent(Object source, VisitorEntity visitor) {
+        super(source);
+        this.visitor = visitor;
     }
     
 }
