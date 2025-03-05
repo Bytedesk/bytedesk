@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:47:15
+ * @LastEditTime: 2025-03-05 13:20:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -148,8 +148,18 @@ public class TabooRestService extends BaseRestService<TabooEntity, TabooRequest,
         return modelMapper.map(entity, TabooResponse.class);
     }
 
-    public TabooExcel convertToExcel(TabooResponse response) {
-        return modelMapper.map(response, TabooExcel.class);
+    public Page<TabooEntity> queryByOrgExcel(TabooRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<TabooEntity> specification = TabooSpecification.search(request);
+        return tabooRepository.findAll(specification, pageable);
+    }
+
+    public TabooExcel convertToExcel(TabooEntity response) {
+        // categoryUid
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(response.getCategoryUid());
+        TabooExcel tabooExcel = modelMapper.map(response, TabooExcel.class);
+        tabooExcel.setCategory(categoryOptional.get().getName());
+        return tabooExcel;
     }
 
     public TabooEntity convertExcelToTaboo(TabooExcel excel, String kbUid, String orgUid) {
