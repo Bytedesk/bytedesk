@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 13:13:18
+ * @LastEditTime: 2025-03-06 09:42:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,22 +97,49 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
     }
 
     @Override
+    @Transactional
     public FaqResponse create(FaqRequest request) {
-        // 检查uid是否已经存在
-        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-            return convertToResponse(findByUid(request.getUid()).get());
+        try {
+            // 如果提供了uid，先尝试查找现有记录
+            if (StringUtils.hasText(request.getUid())) {
+                Optional<FaqEntity> existingFaq = findByUid(request.getUid());
+                if (existingFaq.isPresent()) {
+                    return convertToResponse(existingFaq.get());
+                }
+            }
+
+            // 创建新记录
+            FaqEntity entity = modelMapper.map(request, FaqEntity.class);
+            if (!StringUtils.hasText(request.getUid())) {
+                entity.setUid(uidUtils.getUid());
+            }
+            entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+
+            try {
+                FaqEntity savedEntity = save(entity);
+                if (savedEntity != null) {
+                    return convertToResponse(savedEntity);
+                }
+            } catch (Exception e) {
+                // 如果保存时发生唯一键冲突，再次尝试查找
+                if (e.getCause() instanceof java.sql.SQLIntegrityConstraintViolationException) {
+                    Optional<FaqEntity> existingFaq = findByUid(entity.getUid());
+                    if (existingFaq.isPresent()) {
+                        return convertToResponse(existingFaq.get());
+                    }
+                }
+                throw e;
+            }
+            
+            throw new RuntimeException("Failed to create FAQ");
+        } catch (Exception e) {
+            log.error("Error creating FAQ: {}", e.getMessage(), e);
+            throw new RuntimeException("Error creating FAQ", e);
         }
-        // 
-        FaqEntity entity = modelMapper.map(request, FaqEntity.class);
-        if (!StringUtils.hasText(request.getUid())) {
-            entity.setUid(uidUtils.getUid());
-        }
-        entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
-        //
-        return convertToResponse(save(entity));
     }
 
     @Override
+    @Transactional
     public FaqResponse update(FaqRequest request) {
 
         Optional<FaqEntity> optional = findByUid(request.getUid());
@@ -162,9 +189,14 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         try {
             return faqRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
+            log.warn("Optimistic locking failure for FAQ: {}", entity.getUid());
+            // 重试逻辑
+            Optional<FaqEntity> existingFaq = findByUid(entity.getUid());
+            if (existingFaq.isPresent()) {
+                return existingFaq.get();
+            }
+            throw e;
         }
-        return null;
     }
 
     public void save(List<FaqEntity> entities) {
