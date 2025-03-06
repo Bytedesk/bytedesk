@@ -44,8 +44,8 @@ import com.bytedesk.core.socket.stomp.StompUnsubscribeEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
-import com.bytedesk.core.topic.TopicCreateEvent;
-import com.bytedesk.core.topic.TopicUpdateEvent;
+import com.bytedesk.core.topic.event.TopicCreateEvent;
+import com.bytedesk.core.topic.event.TopicUpdateEvent;
 
 import lombok.AllArgsConstructor;
 
