@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class SensitiveWordFilter {
     }
     
     public boolean containsSensitiveWords(String text) {
+        Assert.hasText(text, "Text must not be empty");
         if (text == null || text.isEmpty()) {
             return false;
         }
@@ -48,6 +50,7 @@ public class SensitiveWordFilter {
     }
     
     public Set<String> findSensitiveWords(String text) {
+        Assert.hasText(text, "Text must not be empty");
         Set<String> found = new HashSet<>();
         if (text == null || text.isEmpty()) {
             return found;
@@ -62,6 +65,7 @@ public class SensitiveWordFilter {
     }
     
     public String filter(String text) {
+        Assert.hasText(text, "Text must not be empty");
         if (text == null || text.isEmpty()) {
             return text;
         }

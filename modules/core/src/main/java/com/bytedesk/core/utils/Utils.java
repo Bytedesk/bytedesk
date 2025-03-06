@@ -15,6 +15,7 @@ package com.bytedesk.core.utils;
 
 import java.util.Random;
 import java.util.UUID;
+import org.springframework.util.Assert;
 
 public class Utils {
 
@@ -47,7 +48,7 @@ public class Utils {
 
     /**
      * 带有时间戳的uuid
-     * UUID.randomUUID().toString()长度为36，我们去掉‘-’之后，截取前半段
+     * UUID.randomUUID().toString()长度为36，我们去掉'-'之后，截取前半段
      * 
      * @return uuid
      */
@@ -60,20 +61,9 @@ public class Utils {
     }
 
     public static String formatUid(String orgUid, String uid) {
-        // 如果都为空，则调用getUid
-        if ((orgUid == null || orgUid.isEmpty()) && (uid == null || uid.isEmpty())) {
-            return getUid();
-        }
-        // 如果orgUid为空，则返回uid
-        if (orgUid == null || orgUid.isEmpty()) {
-            return uid;
-        }   
-        // 如果uid为空，则返回orgUid
-        if (uid == null || uid.isEmpty()) {
-            return orgUid;
-        }
-        // 如果orgUid和uid都不为空，则返回orgUid_uid
-        return orgUid + "_" + uid.toLowerCase();
+        Assert.hasText(orgUid, "Organization UID must not be empty");
+        Assert.hasText(uid, "UID must not be empty");
+        return orgUid + "_" + uid;
     }
 
 

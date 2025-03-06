@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -132,6 +133,15 @@ public class MessageEventListener {
         messageJsonList.forEach(item -> {
             messagePersistService.persist(item);
         });
+    }
+
+    @Async
+    @EventListener
+    public void onMessageCreateEvent(MessageCreateEvent event) {
+        List<String> messageJsonList = event.getMessageJsonList();
+        Assert.notEmpty(messageJsonList, "Message JSON list must not be empty");
+        
+        // ... rest of the method
     }
 
 }
