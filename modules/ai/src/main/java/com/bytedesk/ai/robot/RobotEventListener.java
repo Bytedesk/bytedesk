@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 15:31:58
+ * @LastEditTime: 2025-03-06 16:15:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,7 +50,6 @@ import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 
 import com.bytedesk.ai.provider.LlmProviderConsts;
-// import com.bytedesk.ai.provider.vendors.zhipuai.ZhipuaiChatService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -223,14 +222,10 @@ public class RobotEventListener {
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
                 springAIZhipuaiService.ifPresent(service ->
                   service.sendWsKbMessage(query, robot, message));
-                // zhipuaiChatService.ifPresent(service ->
-                //   service.sendWsKbMessage(query, robot, message));
             } else {
                 // 默认使用智谱AI
                 springAIZhipuaiService.ifPresent(service ->
                   service.sendWsKbMessage(query, robot, message));
-                // zhipuaiChatService.ifPresent(service ->
-                //   service.sendWsKbMessage(query, robot, message));
             }
         }
     }
