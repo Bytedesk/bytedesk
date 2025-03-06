@@ -30,7 +30,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotMessage;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotTypeEnum;
-import com.bytedesk.ai.springai.SpringAIVectorService;
+import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiConfig;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.thread.ThreadEntity;
