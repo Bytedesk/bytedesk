@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 12:45:42
+ * @LastEditTime: 2025-03-06 12:50:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,8 +16,12 @@ package com.bytedesk.service.routing;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 // import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
@@ -70,31 +74,41 @@ public class RouteService {
 
     private final RobotRestService robotRestService;
 
+    @Transactional
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 200))
     public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity thread,
             @Nonnull RobotEntity robot) {
-        // 排队计数
-        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
-        log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
-        //
-        thread.setState(ThreadStateEnum.STARTED.name());
-        // 使用robot的serviceSettings配置
-        String robotString = ConvertAiUtils.convertToUserProtobufString(robot);
-        thread.setAgent(robotString);
-        //
-        thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        thread.setRobot(true);
-        thread.setUnreadCount(0);
-        threadService.save(thread);
-        // 增加接待数量，待优化
-        robot.increaseThreadCount();
-        robotRestService.save(robot);
-        // 更新排队状态，待优化
-        queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
-        queueMemberEntity.setAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
-        queueMemberRestService.save(queueMemberEntity);
-        //
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
+        try {
+            // 排队计数
+            QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
+            log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+
+            // 更新线程状态
+            thread.setState(ThreadStateEnum.STARTED.name());
+            thread.setAgent(ConvertAiUtils.convertToUserProtobufString(robot));
+            thread.setContent(robot.getServiceSettings().getWelcomeTip());
+            thread.setRobot(true);
+            thread.setUnreadCount(0);
+            ThreadEntity savedThread = threadService.save(thread);
+
+            // 增加接待数量
+            robot.increaseThreadCount();
+            robotRestService.save(robot);
+
+            // 更新排队状态
+            queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+            queueMemberEntity.setAcceptTime(LocalDateTime.now());
+            queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+            queueMemberRestService.save(queueMemberEntity);
+
+            return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, savedThread);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn("Optimistic locking failure while routing to robot, retrying...", e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Error while routing to robot: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to route to robot", e);
+        }
     }
 
     public MessageProtobuf routeToAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread,
