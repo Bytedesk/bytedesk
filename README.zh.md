@@ -124,6 +124,8 @@ BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
 
 ### 方法四：源码启动
 
+- [源码启动](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
+
 ## 演示
 
 本地预览
