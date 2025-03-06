@@ -24,8 +24,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import com.bytedesk.ai.springai.BaseSpringAIService;
-import com.bytedesk.ai.springai.SpringAIVectorService;
+import com.bytedesk.ai.springai.base.BaseSpringAIService;
+import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
