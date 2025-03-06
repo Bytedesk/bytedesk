@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 23:44:52
+ * @LastEditTime: 2025-03-06 13:12:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -99,7 +99,7 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageProtobuf getThreadQueueMessage(AgentEntity agent, ThreadEntity thread) {
+    public static MessageProtobuf getAgentThreadQueueMessage(AgentEntity agent, ThreadEntity thread) {
         UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
@@ -163,12 +163,12 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageEntity getThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
+    public static MessageEntity getAgentThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
 
         UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
-                .content(thread.getContent())
+                .content(agent.getLeaveMsgSettings().getLeaveMsgTip())
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
