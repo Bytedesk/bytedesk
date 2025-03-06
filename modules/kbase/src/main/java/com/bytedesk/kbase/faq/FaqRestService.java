@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 09:42:22
+ * @LastEditTime: 2025-03-06 10:04:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -335,15 +335,15 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
      * @return 导入的FAQ数量
      */
     @Transactional
-    public int importFaqs(String orgUid, String kbUid) {
+    public void importFaqs(String orgUid, String kbUid) {
         if (faqRepository.count() > 0) {
-            return (int) faqRepository.count();
+            return;
         }
 
         try {
             // 加载JSON文件中的FAQ数据
             FaqConfiguration config = faqJsonLoader.loadFaqs();
-            int count = 0;
+            // int count = 0;
 
             // 遍历并保存每个FAQ
             for (Faq faq : config.getFaqs()) {
@@ -359,14 +359,14 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                     request.setKbUid(kbUid);
                     request.setType(MessageTypeEnum.TEXT.name());
                     create(request);
-                    count++;
+                    // count++;
                 } else {
                     // log.info("FAQ already exists: {}", faq.getUid());
                 }
             }
 
             // log.info("Successfully imported {} FAQs", count);
-            return count;
+            // return count;
         } catch (Exception e) {
             log.error("Failed to import FAQs", e);
             throw new RuntimeException("Failed to import FAQs", e);

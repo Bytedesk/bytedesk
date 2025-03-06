@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 07:32:39
+ * @LastEditTime: 2025-03-06 10:04:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
@@ -75,6 +76,7 @@ public class AuthorityService extends BaseRestService<AuthorityEntity, Authority
     }
 
     @Override
+    @Transactional
     public AuthorityResponse create(AuthorityRequest request) {
         if (existsByValue(request.getValue())) {
             throw new RuntimeException("value " + request.getValue() + " already exists");
@@ -91,11 +93,12 @@ public class AuthorityService extends BaseRestService<AuthorityEntity, Authority
         if (authorityEntitySaved == null) {
             throw new RuntimeException("save authority failed");
         }
-        return convertToResponse(authorityEntity);
+        return convertToResponse(authorityEntitySaved);
     }
 
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_UPDATE)
    @Override
+   @Transactional
     public AuthorityResponse update(AuthorityRequest request) {
         Optional<AuthorityEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
