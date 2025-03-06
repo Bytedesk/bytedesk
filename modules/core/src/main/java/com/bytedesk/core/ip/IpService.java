@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 14:30:59
+ * @LastEditTime: 2025-03-06 12:40:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,67 +67,6 @@ public class IpService {
         String ip = IpUtils.getIp(request);
         return getIpLocation(ip);
     }
-
-    // 封禁IP, TODO: cache区分org
-    // @CachePut(value = "ip", key = "#ipRequest.ip")
-    // public IpResponse blockIp(IpRequest ipRequest) {
-    //     //
-    //     Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
-    //     if (ipOptional.isPresent()) {
-    //         // 更新
-    //         if (StringUtils.hasText(ipRequest.getIp())) {
-    //             ipOptional.get().getIps().add(ipRequest.getIp());
-    //         }
-    //         ipOptional.get().setIpRangeStart(ipRequest.getIpRangeStart());
-    //         ipOptional.get().setIpRangeEnd(ipRequest.getIpRangeEnd());
-    //         ipOptional.get().setType(IpTypeEnum.fromValue(ipRequest.getType()).name());
-    //         ipOptional.get().setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
-    //         ipOptional.get().setReason(ipRequest.getReason());
-
-    //         IpEntity savedIp = save(ipOptional.get());
-    //         if (savedIp == null) {
-    //             throw new RuntimeException("failed to update ip");
-    //         }
-
-    //         return convertToResponse(ipOptional.get());
-    //     }
-    //     //
-    //     IpEntity ip = modelMapper.map(ipRequest, IpEntity.class);
-    //     ip.setUid(uidUtils.getCacheSerialUid());
-    //     if (StringUtils.hasText(ipRequest.getIp())) {
-    //         ip.getIps().add(ipRequest.getIp());
-    //     }
-    //     ip.setUntilDate(DateUtils.formatStringToDateTime(ipRequest.getUntilDate()));
-    //     //
-    //     IpEntity savedIp = save(ip);
-    //     if (savedIp == null) {
-    //         throw new RuntimeException("failed to save ip");
-    //     }
-    //     //
-    //     return convertToResponse(ip);
-    // }
-
-    // public IpResponse unblockIp(IpRequest ipRequest) {
-
-    //     Optional<IpEntity> ipOptional = findByOrgUid(ipRequest.getOrgUid());
-    //     if (ipOptional.isPresent()) {
-    //         ipOptional.get().getIps().remove(ipRequest.getIp());
-
-    //         IpEntity savedIp = save(ipOptional.get());
-    //         if (savedIp == null) {
-    //             throw new RuntimeException("failed to unblock ip");
-    //         }
-
-    //         return convertToResponse(ipOptional.get());
-    //     }
-
-    //     throw new RuntimeException("failed to unblock ip");
-    // }
-
-    // public Boolean isBlocked(HttpServletRequest request) {
-    //     String ip = IpUtils.getIp(request);
-    //     return isBlocked(ip, "");
-    // }
 
     // TODO: cache区分org
     @Cacheable(value = "ip", key = "#ip-#orgUid")
