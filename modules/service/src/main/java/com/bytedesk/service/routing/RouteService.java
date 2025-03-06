@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 23:50:20
+ * @LastEditTime: 2025-03-06 12:45:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,7 @@ public class RouteService {
             @Nonnull RobotEntity robot) {
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
-        log.info("routeRobot Enqueued to queue {}", queueMemberEntity.toString());
+        log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
         //
         thread.setState(ThreadStateEnum.STARTED.name());
         // 使用robot的serviceSettings配置

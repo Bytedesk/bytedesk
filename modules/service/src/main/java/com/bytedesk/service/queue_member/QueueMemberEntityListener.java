@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:52:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 12:31:21
+ * @LastEditTime: 2025-03-06 12:47:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ public class QueueMemberEntityListener {
 
     @PostPersist
     public void onPostPersist(QueueMemberEntity queueMember) {
-        log.info("QueueMemberEntityListener onPostPersist: {}", queueMember);
+        log.info("QueueMemberEntityListener onPostPersist: {}", queueMember.getQueueNickname());
         QueueMemberEntity clonedEntity = SerializationUtils.clone(queueMember);
         // 
         ApplicationEventPublisher eventPublisher = ApplicationContextHolder.getBean(ApplicationEventPublisher.class);
@@ -39,7 +39,7 @@ public class QueueMemberEntityListener {
 
     @PostUpdate
     public void onPostUpdate(QueueMemberEntity queueMember) {
-        log.info("QueueMemberEntityListener onPostUpdate: {}", queueMember);
+        log.info("QueueMemberEntityListener onPostUpdate: {}", queueMember.getQueueNickname());
     }
     
 }
