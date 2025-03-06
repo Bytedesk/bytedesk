@@ -1,14 +1,15 @@
 services:
-  bytedesk-mysql:
-    image: mysql:latest
-    container_name: mysql-bytedesk
+  bytedesk-postgres:
+    image: postgres:latest
+    container_name: postgres-bytedesk
     environment:
-      MYSQL_DATABASE: bytedesk
-      MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
+      POSTGRES_DB: bytedesk
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: r8FqfdbWUaN3
     ports:
-      - "13306:3306"
+      - "15432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - bytedesk-network
 
@@ -44,15 +45,16 @@ services:
     # mage: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest # aliyun community
     container_name: bytedesk
     depends_on:
-      - bytedesk-mysql
+      - bytedesk-postgres
       - bytedesk-redis
       - ollama
     environment:
       SERVER_PORT: 9003
       # db config
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-bytedesk:3306/bytedesk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
-      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-bytedesk:5432/bytedesk
+      SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: r8FqfdbWUaN3
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       # redis config
       SPRING_DATA_REDIS_HOST: redis-bytedesk
@@ -153,8 +155,8 @@ services:
       SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: qwen2.5:1.5b
       # deepseek
       # 申请key https://api-docs.deepseek.com/zh-cn/
-      SPRING_AI_DEEPSEEK_API_KEY: 'sk-xxx'
       SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com
+      SPRING_AI_DEEPSEEK_API_KEY: 'sk-xxx'
       SPRING_AI_DEEPSEEK_CHAT_ENABLED: false
       # SPRING_AI_OPENAI_CHAT_MODEL: deepseek-chat
       SPRING_AI_DEEPSEEK_CHAT_OPTIONS_MODEL: deepseek-chat
@@ -162,8 +164,8 @@ services:
       SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED: false
       # openai
       # https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html
-      SPRING_AI_OPENAI_API_KEY: 'sk-xxx'
       SPRING_AI_OPENAI_BASE_URL: https://api.openai.com
+      SPRING_AI_OPENAI_API_KEY: 'sk-xxx'
       SPRING_AI_OPENAI_CHAT_ENABLED: false
       SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gpt-4o
       # SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gpt-4o-mini
@@ -222,7 +224,7 @@ services:
       - bytedesk-network
 
 volumes:
-  mysql_data:
+  postgres_data:
   redis_data:
   upload_data:
   ollama_data:
