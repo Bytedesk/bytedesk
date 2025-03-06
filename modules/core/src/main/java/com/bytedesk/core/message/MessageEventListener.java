@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-17 16:30:20
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-06 17:12:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -135,13 +135,13 @@ public class MessageEventListener {
         });
     }
 
-    @Async
-    @EventListener
-    public void onMessageCreateEvent(MessageCreateEvent event) {
-        List<String> messageJsonList = event.getMessageJsonList();
-        Assert.notEmpty(messageJsonList, "Message JSON list must not be empty");
+    // @Async
+    // @EventListener
+    // public void onMessageCreateEvent(MessageCreateEvent event) {
+    //     List<String> messageJsonList = event.getMessageJsonList();
+    //     Assert.notEmpty(messageJsonList, "Message JSON list must not be empty");
         
-        // ... rest of the method
-    }
+    //     // ... rest of the method
+    // }
 
 }
