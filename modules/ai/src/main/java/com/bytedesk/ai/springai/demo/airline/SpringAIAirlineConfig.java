@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 11:15:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 09:55:16
+ * @LastEditTime: 2025-03-06 10:07:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,32 +57,6 @@ public class SpringAIAirlineConfig {
                请讲中文。
                今天的日期是 {current_date}.
             """;
-
-    // 客服助手
-    // https://docs.spring.io/spring-ai/reference/api/chatclient.html#_chat_memory
-    // The bean 'vectorStore', defined in class path resource
-    // [org/springframework/ai/autoconfigure/vectorstore/weaviate/WeaviateVectorStoreAutoConfiguration.class],
-    // could not be registered. A bean with that name has already been defined in
-    // class path resource
-    // [org/springframework/ai/autoconfigure/vectorstore/redis/RedisVectorStoreAutoConfiguration.class]
-    // and overriding is disabled.
-    // @Bean("ollamaCustomerSupportAssistant")
-    // @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue =
-    // "true", matchIfMissing = false)
-    // public ChatClient ollamaCustomerSupportAssistant(
-    // ChatClient.Builder defaultChatClientBuilder,
-    // InMemoryChatMemory defaultChatMemory,
-    // VectorStore ollamaRedisVectorStore) {
-
-    // return defaultChatClientBuilder
-    // .defaultSystem(customerSupportAssistantSystemPrompt)
-    // .defaultAdvisors(
-    // new MessageChatMemoryAdvisor(defaultChatMemory),
-    // new QuestionAnswerAdvisor(ollamaRedisVectorStore),
-    // new SimpleLoggerAdvisor())
-    // .defaultTools("getBookingDetails", "changeBooking", "cancelBooking")
-    // .build();
-    // }
 
     @Bean("dashScopeCustomerSupportAssistant")
     @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)

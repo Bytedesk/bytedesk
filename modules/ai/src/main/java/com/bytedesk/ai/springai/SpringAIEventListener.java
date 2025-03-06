@@ -110,8 +110,8 @@ public class SpringAIEventListener {
 
     @EventListener
     public void onFaqCreateEvent(FaqCreateEvent event) {
-        FaqEntity qa = event.getFaq();
-        log.info("SpringAIEventListener onFaqCreateEvent: {}", qa.getQuestion());
+        // FaqEntity qa = event.getFaq();
+        // log.info("SpringAIEventListener onFaqCreateEvent: {}", qa.getQuestion());
         // 生成document
         // springAiVectorService.ifPresent(service -> {
         //     service.readFaq(qa);
@@ -120,8 +120,8 @@ public class SpringAIEventListener {
 
     @EventListener
     public void onFaqUpdateEvent(FaqUpdateEvent event) {
-        FaqEntity qa = event.getFaq();
-        log.info("SpringAIEventListener onFaqUpdateEvent: {}", qa.getQuestion());
+        // FaqEntity qa = event.getFaq();
+        // log.info("SpringAIEventListener onFaqUpdateEvent: {}", qa.getQuestion());
         // 首先删除text对应的document，以及redis中缓存的document
         // springAiVectorService.deleteDoc(qa.getDocIdList());
         // 然后重新生成document
