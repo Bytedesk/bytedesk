@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 14:24:18
+ * @LastEditTime: 2025-03-06 13:25:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.OptimisticLockingHandler;
@@ -41,11 +42,7 @@ public class TopicService {
 
     private final UidUtils uidUtils;
 
-    // private final ActionRestService actionService;
-
     private final OptimisticLockingHandler optimisticLockingHandler;
-
-    // private final ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
 
     public void create(String topic, String uid) {
         TopicRequest topicRequest = TopicRequest.builder()
@@ -56,6 +53,8 @@ public class TopicService {
         create(topicRequest);
     }
 
+    // 创建topic
+    @Transactional
     public void create(TopicRequest topicRequest) {
         Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
