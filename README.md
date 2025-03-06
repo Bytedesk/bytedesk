@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 10:48:08
+ * @LastEditTime: 2025-03-06 11:29:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,9 +106,9 @@ docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 #### if don't need ollama, you can change `docker-compose.yaml` or `docker-compose-ollama.yaml`
 
 ```bash
-# 关闭ollama对话
+# disable Ollama chat
 SPRING_AI_OLLAMA_CHAT_ENABLED: false
-# 关闭ollama嵌入
+# disable Ollama embedding
 SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
 ```
 
@@ -131,7 +131,7 @@ BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
 ### method 3: run from source code
 
 ```bash
-git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/starter && mvn spring-boot:run
+git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk && ./mvnw install -Dmaven.test.skip=true && cd starter && ./mvnw spring-boot:run
 ```
 
 ## Preview

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 17:25:19
+ * @LastEditTime: 2025-03-06 11:43:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -190,6 +190,8 @@ public class BytedeskProperties {
         private String logo;
         private String description;
         private Boolean showRightCornerChat = true;
+        private String privacyPolicyUrl;
+        private String termsOfServiceUrl;
     }
 
     @Data
