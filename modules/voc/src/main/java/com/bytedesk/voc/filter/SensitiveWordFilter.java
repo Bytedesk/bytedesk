@@ -1,3 +1,16 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-12-12 10:34:21
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-06 17:13:14
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.voc.filter;
 
 import java.io.BufferedReader;
@@ -10,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +51,6 @@ public class SensitiveWordFilter {
     }
     
     public boolean containsSensitiveWords(String text) {
-        Assert.hasText(text, "Text must not be empty");
         if (text == null || text.isEmpty()) {
             return false;
         }
@@ -50,7 +61,6 @@ public class SensitiveWordFilter {
     }
     
     public Set<String> findSensitiveWords(String text) {
-        Assert.hasText(text, "Text must not be empty");
         Set<String> found = new HashSet<>();
         if (text == null || text.isEmpty()) {
             return found;
@@ -65,7 +75,6 @@ public class SensitiveWordFilter {
     }
     
     public String filter(String text) {
-        Assert.hasText(text, "Text must not be empty");
         if (text == null || text.isEmpty()) {
             return text;
         }
