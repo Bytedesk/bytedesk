@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 22:56:21
+ * @LastEditTime: 2025-03-06 15:44:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,7 +81,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                 // 返回继续会话消息
                 log.info("Already have a processing thread {}", topic);
-                return getWorkgroupProcessingMessage(visitorRequest, thread);
+                return getWorkgroupContinueMessage(visitorRequest, thread);
             } else if (thread.isQueuing()) {
                 // 返回排队中的会话
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
@@ -110,6 +110,8 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 // 转机器人
                 RobotEntity robot = workgroup.getRobotSettings().getRobot();
                 if (robot != null) {
+                    thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
+                    // 返回机器人欢迎消息
                     return routeService.routeToRobot(visitorRequest, thread, robot);
                 } else {
                     throw new RuntimeException("Workgroup robot not found");
@@ -122,10 +124,10 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
     }
 
     // Q-原样返回会话
-    private MessageProtobuf getWorkgroupProcessingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
+    private MessageProtobuf getWorkgroupContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("getWorkgroupProcessingMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        log.info("getWorkgroupContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 微信公众号等渠道不能重复推送”继续会话“消息
