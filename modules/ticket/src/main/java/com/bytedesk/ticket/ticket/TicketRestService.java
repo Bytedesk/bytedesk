@@ -138,26 +138,28 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             throw new RuntimeException("workgroup not found");
         }
         //
-        Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
-        if (assigneeOptional.isPresent()) {
-            UserProtobuf assigneeProtobuf = UserProtobuf.builder()
-                    .nickname(assigneeOptional.get().getNickname())
-                    .avatar(assigneeOptional.get().getAvatar())
-                    .build();
-            assigneeProtobuf.setUid(assigneeOptional.get().getUid());
-            assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-            String assigneeJson = JSON.toJSONString(assigneeProtobuf);
-            ticket.setAssignee(assigneeJson);
-            ticket.setStatus(TicketStatusEnum.CLAIMED.name());
-            //
-            String userJson = BytedeskConsts.EMPTY_JSON_STRING;
-            // 使用在线客服工单会话user info
-            if (StringUtils.hasText(request.getServiceThreadTopic())) {
-                String serviceThreadTopic = request.getServiceThreadTopic();
-                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
-                if (serviceThreadOptional.isPresent()) {
-                    userJson = serviceThreadOptional.get().getUser();
-                    ticket.setUser(userJson);
+        if (StringUtils.hasText(request.getAssigneeUid())) {
+            Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
+            if (assigneeOptional.isPresent()) {
+                UserProtobuf assigneeProtobuf = UserProtobuf.builder()
+                        .nickname(assigneeOptional.get().getNickname())
+                        .avatar(assigneeOptional.get().getAvatar())
+                        .build();
+                assigneeProtobuf.setUid(assigneeOptional.get().getUid());
+                assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
+                String assigneeJson = JSON.toJSONString(assigneeProtobuf);
+                ticket.setAssignee(assigneeJson);
+                ticket.setStatus(TicketStatusEnum.CLAIMED.name());
+                //
+                String userJson = BytedeskConsts.EMPTY_JSON_STRING;
+                // 使用在线客服工单会话user info
+                if (StringUtils.hasText(request.getServiceThreadTopic())) {
+                    String serviceThreadTopic = request.getServiceThreadTopic();
+                    Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+                    if (serviceThreadOptional.isPresent()) {
+                        userJson = serviceThreadOptional.get().getUser();
+                        ticket.setUser(userJson);
+                    }
                 }
             }
         } else {
