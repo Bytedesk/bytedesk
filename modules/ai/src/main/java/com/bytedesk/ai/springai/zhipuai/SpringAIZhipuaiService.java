@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 16:12:40
+ * @LastEditTime: 2025-03-06 17:39:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import java.util.Optional;
 
@@ -55,12 +56,12 @@ public class SpringAIZhipuaiService {
 
     private final IMessageSendService messageSendService;
 
-
     public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
-        if (!springAIVectorService.isPresent()) {
-            return;
-        }
-
+        Assert.hasText(query, "Query must not be empty");
+        Assert.notNull(robot, "RobotEntity must not be null");
+        Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+        Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must not be null");
+        //
         List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
         String context = String.join("\n", contentList);
         String history = "";
@@ -118,7 +119,10 @@ public class SpringAIZhipuaiService {
     }
 
     public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
-
+        Assert.hasText(query, "Query must not be empty");
+        Assert.notNull(robotLlm, "RobotLlm must not be null");
+        Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+        //
         String prompt = robotLlm.getPrompt() + "\n" + query;
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(robotLlm.getPrompt()));
@@ -165,9 +169,10 @@ public class SpringAIZhipuaiService {
     }
 
     public void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
-        if (!springAIVectorService.isPresent()) {
-            return;
-        }
+        Assert.hasText(query, "Query must not be empty");
+        Assert.hasText(kbUid, "Knowledge base UID must not be empty");
+        Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+        Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must not be null");
         //
         List<String> contentList = springAIVectorService.get().searchText(query, kbUid);
         String context = String.join("\n", contentList);
