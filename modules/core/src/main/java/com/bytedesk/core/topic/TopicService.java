@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 13:25:51
+ * @LastEditTime: 2025-03-06 13:29:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,6 +76,8 @@ public class TopicService {
         save(topic);
     }
 
+    // 删除topic
+    @Transactional
     public void remove(TopicRequest topicRequest) {
         Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
@@ -85,6 +87,8 @@ public class TopicService {
         }
     }
 
+    // 删除topic
+    @Transactional
     public void remove(String topic, String userUid) {
         Optional<TopicEntity> topicOptional = findByUserUid(userUid);
         if (topicOptional.isPresent()) {
@@ -97,7 +101,9 @@ public class TopicService {
             save(topicElement);
         }
     }
-    
+
+    // 订阅topic
+    @Transactional
     public void subscribe(String topic, String clientId) {
         // 用户clientId格式: uid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
@@ -124,6 +130,8 @@ public class TopicService {
         }
     }
 
+    // 取消订阅topic
+    @Transactional
     public void unsubscribe(String topic, String clientId) {
         // 用户clientId格式: userUid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
@@ -141,7 +149,8 @@ public class TopicService {
         // deleteByTopicAndUid(topic, uid);
     }
 
-    @Async
+    // 添加clientId
+    @Transactional
     public void addClientId(String clientId) {
         // concurrentMap.remove(clientId);
 
@@ -157,6 +166,8 @@ public class TopicService {
         }
     }
 
+    // 删除clientId
+    @Transactional
     private void doRemoveClientId(String clientId) {
         // 用户clientId格式: userUid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
@@ -204,8 +215,8 @@ public class TopicService {
     }
 
     @Cacheable(value = "topic", key = "#topic", unless="#result == null")
-    public Set<TopicEntity> findFirstByTopic(String topic) {
-        return topicRepository.findFirstByTopicsContains(topic);
+    public Set<TopicEntity> findByTopic(String topic) {
+        return topicRepository.findByTopicsContains(topic);
     }
 
     @Caching(put = {

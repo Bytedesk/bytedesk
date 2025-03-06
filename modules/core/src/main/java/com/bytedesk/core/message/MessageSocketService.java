@@ -116,7 +116,7 @@ public class MessageSocketService {
         // log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={}, clientId={}",
         // messageProto.getUser().getNickname(), messageProto.getContent(), topic,
         // messageProto.getType(), messageProto.getClient());
-        Set<TopicEntity> topicSet = topicService.findFirstByTopic(topic);
+        Set<TopicEntity> topicSet = topicService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
         topicSet.forEach(topicElement -> {
             Set<String> clientIdSet = topicElement.getClientIds();

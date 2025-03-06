@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 15:27:37
+ * @LastEditTime: 2025-03-06 13:33:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSpecificationExecutor<AgentEntity> {
 
     Optional<AgentEntity> findByUid(String uid);
+
+    Optional<AgentEntity> findByUserUid(String userUid);
 
     List<AgentEntity> findByOrgUid(String orgUid);
 
