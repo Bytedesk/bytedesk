@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 10:56:48
+ * @LastEditTime: 2025-03-06 10:48:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -126,6 +126,12 @@ docker compose -p bytedesk -f docker-compose.yaml stop
 # please replace 127.0.0.1 with your server ip
 BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
 BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
+```
+
+### method 3: run from source code
+
+```bash
+git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/starter && mvn spring-boot:run
 ```
 
 ## Preview
