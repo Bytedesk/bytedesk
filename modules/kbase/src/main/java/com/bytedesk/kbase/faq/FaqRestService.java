@@ -336,6 +336,10 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
      */
     @Transactional
     public int importFaqs(String orgUid, String kbUid) {
+        if (faqRepository.count() > 0) {
+            return (int) faqRepository.count();
+        }
+
         try {
             // 加载JSON文件中的FAQ数据
             FaqConfiguration config = faqJsonLoader.loadFaqs();

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 18:15:13
+ * @LastEditTime: 2025-03-06 09:51:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,8 @@
 package com.bytedesk.ai.springai;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.ai.document.Document;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -56,11 +54,11 @@ public class SpringAIEventListener {
     
     private final Optional<SpringAIVectorService> springAiVectorService;
 
-    private final Optional<SpringAIZhipuaiService> springAIZhipuaiChatService;
+    // private final Optional<SpringAIZhipuaiService> springAIZhipuaiChatService;
 
     // private final Optional<OllamaChatService> ollamaChatService;
 
-    private final FaqRestService faqRestService;
+    // private final FaqRestService faqRestService;
 
     @EventListener
     public void onFileCreateEvent(FileCreateEvent event) throws IOException {
@@ -115,9 +113,9 @@ public class SpringAIEventListener {
         FaqEntity qa = event.getFaq();
         log.info("SpringAIEventListener onFaqCreateEvent: {}", qa.getQuestion());
         // 生成document
-        springAiVectorService.ifPresent(service -> {
-            service.readFaq(qa);
-        });
+        // springAiVectorService.ifPresent(service -> {
+        //     service.readFaq(qa);
+        // });
     }
 
     @EventListener
@@ -135,9 +133,9 @@ public class SpringAIEventListener {
         WebsiteEntity website = event.getWebsite();
         log.info("SpringAIEventListener onWebsiteCreateEvent: {}", website.getName());
         // 生成document
-        springAiVectorService.ifPresent(service -> {
-            service.readWebsite(website);
-        });
+        // springAiVectorService.ifPresent(service -> {
+        //     service.readWebsite(website);
+        // });
     }
 
     @EventListener
@@ -145,13 +143,13 @@ public class SpringAIEventListener {
         WebsiteEntity website = event.getWebsite();
         log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.getName());
         // 首先删除text对应的document，以及redis中缓存的document
-        springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(website.getDocIdList());
-        });
-        // 然后重新生成document
-        springAiVectorService.ifPresent(service -> {
-            service.readWebsite(website);
-        });
+        // springAiVectorService.ifPresent(service -> {
+        //     service.deleteDoc(website.getDocIdList());
+        // });
+        // // 然后重新生成document
+        // springAiVectorService.ifPresent(service -> {
+        //     service.readWebsite(website);
+        // });
     }
 
     @EventListener
