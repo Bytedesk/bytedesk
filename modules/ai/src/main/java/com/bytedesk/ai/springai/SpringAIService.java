@@ -40,6 +40,14 @@ public interface SpringAIService {
     void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf);
 
     /**
+     * 发送基于知识库的自动回复消息
+     * @param query 用户查询
+     * @param kbUid 知识库ID
+     * @param messageProtobuf 消息协议
+     */
+    void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf);
+
+    /**
      * 异步生成FAQ对
      * @param chunk 文本块
      * @return 生成的FAQ对
