@@ -101,6 +101,23 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
+    @Override
+    public void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
+        Assert.hasText(query, "Query must not be empty");
+        Assert.hasText(kbUid, "Knowledge base UID must not be empty");
+        Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+        Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must be present");
+
+        List<String> contentList = springAIVectorService.get().searchText(query, kbUid);
+        String context = String.join("\n", contentList);
+        String prompt = RobotConsts.PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
+        
+        List<Message> messages = buildMessages(prompt, prompt);
+        Prompt aiPrompt = new Prompt(messages);
+        
+        processPrompt(aiPrompt, messageProtobuf);
+    }
+
     protected String buildKbPrompt(String systemPrompt, String query, String context) {
         return systemPrompt + "\n" +
                "用户查询: " + query + "\n" +
