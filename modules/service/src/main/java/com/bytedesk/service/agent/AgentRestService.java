@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 20:59:28
+ * @LastEditTime: 2025-03-06 13:33:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -91,8 +91,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     private final ThreadRestService threadRestService;
 
     public Page<AgentResponse> queryByOrg(AgentRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "id");
+        Pageable pageable = request.getPageable();
         Specification<AgentEntity> spec = AgentSpecification.search(request);
         Page<AgentEntity> agentPage = agentRepository.findAll(spec, pageable);
         return agentPage.map(this::convertToResponse);
@@ -100,11 +99,13 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Override
     public Page<AgentResponse> queryByUser(AgentRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "id");
-        Specification<AgentEntity> spec = AgentSpecification.search(request);
-        Page<AgentEntity> agentPage = agentRepository.findAll(spec, pageable);
-        return agentPage.map(this::convertToResponse);
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByUser(request);
     }
 
     public AgentResponse query(AgentRequest request) {
@@ -256,7 +257,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
-
     @Transactional
     public AgentResponse updateStatus(AgentRequest request) {
         // agentRepository.updateStatusByUid(request.getStatus(), request.getUid());
@@ -317,6 +317,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
     public Optional<AgentEntity> findByUid(String uid) {
         return agentRepository.findByUid(uid);
+    }
+
+    @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
+    public Optional<AgentEntity> findByUserUid(String userUid) {
+        return agentRepository.findByUserUid(userUid);
     }
 
     @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")
