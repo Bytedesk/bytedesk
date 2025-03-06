@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-19 18:59:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 12:50:10
+ * @LastEditTime: 2025-03-06 12:51:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -190,6 +190,45 @@ public class RouteService {
             return messageProtobuf;
         }
     }
+
+
+    private MessageProtobuf handleAvailableAgent(ThreadEntity thread, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
+        thread.setStarted();
+        thread.setUnreadCount(1);
+        thread.setContent(agent.getServiceSettings().getWelcomeTip());
+        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        thread.setRobot(false);
+        ThreadEntity savedThread = threadService.save(thread);
+
+        agent.increaseThreadCount();
+        agentRestService.save(agent);
+
+        queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+        queueMemberEntity.setAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberRestService.save(queueMemberEntity);
+
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, savedThread);
+        messageSendService.sendProtobufMessage(messageProtobuf);
+        return messageProtobuf;
+    }
+
+    private MessageProtobuf handleQueuedAgent(ThreadEntity thread, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
+        thread.setQueuing();
+        thread.setUnreadCount(0);
+        // thread.setContent(content);
+        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        thread.setRobot(false);
+    }
+
+    private MessageProtobuf handleOfflineAgent(ThreadEntity thread, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
+        thread.setOffline();
+        thread.setUnreadCount(0);
+        thread.setContent(agent.getLeaveMsgSettings().getLeaveMsgTip());
+        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        threadService.save(thread);
+    }
+
 
     public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, String threadTopic,
             WorkgroupEntity workgroup) {
