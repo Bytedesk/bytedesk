@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:44:51
+ * @LastEditTime: 2025-03-06 16:10:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,7 +95,6 @@ public class I18Consts {
     public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description";
     public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = I18N_PREFIX + "robot.agent.assistant.nickname";
     // "llm.prompt";
-    public static final String I18N_ROBOT_LLM_PROMPT = "角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度";
     public static final String I18N_ROBOT_REPLY = I18N_PREFIX + "robot.reply";
     public static final String I18N_ROBOT_NO_REPLY = I18N_PREFIX + "robot.noreply";
     //

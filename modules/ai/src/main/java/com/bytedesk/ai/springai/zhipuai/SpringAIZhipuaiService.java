@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 09:23:42
+ * @LastEditTime: 2025-03-06 16:12:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import java.util.Optional;
 
+import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotTypeEnum;
@@ -51,92 +52,25 @@ public class SpringAIZhipuaiService {
     private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
     //
     private final Optional<SpringAIVectorService> springAIVectorService;
-    
+
     private final IMessageSendService messageSendService;
 
-        private final String PROMPT_BLUEPRINT = """
-            根据提供的文档信息回答问题，文档信息如下:
-            {context}
-            问题:
-            {query}
-            当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
-            """;
-
-    private final String PROMPT_TEMPLATE = """
-              任务描述：根据用户的查询和文档信息回答问题，并结合历史聊天记录生成简要的回答。
-
-              用户查询: {query}
-
-              历史聊天记录: {history}
-
-              搜索结果: {context}
-
-              请根据以上信息生成一个简单明了的回答，确保信息准确且易于理解。
-              当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.
-              另外，请提供更多相关的问答对。
-              回答内容请以JSON格式输出，格式如下：
-              {
-                "answer": "回答内容",
-                "additional_qa_pairs": [
-                    {"question": "相关问题1", "answer": "相关答案1"},
-                    {"question": "相关问题2", "answer": "相关答案2"}
-                ]
-              }
-            """;
-
-    private final String PROMPT_QA_TEMPLATE = """
-            基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
-
-            1. 问题部分：
-            - 为同一个主题创建多个不同表述的问题，确保问题的多样性
-            - 每个问题应考虑用户可能的多种问法，例如：
-              - 直接询问（如"什么是...？"）
-              - 请求确认（如"是否可以说...？"）
-              - 如何做（如"如何实现...？"）
-              - 为什么（如"为什么需要...？"）
-              - 比较类（如"...和...有什么区别？"）
-
-            2. 答案部分：
-            - 答案应该准确、完整且易于理解
-            - 使用简洁清晰的语言
-            - 适当添加示例说明
-            - 可以包含关键步骤或要点
-            - 必要时提供相关概念解释
-
-            3. 格式要求：
-            - 以JSON数组形式输出
-            - 每个问答对包含question和answer字段
-            - 可选添加type字段标识问题类型
-            - 可选添加tags字段标识相关标签
-
-            4. 质量控制：
-            - 确保问答对之间不重复
-            - 问题应该有实际意义和价值
-            - 答案需要准确且有帮助
-            - 覆盖文本中的重要信息点
-
-            给定文本：
-            {chunk}
-
-            请基于这个文本生成问答对
-            """;
 
     public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
         if (!springAIVectorService.isPresent()) {
             return;
         }
 
-        String prompt;
-        if (robot.getType().equals(RobotTypeEnum.SERVICE.name())) {
-            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
-            String context = String.join("\n", contentList);
-            String history = "";
-            prompt = PROMPT_TEMPLATE.replace("{context}", context)
-                    .replace("{query}", query)
-                    .replace("{history}", history);
-        } else {
-            prompt = robot.getLlm().getPrompt() + "\n" + query;
-        }
+        List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+        String context = String.join("\n", contentList);
+        String history = "";
+        // prompt = PROMPT_TEMPLATE.replace("{context}", context)
+        // .replace("{query}", query)
+        // .replace("{history}", history);
+        String prompt = robot.getLlm().getPrompt() + "\n" +
+                "用户查询: " + query + "\n" +
+                "历史聊天记录: " + history + "\n" +
+                "搜索结果: " + context;
 
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(robot.getLlm().getPrompt()));
@@ -234,10 +168,10 @@ public class SpringAIZhipuaiService {
         if (!springAIVectorService.isPresent()) {
             return;
         }
-        // 
+        //
         List<String> contentList = springAIVectorService.get().searchText(query, kbUid);
         String context = String.join("\n", contentList);
-        String prompt = PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
+        String prompt = RobotConsts.PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
         log.info("sendWsAutoReply prompt {}", prompt);
 
         List<Message> messages = new ArrayList<>();
@@ -289,7 +223,7 @@ public class SpringAIZhipuaiService {
             return "";
         }
 
-        String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
+        String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
         return bytedeskZhipuaiChatModel.call(prompt);
     }
 
@@ -298,7 +232,7 @@ public class SpringAIZhipuaiService {
             return;
         }
 
-        String prompt = PROMPT_QA_TEMPLATE.replace("{chunk}", chunk);
+        String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
 
         int maxRetries = 3;
         int retryCount = 0;
