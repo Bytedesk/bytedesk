@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 09:48:41
+ * @LastEditTime: 2025-03-06 15:11:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.bytedesk.core.redis.JedisProperties;
 import com.bytedesk.kbase.config.KbaseConst;
-// import com.zhipu.oapi.ClientV4;
+import com.zhipu.oapi.ClientV4;
 
 import lombok.Data;
 import redis.clients.jedis.JedisPooled;
@@ -120,11 +120,11 @@ public class SpringAIZhipuaiConfig {
         return new ZhiPuAiImageModel(bytedeskZhipuaiImageApi());
     }
 
-    // @Bean("bytedeskZhipuaiClient")
-    // @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
-    // ClientV4 bytedeskZhipuaiClient() {
-    //     return new ClientV4.Builder(zhipuaiApiKey).build();
-    // }
+    @Bean("bytedeskZhipuaiClient")
+    @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
+    ClientV4 bytedeskZhipuaiClient() {
+        return new ClientV4.Builder(zhipuaiApiKey).build();
+    }
 
     @Bean("bytedeskZhipuaiRedisVectorStore")
     @ConditionalOnProperty(name = { "spring.ai.zhipuai.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
