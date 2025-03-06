@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 16:45:09
+ * @LastEditTime: 2025-03-06 16:52:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -102,19 +102,15 @@ public class SpringAIVectorService {
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
 	 */
 	public void readSplitWriteToVectorStore(@NonNull FileEntity file) {
-		//
 		String fileUrl = file.getFileUrl();
 		log.info("Loading document from URL: {}", fileUrl);
-		if (fileUrl == null || fileUrl.isEmpty()) {
-			throw new IllegalArgumentException("File URL must not be empty");
-		}
-		if (!fileUrl.startsWith("http")) {
-			throw new IllegalArgumentException(String.format("File URL must start with http, got %s", fileUrl));
-		}
+		Assert.hasText(fileUrl, "File URL must not be empty");
+		Assert.isTrue(fileUrl.startsWith("http"), String.format("File URL must start with http, got %s", fileUrl));
+
 		String filePathList[] = fileUrl.split("/");
 		String fileName = filePathList[filePathList.length - 1];
 		log.info("fileName {}", fileName);
-		//
+
 		if (fileName.toLowerCase().endsWith(".pdf")) {
 			readPdfPage(fileName, file);
 		} else if (fileName.toLowerCase().endsWith(".json")) {
@@ -130,12 +126,8 @@ public class SpringAIVectorService {
 
 	public void readPdfPage(String fileName, FileEntity file) {
 		log.info("Loading document from pdfPage: {}", fileName);
-		if (fileName == null || fileName.isEmpty()) {
-			throw new IllegalArgumentException("File URL must not be empty");
-		}
-		if (!fileName.endsWith(".pdf")) {
-			throw new IllegalArgumentException(String.format("File URL must end with .pdf, got %s", fileName));
-		}
+		Assert.hasText(fileName, "File name must not be empty");
+		Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
 
 		Resource resource = uploadRestService.loadAsResource(fileName);
 
@@ -166,15 +158,10 @@ public class SpringAIVectorService {
 
 	public void readPdfParagraph(String fileName, FileEntity file) {
 		log.info("Loading document from pdfParagraph: {}", fileName);
-		if (fileName == null || fileName.isEmpty()) {
-			throw new IllegalArgumentException("File URL must not be empty");
-		}
-		if (!fileName.endsWith(".pdf")) {
-			throw new IllegalArgumentException(String.format("File URL must end with .pdf, got %s", fileName));
-		}
-		//
+		Assert.hasText(fileName, "File name must not be empty");
+		Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
+
 		Resource resource = uploadRestService.loadAsResource(fileName);
-		//
 		ParagraphPdfDocumentReader pdfReader = new ParagraphPdfDocumentReader(
 				resource,
 				PdfDocumentReaderConfig.builder()
@@ -202,12 +189,8 @@ public class SpringAIVectorService {
 
 	public void readJson(String fileName, FileEntity file) {
 		log.info("Loading document from json: {}", fileName);
-		if (fileName == null || fileName.isEmpty()) {
-			throw new IllegalArgumentException("File URL must not be empty");
-		}
-		if (!fileName.endsWith(".json")) {
-			throw new IllegalArgumentException(String.format("File URL must end with .json, got %s", fileName));
-		}
+		Assert.hasText(fileName, "File name must not be empty");
+		Assert.isTrue(fileName.endsWith(".json"), String.format("File must end with .json, got %s", fileName));
 
 		Resource resource = uploadRestService.loadAsResource(fileName);
 		JsonReader jsonReader = new JsonReader(resource, "description");
@@ -230,12 +213,8 @@ public class SpringAIVectorService {
 	// 使用spring ai markdown reader
 	public void readMarkdown(String fileName, FileEntity file) {
 		log.info("Loading document from markdown: {}", fileName);
-		if (fileName == null || fileName.isEmpty()) {
-			throw new IllegalArgumentException("File URL must not be empty");
-		}
-		if (!fileName.endsWith(".md")) {
-			throw new IllegalArgumentException(String.format("File URL must end with .md, got %s", fileName));
-		}
+		Assert.hasText(fileName, "File name must not be empty");
+		Assert.isTrue(fileName.endsWith(".md"), String.format("File must end with .md, got %s", fileName));
 
 		Resource resource = uploadRestService.loadAsResource(fileName);
 		MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource, MarkdownDocumentReaderConfig.builder().build());
@@ -255,12 +234,8 @@ public class SpringAIVectorService {
 
 	public void readTxt(String fileName, FileEntity file) {
 		log.info("Loading document from txt: {}", fileName);
-		if (fileName == null || fileName.isEmpty()) {
-			throw new IllegalArgumentException("File URL must not be empty");
-		}
-		if (!fileName.endsWith(".txt")) {
-			throw new IllegalArgumentException(String.format("File URL must end with .txt, got %s", fileName));
-		}
+		Assert.hasText(fileName, "File name must not be empty");
+		Assert.isTrue(fileName.endsWith(".txt"), String.format("File must end with .txt, got %s", fileName));
 
 		Resource resource = uploadRestService.loadAsResource(fileName);
 		TextReader textReader = new TextReader(resource);
@@ -285,9 +260,8 @@ public class SpringAIVectorService {
 	// PDF, DOC/DOCX, PPT/PPTX, and HTML
 	public void readByTika(String fileName, FileEntity file) {
 		log.info("Loading document from tika: {}", fileName);
-		if (fileName == null || fileName.isEmpty()) {
-			throw new IllegalArgumentException("File URL must not be empty");
-		}
+		Assert.hasText(fileName, "File name must not be empty");
+		Assert.notNull(file, "FileEntity must not be null");
 
 		Resource resource = uploadRestService.loadAsResource(fileName);
 		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
@@ -310,9 +284,7 @@ public class SpringAIVectorService {
 	// string content 转换成 List<Document> documents
 	public List<Document> readText(String name, String content, String kbUid, String orgUid) {
 		log.info("Converting string content to documents");
-		if (content == null || content.isEmpty()) {
-			throw new IllegalArgumentException("Content must not be empty");
-		}
+		Assert.hasText(content, "Content must not be empty");
 		// 创建Document对象
 		Document document = new Document(content);
 		// 使用TokenTextSplitter分割文本
@@ -349,9 +321,8 @@ public class SpringAIVectorService {
 	// 使用reader直接将content字符串，转换成 List<Document> documents
 	public List<Document> readText(TextEntity textEntity) {
 		log.info("Converting string content to documents");
-		if (textEntity == null || textEntity.getContent() == null || textEntity.getContent().isEmpty()) {
-			throw new IllegalArgumentException("Content must not be empty");
-		}
+		Assert.notNull(textEntity, "TextEntity must not be null");
+		Assert.hasText(textEntity.getContent(), "Content must not be empty");
 		// 创建Document对象
 		Document document = new Document(textEntity.getContent());
 		// 使用TokenTextSplitter分割文本
@@ -397,15 +368,9 @@ public class SpringAIVectorService {
 	// 使用reader直接将qaEntity字符串，转换成 List<Document> documents
 	public List<Document> readFaq(FaqEntity fqaEntity) {
 		log.info("Converting string content to documents");
-		if (fqaEntity == null || fqaEntity.getAnswer() == null || fqaEntity.getAnswer().isEmpty()) {
-			throw new IllegalArgumentException("Content must not be empty");
-		}
-		if (fqaEntity.getQuestion() == null || fqaEntity.getQuestion().isEmpty()) {
-			throw new IllegalArgumentException("Question must not be empty");
-		}
-		if (fqaEntity.getAnswer() == null || fqaEntity.getAnswer().isEmpty()) {
-			throw new IllegalArgumentException("Answer must not be empty");
-		}
+		Assert.notNull(fqaEntity, "FaqEntity must not be null");
+		Assert.hasText(fqaEntity.getQuestion(), "Question must not be empty");
+		Assert.hasText(fqaEntity.getAnswer(), "Answer must not be empty");
 		//
 		String content = fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
 		// 创建Document对象
@@ -453,13 +418,10 @@ public class SpringAIVectorService {
 	// 抓取website
 	public List<Document> readWebsite(WebsiteEntity websiteEntity) {
 		log.info("Loading document from website: {}", websiteEntity.getUrl());
-		if (websiteEntity == null || websiteEntity.getUrl() == null || websiteEntity.getUrl().isEmpty()) {
-			throw new IllegalArgumentException("URL must not be empty");
-		}
-		if (!websiteEntity.getUrl().startsWith("http")) {
-			throw new IllegalArgumentException(
-					String.format("URL must start with http, got %s", websiteEntity.getUrl()));
-		}
+		Assert.notNull(websiteEntity, "WebsiteEntity must not be null");
+		Assert.hasText(websiteEntity.getUrl(), "URL must not be empty");
+		Assert.isTrue(websiteEntity.getUrl().startsWith("http"), 
+			String.format("URL must start with http, got %s", websiteEntity.getUrl()));
 		//
 		try {
 			// 构建URI
@@ -525,6 +487,11 @@ public class SpringAIVectorService {
 
 	// 存储到vector store
 	private void storeDocuments(List<Document> docList, FileEntity file) {
+		Assert.notNull(docList, "Document list must not be null");
+		Assert.notNull(file, "FileEntity must not be null");
+		Assert.notNull(file.getUid(), "File UID must not be null");
+		Assert.notNull(file.getKbUid(), "Knowledge base UID must not be null");
+
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			log.warn("Vector store is not available, skipping document storage for file: {}", file.getFileName());
 			return;
@@ -577,6 +544,8 @@ public class SpringAIVectorService {
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
 	public List<String> searchText(String query) {
+		Assert.hasText(query, "Search query must not be empty");
+		
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			log.warn("Vector store is not available");
 			return List.of();
@@ -593,6 +562,8 @@ public class SpringAIVectorService {
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	public List<String> searchText(String query, String kbUid) {
+		Assert.hasText(query, "Search query must not be empty");
+		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			log.warn("Vector store is not available for kbUid: {}", kbUid);
 			return List.of();
@@ -621,6 +592,9 @@ public class SpringAIVectorService {
 	 * @param content 新的文档内容
 	 */
 	public void updateDoc(String docId, String content, String kbUid) {
+		Assert.hasText(docId, "Document ID must not be empty");
+		Assert.hasText(content, "Content must not be empty");
+		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
 		log.info("updateDoc docId: {}, content: {}", docId, content);
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
 			try {
@@ -648,6 +622,7 @@ public class SpringAIVectorService {
 	 * @param documents 要更新的文档列表
 	 */
 	public void updateDocs(List<Document> documents) {
+		Assert.notEmpty(documents, "Documents list must not be empty");
 		log.info("Updating {} documents", documents.size());
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
 			try {
@@ -670,10 +645,12 @@ public class SpringAIVectorService {
 
 	// 删除一个docId
 	public void deleteDoc(String docId) {
+		Assert.hasText(docId, "Document ID must not be empty");
 		deleteDoc(List.of(docId));
 	}
 
 	public void deleteDoc(List<String> docIdList) {
+		Assert.notEmpty(docIdList, "Document ID list must not be empty");
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
 		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
