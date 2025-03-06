@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 15:09:58
+ * @LastEditTime: 2025-03-06 15:28:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -174,7 +174,6 @@ public class ZhipuaiChatService implements DisposableBean {
             """;
 
     // 知识库问答
-    // TODO: 使用自定义参数
     public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
         //
         String prompt = robot.getLlm().getPrompt();
@@ -222,12 +221,11 @@ public class ZhipuaiChatService implements DisposableBean {
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                                 String answerContent = accumulator.getDelta().getContent();
-                                log.info("answerContent {}", answerContent);
+                                log.info("chatMessageAccumulator answerContent {}, messageProtobuf {}", answerContent, messageProtobuf);
                                 if (StringUtils.hasText(answerContent)) {
                                     messageProtobuf.setType(MessageTypeEnum.STREAM);
                                     messageProtobuf.setContent(answerContent);
                                     //
-                                    // MessageUtils.notifyUser(messageProtobuf);
                                     messageSendService.sendProtobufMessage(messageProtobuf);
                                 }
                             }
