@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 11:29:44
+ * @LastEditTime: 2025-03-06 17:10:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -184,7 +184,3 @@ demo password: admin
 <!-- - [react for web](https://github.com/Bytedesk/bytedesk-react) -->
 <!-- - [flutter for ios&android](https://github.com/Bytedesk/bytedesk-mobile) -->
 <!-- - [electron for windows&mac&linux](https://github.com/Bytedesk/bytedesk-desktop) -->
-
-## License
-
-- [Apache License 2.0](./LICENSE.txt)
