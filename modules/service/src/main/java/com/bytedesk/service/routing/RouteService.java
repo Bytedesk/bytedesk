@@ -22,6 +22,7 @@ import org.springframework.retry.annotation.Retryable;
 // import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
@@ -79,11 +80,15 @@ public class RouteService {
     public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity threadFromRequest,
             @Nonnull RobotEntity robot) {
         try {
+            Assert.notNull(request, "VisitorRequest must not be null");
+            Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+            Assert.notNull(robot, "RobotEntity must not be null");
+            Assert.hasText(threadFromRequest.getUid(), "Thread UID must not be empty");
+
             // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
             Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
-            if (!threadOptional.isPresent()) {
-                throw new RuntimeException("Thread with uid " + threadFromRequest.getUid() + " not found");
-            }
+            Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+            
             ThreadEntity thread = threadOptional.get();
             // 排队计数
             QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
@@ -122,11 +127,15 @@ public class RouteService {
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 200))
     public MessageProtobuf routeToAgent(VisitorRequest visitorRequest, @Nonnull ThreadEntity threadFromRequest,
             @Nonnull AgentEntity agent) {
+        Assert.notNull(visitorRequest, "VisitorRequest must not be null");
+        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+        Assert.notNull(agent, "AgentEntity must not be null");
+        Assert.hasText(threadFromRequest.getUid(), "Thread UID must not be empty");
+
         // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
-        if (!threadOptional.isPresent()) {
-            throw new RuntimeException("Thread with uid " + threadFromRequest.getUid() + " not found");
-        }
+        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+        
         ThreadEntity thread = threadOptional.get();
         //
         try {
@@ -157,6 +166,10 @@ public class RouteService {
 
     private MessageProtobuf handleAvailableAgent(ThreadEntity thread, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
+        Assert.notNull(thread, "ThreadEntity must not be null");
+        Assert.notNull(agent, "AgentEntity must not be null");
+        Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
+        
         // 未满则接待
         thread.setStarted();
         thread.setUnreadCount(1);
@@ -228,15 +241,16 @@ public class RouteService {
 
     public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, String threadTopic,
             WorkgroupEntity workgroup) {
+        Assert.notNull(visitorRequest, "VisitorRequest must not be null");
+        Assert.hasText(threadTopic, "Thread topic must not be empty");
+        Assert.notNull(workgroup, "WorkgroupEntity must not be null");
+        Assert.notEmpty(workgroup.getAgents(), "No agents found in workgroup with uid " + workgroup.getUid());
+
         log.info("routeService routeWorkgroup: {}", workgroup.getUid());
-        if (workgroup.getAgents().isEmpty()) {
-            throw new RuntimeException("No agents found in workgroup with uid " + workgroup.getUid());
-        }
         // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
-        if (!threadOptional.isPresent()) {
-            throw new RuntimeException("Thread with topic " + threadTopic + " not found");
-        }
+        Assert.isTrue(threadOptional.isPresent(), "Thread with topic " + threadTopic + " not found");
+        
         ThreadEntity thread = threadOptional.get();
         // 下面人工接待
         AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
@@ -257,7 +271,7 @@ public class RouteService {
                 return handleQueuedWorkgroup(thread, agent, queueMemberEntity);
             }
         } else {
-            // 离线状态永远显示离线提示语，不显示“继续会话”
+            // 离线状态永远显示离线提示语，不显示"继续会话"
             // 客服离线 或 非接待状态
             return getOfflineMessage(visitorRequest, thread, workgroup);
         }
