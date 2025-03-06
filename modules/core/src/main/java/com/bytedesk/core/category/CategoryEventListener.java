@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-21 14:28:06
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 13:13:49
+ * @LastEditTime: 2025-03-06 10:17:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,11 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 
 import lombok.AllArgsConstructor;
@@ -32,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CategoryEventListener {
 
-    private final CategoryRestService categoryService;
+    // private final CategoryRestService categoryService;
 
     @Order(2)
     @EventListener
