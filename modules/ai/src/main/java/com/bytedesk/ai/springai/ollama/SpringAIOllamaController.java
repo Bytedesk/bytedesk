@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 15:46:49
+ * @LastEditTime: 2025-03-07 16:07:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.ollama.OllamaChatOptions;
+import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/springai/ollama")
+@RequestMapping("/springai/ollama")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIOllamaController {
@@ -50,7 +50,7 @@ public class SpringAIOllamaController {
 
     /**
      * 方式1：同步调用
-     * http://localhost:8080/api/v1/springai/ollama/chat/sync?message=hello
+     * http://127.0.0.1:9003/springai/ollama/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -61,7 +61,7 @@ public class SpringAIOllamaController {
 
     /**
      * 方式2：异步流式调用
-     * http://localhost:8080/api/v1/springai/ollama/chat/stream?message=hello
+     * http://127.0.0.1:9003/springai/ollama/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -74,7 +74,7 @@ public class SpringAIOllamaController {
 
     /**
      * 方式3：SSE调用
-     * http://localhost:8080/api/v1/springai/ollama/chat/sse?message=hello
+     * http://127.0.0.1:9003/springai/ollama/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -106,26 +106,32 @@ public class SpringAIOllamaController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://localhost:8080/api/v1/springai/ollama/chat/custom?message=hello
+     * http://127.0.0.1:9003/springai/ollama/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        return springAIOllamaService.getOllamaChatModel()
-            .map(model -> {
-                ChatResponse response = model.call(
-                    new Prompt(
-                        message,
-                        OllamaChatOptions.builder()
-                            .model("llama2")
-                            .temperature(0.7)
-                            .topP(0.9)
-                            .build()
-                    ));
-                return ResponseEntity.ok(JsonResult.success(response));
-            })
-            .orElse(ResponseEntity.ok(JsonResult.error("Ollama service is not available")));
+                if (!springAIOllamaService.getOllamaChatModel().isPresent()) {
+                    return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+                }
+        
+                try {
+                    ChatResponse response = springAIOllamaService.getOllamaChatModel().get().call(
+                        new Prompt(
+                            message,
+                            OllamaOptions.builder()
+                                .model("llama2")
+                                .temperature(0.7)
+                                .topP(0.9)
+                                .build()
+                        ));
+                    
+                    String result = response.getResult().getOutput().getText();
+                    return ResponseEntity.ok(JsonResult.success(result));
+                } catch (Exception e) {
+                    return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+                }
     }
 
     // 在 Bean 销毁时关闭线程池

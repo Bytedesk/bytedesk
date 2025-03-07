@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 15:45:26
+ * @LastEditTime: 2025-03-07 16:06:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/springai/dashscope")
+@RequestMapping("/springai/dashscope")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
 public class SpringAIDashscopeController {
@@ -52,7 +52,7 @@ public class SpringAIDashscopeController {
 
 	/**
 	 * 方式1：同步调用
-	 * http://localhost:8080/api/v1/springai/dashscope/chat/sync?message=hello
+	 * http://127.0.0.1:9003/springai/dashscope/chat/sync?message=hello
 	 */
 	@GetMapping("/chat/sync")
 	public ResponseEntity<JsonResult<?>> chatSync(
@@ -63,7 +63,7 @@ public class SpringAIDashscopeController {
 
 	/**
 	 * 方式2：异步流式调用
-	 * http://localhost:8080/api/v1/springai/dashscope/chat/stream?message=hello
+	 * http://127.0.0.1:9003/springai/dashscope/chat/stream?message=hello
 	 */
 	@GetMapping("/chat/stream")
 	public Flux<ChatResponse> chatStream(
@@ -74,7 +74,7 @@ public class SpringAIDashscopeController {
 
 	/**
 	 * 方式3：SSE调用
-	 * http://localhost:8080/api/v1/springai/dashscope/chat/sse?message=hello
+	 * http://127.0.0.1:9003/springai/dashscope/chat/sse?message=hello
 	 */
 	@GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter chatSSE(
@@ -106,7 +106,7 @@ public class SpringAIDashscopeController {
 
 	/**
 	 * 自定义模型参数的调用示例
-	 * http://localhost:8080/api/v1/springai/dashscope/chat/custom?message=hello
+	 * http://127.0.0.1:9003/springai/dashscope/chat/custom?message=hello
 	 */
 	@GetMapping("/chat/custom")
 	public ResponseEntity<JsonResult<?>> chatCustom(
@@ -116,9 +116,9 @@ public class SpringAIDashscopeController {
 			new Prompt(
 				message,
 				DashScopeChatOptions.builder()
-					.model("qwen-max")
-					.temperature(0.7)
-					.topP(0.9)
+					// .model("qwen-max")
+					// .temperature(0.7)
+					// .topP(0.9)
 					.build()
 			));
 		
