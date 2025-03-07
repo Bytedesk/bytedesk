@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 12:10:43
+ * @LastEditTime: 2025-03-07 08:51:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,8 +38,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -60,7 +58,7 @@ public class SpringAIDashscopeController {
 	@Qualifier("bytedeskDashScopeChatClient")
 	private final ChatClient bytedeskDashScopeChatClient;
 
-	private final Optional<SpringAIDashscopeImageService> imageService;
+	private final Optional<SpringAIDashscopeImageService> dashScopeImageService;
 
 	// @ConditionalOnProperty(name =
 	// {"spring.ai.dashscope.audio.transcription.enabled",
@@ -127,8 +125,8 @@ public class SpringAIDashscopeController {
 			return Flux.just(JsonResult.error("No image file provided"));
 		}
 
-		if (imageService.isPresent()) {
-			return imageService.get().image2Text(image).map(JsonResult::success);
+		if (dashScopeImageService.isPresent()) {
+			return dashScopeImageService.get().image2Text(image).map(JsonResult::success);
 		} else {
 			return Flux.just(JsonResult.error("Image service not enabled"));
 		}
@@ -148,8 +146,8 @@ public class SpringAIDashscopeController {
 			return JsonResult.error("Prompt is required");
 		}
 
-		if (imageService.isPresent()) {
-			imageService.get().text2Image(prompt, response);
+		if (dashScopeImageService.isPresent()) {
+			dashScopeImageService.get().text2Image(prompt, response);
 		} else {
 			return JsonResult.error("Image service not enabled");
 		}
