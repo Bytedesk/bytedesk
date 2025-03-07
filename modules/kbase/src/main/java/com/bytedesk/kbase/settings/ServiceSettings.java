@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 13:38:13
+ * @LastEditTime: 2025-03-07 10:11:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -176,6 +176,35 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> shortcutFaqs = new ArrayList<>();
+
+    // 满足一定触发条件下，机器人支持主动触发某个任务或者回复某些话术。
+    // 例如：1、长时间访客无消息，机器人主动发问或者触发任务，主动暖场；
+    // 2、满足一定条件，自动触发某个任务。
+
+    // 主动触发设置
+    @Builder.Default
+    private boolean enableProactiveTrigger = false;  // 是否启用主动触发
+
+    @Builder.Default
+    private int noResponseTimeout = 300;  // 访客无响应超时时间(秒)，默认5分钟
+
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String proactiveMessage = "您好，看起来您有一段时间没有互动了。请问还需要帮助吗？";  // 主动发送的消息内容
+
+    @Builder.Default
+    private int maxProactiveCount = 3;  // 最大主动触发次数，防止打扰用户
+
+    @Builder.Default
+    private int proactiveInterval = 600;  // 两次主动触发的最小间隔(秒)，默认10分钟
+
+    @Builder.Default
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String triggerConditions = BytedeskConsts.EMPTY_JSON_STRING;  // 触发条件配置，JSON格式
+
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<FaqEntity> proactiveFaqs = new ArrayList<>();  // 主动推送的常见问题列表
 
     @NotBlank
     @Builder.Default
