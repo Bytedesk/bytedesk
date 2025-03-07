@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 13:38:49
+ * @LastEditTime: 2025-03-07 10:20:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import java.util.List;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -125,6 +124,28 @@ public class ServiceSettingsRequest  implements Serializable {
     private Boolean showShortcutFaqs = true;
     @Builder.Default
     private List<String> shortcutFaqUids = new ArrayList<>();
+
+    // 主动触发设置
+    @Builder.Default
+    private Boolean enableProactiveTrigger = false;  // 是否启用主动触发
+
+    @Builder.Default
+    private Integer noResponseTimeout = 300;  // 访客无响应超时时间(秒)，默认5分钟
+
+    @Builder.Default
+    private String proactiveMessage = "您好，看起来您有一段时间没有互动了。请问还需要帮助吗？";  // 主动发送的消息内容
+
+    @Builder.Default
+    private Integer maxProactiveCount = 3;  // 最大主动触发次数，防止打扰用户
+
+    @Builder.Default
+    private Integer proactiveInterval = 600;  // 两次主动触发的最小间隔(秒)，默认10分钟
+
+    @Builder.Default
+    private String triggerConditions = BytedeskConsts.EMPTY_JSON_STRING;  // 触发条件配置，JSON格式
+
+    @Builder.Default
+    private List<String> proactiveFaqUids = new ArrayList<>();  // 主动推送的常见问题列表
 
     // 访客对话底部页面显示logo
     @Builder.Default

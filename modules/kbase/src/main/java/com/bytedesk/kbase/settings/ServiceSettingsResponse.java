@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 13:39:00
+ * @LastEditTime: 2025-03-07 10:18:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,9 +15,11 @@ package com.bytedesk.kbase.settings;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.faq.FaqResponse;
 
@@ -97,6 +99,21 @@ public class ServiceSettingsResponse implements Serializable {
 
     private Boolean showShortcutFaqs;
     private List<FaqResponse> shortcutFaqs;
+
+    // 主动触发设置
+    private Boolean enableProactiveTrigger;  // 是否启用主动触发
+
+    private Integer noResponseTimeout;  // 访客无响应超时时间(秒)，默认5分钟
+
+    private String proactiveMessage;  // 主动发送的消息内容
+
+    private Integer maxProactiveCount;  // 最大主动触发次数，防止打扰用户
+
+    private Integer proactiveInterval;  // 两次主动触发的最小间隔(秒)，默认10分钟
+
+    private String triggerConditions;  // 触发条件配置，JSON格式
+
+    private List<FaqResponse> proactiveFaqs;  // 主动推送的常见问题列表
 
     private Boolean showLogo;
 
