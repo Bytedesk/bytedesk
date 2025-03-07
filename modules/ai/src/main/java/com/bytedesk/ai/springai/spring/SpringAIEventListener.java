@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 09:51:07
+ * @LastEditTime: 2025-03-07 16:21:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,12 +20,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.springai.spring.event.VectorSplitEvent;
-import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
-import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
 import com.bytedesk.kbase.file.FileEntity;

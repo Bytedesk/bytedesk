@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 16:06:48
+ * @LastEditTime: 2025-03-07 16:40:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -67,7 +68,10 @@ public class SpringAIDashscopeController {
 	 */
 	@GetMapping("/chat/stream")
 	public Flux<ChatResponse> chatStream(
-			@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+			@RequestParam(value = "message", defaultValue = "Tell me a joke") String message, HttpServletResponse response) {
+		// 避免返回乱码
+		response.setCharacterEncoding("UTF-8");
+		// 设置返回类型
 		Prompt prompt = new Prompt(new UserMessage(message));
 		return bytedeskDashScopeChatModel.stream(prompt);
 	}
