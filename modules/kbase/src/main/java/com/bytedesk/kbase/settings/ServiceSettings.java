@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 12:12:31
+ * @LastEditTime: 2025-03-07 12:19:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.gray_release.GrayReleaseConfig;
 import com.bytedesk.kbase.faq.FaqEntity;
 
 import jakarta.persistence.Column;
@@ -37,9 +36,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.Embedded;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -92,7 +88,7 @@ public class ServiceSettings implements Serializable {
     private boolean showPreForm = false;
 
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     // show history message or not
@@ -211,7 +207,7 @@ public class ServiceSettings implements Serializable {
      * @see ServiceTrigger
      */
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String triggerConditions = BytedeskConsts.EMPTY_JSON_STRING;  // 触发条件配置，JSON格式
 
     @Builder.Default
@@ -219,18 +215,25 @@ public class ServiceSettings implements Serializable {
     private List<FaqEntity> proactiveFaqs = new ArrayList<>();  // 主动推送的常见问题列表
 
     // 灰度发布配置
-    @Builder.Default
-    @Embedded
-    @AttributeOverrides({
-        @AttributeOverride(name = "enableGrayRelease", column = @Column(name = "gray_release_enabled")),
-        @AttributeOverride(name = "features", column = @Column(name = "gray_release_features", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)),
-        @AttributeOverride(name = "whitelistUsers", column = @Column(name = "gray_release_whitelist", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)),
-        @AttributeOverride(name = "grayReleasePercentage", column = @Column(name = "gray_release_percentage")),
-        @AttributeOverride(name = "startTime", column = @Column(name = "gray_release_start_time")),
-        @AttributeOverride(name = "endTime", column = @Column(name = "gray_release_end_time")),
-        @AttributeOverride(name = "status", column = @Column(name = "gray_release_status", length = 32))
-    })
-    private GrayReleaseConfig grayReleaseConfig = new GrayReleaseConfig();
+    // @Builder.Default
+    // @Embedded
+    // @AttributeOverrides({
+    //     @AttributeOverride(name = "enableGrayRelease", 
+    //         column = @Column(name = "gray_release_enabled")),
+    //     @AttributeOverride(name = "features", 
+    //         column = @Column(name = "gray_release_features", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)),
+    //     @AttributeOverride(name = "whitelistUsers", 
+    //         column = @Column(name = "gray_release_whitelist", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)),
+    //     @AttributeOverride(name = "grayReleasePercentage", 
+    //         column = @Column(name = "gray_release_percentage")),
+    //     @AttributeOverride(name = "startTime", 
+    //         column = @Column(name = "gray_release_start_time")),
+    //     @AttributeOverride(name = "endTime", 
+    //         column = @Column(name = "gray_release_end_time")),
+    //     @AttributeOverride(name = "status", 
+    //         column = @Column(name = "gray_release_status", length = 32))
+    // })
+    // private GrayReleaseEntity grayReleaseConfig = new GrayReleaseEntity();
 
     @NotBlank
     @Builder.Default

@@ -22,12 +22,13 @@ import java.util.List;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.gray_release.GrayReleaseConfig;
+import com.bytedesk.core.gray_release.GrayReleaseEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -164,8 +165,8 @@ public class ServiceSettingsRequest  implements Serializable {
     private List<String> proactiveFaqUids = new ArrayList<>();  // 主动推送的常见问题列表
 
     // 灰度发布配置
-    @Builder.Default
-    private GrayReleaseConfig grayReleaseConfig = new GrayReleaseConfig();
+    // @Builder.Default
+    // private GrayReleaseEntity grayReleaseConfig = new GrayReleaseConfig();
 
     // 访客对话底部页面显示logo
     @Builder.Default
