@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 11:04:42
+ * @LastEditTime: 2025-03-07 12:21:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,13 +15,10 @@ package com.bytedesk.kbase.settings;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.gray_release.GrayReleaseConfig;
 import com.bytedesk.kbase.faq.FaqResponse;
 
 import lombok.AllArgsConstructor;
@@ -122,7 +119,7 @@ public class ServiceSettingsResponse implements Serializable {
     private List<FaqResponse> proactiveFaqs;  // 主动推送的常见问题列表
 
     // 灰度发布配置
-    private GrayReleaseConfig grayReleaseConfig;
+    // private GrayReleaseEntity grayReleaseConfig;
 
     private Boolean showLogo;
 

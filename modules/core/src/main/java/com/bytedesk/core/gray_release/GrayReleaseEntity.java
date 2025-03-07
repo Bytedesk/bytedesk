@@ -5,13 +5,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,12 +23,14 @@ import lombok.extern.slf4j.Slf4j;
  * 用于控制新功能的逐步放量
  */
 @Slf4j
+@Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable
-public class GrayReleaseConfig implements Serializable {
+@Table(name = "bytedesk_core_gray_release")
+public class GrayReleaseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,12 +41,12 @@ public class GrayReleaseConfig implements Serializable {
 
     // 功能列表 - JSON格式存储
     @Builder.Default
-    @Column(name = "gray_release_features", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "gray_release_features", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String features = "[]"; // 功能列表，JSON格式
 
     // 白名单用户 - JSON格式存储
     @Builder.Default
-    @Column(name = "gray_release_whitelist", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "gray_release_whitelist", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String whitelistUsers = "[]"; // 白名单用户列表，JSON格式
 
     // 灰度比例
