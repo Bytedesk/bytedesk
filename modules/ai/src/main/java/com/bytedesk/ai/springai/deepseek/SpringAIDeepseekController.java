@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 15:46:10
+ * @LastEditTime: 2025-03-07 16:05:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,7 +40,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/springai/deepseek")
+@RequestMapping("/springai/deepseek")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true")
 public class SpringAIDeepseekController {
@@ -50,7 +50,7 @@ public class SpringAIDeepseekController {
 
     /**
      * 方式1：同步调用
-     * http://localhost:8080/api/v1/springai/deepseek/chat/sync?message=hello
+     * http://127.0.0.1:9003/springai/deepseek/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -61,7 +61,7 @@ public class SpringAIDeepseekController {
 
     /**
      * 方式2：异步流式调用
-     * http://localhost:8080/api/v1/springai/deepseek/chat/stream?message=hello
+     * http://127.0.0.1:9003/springai/deepseek/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -74,7 +74,7 @@ public class SpringAIDeepseekController {
 
     /**
      * 方式3：SSE调用
-     * http://localhost:8080/api/v1/springai/deepseek/chat/sse?message=hello
+     * http://127.0.0.1:9003/springai/deepseek/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -106,26 +106,32 @@ public class SpringAIDeepseekController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://localhost:8080/api/v1/springai/deepseek/chat/custom?message=hello
+     * http://127.0.0.1:9003/springai/deepseek/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
-    public ResponseEntity<JsonResult<?>> chatCustom(
+    public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        return springAIDeepseekService.getDeepSeekChatModel()
-            .map(model -> {
-                ChatResponse response = model.call(
-                    new Prompt(
-                        message,
-                        OpenAiChatOptions.builder()
-                            .model("deepseek-chat")
-                            .temperature(0.7)
-                            .topP(0.9)
-                            .build()
-                    ));
-                return ResponseEntity.ok(JsonResult.success(response));
-            })
-            .orElse(ResponseEntity.ok(JsonResult.error("DeepSeek service is not available")));
+        if (!springAIDeepseekService.getDeepSeekChatModel().isPresent()) {
+            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+        }
+
+        try {
+            ChatResponse response = springAIDeepseekService.getDeepSeekChatModel().get().call(
+                new Prompt(
+                    message,
+                    OpenAiChatOptions.builder()
+                        .model("deepseek-chat")
+                        .temperature(0.7)
+                        .topP(0.9)
+                        .build()
+                ));
+            
+            String result = response.getResult().getOutput().getText();
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
     }
 
     // 在 Bean 销毁时关闭线程池
