@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:09:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 07:39:32
+ * @LastEditTime: 2025-03-07 17:17:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,14 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIConfig {
 
     private final Optional<OllamaChatModel> ollamaChatModel;
-
-    // @Bean("defaultChatClientBuilder")
-    // ChatClient.Builder defaultChatClientBuilder() {
-    //     if (ollamaChatModel.isPresent()) {
-    //         return ChatClient.builder(ollamaChatModel.get());
-    //     }
-    //     return null;
-    // }
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
     @Primary

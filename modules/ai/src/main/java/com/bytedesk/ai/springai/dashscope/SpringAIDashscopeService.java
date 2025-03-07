@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 15:37:58
+ * @LastEditTime: 2025-03-07 17:00:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.springai.dashscope;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -24,7 +25,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
@@ -38,55 +38,52 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeService extends BaseSpringAIService {
 
-    private final Optional<DashScopeChatModel> bytedeskDashScopeChatModel;
+    // private final Optional<DashScopeChatModel> bytedeskDashScopeChatModel;
+    // private final ChatClient bytedeskDashScopeChatClient;
+    @Qualifier("bytedeskDashScopeChatClient")
+	private final ChatClient bytedeskDashScopeChatClient;
 
     public SpringAIDashscopeService(
-            @Qualifier("bytedeskDashScopeChatModel") Optional<DashScopeChatModel> bytedeskDashScopeChatModel,
+            @Qualifier("bytedeskDashScopeChatClient") ChatClient bytedeskDashScopeChatClient,
             Optional<SpringAIVectorService> springAIVectorService,
             IMessageSendService messageSendService) {
         super(springAIVectorService, messageSendService);
-        this.bytedeskDashScopeChatModel = bytedeskDashScopeChatModel;
+        // this.bytedeskDashScopeChatModel = bytedeskDashScopeChatModel;
+        this.bytedeskDashScopeChatClient = bytedeskDashScopeChatClient;
     }
 
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        bytedeskDashScopeChatModel.ifPresent(model -> model.stream(prompt).subscribe(
-            response -> {
-                if (response != null) {
-                    log.info("DashScope API response metadata: {}", response.getMetadata());
-                    List<Generation> generations = response.getResults();
-                    for (Generation generation : generations) {
-                        AssistantMessage assistantMessage = generation.getOutput();
-                        String textContent = assistantMessage.getText();
-
-                        messageProtobuf.setType(MessageTypeEnum.STREAM);
-                        messageProtobuf.setContent(textContent);
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    }
-                }
-            },
-            error -> {
-                log.error("DashScope API error: ", error);
-                messageProtobuf.setType(MessageTypeEnum.ERROR);
-                messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                messageSendService.sendProtobufMessage(messageProtobuf);
-            },
-            () -> log.info("Chat stream completed")
-        ));
+        bytedeskDashScopeChatClient.prompt(prompt.toString())
+            .stream()
+            .content()
+            .subscribe(
+                content -> {
+                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                    messageProtobuf.setContent(content);
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                error -> {
+                    log.error("DashScope API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed")
+            );
     }
 
     
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return bytedeskDashScopeChatModel.map(model -> model.call(prompt)).orElse("");
+        return bytedeskDashScopeChatClient.prompt(prompt).call().content();
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return bytedeskDashScopeChatModel.map(model -> model.call(message))
-                .orElse("DashScope service is not available");
+            return bytedeskDashScopeChatClient.prompt(message).call().content();
         } catch (Exception e) {
             log.error("DashScope API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -95,25 +92,17 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSSE(String message, SseEmitter emitter) {
-        bytedeskDashScopeChatModel.ifPresentOrElse(
-            model -> {
-                Prompt prompt = new Prompt(message);
-                model.stream(prompt).subscribe(
-                    response -> {
+        try {
+            bytedeskDashScopeChatClient.prompt(message)
+                .stream()
+                .content()
+                .subscribe(
+                    content -> {
                         try {
-                            if (response != null) {
-                                List<Generation> generations = response.getResults();
-                                for (Generation generation : generations) {
-                                    AssistantMessage assistantMessage = generation.getOutput();
-                                    String textContent = assistantMessage.getText();
-                                    
-                                    // 发送SSE事件
-                                    emitter.send(SseEmitter.event()
-                                        .data(textContent)
-                                        .id(String.valueOf(System.currentTimeMillis()))
-                                        .name("message"));
-                                }
-                            }
+                            emitter.send(SseEmitter.event()
+                                .data(content)
+                                .id(String.valueOf(System.currentTimeMillis()))
+                                .name("message"));
                         } catch (Exception e) {
                             log.error("Error sending SSE event", e);
                             emitter.completeWithError(e);
@@ -138,17 +127,9 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                         }
                     }
                 );
-            },
-            () -> {
-                try {
-                    emitter.send(SseEmitter.event()
-                        .data("DashScope service is not available")
-                        .name("error"));
-                    emitter.complete();
-                } catch (Exception e) {
-                    emitter.completeWithError(e);
-                }
-            }
-        );
+        } catch (Exception e) {
+            log.error("Error starting SSE stream", e);
+            emitter.completeWithError(e);
+        }
     }
 }
