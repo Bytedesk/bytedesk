@@ -1,22 +1,38 @@
 services:
-  bytedesk-db:
+  bytedesk-mysql:
     image: mysql:latest
     container_name: mysql-bytedesk
     environment:
       MYSQL_DATABASE: bytedesk
       MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
-      MYSQL_CHARSET: utf8mb4
-      MYSQL_COLLATION: utf8mb4_unicode_ci
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --default-time-zone=+8:00
     ports:
-      - "3306:3306"
+      - "13306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - bytedesk-network
+
   bytedesk-redis:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
+    ports:
+      - "16379:6379"
     environment:
       - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
+    volumes:
+      - redis_data:/data
+    networks:
+      - bytedesk-network
+
+  bytedesk-ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-bytedesk
     ports:
-      - "6379:6379"
+      - "21434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=deepseek-r1:1.5b
+    command: serve
+    networks:
+      - bytedesk-network
