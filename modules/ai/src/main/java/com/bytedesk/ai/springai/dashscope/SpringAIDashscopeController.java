@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 16:53:02
+ * @LastEditTime: 2025-03-07 17:30:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,11 +85,12 @@ public class SpringAIDashscopeController {
 	 * http://127.0.0.1:9003/springai/dashscope/stream/chat?query=
 	 */
 	@GetMapping("/stream/chat")
-	public Flux<String> streamChat(@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？") String query,
+	public Flux<?> streamChat(@RequestParam(value = "query", defaultValue = "你好，很高兴认识你，能简单介绍一下自己吗？") String query,
 			HttpServletResponse response) {
 
 		response.setCharacterEncoding("UTF-8");
 
+		// return bytedeskDashScopeChatClient.prompt(query).stream().chatResponse();
 		return bytedeskDashScopeChatClient.prompt(query).stream().content();
 	}
 
