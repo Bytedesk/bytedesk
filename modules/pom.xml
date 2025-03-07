@@ -154,12 +154,6 @@
             <version>${querydsl.version}</version>
         </dependency> -->
 
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-observation</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!--  -->
         <!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
         <!-- https://alibaba.github.io/fastjson2/ -->
