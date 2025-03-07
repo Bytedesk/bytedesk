@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 10:27:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 12:10:38
+ * @LastEditTime: 2025-03-07 12:39:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,6 +52,14 @@ import lombok.NoArgsConstructor;
  *             "start": "09:00",
  *             "end": "18:00",
  *             "message": "您似乎在浏览页面，需要帮助吗？"
+ *         },
+ *         {
+ *             "type": "auto_guide",
+ *             "message": "您似乎在浏览页面，需要帮助吗？"
+ *         },
+ *         {
+ *             "type": "queue_remind",
+ *             "message": "您似乎在浏览页面，需要帮助吗？"
  *         }
  *     ]
  * }
@@ -83,7 +91,8 @@ public class ServiceTrigger {
         public static final String TYPE_VISIT_COUNT = "visit_count";       // 访问次数触发
         public static final String TYPE_PAGE_STAY = "page_stay";          // 页面停留触发
         public static final String TYPE_TIME_RANGE = "time_range";        // 时间范围触发
-        
+        public static final String TYPE_AUTO_GUIDE = "auto_guide";        // 自动引导
+        public static final String TYPE_QUEUE_REMIND = "queue_remind";    // 排队提醒
         /**
          * 验证触发条件是否有效
          */
