@@ -22,6 +22,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -76,5 +77,79 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     @Override
     protected String generateFaqPairs(String prompt) {
         return deepSeekChatModel.map(model -> model.call(prompt)).orElse("");
+    }
+
+    @Override
+    protected String processPromptSync(String message) {
+        try {
+            return deepSeekChatModel.map(model -> model.call(message))
+                .orElse("DeepSeek service is not available");
+        } catch (Exception e) {
+            log.error("DeepSeek API sync error: ", e);
+            return "服务暂时不可用，请稍后重试";
+        }
+    }
+
+    @Override
+    protected void processPromptSSE(String message, SseEmitter emitter) {
+        deepSeekChatModel.ifPresentOrElse(
+            model -> {
+                Prompt prompt = new Prompt(message);
+                model.stream(prompt).subscribe(
+                    response -> {
+                        try {
+                            if (response != null) {
+                                List<Generation> generations = response.getResults();
+                                for (Generation generation : generations) {
+                                    AssistantMessage assistantMessage = generation.getOutput();
+                                    String textContent = assistantMessage.getText();
+                                    
+                                    // 发送SSE事件
+                                    emitter.send(SseEmitter.event()
+                                        .data(textContent)
+                                        .id(String.valueOf(System.currentTimeMillis()))
+                                        .name("message"));
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.error("Error sending SSE event", e);
+                            emitter.completeWithError(e);
+                        }
+                    },
+                    error -> {
+                        log.error("DeepSeek API SSE error: ", error);
+                        try {
+                            emitter.send(SseEmitter.event()
+                                .data("服务暂时不可用，请稍后重试")
+                                .name("error"));
+                            emitter.complete();
+                        } catch (Exception e) {
+                            emitter.completeWithError(e);
+                        }
+                    },
+                    () -> {
+                        try {
+                            emitter.complete();
+                        } catch (Exception e) {
+                            log.error("Error completing SSE", e);
+                        }
+                    }
+                );
+            },
+            () -> {
+                try {
+                    emitter.send(SseEmitter.event()
+                        .data("DeepSeek service is not available")
+                        .name("error"));
+                    emitter.complete();
+                } catch (Exception e) {
+                    emitter.completeWithError(e);
+                }
+            }
+        );
+    }
+
+    public Optional<OpenAiChatModel> getDeepSeekChatModel() {
+        return deepSeekChatModel;
     }
 }
