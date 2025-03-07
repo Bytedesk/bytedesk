@@ -1,3 +1,16 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-03-07 11:14:04
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-07 11:25:18
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.core.gray_release;
 
 import java.time.LocalDateTime;
@@ -21,7 +34,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "bytedesk_gray_release_metrics")
+@Table(name = "bytedesk_core_gray_release_metrics")
 @EqualsAndHashCode(callSuper = true)
 public class GrayReleaseMetrics extends BaseEntity {
 
