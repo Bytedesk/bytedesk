@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 07:29:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 09:33:16
+ * @LastEditTime: 2025-03-07 09:32:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.auto_reply.keyword;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,11 +77,20 @@ public class AutoReplyKeywordEntity extends BaseEntity {
     private String contentType = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
+    private String tags = "[]";
+
+    @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
     @Builder.Default
     private boolean isTransfer = false; // 是否是 转人工 关键词
+
+    // 有效开始日期
+    private LocalDateTime startDate;
+
+    // 有效结束日期
+    private LocalDateTime endDate;
 
     private String categoryUid; // 文章分类
 

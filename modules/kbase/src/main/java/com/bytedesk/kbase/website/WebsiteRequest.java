@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:50:39
+ * @LastEditTime: 2025-03-07 09:37:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kbase.website;
+
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.enums.LevelEnum;
@@ -45,6 +47,13 @@ public class WebsiteRequest extends BaseRequest {
 
     // @Builder.Default
     // private String color = "red";
+
+    @Builder.Default
+    private String tags = "[]";
+    
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();

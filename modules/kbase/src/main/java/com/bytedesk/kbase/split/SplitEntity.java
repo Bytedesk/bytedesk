@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 16:45:41
+ * @LastEditTime: 2025-03-07 09:33:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kbase.split;
+
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
@@ -55,6 +57,15 @@ public class SplitEntity extends BaseEntity {
 
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
+
+    @Builder.Default
+    private String tags = "[]";
+
+    // 有效开始日期
+    private LocalDateTime startDate;
+
+    // 有效结束日期
+    private LocalDateTime endDate;
 
     // 对应 拆分 document 的 id
     private String docId;

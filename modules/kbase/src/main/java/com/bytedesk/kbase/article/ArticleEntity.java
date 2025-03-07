@@ -13,6 +13,8 @@
  */
 package com.bytedesk.kbase.article;
 
+import java.time.LocalDateTime;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -98,6 +100,12 @@ public class ArticleEntity extends BaseEntity {
     @Builder.Default
     private String editor = BytedeskConsts.EMPTY_STRING;
 
+    // 有效开始日期
+    private LocalDateTime startDate;
+
+    // 有效结束日期
+    private LocalDateTime endDate;
+
     // 是否需要审核
     @Builder.Default
     @Column(name = "need_audit")
@@ -122,6 +130,7 @@ public class ArticleEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_password_protected")
     private boolean isPasswordProtected = false;
+    
 
     private String password;
 

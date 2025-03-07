@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 17:36:57
+ * @LastEditTime: 2025-03-07 09:27:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,6 +88,10 @@ public class VisitorRequest extends BaseRequest {
 	// 浏览的IP位置
 	@Builder.Default
 	private String ipLocation = "localhost";
+
+	// 会员等级
+	@Builder.Default
+	private Integer vipLevel = 0;
 
 	// wechat mp extra
 	private String threadExtra;

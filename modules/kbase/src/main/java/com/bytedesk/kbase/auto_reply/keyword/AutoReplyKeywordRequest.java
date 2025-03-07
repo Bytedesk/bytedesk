@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 19:10:22
+ * @LastEditTime: 2025-03-07 09:35:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.auto_reply.keyword;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,13 @@ public class AutoReplyKeywordRequest extends BaseRequest {
 
     @Builder.Default
     private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
+
+    @Builder.Default
+    private String tags = "[]";
+    
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 
     @Builder.Default
     private Boolean enabled = true;

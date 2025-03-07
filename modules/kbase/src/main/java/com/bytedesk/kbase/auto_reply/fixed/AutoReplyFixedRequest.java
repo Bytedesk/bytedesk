@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-01 10:01:58
+ * @LastEditTime: 2025-03-07 09:35:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kbase.auto_reply.fixed;
+
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -29,6 +31,13 @@ import lombok.NoArgsConstructor;
 public class AutoReplyFixedRequest extends BaseRequest {
     
     private String content;
+
+    @Builder.Default
+    private String tags = "[]";
+    
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 
     private String categoryUid;
 

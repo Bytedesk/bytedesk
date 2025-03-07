@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 12:08:32
+ * @LastEditTime: 2025-03-07 09:39:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,8 +46,12 @@ public class FaqResponse extends BaseResponse {
 
     private Boolean valid;
 
+    private String tags;
+
+    // 有效开始日期
     private LocalDateTime startDate;
 
+    // 有效结束日期
     private LocalDateTime endDate;
 
     private String categoryUid; // 分类
