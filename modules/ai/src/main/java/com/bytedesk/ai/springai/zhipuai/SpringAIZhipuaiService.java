@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 17:40:30
+ * @LastEditTime: 2025-03-07 15:37:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -31,6 +33,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @Service
@@ -47,6 +50,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         this.bytedeskZhipuaiChatModel = bytedeskZhipuaiChatModel;
     }
 
+    /**
+     * 方式1：异步流式调用
+     */
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
         bytedeskZhipuaiChatModel.stream(prompt).subscribe(
@@ -74,9 +80,71 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         );
     }
 
+    /**
+     * 方式2：同步调用
+     */
+    @Override
+    public String processPromptSync(String message) {
+        try {
+            return bytedeskZhipuaiChatModel.call(message);
+        } catch (Exception e) {
+            log.error("Zhipuai API sync error: ", e);
+            return "服务暂时不可用，请稍后重试";
+        }
+    }
+
+    /**
+     * 方式3：SSE方式调用
+     */
+    @Override
+    public void processPromptSSE(String message, SseEmitter emitter) {
+        Prompt prompt = new Prompt(message);
+        Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
+
+        responseFlux.subscribe(
+            response -> {
+                try {
+                    if (response != null) {
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
+                            
+                            // 发送SSE事件
+                            emitter.send(SseEmitter.event()
+                                .data(textContent)
+                                .id(String.valueOf(System.currentTimeMillis()))
+                                .name("message"));
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Error sending SSE event", e);
+                    emitter.completeWithError(e);
+                }
+            },
+            error -> {
+                log.error("Zhipuai API SSE error: ", error);
+                try {
+                    emitter.send(SseEmitter.event()
+                        .data("服务暂时不可用，请稍后重试")
+                        .name("error"));
+                    emitter.complete();
+                } catch (Exception e) {
+                    emitter.completeWithError(e);
+                }
+            },
+            () -> {
+                try {
+                    emitter.complete();
+                } catch (Exception e) {
+                    log.error("Error completing SSE", e);
+                }
+            }
+        );
+    }
+
     @Override
     protected String generateFaqPairs(String prompt) {
         return bytedeskZhipuaiChatModel.call(prompt);
     }
-
 }

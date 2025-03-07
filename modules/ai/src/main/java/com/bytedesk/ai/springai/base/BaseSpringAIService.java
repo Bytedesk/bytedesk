@@ -10,6 +10,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
@@ -140,5 +141,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     // 抽象方法，由具体实现类提供
     protected abstract void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf);
+    protected abstract String processPromptSync(String message);
+    protected abstract void processPromptSSE(String message, SseEmitter emitter);
+    // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);
 } 
