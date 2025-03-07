@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 10:31:09
+ * @LastEditTime: 2025-03-07 10:45:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.gray_release.GrayReleaseConfig;
 import com.bytedesk.kbase.faq.FaqEntity;
 
 import jakarta.persistence.Column;
@@ -88,8 +89,6 @@ public class ServiceSettings implements Serializable {
     private boolean showPreForm = false;
 
     @Builder.Default
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
 
@@ -177,6 +176,13 @@ public class ServiceSettings implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
+    // 未知答案固定回复
+    @Builder.Default
+    private boolean showUnknownAnswer = false;
+
+    @Builder.Default
+    private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
+
     // 满足一定触发条件下，机器人支持主动触发某个任务或者回复某些话术。
     // 例如：1、长时间访客无消息，机器人主动发问或者触发任务，主动暖场；
     // 2、满足一定条件，自动触发某个任务。
@@ -208,6 +214,10 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> proactiveFaqs = new ArrayList<>();  // 主动推送的常见问题列表
+
+    // 灰度发布配置
+    @Builder.Default
+    private GrayReleaseConfig grayReleaseConfig = new GrayReleaseConfig();
 
     @NotBlank
     @Builder.Default

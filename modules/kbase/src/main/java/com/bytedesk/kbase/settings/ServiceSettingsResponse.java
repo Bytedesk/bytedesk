@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 10:18:03
+ * @LastEditTime: 2025-03-07 11:04:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import java.util.List;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.gray_release.GrayReleaseConfig;
 import com.bytedesk.kbase.faq.FaqResponse;
 
 import lombok.AllArgsConstructor;
@@ -100,6 +101,11 @@ public class ServiceSettingsResponse implements Serializable {
     private Boolean showShortcutFaqs;
     private List<FaqResponse> shortcutFaqs;
 
+    // 未知答案固定回复
+    private Boolean showUnknownAnswer;
+
+    private String unknownAnswer;
+
     // 主动触发设置
     private Boolean enableProactiveTrigger;  // 是否启用主动触发
 
@@ -114,6 +120,9 @@ public class ServiceSettingsResponse implements Serializable {
     private String triggerConditions;  // 触发条件配置，JSON格式
 
     private List<FaqResponse> proactiveFaqs;  // 主动推送的常见问题列表
+
+    // 灰度发布配置
+    private GrayReleaseConfig grayReleaseConfig;
 
     private Boolean showLogo;
 
