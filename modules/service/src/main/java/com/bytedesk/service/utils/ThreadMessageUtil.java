@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 13:12:40
+ * @LastEditTime: 2025-03-07 10:41:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,8 @@ import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings.ServiceTrigger;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
@@ -210,5 +212,28 @@ public class ThreadMessageUtil {
         // return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
         return message;
     }
+
+    // 检查无响应触发
+    public static void checkNoResponse(String userId, long lastActiveTime, ServiceSettings settings) {
+        if (!settings.isEnableProactiveTrigger()) {
+            return;
+        }
+
+        ServiceTrigger trigger = JSON.parseObject(
+            settings.getTriggerConditions(), 
+            ServiceTrigger.class
+        );
+
+        // 检查无响应触发
+        trigger.getConditions().stream()
+            .filter(c -> c.getType().equals(ServiceTrigger.TriggerCondition.TYPE_NO_RESPONSE))
+            .filter(c -> (System.currentTimeMillis() - lastActiveTime) / 1000 > c.getTimeout())
+            .findFirst()
+            .ifPresent(condition -> {
+                // TODO: 发送主动推送消息
+                // sendProactiveMessage(userId, condition.getMessage());
+            });
+    }
+
 
 }
