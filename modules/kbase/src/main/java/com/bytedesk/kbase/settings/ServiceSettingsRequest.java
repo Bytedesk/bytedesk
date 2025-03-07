@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 10:20:12
+ * @LastEditTime: 2025-03-07 11:13:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,8 @@ import java.util.List;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.gray_release.GrayReleaseConfig;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -125,6 +127,20 @@ public class ServiceSettingsRequest  implements Serializable {
     @Builder.Default
     private List<String> shortcutFaqUids = new ArrayList<>();
 
+    // 可自定义设置相似问题、关联问题的引导语
+    @Builder.Default    
+    private String similarQuestionGuide = "您是否想问：";
+
+    @Builder.Default
+    private String relatedQuestionGuide = "您是否想问：";
+
+    // 未知答案固定回复
+    @Builder.Default
+    private Boolean showUnknownAnswer = false;
+
+    @Builder.Default
+    private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
+
     // 主动触发设置
     @Builder.Default
     private Boolean enableProactiveTrigger = false;  // 是否启用主动触发
@@ -146,6 +162,10 @@ public class ServiceSettingsRequest  implements Serializable {
 
     @Builder.Default
     private List<String> proactiveFaqUids = new ArrayList<>();  // 主动推送的常见问题列表
+
+    // 灰度发布配置
+    @Builder.Default
+    private GrayReleaseConfig grayReleaseConfig = new GrayReleaseConfig();
 
     // 访客对话底部页面显示logo
     @Builder.Default

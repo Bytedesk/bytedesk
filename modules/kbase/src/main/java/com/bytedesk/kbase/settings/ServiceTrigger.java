@@ -120,6 +120,28 @@ public class ServiceTrigger {
         return conditions.stream().allMatch(TriggerCondition::isValid);
     }
 
+    /**
+     * 检查是否可以触发条件
+     * @param userUid 用户ID
+     * @param settings 服务设置
+     * @param condition 触发条件
+     * @return 是否可以触发
+     */
+    public boolean canTrigger(String userUid, ServiceSettings settings, TriggerCondition condition) {
+        // 1. 检查基本开关
+        if (!settings.isEnableProactiveTrigger()) {
+            return false;
+        }
+
+        // 2. 检查灰度发布
+        if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid, "proactive_trigger")) {
+            return false;
+        }
+
+        // 3. 检查触发条件是否有效
+        return condition.isValid();
+    }
+
     // 创建默认触发配置
     public static ServiceTrigger createDefaultTrigger() {
         return ServiceTrigger.builder()
