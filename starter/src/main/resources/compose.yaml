@@ -6,7 +6,7 @@ services:
       MYSQL_DATABASE: bytedesk
       MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
     ports:
-      - "3306:3306"
+      - "13306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -16,7 +16,7 @@ services:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
     ports:
-      - "6379:6379"
+      - "16379:6379"
     environment:
       - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
     volumes:
@@ -28,7 +28,7 @@ services:
     image: ollama/ollama:latest
     container_name: ollama-bytedesk
     ports:
-      - "11434:11434"
+      - "21434:11434"
     volumes:
       - ollama_data:/root/.ollama
     environment:
@@ -41,7 +41,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus-bytedesk
     ports:
-      - "9090:9090"
+      - "19090:9090"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -50,7 +50,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--storage.tsdb.retention.time=15d'
       - '--web.enable-admin-api'
-      - '--web.external-url=http://localhost:9090'
+      - '--web.external-url=http://localhost:19090'
     volumes:
       - prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -61,7 +61,7 @@ services:
     image: grafana/grafana:latest
     container_name: grafana-bytedesk
     ports:
-      - "3000:3000"
+      - "13000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -69,6 +69,22 @@ services:
       - grafana_data:/var/lib/grafana
     networks:
       - bytedesk-network
+
+  # bytedesk-app:
+  #   build: .
+  #   container_name: bytedesk-app
+  #   ports:
+  #     - "9003:9003"
+  #   environment:
+  #     - SPRING_PROFILES_ACTIVE=local
+  #   depends_on:
+  #     - bytedesk-mysql
+  #     - bytedesk-redis
+  #     - bytedesk-ollama
+  #     - bytedesk-prometheus
+  #     - bytedesk-grafana
+  #   networks:
+  #     - bytedesk-network
 
 volumes:
   mysql_data:
