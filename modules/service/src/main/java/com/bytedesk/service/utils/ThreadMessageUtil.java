@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 11:08:02
+ * @LastEditTime: 2025-03-07 11:36:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -213,11 +213,19 @@ public class ThreadMessageUtil {
         return message;
     }
 
+
     // 检查无响应触发
     public static void checkNoResponse(String userUid, long lastActiveTime, ServiceSettings settings) {
         if (!settings.isEnableProactiveTrigger()) {
             return;
         }
+
+        // 检查用户是否在灰度范围内
+        // if (grayReleaseService.isUserInGrayRelease(userUid, 
+        //         GrayReleaseFeature.PROACTIVE_TRIGGER.getCode())) {
+        //     // 启用功能
+        //     // ...
+        // }
 
         // 检查用户是否可以使用主动触发功能
         if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid, "proactive_trigger")) {
@@ -238,6 +246,8 @@ public class ThreadMessageUtil {
                 // TODO: 发送主动推送消息
                 // sendProactiveMessage(userId, condition.getMessage());
             });
+
+        
     }
 
 
