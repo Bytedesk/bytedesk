@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 10:13:55
+ * @LastEditTime: 2025-03-07 10:31:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -180,7 +180,7 @@ public class ServiceSettings implements Serializable {
     // 满足一定触发条件下，机器人支持主动触发某个任务或者回复某些话术。
     // 例如：1、长时间访客无消息，机器人主动发问或者触发任务，主动暖场；
     // 2、满足一定条件，自动触发某个任务。
-    
+
     // 主动触发设置
     @Builder.Default
     private boolean enableProactiveTrigger = false;  // 是否启用主动触发
@@ -198,6 +198,9 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     private int proactiveInterval = 600;  // 两次主动触发的最小间隔(秒)，默认10分钟
 
+    /**
+     * @see ServiceTrigger
+     */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String triggerConditions = BytedeskConsts.EMPTY_JSON_STRING;  // 触发条件配置，JSON格式
