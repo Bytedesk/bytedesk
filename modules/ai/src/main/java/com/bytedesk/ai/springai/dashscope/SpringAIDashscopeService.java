@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 17:00:40
+ * @LastEditTime: 2025-03-07 18:08:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,12 +13,9 @@
  */
 package com.bytedesk.ai.springai.dashscope;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,6 +29,9 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 
 @Slf4j
 @Service
@@ -43,34 +43,61 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     @Qualifier("bytedeskDashScopeChatClient")
 	private final ChatClient bytedeskDashScopeChatClient;
 
+    private final Counter aiRequestCounter;
+    private final Timer aiResponseTimer;
+
     public SpringAIDashscopeService(
             @Qualifier("bytedeskDashScopeChatClient") ChatClient bytedeskDashScopeChatClient,
             Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService) {
+            IMessageSendService messageSendService,
+            MeterRegistry registry) {
         super(springAIVectorService, messageSendService);
         // this.bytedeskDashScopeChatModel = bytedeskDashScopeChatModel;
         this.bytedeskDashScopeChatClient = bytedeskDashScopeChatClient;
+        
+        // 初始化监控指标
+        this.aiRequestCounter = Counter.builder("bytedesk.ai.dashscope.requests")
+            .description("Number of DashScope AI requests")
+            .register(registry);
+            
+        this.aiResponseTimer = Timer.builder("bytedesk.ai.dashscope.response.time")
+            .description("DashScope AI response time")
+            .register(registry);
     }
 
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        bytedeskDashScopeChatClient.prompt(prompt.toString())
-            .stream()
-            .content()
-            .subscribe(
-                content -> {
-                    messageProtobuf.setType(MessageTypeEnum.STREAM);
-                    messageProtobuf.setContent(content);
-                    messageSendService.sendProtobufMessage(messageProtobuf);
-                },
-                error -> {
-                    log.error("DashScope API error: ", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobuf);
-                },
-                () -> log.info("Chat stream completed")
-            );
+        aiRequestCounter.increment();
+        
+        Timer.Sample sample = Timer.start();
+        try {
+            bytedeskDashScopeChatClient.prompt(prompt.toString())
+                .stream()
+                .content()
+                .subscribe(
+                    content -> {
+                        messageProtobuf.setType(MessageTypeEnum.STREAM);
+                        messageProtobuf.setContent(content);
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                    },
+                    error -> {
+                        log.error("DashScope API error: ", error);
+                        messageProtobuf.setType(MessageTypeEnum.ERROR);
+                        messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                    },
+                    () -> {
+                        sample.stop(aiResponseTimer);
+                        log.info("Chat stream completed");
+                    }
+                );
+        } catch (Exception e) {
+            sample.stop(aiResponseTimer);
+            log.error("Error in processPrompt", e);
+            messageProtobuf.setType(MessageTypeEnum.ERROR);
+            messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        }
     }
 
     
