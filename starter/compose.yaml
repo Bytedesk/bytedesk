@@ -36,3 +36,13 @@ services:
     command: serve
     networks:
       - bytedesk-network
+
+volumes:
+  mysql_data:
+  redis_data:
+  upload_data:
+  ollama_data:
+
+networks:
+  bytedesk-network:
+    driver: bridge
