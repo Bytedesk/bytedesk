@@ -37,7 +37,7 @@ services:
     networks:
       - bytedesk-network
 
-  prometheus:
+  bytedesk-prometheus:
     image: prom/prometheus:latest
     container_name: prometheus-bytedesk
     ports:
@@ -51,7 +51,7 @@ services:
     networks:
       - bytedesk-network
 
-  grafana:
+  bytedesk-grafana:
     image: grafana/grafana:latest
     container_name: grafana-bytedesk
     ports:
