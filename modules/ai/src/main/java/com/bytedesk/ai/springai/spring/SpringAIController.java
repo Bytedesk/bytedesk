@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 09:30:15
+ * @LastEditTime: 2025-03-07 17:44:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,6 +68,13 @@ public class SpringAIController {
 
         @Qualifier("ollamaChatModel")
         private final Optional<OllamaChatModel> ollamaChatModel;
+
+        // 流式生成
+        // @GetMapping(value = "/generateStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	// public Flux<ChatResponse> generateStream(
+	// 		@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+	// 	return chatModel.stream(new Prompt(new UserMessage(message)));
+	// }
 
         // http://127.0.0.1:9003/spring/ai/completion?message=hello&voice=agent
         // https://docs.spring.io/spring-ai/reference/api/chatclient.html
