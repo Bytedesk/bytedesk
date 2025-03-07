@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-30 22:48:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 14:47:12
+ * @LastEditTime: 2025-03-07 14:58:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,6 @@ public enum WorkgroupRoutingModeEnum {
     // RECENT, # 同 CONSISTENT_HASH
     // 优先级分配
     // PRIORITY,
-    // 由大模型决定：根据客服历史会话 或者 ，自动分配
-    AI_MODEL;
+    // 由大模型决定：根据客服技能或历史数据，由大模型决定分配
+    LLM;
 }
