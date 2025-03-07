@@ -37,11 +37,40 @@ services:
     networks:
       - bytedesk-network
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-bytedesk
+    ports:
+      - "19090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - bytedesk-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-bytedesk
+    ports:
+      - "13000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - bytedesk-network
+
 volumes:
   mysql_data:
   redis_data:
   upload_data:
   ollama_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
   bytedesk-network:
