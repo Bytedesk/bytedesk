@@ -27,6 +27,13 @@
         "webUrl": "https://dashscope.aliyun.com/",
         "status": "PRODUCTION"
     },
+    "silicon": {
+        "nickname": "硅基流动",
+        "logo": "silicon.png",
+        "apiUrl": "https://cloud.siliconflow.cn",
+        "webUrl": "https://www.siliconflow.cn/",
+        "status": "DEVELOPMENT"
+    },
     "yiyan": {
         "nickname": "文心一言",
         "logo": "yiyan.png",
@@ -76,13 +83,7 @@
         "webUrl": "https://platform.minimaxi.com/",
         "status": "DEVELOPMENT"
     },
-    "silicon": {
-        "nickname": "SiliconFlow",
-        "logo": "silicon.png",
-        "apiUrl": "https://cloud.siliconflow.cn",
-        "webUrl": "https://www.siliconflow.cn/",
-        "status": "DEVELOPMENT"
-    },
+    
     "yi": {
         "nickname": "Yi",
         "logo": "yi.png",
