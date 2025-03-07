@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 15:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 09:33:05
+ * @LastEditTime: 2025-03-07 09:31:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kbase.auto_reply.fixed;
+
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
@@ -50,6 +52,15 @@ public class AutoReplyFixedEntity extends BaseEntity {
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
+
+    @Builder.Default
+    private String tags = "[]";
+
+    // 有效开始日期
+    private LocalDateTime startDate;
+
+    // 有效结束日期
+    private LocalDateTime endDate;
 
     private String categoryUid; // 文章分类。生成页面时，先查询分类，后通过分类查询相关文章。
 

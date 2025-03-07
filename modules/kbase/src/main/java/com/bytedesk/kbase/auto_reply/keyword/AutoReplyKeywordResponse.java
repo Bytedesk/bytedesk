@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 15:53:18
+ * @LastEditTime: 2025-03-07 09:39:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,14 @@ public class AutoReplyKeywordResponse extends BaseResponse {
     private AutoReplyKeywordMatchEnum matchType;
 
     private MessageTypeEnum contentType;
+
+    private String tags;
+
+    // 有效开始日期
+    private LocalDateTime startDate;
+
+    // 有效结束日期
+    private LocalDateTime endDate;
 
     private Boolean enabled;
 

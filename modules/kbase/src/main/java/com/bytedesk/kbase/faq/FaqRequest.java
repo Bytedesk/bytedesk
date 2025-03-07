@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 15:39:36
+ * @LastEditTime: 2025-03-07 09:34:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,9 @@ public class FaqRequest extends BaseRequest {
     // 是否有效
     @Builder.Default
     private Boolean valid = true;
+
+    @Builder.Default
+    private String tags = "[]";
     
     private LocalDateTime startDate;
 

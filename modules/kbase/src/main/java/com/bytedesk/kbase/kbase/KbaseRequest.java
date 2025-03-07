@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 12:36:18
+ * @LastEditTime: 2025-03-07 09:36:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.kbase;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,8 +132,11 @@ public class KbaseRequest extends BaseRequest {
     // private String categoryUid;
 
     @Builder.Default
-    // private List<String> tags = new ArrayList<>();
     private String tags = "[]";
+    
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 
     @Builder.Default
     private boolean showChat = false;

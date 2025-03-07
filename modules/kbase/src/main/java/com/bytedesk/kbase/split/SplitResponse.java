@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 16:20:11
+ * @LastEditTime: 2025-03-07 09:38:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,17 +41,13 @@ public class SplitResponse extends BaseResponse {
     // 对应 拆分 document 的 id
     private String docId;
 
-    // 对应 fileEntity 的 uid
-    // private String fileUid;
+    private String tags;
 
-    // // 对应 textEntity 的 uid
-    // private String textUid;
+    // 有效开始日期
+    private LocalDateTime startDate;
 
-    // // 对应 qaEntity 的 uid
-    // private String qaUid;
-
-    // // 对应 websiteEntity 的 uid
-    // private String websiteUid;
+    // 有效结束日期
+    private LocalDateTime endDate;
 
     // 合并fileEntity/textEntity/qaEntity/websiteEntity 的 uid
     private String typeUid;

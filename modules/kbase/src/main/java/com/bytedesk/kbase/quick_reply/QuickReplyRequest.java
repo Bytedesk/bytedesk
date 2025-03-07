@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-21 11:26:41
+ * @LastEditTime: 2025-03-07 09:36:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kbase.quick_reply;
+
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.enums.LevelEnum;
@@ -41,6 +43,13 @@ public class QuickReplyRequest extends BaseRequest {
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
+
+    @Builder.Default
+    private String tags = "[]";
+    
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 
     private String categoryUid;
 

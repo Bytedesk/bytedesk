@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 15:35:14
+ * @LastEditTime: 2025-03-07 09:41:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,7 +65,11 @@ public class FaqEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String answer;
 
-    // TODO：支持一问多答，根据访客不同身份，显示不同答案
+    // 支持一问多答，根据访客不同身份，显示不同答案
+    @Builder.Default
+    @Convert(converter = FaqListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> answerList = new ArrayList<>();
 
     // TODO: 支持设置关联问题
 

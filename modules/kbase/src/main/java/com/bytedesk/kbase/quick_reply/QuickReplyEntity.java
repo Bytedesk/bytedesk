@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 16:05:06
+ * @LastEditTime: 2025-03-07 09:32:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kbase.quick_reply;
+
+import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
@@ -51,11 +53,20 @@ public class QuickReplyEntity extends BaseEntity {
     private String shortCut;
 
     @Builder.Default
+    private String tags = "[]";
+
+    @Builder.Default
     @Column(name = "reply_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
+
+    // 有效开始日期
+    private LocalDateTime startDate;
+
+    // 有效结束日期
+    private LocalDateTime endDate;
 
     private String categoryUid; // 文章分类
 
