@@ -37,13 +37,15 @@ services:
     networks:
       - bytedesk-network
 
+  # http://127.0.0.1:19090/
   bytedesk-prometheus:
     image: prom/prometheus:latest
     container_name: prometheus-bytedesk
     ports:
       - "19090:9090"
     environment:
-      - PROMETHEUS_ADMIN_USER=admin@email.com
+      # FIXME: 修改为admin@email.com不起作用？
+      - PROMETHEUS_ADMIN_USER=admin
       - PROMETHEUS_ADMIN_PASSWORD=admin
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -60,13 +62,15 @@ services:
     networks:
       - bytedesk-network
 
+  # http://127.0.0.1:13000/
   bytedesk-grafana:
     image: grafana/grafana:latest
     container_name: grafana-bytedesk
     ports:
       - "13000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin@email.com
+      # FIXME: 修改为admin@email.com不起作用？
+      - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_AUTH_ANONYMOUS_ENABLED=false
       - GF_AUTH_BASIC_ENABLED=true
