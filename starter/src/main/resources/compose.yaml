@@ -42,6 +42,9 @@ services:
     container_name: prometheus-bytedesk
     ports:
       - "19090:9090"
+    environment:
+      - PROMETHEUS_ADMIN_USER=admin@email.com
+      - PROMETHEUS_ADMIN_PASSWORD=admin
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -63,8 +66,11 @@ services:
     ports:
       - "13000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_USER=admin@email.com
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_BASIC_ENABLED=true
+      - GF_AUTH_DISABLE_LOGIN_FORM=false
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
