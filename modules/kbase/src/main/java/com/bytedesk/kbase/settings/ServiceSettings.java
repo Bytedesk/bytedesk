@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 10:45:43
+ * @LastEditTime: 2025-03-07 12:10:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Embedded;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -216,8 +219,18 @@ public class ServiceSettings implements Serializable {
     private List<FaqEntity> proactiveFaqs = new ArrayList<>();  // 主动推送的常见问题列表
 
     // 灰度发布配置
-    @Builder.Default
-    private GrayReleaseConfig grayReleaseConfig = new GrayReleaseConfig();
+    // @Builder.Default
+    // @Embedded
+    // @AttributeOverrides({
+    //     @AttributeOverride(name = "enableGrayRelease", column = @Column(name = "gray_release_enabled")),
+    //     @AttributeOverride(name = "features", column = @Column(name = "gray_release_features", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)),
+    //     @AttributeOverride(name = "whitelistUsers", column = @Column(name = "gray_release_whitelist", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)),
+    //     @AttributeOverride(name = "grayReleasePercentage", column = @Column(name = "gray_release_percentage")),
+    //     @AttributeOverride(name = "startTime", column = @Column(name = "gray_release_start_time")),
+    //     @AttributeOverride(name = "endTime", column = @Column(name = "gray_release_end_time")),
+    //     @AttributeOverride(name = "status", column = @Column(name = "gray_release_status", length = 32))
+    // })
+    // private GrayReleaseConfig grayReleaseConfig = new GrayReleaseConfig();
 
     @NotBlank
     @Builder.Default
