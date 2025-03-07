@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 10:27:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 10:42:48
+ * @LastEditTime: 2025-03-07 12:10:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -134,9 +134,9 @@ public class ServiceTrigger {
         }
 
         // 2. 检查灰度发布
-        if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid, "proactive_trigger")) {
-            return false;
-        }
+        // if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid, "proactive_trigger")) {
+        //     return false;
+        // }
 
         // 3. 检查触发条件是否有效
         return condition.isValid();

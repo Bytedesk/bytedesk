@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 11:36:07
+ * @LastEditTime: 2025-03-07 12:10:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -228,9 +228,9 @@ public class ThreadMessageUtil {
         // }
 
         // 检查用户是否可以使用主动触发功能
-        if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid, "proactive_trigger")) {
-            return;
-        }
+        // if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid, "proactive_trigger")) {
+        //     return;
+        // }
 
         ServiceTrigger trigger = JSON.parseObject(
             settings.getTriggerConditions(), 
