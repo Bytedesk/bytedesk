@@ -1,4 +1,4 @@
-package com.bytedesk.metrics;
+package com.bytedesk.core.config.metrics;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -217,4 +217,13 @@ public class BytedeskMetrics {
     public double getWsConnectionsCount() {
         return wsConnectionCounter.count();
     }
+
+    public double getJvmMemoryUsage() {
+        return jvmMemoryGauge.value();
+    }
+
+    public double getWsActiveConnectionsCount() {
+        return wsActiveConnectionGauge.value();
+    }
+
 } 
