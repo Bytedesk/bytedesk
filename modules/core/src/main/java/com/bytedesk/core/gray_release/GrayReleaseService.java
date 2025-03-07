@@ -13,85 +13,102 @@
  */
 package com.bytedesk.core.gray_release;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GrayReleaseService {
     
-    // private final ServiceSettingsRepository serviceSettingsRepository;
+    private final GrayReleaseRepository grayReleaseRepository;
+    private final GrayReleaseMetricsService metricsService;
 
     /**
      * 初始化功能的灰度发布
      */
-    public void initializeFeatureRollout(String feature, String description) {
-        GrayReleaseConfig config = new GrayReleaseConfig();
-        config.setEnableGrayRelease(true);
-        
-        // FeatureConfig.Feature newFeature = new FeatureConfig.Feature();
-        // newFeature.setName(feature);
-        // newFeature.setEnabled(true);
-        // newFeature.setDescription(description);
-
-        // FeatureConfig featureConfig = new FeatureConfig();
-        // featureConfig.getFeatures().add(newFeature);
-
-        // config.setFeatures(BytedeskConsts.OBJECT_MAPPER.writeValueAsString(featureConfig));
-        // config.setGrayReleasePercentage(0);  // 初始设置为0%
-        // config.setStartTime(LocalDateTime.now());
-        // config.setStatus("pending");
-
-        // 保存配置
-        // serviceSettingsRepository.save(settings);
+    public void initializeFeatureRollout(GrayReleaseFeature feature) {
+        log.info("Initializing gray release for feature: {}", feature.getCode());
+        // TODO: 实现初始化逻辑
     }
 
     /**
      * 增加灰度比例
      */
     public void increaseRolloutPercentage(String feature, int increment) {
-        // ServiceSettings settings = serviceSettingsRepository.findByFeature(feature);
-        // GrayReleaseConfig config = settings.getGrayReleaseConfig();
-        
-        // int newPercentage = Math.min(100, config.getGrayReleasePercentage() + increment);
-        // config.setGrayReleasePercentage(newPercentage);
-        
-        // if (newPercentage >= 100) {
-        //     config.setStatus("completed");
-        //     config.setEndTime(LocalDateTime.now());
-        // }
+        log.info("Increasing rollout percentage for feature: {} by {}%", feature, increment);
+        // TODO: 实现增加灰度比例的逻辑
+    }
 
-        // serviceSettingsRepository.save(settings);
+    /**
+     * 暂停灰度发布
+     */
+    public void pauseRollout(String feature) {
+        log.info("Pausing rollout for feature: {}", feature);
+        // TODO: 实现暂停灰度发布的逻辑
+    }
+
+    /**
+     * 恢复灰度发布
+     */
+    public void resumeRollout(String feature) {
+        log.info("Resuming rollout for feature: {}", feature);
+        // TODO: 实现恢复灰度发布的逻辑
+    }
+
+    /**
+     * 完成灰度发布
+     */
+    public void completeRollout(String feature) {
+        log.info("Completing rollout for feature: {}", feature);
+        // TODO: 实现完成灰度发布的逻辑
     }
 
     /**
      * 添加白名单用户
      */
     public void addToWhitelist(String feature, String userUid) {
-        // ServiceSettings settings = serviceSettingsRepository.findByFeature(feature);
-        // GrayReleaseConfig config = settings.getGrayReleaseConfig();
-        
-        // WhitelistConfig whitelist = WhitelistConfig.fromJson(config.getWhitelistUsers());
-        // whitelist.getUserUids().add(userUid);
-        
-        // config.setWhitelistUsers(BytedeskConsts.OBJECT_MAPPER.writeValueAsString(whitelist));
-        // serviceSettingsRepository.save(settings);
+        log.info("Adding user {} to whitelist for feature: {}", userUid, feature);
+        // TODO: 实现添加白名单的逻辑
     }
 
     /**
      * 获取功能的灰度状态
      */
     public GrayReleaseStatus getFeatureStatus(String feature) {
-        // ServiceSettings settings = serviceSettingsRepository.findByFeature(feature);
-        // GrayReleaseConfig config = settings.getGrayReleaseConfig();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dayStart = now.minusDays(1);
         
-        // return GrayReleaseStatus.builder()
-        //     .feature(feature)
-        //     .enabled(config.isEnableGrayRelease())
-        //     .percentage(config.getGrayReleasePercentage())
-        //     .status(config.getStatus())
-        //     .activeUsers(calculateActiveUsers(feature))
-        //     .build();
+        // 获取最近24小时的统计数据
+        GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(
+            GrayReleaseFeature.getByCode(feature), 
+            dayStart, 
+            now
+        );
+        
+        return GrayReleaseStatus.builder()
+            .feature(feature)
+            .enabled(true)  // TODO: 从配置中获取
+            .percentage(50) // TODO: 从配置中获取
+            .status(GrayReleaseStatus.STATUS_ACTIVE)
+            .activeUsers(stats.getUniqueUsers())
+            .totalUsers(1000)  // TODO: 从用户系统获取
+            .successRate(stats.getSuccessRate())
+            .failureRate(stats.getFailureRate())
+            .startTime(dayStart)
+            .endTime(null)
+            .build();
+    }
+
+    /**
+     * 检查用户是否可以使用某个功能
+     */
+    public boolean canUserAccessFeature(String userUid, String feature) {
+        // TODO: 实现用户访问权限检查逻辑
+        return true;
     }
 }
