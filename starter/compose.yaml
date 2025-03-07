@@ -42,9 +42,8 @@ services:
     container_name: prometheus-bytedesk
     ports:
       - "19090:9090"
-    volumes:
-      - prometheus_data:/prometheus
     command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.enable-lifecycle'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
@@ -52,21 +51,9 @@ services:
       - '--storage.tsdb.retention.time=15d'
       - '--web.enable-admin-api'
       - '--web.external-url=http://localhost:19090'
-      - '--web.enable-lifecycle'
-      - |
-        --config.file=/dev/stdin <<EOF
-        global:
-          scrape_interval: 15s
-          evaluation_interval: 15s
-        scrape_configs:
-          - job_name: spring-actuator
-            metrics_path: /actuator/prometheus
-            static_configs:
-              - targets: ['host.docker.internal:9003']
-          - job_name: prometheus
-            static_configs:
-              - targets: ['localhost:9090']
-        EOF
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - bytedesk-network
 
@@ -80,6 +67,28 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana_data:/var/lib/grafana
+    networks:
+      - bytedesk-network
+
+  bytedesk-app:
+    build: .
+    container_name: bytedesk-app
+    ports:
+      - "9003:9003"
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_DATASOURCE_URL=jdbc:mysql://bytedesk-mysql:3306/bytedesk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=r8FqfdbWUaN3
+      - SPRING_DATA_REDIS_HOST=bytedesk-redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=qfRxz3tVT8Nh
+    depends_on:
+      - bytedesk-mysql
+      - bytedesk-redis
+      - bytedesk-ollama
+      - bytedesk-prometheus
+      - bytedesk-grafana
     networks:
       - bytedesk-network
 
