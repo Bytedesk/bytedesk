@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 11:13:13
+ * @LastEditTime: 2025-03-08 13:10:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,6 +64,7 @@ public class PageRouteController {
 			en.put("docs", "Docs");
 			en.put("monitoring", "Monitoring");
 			en.put("voiceOfCustomer", "Voice of Customer");
+			en.put("kanban", "Project kanban");
 			en.put("moduleDevelopment", "Module Development");
 			en.put("forum", "Forum");
 			en.put("ticket", "Ticket");
@@ -95,6 +96,7 @@ public class PageRouteController {
 			zh.put("docs", "文档");
 			zh.put("monitoring", "系统监控");
 			zh.put("voiceOfCustomer", "客户之声");
+			zh.put("kanban", "项目看板");
 			zh.put("moduleDevelopment", "模块简介");
 			zh.put("forum", "用户社区");
 			zh.put("ticket", "工单模块");
@@ -125,6 +127,7 @@ public class PageRouteController {
 			zhTW.put("docs", "文檔");
 			zhTW.put("monitoring", "系統監控");
 			zhTW.put("voiceOfCustomer", "客戶之聲");
+			zhTW.put("kanban", "項目看板");
 			zhTW.put("moduleDevelopment", "模組簡介");
 			zhTW.put("forum", "用戶社區");
 			zhTW.put("ticket", "工單模組");

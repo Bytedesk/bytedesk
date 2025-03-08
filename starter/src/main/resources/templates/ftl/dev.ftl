@@ -189,6 +189,7 @@
                 <li><a href="/ticket/" target="_blank">${i18n[lang]["ticket"]}</a></li>
                 <li><a href="/social/" target="_blank">${i18n[lang]["social"]}</a></li>                
                 <li><a href="/voc/" target="_blank">${i18n[lang]["voiceOfCustomer"]}</a></li>
+                <li><a href="/plugins/kanban/" target="_blank">${i18n[lang]["kanban"]}</a></li>      
                 <#--  <li><a href="/forum/" target="_blank">${i18n[lang]["forum"]}</a></li>  -->
             </ul>
 
