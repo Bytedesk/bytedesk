@@ -14,6 +14,7 @@
 package com.bytedesk.kanban.report;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -33,6 +34,9 @@ import lombok.experimental.Accessors;
 public class ReportRequest extends BaseRequest {
 
     private String name;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
     // @Builder.Default
     // private String type = ReportTypeEnum.CUSTOMER.name();
