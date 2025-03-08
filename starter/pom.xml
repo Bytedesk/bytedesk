@@ -235,6 +235,13 @@
 			<version>${revision}</version>
 		</dependency>
 
+		<!-- kanban -->
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-plugin-kanban</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
 		<!--
 		//////////////////////////////////Plugin模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
 
