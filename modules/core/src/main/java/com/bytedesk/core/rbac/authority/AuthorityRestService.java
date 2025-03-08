@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 10:04:45
+ * @LastEditTime: 2025-03-08 22:36:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class AuthorityService extends BaseRestService<AuthorityEntity, AuthorityRequest, AuthorityResponse> {
+public class AuthorityRestService extends BaseRestService<AuthorityEntity, AuthorityRequest, AuthorityResponse> {
 
     private final AuthorityRepository authorityRepository;
     private final ModelMapper modelMapper;
@@ -152,6 +152,12 @@ public class AuthorityService extends BaseRestService<AuthorityEntity, Authority
     @Override
     public AuthorityResponse convertToResponse(AuthorityEntity entity) {
         return modelMapper.map(entity, AuthorityResponse.class);
+    }
+
+    @Override
+    public AuthorityResponse queryByUid(AuthorityRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     // public void initData() {

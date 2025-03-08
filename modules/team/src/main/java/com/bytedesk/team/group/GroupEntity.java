@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:58:03
+ * @LastEditTime: 2025-03-08 17:10:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -174,27 +174,27 @@ public class GroupEntity extends BaseEntity {
     }
 
     // 处理邀请
-    public void handleInvite(GroupInviteEntity invite, boolean accept) {
-        // if (invite.getStatus() != GroupInviteStatus.PENDING) {
-        //     throw new GroupOperationException("Invite is not pending");
-        // }
+    // public void handleInvite(GroupInviteEntity invite, boolean accept) {
+    //     // if (invite.getStatus() != GroupInviteStatus.PENDING) {
+    //     //     throw new GroupOperationException("Invite is not pending");
+    //     // }
 
-        // if (accept) {
-        //     // 接受邀请
-        //     if (members.size() >= maxMembers) {
-        //         throw new GroupOperationException("Group is full");
-        //     }
+    //     // if (accept) {
+    //     //     // 接受邀请
+    //     //     if (members.size() >= maxMembers) {
+    //     //         throw new GroupOperationException("Group is full");
+    //     //     }
             
-        //     MemberEntity member = MemberEntity.builder()
-        //         .user(invite.getInvitee())
-        //         .group(this)
-        //         .joinTime(LocalDateTime.now())
-        //         .build();
-        //     members.add(member);
-        //     invite.setStatus(GroupInviteStatus.ACCEPTED);
-        // } else {
-        //     // 拒绝邀请
-        //     invite.setStatus(GroupInviteStatus.REJECTED);
-        // }
-    }
+    //     //     MemberEntity member = MemberEntity.builder()
+    //     //         .user(invite.getInvitee())
+    //     //         .group(this)
+    //     //         .joinTime(LocalDateTime.now())
+    //     //         .build();
+    //     //     members.add(member);
+    //     //     invite.setStatus(GroupInviteStatus.ACCEPTED);
+    //     // } else {
+    //     //     // 拒绝邀请
+    //     //     invite.setStatus(GroupInviteStatus.REJECTED);
+    //     // }
+    // }
 }

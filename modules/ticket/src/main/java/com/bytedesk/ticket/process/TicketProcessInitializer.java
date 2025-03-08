@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRequest;
-import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.OrganizationService;
+import com.bytedesk.core.rbac.organization.OrganizationRestService;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.consts.TicketConsts;
 
@@ -44,9 +44,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TicketProcessInitializer implements SmartInitializingSingleton {
 
-    private final AuthorityService authorityService;
+    private final AuthorityRestService authorityService;
 
-    private final OrganizationService organizationService;
+    private final OrganizationRestService organizationService;
 
     private final TicketProcessRestService ticketProcessRestService;
 

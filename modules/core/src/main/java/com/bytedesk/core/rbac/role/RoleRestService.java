@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
-import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -49,7 +49,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         private final UidUtils uidUtils;
 
-        private final AuthorityService authorityService;
+        private final AuthorityRestService authorityService;
 
         private final AuthService authService;
 
@@ -208,6 +208,12 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         log.error("save role failed: {}", e.getMessage());
                 }
                 return null;
+        }
+
+        @Override
+        public RoleResponse queryByUid(RoleRequest request) {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
         }
 
 }

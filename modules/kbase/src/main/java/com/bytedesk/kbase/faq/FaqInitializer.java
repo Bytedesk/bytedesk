@@ -20,7 +20,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRequest;
-import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ public class FaqInitializer implements SmartInitializingSingleton {
 
     private final FaqRestService faqService;
 
-    private final AuthorityService authorityService;
+    private final AuthorityRestService authorityService;
 
     @Override
     public void afterSingletonsInstantiated() {

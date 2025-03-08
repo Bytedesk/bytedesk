@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:40:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:36:54
+ * @LastEditTime: 2025-03-08 22:35:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.core.quartz;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +34,12 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/quartz")
 public class QuartzRestController extends BaseRestController<QuartzRequest> {
 
-    private QuartzService quartzService;
+    private QuartzRestService quartzRestService;
 
     @Override
     public ResponseEntity<?> queryByOrg(QuartzRequest request) {
 
-        Page<QuartzResponse> pageResult = quartzService.queryByOrg(request);
+        Page<QuartzResponse> pageResult = quartzRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
@@ -49,7 +48,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     @Override
     public ResponseEntity<?> queryByUser(QuartzRequest request) {
 
-        Page<QuartzResponse> pageResult = quartzService.queryByUser(request);
+        Page<QuartzResponse> pageResult = quartzRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
@@ -57,7 +56,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody QuartzRequest request) {
 
-        QuartzResponse response = quartzService.create(request);
+        QuartzResponse response = quartzRestService.create(request);
         if (response == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("jobName already exists"));
         }
@@ -68,7 +67,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     @Override
     public ResponseEntity<?> update(@RequestBody QuartzRequest request) {
 
-        QuartzResponse response = quartzService.update(request);
+        QuartzResponse response = quartzRestService.update(request);
         if (response == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("uid not exists"));
         }
@@ -79,7 +78,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody QuartzRequest request) {
 
-        quartzService.delete(request);
+        quartzRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -87,25 +86,25 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     //
     @PostMapping("/startJob")
     public ResponseEntity<?> startJob(@RequestBody QuartzRequest request) {
-        quartzService.startJob(request);
+        quartzRestService.startJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
     @PostMapping("/pauseJob")
     public ResponseEntity<?> pauseJob(@RequestBody QuartzRequest request) {
-        quartzService.pauseJob(request);
+        quartzRestService.pauseJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
     @PostMapping("/resumeJob")
     public ResponseEntity<?> resumeJob(@RequestBody QuartzRequest request) {
-        quartzService.resumeJob(request);
+        quartzRestService.resumeJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
     @PostMapping("/deleteJob")
     public ResponseEntity<?> deleteJob(@RequestBody QuartzRequest request) {
-        quartzService.deleteJob(request);
+        quartzRestService.deleteJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 

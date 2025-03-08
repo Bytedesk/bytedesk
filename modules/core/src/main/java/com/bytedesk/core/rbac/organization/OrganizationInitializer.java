@@ -47,7 +47,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
 
     private final UserService userService;
 
-    private final OrganizationService organizationService;
+    private final OrganizationRestService organizationService;
 
     @Override
     public void afterSingletonsInstantiated() {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 18:16:43
+ * @LastEditTime: 2025-03-08 22:27:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -164,6 +164,12 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
     @Override
     public TodoListResponse convertToResponse(TodoListEntity entity) {
         return modelMapper.map(entity, TodoListResponse.class);
+    }
+
+    @Override
+    public TodoListResponse queryByUid(TodoListRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
     
 }

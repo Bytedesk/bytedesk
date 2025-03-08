@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 10:17:02
+ * @LastEditTime: 2025-03-08 22:34:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -118,6 +118,12 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
     @Override
     public NotificationResponse convertToResponse(NotificationEntity entity) {
         return modelMapper.map(entity, NotificationResponse.class);
+    }
+
+    @Override
+    public NotificationResponse queryByUid(NotificationRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:15:48
+ * @LastEditTime: 2025-03-05 16:37:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kanban.project;
+package com.bytedesk.kanban.module;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -27,69 +27,63 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/project")
+@RequestMapping("/api/v1/module")
 @AllArgsConstructor
-public class ProjectRestController extends BaseRestController<ProjectRequest> {
+public class ModuleRestController extends BaseRestController<ModuleRequest> {
 
-    private final ProjectRestService projectService;
+    private final ModuleRestService moduleService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(ProjectRequest request) {
+    public ResponseEntity<?> queryByOrg(ModuleRequest request) {
         
-        Page<ProjectResponse> projects = projectService.queryByOrg(request);
+        Page<ModuleResponse> modules = moduleService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(projects));
+        return ResponseEntity.ok(JsonResult.success(modules));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(ProjectRequest request) {
+    public ResponseEntity<?> queryByUser(ModuleRequest request) {
         
-        Page<ProjectResponse> projects = projectService.queryByUser(request);
+        Page<ModuleResponse> modules = moduleService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(projects));
+        return ResponseEntity.ok(JsonResult.success(modules));
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(ProjectRequest request) {
+    public ResponseEntity<?> create(ModuleRequest request) {
         
-        ProjectResponse project = projectService.queryByUid(request);
-        if (project == null) {
-            return ResponseEntity.ok(JsonResult.error("项目不存在"));
-        }
-        return ResponseEntity.ok(JsonResult.success(project));
+        ModuleResponse module = moduleService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(module));
     }
 
     @Override
-    public ResponseEntity<?> create(ProjectRequest request) {
+    public ResponseEntity<?> update(ModuleRequest request) {
         
-        ProjectResponse project = projectService.create(request);
+        ModuleResponse module = moduleService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(project));
+        return ResponseEntity.ok(JsonResult.success(module));
     }
 
     @Override
-    public ResponseEntity<?> update(ProjectRequest request) {
+    public ResponseEntity<?> delete(ModuleRequest request) {
         
-        ProjectResponse project = projectService.update(request);
-
-        return ResponseEntity.ok(JsonResult.success(project));
-    }
-
-    @Override
-    public ResponseEntity<?> delete(ProjectRequest request) {
-        
-        projectService.delete(request);
+        moduleService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
-    public Object export(ProjectRequest request, HttpServletResponse response) {
+    public Object export(ModuleRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    
+    @Override
+    public ResponseEntity<?> queryByUid(ModuleRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
     
 }

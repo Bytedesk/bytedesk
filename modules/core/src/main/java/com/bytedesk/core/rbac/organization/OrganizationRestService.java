@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 12:24:17
+ * @LastEditTime: 2025-03-08 22:38:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class OrganizationService extends BaseRestService<OrganizationEntity, OrganizationRequest, OrganizationResponse> {
+public class OrganizationRestService extends BaseRestService<OrganizationEntity, OrganizationRequest, OrganizationResponse> {
 
     private final AuthService authService;
 
@@ -187,6 +187,12 @@ public class OrganizationService extends BaseRestService<OrganizationEntity, Org
 
     public OrganizationResponse convertToResponse(OrganizationEntity organization) {
         return modelMapper.map(organization, OrganizationResponse.class);
+    }
+
+    @Override
+    public OrganizationResponse queryByUid(OrganizationRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     

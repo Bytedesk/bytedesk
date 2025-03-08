@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 23:50:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:37:07
+ * @LastEditTime: 2025-03-08 22:38:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,9 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/oauth/api/v1")
 @RequiredArgsConstructor
-public class OAuthController extends BaseRestController<OAuthRequest> {
+public class OAuthRestController extends BaseRestController<OAuthRequest> {
 
-    private final OAuthService oauthService;
+    private final OAuthRestService oauthService;
 
     @Override
     public ResponseEntity<?> queryByOrg(OAuthRequest request) {

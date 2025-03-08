@@ -24,7 +24,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRequest;
-import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TicketInitializer implements SmartInitializingSingleton {
 
-    private final AuthorityService authorityService;
+    private final AuthorityRestService authorityService;
 
     private final CategoryRestService categoryService;
 

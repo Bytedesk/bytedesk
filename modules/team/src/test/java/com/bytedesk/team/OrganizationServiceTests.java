@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
-import com.bytedesk.core.rbac.organization.OrganizationService;
+import com.bytedesk.core.rbac.organization.OrganizationRestService;
 
 @ExtendWith(MockitoExtension.class)
 public class OrganizationServiceTests {
@@ -34,7 +34,7 @@ public class OrganizationServiceTests {
     private OrganizationRepository organizationRepository;
 
     @InjectMocks
-    private OrganizationService organizationService;
+    private OrganizationRestService organizationService;
 
     @BeforeEach
     public void setUp() {

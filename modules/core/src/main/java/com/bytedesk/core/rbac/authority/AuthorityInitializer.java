@@ -36,7 +36,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AuthorityInitializer {
 
-    private AuthorityService authorityService;
+    private AuthorityRestService authorityService;
 
     public void init() {
 

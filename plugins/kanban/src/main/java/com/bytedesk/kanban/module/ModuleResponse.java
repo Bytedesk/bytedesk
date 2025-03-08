@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 21:17:38
+ * @LastEditTime: 2025-03-08 21:16:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,13 +11,14 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kanban.todo_list;
+package com.bytedesk.kanban.module;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kanban.task.TaskResponse;
+import com.bytedesk.kanban.todo_list.TodoListResponse;
+import com.bytedesk.team.member.MemberResponseSimple;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +33,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TodoListResponse extends BaseResponse {
+public class ModuleResponse extends BaseResponse {
 
     private String name;
 
@@ -40,17 +41,21 @@ public class TodoListResponse extends BaseResponse {
 
     private String type;
 
-    private String color;
+    // private String color;
 
     private Integer order;
 
-    private List<TaskResponse> tasks;
+    private List<MemberResponseSimple> members;
+
+    private List<TodoListResponse> todoLists;
 
     private String projectUid;
 
-    private String moduleUid;
+    private String userUid;
 
-    private LocalDateTime updatedAt;
+    private Boolean isPublic;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

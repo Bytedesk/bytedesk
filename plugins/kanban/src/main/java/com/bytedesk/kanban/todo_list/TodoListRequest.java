@@ -58,6 +58,8 @@ public class TodoListRequest extends BaseRequest {
 
     private String projectUid;
 
+    private String moduleUid;
+
     @Builder.Default
     private List<String> taskUids = new ArrayList<>();
 

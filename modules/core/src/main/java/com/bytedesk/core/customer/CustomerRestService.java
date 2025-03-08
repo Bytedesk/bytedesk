@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:12:29
+ * @LastEditTime: 2025-03-08 22:33:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.crm;
+package com.bytedesk.core.customer;
 
 import java.util.Optional;
 
@@ -102,6 +102,12 @@ public class CustomerRestService extends BaseRestService<CustomerEntity, Custome
     @Override
     public CustomerResponse convertToResponse(CustomerEntity entity) {
         return modelMapper.map(entity, CustomerResponse.class);
+    }
+
+    @Override
+    public CustomerResponse queryByUid(CustomerRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
 

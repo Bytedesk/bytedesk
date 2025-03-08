@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:04
+ * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 21:19:08
+ * @LastEditTime: 2025-03-08 21:15:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,16 +11,26 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kanban.project;
+package com.bytedesk.kanban.module;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.kanban.todo_list.TodoListEntity;
+import com.bytedesk.team.member.MemberEntity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,27 +38,33 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+@Entity
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectRequest extends BaseRequest {
+@EntityListeners({ModuleEntityListener.class})
+@Table(name = "bytedesk_plugin_kanban_module")
+public class ModuleEntity extends BaseEntity {
 
     private String name;
 
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
-    // @Builder.Default
-    // private String type = ProjectTypeEnum.CUSTOMER.name();
+    @Builder.Default
+    @Column(name = "module_type")
+    private String type = ModuleTypeEnum.CUSTOMER.name();
 
     @Builder.Default
+    @Column(name = "module_color", nullable = false)
     private String color = "red";
 
     @Builder.Default
-    private Integer order = 0;
+    @Column(name = "module_order", nullable = false)
+    private int order = 0;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
@@ -57,17 +73,19 @@ public class ProjectRequest extends BaseRequest {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
-    private List<String> memberUids = new ArrayList<>();
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    private List<MemberEntity> members = new ArrayList<>();
 
     @Builder.Default
-    private List<String> modulesUids = new ArrayList<>();
-
-    // private String parentUid;
-
-    // private String userUid;
+    @OneToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    private List<TodoListEntity> todoLists = new ArrayList<>();
 
     // 是否公开，公开后，对外匿名可见
     @Builder.Default
-    private Boolean isPublic = false;
+    @Column(name = "is_public")
+    private boolean isPublic = false;
 
+    private String projectUid;
+
+    private String userUid;
 }

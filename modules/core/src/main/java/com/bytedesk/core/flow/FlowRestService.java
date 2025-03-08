@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 17:31:15
+ * @LastEditTime: 2025-03-08 22:33:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -128,6 +128,12 @@ public class FlowRestService extends BaseRestService<FlowEntity, FlowRequest, Fl
     @Override
     public FlowResponse convertToResponse(FlowEntity entity) {
         return modelMapper.map(entity, FlowResponse.class);
+    }
+
+    @Override
+    public FlowResponse queryByUid(FlowRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 21:19:08
+ * @LastEditTime: 2025-03-08 21:15:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kanban.project;
+package com.bytedesk.kanban.module;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectRequest extends BaseRequest {
+public class ModuleRequest extends BaseRequest {
 
     private String name;
 
@@ -42,7 +42,7 @@ public class ProjectRequest extends BaseRequest {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     // @Builder.Default
-    // private String type = ProjectTypeEnum.CUSTOMER.name();
+    // private String type = ModuleTypeEnum.CUSTOMER.name();
 
     @Builder.Default
     private String color = "red";
@@ -60,11 +60,9 @@ public class ProjectRequest extends BaseRequest {
     private List<String> memberUids = new ArrayList<>();
 
     @Builder.Default
-    private List<String> modulesUids = new ArrayList<>();
+    private List<String> todoListUids = new ArrayList<>();
 
-    // private String parentUid;
-
-    // private String userUid;
+    private String projectUid;
 
     // 是否公开，公开后，对外匿名可见
     @Builder.Default
