@@ -15,7 +15,7 @@
     <version>${revision}</version>
 
     <modules>
-        <module>todo</module>
+        <!-- <module>todo</module> -->
     </modules>
 
     <dependencies>
