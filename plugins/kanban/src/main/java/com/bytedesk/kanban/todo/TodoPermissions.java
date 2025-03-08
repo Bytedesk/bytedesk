@@ -11,12 +11,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.tag;
+package com.bytedesk.kanban.todo;
 
-public class TagPermissions {
+public class TodoPermissions {
 
     public static final String TAG_PREFIX = "TAG_";
-    // Tag permissions
+    // Todo permissions
     public static final String TAG_CREATE = "hasAuthority('TAG_CREATE')";
     public static final String TAG_READ = "hasAuthority('TAG_READ')";
     public static final String TAG_UPDATE = "hasAuthority('TAG_UPDATE')";

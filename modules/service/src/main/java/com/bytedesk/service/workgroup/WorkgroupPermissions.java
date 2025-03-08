@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 17:07:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 21:55:49
+ * @LastEditTime: 2025-03-08 10:34:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,4 +22,8 @@ public class WorkgroupPermissions {
     public static final String WORKGROUP_UPDATE = "hasAuthority('WORKGROUP_UPDATE')";
     public static final String WORKGROUP_DELETE = "hasAuthority('WORKGROUP_DELETE')";
     public static final String WORKGROUP_EXPORT = "hasAuthority('WORKGROUP_EXPORT')";
+
+    // 
+    public static final String WORKGROUP_ANY = "hasAnyAuthority('WORKGROUP_CREATE', 'WORKGROUP_READ', 'WORKGROUP_UPDATE', 'WORKGROUP_EXPORT', 'WORKGROUP_DELETE')";
+    
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 10:51:26
+ * @LastEditTime: 2025-03-08 10:52:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kanban.report;
+package com.bytedesk.kanban.todo;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.enums.LevelEnum;
@@ -35,15 +35,15 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ReportEntityListener.class})
-@Table(name = "bytedesk_kanban_report")
-public class ReportEntity extends BaseEntity {
+@EntityListeners({TodoEntityListener.class})
+@Table(name = "bytedesk_kanban_todo")
+public class TodoEntity extends BaseEntity {
 
     private String name;
 
     @Builder.Default
-    @Column(name = "report_type", nullable = false)
-    private String type = ReportTypeEnum.CUSTOMER.name();
+    @Column(name = "todo_type", nullable = false)
+    private String type = TodoTypeEnum.CUSTOMER.name();
 
     @Builder.Default
     @Column(nullable = false)
