@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 11:04:21
+ * @LastEditTime: 2025-03-08 22:35:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ public class QuartzInitializer {
 
     private final QuartzRepository quartzRepository;
 
-    private final QuartzService quartzService;
+    private final QuartzRestService quartzRestService;
 
     @PostConstruct
     public void init() {
@@ -51,7 +51,7 @@ public class QuartzInitializer {
                 .triggerState("started")
                 .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
-                quartzService.create(quartzRequest);
+                quartzRestService.create(quartzRequest);
         
     }
     

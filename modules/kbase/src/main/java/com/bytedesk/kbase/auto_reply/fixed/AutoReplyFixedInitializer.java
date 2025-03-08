@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRequest;
-import com.bytedesk.core.rbac.authority.AuthorityService;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AutoReplyFixedInitializer implements SmartInitializingSingleton {
 
-    private final AuthorityService authorityService;
+    private final AuthorityRestService authorityService;
 
     @Override
     public void afterSingletonsInstantiated() {

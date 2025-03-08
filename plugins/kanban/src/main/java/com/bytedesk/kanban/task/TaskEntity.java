@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 16:14:38
+ * @LastEditTime: 2025-03-08 17:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,11 +46,11 @@ public class TaskEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "task_type", nullable = false)
+    @Column(name = "task_type")
     private String type = TaskTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "task_color", nullable = false)
+    @Column(name = "task_color")
     private String color = "red";
 
     @Builder.Default

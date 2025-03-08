@@ -84,5 +84,11 @@ public class EmailTemplateService extends BaseRestService<EmailTemplateEntity, E
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
+
+    @Override
+    public EmailTemplateResponse queryByUid(EmailTemplateRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
     
 }

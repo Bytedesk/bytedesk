@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:18:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 16:08:31
+ * @LastEditTime: 2025-03-08 22:33:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -140,6 +140,12 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
     @Override
     public IpWhitelistResponse convertToResponse(IpWhitelistEntity entity) {
         return modelMapper.map(entity, IpWhitelistResponse.class);
+    }
+
+    @Override
+    public IpWhitelistResponse queryByUid(IpWhitelistRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
     
 }

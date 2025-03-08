@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 18:16:43
+ * @LastEditTime: 2025-03-08 22:16:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,6 +66,15 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
         return queryByOrg(request);
     }
 
+    @Override
+    public ProjectResponse queryByUid(ProjectRequest request) {
+        Optional<ProjectEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
+        }
+        return null;
+    }
+
     @Cacheable(value = "project", key = "#uid", unless="#result==null")
     @Override
     public Optional<ProjectEntity> findByUid(String uid) {
@@ -80,7 +89,11 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
         }
         request.setUserUid(user.getUid());
         
-        ProjectEntity entity = modelMapper.map(request, ProjectEntity.class);
+        // ProjectEntity entity = modelMapper.map(request, ProjectEntity.class);
+        ProjectEntity entity = ProjectEntity.builder()
+            .name(request.getName())
+            .description(request.getDescription())
+        .build();
         entity.setUid(uidUtils.getUid());
         // 
         entity.setOrgUid(user.getOrgUid());

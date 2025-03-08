@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 @Tag(name = "organization - 组织", description = "organization apis")
 public class OrganizationRestController extends BaseRestController<OrganizationRequest> {
 
-    private final OrganizationService organizationService;
+    private final OrganizationRestService organizationService;
 
     @Override
     public ResponseEntity<?> queryByOrg(OrganizationRequest request) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 11:03:00
+ * @LastEditTime: 2025-03-08 22:34:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class QuartzService extends BaseRestService<QuartzEntity, QuartzRequest, QuartzResponse> {
+public class QuartzRestService extends BaseRestService<QuartzEntity, QuartzRequest, QuartzResponse> {
 
     private Scheduler scheduler;
 
@@ -250,6 +250,12 @@ public class QuartzService extends BaseRestService<QuartzEntity, QuartzRequest, 
         }
         //
         deleteByUid(quartzRequest.getUid());
+    }
+
+    @Override
+    public QuartzResponse queryByUid(QuartzRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     // //

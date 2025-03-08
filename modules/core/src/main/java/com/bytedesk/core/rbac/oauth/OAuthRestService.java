@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 23:50:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 18:14:55
+ * @LastEditTime: 2025-03-08 22:36:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 
 @Service
-public class OAuthService extends BaseRestService<OAuthEntity, OAuthRequest, OAuthResponse> {
+public class OAuthRestService extends BaseRestService<OAuthEntity, OAuthRequest, OAuthResponse> {
 
     @Override
     public Page<OAuthResponse> queryByOrg(OAuthRequest request) {
@@ -82,6 +82,12 @@ public class OAuthService extends BaseRestService<OAuthEntity, OAuthRequest, OAu
     public OAuthResponse convertToResponse(OAuthEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+    }
+
+    @Override
+    public OAuthResponse queryByUid(OAuthRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
     
 }

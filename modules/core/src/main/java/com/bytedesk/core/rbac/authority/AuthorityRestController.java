@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AuthorityRestController extends BaseRestController<AuthorityRequest> {
 
-    private final AuthorityService authorityService;
+    private final AuthorityRestService authorityService;
 
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_READ)
     @Override

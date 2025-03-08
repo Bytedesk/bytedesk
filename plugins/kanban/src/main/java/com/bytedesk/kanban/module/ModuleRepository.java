@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-06-27 11:12:55
+ * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 22:01:52
+ * @LastEditTime: 2024-10-24 18:20:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,28 +11,16 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.crm;
+package com.bytedesk.kanban.module;
 
-public enum CustomerTypeEnum {
-    
-    NEW_VISITOR("new_visitor", "新访客"),
-    POTENTIAL("potential", "潜在客户"),
-    FORMAL("formal", "正式客户"),
-    LOST("lost", "流失客户");
-    
-    private String code;
-    private String name;
-    
-    CustomerTypeEnum(String code, String name) {
-        this.code = code;
-        this.name = name;
-    }
-    
-    public String getCode() {
-        return code;
-    }
-    
-    public String getName() {
-        return name;
-    }
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+public interface ModuleRepository extends JpaRepository<ModuleEntity, Long>, JpaSpecificationExecutor<ModuleEntity> {
+
+    Optional<ModuleEntity> findByUid(String uid);
+
+    // Boolean existsByPlatform(String platform);
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 13:33:19
+ * @LastEditTime: 2025-03-08 22:31:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -171,6 +171,12 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     @Override
     public LlmProviderResponse convertToResponse(LlmProviderEntity entity) {
         return modelMapper.map(entity, LlmProviderResponse.class);
+    }
+
+    @Override
+    public LlmProviderResponse queryByUid(LlmProviderRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
 }
