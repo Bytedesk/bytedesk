@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:17:09
+ * @LastEditTime: 2025-03-09 00:00:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kanban.todo_list.TodoListEntity;
+import com.bytedesk.kanban.todo_list.TodoListRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, TaskResponse> {
 
     private final TaskRepository taskRepository;
+
+    private final TodoListRepository todoListRepository;
 
     private final ModelMapper modelMapper;
 
@@ -79,16 +83,22 @@ public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, Ta
             throw new RuntimeException("user not found");
         }
         request.setUserUid(user.getUid());
-        
+        // 
         TaskEntity entity = modelMapper.map(request, TaskEntity.class);
         entity.setUid(uidUtils.getUid());
-        // 
         entity.setOrgUid(user.getOrgUid());
-
+        // 
         TaskEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create task failed");
         }
+        // 
+        Optional<TodoListEntity> todoListOptional = todoListRepository.findByUid(request.getTodoListUid());
+        if (todoListOptional.isPresent()) {
+            todoListOptional.get().getTasks().add(savedEntity);
+            todoListRepository.save(todoListOptional.get());
+        }
+        // 
         return convertToResponse(savedEntity);
     }
 
