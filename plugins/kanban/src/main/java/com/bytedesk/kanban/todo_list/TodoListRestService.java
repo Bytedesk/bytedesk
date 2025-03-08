@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:27:17
+ * @LastEditTime: 2025-03-08 23:52:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kanban.module.ModuleEntity;
+import com.bytedesk.kanban.module.ModuleRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 public class TodoListRestService extends BaseRestService<TodoListEntity, TodoListRequest, TodoListResponse> {
 
     private final TodoListRepository todoRepository;
+
+    private final ModuleRepository moduleRepository;
 
     private final ModelMapper modelMapper;
 
@@ -82,13 +86,19 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
         
         TodoListEntity entity = modelMapper.map(request, TodoListEntity.class);
         entity.setUid(uidUtils.getUid());
-        // 
         entity.setOrgUid(user.getOrgUid());
-
+        // 
         TodoListEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create todo failed");
         }
+        // 
+        Optional<ModuleEntity> moduleOptional = moduleRepository.findByUid(request.getModuleUid());
+        if (moduleOptional.isPresent()) {
+            moduleOptional.get().getTodoLists().add(savedEntity);
+            moduleRepository.save(moduleOptional.get());
+        }
+        // 
         return convertToResponse(savedEntity);
     }
 
