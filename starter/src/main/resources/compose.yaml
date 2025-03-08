@@ -30,10 +30,33 @@ services:
     ports:
       - "21434:11434"
     volumes:
-      - ollama_data:/root/.ollama
+      - bytedesk_ollama_models:/root/.ollama
     environment:
-      - OLLAMA_MODELS=deepseek-r1:1.5b
-    command: serve
+      - OLLAMA_MODELS=qwen2.5:1.5b
+    # 添加健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # 添加初始化脚本
+    entrypoint: >
+      /bin/sh -c "
+      ollama serve &
+      sleep 10 &&
+      if ! ollama list | grep -q 'qwen2.5:1.5b'; then
+        echo 'Pulling qwen2.5:1.5b model...'
+        ollama pull qwen2.5:1.5b
+      else
+        echo 'qwen2.5:1.5b model already exists'
+      fi &&
+      if ! ollama list | grep -q 'deepseek-r1:1.5b'; then
+        echo 'Pulling deepseek-r1:1.5b model...'
+        ollama pull deepseek-r1:1.5b
+      else
+        echo 'deepseek-r1:1.5b model already exists'
+      fi &&
+      wait"
     networks:
       - bytedesk-network
 
@@ -44,7 +67,6 @@ services:
     ports:
       - "19090:9090"
     environment:
-      # FIXME: 修改为admin@email.com不起作用？
       - PROMETHEUS_ADMIN_USER=admin
       - PROMETHEUS_ADMIN_PASSWORD=admin
     command:
@@ -69,7 +91,6 @@ services:
     ports:
       - "13000:3000"
     environment:
-      # FIXME: 修改为admin@email.com不起作用？
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_AUTH_ANONYMOUS_ENABLED=false
@@ -85,28 +106,17 @@ services:
     depends_on:
       - bytedesk-prometheus
 
-  # bytedesk-app:
-  #   build: .
-  #   container_name: bytedesk-app
-  #   ports:
-  #     - "9003:9003"
-  #   environment:
-  #     - SPRING_PROFILES_ACTIVE=local
-  #   depends_on:
-  #     - bytedesk-mysql
-  #     - bytedesk-redis
-  #     - bytedesk-ollama
-  #     - bytedesk-prometheus
-  #     - bytedesk-grafana
-  #   networks:
-  #     - bytedesk-network
-
 volumes:
   mysql_data:
+    name: bytedesk_mysql_data
   redis_data:
-  ollama_data:
+    name: bytedesk_redis_data
+  bytedesk_ollama_models:
+    name: bytedesk_ollama_models
   prometheus_data:
+    name: bytedesk_prometheus_data
   grafana_data:
+    name: bytedesk_grafana_data
 
 networks:
   bytedesk-network:
