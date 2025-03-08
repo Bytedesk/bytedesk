@@ -15,7 +15,8 @@
     <version>${revision}</version>
 
     <modules>
-        <!-- <module>todo</module> -->
+        <module>kanban</module>
+        <!-- <module>remote</module> -->
     </modules>
 
     <dependencies>
