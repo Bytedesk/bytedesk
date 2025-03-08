@@ -14,6 +14,7 @@
 package com.bytedesk.kanban.report;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -40,6 +41,9 @@ import lombok.experimental.Accessors;
 public class ReportEntity extends BaseEntity {
 
     private String name;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
     @Column(name = "report_type", nullable = false)

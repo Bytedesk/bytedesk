@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 12:12:40
+ * @LastEditTime: 2025-03-08 12:32:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.kanban.panel;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -42,12 +43,19 @@ public class PanelEntity extends BaseEntity {
     private String name;
 
     @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
+
+    @Builder.Default
     @Column(name = "panel_type", nullable = false)
     private String type = PanelTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(name = "panel_color", nullable = false)
     private String color = "red";
+
+    @Builder.Default
+    @Column(name = "panel_order", nullable = false)
+    private int order = 0;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
