@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:27:25
+ * @LastEditTime: 2025-03-08 22:57:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,10 +84,13 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
         ModuleEntity entity = ModuleEntity.builder()
             .name(request.getName())
             .description(request.getDescription())
+            .projectUid(request.getProjectUid())
         .build();
         entity.setUid(uidUtils.getUid());
-        // 
+        entity.setUserUid(user.getUid());
         entity.setOrgUid(user.getOrgUid());
+        // 
+        
 
         ModuleEntity savedEntity = save(entity);
         if (savedEntity == null) {
