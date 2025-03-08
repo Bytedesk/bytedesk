@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:57:37
+ * @LastEditTime: 2025-03-08 23:24:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kanban.project.ProjectEntity;
+import com.bytedesk.kanban.project.ProjectRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleRequest, ModuleResponse> {
 
     private final ModuleRepository moduleRepository;
+
+    private final ProjectRepository projectRepository;
 
     private final ModelMapper modelMapper;
 
@@ -62,11 +66,11 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
             throw new RuntimeException("user not found");
         }
         request.setUserUid(user.getUid());
-        // 
+        //
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "module", key = "#uid", unless="#result==null")
+    @Cacheable(value = "module", key = "#uid", unless = "#result==null")
     @Override
     public Optional<ModuleEntity> findByUid(String uid) {
         return moduleRepository.findByUid(uid);
@@ -79,23 +83,28 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
             throw new RuntimeException("user not found");
         }
         request.setUserUid(user.getUid());
-        
+
         // ModuleEntity entity = modelMapper.map(request, ModuleEntity.class);
         ModuleEntity entity = ModuleEntity.builder()
-            .name(request.getName())
-            .description(request.getDescription())
-            .projectUid(request.getProjectUid())
-        .build();
+                .name(request.getName())
+                .description(request.getDescription())
+                .projectUid(request.getProjectUid())
+                .build();
         entity.setUid(uidUtils.getUid());
         entity.setUserUid(user.getUid());
         entity.setOrgUid(user.getOrgUid());
-        // 
-        
-
+        //
         ModuleEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create module failed");
         }
+        //
+        Optional<ProjectEntity> projectOptional = projectRepository.findByUid(request.getProjectUid());
+        if (projectOptional.isPresent()) {
+            projectOptional.get().getModules().add(savedEntity);
+            projectRepository.save(projectOptional.get());
+        }
+        //
         return convertToResponse(savedEntity);
     }
 
@@ -111,8 +120,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
                 throw new RuntimeException("Update module failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("Module not found");
         }
     }
@@ -123,11 +131,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
      * backoff: 重试延迟，multiplier是延迟倍数
      * recover: 当重试次数用完后的回调方法
      */
-    @Retryable(
-        value = { Exception.class },
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
+    @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
     public ModuleEntity save(ModuleEntity entity) {
         log.info("Attempting to save module: {}", entity.getName());
@@ -151,8 +155,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
             optional.get().setDeleted(true);
             save(optional.get());
             // moduleRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("Module not found");
         }
     }
@@ -163,7 +166,8 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ModuleEntity entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            ModuleEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
@@ -178,5 +182,5 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
-    
+
 }
