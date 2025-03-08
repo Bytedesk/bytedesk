@@ -75,10 +75,15 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=false
       - GF_AUTH_BASIC_ENABLED=true
       - GF_AUTH_DISABLE_LOGIN_FORM=false
+      # Provisioning settings
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - bytedesk-network
+    depends_on:
+      - bytedesk-prometheus
 
   # bytedesk-app:
   #   build: .
