@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 17:10:23
+ * @LastEditTime: 2025-03-08 11:35:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,41 +29,55 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 
 ## Introduction
 
-### Team IM
+### [TeamIM](./modules/team/readme.md)
 
 - Multi-level organizational structure
 - Role management
 - Permission management
 - ...
 
-### Customer Service
+### [Customer Service](./modules/service/readme.md)
 
 - Support multiple channels
 - multiple routing strategies, and detailed assessment indicators
 - Seating workbench
 - ...
 
-### Knowledge Base
+### [Knowledge Base](./modules/kbase/readme.md)
 
 - Internal Docs
 - HelpCenter
 - FAQ
 
-### Ticket
+### [Ticket](./modules/ticket/readme.md)
 
 - Ticket management
 - Ticket SLA management
 - Ticket statistics and reports
 - ...
 
-### AI Chat
+### [AI Chat](./modules/ai/readme.md)
 
 - Chat with Ollama/DeepSeek/ZhipuAI/...
 - Chat with Knowledge base(RAG)
 - Function calling
 - Mcp
 
-### Social Group
+### project kanban
+
+- todo list
+- daily/weekly report
+- statistics
+- ...
+
+### workflow
+
+- form
+- process
+- ticket process
+- ...
+
+### [Social Group](./modules/social/readme.md)
 
 - like Discord
 - ...

@@ -17,21 +17,21 @@
 
 ## 介绍
 
-### 企业IM
+### [企业IM](./modules/team/readme.zh.md)
 
 - 局域网即时通讯
 - 企业成员管理
 - 聊天记录监控
 - ...
 
-### 全渠道客服
+### [全渠道客服](./modules/service/readme.zh.md)
 
 - 多渠道接入
 - 人工客服
 - 客服Agent智能体，对接自有数据，自动执行操作
 - ...
 
-### 知识库
+### [知识库](./modules/kbase/readme.zh.md)
 
 - 对接大模型
 - 自定义知识库
@@ -39,21 +39,35 @@
 - Mcp
 - ...
 
-### 工单系统
+### [工单系统](./modules/ticket/readme.zh.md)
 
 - 工单管理
 - 工单SLA管理
 - 工单统计和报表
 - ...
 
-### AI 大模型
+### [AI大模型](./modules/ai/readme.zh.md)
 
 - Ollama/DeepSeek/ZhipuAI/...
 - 智能体
 - 工作流
 - ...
 
-### 社交群组
+### 项目看板
+
+- 待办todo卡片
+- 日报/周报
+- 统计
+- ...
+
+### 工作流
+
+- 自定义表单
+- 自定义流程
+- 工单流程可视化
+- ...
+
+### [社交群组](./modules/social/readme.zh.md)
 
 - 类似 Discord
 - ...
