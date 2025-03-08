@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 15:57:14
+ * @LastEditTime: 2025-03-08 16:12:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.kanban.todo_list.TodoListEntity;
 import com.bytedesk.team.member.MemberEntity;
 
 import jakarta.persistence.CascadeType;
@@ -28,6 +29,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -73,6 +75,10 @@ public class ProjectEntity extends BaseEntity {
     @Builder.Default
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<MemberEntity> members = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    private List<TodoListEntity> todoLists = new ArrayList<>();
 
     private String parentUid;
 

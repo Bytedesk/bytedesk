@@ -59,6 +59,9 @@ public class ProjectRequest extends BaseRequest {
     @Builder.Default
     private List<String> memberUids = new ArrayList<>();
 
+    @Builder.Default
+    private List<String> todoListUids = new ArrayList<>();
+
     private String parentUid;
 
     // private String userUid;
