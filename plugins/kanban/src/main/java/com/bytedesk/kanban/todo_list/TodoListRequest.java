@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 12:33:58
+ * @LastEditTime: 2025-03-08 16:18:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kanban.todo_list;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
@@ -52,6 +55,11 @@ public class TodoListRequest extends BaseRequest {
 
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
+
+    private String projectUid;
+
+    @Builder.Default
+    private List<String> taskUids = new ArrayList<>();
 
     // private String userUid;
 }

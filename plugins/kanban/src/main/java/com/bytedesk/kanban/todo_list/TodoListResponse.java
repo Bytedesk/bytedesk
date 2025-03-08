@@ -14,8 +14,10 @@
 package com.bytedesk.kanban.todo_list;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.kanban.task.TaskResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,6 +43,10 @@ public class TodoListResponse extends BaseResponse {
     private String color;
 
     private Integer order;
+
+    private List<TaskResponse> tasks;
+
+    private LocalDateTime updatedAt;
 
     private LocalDateTime createdAt;
 }
