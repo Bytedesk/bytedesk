@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:31:55
+ * @LastEditTime: 2025-03-08 22:53:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -642,12 +642,12 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 });
                 // 只在前两次调用zhipuaiChatService
                 if (count[0] < MAX_CALLS) {
-                    springAIZhipuaiChatService.ifPresent(service -> {
-                        String qaPairs = service.generateFaqPairsAsync(file.getContent());
-                        log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
-                        faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
-                        count[0]++;
-                    });
+                    // springAIZhipuaiChatService.ifPresent(service -> {
+                    //     String qaPairs = service.generateFaqPairsAsync(file.getContent());
+                    //     log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
+                    //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
+                    //     count[0]++;
+                    // });
                 }
             }
             // 设置redis key 为已初始化
