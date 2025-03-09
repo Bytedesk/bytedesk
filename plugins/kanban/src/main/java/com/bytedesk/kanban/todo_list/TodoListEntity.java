@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 23:59:14
+ * @LastEditTime: 2025-03-09 22:18:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.kanban.project.ProjectEntity;
 import com.bytedesk.kanban.task.TaskEntity;
 
 import jakarta.persistence.CascadeType;

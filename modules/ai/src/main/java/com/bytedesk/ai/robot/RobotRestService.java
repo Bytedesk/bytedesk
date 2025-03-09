@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:53:31
+ * @LastEditTime: 2025-03-09 22:25:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
-import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.ai.utils.demo.bytedesk.SpringAIBytedeskService;
 import com.bytedesk.ai.utils.demo.utils.FileContent;
@@ -95,9 +94,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     // private final Optional<OllamaChatService> ollamaChatService;
 
-    private final Optional<SpringAIZhipuaiService> springAIZhipuaiChatService;
+    // private final Optional<SpringAIZhipuaiService> springAIZhipuaiChatService;
 
-    private final FaqRestService faqRestService;
+    // private final FaqRestService faqRestService;
 
     // private final ActionRestService actionRestService;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 11:51:03
+ * @LastEditTime: 2025-03-09 22:24:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,9 +23,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
-import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.core.thread.ThreadUtils;
-import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 public class MessageUtils {

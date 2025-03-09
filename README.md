@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 10:32:34
+ * @LastEditTime: 2025-03-09 22:07:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,6 +62,12 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 - Chat with Knowledge base(RAG)
 - Function calling
 - Mcp
+
+### [Voice Of Customer](./modules/voc/readme.md)
+
+- feedback
+- survey
+- ...
 
 ### [project kanban](./plugins/kanban/readme.md)
 

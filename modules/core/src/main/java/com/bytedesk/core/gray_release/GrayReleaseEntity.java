@@ -1,6 +1,5 @@
 package com.bytedesk.core.gray_release;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
