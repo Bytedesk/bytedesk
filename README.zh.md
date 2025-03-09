@@ -53,6 +53,13 @@
 - 工作流
 - ...
 
+### [客户之声](./modules/voc/readme.zh.md)
+
+- 意见反馈
+- 服务投诉
+- 问卷调查
+- ...
+
 ### [项目看板](./plugins/kanban/readme.zh.md)
 
 - 待办todo卡片
