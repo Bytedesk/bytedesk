@@ -53,7 +53,7 @@
 - 工作流
 - ...
 
-### 项目看板
+### [项目看板](./plugins/kanban/readme.zh.md)
 
 - 待办todo卡片
 - 日报/周报
