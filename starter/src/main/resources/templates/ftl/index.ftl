@@ -81,8 +81,8 @@ Listed course START -->
 						<img src="assets/images/element/engineering.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="#" class="stretched-link">企业知识库</a></h5>
-					<span class="mb-0">AI写作助手，自动撰写内容，内部知识库管理、文档管理、AI问答</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">企业知识库/帮助中心</a></h5>
+					<span class="mb-0">AI写作助手，AI知识库问答，自动撰写内容，内部知识库管理、文档管理、对外知识库、帮助文档、内容公告</span>
 				</div>
 			</div>
 
@@ -93,8 +93,8 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/profit.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="#" class="stretched-link">帮助中心</a></h5>
-					<span class="mb-0">AI知识库问答，对外知识库、帮助文档、内容公告</span>
+					<h5 class="mb-1"><a href="#" class="stretched-link">客户之声</a></h5>
+					<span class="mb-0">AI回复助手，社交媒体评论抓取、第三方平台评论同步、意见反馈、服务投诉、调查问卷</span>
 				</div>
 			</div>
 
