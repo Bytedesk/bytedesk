@@ -159,7 +159,7 @@ public class KbaseEntity extends BaseEntity {
     // @CollectionTable(name = "bytedesk_kbase_tags")
     // private List<String> tags = new ArrayList<>();
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     @Builder.Default
     private boolean showChat = false;

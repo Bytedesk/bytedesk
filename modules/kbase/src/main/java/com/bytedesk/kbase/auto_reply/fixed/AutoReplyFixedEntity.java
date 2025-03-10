@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
@@ -58,7 +59,7 @@ public class AutoReplyFixedEntity extends BaseEntity {
     private boolean enabled = true;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     // 回复次数
     @Builder.Default

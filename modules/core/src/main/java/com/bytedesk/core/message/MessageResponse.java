@@ -13,8 +13,6 @@
  */
 package com.bytedesk.core.message;
 
-import java.time.LocalDateTime;
-
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;

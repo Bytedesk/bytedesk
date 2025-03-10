@@ -47,7 +47,7 @@ public class ArticleRequest extends BaseRequest {
     // private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
     
     private LocalDateTime startDate;
 

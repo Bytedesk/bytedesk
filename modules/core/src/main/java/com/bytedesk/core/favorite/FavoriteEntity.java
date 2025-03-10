@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 10:51:45
+ * @LastEditTime: 2025-03-10 16:24:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.core.favorite;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -54,7 +55,7 @@ public class FavoriteEntity extends BaseEntity {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     private String userUid;
 }

@@ -132,7 +132,7 @@ public class KbaseRequest extends BaseRequest {
     // private String categoryUid;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
     
     private LocalDateTime startDate;
 
