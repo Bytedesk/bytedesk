@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-10 13:02:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 13:06:14
+ * @LastEditTime: 2025-03-10 17:52:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,7 @@ public class SsoOAuth2UserService extends DefaultOAuth2UserService {
                 name = (String) attributes.get("name");
                 break;
             case "wecom":
-                String userId = (String) attributes.get("userid");
+                // String userId = (String) attributes.get("userid");
                 // TODO: 调用企业微信API获取用户详细信息
                 break;
             default:
