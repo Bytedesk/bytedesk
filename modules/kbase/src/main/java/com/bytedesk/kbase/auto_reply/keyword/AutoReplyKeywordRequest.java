@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 16:24:03
+ * @LastEditTime: 2025-03-10 19:29:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,10 +45,10 @@ public class AutoReplyKeywordRequest extends BaseRequest {
     // private String reply;
     
     @Builder.Default
-    private AutoReplyKeywordMatchEnum matchType = AutoReplyKeywordMatchEnum.EXACT;
+    private String matchType = AutoReplyKeywordMatchEnum.EXACT.name();
 
     @Builder.Default
-    private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
+    private String contentType = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
     private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 11:43:52
+ * @LastEditTime: 2025-03-10 19:23:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -54,8 +52,7 @@ public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEnt
 
     @Override
     public Page<AutoReplyFixedResponse> queryByOrg(AutoReplyFixedRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<AutoReplyFixedEntity> specification = AutoReplyFixedSpecification.search(request);
         Page<AutoReplyFixedEntity> page = autoReplyRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
@@ -64,12 +61,12 @@ public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEnt
     @Override
     public Page<AutoReplyFixedResponse> queryByUser(AutoReplyFixedRequest request) {
         UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
         request.setUserUid(user.getUid());
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-        Specification<AutoReplyFixedEntity> specification = AutoReplyFixedSpecification.search(request);
-        Page<AutoReplyFixedEntity> page = autoReplyRepository.findAll(specification, pageable);
-        return page.map(this::convertToResponse);
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "auto_reply", key="#uid", unless = "#result == null")
