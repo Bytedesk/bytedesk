@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:32:13
+ * @LastEditTime: 2025-03-10 14:37:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -133,7 +133,7 @@ public class ActionRestService extends BaseRestService<ActionEntity, ActionReque
         if (action.getUser() != null) {
             actionExcel.setUser(action.getUser().getNickname());
         }
-        actionExcel.setCreatedAt(BdDateUtils.formatDatetimeToString(action.getCreatedAt()));
+        actionExcel.setCreatedAt(action.getCreatedAt());
         return actionExcel;
     }
 

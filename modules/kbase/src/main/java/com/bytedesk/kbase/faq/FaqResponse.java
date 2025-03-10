@@ -82,9 +82,9 @@ public class FaqResponse extends BaseResponse {
     // 是否是快捷路径
     private Boolean isShortcutPath;
 
-    private String orgUid;
+    // private String orgUid;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }

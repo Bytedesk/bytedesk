@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 13:33:37
+ * @LastEditTime: 2025-03-10 13:53:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,9 @@
 package com.bytedesk.core.base;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -24,9 +27,17 @@ public abstract class BaseResponse implements Serializable {
 
     protected String uid;
 
-    // 导致报错： com.google.protobuf.InvalidProtocolBufferException: Cannot find field: orgUid
-    // in message Thread
-    // at com.bytedesk.core.utils.MessageConvertUtils.toProtoBean(MessageConvertUtils.java:19)
-    // at com.bytedesk.core.message.MessageEventListener.onMessageJsonEvent(MessageEventListener.java:55)
-    // private String orgUid;
+    private String orgUid;
+
+    private LocalDateTime createdAt;
+    
+    private LocalDateTime updatedAt;
+
+    public String getCreatedAt() {
+        return BdDateUtils.formatDatetimeToString(createdAt);
+    }
+
+    public String getUpdatedAt() {
+        return BdDateUtils.formatDatetimeToString(updatedAt);
+    }
 }

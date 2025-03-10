@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class SplitResponse extends BaseResponse {
@@ -58,7 +58,7 @@ public class SplitResponse extends BaseResponse {
     // kbaseEntity 的 uid
     private String kbUid;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }

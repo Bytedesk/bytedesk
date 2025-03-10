@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportResponse extends BaseResponse {
@@ -40,5 +40,5 @@ public class ReportResponse extends BaseResponse {
 
     private String color;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 }

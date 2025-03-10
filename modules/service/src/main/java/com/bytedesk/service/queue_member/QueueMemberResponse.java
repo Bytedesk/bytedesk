@@ -111,8 +111,8 @@ public class QueueMemberResponse extends BaseResponse {
 
     private String client;  // 客户端类型
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
     
 }

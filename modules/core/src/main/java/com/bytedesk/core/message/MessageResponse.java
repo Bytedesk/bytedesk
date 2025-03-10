@@ -67,7 +67,7 @@ public class MessageResponse extends BaseResponse {
 	// 是否是访客
     private Boolean visitor;
 
-	private LocalDateTime createdAt;
+	// private LocalDateTime createdAt;
 
-	private LocalDateTime updatedAt;
+	// private LocalDateTime updatedAt;
 }

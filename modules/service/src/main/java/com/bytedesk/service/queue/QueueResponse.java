@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueueResponse extends BaseResponse {
@@ -52,7 +52,7 @@ public class QueueResponse extends BaseResponse {
 
     private Integer avgSolveTime;  // 平均解决时间(秒)
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }

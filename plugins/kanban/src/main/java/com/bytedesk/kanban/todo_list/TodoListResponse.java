@@ -29,7 +29,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class TodoListResponse extends BaseResponse {
@@ -50,7 +50,7 @@ public class TodoListResponse extends BaseResponse {
 
     private String moduleUid;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 }

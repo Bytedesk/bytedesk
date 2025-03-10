@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuickReplyResponse extends BaseResponse {
@@ -55,11 +55,11 @@ public class QuickReplyResponse extends BaseResponse {
 
     private String kbUid;
     
-    private String orgUid;
+    // private String orgUid;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 
     private String agentUid;
     

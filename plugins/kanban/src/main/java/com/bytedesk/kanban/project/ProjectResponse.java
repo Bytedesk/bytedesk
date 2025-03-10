@@ -55,7 +55,7 @@ public class ProjectResponse extends BaseResponse {
 
     private Boolean isPublic;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }
