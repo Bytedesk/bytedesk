@@ -22,7 +22,8 @@ declare interface ButtonConfig {
     show?: boolean;
     icon?: string;
     text?: string;
-    size?: number;
+    width?: number;
+    height?: number;
     onClick?: () => void;
 }
 
@@ -58,6 +59,8 @@ declare class BytedeskWeb {
     private bubble;
     private window;
     private inviteDialog;
+    private contextMenu;
+    private hideTimeout;
     private isVisible;
     private isDragging;
     private windowState;
@@ -86,6 +89,9 @@ declare class BytedeskWeb {
     hideButton(): void;
     showBubble(): void;
     hideBubble(): void;
+    private createContextMenu;
+    private showContextMenu;
+    private hideContextMenu;
 }
 export default BytedeskWeb;
 

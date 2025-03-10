@@ -22,7 +22,8 @@ declare interface ButtonConfig {
     show?: boolean;
     icon?: string;
     text?: string;
-    size?: number;
+    width?: number;
+    height?: number;
     onClick?: () => void;
 }
 

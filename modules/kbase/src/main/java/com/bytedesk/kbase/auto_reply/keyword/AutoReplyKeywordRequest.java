@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 19:29:19
+ * @LastEditTime: 2025-03-10 21:01:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.message.MessageTypeEnum;
+// import com.bytedesk.core.constant.BytedeskConsts;
+// import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,14 +44,11 @@ public class AutoReplyKeywordRequest extends BaseRequest {
     private List<String> replyList = new ArrayList<>();
     // private String reply;
     
-    @Builder.Default
-    private String matchType = AutoReplyKeywordMatchEnum.EXACT.name();
+    private String matchType;
 
-    @Builder.Default
-    private String contentType = MessageTypeEnum.TEXT.name();
+    private String contentType;
 
-    @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    private String tags;
 
     // 回复次数
     @Builder.Default
@@ -61,8 +58,7 @@ public class AutoReplyKeywordRequest extends BaseRequest {
 
     private LocalDateTime endDate;
 
-    @Builder.Default
-    private Boolean enabled = true;
+    private Boolean enabled;
 
     @Builder.Default
     private Boolean isTransfer = false; // 是否转人工
