@@ -1,17 +1,19 @@
-var k = Object.defineProperty;
-var z = (m, t, e) => t in m ? k(m, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : m[t] = e;
-var r = (m, t, e) => z(m, typeof t != "symbol" ? t + "" : t, e);
-class M {
+var L = Object.defineProperty;
+var z = (p, t, e) => t in p ? L(p, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : p[t] = e;
+var c = (p, t, e) => z(p, typeof t != "symbol" ? t + "" : t, e);
+class R {
   constructor(t) {
-    r(this, "config");
-    r(this, "bubble", null);
-    r(this, "window", null);
-    r(this, "inviteDialog", null);
-    r(this, "isVisible", !1);
-    r(this, "isDragging", !1);
-    r(this, "windowState", "normal");
-    r(this, "loopCount", 0);
-    r(this, "loopTimer", null);
+    c(this, "config");
+    c(this, "bubble", null);
+    c(this, "window", null);
+    c(this, "inviteDialog", null);
+    c(this, "contextMenu", null);
+    c(this, "hideTimeout", null);
+    c(this, "isVisible", !1);
+    c(this, "isDragging", !1);
+    c(this, "windowState", "normal");
+    c(this, "loopCount", 0);
+    c(this, "loopTimer", null);
     this.config = {
       ...this.getDefaultConfig(),
       ...t
@@ -21,7 +23,7 @@ class M {
     return {
       isDebug: !1,
       isPreload: !1,
-      baseUrl: "https://www.weiyuai.cn/chat",
+      baseUrl: "https://cdn.weiyuai.cn/chat",
       placement: "bottom-right",
       marginBottom: 20,
       marginSide: 20,
@@ -40,8 +42,8 @@ class M {
       },
       buttonConfig: {
         show: !0,
-        // icon: '👋',
-        // text: '需要帮助吗？',
+        width: 60,
+        height: 60,
         onClick: () => {
           this.showChat();
         }
@@ -79,7 +81,7 @@ class M {
     }, this.config.inviteConfig.delay || 3e3);
   }
   createBubble() {
-    var a, o, h, p, c, g, x, b, E, T, I, D;
+    var h, m, r, f, w, u, E, T, M, I, k, D;
     const t = document.createElement("div");
     t.style.cssText = `
       position: fixed;
@@ -92,10 +94,10 @@ class M {
       z-index: 9999;
     `;
     let e = null;
-    if ((a = this.config.bubbleConfig) != null && a.show) {
+    if ((h = this.config.bubbleConfig) != null && h.show) {
       e = document.createElement("div"), e.style.cssText = `
-        background: ${((o = this.config.theme) == null ? void 0 : o.mode) === "dark" ? "#1f2937" : "white"};
-        color: ${((h = this.config.theme) == null ? void 0 : h.mode) === "dark" ? "#e5e7eb" : "#1f2937"};
+        background: ${((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#1f2937" : "white"};
+        color: ${((r = this.config.theme) == null ? void 0 : r.mode) === "dark" ? "#e5e7eb" : "#1f2937"};
         padding: 12px 16px;
         border-radius: 8px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -112,12 +114,12 @@ class M {
         align-items: center;
         gap: 8px;
       `;
-      const u = document.createElement("span");
-      u.textContent = ((p = this.config.bubbleConfig) == null ? void 0 : p.icon) || "", u.style.fontSize = "20px", l.appendChild(u);
-      const w = document.createElement("div"), f = document.createElement("div");
-      f.textContent = ((c = this.config.bubbleConfig) == null ? void 0 : c.title) || "", f.style.fontWeight = "bold", f.style.color = ((g = this.config.theme) == null ? void 0 : g.mode) === "dark" ? "#e5e7eb" : "#1f2937", f.style.marginBottom = "4px", w.appendChild(f);
+      const b = document.createElement("span");
+      b.textContent = ((f = this.config.bubbleConfig) == null ? void 0 : f.icon) || "", b.style.fontSize = "20px", l.appendChild(b);
+      const x = document.createElement("div"), g = document.createElement("div");
+      g.textContent = ((w = this.config.bubbleConfig) == null ? void 0 : w.title) || "", g.style.fontWeight = "bold", g.style.color = ((u = this.config.theme) == null ? void 0 : u.mode) === "dark" ? "#e5e7eb" : "#1f2937", g.style.marginBottom = "4px", x.appendChild(g);
       const d = document.createElement("div");
-      d.textContent = ((x = this.config.bubbleConfig) == null ? void 0 : x.subtitle) || "", d.style.fontSize = "0.9em", d.style.color = ((b = this.config.theme) == null ? void 0 : b.mode) === "dark" ? "#9ca3af" : "#4b5563", w.appendChild(d), l.appendChild(w), e.appendChild(l);
+      d.textContent = ((E = this.config.bubbleConfig) == null ? void 0 : E.subtitle) || "", d.style.fontSize = "0.9em", d.style.color = ((T = this.config.theme) == null ? void 0 : T.mode) === "dark" ? "#9ca3af" : "#4b5563", x.appendChild(d), l.appendChild(x), e.appendChild(l);
       const y = document.createElement("div");
       y.style.cssText = `
         position: absolute;
@@ -125,7 +127,7 @@ class M {
         ${this.config.placement === "bottom-left" ? "left: 24px" : "right: 24px"};
         width: 12px;
         height: 12px;
-        background: ${((E = this.config.theme) == null ? void 0 : E.mode) === "dark" ? "#1f2937" : "white"};
+        background: ${((M = this.config.theme) == null ? void 0 : M.mode) === "dark" ? "#1f2937" : "white"};
         transform: rotate(45deg);
         box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
       `;
@@ -136,21 +138,21 @@ class M {
         ${this.config.placement === "bottom-left" ? "left: 18px" : "right: 18px"};
         width: 24px;
         height: 12px;
-        background: ${((T = this.config.theme) == null ? void 0 : T.mode) === "dark" ? "#1f2937" : "white"};
+        background: ${((I = this.config.theme) == null ? void 0 : I.mode) === "dark" ? "#1f2937" : "white"};
       `, e.appendChild(y), e.appendChild(C), t.appendChild(e), setTimeout(() => {
         e && (e.style.opacity = "1", e.style.transform = "translateY(0)");
       }, 500);
     }
     this.bubble = document.createElement("button");
-    const i = this.config.buttonConfig || {}, n = i.size || 60;
+    const n = this.config.buttonConfig || {}, i = n.width || 60, o = n.height || 60, a = Math.min(i, o) / 2;
     this.bubble.style.cssText = `
-      background-color: ${(I = this.config.theme) == null ? void 0 : I.backgroundColor};
-      width: ${n}px;
-      height: ${n}px;
-      border-radius: ${n / 2}px;
+      background-color: ${(k = this.config.theme) == null ? void 0 : k.backgroundColor};
+      width: ${i}px;
+      height: ${o}px;
+      border-radius: ${a}px;
       border: none;
       cursor: ${this.config.draggable ? "move" : "pointer"};
-      display: ${i.show === !1 ? "none" : "flex"};
+      display: ${n.show === !1 ? "none" : "flex"};
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
@@ -165,9 +167,9 @@ class M {
       align-items: center;
       justify-content: center;
       gap: 8px;
-    `, i.icon) {
+    `, n.icon) {
       const l = document.createElement("span");
-      l.textContent = i.icon, l.style.fontSize = `${n * 0.4}px`, s.appendChild(l);
+      l.textContent = n.icon, l.style.fontSize = `${o * 0.4}px`, s.appendChild(l);
     } else {
       const l = document.createElement("div");
       l.innerHTML = `
@@ -177,11 +179,11 @@ class M {
         </svg>
       `, s.appendChild(l);
     }
-    if (i.text) {
+    if (n.text) {
       const l = document.createElement("span");
-      l.textContent = i.text, l.style.cssText = `
+      l.textContent = n.text, l.style.cssText = `
         color: ${((D = this.config.theme) == null ? void 0 : D.textColor) || "#ffffff"};
-        font-size: ${n * 0.25}px;
+        font-size: ${o * 0.25}px;
         white-space: nowrap;
       `, s.appendChild(l);
     }
@@ -190,13 +192,13 @@ class M {
     }), this.bubble.addEventListener("mouseleave", () => {
       this.bubble.style.transform = "scale(1)";
     }), t.appendChild(this.bubble), this.config.draggable) {
-      let l = 0, u = 0, w = 0, f = 0;
+      let l = 0, b = 0, x = 0, g = 0;
       this.bubble.addEventListener("mousedown", (d) => {
-        d.button === 0 && (this.isDragging = !0, l = d.clientX, u = d.clientY, w = t.offsetLeft, f = t.offsetTop, t.style.transition = "none");
+        d.button === 0 && (this.isDragging = !0, l = d.clientX, b = d.clientY, x = t.offsetLeft, g = t.offsetTop, t.style.transition = "none");
       }), document.addEventListener("mousemove", (d) => {
         if (!this.isDragging) return;
         d.preventDefault();
-        const y = d.clientX - l, C = d.clientY - u, v = w + y, $ = f + C, S = window.innerHeight - t.offsetHeight;
+        const y = d.clientX - l, C = d.clientY - b, v = x + y, $ = g + C, S = window.innerHeight - t.offsetHeight;
         v <= window.innerWidth / 2 ? (t.style.left = `${Math.max(0, v)}px`, t.style.right = "auto", this.config.placement = "bottom-left") : (t.style.right = `${Math.max(0, window.innerWidth - v - t.offsetWidth)}px`, t.style.left = "auto", this.config.placement = "bottom-right"), t.style.bottom = `${Math.min(Math.max(0, window.innerHeight - $ - t.offsetHeight), S)}px`;
       }), document.addEventListener("mouseup", () => {
         this.isDragging && (this.isDragging = !1, t.style.transition = "all 0.3s ease", this.config.marginSide = parseInt(
@@ -210,7 +212,11 @@ class M {
         const l = this.bubble.messageElement;
         l instanceof HTMLElement && (l.style.display = "none"), this.showChat();
       }
-    }), this.bubble.messageElement = e, document.body.appendChild(t);
+    }), this.bubble.messageElement = e, document.body.appendChild(t), this.bubble.addEventListener("contextmenu", (l) => {
+      this.showContextMenu(l);
+    }), document.addEventListener("click", () => {
+      this.hideContextMenu();
+    });
   }
   getSupportText() {
     const t = this.config.locale || "zh-cn", e = {
@@ -222,9 +228,9 @@ class M {
     return e[t] || e["zh-cn"];
   }
   createChatWindow() {
-    var o, h, p, c, g, x;
+    var s, h, m, r, f, w;
     this.window = document.createElement("div");
-    const t = window.innerWidth <= 768, e = window.innerWidth, i = window.innerHeight, n = Math.min(((o = this.config.window) == null ? void 0 : o.width) || e * 0.9, e * 0.9), s = Math.min(((h = this.config.window) == null ? void 0 : h.height) || i * 0.9, i * 0.9);
+    const t = window.innerWidth <= 768, e = window.innerWidth, n = window.innerHeight, i = Math.min(((s = this.config.window) == null ? void 0 : s.width) || e * 0.9, e * 0.9), o = Math.min(((h = this.config.window) == null ? void 0 : h.height) || n * 0.9, n * 0.9);
     t ? this.window.style.cssText = `
         position: fixed;
         left: 0;
@@ -236,19 +242,19 @@ class M {
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
-        transition: all ${(p = this.config.animation) == null ? void 0 : p.duration}ms ${(c = this.config.animation) == null ? void 0 : c.type};
+        transition: all ${(m = this.config.animation) == null ? void 0 : m.duration}ms ${(r = this.config.animation) == null ? void 0 : r.type};
       ` : this.window.style.cssText = `
         position: fixed;
         ${this.config.placement === "bottom-right" ? "right" : "left"}: ${this.config.marginSide}px;
         bottom: ${this.config.marginBottom}px;
-        width: ${n}px;
-        height: ${s}px;
+        width: ${i}px;
+        height: ${o}px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
         display: none;
         overflow: hidden;
         z-index: 10000;
-        transition: all ${(g = this.config.animation) == null ? void 0 : g.duration}ms ${(x = this.config.animation) == null ? void 0 : x.type};
+        transition: all ${(f = this.config.animation) == null ? void 0 : f.duration}ms ${(w = this.config.animation) == null ? void 0 : w.type};
       `;
     const a = document.createElement("iframe");
     if (a.style.cssText = `
@@ -256,8 +262,8 @@ class M {
       height: ${this.config.showSupport ? "calc(100% - 30px)" : "100%"};
       border: none;
     `, a.src = this.generateChatUrl(), console.log("iframe.src: ", a.src), this.window.appendChild(a), this.config.showSupport) {
-      const b = document.createElement("div");
-      b.style.cssText = `
+      const u = document.createElement("div");
+      u.style.cssText = `
         height: 20px;
         display: flex;
         align-items: center;
@@ -265,7 +271,8 @@ class M {
         color: #666;
         font-size: 12px;
         line-height: 30px;
-      `, b.innerHTML = `
+        background: #ffffff;
+      `, u.innerHTML = `
         <a href="https://ai.bytedesk.com" 
            target="_blank" 
            style="
@@ -277,20 +284,20 @@ class M {
            ">
           ${this.getSupportText()}
         </a>
-      `, this.window.appendChild(b);
+      `, this.window.appendChild(u);
     }
     document.body.appendChild(this.window);
   }
   generateChatUrl(t = !1, e = "messages") {
     console.log("this.config: ", this.config, e);
-    const i = new URLSearchParams();
-    return Object.entries(this.config.chatConfig || {}).forEach(([n, s]) => {
-      i.append(n, String(s));
-    }), Object.entries(this.config.browseConfig || {}).forEach(([n, s]) => {
-      i.append(n, String(s));
-    }), Object.entries(this.config.theme || {}).forEach(([n, s]) => {
-      i.append(n, String(s));
-    }), i.append("lang", this.config.locale || "zh-cn"), t && i.append("preload", "1"), `${this.config.baseUrl}?${i.toString()}`;
+    const n = new URLSearchParams();
+    return Object.entries(this.config.chatConfig || {}).forEach(([i, o]) => {
+      n.append(i, String(o));
+    }), Object.entries(this.config.browseConfig || {}).forEach(([i, o]) => {
+      n.append(i, String(o));
+    }), Object.entries(this.config.theme || {}).forEach(([i, o]) => {
+      n.append(i, String(o));
+    }), n.append("lang", this.config.locale || "zh-cn"), t && n.append("preload", "1"), `${this.config.baseUrl}?${n.toString()}`;
   }
   setupMessageListener() {
     window.addEventListener("message", (t) => {
@@ -330,28 +337,28 @@ class M {
   showChat() {
     var t, e;
     if (this.window || this.createChatWindow(), this.window) {
-      const i = window.innerWidth <= 768;
-      if (this.window.style.display = "block", this.setupResizeListener(), i && this.window && (this.window.style.transform = "translateY(100%)", requestAnimationFrame(() => {
+      const n = window.innerWidth <= 768;
+      if (this.window.style.display = "block", this.setupResizeListener(), n && this.window && (this.window.style.transform = "translateY(100%)", requestAnimationFrame(() => {
         this.window && (this.window.style.transform = "translateY(0)");
       })), this.isVisible = !0, this.bubble) {
         this.bubble.style.display = "none";
-        const n = this.bubble.messageElement;
-        n instanceof HTMLElement && (n.style.display = "none");
+        const i = this.bubble.messageElement;
+        i instanceof HTMLElement && (i.style.display = "none");
       }
     }
     this.hideInviteDialog(), (e = (t = this.config).onShowChat) == null || e.call(t);
   }
   hideChat() {
-    var t, e, i, n, s;
+    var t, e, n, i, o;
     if (this.window) {
       if (window.innerWidth <= 768 ? (this.window.style.transform = "translateY(100%)", setTimeout(() => {
         this.window && (this.window.style.display = "none");
       }, ((t = this.config.animation) == null ? void 0 : t.duration) || 300)) : this.window.style.display = "none", this.isVisible = !1, this.bubble) {
         this.bubble.style.display = ((e = this.config.buttonConfig) == null ? void 0 : e.show) === !1 ? "none" : "inline-flex";
-        const o = this.bubble.messageElement;
-        o instanceof HTMLElement && (o.style.display = ((i = this.config.bubbleConfig) == null ? void 0 : i.show) === !1 ? "none" : "block");
+        const s = this.bubble.messageElement;
+        s instanceof HTMLElement && (s.style.display = ((n = this.config.bubbleConfig) == null ? void 0 : n.show) === !1 ? "none" : "block");
       }
-      (s = (n = this.config).onHideChat) == null || s.call(n);
+      (o = (i = this.config).onHideChat) == null || o.call(i);
     }
   }
   minimizeWindow() {
@@ -362,10 +369,10 @@ class M {
   }
   setupResizeListener() {
     const t = () => {
-      var a, o;
+      var a, s;
       if (!this.window || !this.isVisible) return;
-      const i = window.innerWidth <= 768, n = window.innerWidth, s = window.innerHeight;
-      if (i)
+      const n = window.innerWidth <= 768, i = window.innerWidth, o = window.innerHeight;
+      if (n)
         Object.assign(this.window.style, {
           left: "0",
           bottom: "0",
@@ -377,13 +384,13 @@ class M {
           borderBottomRightRadius: "0"
         });
       else {
-        let h = this.windowState === "maximized" ? n : Math.min(((a = this.config.window) == null ? void 0 : a.width) || n * 0.9, n * 0.9), p = this.windowState === "maximized" ? s : Math.min(((o = this.config.window) == null ? void 0 : o.height) || s * 0.9, s * 0.9);
-        const c = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, g = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
+        let h = this.windowState === "maximized" ? i : Math.min(((a = this.config.window) == null ? void 0 : a.width) || i * 0.9, i * 0.9), m = this.windowState === "maximized" ? o : Math.min(((s = this.config.window) == null ? void 0 : s.height) || o * 0.9, o * 0.9);
+        const r = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, f = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
         Object.assign(this.window.style, {
           width: `${h}px`,
-          height: `${p}px`,
-          right: c ? `${c}px` : "auto",
-          left: g ? `${g}px` : "auto",
+          height: `${m}px`,
+          right: r ? `${r}px` : "auto",
+          left: f ? `${f}px` : "auto",
           bottom: `${this.config.marginBottom}px`,
           borderRadius: this.windowState === "maximized" ? "0" : "12px"
         });
@@ -397,11 +404,11 @@ class M {
   destroy() {
     var e;
     const t = (e = this.bubble) == null ? void 0 : e.parentElement;
-    t && document.body.contains(t) && (document.body.removeChild(t), this.bubble = null), this.window && document.body.contains(this.window) && (document.body.removeChild(this.window), this.window = null), window.removeEventListener("resize", this.setupResizeListener.bind(this)), this.loopTimer && (window.clearTimeout(this.loopTimer), this.loopTimer = null), this.inviteDialog && document.body.contains(this.inviteDialog) && (document.body.removeChild(this.inviteDialog), this.inviteDialog = null);
+    t && document.body.contains(t) && (document.body.removeChild(t), this.bubble = null), this.window && document.body.contains(this.window) && (document.body.removeChild(this.window), this.window = null), window.removeEventListener("resize", this.setupResizeListener.bind(this)), this.loopTimer && (window.clearTimeout(this.loopTimer), this.loopTimer = null), this.inviteDialog && document.body.contains(this.inviteDialog) && (document.body.removeChild(this.inviteDialog), this.inviteDialog = null), this.contextMenu && document.body.contains(this.contextMenu) && (document.body.removeChild(this.contextMenu), this.contextMenu = null), this.hideTimeout && (clearTimeout(this.hideTimeout), this.hideTimeout = null);
   }
   createInviteDialog() {
-    var s, a;
-    if (!((s = this.config.inviteConfig) != null && s.show)) return;
+    var o, a;
+    if (!((o = this.config.inviteConfig) != null && o.show)) return;
     if (this.inviteDialog = document.createElement("div"), this.inviteDialog.style.cssText = `
       position: fixed;
       top: 50%;
@@ -416,11 +423,11 @@ class M {
       max-width: 300px;
       text-align: center;
     `, this.config.inviteConfig.icon) {
-      const o = document.createElement("div");
-      o.style.cssText = `
+      const s = document.createElement("div");
+      s.style.cssText = `
         font-size: 32px;
         margin-bottom: 12px;
-      `, o.textContent = this.config.inviteConfig.icon, this.inviteDialog.appendChild(o);
+      `, s.textContent = this.config.inviteConfig.icon, this.inviteDialog.appendChild(s);
     }
     const t = document.createElement("div");
     t.style.cssText = `
@@ -433,30 +440,30 @@ class M {
       gap: 10px;
       justify-content: center;
     `;
-    const i = document.createElement("button");
-    i.textContent = "开始对话", i.style.cssText = `
+    const n = document.createElement("button");
+    n.textContent = "开始对话", n.style.cssText = `
       padding: 8px 16px;
       background: ${((a = this.config.theme) == null ? void 0 : a.backgroundColor) || "#0066FF"};
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-    `, i.onclick = () => {
-      var o, h;
-      this.hideInviteDialog(), this.showChat(), (h = (o = this.config.inviteConfig) == null ? void 0 : o.onAccept) == null || h.call(o);
+    `, n.onclick = () => {
+      var s, h;
+      this.hideInviteDialog(), this.showChat(), (h = (s = this.config.inviteConfig) == null ? void 0 : s.onAccept) == null || h.call(s);
     };
-    const n = document.createElement("button");
-    n.textContent = "稍后再说", n.style.cssText = `
+    const i = document.createElement("button");
+    i.textContent = "稍后再说", i.style.cssText = `
       padding: 8px 16px;
       background: #f5f5f5;
       color: #666;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-    `, n.onclick = () => {
-      var o, h;
-      this.hideInviteDialog(), (h = (o = this.config.inviteConfig) == null ? void 0 : o.onReject) == null || h.call(o), this.handleInviteLoop();
-    }, e.appendChild(i), e.appendChild(n), this.inviteDialog.appendChild(e), document.body.appendChild(this.inviteDialog);
+    `, i.onclick = () => {
+      var s, h;
+      this.hideInviteDialog(), (h = (s = this.config.inviteConfig) == null ? void 0 : s.onReject) == null || h.call(s), this.handleInviteLoop();
+    }, e.appendChild(n), e.appendChild(i), this.inviteDialog.appendChild(e), document.body.appendChild(this.inviteDialog);
   }
   showInviteDialog() {
     var t, e;
@@ -464,11 +471,11 @@ class M {
   }
   hideInviteDialog() {
     var t, e;
-    this.inviteDialog && (this.inviteDialog.style.display = "none", (e = (t = this.config.inviteConfig) == null ? void 0 : t.onClose) == null || e.call(t));
+    console.log("hideInviteDialog before"), this.inviteDialog && (this.inviteDialog.style.display = "none", (e = (t = this.config.inviteConfig) == null ? void 0 : t.onClose) == null || e.call(t), console.log("hideInviteDialog after"));
   }
   handleInviteLoop() {
-    const { loop: t, loopDelay: e = 3e3, loopCount: i = 1 / 0 } = this.config.inviteConfig || {};
-    !t || this.loopCount >= i - 1 || (this.loopTimer && window.clearTimeout(this.loopTimer), this.loopTimer = window.setTimeout(() => {
+    const { loop: t, loopDelay: e = 3e3, loopCount: n = 1 / 0 } = this.config.inviteConfig || {};
+    !t || this.loopCount >= n - 1 || (this.loopTimer && window.clearTimeout(this.loopTimer), this.loopTimer = window.setTimeout(() => {
       this.loopCount++, this.showInviteDialog();
     }, e));
   }
@@ -494,7 +501,68 @@ class M {
       }, 300));
     }
   }
+  createContextMenu() {
+    this.contextMenu = document.createElement("div"), this.contextMenu.style.cssText = `
+      position: fixed;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 4px 0;
+      display: none;
+      z-index: 10000;
+      min-width: 150px;
+    `;
+    const t = [
+      {
+        text: "隐藏按钮和气泡",
+        onClick: () => {
+          this.hideButton(), this.hideBubble();
+        }
+      },
+      {
+        text: "隐藏按钮和气泡5分钟",
+        onClick: () => {
+          this.hideButton(), this.hideBubble(), this.hideTimeout && clearTimeout(this.hideTimeout), this.hideTimeout = setTimeout(() => {
+            this.showButton(), this.showBubble();
+          }, 5 * 60 * 1e3);
+        }
+      }
+    ];
+    t.forEach((e, n) => {
+      const i = document.createElement("div");
+      if (i.style.cssText = `
+        padding: 8px 16px;
+        cursor: pointer;
+        color: #333;
+        font-size: 14px;
+        
+        &:hover {
+          background: #f5f5f5;
+        }
+      `, i.textContent = e.text, i.onclick = () => {
+        e.onClick(), this.hideContextMenu();
+      }, this.contextMenu && this.contextMenu.appendChild(i), n < t.length - 1) {
+        const o = document.createElement("div");
+        o.style.cssText = `
+          height: 1px;
+          background: #eee;
+          margin: 4px 0;
+        `, this.contextMenu && this.contextMenu.appendChild(o);
+      }
+    }), document.body.appendChild(this.contextMenu);
+  }
+  showContextMenu(t) {
+    if (t.preventDefault(), this.contextMenu || this.createContextMenu(), this.contextMenu) {
+      this.contextMenu.style.visibility = "hidden", this.contextMenu.style.display = "block";
+      const e = this.contextMenu.offsetWidth, n = this.contextMenu.offsetHeight;
+      let i = t.clientX, o = t.clientY;
+      i + e > window.innerWidth && (i = i - e), o + n > window.innerHeight && (o = o - n), i = Math.max(0, i), o = Math.max(0, o), this.contextMenu.style.left = `${i}px`, this.contextMenu.style.top = `${o}px`, this.contextMenu.style.visibility = "visible";
+    }
+  }
+  hideContextMenu() {
+    this.contextMenu && (this.contextMenu.style.display = "none");
+  }
 }
 export {
-  M as default
+  R as default
 };
