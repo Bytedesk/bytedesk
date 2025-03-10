@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 07:29:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 12:11:36
+ * @LastEditTime: 2025-03-10 19:34:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,12 +54,7 @@ public class AutoReplyKeywordEntity extends BaseEntity {
     @Convert(converter = AutoReplyKeywordListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> keywordList = new ArrayList<>();
-
-    // @Builder.Default
-    // @ElementCollection
-    // @CollectionTable(name = "kb_keyword_question")
-    // private List<String> keywordList = new ArrayList<>();
-
+    
     // 支持多个回答，随机返回一个，分隔符
     // TODO: 支持末尾添加随机字符，避免完全一样的重复回答
     @Builder.Default
@@ -68,13 +63,9 @@ public class AutoReplyKeywordEntity extends BaseEntity {
     private List<String> replyList = new ArrayList<>();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private AutoReplyKeywordMatchEnum matchType = AutoReplyKeywordMatchEnum.EXACT;
     private String matchType = AutoReplyKeywordMatchEnum.EXACT.name();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
     private String contentType = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
