@@ -114,10 +114,10 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private int downCount = 0;
 
-    // 是否有效
+    // 是否启用，状态：启用/禁用
     @Builder.Default
-    @Column(name = "is_valid", nullable = false)
-    private boolean valid = true;
+    @Column(name = "is_enabled")
+    private boolean enabled = true;
 
     // 有效开始日期
     private LocalDateTime startDate;
@@ -171,12 +171,6 @@ public class FaqEntity extends BaseEntity {
     public void down() {
         this.setDownCount(this.downCount + 1);
     }
-
-    /**
-     * 状态：启用/禁用
-     */
-    @Builder.Default
-    private boolean enabled = true;
 
     /**
      * 排序权重

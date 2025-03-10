@@ -77,11 +77,11 @@ public class AutoReplyKeywordEntity extends BaseEntity {
     private String contentType = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    private String tags = "[]";
-
-    @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = true;
+
+    @Builder.Default
+    private String tags = "[]";
 
     @Builder.Default
     private boolean isTransfer = false; // 是否是 转人工 关键词

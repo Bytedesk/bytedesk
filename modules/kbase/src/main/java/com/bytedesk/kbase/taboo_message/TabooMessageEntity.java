@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-02-22 16:12:30
+ * @Date: 2024-02-22 16:51:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 15:10:16
+ * @LastEditTime: 2025-03-10 15:31:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,16 +11,18 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.quick_reply;
+package com.bytedesk.kbase.taboo_message;
 
 import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +32,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 常用语-快捷回复
+ * 敏感词
  */
 @Entity
 @Data
@@ -39,18 +41,21 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_kbase_quick_reply")
-public class QuickReplyEntity extends BaseEntity {
+@EntityListeners({TabooMessageEntityListener.class})
+@Table(name = "bytedesk_kbase_taboo_message")
+public class TabooMessageEntity extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
-
-    private String title;
-
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    // 快捷键
-    private String shortCut;
+    @Builder.Default
+    @Column(name = "taboo_message_type", nullable = false)
+    private String type = MessageTypeEnum.TEXT.name();
+
+    @Builder.Default
+    private String level = LevelEnum.ORGANIZATION.name();
+
+    @Builder.Default
+    private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
     private String tags = "[]";
@@ -59,28 +64,13 @@ public class QuickReplyEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
-    @Builder.Default
-    @Column(name = "reply_type", nullable = false)
-    private String type = MessageTypeEnum.TEXT.name();
-
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
-
-    // 被点击次数
-    @Builder.Default
-    private int clickCount = 0;
-
     // 有效开始日期
     private LocalDateTime startDate;
 
     // 有效结束日期
     private LocalDateTime endDate;
 
-    private String categoryUid; // 文章分类
+    private String categoryUid;
 
     private String kbUid; // 对应知识库
-
-    // 某人工客服快捷回复知识库
-    private String agentUid;
-
 }
