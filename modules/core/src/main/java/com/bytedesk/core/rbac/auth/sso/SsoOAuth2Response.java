@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-10 23:20:36
+ * @Date: 2024-07-10 23:50:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:10:36
+ * @LastEditTime: 2024-08-26 06:19:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,34 +11,24 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.oauth;
+package com.bytedesk.core.rbac.auth.sso;
 
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.rbac.user.UserResponse;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-// github：https://www.ruanyifeng.com/blog/2019/04/github-oauth.html
-// 第三方授权登录
-@Entity
 @Data
 @Builder
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-@Table(name = "bytedesk_core_oauth")
-public class OAuthEntity extends BaseEntity {
-
+@AllArgsConstructor
+public class SsoOAuth2Response extends BaseResponse {
+    
     private String openId;
 
     private String unionId;
@@ -49,13 +39,8 @@ public class OAuthEntity extends BaseEntity {
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
-    // private OAuthProviderEnum provider = OAuthProviderEnum.GITHUB;
-    private String provider = OAuthProviderEnum.GITHUB.name();
+    // private SsoOAuth2ProviderEnum provider = SsoOAuth2ProviderEnum.GITHUB;
+    private String provider = SsoOAuth2ProviderEnum.GITHUB.name();
 
-    // private String scope;
-    // private String tokenType;
-    // private Integer expiresIn;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UserEntity user;
+    private UserResponse user;
 }
