@@ -17,7 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserCreateEvent;
+import com.bytedesk.core.rbac.user.event.UserCreateEvent;
 import com.bytedesk.core.thread.ThreadRestService;
 
 import lombok.AllArgsConstructor;

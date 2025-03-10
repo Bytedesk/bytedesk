@@ -22,7 +22,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserLogoutEvent;
+import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
 import com.bytedesk.core.topic.event.TopicCreateEvent;
 import com.bytedesk.core.topic.event.TopicUpdateEvent;

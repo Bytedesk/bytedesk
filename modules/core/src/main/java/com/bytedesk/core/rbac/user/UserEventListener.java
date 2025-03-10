@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.rbac.user.event.UserCreateEvent;
+import com.bytedesk.core.rbac.user.event.UserUpdateEvent;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicUtils;
