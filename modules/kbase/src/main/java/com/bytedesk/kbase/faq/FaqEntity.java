@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 12:13:02
+ * @LastEditTime: 2025-03-10 16:21:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -96,7 +97,7 @@ public class FaqEntity extends BaseEntity {
      * 标签，多个标签用逗号分隔
      */
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     // 被浏览次数
     // @Builder.Default
@@ -113,6 +114,10 @@ public class FaqEntity extends BaseEntity {
     // 点踩次数
     @Builder.Default
     private int downCount = 0;
+
+    // 当用户点踩的时候，是否显示转人工按钮
+    @Builder.Default
+    private boolean downShowTransferToAgentButton = true;
 
     // 是否启用，状态：启用/禁用
     @Builder.Default

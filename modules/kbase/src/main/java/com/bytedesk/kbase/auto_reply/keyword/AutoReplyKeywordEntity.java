@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
@@ -81,7 +82,7 @@ public class AutoReplyKeywordEntity extends BaseEntity {
     private boolean enabled = true;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     @Builder.Default
     private boolean isTransfer = false; // 是否是 转人工 关键词

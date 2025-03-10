@@ -15,6 +15,7 @@ package com.bytedesk.kanban.task;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -58,7 +59,7 @@ public class TaskEntity extends BaseEntity {
     private int order = 0;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     // 是否完成
     @Builder.Default

@@ -65,7 +65,7 @@ public class CommentEntity extends BaseEntity {
     private String replyToUser;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     // 评论文章
     private String articleUid;

@@ -16,6 +16,7 @@ package com.bytedesk.kbase.quick_reply;
 import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -53,7 +54,7 @@ public class QuickReplyEntity extends BaseEntity {
     private String shortCut;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     @Builder.Default
     @Column(name = "is_enabled")

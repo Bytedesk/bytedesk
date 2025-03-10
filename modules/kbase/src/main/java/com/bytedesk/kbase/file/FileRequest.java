@@ -16,6 +16,7 @@ package com.bytedesk.kbase.file;
 import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.kbase.split.SplitStatusEnum;
@@ -50,7 +51,7 @@ public class FileRequest extends BaseRequest {
     // private int docsCount;
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
     
     private LocalDateTime startDate;
 

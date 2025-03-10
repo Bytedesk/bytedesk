@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.utils.StringListConverter;
@@ -66,7 +67,7 @@ public class TextEntity extends BaseEntity {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
-    private String tags = "[]";
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     // 有效开始日期
     private LocalDateTime startDate;
