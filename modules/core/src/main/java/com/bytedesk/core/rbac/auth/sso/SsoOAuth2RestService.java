@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 23:50:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:36:21
+ * @LastEditTime: 2025-03-10 13:18:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.oauth;
+package com.bytedesk.core.rbac.auth.sso;
 
 import java.util.Optional;
 
@@ -22,40 +22,40 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 
 @Service
-public class OAuthRestService extends BaseRestService<OAuthEntity, OAuthRequest, OAuthResponse> {
+public class SsoOAuth2RestService extends BaseRestService<SsoOAuth2Entity, SsoOAuth2Request, SsoOAuth2Response> {
 
     @Override
-    public Page<OAuthResponse> queryByOrg(OAuthRequest request) {
+    public Page<SsoOAuth2Response> queryByOrg(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
     @Override
-    public Page<OAuthResponse> queryByUser(OAuthRequest request) {
+    public Page<SsoOAuth2Response> queryByUser(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Override
-    public Optional<OAuthEntity> findByUid(String uid) {
+    public Optional<SsoOAuth2Entity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
 
     @Override
-    public OAuthResponse create(OAuthRequest request) {
+    public SsoOAuth2Response create(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
     @Override
-    public OAuthResponse update(OAuthRequest request) {
+    public SsoOAuth2Response update(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     @Override
-    public OAuthEntity save(OAuthEntity entity) {
+    public SsoOAuth2Entity save(SsoOAuth2Entity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
@@ -67,25 +67,25 @@ public class OAuthRestService extends BaseRestService<OAuthEntity, OAuthRequest,
     }
 
     @Override
-    public void delete(OAuthRequest entity) {
+    public void delete(SsoOAuth2Request entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, OAuthEntity entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SsoOAuth2Entity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public OAuthResponse convertToResponse(OAuthEntity entity) {
+    public SsoOAuth2Response convertToResponse(SsoOAuth2Entity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 
     @Override
-    public OAuthResponse queryByUid(OAuthRequest request) {
+    public SsoOAuth2Response queryByUid(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }

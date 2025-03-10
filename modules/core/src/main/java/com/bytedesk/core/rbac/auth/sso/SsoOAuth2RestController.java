@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.oauth;
+package com.bytedesk.core.rbac.auth.sso;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -25,52 +25,52 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/oauth/api/v1")
+@RequestMapping("/api/v1/sso2/oauth2")
 @RequiredArgsConstructor
-public class OAuthRestController extends BaseRestController<OAuthRequest> {
+public class SsoOAuth2RestController extends BaseRestController<SsoOAuth2Request> {
 
-    private final OAuthRestService oauthService;
+    private final SsoOAuth2RestService oauthService;
 
     @Override
-    public ResponseEntity<?> queryByOrg(OAuthRequest request) {
+    public ResponseEntity<?> queryByOrg(SsoOAuth2Request request) {
         
-        Page<OAuthResponse> oauths = oauthService.queryByOrg(request);
+        Page<SsoOAuth2Response> oauths = oauthService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(oauths));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(OAuthRequest request) {
+    public ResponseEntity<?> queryByUser(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
     @Override
-    public ResponseEntity<?> create(OAuthRequest request) {
+    public ResponseEntity<?> create(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
     @Override
-    public ResponseEntity<?> update(OAuthRequest request) {
+    public ResponseEntity<?> update(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     @Override
-    public ResponseEntity<?> delete(OAuthRequest request) {
+    public ResponseEntity<?> delete(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public Object export(OAuthRequest request, HttpServletResponse response) {
+    public Object export(SsoOAuth2Request request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(OAuthRequest request) {
+    public ResponseEntity<?> queryByUid(SsoOAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }

@@ -11,11 +11,11 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.oauth;
+package com.bytedesk.core.rbac.auth.sso;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface OAuthRepository extends JpaRepository<OAuthEntity, Long>, JpaSpecificationExecutor<OAuthEntity> {
+public interface SsoOAuth2Repository extends JpaRepository<SsoOAuth2Entity, Long>, JpaSpecificationExecutor<SsoOAuth2Entity> {
     
 }

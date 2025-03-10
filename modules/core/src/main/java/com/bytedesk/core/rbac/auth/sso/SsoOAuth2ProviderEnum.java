@@ -1,6 +1,6 @@
-package com.bytedesk.core.rbac.oauth;
+package com.bytedesk.core.rbac.auth.sso;
 
-public enum OAuthProviderEnum {
+public enum SsoOAuth2ProviderEnum {
     GITHUB,
     GOOGLE,
     FACEBOOK,
