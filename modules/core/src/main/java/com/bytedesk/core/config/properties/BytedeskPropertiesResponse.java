@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 20:45:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 11:43:53
+ * @LastEditTime: 2025-03-10 09:51:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,19 +27,10 @@ public class BytedeskPropertiesResponse implements Serializable {
     private String version; 
 
     // 
-    // // 是否启用自定义配置：name, logo, description
-    // private Boolean customEnabled;
-    // private String name;
-    // private String logo;
-    // private String description;
-    // private String version;
-    // // 是否启用右下角聊天
-    // private Boolean rightCornerChatEnabled;
-    
-    // 
     private Custom custom;
     private Admin admin;
     private Features features;
+    private Testing testing;
 
     @Data
     public static class Custom {
@@ -58,6 +49,16 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean allowRegister;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
+    }
+
+    @Data
+    private static class  Testing {
+        private Boolean enabled = false;
+        private Integer accountCount = 300;
+        private String accountUsername = "test";
+        private String accountPassword = "password";
+        private Boolean disableCaptcha = true;
+        private Boolean disableIpFilter = true;
     }
 
     @Data

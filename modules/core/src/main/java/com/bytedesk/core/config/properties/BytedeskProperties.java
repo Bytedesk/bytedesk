@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 11:43:44
+ * @LastEditTime: 2025-03-10 09:52:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -122,25 +122,14 @@ public class BytedeskProperties {
 
     private String edition = Edition.COMMUNITY.name().toLowerCase();
 
-    // // 是否启用自定义配置：name, logo, description
-    // private Boolean customEnabled = false;
-
-    // private String name;
-
-    // private String version;
-
-    // private String logo;
-
-    // private String description;
-
-    // // 是否启用右下角聊天
-    // private Boolean rightCornerChatEnabled = true;
-
     // 自定义配置
     private Custom custom = new Custom();
 
     // 管理员配置
     private Admin admin = new Admin();
+
+    // 性能测试配置
+    private Testing testing = new Testing();
     
     // 组织配置
     private Organization organization = new Organization();
@@ -209,6 +198,15 @@ public class BytedeskProperties {
         private Boolean forceValidateEmail;
     }
 
+    @Data
+    private static class  Testing {
+        private Boolean enabled = false;
+        private Integer accountCount = 300;
+        private String accountUsername = "test";
+        private String accountPassword = "password";
+        private Boolean disableCaptcha = true;
+        private Boolean disableIpFilter = true;
+    }
     @Data 
     public static class Organization {
         private String name;
