@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 16:21:44
+ * @LastEditTime: 2025-03-10 17:41:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,15 +56,11 @@ public class FaqEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 问题
-     */
+    // 问题
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String question;
 
-    /**
-     * 答案
-     */
+    // 答案
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String answer;
 
@@ -78,7 +74,6 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> relatedFaqs = new ArrayList<>();
-
 
     @Builder.Default
     @Column(name = "faq_type", nullable = false)
@@ -143,25 +138,25 @@ public class FaqEntity extends BaseEntity {
 
     private String userUid;
 
-    // 是否是常见问题/
-    @Builder.Default
-    private boolean isCommon = false;
+    // // 是否是常见问题/
+    // @Builder.Default
+    // private boolean isCommon = false;
 
-    // 是否是快捷按钮
-    @Builder.Default
-    private boolean isShortcut = false;
+    // // 是否是快捷按钮
+    // @Builder.Default
+    // private boolean isShortcut = false;
 
-    // 是否是猜你相问
-    @Builder.Default
-    private boolean isGuess = false;
+    // // 是否是猜你相问
+    // @Builder.Default
+    // private boolean isGuess = false;
 
-    // 是否是热门问题
-    @Builder.Default
-    private boolean isHot = false;
+    // // 是否是热门问题
+    // @Builder.Default
+    // private boolean isHot = false;
 
-    // 是否是快捷路径
-    @Builder.Default
-    private boolean isShortcutPath = false;
+    // // 是否是快捷路径
+    // @Builder.Default
+    // private boolean isShortcutPath = false;
 
     // vector store id
     @Builder.Default

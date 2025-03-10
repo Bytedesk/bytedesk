@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 16:17:58
+ * @LastEditTime: 2025-03-10 17:40:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,8 @@ public class FaqResponse extends BaseResponse {
 
     private String type;
 
+    private String status;
+
     // private Integer viewCount;
 
     private Integer clickCount;
@@ -70,20 +72,20 @@ public class FaqResponse extends BaseResponse {
 
     private String docUid; // 对应文档
 
-    // 是否是常见问题/
-    private Boolean isCommon;
+    // // 是否是常见问题/
+    // private Boolean isCommon;
 
-    // 是否是快捷按钮
-    private Boolean isShortcut;
+    // // 是否是快捷按钮
+    // private Boolean isShortcut;
 
-    // 是否是猜你相问
-    private Boolean isGuess;
+    // // 是否是猜你相问
+    // private Boolean isGuess;
 
-    // 是否是热门问题
-    private Boolean isHot;
+    // // 是否是热门问题
+    // private Boolean isHot;
 
-    // 是否是快捷路径
-    private Boolean isShortcutPath;
+    // // 是否是快捷路径
+    // private Boolean isShortcutPath;
 
     // private String orgUid;
 
