@@ -14,6 +14,7 @@
 package com.bytedesk.core.rbac.auth.ldap;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.LdapTemplate;
@@ -27,6 +28,7 @@ import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 
 @Configuration
+@ConditionalOnProperty(name = "spring.ldap.enabled", havingValue = "true", matchIfMissing = false)
 public class LdapSecurityConfig extends GlobalAuthenticationConfigurerAdapter {
 
     @Value("${spring.ldap.urls}")
