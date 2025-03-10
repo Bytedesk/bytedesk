@@ -81,6 +81,10 @@ public class ThreadEntity extends BaseEntity {
     @Builder.Default
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
 
+    // 质检结果
+    @Builder.Default
+    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
+
     @Builder.Default
     private String state = ThreadStateEnum.QUEUING.name();
 

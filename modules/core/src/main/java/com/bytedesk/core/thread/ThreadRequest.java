@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 11:19:10
+ * @LastEditTime: 2025-03-10 11:23:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,6 +45,10 @@ public class ThreadRequest extends BaseRequest {
     // 情绪类型
     @Builder.Default
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
+
+    // 质检结果
+    @Builder.Default
+    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
 
     private UserProtobuf user;
