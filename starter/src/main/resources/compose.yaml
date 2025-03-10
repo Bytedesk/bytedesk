@@ -24,13 +24,47 @@ services:
     networks:
       - bytedesk-network
 
+  bytedesk-ldap:
+    image: osixia/openldap:latest
+    container_name: ldap-bytedesk
+    ports:
+      - "389:389"
+      - "636:636"
+    environment:
+      - LDAP_ORGANISATION=ByteDesk
+      - LDAP_DOMAIN=example.com
+      - LDAP_BASE_DN=dc=example,dc=com
+      - LDAP_ADMIN_PASSWORD=admin
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+    networks:
+      - bytedesk-network
+
+  # http://localhost:18080
+  # 登录凭据：
+  # - DN: cn=admin,dc=example,dc=com
+  # - 密码: admin
+  bytedesk-phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin-bytedesk
+    ports:
+      - "18080:80"
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=bytedesk-ldap
+      - PHPLDAPADMIN_HTTPS=false
+    depends_on:
+      - bytedesk-ldap
+    networks:
+      - bytedesk-network
+
   bytedesk-ollama:
     image: ollama/ollama:latest
     container_name: ollama-bytedesk
     ports:
       - "21434:11434"
     volumes:
-      - bytedesk_ollama_models:/root/.ollama
+      - ollama_models:/root/.ollama
     environment:
       - OLLAMA_MODELS=qwen2.5:1.5b
     # 添加健康检查
@@ -66,9 +100,6 @@ services:
     container_name: prometheus-bytedesk
     ports:
       - "19090:9090"
-    environment:
-      - PROMETHEUS_ADMIN_USER=admin
-      - PROMETHEUS_ADMIN_PASSWORD=admin
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -93,14 +124,8 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_AUTH_ANONYMOUS_ENABLED=false
-      - GF_AUTH_BASIC_ENABLED=true
-      - GF_AUTH_DISABLE_LOGIN_FORM=false
-      # Provisioning settings
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - bytedesk-network
     depends_on:
@@ -111,12 +136,16 @@ volumes:
     name: bytedesk_mysql_data
   redis_data:
     name: bytedesk_redis_data
-  bytedesk_ollama_models:
+  ollama_models:
     name: bytedesk_ollama_models
   prometheus_data:
     name: bytedesk_prometheus_data
   grafana_data:
     name: bytedesk_grafana_data
+  ldap_data:
+    name: bytedesk_ldap_data
+  ldap_config:
+    name: bytedesk_ldap_config
 
 networks:
   bytedesk-network:
