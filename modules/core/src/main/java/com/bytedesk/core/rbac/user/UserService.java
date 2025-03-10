@@ -42,6 +42,7 @@ import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleRestService;
+import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 

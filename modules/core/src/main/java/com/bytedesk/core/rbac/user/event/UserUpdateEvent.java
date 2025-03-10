@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-09-25 10:32:39
+ * @Date: 2024-07-04 10:25:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-25 10:35:33
+ * @LastEditTime: 2024-07-04 10:25:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,23 +11,24 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.user;
+package com.bytedesk.core.rbac.user.event;
 
 import org.springframework.context.ApplicationEvent;
+
+import com.bytedesk.core.rbac.user.UserEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class UserLogoutEvent extends ApplicationEvent {
-    
-    private static final long serialVersionUID = 1L;
+public class UserUpdateEvent extends ApplicationEvent {
 
     private UserEntity user;
 
-    public UserLogoutEvent(Object source, UserEntity user) {
-        super(source);
+    public UserUpdateEvent(UserEntity user) {
+        super(user);
         this.user = user;
     }
+    
 }

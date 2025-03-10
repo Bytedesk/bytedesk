@@ -21,7 +21,7 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserUpdateEvent;
+import com.bytedesk.core.rbac.user.event.UserUpdateEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
