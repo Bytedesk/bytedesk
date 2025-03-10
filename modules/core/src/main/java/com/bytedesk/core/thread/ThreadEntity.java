@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 11:18:46
+ * @LastEditTime: 2025-03-10 12:20:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,6 +61,7 @@ public class ThreadEntity extends BaseEntity {
      * @{TopicUtils}
      */
     @NotBlank
+    @Column(name = "thread_topic", nullable = false)
     private String topic;
 
     @Builder.Default
@@ -85,7 +86,13 @@ public class ThreadEntity extends BaseEntity {
     @Builder.Default
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
+    // 是否被评价
     @Builder.Default
+    @Column(name = "is_rated")
+    private boolean rated = false;
+
+    @Builder.Default
+    @Column(name = "thread_state", nullable = false)
     private String state = ThreadStateEnum.QUEUING.name();
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
@@ -97,6 +104,7 @@ public class ThreadEntity extends BaseEntity {
 
     // 星标
     @Builder.Default
+    @Column(name = "thread_star")
     private int star = 0;
 
     // 置顶
