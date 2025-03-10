@@ -1,6 +1,6 @@
 var L = Object.defineProperty;
-var z = (p, t, e) => t in p ? L(p, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : p[t] = e;
-var c = (p, t, e) => z(p, typeof t != "symbol" ? t + "" : t, e);
+var z = (m, t, e) => t in m ? L(m, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : m[t] = e;
+var c = (m, t, e) => z(m, typeof t != "symbol" ? t + "" : t, e);
 class R {
   constructor(t) {
     c(this, "config");
@@ -81,7 +81,7 @@ class R {
     }, this.config.inviteConfig.delay || 3e3);
   }
   createBubble() {
-    var h, m, r, f, w, u, E, T, M, I, k, D;
+    var h, p, r, f, w, u, E, T, M, I, k, D;
     const t = document.createElement("div");
     t.style.cssText = `
       position: fixed;
@@ -96,7 +96,7 @@ class R {
     let e = null;
     if ((h = this.config.bubbleConfig) != null && h.show) {
       e = document.createElement("div"), e.style.cssText = `
-        background: ${((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#1f2937" : "white"};
+        background: ${((p = this.config.theme) == null ? void 0 : p.mode) === "dark" ? "#1f2937" : "white"};
         color: ${((r = this.config.theme) == null ? void 0 : r.mode) === "dark" ? "#e5e7eb" : "#1f2937"};
         padding: 12px 16px;
         border-radius: 8px;
@@ -228,7 +228,7 @@ class R {
     return e[t] || e["zh-cn"];
   }
   createChatWindow() {
-    var s, h, m, r, f, w;
+    var s, h, p, r, f, w;
     this.window = document.createElement("div");
     const t = window.innerWidth <= 768, e = window.innerWidth, n = window.innerHeight, i = Math.min(((s = this.config.window) == null ? void 0 : s.width) || e * 0.9, e * 0.9), o = Math.min(((h = this.config.window) == null ? void 0 : h.height) || n * 0.9, n * 0.9);
     t ? this.window.style.cssText = `
@@ -242,7 +242,7 @@ class R {
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
-        transition: all ${(m = this.config.animation) == null ? void 0 : m.duration}ms ${(r = this.config.animation) == null ? void 0 : r.type};
+        transition: all ${(p = this.config.animation) == null ? void 0 : p.duration}ms ${(r = this.config.animation) == null ? void 0 : r.type};
       ` : this.window.style.cssText = `
         position: fixed;
         ${this.config.placement === "bottom-right" ? "right" : "left"}: ${this.config.marginSide}px;
@@ -384,11 +384,11 @@ class R {
           borderBottomRightRadius: "0"
         });
       else {
-        let h = this.windowState === "maximized" ? i : Math.min(((a = this.config.window) == null ? void 0 : a.width) || i * 0.9, i * 0.9), m = this.windowState === "maximized" ? o : Math.min(((s = this.config.window) == null ? void 0 : s.height) || o * 0.9, o * 0.9);
+        let h = this.windowState === "maximized" ? i : Math.min(((a = this.config.window) == null ? void 0 : a.width) || i * 0.9, i * 0.9), p = this.windowState === "maximized" ? o : Math.min(((s = this.config.window) == null ? void 0 : s.height) || o * 0.9, o * 0.9);
         const r = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, f = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
         Object.assign(this.window.style, {
           width: `${h}px`,
-          height: `${m}px`,
+          height: `${p}px`,
           right: r ? `${r}px` : "auto",
           left: f ? `${f}px` : "auto",
           bottom: `${this.config.marginBottom}px`,
@@ -518,15 +518,23 @@ class R {
         onClick: () => {
           this.hideButton(), this.hideBubble();
         }
-      },
-      {
-        text: "隐藏按钮和气泡5分钟",
-        onClick: () => {
-          this.hideButton(), this.hideBubble(), this.hideTimeout && clearTimeout(this.hideTimeout), this.hideTimeout = setTimeout(() => {
-            this.showButton(), this.showBubble();
-          }, 5 * 60 * 1e3);
-        }
       }
+      // {
+      //   text: '隐藏按钮和气泡5分钟',
+      //   onClick: () => {
+      //     this.hideButton();
+      //     this.hideBubble();
+      //     // 清除之前的定时器
+      //     if (this.hideTimeout) {
+      //       clearTimeout(this.hideTimeout);
+      //     }
+      //     // 5分钟后重新显示
+      //     this.hideTimeout = setTimeout(() => {
+      //       this.showButton();
+      //       this.showBubble();
+      //     }, 5 * 60 * 1000);
+      //   }
+      // }
     ];
     t.forEach((e, n) => {
       const i = document.createElement("div");

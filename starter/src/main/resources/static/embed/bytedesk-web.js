@@ -163,7 +163,7 @@ var BytedeskWeb=function(){"use strict";var z=Object.defineProperty;var W=(p,r,t
       display: none;
       z-index: 10000;
       min-width: 150px;
-    `;const t=[{text:"隐藏按钮和气泡",onClick:()=>{this.hideButton(),this.hideBubble()}},{text:"隐藏按钮和气泡5分钟",onClick:()=>{this.hideButton(),this.hideBubble(),this.hideTimeout&&clearTimeout(this.hideTimeout),this.hideTimeout=setTimeout(()=>{this.showButton(),this.showBubble()},5*60*1e3)}}];t.forEach((e,n)=>{const i=document.createElement("div");if(i.style.cssText=`
+    `;const t=[{text:"隐藏按钮和气泡",onClick:()=>{this.hideButton(),this.hideBubble()}}];t.forEach((e,n)=>{const i=document.createElement("div");if(i.style.cssText=`
         padding: 8px 16px;
         cursor: pointer;
         color: #333;

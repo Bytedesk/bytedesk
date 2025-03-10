@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 12:20:30
+ * @LastEditTime: 2025-03-10 23:02:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.core.thread;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -146,11 +147,7 @@ public class ThreadEntity extends BaseEntity {
     private String client = ClientEnum.WEB.name();
 
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // for postgres compatibility，[ERROR: column "extra" is of type json but expression is of type character varying
-    // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "thread_extra", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)   
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
@@ -163,9 +160,6 @@ public class ThreadEntity extends BaseEntity {
      * @{UserProtobuf}
      */
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "thread_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
@@ -177,17 +171,11 @@ public class ThreadEntity extends BaseEntity {
      * @{UserProtobuf}
      */
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
     // multi agent assistants: monitoring agent、quality check agent、robot agent
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String multiAgents = BytedeskConsts.EMPTY_JSON_STRING;
 
