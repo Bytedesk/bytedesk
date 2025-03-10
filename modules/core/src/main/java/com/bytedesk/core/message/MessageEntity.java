@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 15:07:08
+ * @LastEditTime: 2025-03-10 11:27:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,6 +52,21 @@ public class MessageEntity extends BaseEntity {
     // 复杂类型可以使用json存储在此，通过type字段区分
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
+
+    // 有帮助、没帮助
+    @Builder.Default
+    private String helpful = MessageHelpfulEnum.HELPFUL.name();
+
+    // 是否是机器人
+    @Builder.Default
+    @Column(name = "is_robot", nullable = false)
+    private boolean robot = false;
+
+    // 是否是访客
+    @Builder.Default
+    @Column(name = "is_visitor", nullable = false)
+    private boolean visitor = false;
+
 
     @Builder.Default
     // json字段格式，搜索时，对数据库有依赖，不方便迁移

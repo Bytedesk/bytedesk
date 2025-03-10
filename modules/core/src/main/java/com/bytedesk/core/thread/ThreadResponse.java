@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 11:19:22
+ * @LastEditTime: 2025-03-10 11:23:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,6 +49,9 @@ public class ThreadResponse extends BaseResponse {
 
     // 情绪类型
     private String emotionType;
+
+    // 质检结果
+    private String qualityCheckResult;
 
     private String state;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 08:37:38
+ * @LastEditTime: 2025-03-10 11:25:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,18 @@ public class MessageRequest extends BaseRequest {
     private String nickname;
 
     private String type;
+
+    // 有帮助、没帮助
+    @Builder.Default
+    private String helpful = MessageHelpfulEnum.HELPFUL.name();
+
+    // 是否是机器人
+    @Builder.Default
+    private Boolean robot = false;
+
+    // 是否是访客
+    @Builder.Default
+    private Boolean visitor = false;
 
     // private String orgUid;
 
