@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.auth.ldap;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.LdapTemplate;
@@ -27,6 +28,18 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 
 @Configuration
 public class LdapSecurityConfig extends GlobalAuthenticationConfigurerAdapter {
+
+    @Value("${spring.ldap.urls}")
+    private String ldapUrls;
+
+    @Value("${spring.ldap.base}")
+    private String ldapBase;
+
+    @Value("${spring.ldap.username}")
+    private String ldapUsername;
+
+    @Value("${spring.ldap.password}")
+    private String ldapPassword;
 
     @Override
     public void init(AuthenticationManagerBuilder auth) throws Exception {
@@ -50,18 +63,19 @@ public class LdapSecurityConfig extends GlobalAuthenticationConfigurerAdapter {
     @Bean
     public FilterBasedLdapUserSearch userSearch() {
         return new FilterBasedLdapUserSearch(
-            "${spring.ldap.base}", // 搜索基础
-            "(uid={0})",          // 用户搜索过滤器
+            ldapBase,
+            "(uid={0})",
             contextSource());
     }
 
     @Bean
     public LdapContextSource contextSource() {
         LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl("${spring.ldap.urls}");
-        contextSource.setBase("${spring.ldap.base}");
-        contextSource.setUserDn("${spring.ldap.username}");
-        contextSource.setPassword("${spring.ldap.password}");
+        contextSource.setUrl(ldapUrls);
+        contextSource.setBase(ldapBase);
+        contextSource.setUserDn(ldapUsername);
+        contextSource.setPassword(ldapPassword);
+        contextSource.afterPropertiesSet(); // 重要：初始化上下文源
         return contextSource;
     }
 
