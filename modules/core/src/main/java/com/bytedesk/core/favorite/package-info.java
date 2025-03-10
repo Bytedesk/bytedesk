@@ -3,6 +3,6 @@
  * 提供收藏夹的CRUD、搜索等功能
  */
 @NonNullApi
-package com.bytedesk.kbase.favorite;
+package com.bytedesk.core.favorite;
 
 import org.springframework.lang.NonNullApi;

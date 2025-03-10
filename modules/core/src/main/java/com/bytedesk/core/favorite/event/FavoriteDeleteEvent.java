@@ -11,11 +11,11 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.favorite.event;
+package com.bytedesk.core.favorite.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.kbase.favorite.FavoriteEntity;
+import com.bytedesk.core.favorite.FavoriteEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
