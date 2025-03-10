@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 00:04:17
+ * @LastEditTime: 2025-03-10 11:18:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,6 +72,14 @@ public class ThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_type", nullable = false)
     private String type = ThreadTypeEnum.WORKGROUP.name();
+
+    // 意图类型
+    @Builder.Default
+    private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
+
+    // 情绪类型
+    @Builder.Default
+    private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
 
     @Builder.Default
     private String state = ThreadStateEnum.QUEUING.name();
