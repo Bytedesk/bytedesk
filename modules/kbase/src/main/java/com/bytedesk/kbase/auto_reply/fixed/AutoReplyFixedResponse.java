@@ -51,7 +51,7 @@ public class AutoReplyFixedResponse extends BaseResponse {
 
     private String kbUid; // 对应知识库
     
-    private String orgUid;
+    // private String orgUid;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }

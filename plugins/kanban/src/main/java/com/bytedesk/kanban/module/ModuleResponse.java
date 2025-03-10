@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModuleResponse extends BaseResponse {
@@ -55,7 +55,7 @@ public class ModuleResponse extends BaseResponse {
 
     private Boolean isPublic;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }

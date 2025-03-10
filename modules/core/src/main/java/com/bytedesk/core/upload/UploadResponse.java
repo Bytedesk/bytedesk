@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-18 12:06:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-30 22:26:40
+ * @LastEditTime: 2025-03-10 14:29:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadResponse extends BaseResponse {
@@ -51,7 +51,7 @@ public class UploadResponse extends BaseResponse {
 
     private String user;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 
     private List<String> docIdList;
 }

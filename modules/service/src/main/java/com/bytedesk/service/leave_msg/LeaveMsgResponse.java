@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.leave_msg;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -43,7 +42,7 @@ public class LeaveMsgResponse extends BaseResponse {
 
     private String status;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }

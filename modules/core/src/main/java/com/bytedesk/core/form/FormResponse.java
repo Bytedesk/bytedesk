@@ -13,8 +13,6 @@
  */
 package com.bytedesk.core.form;
 
-import java.time.LocalDateTime;
-
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +25,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class FormResponse extends BaseResponse {
@@ -40,7 +38,7 @@ public class FormResponse extends BaseResponse {
 
     private String type;
 
-    private LocalDateTime createdAt;
+    // private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    // private LocalDateTime updatedAt;
 }
