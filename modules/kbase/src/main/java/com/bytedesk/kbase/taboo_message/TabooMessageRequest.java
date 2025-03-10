@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-22 23:00:00
+ * @Date: 2024-06-27 22:35:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 15:10:52
+ * @LastEditTime: 2025-03-07 09:37:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,11 +11,13 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.quick_reply;
+package com.bytedesk.kbase.taboo_message;
 
 import java.time.LocalDateTime;
 
-import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,44 +27,29 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuickReplyResponse extends BaseResponse {
-
-    private String title;
-
+public class TabooMessageRequest extends BaseRequest {
+    
     private String content;
-
-    private String shortCut;
 
     private String type;
 
-    private String level;
-
-    private String tags;
-
-    private Boolean enabled;
-
-    // 被点击次数
-    private Integer clickCount;
-
-    // 有效开始日期
+    @Builder.Default
+    private String tags = "[]";
+    
     private LocalDateTime startDate;
 
-    // 有效结束日期
     private LocalDateTime endDate;
+
+    @Builder.Default
+    private String level = LevelEnum.ORGANIZATION.name();
+
+    @Builder.Default
+    private String platform = PlatformEnum.BYTEDESK.name();
 
     private String categoryUid;
 
-    private String kbUid;
-    
-    // private String orgUid;
-
-    // private LocalDateTime createdAt;
-
-    // private LocalDateTime updatedAt;
-
-    private String agentUid;
-    
+    private String kbUid; // 对应知识库
 }

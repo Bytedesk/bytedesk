@@ -41,6 +41,8 @@ public class AutoReplyFixedResponse extends BaseResponse {
     // 回复次数
     private Integer replyCount;
 
+    private Boolean enabled;
+
     // 有效开始日期
     private LocalDateTime startDate;
 
