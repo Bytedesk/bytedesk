@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.favorite;
+package com.bytedesk.core.favorite;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.enums.LevelEnum;
