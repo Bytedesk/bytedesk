@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 09:45:38
+ * @LastEditTime: 2025-03-10 12:13:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,7 @@ package com.bytedesk.kbase.faq;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;  
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -44,13 +44,25 @@ public class FaqRequest extends BaseRequest {
 
     private String type;
 
+    // 被点击次数
+    @Builder.Default
+    private Integer clickCount = 0;
+
+    // 点赞次数
+    @Builder.Default
+    private Integer upCount = 0;
+
+    // 点踩次数
+    @Builder.Default
+    private Integer downCount = 0;
+
     // 是否有效
     @Builder.Default
     private Boolean valid = true;
 
     @Builder.Default
     private String tags = "[]";
-    
+
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;

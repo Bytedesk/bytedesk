@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 07:29:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 09:32:08
+ * @LastEditTime: 2025-03-10 12:11:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,6 +85,10 @@ public class AutoReplyKeywordEntity extends BaseEntity {
 
     @Builder.Default
     private boolean isTransfer = false; // 是否是 转人工 关键词
+
+    // 回复次数
+    @Builder.Default
+    private int replyCount = 0;
 
     // 有效开始日期
     private LocalDateTime startDate;
