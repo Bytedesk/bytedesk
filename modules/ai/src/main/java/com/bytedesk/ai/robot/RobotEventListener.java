@@ -170,17 +170,17 @@ public class RobotEventListener {
                             .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
                 } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
                     springAIDeepseekService
-                            .ifPresent(service -> service.sendLlmWebsocketMessage(query, robot, message));
+                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
                 } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
                     springAIDashscopeService
                             .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
                 } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
                     springAIZhipuaiService
-                            .ifPresent(service -> service.sendLlmWebsocketMessage(query, robot, message));
+                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
                 } else {
                     // 默认使用智谱AI
                     springAIZhipuaiService
-                            .ifPresent(service -> service.sendLlmWebsocketMessage(query, robot, message));
+                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
                 }
             } else {
                 log.error("robot not found");
