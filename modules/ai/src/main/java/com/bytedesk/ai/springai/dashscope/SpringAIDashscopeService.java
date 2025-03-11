@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:36:39
+ * @LastEditTime: 2025-03-11 21:16:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
@@ -128,46 +129,81 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     protected void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
             MessageProtobuf messageProtobuf, SseEmitter emitter) {
 
-        // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson,
-        // MessageProtobuf.class);
-
         try {
             bytedeskDashScopeChatClient.prompt(messageProtobuf.getContent())
                     .stream()
                     .content()
                     .subscribe(
-                            content -> {
+                            textContent -> {
                                 try {
+                                    //
+                                    messageProtobuf.setContent(textContent);
+                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                    // 发送SSE事件
                                     emitter.send(SseEmitter.event()
-                                            .data(content)
-                                            .id(String.valueOf(System.currentTimeMillis()))
+                                            .data(JSON.toJSONString(messageProtobuf))
+                                            .id(messageProtobuf.getUid())
                                             .name("message"));
+
                                 } catch (Exception e) {
                                     log.error("Error sending SSE event", e);
-                                    emitter.completeWithError(e);
+                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                    //
+                                    try {
+                                        emitter.send(SseEmitter.event()
+                                                .data(JSON.toJSONString(messageProtobuf))
+                                                .id(messageProtobuf.getUid())
+                                                .name("error"));
+                                        emitter.complete();
+                                    } catch (Exception ex) {
+                                        emitter.completeWithError(ex);
+                                    }
                                 }
                             },
                             error -> {
                                 log.error("DashScope API SSE error: ", error);
+                                messageProtobuf.setType(MessageTypeEnum.ERROR);
+                                messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                //
                                 try {
                                     emitter.send(SseEmitter.event()
-                                            .data("服务暂时不可用，请稍后重试")
+                                            .data(JSON.toJSONString(messageProtobuf))
+                                            .id(messageProtobuf.getUid())
                                             .name("error"));
                                     emitter.complete();
-                                } catch (Exception e) {
-                                    emitter.completeWithError(e);
+                                } catch (Exception ex) {
+                                    emitter.completeWithError(ex);
                                 }
                             },
                             () -> {
                                 try {
+                                    // 发送流结束标记
+                                    messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                                    messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                                    emitter.send(SseEmitter.event()
+                                            .data(JSON.toJSONString(messageProtobuf))
+                                            .id(messageProtobuf.getUid())
+                                            .name("end"));
                                     emitter.complete();
                                 } catch (Exception e) {
                                     log.error("Error completing SSE", e);
                                 }
                             });
         } catch (Exception e) {
-            log.error("Error starting SSE stream", e);
-            emitter.completeWithError(e);
+            log.error("DashScope API SSE error: ", e);
+            messageProtobuf.setType(MessageTypeEnum.ERROR);
+            messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+            //
+            try {
+                emitter.send(SseEmitter.event()
+                        .data(JSON.toJSONString(messageProtobuf))
+                        .id(messageProtobuf.getUid())
+                        .name("error"));
+                emitter.complete();
+            } catch (Exception ex) {
+                emitter.completeWithError(ex);
+            }
         }
     }
 
