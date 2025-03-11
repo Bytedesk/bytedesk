@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 16:15:07
+ * @LastEditTime: 2025-03-11 15:44:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -155,23 +155,23 @@ public class RobotEventListener {
                 clonedMessage.setUid(uidUtils.getUid());
                 clonedMessage.setType(MessageTypeEnum.PROCESSING);
                 messageSendService.sendProtobufMessage(clonedMessage);
-                // 
+                //
                 if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                    springAIOllamaService.ifPresent(service -> 
-                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                    springAIOllamaService
+                            .ifPresent(service -> service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 } else if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
-                    springAIDeepseekService.ifPresent(service -> 
-                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                    springAIDeepseekService
+                            .ifPresent(service -> service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 } else if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
-                    springAIDashscopeService.ifPresent(service -> 
-                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                    springAIDashscopeService
+                            .ifPresent(service -> service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 } else if (robotProtobuf.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
-                    springAIZhipuaiService.ifPresent(service -> 
-                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
-                } else  {
+                    springAIZhipuaiService
+                            .ifPresent(service -> service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                } else {
                     // 默认使用智谱AI
-                    springAIZhipuaiService.ifPresent(service -> 
-                        service.sendWsMessage(query, robotProtobuf.getLlm(), message));
+                    springAIZhipuaiService
+                            .ifPresent(service -> service.sendWsMessage(query, robotProtobuf.getLlm(), message));
                 }
             } else {
                 log.error("robot not found");
@@ -209,26 +209,22 @@ public class RobotEventListener {
             clonedMessage.setUid(uidUtils.getUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
             messageSendService.sendProtobufMessage(clonedMessage);
-            // 
+            //
             if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                springAIOllamaService.ifPresent(service -> 
-                    service.sendWsKbMessage(query, robot, message));
+                springAIOllamaService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
-                springAIDeepseekService.ifPresent(service -> 
-                    service.sendWsKbMessage(query, robot, message));
+                springAIDeepseekService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
-                springAIDashscopeService.ifPresent(service -> 
-                    service.sendWsKbMessage(query, robot, message));
+                springAIDashscopeService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
-                springAIZhipuaiService.ifPresent(service ->
-                  service.sendWsKbMessage(query, robot, message));
+                springAIZhipuaiService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
             } else {
                 // 默认使用智谱AI
-                springAIZhipuaiService.ifPresent(service ->
-                  service.sendWsKbMessage(query, robot, message));
+                springAIZhipuaiService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
             }
         }
     }
 
-}
+    
 
+}
