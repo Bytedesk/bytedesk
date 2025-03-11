@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 10:37:42
+ * @LastEditTime: 2025-03-11 13:53:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,8 +55,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     private final UidUtils uidUtils;
 
     private final ServiceSettingsService serviceSettingsService;
-
-    // private final FaqRestService faqRestService;
 
     private final AuthService authService;
 
