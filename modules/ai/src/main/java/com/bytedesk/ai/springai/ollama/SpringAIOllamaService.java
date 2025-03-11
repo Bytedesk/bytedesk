@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 17:56:46
+ * @LastEditTime: 2025-03-11 21:17:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -126,7 +126,8 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                         for (Generation generation : generations) {
                                             AssistantMessage assistantMessage = generation.getOutput();
                                             String textContent = assistantMessage.getText();
-                                            log.info("Ollama API response metadata: {}, text {}", response.getMetadata(), textContent);
+                                            log.info("Ollama API response metadata: {}, text {}",
+                                                    response.getMetadata(), textContent);
                                             //
                                             messageProtobuf.setContent(textContent);
                                             messageProtobuf.setType(MessageTypeEnum.STREAM);
@@ -139,8 +140,18 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     }
                                 } catch (Exception e) {
                                     log.error("Error sending SSE event", e);
-
-                                    emitter.completeWithError(e);
+                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                    //
+                                    try {
+                                        emitter.send(SseEmitter.event()
+                                                .data(JSON.toJSONString(messageProtobuf))
+                                                .id(messageProtobuf.getUid())
+                                                .name("error"));
+                                        emitter.complete();
+                                    } catch (Exception ex) {
+                                        emitter.completeWithError(ex);
+                                    }
                                 }
                             },
                             error -> {

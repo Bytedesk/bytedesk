@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:36:14
+ * @LastEditTime: 2025-03-11 21:17:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
@@ -59,28 +60,27 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
         deepSeekChatModel.ifPresent(model -> model.stream(prompt).subscribe(
-            response -> {
-                if (response != null) {
-                    log.info("DeepSeek API response metadata: {}", response.getMetadata());
-                    List<Generation> generations = response.getResults();
-                    for (Generation generation : generations) {
-                        AssistantMessage assistantMessage = generation.getOutput();
-                        String textContent = assistantMessage.getText();
+                response -> {
+                    if (response != null) {
+                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
 
-                        messageProtobuf.setType(MessageTypeEnum.STREAM);
-                        messageProtobuf.setContent(textContent);
-                        messageSendService.sendProtobufMessage(messageProtobuf);
+                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                            messageProtobuf.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobuf);
+                        }
                     }
-                }
-            },
-            error -> {
-                log.error("DeepSeek API error: ", error);
-                messageProtobuf.setType(MessageTypeEnum.ERROR);
-                messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                messageSendService.sendProtobufMessage(messageProtobuf);
-            },
-            () -> log.info("Chat stream completed")
-        ));
+                },
+                error -> {
+                    log.error("DeepSeek API error: ", error);
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                },
+                () -> log.info("Chat stream completed")));
     }
 
     @Override
@@ -92,7 +92,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     protected String processPromptSync(String message) {
         try {
             return deepSeekChatModel.map(model -> model.call(message))
-                .orElse("DeepSeek service is not available");
+                    .orElse("DeepSeek service is not available");
         } catch (Exception e) {
             log.error("DeepSeek API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -103,60 +103,87 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     protected void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
             MessageProtobuf messageProtobuf, SseEmitter emitter) {
         deepSeekChatModel.ifPresentOrElse(
-            model -> {
-                model.stream(prompt).subscribe(
-                    response -> {
-                        try {
-                            if (response != null) {
-                                List<Generation> generations = response.getResults();
-                                for (Generation generation : generations) {
-                                    AssistantMessage assistantMessage = generation.getOutput();
-                                    String textContent = assistantMessage.getText();
-                                    log.info("DeepSeek API response metadata: {}, text {}", response.getMetadata(), textContent);
-                                    
-                                    // 发送SSE事件
-                                    emitter.send(SseEmitter.event()
-                                        .data(textContent)
-                                        .id(String.valueOf(System.currentTimeMillis()))
-                                        .name("message"));
+                model -> {
+                    model.stream(prompt).subscribe(
+                            response -> {
+                                try {
+                                    if (response != null) {
+                                        List<Generation> generations = response.getResults();
+                                        for (Generation generation : generations) {
+                                            AssistantMessage assistantMessage = generation.getOutput();
+                                            String textContent = assistantMessage.getText();
+                                            log.info("DeepSeek API response metadata: {}, text {}",
+                                                    response.getMetadata(), textContent);
+                                            //
+                                            messageProtobuf.setContent(textContent);
+                                            messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                            // 发送SSE事件
+                                            emitter.send(SseEmitter.event()
+                                                    .data(JSON.toJSONString(messageProtobuf))
+                                                    .id(messageProtobuf.getUid())
+                                                    .name("message"));
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    log.error("Error sending SSE event", e);
+                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                    //
+                                    try {
+                                        emitter.send(SseEmitter.event()
+                                                .data(JSON.toJSONString(messageProtobuf))
+                                                .id(messageProtobuf.getUid())
+                                                .name("error"));
+                                        emitter.complete();
+                                    } catch (Exception ex) {
+                                        emitter.completeWithError(ex);
+                                    }
                                 }
-                            }
-                        } catch (Exception e) {
-                            log.error("Error sending SSE event", e);
-                            emitter.completeWithError(e);
-                        }
-                    },
-                    error -> {
-                        log.error("DeepSeek API SSE error: ", error);
-                        try {
-                            emitter.send(SseEmitter.event()
-                                .data("服务暂时不可用，请稍后重试")
+                            },
+                            error -> {
+                                log.error("DeepSeek API SSE error: ", error);
+                                messageProtobuf.setType(MessageTypeEnum.ERROR);
+                                messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                //
+                                try {
+                                    emitter.send(SseEmitter.event()
+                                            .data(JSON.toJSONString(messageProtobuf))
+                                            .id(messageProtobuf.getUid())
+                                            .name("error"));
+                                    emitter.complete();
+                                } catch (Exception ex) {
+                                    emitter.completeWithError(ex);
+                                }
+                            },
+                            () -> {
+                                try {
+                                    // 发送流结束标记
+                                    messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                                    messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                                    emitter.send(SseEmitter.event()
+                                            .data(JSON.toJSONString(messageProtobuf))
+                                            .id(messageProtobuf.getUid())
+                                            .name("end"));
+                                    emitter.complete();
+                                } catch (Exception e) {
+                                    log.error("Error completing SSE", e);
+                                }
+                            });
+                },
+                () -> {
+                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    //
+                    try {
+                        emitter.send(SseEmitter.event()
+                                .data(JSON.toJSONString(messageProtobuf))
+                                .id(messageProtobuf.getUid())
                                 .name("error"));
-                            emitter.complete();
-                        } catch (Exception e) {
-                            emitter.completeWithError(e);
-                        }
-                    },
-                    () -> {
-                        try {
-                            emitter.complete();
-                        } catch (Exception e) {
-                            log.error("Error completing SSE", e);
-                        }
+                        emitter.complete();
+                    } catch (Exception ex) {
+                        emitter.completeWithError(ex);
                     }
-                );
-            },
-            () -> {
-                try {
-                    emitter.send(SseEmitter.event()
-                        .data("DeepSeek service is not available")
-                        .name("error"));
-                    emitter.complete();
-                } catch (Exception e) {
-                    emitter.completeWithError(e);
-                }
-            }
-        );
+                });
     }
 
     public Optional<OpenAiChatModel> getDeepSeekChatModel() {

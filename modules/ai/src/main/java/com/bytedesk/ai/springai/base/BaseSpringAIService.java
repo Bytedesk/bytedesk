@@ -78,7 +78,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
-        log.info("robot processMessage {}", query);
+        log.info("BaseSpringAIService sendSseMessage query {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         //
         MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
@@ -98,6 +98,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
         messages.add(new UserMessage(query));
+        log.info("BaseSpringAIService sendSseMessage messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
         //
