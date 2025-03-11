@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:21:45
+ * @LastEditTime: 2025-03-11 21:37:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,6 +57,30 @@ public class RobotService {
     private final IMessageSendService messageSendService;
     private final RobotRestService robotRestService;
 
+    public void processSyncMessage(String messageJson) {
+        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+        MessageTypeEnum messageType = messageProtobuf.getType();
+        if (messageType.equals(MessageTypeEnum.STREAM)) {
+            return;
+        }
+        String query = messageProtobuf.getContent();
+        log.info("robot processMessage {}", query);
+        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
+        if (threadProtobuf == null) {
+            throw new RuntimeException("thread is null");
+        }
+        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
+        if (!messageType.equals(MessageTypeEnum.TEXT)) {
+            return;
+        }
+        String threadTopic = threadProtobuf.getTopic();
+        // if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) ||
+        // threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
+        log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+        processRobotThreadSyncMessage(query, threadTopic, threadProtobuf, messageProtobuf);
+        // }
+    }
+
     public void processWebsocketMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
@@ -104,6 +128,11 @@ public class RobotService {
         log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
         processRobotThreadSseMessage(query, threadTopic, threadProtobuf, messageProtobuf, emitter);
         // }
+    }
+
+    private void processRobotThreadSyncMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf,
+            MessageProtobuf messageProtobuf) {
+        log.info(threadTopic + " query: " + query);
     }
 
     private void processRobotThreadWebsocketMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf,

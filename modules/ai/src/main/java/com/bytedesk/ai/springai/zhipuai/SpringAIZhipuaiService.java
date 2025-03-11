@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 21:15:58
+ * @LastEditTime: 2025-03-11 21:38:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -137,7 +137,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         }
                     }
                 } catch (Exception e) {
-                    log.error("Error sending SSE event", e);
+                    log.error("Zhipuai API Error sending SSE event 1：", e);
                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     //
@@ -145,15 +145,16 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         emitter.send(SseEmitter.event()
                                 .data(JSON.toJSONString(messageProtobuf))
                                 .id(messageProtobuf.getUid())
-                                .name("error"));
+                                .name("error1"));
                         emitter.complete();
                     } catch (Exception ex) {
+                        log.error("Zhipuai API SSE complete Error 1", ex);
                         emitter.completeWithError(ex);
                     }
                 }
             },
             error -> {
-                log.error("Zhipuai API SSE error: ", error);
+                log.error("Zhipuai API SSE error 2:", error);
                 messageProtobuf.setType(MessageTypeEnum.ERROR);
                 messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                 //
@@ -161,13 +162,15 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     emitter.send(SseEmitter.event()
                             .data(JSON.toJSONString(messageProtobuf))
                             .id(messageProtobuf.getUid())
-                            .name("error"));
+                            .name("error2"));
                     emitter.complete();
                 } catch (Exception ex) {
+                    log.error("Zhipuai API SSE complete Error 2", ex);
                     emitter.completeWithError(ex);
                 }
             },
             () -> {
+                log.error("Zhipuai API SSE complete");
                 try {
                     // 发送流结束标记
                     messageProtobuf.setType(MessageTypeEnum.STREAM_END);
@@ -178,7 +181,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             .name("end"));
                     emitter.complete();
                 } catch (Exception e) {
-                    log.error("Error completing SSE", e);
+                    log.error("Zhipuai API SSE complete Error completing SSE", e);
                 }
             }
         );
