@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 15:02:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-31 23:05:57
+ * @LastEditTime: 2025-03-11 12:31:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,11 +20,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
+// import org.springframework.data.web.config.EnableSpringDataWebSupport;
+// import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 
 @EnableScheduling
 @EnableJpaAuditing
 @ComponentScan("com.bytedesk.**")
 @EnableRetry
+// @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
 @SpringBootApplication
 public class StarterApplication {
 

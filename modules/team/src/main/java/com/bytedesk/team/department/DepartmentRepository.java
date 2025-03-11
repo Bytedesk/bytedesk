@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 11:07:43
+ * @LastEditTime: 2025-03-11 12:34:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,7 @@ import java.util.Optional;
 // import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+// import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.lang.NonNull;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
@@ -32,7 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Repository
 @Tag(name = "department - 部门/分公司")
 // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER')")
-@RepositoryRestResource(path = "dep")
+// @RepositoryRestResource(path = "dep")
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long>, JpaSpecificationExecutor<DepartmentEntity> {
 
     // @SuppressWarnings("unchecked")
