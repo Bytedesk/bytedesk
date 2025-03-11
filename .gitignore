@@ -74,3 +74,5 @@ agent_status/
 browse/
 # kanban/
 message_parsed/
+message_feedback/
+message_leave/
