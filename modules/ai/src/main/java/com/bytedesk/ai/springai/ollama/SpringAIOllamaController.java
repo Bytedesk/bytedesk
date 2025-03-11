@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 15:41:08
+ * @LastEditTime: 2025-03-11 16:15:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ai.springai.ollama;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,15 +23,12 @@ import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -53,7 +49,7 @@ public class SpringAIOllamaController {
     private final SpringAIOllamaService springAIOllamaService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final UidUtils uidUtils;
-    private final ThreadRestService threadRestService;
+    // private final ThreadRestService threadRestService;
 
     /**
      * 方式1：同步调用
@@ -84,16 +80,12 @@ public class SpringAIOllamaController {
      * http://127.0.0.1:9003/springai/ollama/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter chatSSE(
-        @RequestParam(value = "uid") String threadUid,
-        @RequestParam(value = "message") String message) {
-        Assert.notNull(threadUid, "threadUid must not be null");
+    public SseEmitter chatSSE(@RequestParam(value = "message") String message) {
         // 
-        Optional<ThreadEntity> threadEntity = threadRestService.findByUid(threadUid);
-        if (!threadEntity.isPresent()) {
-            return null;
-        }
-
+        // Optional<ThreadEntity> threadEntity = threadRestService.findByUid(threadUid);
+        // if (!threadEntity.isPresent()) {
+        //     return null;
+        // }
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         

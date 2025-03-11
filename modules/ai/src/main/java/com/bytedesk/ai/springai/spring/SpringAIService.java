@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 14:48:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 17:37:16
+ * @LastEditTime: 2025-03-11 15:51:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.spring;
 
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.core.message.MessageProtobuf;
 
 /**
@@ -34,10 +33,10 @@ public interface SpringAIService {
     /**
      * 发送普通消息
      * @param query 用户查询
-     * @param robotLlm 机器人LLM配置
+     * @param robot 机器人
      * @param messageProtobuf 消息协议
      */
-    void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf);
+    void sendWsMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf);
 
     /**
      * 发送基于知识库的自动回复消息
