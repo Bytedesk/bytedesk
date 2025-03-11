@@ -142,25 +142,25 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chatCustom(java.lang.String)" class="member-name-link">chatCustom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">自定义模型参数的调用示例
- http://localhost:9003/springai/zhipuai/chat/custom?</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/custom?</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.web.servlet.mvc.method.annotation.SseEmitter</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chatSSE(java.lang.String)" class="member-name-link">chatSSE</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">方式3：SSE调用
- http://localhost:9003/springai/zhipuai/chat/sse?</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/sse?</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>reactor.core.publisher.Flux&lt;org.springframework.ai.chat.model.ChatResponse&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chatStream(java.lang.String)" class="member-name-link">chatStream</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">方式2：异步流式调用
- http://localhost:9003/springai/zhipuai/chat/stream?</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/stream?</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity&lt;<a href="../../../core/utils/JsonResult.html" title="class in com.bytedesk.core.utils">JsonResult</a>&lt;?&gt;&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#chatSync(java.lang.String)" class="member-name-link">chatSync</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">方式1：同步调用
- http://localhost:9003/springai/zhipuai/chat/sync?</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/sync?</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#destroy()" class="member-name-link">destroy</a>()</code></div>
@@ -169,7 +169,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#generateImage(java.lang.String)" class="member-name-link">generateImage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">图像生成接口
- http://localhost:9003/springai/zhipuai/image</div>
+ http://127.0.0.1:9003/springai/zhipuai/image</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#streamSse(jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)" class="member-name-link">streamSse</a><wbr>(jakarta.servlet.http.HttpServletRequest&nbsp;request,
@@ -245,7 +245,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="../../../core/utils/JsonResult.html" title="class in com.bytedesk.core.utils">JsonResult</a>&lt;?&gt;&gt;</span>&nbsp;<span class="element-name">chatSync</span><wbr><span class="parameters">(@RequestParam(value="message",defaultValue="Tell me a joke")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
 <div class="block">方式1：同步调用
- http://localhost:9003/springai/zhipuai/chat/sync?message=hello</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/sync?message=hello</div>
 </section>
 </li>
 <li>
@@ -255,7 +255,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">reactor.core.publisher.Flux&lt;org.springframework.ai.chat.model.ChatResponse&gt;</span>&nbsp;<span class="element-name">chatStream</span><wbr><span class="parameters">(@RequestParam(value="message",defaultValue="Tell me a joke")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
 <div class="block">方式2：异步流式调用
- http://localhost:9003/springai/zhipuai/chat/stream?message=hello</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/stream?message=hello</div>
 </section>
 </li>
 <li>
@@ -266,7 +266,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.web.servlet.mvc.method.annotation.SseEmitter</span>&nbsp;<span class="element-name">chatSSE</span><wbr><span class="parameters">(@RequestParam(value="message",defaultValue="Tell me a joke")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
 <div class="block">方式3：SSE调用
- http://localhost:9003/springai/zhipuai/chat/sse?message=hello</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/sse?message=hello</div>
 </section>
 </li>
 <li>
@@ -276,7 +276,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="../../../core/utils/JsonResult.html" title="class in com.bytedesk.core.utils">JsonResult</a>&lt;?&gt;&gt;</span>&nbsp;<span class="element-name">chatCustom</span><wbr><span class="parameters">(@RequestParam(value="message",defaultValue="Tell me a joke")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</span></div>
 <div class="block">自定义模型参数的调用示例
- http://localhost:9003/springai/zhipuai/chat/custom?message=hello</div>
+ http://127.0.0.1:9003/springai/zhipuai/chat/custom?message=hello</div>
 </section>
 </li>
 <li>
@@ -286,7 +286,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;<a href="../../../core/utils/JsonResult.html" title="class in com.bytedesk.core.utils">JsonResult</a>&lt;?&gt;&gt;</span>&nbsp;<span class="element-name">generateImage</span><wbr><span class="parameters">(@RequestParam(defaultValue="A cute cat")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt)</span></div>
 <div class="block">图像生成接口
- http://localhost:9003/springai/zhipuai/image</div>
+ http://127.0.0.1:9003/springai/zhipuai/image</div>
 </section>
 </li>
 <li>

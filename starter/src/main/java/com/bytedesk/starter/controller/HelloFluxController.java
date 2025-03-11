@@ -29,13 +29,13 @@ import reactor.core.publisher.Flux;
 public class HelloFluxController {
 
     // router中优先运行
-    // http://localhost:9003/flux/
+    // http://127.0.0.1:9003/flux/
     @GetMapping({"", "/"})
     public String index() {
         return "Hello Bytedesk AI Flux";
     }
 
-    // http://localhost:9003/flux/chat
+    // http://127.0.0.1:9003/flux/chat
     @Operation(
             summary = "流式获取回答",
             description = "以流的形式返回",
