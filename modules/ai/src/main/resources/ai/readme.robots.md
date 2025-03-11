@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 19:09:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 09:45:48
+ * @LastEditTime: 2025-03-11 11:39:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,6 +51,28 @@
 - 会话小结：根据会话历史记录，生成会话小结
 - 输入补全：根据会话历史记录，以及用户实时输入内容，补全用户输入
 
+### 专门用于客户支持流程的代理
+
+客户代理（Customer agent）：此代理代表客户，负责启动支持流程。
+卖家代理：代表卖家，负责处理退款。
+支付代理：代表支付流程，负责退还客户的付款。
+解决方案代理：代表问题解决流程，负责解决退款流程中出现的任何问题。
+物流代理：代表物流流程，负责将产品退回给卖家。该代理既可以用于退款流程，也可以用于例如购买时的物流。
+支持代理（Support agent）：此代理代表支持流程，负责为客户提供协助。
+升级代理（Escalation agent）：此代理代表升级流程，负责将问题升级到更高级别的支持。
+解决代理（Resolution agent）：此代理代表解决流程，负责解决支持流程中出现的任何问题。
+反馈代理（Feedback agent）：此代理代表反馈流程，负责收集客户的反馈意见。
+通知代理（Notification agent）：此代理代表通知流程，负责在支持流程的各个阶段向客户发送通知。
+分析代理（Analytics agent）：此代理代表分析流程，负责分析与支持流程相关的数据。
+审计代理（Audit agent）：此代理代表审计流程，负责审查支持流程以确保其正确执行。
+报告代理（Reporting agent）：此代理代表报告流程，负责生成有关支持流程的报告。
+知识代理（Knowledge agent）：此代理代表知识流程，负责维护与支持流程相关的信息知识库。
+安全代理（Security agent）：此代理代表安全流程，负责确保支持流程的安全性。
+质量代理（Quality agent）：此代理代表质量流程，负责确保支持流程的质量。
+合规代理（Compliance agent）：此代理代表合规流程，负责确保支持流程符合相关法规和政策。
+培训代理（Training agent）：此代理代表培训流程，负责培训支持代理如何为客户提供帮助。
+
 ## 参考
 
 - [ticket](https://mp.weixin.qq.com/s/MNZR2tkVANfQKWqyAKlSPQ)
+- [multi-agent](https://github.com/pengjinning/ai-agents-for-beginners/blob/main/translations/zh/08-multi-agent/solution/solution.md)

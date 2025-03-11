@@ -1,3 +1,16 @@
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-03-11 11:18:50
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-11 11:58:37
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+-->
 # 安全
 
 ## 1. 任务与指令
@@ -30,4 +43,25 @@
 
 缓解措施： 一种避免方法是让 AI 代理在受限环境中运行，例如在 Docker 容器中执行任务，以防止直接系统攻击。创建回退机制和重试逻辑，以应对某些系统返回错误的情况，也是防止更大范围系统故障的有效手段。
 
+# 成本管理
+
+以下是一些在生产环境中部署AI代理的成本管理策略：
+
+## 缓存响应
+
+- 识别常见请求和任务，并在它们通过您的代理系统之前提供响应，这是减少类似请求量的好方法。您甚至可以通过更基础的AI模型实现一个流程，来判断某个请求与缓存请求的相似度。
+
+## 使用小型模型
+
+- 小型语言模型（SLM）在某些代理使用场景中表现良好，并能显著降低成本。如前所述，建立一个评估系统来确定并比较其与大型模型的性能是了解SLM在您的使用场景中表现的最佳方式。
+
+## 使用路由模型
+
+- 类似的策略是使用不同规模的模型组合。您可以使用LLM/SLM或无服务器函数，根据请求的复杂性将其路由到最合适的模型。这不仅能降低成本，还能确保复杂任务的性能表现。
+
+## 限制对话轮数
+
+## 参考
+
 - [building-trustworthy-agents](https://github.com/pengjinning/ai-agents-for-beginners/tree/main/translations/zh/06-building-trustworthy-agents)
+- [ai-agents](https://github.com/pengjinning/ai-agents-for-beginners/tree/main/translations/zh/10-ai-agents-production)
