@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:32:33
+ * @LastEditTime: 2025-03-11 09:27:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,9 +132,8 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     public CategoryResponse create(CategoryRequest request) {
 
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-            return null;
+            return convertToResponse(findByUid(request.getUid()).get());
         }
-        
         //
         CategoryEntity category = modelMapper.map(request, CategoryEntity.class);
 

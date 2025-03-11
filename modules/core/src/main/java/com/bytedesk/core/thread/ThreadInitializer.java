@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 08:40:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 09:00:41
+ * @LastEditTime: 2025-03-11 09:24:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,7 +86,6 @@ public class ThreadInitializer implements SmartInitializingSingleton {
         }
     }
 
-
     private void initThreadTag() {
         log.info("initThreadTag");
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
@@ -104,4 +103,6 @@ public class ThreadInitializer implements SmartInitializingSingleton {
             tagRestService.create(tagRequest);
         }
     }
+
+
 }
