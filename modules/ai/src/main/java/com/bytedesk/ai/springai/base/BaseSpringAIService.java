@@ -9,15 +9,26 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.util.Assert;
+import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,11 +37,21 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected final Optional<SpringAIVectorService> springAIVectorService;
     protected final IMessageSendService messageSendService;
+    protected final UidUtils uidUtils;
+    protected final RobotRestService robotRestService;
+    protected final ThreadRestService threadRestService;
 
     protected BaseSpringAIService(Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService) {
+            IMessageSendService messageSendService,
+            UidUtils uidUtils,
+            RobotRestService robotRestService,
+            ThreadRestService threadRestService
+            ) {
         this.springAIVectorService = springAIVectorService;
         this.messageSendService = messageSendService;
+        this.uidUtils = uidUtils;
+        this.robotRestService = robotRestService;
+        this.threadRestService = threadRestService;
     }
 
     @Override
@@ -59,9 +80,59 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendKbaseSseMessage(String message, SseEmitter emitter) {
-        Assert.hasText(message, "Message must not be empty");
+    public void sendSseMessage(String messageJson, SseEmitter emitter) {
+        Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
+        //
+        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+        MessageTypeEnum messageType = messageProtobuf.getType();
+        if (messageType.equals(MessageTypeEnum.STREAM)) {
+            return;
+        }
+        String query = messageProtobuf.getContent();
+        log.info("robot processMessage {}", query);
+        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
+        if (threadProtobuf == null) {
+            throw new RuntimeException("thread is null");
+        }
+        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
+        if (!messageType.equals(MessageTypeEnum.TEXT)) {
+            return;
+        }
+        String threadTopic = threadProtobuf.getTopic();
+        ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
+                .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
+                        " not found"));
+        UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
+            log.info("robot thread reply");
+            RobotEntity robot = robotRestService.findByUid(agent.getUid())
+                    .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
+            //
+            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
+                    messageProtobuf);
+            //
+            MessageProtobuf clonedMessage = SerializationUtils.clone(message);
+            clonedMessage.setUid(uidUtils.getUid());
+            clonedMessage.setType(MessageTypeEnum.PROCESSING);
+            messageSendService.sendProtobufMessage(clonedMessage);
+            //
+            String prompt = "";
+            if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
+                List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+                String context = String.join("\n", contentList);
+                prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
+            } else {
+                prompt = robot.getLlm().getPrompt();
+            }
+            // 
+            List<Message> messages = new ArrayList<>();
+            messages.add(new SystemMessage(prompt));
+            messages.add(new UserMessage(query));
+            // 
+            Prompt aiPrompt = new Prompt(messages);
+            processPromptSSE(robot, aiPrompt, threadProtobuf, message, emitter);
+        }
     }
 
     @Override
@@ -105,7 +176,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    protected String buildKbPrompt(String systemPrompt, String query, String context) {
+    public String buildKbPrompt(String systemPrompt, String query, String context) {
         return systemPrompt + "\n" +
                 "用户查询: " + query + "\n" +
                 "历史聊天记录: " + "\n" +

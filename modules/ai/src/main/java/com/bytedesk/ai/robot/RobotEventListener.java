@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 17:03:53
+ * @LastEditTime: 2025-03-11 17:29:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,7 +103,8 @@ public class RobotEventListener {
             return;
         }
         String threadTopic = threadProtobuf.getTopic();
-        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) || threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
+        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) || 
+            threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
             log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             processRobotThreadMessage(query, threadTopic, threadProtobuf, messageProtobuf);
         }
