@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 15:46:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 15:46:25
+ * @LastEditTime: 2025-03-11 15:57:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,8 @@ package com.bytedesk.ai.robot_message;
 
 import java.time.LocalDateTime;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -30,18 +29,15 @@ import com.bytedesk.core.uid.UidUtils;
 
 public class RobotMessageUtils {
 
-    public static MessageProtobuf createRobotMessage(ThreadEntity thread, ThreadProtobuf threadProtobuf,
+    public static MessageProtobuf createRobotMessage(ThreadEntity thread, ThreadProtobuf threadProtobuf, RobotEntity robot,
             MessageProtobuf messageProtobuf) {
-        // ThreadEntity thread = threadOptional.get();
         MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
-        String agent = thread.getAgent();
-        RobotProtobuf robotProtobuf = JSON.parseObject(agent, RobotProtobuf.class);
         UserProtobuf user = UserProtobuf.builder()
-                .nickname(robotProtobuf.getNickname())
-                .avatar(robotProtobuf.getAvatar())
+                .nickname(robot.getNickname())
+                .avatar(robot.getAvatar())
                 .type(UserTypeEnum.ROBOT.name())
                 .build();
-        user.setUid(robotProtobuf.getUid());
+        user.setUid(robot.getUid());
         String messageUid = UidUtils.getInstance().getUid();
         MessageProtobuf message = MessageProtobuf.builder()
                 .uid(messageUid)

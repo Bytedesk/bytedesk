@@ -14,7 +14,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
@@ -52,13 +51,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendWsMessage(String query, RobotLlm robotLlm, MessageProtobuf messageProtobuf) {
+    public void sendWsMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
         Assert.hasText(query, "Query must not be empty");
-        Assert.notNull(robotLlm, "RobotLlm must not be null");
+        Assert.notNull(robot, "Robot must not be null");
         Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
 
-        String prompt = buildPrompt(robotLlm.getPrompt(), query);
-        List<Message> messages = buildMessages(robotLlm.getPrompt(), prompt);
+        String prompt = buildPrompt(robot.getLlm().getPrompt(), query);
+        List<Message> messages = buildMessages(robot.getLlm().getPrompt(), prompt);
         Prompt aiPrompt = new Prompt(messages);
         
         processPrompt(aiPrompt, messageProtobuf);
