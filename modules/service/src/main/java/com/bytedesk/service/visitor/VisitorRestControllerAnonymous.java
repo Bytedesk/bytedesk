@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:12:33
+ * @LastEditTime: 2025-03-11 17:25:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,13 +15,19 @@ package com.bytedesk.service.visitor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -58,6 +64,8 @@ public class VisitorRestControllerAnonymous {
     private final IpService ipService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
     @ApiRateLimiter(value = 10.0, timeout = 1)
@@ -142,5 +150,39 @@ public class VisitorRestControllerAnonymous {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
+    @VisitorAnnotation(title = "visitor", action = "sendSseMessage", description = "sendSseMessage")
+    @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter sendSseMessage(@RequestParam(value = "message") String message) {
+        
+        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        
+        executorService.execute(() -> {
+            try {
+                // springAIOllamaService.processPromptSSE(message, emitter);
+            } catch (Exception e) {
+                log.error("Error processing SSE request", e);
+                emitter.completeWithError(e);
+            }
+        });
+        
+        // 添加超时和完成时的回调
+        emitter.onTimeout(() -> {
+            log.warn("SSE connection timed out");
+            emitter.complete();
+        });
+        
+        emitter.onCompletion(() -> {
+            log.info("SSE connection completed");
+        });
+        
+        return emitter;
+    }
+
+    // 在 Bean 销毁时关闭线程池
+    public void destroy() {
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdown();
+        }
+    }
 
 }

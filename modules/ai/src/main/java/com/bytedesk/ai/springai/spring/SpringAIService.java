@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 14:48:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:55:53
+ * @LastEditTime: 2025-03-11 17:28:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,7 @@ public interface SpringAIService {
      * @param message 消息
      * @param emitter SseEmitter
      */
-    void sendKbaseSseMessage(String message, SseEmitter emitter);
+    void sendSseMessage(String message, SseEmitter emitter);
 
     /**
      * 异步生成FAQ对
