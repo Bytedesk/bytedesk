@@ -40,7 +40,7 @@ public class CategoryRequest extends BaseRequest {
     // private String icon;
 
     @Builder.Default
-    private Integer orderNo = 0;
+    private Integer order = 0;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();

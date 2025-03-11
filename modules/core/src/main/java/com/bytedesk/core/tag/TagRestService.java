@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:39:05
+ * @LastEditTime: 2025-03-11 08:59:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -75,16 +75,13 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     @Override
     public TagResponse create(TagRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("user not found");
+        if (user != null) {
+            request.setUserUid(user.getUid());
         }
-        request.setUserUid(user.getUid());
-        
+        // 
         TagEntity entity = modelMapper.map(request, TagEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
-        entity.setOrgUid(user.getOrgUid());
-
         TagEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create tag failed");
