@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:01:35
+ * @LastEditTime: 2025-03-11 18:35:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -114,9 +114,6 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     public void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
             MessageProtobuf messageProtobuf, SseEmitter emitter) {
 
-        // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
-            // 
-        // Prompt prompt = new Prompt(messageProtobuf.getContent());
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
 
         responseFlux.subscribe(
@@ -127,6 +124,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
+                            log.info("Zhipuai API response metadata: {}, text {}", response.getMetadata(), textContent);
                             messageProtobuf.setContent(textContent);
                             
                             // 发送SSE事件
