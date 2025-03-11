@@ -118,7 +118,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(String message, SseEmitter emitter) {
+    protected void processPromptSSE(String uid, String message, SseEmitter emitter) {
         try {
             bytedeskDashScopeChatClient.prompt(message)
                 .stream()

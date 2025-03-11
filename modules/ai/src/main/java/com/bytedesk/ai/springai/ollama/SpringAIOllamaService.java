@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 15:18:48
+ * @LastEditTime: 2025-03-11 15:30:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,6 @@ import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
-import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,16 +46,14 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     
     private final Optional<OllamaChatModel> bytedeskOllamaChatModel;
 
-    private final UidUtils uidUtils;
+    // private final UidUtils uidUtils;
 
     public SpringAIOllamaService(
             @Qualifier("bytedeskOllamaChatModel") Optional<OllamaChatModel> bytedeskOllamaChatModel,
             Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService, 
-            UidUtils uidUtils) {
+            IMessageSendService messageSendService) {
         super(springAIVectorService, messageSendService);
         this.bytedeskOllamaChatModel = bytedeskOllamaChatModel;
-        this.uidUtils = uidUtils;
     }
 
     @Override
@@ -82,7 +79,13 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                 messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                 messageSendService.sendProtobufMessage(messageProtobuf);
             },
-            () -> log.info("Chat stream completed")
+            () -> {
+                log.info("Chat stream completed");
+                // 发送流结束标记
+                messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            }
         ));
     }
 
@@ -103,7 +106,31 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(String question, SseEmitter emitter) {
+    protected void processPromptSSE(String uid, String question, SseEmitter emitter) {
+        // 
+        ThreadProtobuf thread = ThreadProtobuf
+            .builder()
+            .uid(uid)
+            .build();
+        UserProtobuf user = UserProtobuf
+            .builder()
+            .uid(uid)
+            .nickname("ollama")
+            .avatar("")
+            .build();
+        // 
+        MessageProtobuf messageProtobuf = MessageProtobuf
+            .builder()
+            .uid(uid)
+            // .content(textContent)
+            .type(MessageTypeEnum.STREAM)
+            .status(MessageStatusEnum.SUCCESS)
+            .client(ClientEnum.SYSTEM)
+            .createdAt(LocalDateTime.now())
+            .thread(thread)
+            .user(user)
+            .build();      
+
         bytedeskOllamaChatModel.ifPresentOrElse(
             model -> {
                 Prompt prompt = new Prompt(question);
@@ -116,28 +143,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
                                     // 
-                                    ThreadProtobuf thread = ThreadProtobuf
-                                        .builder()
-                                        .uid(uidUtils.getUid())
-                                        .build();
-                                    UserProtobuf user = UserProtobuf
-                                        .builder()
-                                        .uid(uidUtils.getUid())
-                                        .nickname("ollama")
-                                        .avatar("")
-                                        .build();
-                                    // 
-                                    MessageProtobuf messageProtobuf = MessageProtobuf
-                                        .builder()
-                                        .uid(uidUtils.getUid())
-                                        .content(textContent)
-                                        .type(MessageTypeEnum.STREAM)
-                                        .status(MessageStatusEnum.SUCCESS)
-                                        .client(ClientEnum.SYSTEM)
-                                        .createdAt(LocalDateTime.now())
-                                        .thread(thread)
-                                        .user(user)
-                                        .build();                        
+                                    messageProtobuf.setContent(textContent);
                                     // 发送SSE事件
                                     emitter.send(SseEmitter.event()
                                         .data(JSON.toJSONString(messageProtobuf))
@@ -163,6 +169,10 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     },
                     () -> {
                         try {
+                            // 发送流结束标记
+                            messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                            messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                            messageSendService.sendProtobufMessage(messageProtobuf);
                             emitter.complete();
                         } catch (Exception e) {
                             log.error("Error completing SSE", e);

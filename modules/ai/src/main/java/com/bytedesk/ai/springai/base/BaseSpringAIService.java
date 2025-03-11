@@ -142,7 +142,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // 抽象方法，由具体实现类提供
     protected abstract void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf);
     protected abstract String processPromptSync(String message);
-    protected abstract void processPromptSSE(String message, SseEmitter emitter);
+    protected abstract void processPromptSSE(String uid, String message, SseEmitter emitter);
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);
 } 

@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.ServletException;
@@ -62,6 +63,7 @@ public class SpringAIZhipuaiController {
     private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
     private final ZhiPuAiImageModel bytedeskZhipuaiImageModel;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final UidUtils uidUtils;
 
     /**
      * 方式1：同步调用
@@ -97,7 +99,7 @@ public class SpringAIZhipuaiController {
         
         executorService.execute(() -> {
             try {
-                springAIZhipuaiService.processPromptSSE(message, emitter);
+                springAIZhipuaiService.processPromptSSE(uidUtils.getUid(), message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);

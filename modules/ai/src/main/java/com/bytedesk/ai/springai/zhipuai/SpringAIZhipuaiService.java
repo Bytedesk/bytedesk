@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 15:37:19
+ * @LastEditTime: 2025-03-11 15:29:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.springai.zhipuai;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,9 +29,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadProtobuf;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -68,6 +73,12 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         messageProtobuf.setContent(textContent);
                         messageSendService.sendProtobufMessage(messageProtobuf);
                     }
+                    // 判断输出是否结束
+                    // if (response.isComplete()) {
+                    //     messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                    //     messageProtobuf.setContent("输出结束");
+                    //     messageSendService.sendProtobufMessage(messageProtobuf);
+                    // }
                 }
             },
             error -> {
@@ -76,7 +87,13 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                 messageSendService.sendProtobufMessage(messageProtobuf);
             },
-            () -> log.info("Chat stream completed")
+            () -> {
+                log.info("Chat stream completed");
+                // 发送流结束标记
+                messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            }
         );
     }
 
@@ -97,7 +114,31 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    public void processPromptSSE(String message, SseEmitter emitter) {
+    public void processPromptSSE(String uid, String message, SseEmitter emitter) {
+        // 
+        ThreadProtobuf thread = ThreadProtobuf
+            .builder()
+            .uid(uid)
+            .build();
+        UserProtobuf user = UserProtobuf
+            .builder()
+            .uid(uid)
+            .nickname("ollama")
+            .avatar("")
+            .build();
+        // 
+        MessageProtobuf messageProtobuf = MessageProtobuf
+            .builder()
+            .uid(uid)
+            // .content(textContent)
+            .type(MessageTypeEnum.STREAM)
+            .status(MessageStatusEnum.SUCCESS)
+            .client(ClientEnum.SYSTEM)
+            .createdAt(LocalDateTime.now())
+            .thread(thread)
+            .user(user)
+            .build();  
+            // 
         Prompt prompt = new Prompt(message);
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
 
@@ -109,6 +150,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
+                            messageProtobuf.setContent(textContent);
                             
                             // 发送SSE事件
                             emitter.send(SseEmitter.event()
@@ -135,6 +177,11 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             },
             () -> {
                 try {
+                    // 发送流结束标记
+                    messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                    messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                    // 
                     emitter.complete();
                 } catch (Exception e) {
                     log.error("Error completing SSE", e);

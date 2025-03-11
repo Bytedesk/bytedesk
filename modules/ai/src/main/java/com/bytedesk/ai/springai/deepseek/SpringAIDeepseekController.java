@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ import reactor.core.publisher.Flux;
 public class SpringAIDeepseekController {
 
     private final SpringAIDeepseekService springAIDeepseekService;
+    private final UidUtils uidUtils;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
@@ -84,7 +86,7 @@ public class SpringAIDeepseekController {
         
         executorService.execute(() -> {
             try {
-                springAIDeepseekService.processPromptSSE(message, emitter);
+                springAIDeepseekService.processPromptSSE(uidUtils.getUid(), message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);

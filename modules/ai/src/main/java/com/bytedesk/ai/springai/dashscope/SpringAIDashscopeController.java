@@ -36,6 +36,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.core.annotation.UserIp;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,6 +63,7 @@ public class SpringAIDashscopeController {
 	private final DashScopeChatModel bytedeskDashScopeChatModel;
 	private final Optional<SpringAIDashscopeImageService> imageService;
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
+	private final UidUtils uidUtils;
 	
 	@Qualifier("bytedeskDashScopeChatClient")
 	private final ChatClient bytedeskDashScopeChatClient;
@@ -106,7 +108,7 @@ public class SpringAIDashscopeController {
 		
 		executorService.execute(() -> {
 			try {
-				springAIDashscopeService.processPromptSSE(message, emitter);
+				springAIDashscopeService.processPromptSSE(uidUtils.getUid(), message, emitter);
 			} catch (Exception e) {
 				log.error("Error processing SSE request", e);
 				emitter.completeWithError(e);
