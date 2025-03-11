@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_leave;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +24,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LeaveMsgSpecification extends BaseSpecification {
+public class MessageLeaveSpecification extends BaseSpecification {
 
-    public static Specification<LeaveMsgEntity> search(LeaveMsgRequest request) {
+    public static Specification<MessageLeaveEntity> search(MessageLeaveRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

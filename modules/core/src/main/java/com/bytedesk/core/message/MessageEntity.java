@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 11:27:33
+ * @LastEditTime: 2025-03-11 10:48:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,8 +40,6 @@ public class MessageEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
-    // 如果使用int存储，enum中类型的顺序改变，会导致数据库中的数据类型改变，导致无法查询到数据
-    // @Enumerated(EnumType.STRING) // 默认使用int类型表示，如果为了可读性，可以转换为使用字符串存储
     @Column(name = "message_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
 
@@ -53,9 +51,7 @@ public class MessageEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    // 有帮助、没帮助
-    @Builder.Default
-    private String helpful = MessageHelpfulEnum.HELPFUL.name();
+    // helpful/feedback 迁移至 MessageExtra
 
     // 是否是机器人
     @Builder.Default
@@ -67,12 +63,8 @@ public class MessageEntity extends BaseEntity {
     @Column(name = "is_visitor", nullable = false)
     private boolean visitor = false;
 
-
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     @Builder.Default
@@ -92,9 +84,6 @@ public class MessageEntity extends BaseEntity {
     // private User user;
     // h2 db 不能使用 user, 所以重定义为 message_user
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(name = "message_user", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "message_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 

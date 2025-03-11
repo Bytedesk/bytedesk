@@ -51,7 +51,7 @@ import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.event.AgentUpdateEvent;
 import com.bytedesk.service.constant.I18ServiceConsts;
-import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -214,8 +214,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
         // 
-        LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatAgentLeaveMsgSettings(request);
-        agent.setLeaveMsgSettings(leaveMsgSettings);
+        MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatAgentMessageLeaveSettings(request);
+        agent.setMessageLeaveSettings(messageLeaveSettings);
         // 
         // 一对一人工客服，不支持机器人接待
         // RobotSettings robotSettings = serviceSettingsService.formatAgentRobotSettings(request);

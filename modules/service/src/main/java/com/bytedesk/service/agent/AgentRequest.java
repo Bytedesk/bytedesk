@@ -19,7 +19,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsRequest;
-import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsRequest;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue.settings.QueueSettings;
 
 import jakarta.validation.constraints.Email;
@@ -65,7 +65,7 @@ public class AgentRequest extends BaseRequest {
     private Boolean enabled = true;
 
     @Builder.Default
-    private LeaveMsgSettingsRequest leaveMsgSettings = new LeaveMsgSettingsRequest();
+    private MessageLeaveSettingsRequest messageLeaveSettings = new MessageLeaveSettingsRequest();
 
     // 一对一人工客服，不支持机器人接待
     // @Builder.Default

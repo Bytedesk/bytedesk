@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-19 11:54:09
+ * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 11:54:12
+ * @LastEditTime: 2025-03-11 09:23:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,11 +11,18 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_feedback;
 
-public enum LeaveMsgStatusEnum {
-    UNREAD,
-    READ,
-    REPLIED,
-    CLOSED
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+public interface MessageFeedbackRepository extends JpaRepository<MessageFeedbackEntity, Long>, JpaSpecificationExecutor<MessageFeedbackEntity> {
+
+    Optional<MessageFeedbackEntity> findByUid(String uid);
+
+    Boolean existsByUid(String uid);
+
+    // Boolean existsByPlatform(String platform);
 }

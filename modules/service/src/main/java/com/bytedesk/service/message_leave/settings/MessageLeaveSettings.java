@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg.settings;
+package com.bytedesk.service.message_leave.settings;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.service.leave_msg.LeaveMsgNotifyTypeEnum;
+import com.bytedesk.service.message_leave.MessageLeaveNotifyTypeEnum;
 import com.bytedesk.service.worktime.WorktimeEntity;
 
 import jakarta.persistence.Column;
@@ -37,51 +37,51 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveMsgSettings implements Serializable {
+public class MessageLeaveSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     // 留言开关
     @Builder.Default
     @Column(name = "is_leave_msg_enabled")
-    private boolean leaveMsgEnabled = true;
+    private boolean messageLeaveEnabled = true;
 
     @NotBlank
     @Builder.Default
-    private String leaveMsgTip = I18Consts.I18N_LEAVEMSG_TIP;
+    private String messageLeaveTip = I18Consts.I18N_LEAVEMSG_TIP;
 
     // 处理留言agent
     @Builder.Default
-    private String leaveMsgAgentUid = BytedeskConsts.EMPTY_STRING;
+    private String messageLeaveAgentUid = BytedeskConsts.EMPTY_STRING;
 
     // 是否支持留言提醒
     @Builder.Default
-    private Boolean leaveMsgNotify = false;
+    private Boolean messageLeaveNotify = false;
 
     // 留言提醒类型
     @Builder.Default
-    private String leaveMsgNotifyType = LeaveMsgNotifyTypeEnum.EMAIL.name();
+    private String messageLeaveNotifyType = MessageLeaveNotifyTypeEnum.EMAIL.name();
 
     // 留言提醒邮箱
     @Builder.Default
-    private String leaveMsgNotifyEmail = BytedeskConsts.EMPTY_STRING;
+    private String messageLeaveNotifyEmail = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
-    private String leaveMsgNotifyMobile = BytedeskConsts.EMPTY_STRING;
+    private String messageLeaveNotifyMobile = BytedeskConsts.EMPTY_STRING;
 
     // @Builder.Default
-    // private String leaveMsgNotifyWechat = BytedeskConsts.EMPTY_STRING;
+    // private String messageLeaveNotifyWechat = BytedeskConsts.EMPTY_STRING;
 
     // 留言提醒时间
     // @Builder.Default
-    // private String leaveMsgNotifyTime = BytedeskConsts.EMPTY_STRING;
+    // private String messageLeaveNotifyTime = BytedeskConsts.EMPTY_STRING;
 
     // 留言表单
     @Builder.Default
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String leaveMsgForm = BytedeskConsts.EMPTY_JSON_STRING;
+    private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
 
     /** work time */
     @Builder.Default

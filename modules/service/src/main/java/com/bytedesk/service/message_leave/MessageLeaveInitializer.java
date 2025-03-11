@@ -11,13 +11,13 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_leave;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LeaveMsgInitializer implements SmartInitializingSingleton {
+public class MessageLeaveInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {

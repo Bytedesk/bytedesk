@@ -11,14 +11,14 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_leave;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface LeaveMsgRepository extends JpaRepository<LeaveMsgEntity, Long>, JpaSpecificationExecutor<LeaveMsgEntity> {
+public interface MessageLeaveRepository extends JpaRepository<MessageLeaveEntity, Long>, JpaSpecificationExecutor<MessageLeaveEntity> {
 
-    Optional<LeaveMsgEntity> findByUid(String uid);
+    Optional<MessageLeaveEntity> findByUid(String uid);
 }

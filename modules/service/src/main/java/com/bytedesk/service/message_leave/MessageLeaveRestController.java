@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:40:25
+ * @LastEditTime: 2025-03-11 10:57:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,12 +11,11 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_leave;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,56 +30,55 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/leavemsg")
 @AllArgsConstructor
-public class LeaveMsgRestController extends BaseRestController<LeaveMsgRequest> {
+public class MessageLeaveRestController extends BaseRestController<MessageLeaveRequest> {
 
-    private final LeaveMsgRestService LeaveMsgService;
+    private final MessageLeaveRestService MessageLeaveService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(LeaveMsgRequest request) {
+    public ResponseEntity<?> queryByOrg(MessageLeaveRequest request) {
 
-        Page<LeaveMsgResponse> page = LeaveMsgService.queryByOrg(request);
+        Page<MessageLeaveResponse> page = MessageLeaveService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(LeaveMsgRequest request) {
+    public ResponseEntity<?> queryByUser(MessageLeaveRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
-    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(@RequestBody LeaveMsgRequest request) {
+    public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
-        LeaveMsgResponse response = LeaveMsgService.create(request);
+        MessageLeaveResponse response = MessageLeaveService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
-    public ResponseEntity<?> update(LeaveMsgRequest request) {
+    public ResponseEntity<?> update(MessageLeaveRequest request) {
 
-        LeaveMsgResponse response = LeaveMsgService.update(request);
+        MessageLeaveResponse response = MessageLeaveService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
-    public ResponseEntity<?> delete(LeaveMsgRequest request) {
+    public ResponseEntity<?> delete(MessageLeaveRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public Object export(LeaveMsgRequest request, HttpServletResponse response) {
+    public Object export(MessageLeaveRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(LeaveMsgRequest request) {
+    public ResponseEntity<?> queryByUid(MessageLeaveRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }

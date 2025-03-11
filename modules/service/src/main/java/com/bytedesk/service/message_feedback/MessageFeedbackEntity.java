@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-02-22 16:11:42
+ * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 06:44:16
+ * @LastEditTime: 2025-03-11 10:49:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,19 +11,16 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.bytedesk.service.message_feedback;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.utils.StringListConverter;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+// import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,9 +29,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * 留言
- */
 @Entity
 @Data
 @Builder
@@ -42,30 +36,32 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_service_leavemsg")
-public class LeaveMsgEntity extends BaseEntity {
+// @EntityListeners({MessageFeedbackEntityListener.class})
+@Table(name = "bytedesk_service_message_feedback")
+public class MessageFeedbackEntity extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
-
-    // 联系方式
-    private String contact;
-
-    // 留言内容
-    private String content;
-
-    // 支持图片
-    @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> images = new ArrayList<>();
-
-    private String threadTopic;
+    private String name;
 
     @Builder.Default
-    private String status = LeaveMsgStatusEnum.UNREAD.name();
+    private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "leavemsg_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    // @JdbcTypeCode(SqlTypes.JSON)
-    private String user = BytedeskConsts.EMPTY_JSON_STRING;
+    @Column(name = "message_feedback_type", nullable = false)
+    private String type = MessageFeedbackTypeEnum.CUSTOMER.name();
+
+    @Builder.Default
+    @Column(name = "message_feedback_color", nullable = false)
+    private String color = "red";
+
+    @Builder.Default
+    @Column(name = "message_feedback_order", nullable = false)
+    private int order = 0;
+
+    @Builder.Default
+    private String level = LevelEnum.ORGANIZATION.name();
+
+    @Builder.Default
+    private String platform = PlatformEnum.BYTEDESK.name();
+
+    private String userUid;
 }

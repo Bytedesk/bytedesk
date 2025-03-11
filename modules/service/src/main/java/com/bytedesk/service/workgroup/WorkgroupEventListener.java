@@ -83,7 +83,7 @@ public class WorkgroupEventListener {
         workgroupRequest.setOrgUid(orgUid);
         workgroupRequest.getServiceSettings().setFaqUids(faqUids);
         workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
-        workgroupRequest.getLeaveMsgSettings().setWorktimeUids(worktimeUids);
+        workgroupRequest.getMessageLeaveSettings().setWorktimeUids(worktimeUids);
 
         workgroupService.create(workgroupRequest);
     }
