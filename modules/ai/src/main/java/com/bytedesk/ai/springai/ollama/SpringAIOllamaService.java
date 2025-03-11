@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 15:55:54
+ * @LastEditTime: 2025-03-11 14:56:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,11 +25,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,12 +42,16 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     
     private final Optional<OllamaChatModel> bytedeskOllamaChatModel;
 
+    private final UidUtils uidUtils;
+
     public SpringAIOllamaService(
             @Qualifier("bytedeskOllamaChatModel") Optional<OllamaChatModel> bytedeskOllamaChatModel,
             Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService) {
+            IMessageSendService messageSendService, 
+            UidUtils uidUtils) {
         super(springAIVectorService, messageSendService);
         this.bytedeskOllamaChatModel = bytedeskOllamaChatModel;
+        this.uidUtils = uidUtils;
     }
 
     @Override
@@ -92,10 +98,10 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(String message, SseEmitter emitter) {
+    protected void processPromptSSE(String question, SseEmitter emitter) {
         bytedeskOllamaChatModel.ifPresentOrElse(
             model -> {
-                Prompt prompt = new Prompt(message);
+                Prompt prompt = new Prompt(question);
                 model.stream(prompt).subscribe(
                     response -> {
                         try {
@@ -104,10 +110,15 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                 for (Generation generation : generations) {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
-                                    
+                                    // 
+                                    MessageProtobuf messageProtobuf = MessageProtobuf
+                                        .builder()
+                                        .uid(uidUtils.getUid())
+                                        .content(textContent)
+                                        .build();                        
                                     // 发送SSE事件
                                     emitter.send(SseEmitter.event()
-                                        .data(textContent)
+                                        .data(JSON.toJSONString(messageProtobuf))
                                         .id(String.valueOf(System.currentTimeMillis()))
                                         .name("message"));
                                 }

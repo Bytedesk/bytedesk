@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 16:07:30
+ * @LastEditTime: 2025-03-11 14:40:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,7 +65,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 方式1：同步调用
-     * http://localhost:9003/springai/zhipuai/chat/sync?message=hello
+     * http://127.0.0.1:9003/springai/zhipuai/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -76,7 +76,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 方式2：异步流式调用
-     * http://localhost:9003/springai/zhipuai/chat/stream?message=hello
+     * http://127.0.0.1:9003/springai/zhipuai/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -87,7 +87,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 方式3：SSE调用
-     * http://localhost:9003/springai/zhipuai/chat/sse?message=hello
+     * http://127.0.0.1:9003/springai/zhipuai/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -119,7 +119,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://localhost:9003/springai/zhipuai/chat/custom?message=hello
+     * http://127.0.0.1:9003/springai/zhipuai/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(
@@ -140,7 +140,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 图像生成接口
-     * http://localhost:9003/springai/zhipuai/image
+     * http://127.0.0.1:9003/springai/zhipuai/image
      */
     @GetMapping("/image")
     public ResponseEntity<JsonResult<?>> generateImage(
