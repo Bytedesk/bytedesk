@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 15:04:57
+ * @LastEditTime: 2025-03-11 15:18:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.springai.ollama;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,9 +29,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -111,16 +116,33 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
                                     // 
+                                    ThreadProtobuf thread = ThreadProtobuf
+                                        .builder()
+                                        .uid(uidUtils.getUid())
+                                        .build();
+                                    UserProtobuf user = UserProtobuf
+                                        .builder()
+                                        .uid(uidUtils.getUid())
+                                        .nickname("ollama")
+                                        .avatar("")
+                                        .build();
+                                    // 
                                     MessageProtobuf messageProtobuf = MessageProtobuf
                                         .builder()
                                         .uid(uidUtils.getUid())
                                         .content(textContent)
+                                        .type(MessageTypeEnum.STREAM)
+                                        .status(MessageStatusEnum.SUCCESS)
+                                        .client(ClientEnum.SYSTEM)
+                                        .createdAt(LocalDateTime.now())
+                                        .thread(thread)
+                                        .user(user)
                                         .build();                        
                                     // 发送SSE事件
                                     emitter.send(SseEmitter.event()
                                         .data(JSON.toJSONString(messageProtobuf))
                                         .id(messageProtobuf.getUid())
-                                        .name("ollamaMessage"));
+                                        .name("message"));
                                 }
                             }
                         } catch (Exception e) {
