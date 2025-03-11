@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 17:29:15
+ * @LastEditTime: 2025-03-11 18:10:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class RobotEventListener {
 
-    private final RobotRestService robotRestService;
+    
     // private final Optional<ZhipuaiChatService> zhipuaiChatService;
     // private final Optional<OllamaChatService> ollamaChatService;
     private final Optional<SpringAIDeepseekService> springAIDeepseekService;
@@ -64,6 +64,7 @@ public class RobotEventListener {
     private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
     private final IMessageSendService messageSendService;
+    private final RobotRestService robotRestService;
     // private final RobotFaqProcessor robotFaqProcessor;
 
     @Order(5)

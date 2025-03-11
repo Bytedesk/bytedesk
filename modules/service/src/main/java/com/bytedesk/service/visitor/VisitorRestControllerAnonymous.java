@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 17:25:00
+ * @LastEditTime: 2025-03-11 18:07:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
@@ -64,6 +65,8 @@ public class VisitorRestControllerAnonymous {
     private final IpService ipService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final RobotService robotService;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -158,7 +161,7 @@ public class VisitorRestControllerAnonymous {
         
         executorService.execute(() -> {
             try {
-                // springAIOllamaService.processPromptSSE(message, emitter);
+                robotService.processSseMessage(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);

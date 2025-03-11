@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:34:00
+ * @LastEditTime: 2025-03-11 18:01:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -98,7 +98,7 @@ public class SpringAIZhipuaiController {
         
         executorService.execute(() -> {
             try {
-                springAIZhipuaiService.processPromptSSE(message, emitter);
+                // springAIZhipuaiService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);
