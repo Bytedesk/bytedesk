@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 22:25:42
+ * @LastEditTime: 2025-03-11 16:33:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.core.annotation.UserIp;
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,7 +62,7 @@ public class SpringAIDashscopeController {
 	private final DashScopeChatModel bytedeskDashScopeChatModel;
 	private final Optional<SpringAIDashscopeImageService> imageService;
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
-	private final UidUtils uidUtils;
+	// private final UidUtils uidUtils;
 	
 	@Qualifier("bytedeskDashScopeChatClient")
 	private final ChatClient bytedeskDashScopeChatClient;
@@ -108,7 +107,7 @@ public class SpringAIDashscopeController {
 		
 		executorService.execute(() -> {
 			try {
-				springAIDashscopeService.processPromptSSE(uidUtils.getUid(), message, emitter);
+				springAIDashscopeService.processPromptSSE(message, emitter);
 			} catch (Exception e) {
 				log.error("Error processing SSE request", e);
 				emitter.completeWithError(e);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 15:33:04
+ * @LastEditTime: 2025-03-11 16:34:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -91,7 +91,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(String uid, String message, SseEmitter emitter) {
+    protected void processPromptSSE(String message, SseEmitter emitter) {
         deepSeekChatModel.ifPresentOrElse(
             model -> {
                 Prompt prompt = new Prompt(message);

@@ -34,7 +34,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendWsKbMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
+    public void sendWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(robot, "RobotEntity must not be null");
         Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
@@ -51,16 +51,17 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendWsMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
-        Assert.hasText(query, "Query must not be empty");
-        Assert.notNull(robot, "Robot must not be null");
-        Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+    public void sendKbaseSseMessage(String message, SseEmitter emitter) {
+        Assert.hasText(message, "Message must not be empty");
+        Assert.notNull(emitter, "SseEmitter must not be null");
 
-        String prompt = buildPrompt(robot.getLlm().getPrompt(), query);
-        List<Message> messages = buildMessages(robot.getLlm().getPrompt(), prompt);
-        Prompt aiPrompt = new Prompt(messages);
-        
-        processPrompt(aiPrompt, messageProtobuf);
+        // MessageProtobuf messageProtobuf = new MessageProtobuf();
+        // messageProtobuf.setType(MessageProtobuf.MessageType.TEXT);
+
+        // String result = processPromptSync(message);
+        // messageProtobuf.setContent(result);
+        // messageSendService.sendProtobufMessage(messageProtobuf);
+        // 
     }
 
     @Override
@@ -71,6 +72,39 @@ public abstract class BaseSpringAIService implements SpringAIService {
         String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
         return generateFaqPairs(prompt);
     }
+
+    // @Override
+    // public void sendLlmWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
+    //     Assert.hasText(query, "Query must not be empty");
+    //     Assert.notNull(robot, "Robot must not be null");
+    //     Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+
+    //     String prompt = buildPrompt(robot.getLlm().getPrompt(), query);
+    //     List<Message> messages = buildMessages(robot.getLlm().getPrompt(), prompt);
+    //     Prompt aiPrompt = new Prompt(messages);
+        
+    //     processPrompt(aiPrompt, messageProtobuf);
+    // }
+
+
+    // @Override
+    // public void sendKbaseWebsocketAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
+    //     Assert.hasText(query, "Query must not be empty");
+    //     Assert.hasText(kbUid, "Knowledge base UID must not be empty");
+    //     Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+    //     Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must be present");
+
+    //     List<String> contentList = springAIVectorService.get().searchText(query, kbUid);
+    //     String context = String.join("\n", contentList);
+    //     String prompt = RobotConsts.PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
+        
+    //     List<Message> messages = buildMessages(prompt, prompt);
+    //     Prompt aiPrompt = new Prompt(messages);
+        
+    //     processPrompt(aiPrompt, messageProtobuf);
+    // }
+
+    
 
     @Override
     public void generateFaqPairsSync(String chunk) {
@@ -103,23 +137,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    @Override
-    public void sendWsKbAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf) {
-        Assert.hasText(query, "Query must not be empty");
-        Assert.hasText(kbUid, "Knowledge base UID must not be empty");
-        Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
-        Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must be present");
-
-        List<String> contentList = springAIVectorService.get().searchText(query, kbUid);
-        String context = String.join("\n", contentList);
-        String prompt = RobotConsts.PROMPT_BLUEPRINT.replace("{context}", context).replace("{query}", query);
-        
-        List<Message> messages = buildMessages(prompt, prompt);
-        Prompt aiPrompt = new Prompt(messages);
-        
-        processPrompt(aiPrompt, messageProtobuf);
-    }
-
     protected String buildKbPrompt(String systemPrompt, String query, String context) {
         return systemPrompt + "\n" +
                "用户查询: " + query + "\n" +
@@ -141,7 +158,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // 抽象方法，由具体实现类提供
     protected abstract void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf);
     protected abstract String processPromptSync(String message);
-    protected abstract void processPromptSSE(String uid, String message, SseEmitter emitter);
+    protected abstract void processPromptSSE(String message, SseEmitter emitter);
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);
 } 
