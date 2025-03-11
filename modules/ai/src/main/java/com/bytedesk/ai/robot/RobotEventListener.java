@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:46:50
+ * @LastEditTime: 2025-03-11 17:03:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,7 +62,7 @@ public class RobotEventListener {
     private final Optional<SpringAIDashscopeService> springAIDashscopeService;
     private final Optional<SpringAIOllamaService> springAIOllamaService;
     private final UidUtils uidUtils;
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
     private final IMessageSendService messageSendService;
     // private final RobotFaqProcessor robotFaqProcessor;
 
@@ -98,119 +98,31 @@ public class RobotEventListener {
         if (threadProtobuf == null) {
             throw new RuntimeException("thread is null");
         }
+        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
         if (!messageType.equals(MessageTypeEnum.TEXT)) {
             return;
         }
         String threadTopic = threadProtobuf.getTopic();
-        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
-            processLlmThreadMessage(query, threadTopic, threadProtobuf, messageProtobuf);
-            return;
-        } else if (threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-            log.info("robot robot threadTopic {}, thread.type {}", threadTopic,
-            threadProtobuf.getType());
+        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) || threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
+            log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
             processRobotThreadMessage(query, threadTopic, threadProtobuf, messageProtobuf);
         }
     }
 
-    private void processLlmThreadMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf, MessageProtobuf messageProtobuf) {
-        log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
-            String[] splits = threadTopic.split("/");
-            if (splits.length < 4) {
-                throw new RuntimeException("robot topic format error");
-            }
-            String robotUid = splits[2];
-            if (!StringUtils.hasText(robotUid)) {
-                throw new RuntimeException("robotUid is null");
-            }
-            Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
-            if (robotOptional.isPresent()) {
-                RobotEntity robot = robotOptional.get();
-                // 
-                if (robot.getLlm().isEnabled()) {
-                    if (robot.isKbEnabled()) {
-                    }
-                } else if (robot.isKbEnabled()) {
-                } else {
-                }
-                Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
-                if (!threadOptional.isPresent()) {
-                    throw new RuntimeException("thread with topic " + threadTopic + " not found");
-                }
-                ThreadEntity thread = threadOptional.get();
-                // MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
-                // String agent = thread.getAgent();
-                // RobotProtobuf agent = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
-                // RobotEntity robot = robotRestService.findByUid(agent.getUid())
-                //     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-                // UserProtobuf user = UserProtobuf.builder()
-                //         .nickname(robotProtobuf.getNickname())
-                //         .avatar(robotProtobuf.getAvatar())
-                //         .type(UserTypeEnum.ROBOT.name())
-                //         .build();
-                // user.setUid(robotProtobuf.getUid());
-                // String messageUid = uidUtils.getUid();
-                // MessageProtobuf message = MessageProtobuf.builder()
-                //         .uid(messageUid)
-                //         .status(MessageStatusEnum.SUCCESS)
-                //         .thread(threadProtobuf)
-                //         .user(user)
-                //         .client(ClientEnum.ROBOT)
-                //         .extra(JSONObject.toJSONString(extraObject))
-                //         .createdAt(LocalDateTime.now())
-                //         .build();
-                MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot, messageProtobuf);
-                // 
-                MessageProtobuf clonedMessage = SerializationUtils.clone(message);
-                clonedMessage.setUid(uidUtils.getUid());
-                clonedMessage.setType(MessageTypeEnum.PROCESSING);
-                messageSendService.sendProtobufMessage(clonedMessage);
-                //
-                if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                    springAIOllamaService
-                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-                } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
-                    springAIDeepseekService
-                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-                } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
-                    springAIDashscopeService
-                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-                } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
-                    springAIZhipuaiService
-                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-                } else {
-                    // 默认使用智谱AI
-                    springAIZhipuaiService
-                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-                }
-            } else {
-                log.error("robot not found");
-            }
-    }
-
     private void processRobotThreadMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf, MessageProtobuf messageProtobuf) {
-        ThreadEntity thread = threadService.findFirstByTopic(threadTopic)
+        ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                         " not found"));
         if (!StringUtils.hasText(thread.getAgent())) {
             return;
         }
         UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        if (agent.getType().equals(UserTypeEnum.ROBOT.name())
-                && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())) {
+        // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
+        if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
             log.info("robot thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            // MessageExtra extra = MessageUtils.getMessageExtra(robot.getOrgUid());
-            // String messageUid = uidUtils.getUid();
-            // MessageProtobuf message = MessageProtobuf.builder()
-            //         .uid(messageUid)
-            //         .status(MessageStatusEnum.SUCCESS)
-            //         .thread(threadProtobuf)
-            //         .user(agent)
-            //         .client(ClientEnum.ROBOT)
-            //         .extra(JSONObject.toJSONString(extra))
-            //         .createdAt(LocalDateTime.now())
-            //         .build();
+            // 
             MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot, messageProtobuf);
             // 
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
@@ -233,5 +145,81 @@ public class RobotEventListener {
         }
     }
     
+
+    // private void processLlmThreadMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf, MessageProtobuf messageProtobuf) {
+    //     log.info("robot llm threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+    //         String[] splits = threadTopic.split("/");
+    //         if (splits.length < 4) {
+    //             throw new RuntimeException("robot topic format error");
+    //         }
+    //         String robotUid = splits[2];
+    //         if (!StringUtils.hasText(robotUid)) {
+    //             throw new RuntimeException("robotUid is null");
+    //         }
+    //         Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
+    //         if (robotOptional.isPresent()) {
+    //             RobotEntity robot = robotOptional.get();
+    //             // 
+    //             if (robot.getLlm().isEnabled()) {
+    //                 if (robot.isKbEnabled()) {
+    //                 }
+    //             } else if (robot.isKbEnabled()) {
+    //             } else {
+    //             }
+    //             Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
+    //             if (!threadOptional.isPresent()) {
+    //                 throw new RuntimeException("thread with topic " + threadTopic + " not found");
+    //             }
+    //             ThreadEntity thread = threadOptional.get();
+    //             // MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+    //             // String agent = thread.getAgent();
+    //             // RobotProtobuf agent = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
+    //             // RobotEntity robot = robotRestService.findByUid(agent.getUid())
+    //             //     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
+    //             // UserProtobuf user = UserProtobuf.builder()
+    //             //         .nickname(robotProtobuf.getNickname())
+    //             //         .avatar(robotProtobuf.getAvatar())
+    //             //         .type(UserTypeEnum.ROBOT.name())
+    //             //         .build();
+    //             // user.setUid(robotProtobuf.getUid());
+    //             // String messageUid = uidUtils.getUid();
+    //             // MessageProtobuf message = MessageProtobuf.builder()
+    //             //         .uid(messageUid)
+    //             //         .status(MessageStatusEnum.SUCCESS)
+    //             //         .thread(threadProtobuf)
+    //             //         .user(user)
+    //             //         .client(ClientEnum.ROBOT)
+    //             //         .extra(JSONObject.toJSONString(extraObject))
+    //             //         .createdAt(LocalDateTime.now())
+    //             //         .build();
+    //             MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot, messageProtobuf);
+    //             // 
+    //             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
+    //             clonedMessage.setUid(uidUtils.getUid());
+    //             clonedMessage.setType(MessageTypeEnum.PROCESSING);
+    //             messageSendService.sendProtobufMessage(clonedMessage);
+    //             //
+    //             if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
+    //                 springAIOllamaService
+    //                         .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
+    //                 springAIDeepseekService
+    //                         .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
+    //                 springAIDashscopeService
+    //                         .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
+    //                 springAIZhipuaiService
+    //                         .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //             } else {
+    //                 // 默认使用智谱AI
+    //                 springAIZhipuaiService
+    //                         .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //             }
+    //         } else {
+    //             log.error("robot not found");
+    //         }
+    // }
+
 
 }

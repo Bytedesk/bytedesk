@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:35:47
+ * @LastEditTime: 2025-03-11 17:19:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,12 +68,6 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         messageProtobuf.setContent(textContent);
                         messageSendService.sendProtobufMessage(messageProtobuf);
                     }
-                    // 判断输出是否结束
-                    // if (response.isComplete()) {
-                    //     messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                    //     messageProtobuf.setContent("输出结束");
-                    //     messageSendService.sendProtobufMessage(messageProtobuf);
-                    // }
                 }
             },
             error -> {
@@ -112,29 +106,6 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     public void processPromptSSE(String messageJson, SseEmitter emitter) {
 
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
-        // 
-        // ThreadProtobuf thread = ThreadProtobuf
-        //     .builder()
-        //     .uid(uid)
-        //     .build();
-        // UserProtobuf user = UserProtobuf
-        //     .builder()
-        //     .uid(uid)
-        //     .nickname("ollama")
-        //     .avatar("")
-        //     .build();
-        // // 
-        // MessageProtobuf messageProtobuf = MessageProtobuf
-        //     .builder()
-        //     .uid(uid)
-        //     // .content(textContent)
-        //     .type(MessageTypeEnum.STREAM)
-        //     .status(MessageStatusEnum.SUCCESS)
-        //     .client(ClientEnum.SYSTEM)
-        //     .createdAt(LocalDateTime.now())
-        //     .thread(thread)
-        //     .user(user)
-        //     .build();  
             // 
         Prompt prompt = new Prompt(messageProtobuf.getContent());
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
