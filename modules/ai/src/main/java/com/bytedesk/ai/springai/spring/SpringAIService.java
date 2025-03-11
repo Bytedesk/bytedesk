@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 14:48:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:45:31
+ * @LastEditTime: 2025-03-11 16:55:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 public interface SpringAIService {
 
     /**
-     * 发送基于知识库的消息
+     * 发送websocket消息
      * @param query 用户查询
      * @param robot 机器人实体
      * @param messageProtobuf 消息协议
@@ -33,23 +33,7 @@ public interface SpringAIService {
     void sendWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf);
     
     /**
-     * 发送普通消息
-     * @param query 用户查询
-     * @param robot 机器人
-     * @param messageProtobuf 消息协议
-     */
-    // void sendLlmWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf);
-
-    /**
-     * 发送基于知识库的自动回复消息
-     * @param query 用户查询
-     * @param kbUid 知识库ID
-     * @param messageProtobuf 消息协议
-     */
-    // void sendKbaseWebsocketAutoReply(String query, String kbUid, MessageProtobuf messageProtobuf);
-
-    /**
-     * 处理消息
+     * 发送Sse消息
      * @param message 消息
      * @param emitter SseEmitter
      */
