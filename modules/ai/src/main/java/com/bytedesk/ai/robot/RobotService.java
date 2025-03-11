@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 17:47:59
+ * @LastEditTime: 2025-03-11 18:14:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,13 +13,8 @@
  */
 package com.bytedesk.ai.robot;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
 // import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.SerializationUtils;
@@ -27,10 +22,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.provider.LlmProviderConsts;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
+import com.bytedesk.ai.springai.dashscope.SpringAIDashscopeService;
+import com.bytedesk.ai.springai.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;
-import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -38,6 +36,7 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -48,22 +47,18 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RobotService {
 
-    private final RobotRestService robotRestService;
-
-    private final ThreadRestService threadRestService;
-
-    protected final IMessageSendService messageSendService;
+    private final Optional<SpringAIDeepseekService> springAIDeepseekService;
+    private final Optional<SpringAIZhipuaiService> springAIZhipuaiService;
+    private final Optional<SpringAIDashscopeService> springAIDashscopeService;
+    private final Optional<SpringAIOllamaService> springAIOllamaService;
 
     private final UidUtils uidUtils;
+    private final ThreadRestService threadRestService;
+    private final IMessageSendService messageSendService;
+    private final RobotRestService robotRestService;
 
-    // private final Optional<OllamaChatModel> bytedeskOllamaChatModel;
-
-    protected final Optional<SpringAIVectorService> springAIVectorService;
-
-    private final SpringAIOllamaService springAIOllamaService;
-
-    protected void processPromptSSE(String messageJson, SseEmitter emitter) {
-        //
+    public void processSseMessage(String messageJson, SseEmitter emitter) {
+        log.info("processPromptSSE: messageJson: {}", messageJson);
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
         if (messageType.equals(MessageTypeEnum.STREAM)) {
@@ -80,118 +75,47 @@ public class RobotService {
             return;
         }
         String threadTopic = threadProtobuf.getTopic();
+        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) || 
+            threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
+            log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+            processRobotThreadMessage(query, threadTopic, threadProtobuf, messageProtobuf, emitter);
+        }
+    }
+
+    private void processRobotThreadMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf, MessageProtobuf messageProtobuf, SseEmitter emitter) {
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                         " not found"));
+        if (!StringUtils.hasText(thread.getAgent())) {
+            return;
+        }
         UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
         if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
             log.info("robot thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            //
-            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
-                    messageProtobuf);
-            //
+            // 
+            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot, messageProtobuf);
+            // 
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
             clonedMessage.setUid(uidUtils.getUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
             messageSendService.sendProtobufMessage(clonedMessage);
             //
-            String prompt = "";
-            if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
-                List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
-                String context = String.join("\n", contentList);
-                prompt = springAIOllamaService.buildKbPrompt(robot.getLlm().getPrompt(), query, context);
+            if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
+                springAIOllamaService.ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+            } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
+                springAIDeepseekService.ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+            } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
+                springAIDashscopeService.ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+            } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
+                springAIZhipuaiService.ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             } else {
-                prompt = robot.getLlm().getPrompt();
+                // 默认使用智谱AI
+                springAIZhipuaiService.ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             }
-            // 
-            List<Message> messages = new ArrayList<>();
-            messages.add(new SystemMessage(prompt));
-            messages.add(new UserMessage(query));
-            // 
-            // Prompt aiPrompt = new Prompt(messages);
-            // 
-            // springAIOllamaService.sendSseMessage(query, robot, message);
-            // 
-            // ollamaProcess(robot, aiPrompt, threadProtobuf, message, emitter);
         }
     }
-
-    // private void ollamaProcess(RobotEntity robot, Prompt aiPrompt, ThreadProtobuf thread, MessageProtobuf message, SseEmitter emitter) {
-    //     // 你的处理逻辑
-    //     bytedeskOllamaChatModel.ifPresentOrElse(
-    //                 model -> {
-                        
-    //                     model.stream(aiPrompt).subscribe(
-    //                             response -> {
-    //                                 try {
-    //                                     if (response != null) {
-    //                                         List<Generation> generations = response.getResults();
-    //                                         for (Generation generation : generations) {
-    //                                             AssistantMessage assistantMessage = generation.getOutput();
-    //                                             String textContent = assistantMessage.getText();
-    //                                             //
-    //                                             message.setContent(textContent);
-    //                                             message.setType(MessageTypeEnum.STREAM);
-    //                                             // 发送SSE事件
-    //                                             emitter.send(SseEmitter.event()
-    //                                                     .data(JSON.toJSONString(message))
-    //                                                     .id(message.getUid())
-    //                                                     .name("message"));
-    //                                         }
-    //                                     }
-    //                                 } catch (Exception e) {
-    //                                     log.error("Error sending SSE event", e);
-                                        
-    //                                     emitter.completeWithError(e);
-    //                                 }
-    //                             },
-    //                             error -> {
-    //                                 log.error("Ollama API SSE error: ", error);
-    //                                 try {
-    //                                     message.setType(MessageTypeEnum.ERROR);
-    //                                     message.setContent("服务暂时不可用，请稍后重试");
-    //                                     // 
-    //                                     emitter.send(SseEmitter.event()
-    //                                             .data(JSON.toJSONString(message))   
-    //                                             .id(message.getUid())
-    //                                             .name("error"));
-    //                                     emitter.complete();
-    //                                 } catch (Exception e) {
-    //                                     emitter.completeWithError(e);
-    //                                 }
-    //                             },
-    //                             () -> {
-    //                                 try {
-    //                                     // 发送流结束标记
-    //                                     message.setType(MessageTypeEnum.STREAM_END);
-    //                                     message.setContent(""); // 或者可以是任何结束标记
-    //                                     emitter.send(SseEmitter.event()
-    //                                             .data(JSON.toJSONString(message))   
-    //                                             .id(message.getUid())
-    //                                             .name("end"));
-    //                                     emitter.complete();
-    //                                 } catch (Exception e) {
-    //                                     log.error("Error completing SSE", e);
-    //                                 }
-    //                             });
-    //                 },
-    //                 () -> {
-    //                     try {
-    //                         // 发送流结束标记
-    //                         message.setType(MessageTypeEnum.STREAM_END);
-    //                         message.setContent("Ollama service is not available"); // 或者可以是任何结束标记
-    //                         emitter.send(SseEmitter.event()
-    //                                 .data(JSON.toJSONString(message))   
-    //                                 .id(message.getUid())
-    //                                 .name("ollama_error"));
-    //                         emitter.complete();
-    //                     } catch (Exception e) {
-    //                         emitter.completeWithError(e);
-    //                     }
-    //                 });
-    // }
-
     
 }

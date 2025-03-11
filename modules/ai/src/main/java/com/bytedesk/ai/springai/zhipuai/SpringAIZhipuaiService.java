@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 17:19:51
+ * @LastEditTime: 2025-03-11 18:01:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,12 +26,17 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.uid.UidUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
@@ -45,8 +50,11 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     public SpringAIZhipuaiService(
             @Qualifier("bytedeskZhipuaiChatModel") ZhiPuAiChatModel bytedeskZhipuaiChatModel,
             Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService) {
-        super(springAIVectorService, messageSendService);
+            IMessageSendService messageSendService,  
+            UidUtils uidUtils,
+            RobotRestService robotRestService,
+            ThreadRestService threadRestService) {
+        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService);
         this.bytedeskZhipuaiChatModel = bytedeskZhipuaiChatModel;
     }
 
@@ -103,11 +111,12 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    public void processPromptSSE(String messageJson, SseEmitter emitter) {
+    public void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
+            MessageProtobuf messageProtobuf, SseEmitter emitter) {
 
-        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+        // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
             // 
-        Prompt prompt = new Prompt(messageProtobuf.getContent());
+        // Prompt prompt = new Prompt(messageProtobuf.getContent());
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
 
         responseFlux.subscribe(

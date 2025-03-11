@@ -86,7 +86,7 @@ public class SpringAIDeepseekController {
         
         executorService.execute(() -> {
             try {
-                springAIDeepseekService.processPromptSSE(message, emitter);
+                // springAIDeepseekService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);

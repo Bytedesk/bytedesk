@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:34:49
+ * @LastEditTime: 2025-03-11 18:01:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,11 +24,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,9 +47,13 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     public SpringAIDeepseekService(
             Optional<OpenAiChatModel> deepSeekChatModel,
             Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService) {
-        super(springAIVectorService, messageSendService);
+            IMessageSendService messageSendService,
+            UidUtils uidUtils,
+            RobotRestService robotRestService,
+            ThreadRestService threadRestService) {
+        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService);
         this.deepSeekChatModel = deepSeekChatModel;
+
     }
 
     @Override
@@ -91,10 +100,10 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(String message, SseEmitter emitter) {
+    protected void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
+            MessageProtobuf messageProtobuf, SseEmitter emitter) {
         deepSeekChatModel.ifPresentOrElse(
             model -> {
-                Prompt prompt = new Prompt(message);
                 model.stream(prompt).subscribe(
                     response -> {
                         try {

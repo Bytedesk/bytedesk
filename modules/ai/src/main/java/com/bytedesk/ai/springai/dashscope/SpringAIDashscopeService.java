@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:46:11
+ * @LastEditTime: 2025-03-11 18:00:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,12 +22,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import io.micrometer.core.instrument.Counter;
@@ -42,7 +46,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     // private final Optional<DashScopeChatModel> bytedeskDashScopeChatModel;
     // private final ChatClient bytedeskDashScopeChatClient;
     @Qualifier("bytedeskDashScopeChatClient")
-	private final ChatClient bytedeskDashScopeChatClient;
+    private final ChatClient bytedeskDashScopeChatClient;
 
     private final Counter aiRequestCounter;
     private final Timer aiResponseTimer;
@@ -51,47 +55,50 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
             @Qualifier("bytedeskDashScopeChatClient") ChatClient bytedeskDashScopeChatClient,
             Optional<SpringAIVectorService> springAIVectorService,
             IMessageSendService messageSendService,
-            MeterRegistry registry) {
-        super(springAIVectorService, messageSendService);
+            MeterRegistry registry,
+            UidUtils uidUtils,
+            RobotRestService robotRestService,
+            ThreadRestService threadRestService) {
+        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService);
+
         // this.bytedeskDashScopeChatModel = bytedeskDashScopeChatModel;
         this.bytedeskDashScopeChatClient = bytedeskDashScopeChatClient;
-        
+
         // 初始化监控指标
         this.aiRequestCounter = Counter.builder("bytedesk.ai.dashscope.requests")
-            .description("Number of DashScope AI requests")
-            .register(registry);
-            
+                .description("Number of DashScope AI requests")
+                .register(registry);
+
         this.aiResponseTimer = Timer.builder("bytedesk.ai.dashscope.response.time")
-            .description("DashScope AI response time")
-            .register(registry);
+                .description("DashScope AI response time")
+                .register(registry);
     }
 
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
         aiRequestCounter.increment();
-        
+
         Timer.Sample sample = Timer.start();
         try {
             bytedeskDashScopeChatClient.prompt(prompt.toString())
-                .stream()
-                .content()
-                .subscribe(
-                    content -> {
-                        messageProtobuf.setType(MessageTypeEnum.STREAM);
-                        messageProtobuf.setContent(content);
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    },
-                    error -> {
-                        log.error("DashScope API error: ", error);
-                        messageProtobuf.setType(MessageTypeEnum.ERROR);
-                        messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    },
-                    () -> {
-                        sample.stop(aiResponseTimer);
-                        log.info("Chat stream completed");
-                    }
-                );
+                    .stream()
+                    .content()
+                    .subscribe(
+                            content -> {
+                                messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                messageProtobuf.setContent(content);
+                                messageSendService.sendProtobufMessage(messageProtobuf);
+                            },
+                            error -> {
+                                log.error("DashScope API error: ", error);
+                                messageProtobuf.setType(MessageTypeEnum.ERROR);
+                                messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                messageSendService.sendProtobufMessage(messageProtobuf);
+                            },
+                            () -> {
+                                sample.stop(aiResponseTimer);
+                                log.info("Chat stream completed");
+                            });
         } catch (Exception e) {
             sample.stop(aiResponseTimer);
             log.error("Error in processPrompt", e);
@@ -117,50 +124,50 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(String messageJson, SseEmitter emitter) {
+    protected void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
+            MessageProtobuf messageProtobuf, SseEmitter emitter) {
 
-        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+        // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson,
+        // MessageProtobuf.class);
 
         try {
             bytedeskDashScopeChatClient.prompt(messageProtobuf.getContent())
-                .stream()
-                .content()
-                .subscribe(
-                    content -> {
-                        try {
-                            emitter.send(SseEmitter.event()
-                                .data(content)
-                                .id(String.valueOf(System.currentTimeMillis()))
-                                .name("message"));
-                        } catch (Exception e) {
-                            log.error("Error sending SSE event", e);
-                            emitter.completeWithError(e);
-                        }
-                    },
-                    error -> {
-                        log.error("DashScope API SSE error: ", error);
-                        try {
-                            emitter.send(SseEmitter.event()
-                                .data("服务暂时不可用，请稍后重试")
-                                .name("error"));
-                            emitter.complete();
-                        } catch (Exception e) {
-                            emitter.completeWithError(e);
-                        }
-                    },
-                    () -> {
-                        try {
-                            emitter.complete();
-                        } catch (Exception e) {
-                            log.error("Error completing SSE", e);
-                        }
-                    }
-                );
+                    .stream()
+                    .content()
+                    .subscribe(
+                            content -> {
+                                try {
+                                    emitter.send(SseEmitter.event()
+                                            .data(content)
+                                            .id(String.valueOf(System.currentTimeMillis()))
+                                            .name("message"));
+                                } catch (Exception e) {
+                                    log.error("Error sending SSE event", e);
+                                    emitter.completeWithError(e);
+                                }
+                            },
+                            error -> {
+                                log.error("DashScope API SSE error: ", error);
+                                try {
+                                    emitter.send(SseEmitter.event()
+                                            .data("服务暂时不可用，请稍后重试")
+                                            .name("error"));
+                                    emitter.complete();
+                                } catch (Exception e) {
+                                    emitter.completeWithError(e);
+                                }
+                            },
+                            () -> {
+                                try {
+                                    emitter.complete();
+                                } catch (Exception e) {
+                                    log.error("Error completing SSE", e);
+                                }
+                            });
         } catch (Exception e) {
             log.error("Error starting SSE stream", e);
             emitter.completeWithError(e);
         }
     }
-
 
 }
