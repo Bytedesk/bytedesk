@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 08:40:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 08:40:14
+ * @LastEditTime: 2025-03-11 09:00:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,9 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRequest;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
+import com.bytedesk.core.tag.TagRequest;
+import com.bytedesk.core.tag.TagRestService;
+import com.bytedesk.core.tag.TagTypeEnum;
 import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
@@ -39,10 +42,13 @@ public class ThreadInitializer implements SmartInitializingSingleton {
 
     private final CategoryRestService categoryService;
 
+    private final TagRestService tagRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
         initThreadCategory();
+        initThreadTag();
     }
 
     private void initAuthority() {
@@ -67,11 +73,9 @@ public class ThreadInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         for (String category : ThreadCategories.getAllCategories()) {
             // log.info("initThreadCategory: {}", category);
-
-            // if (ThreadCategories.isParentCategory(category)) { // 父类
             CategoryRequest categoryRequest = CategoryRequest.builder()
                     .name(category)
-                    .orderNo(0)
+                    .order(0)
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .build();
@@ -79,21 +83,26 @@ public class ThreadInitializer implements SmartInitializingSingleton {
             categoryRequest.setUid(Utils.formatUid(orgUid, category));
             categoryRequest.setOrgUid(orgUid);
             categoryService.create(categoryRequest);
-            // } else { // 子类
-            // String parentCategory = ThreadCategories.getParentCategory(category);
-            // CategoryRequest categoryRequest = CategoryRequest.builder()
-            // .parentUid(orgUid + parentCategory)
-            // .name(category)
-            // .orderNo(0)
-            // .level(LevelEnum.ORGANIZATION.name())
-            // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-            // .build();
-            // categoryRequest.setType(CategoryTypeEnum.THREAD.name());
-            // categoryRequest.setUid(orgUid + category);
-            // categoryRequest.setOrgUid(orgUid);
-            // categoryService.create(categoryRequest);
-            // }
         }
     }
 
+
+    private void initThreadTag() {
+        log.info("initThreadTag");
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        for (String tag : ThreadTags.getAllTags()) {
+            // log.info("initThreadCategory: {}", category);
+            TagRequest tagRequest = TagRequest.builder()
+                    .name(tag)
+                    .order(0)
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .build();
+            tagRequest.setType(TagTypeEnum.THREAD.name());
+            tagRequest.setUid(Utils.formatUid(orgUid, tag));
+            tagRequest.setOrgUid(orgUid);
+            tagRestService.create(tagRequest);
+        }
+
+    }
 }

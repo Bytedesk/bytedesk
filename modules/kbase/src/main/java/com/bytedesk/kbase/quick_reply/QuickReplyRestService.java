@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:15:45
+ * @LastEditTime: 2025-03-11 08:59:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -260,7 +260,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         // 快捷回复-询问联系方式
         CategoryRequest categoryContact = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_CONTACT)
-                .orderNo(0)
+                .order(0)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
@@ -275,7 +275,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         String quickReplyCategoryThanksUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS);
         CategoryRequest categoryThanks = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS)
-                .orderNo(1)
+                .order(1)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
@@ -290,7 +290,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         String quickReplyCategoryWelcomeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME);
         CategoryRequest categoryWelcome = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME)
-                .orderNo(2)
+                .order(2)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
@@ -305,7 +305,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         String quickReplyCategoryByeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE);
         CategoryRequest categoryBye = CategoryRequest.builder()
                 .name(I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE)
-                .orderNo(3)
+                .order(3)
                 .level(LevelEnum.ORGANIZATION.name())
                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                 .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))

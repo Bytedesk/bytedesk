@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:34:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 09:13:35
+ * @LastEditTime: 2025-03-11 08:59:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -71,7 +71,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
             // if (TicketCategories.isParentCategory(category)) { // 父类
             CategoryRequest categoryRequest = CategoryRequest.builder()
                     .name(category)
-                    .orderNo(0)
+                    .order(0)
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .build();
@@ -84,7 +84,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
             // CategoryRequest categoryRequest = CategoryRequest.builder()
             // .parentUid(orgUid + parentCategory)
             // .name(category)
-            // .orderNo(0)
+            // .order(0)
             // .level(LevelEnum.ORGANIZATION.name())
             // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
             // .build();
