@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 16:58:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 16:58:22
+ * @LastEditTime: 2025-03-11 08:51:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,15 +13,18 @@
  */
 package com.bytedesk.core.thread;
 
-public class ThreadPermissions {
+import com.bytedesk.core.base.BasePermissions;
+
+public class ThreadPermissions extends BasePermissions {
 
     public static final String THREAD_PREFIX = "THREAD_";
-    // Thread permissions
-    public static final String THREAD_CREATE = "hasAuthority('THREAD_CREATE')";
-    public static final String THREAD_READ = "hasAuthority('THREAD_READ')";
-    public static final String THREAD_UPDATE = "hasAuthority('THREAD_UPDATE')";
-    public static final String THREAD_DELETE = "hasAuthority('THREAD_DELETE')";
-    public static final String THREAD_EXPORT = "hasAuthority('THREAD_EXPORT')";
 
+    public static final String THREAD_CREATE = formatAuthority(THREAD_PREFIX + "CREATE");
+    public static final String THREAD_READ = formatAuthority(THREAD_PREFIX + "READ");
+    public static final String THREAD_UPDATE = formatAuthority(THREAD_PREFIX + "UPDATE");
+    public static final String THREAD_DELETE = formatAuthority(THREAD_PREFIX + "DELETE");
+    public static final String THREAD_EXPORT = formatAuthority(THREAD_PREFIX + "EXPORT");
+
+    public static final String THREAD_ANY = formatAnyAuthority(THREAD_PREFIX + "CREATE", THREAD_PREFIX + "READ", THREAD_PREFIX + "UPDATE", THREAD_PREFIX + "EXPORT", THREAD_PREFIX + "DELETE");
 
 }

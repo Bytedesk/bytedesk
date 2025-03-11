@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:35:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-03 13:35:25
+ * @LastEditTime: 2025-03-11 08:51:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,14 +13,18 @@
  */
 package com.bytedesk.ticket.ticket;
 
-public class TicketPermissions {
+import com.bytedesk.core.base.BasePermissions;
+
+public class TicketPermissions extends BasePermissions {
 
     public static final String TICKET_PREFIX = "TICKET_";
 
-    public static final String TICKET_CREATE = "hasAuthority('TICKET_CREATE')";
-    public static final String TICKET_READ = "hasAuthority('TICKET_READ')";
-    public static final String TICKET_UPDATE = "hasAuthority('TICKET_UPDATE')";
-    public static final String TICKET_DELETE = "hasAuthority('TICKET_DELETE')";
-    public static final String TICKET_EXPORT = "hasAuthority('TICKET_EXPORT')";
+    public static final String TICKET_CREATE = formatAuthority(TICKET_PREFIX + "CREATE");
+    public static final String TICKET_READ = formatAuthority(TICKET_PREFIX + "READ");
+    public static final String TICKET_UPDATE = formatAuthority(TICKET_PREFIX + "UPDATE");
+    public static final String TICKET_DELETE = formatAuthority(TICKET_PREFIX + "DELETE");
+    public static final String TICKET_EXPORT = formatAuthority(TICKET_PREFIX + "EXPORT");
+
+    public static final String TICKET_ANY = formatAnyAuthority(TICKET_PREFIX + "CREATE", TICKET_PREFIX + "READ", TICKET_PREFIX + "UPDATE", TICKET_PREFIX + "EXPORT", TICKET_PREFIX + "DELETE");
 
 }
