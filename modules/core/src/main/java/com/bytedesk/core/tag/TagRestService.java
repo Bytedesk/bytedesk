@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 08:59:58
+ * @LastEditTime: 2025-03-11 09:26:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -72,15 +73,26 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
         return tagRepository.findByUid(uid);
     }
 
+    public Boolean existsByUid(String uid) {
+        return tagRepository.existsByUid(uid);
+    }
+
     @Override
     public TagResponse create(TagRequest request) {
+        // 判断是否已经存在
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return convertToResponse(findByUid(request.getUid()).get());
+        }
+        // 
         UserEntity user = authService.getUser();
         if (user != null) {
             request.setUserUid(user.getUid());
         }
         // 
         TagEntity entity = modelMapper.map(request, TagEntity.class);
-        entity.setUid(uidUtils.getUid());
+        if (!StringUtils.hasText(request.getUid())) {
+            entity.setUid(uidUtils.getUid());
+        }
         // 
         TagEntity savedEntity = save(entity);
         if (savedEntity == null) {
