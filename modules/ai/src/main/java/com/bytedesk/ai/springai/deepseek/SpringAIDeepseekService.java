@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 22:48:27
+ * @LastEditTime: 2025-03-11 22:55:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -142,10 +142,10 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                             },
                             error -> {
                                 log.error("DeepSeek API SSE error: ", error);
-                                messageProtobuf.setType(MessageTypeEnum.ERROR);
-                                messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                                 //
                                 try {
+                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
+                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                                     emitter.send(SseEmitter.event()
                                             .data(JSON.toJSONString(messageProtobuf))
                                             .id(messageProtobuf.getUid())
@@ -156,6 +156,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                                 }
                             },
                             () -> {
+                                log.info("DeepSeek API SSE complete");
                                 try {
                                     // 发送流结束标记
                                     messageProtobuf.setType(MessageTypeEnum.STREAM_END);
