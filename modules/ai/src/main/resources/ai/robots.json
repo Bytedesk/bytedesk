@@ -90,7 +90,7 @@
         },
         "zh_cn": {
           "nickname": "客服问答 - 用于访客端",
-          "prompt": "根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关",
+          "prompt": "你是访客问答助手。根据提供的文档信息回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关",
           "description": "创建一个客服问答机器人"
         },
         "zh_tw": {
@@ -631,14 +631,14 @@
     },
     {
       "uid": "26",
-      "name": "session_classification",
+      "name": "thread_classification",
       "type": "LLM",
       "category": "i18n.module.service",
       "i18n": {
         "en": {
-          "nickname": "Session Classification",
+          "nickname": "Thread Classification",
           "prompt": "Based on set tags, automatically categorize conversations after they end. Support manual correction by customer service, and the large model will continuously improve the algorithm based on correction results to gradually improve classification accuracy.",
-          "description": "Create a session classification bot"
+          "description": "Create a thread classification bot"
         },
         "zh_cn": {
           "nickname": "会话分类",
@@ -764,6 +764,75 @@
           "nickname": "生成小紅書文章",
           "prompt": "給定一段文本，生成一篇小紅書文章。",
           "description": "創建一個小紅書寫作助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "32",
+      "name": "agent_assistant",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Customer Service Assistant",
+          "prompt": "you are a customer service assistant. based on the provided document information and historical chat records, answer the user's question. the document information is as follows: {context} the question: {query} when the user's question cannot be answered based on the document content or you are not sure, reply: no relevant answer found.",
+          "description": "Create a customer service assistant bot"
+        },
+        "zh_cn": {
+          "nickname": "客服助手",
+          "prompt": "你是客服人员的工作助手。根据提供的文档信息以及历史聊天记录回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.",
+          "description": "创建一个客服助手机器人"
+        },
+        "zh_tw": {
+          "nickname": "客服助手",
+          "prompt": "你是客服人员的工作助手。根据提供的文档信息以及历史聊天记录回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.",
+          "description": "創建一個客服助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "33",
+      "name": "thread_summary",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Thread Summary",
+          "prompt": "Based on the thread history, generate a thread summary.",
+          "description": "Create a thread summary bot"
+        },
+        "zh_cn": {
+          "nickname": "会话小结",
+          "prompt": "根据会话历史记录，生成会话小结。",
+          "description": "创建一个会话小结机器人"
+        },
+        "zh_tw": {
+          "nickname": "會話小結",
+          "prompt": "根據會話歷史記錄，生成會話小結。",
+          "description": "創建一個會話小結機器人"
+        }
+      }
+    },
+    {
+      "uid": "34",
+      "name": "thread_completion",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Thread Completion",
+          "prompt": "Based on the thread history and the user's real-time input, complete the user's input.",
+          "description": "Create a thread completion bot"
+        },
+        "zh_cn": {
+          "nickname": "输入补全",
+          "prompt": "根据会话历史记录，以及用户实时输入内容，补全用户输入",
+          "description": "创建一个输入补全机器人"
+        },
+        "zh_tw": {
+          "nickname": "輸入補全",
+          "prompt": "根據會話歷史記錄，以及用戶實時輸入內容，補全用戶輸入",
+          "description": "創建一個輸入補全機器人"
         }
       }
     }

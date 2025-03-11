@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 16:12:11
+ * @LastEditTime: 2025-03-11 09:52:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,6 +63,11 @@ public class RobotConsts {
     public static final String ROBOT_NAME_GENERATE_TICKET = "generate_ticket";
     public static final String ROBOT_NAME_CUSTOMER_SERVICE_EXPERT = "customer_service_expert";
     public static final String ROBOT_NAME_GENERATE_FAQ = "generate_faq";
+    public static final String ROBOT_NAME_GENERATE_WECHAT_ARTICLE = "generate_wechat_article";
+    public static final String ROBOT_NAME_GENERATE_XIAOHONGSHU_ARTICLE = "generate_xiaohongshu_article";
+    public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant";
+    public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary";
+    public static final String ROBOT_NAME_THREAD_COMPLETION = "thread_completion";
 
     // 
     public static final String ROBOT_LLM_DEFAULT_PROMPT = "角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度";
