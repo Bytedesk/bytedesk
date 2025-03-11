@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 14:40:57
+ * @LastEditTime: 2025-03-11 16:34:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.ServletException;
@@ -63,7 +62,7 @@ public class SpringAIZhipuaiController {
     private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
     private final ZhiPuAiImageModel bytedeskZhipuaiImageModel;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
-    private final UidUtils uidUtils;
+    // private final UidUtils uidUtils;
 
     /**
      * 方式1：同步调用
@@ -99,7 +98,7 @@ public class SpringAIZhipuaiController {
         
         executorService.execute(() -> {
             try {
-                springAIZhipuaiService.processPromptSSE(uidUtils.getUid(), message, emitter);
+                springAIZhipuaiService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);

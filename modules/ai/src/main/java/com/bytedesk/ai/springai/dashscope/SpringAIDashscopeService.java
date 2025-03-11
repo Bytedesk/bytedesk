@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 18:08:39
+ * @LastEditTime: 2025-03-11 16:46:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
@@ -100,8 +101,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         }
     }
 
-    
-
     @Override
     protected String generateFaqPairs(String prompt) {
         return bytedeskDashScopeChatClient.prompt(prompt).call().content();
@@ -118,9 +117,12 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(String uid, String message, SseEmitter emitter) {
+    protected void processPromptSSE(String messageJson, SseEmitter emitter) {
+
+        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+
         try {
-            bytedeskDashScopeChatClient.prompt(message)
+            bytedeskDashScopeChatClient.prompt(messageProtobuf.getContent())
                 .stream()
                 .content()
                 .subscribe(
@@ -159,4 +161,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
             emitter.completeWithError(e);
         }
     }
+
+
 }

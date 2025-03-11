@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 16:05:58
+ * @LastEditTime: 2025-03-11 16:34:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.core.uid.UidUtils;
+// import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ import reactor.core.publisher.Flux;
 public class SpringAIDeepseekController {
 
     private final SpringAIDeepseekService springAIDeepseekService;
-    private final UidUtils uidUtils;
+    // private final UidUtils uidUtils;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
@@ -86,7 +86,7 @@ public class SpringAIDeepseekController {
         
         executorService.execute(() -> {
             try {
-                springAIDeepseekService.processPromptSSE(uidUtils.getUid(), message, emitter);
+                springAIDeepseekService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);

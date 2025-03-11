@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:08:20
+ * @LastEditTime: 2025-03-11 16:46:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -167,20 +167,20 @@ public class RobotEventListener {
                 //
                 if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
                     springAIOllamaService
-                            .ifPresent(service -> service.sendWsMessage(query, robot, message));
+                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
                 } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
                     springAIDeepseekService
-                            .ifPresent(service -> service.sendWsMessage(query, robot, message));
+                            .ifPresent(service -> service.sendLlmWebsocketMessage(query, robot, message));
                 } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
                     springAIDashscopeService
-                            .ifPresent(service -> service.sendWsMessage(query, robot, message));
+                            .ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
                 } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
                     springAIZhipuaiService
-                            .ifPresent(service -> service.sendWsMessage(query, robot, message));
+                            .ifPresent(service -> service.sendLlmWebsocketMessage(query, robot, message));
                 } else {
                     // 默认使用智谱AI
                     springAIZhipuaiService
-                            .ifPresent(service -> service.sendWsMessage(query, robot, message));
+                            .ifPresent(service -> service.sendLlmWebsocketMessage(query, robot, message));
                 }
             } else {
                 log.error("robot not found");
@@ -219,16 +219,16 @@ public class RobotEventListener {
             messageSendService.sendProtobufMessage(clonedMessage);
             //
             if (robot.getLlm().getProvider().equals(LlmProviderConsts.OLLAMA)) {
-                springAIOllamaService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
+                springAIOllamaService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DEEPSEEK)) {
-                springAIDeepseekService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
+                springAIDeepseekService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.DASHSCOPE)) {
-                springAIDashscopeService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
+                springAIDashscopeService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
             } else if (robot.getLlm().getProvider().equals(LlmProviderConsts.ZHIPU)) {
-                springAIZhipuaiService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
+                springAIZhipuaiService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
             } else {
                 // 默认使用智谱AI
-                springAIZhipuaiService.ifPresent(service -> service.sendWsKbMessage(query, robot, message));
+                springAIZhipuaiService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
             }
         }
     }
