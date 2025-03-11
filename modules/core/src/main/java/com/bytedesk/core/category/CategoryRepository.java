@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-06 12:20:00
+ * @LastEditTime: 2025-03-11 09:06:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>, JpaSpecificationExecutor<CategoryEntity> {
     Optional<CategoryEntity> findByUid(String uid);
     // 
-    List<CategoryEntity> findByParentAndPlatformAndDeletedOrderByOrderNoAsc(CategoryEntity parent, String platform,
+    List<CategoryEntity> findByParentAndPlatformAndDeletedOrderByOrderAsc(CategoryEntity parent, String platform,
                     Boolean deleted);
             
     Optional<CategoryEntity> findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeletedFalse(String name, String type, String orgUid, String level, String platform);

@@ -54,14 +54,14 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     public List<CategoryResponse> findByNullParent(String platform) {
         // 一级分类
-        List<CategoryEntity> firstCategoriesList = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderNoAsc(null,
+        List<CategoryEntity> firstCategoriesList = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderAsc(null,
                 platform, false);
 
         Iterator<CategoryEntity> iterator = firstCategoriesList.iterator();
         while (iterator.hasNext()) {
             CategoryEntity category = iterator.next();
             // 二级分类
-            List<CategoryEntity> secondCategoriesSet = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderNoAsc(category,
+            List<CategoryEntity> secondCategoriesSet = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderAsc(category,
                     platform, false);
             if (secondCategoriesSet != null && !secondCategoriesSet.isEmpty()) {
                 category.setChildren(secondCategoriesSet);
