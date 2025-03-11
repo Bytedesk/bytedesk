@@ -36,7 +36,7 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+// import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -74,11 +74,11 @@ public class RobotService {
             return;
         }
         String threadTopic = threadProtobuf.getTopic();
-        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) || 
-            threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-            log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
-            processRobotThreadWebsocketMessage(query, threadTopic, threadProtobuf, messageProtobuf);
-        }
+        // if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) ||
+        // threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
+        log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+        processRobotThreadWebsocketMessage(query, threadTopic, threadProtobuf, messageProtobuf);
+        // }
     }
 
     public void processSseMessage(String messageJson, SseEmitter emitter) {
@@ -99,14 +99,15 @@ public class RobotService {
             return;
         }
         String threadTopic = threadProtobuf.getTopic();
-        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) || 
-            threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-            log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
-            processRobotThreadSseMessage(query, threadTopic, threadProtobuf, messageProtobuf, emitter);
-        }
+        // if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) ||
+        // threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
+        log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+        processRobotThreadSseMessage(query, threadTopic, threadProtobuf, messageProtobuf, emitter);
+        // }
     }
 
-    private void processRobotThreadWebsocketMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf, MessageProtobuf messageProtobuf) {
+    private void processRobotThreadWebsocketMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf,
+            MessageProtobuf messageProtobuf) {
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                         " not found"));
@@ -119,9 +120,10 @@ public class RobotService {
             log.info("robot thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            // 
-            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot, messageProtobuf);
-            // 
+            //
+            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
+                    messageProtobuf);
+            //
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
             clonedMessage.setUid(uidUtils.getUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
@@ -139,9 +141,10 @@ public class RobotService {
                 springAIZhipuaiService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
             }
         }
-    } 
+    }
 
-    private void processRobotThreadSseMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    private void processRobotThreadSseMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf,
+            MessageProtobuf messageProtobuf, SseEmitter emitter) {
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                         " not found"));
@@ -154,9 +157,10 @@ public class RobotService {
             log.info("robot thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            // 
-            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot, messageProtobuf);
-            // 
+            //
+            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
+                    messageProtobuf);
+            //
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);
             clonedMessage.setUid(uidUtils.getUid());
             clonedMessage.setType(MessageTypeEnum.PROCESSING);
@@ -175,6 +179,5 @@ public class RobotService {
             }
         }
     }
-    
 
 }

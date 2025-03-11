@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:00:05
+ * @LastEditTime: 2025-03-11 18:36:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,6 +85,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                     .content()
                     .subscribe(
                             content -> {
+                                log.info("DashScope API response  text {}", content);
                                 messageProtobuf.setType(MessageTypeEnum.STREAM);
                                 messageProtobuf.setContent(content);
                                 messageSendService.sendProtobufMessage(messageProtobuf);

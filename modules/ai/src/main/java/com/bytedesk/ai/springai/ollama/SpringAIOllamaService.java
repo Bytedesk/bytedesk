@@ -126,6 +126,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                         for (Generation generation : generations) {
                                             AssistantMessage assistantMessage = generation.getOutput();
                                             String textContent = assistantMessage.getText();
+                                            log.info("Ollama API response metadata: {}, text {}", response.getMetadata(), textContent);
                                             //
                                             messageProtobuf.setContent(textContent);
                                             messageProtobuf.setType(MessageTypeEnum.STREAM);
