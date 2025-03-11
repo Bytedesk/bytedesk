@@ -17,7 +17,7 @@ import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponse;
-import com.bytedesk.service.leave_msg.settings.LeaveMsgSettingsResponse;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
 import com.bytedesk.team.member.MemberResponseSimple;
 
@@ -54,7 +54,7 @@ public class AgentResponse extends BaseResponse {
 
     private Boolean enabled;
 
-    private LeaveMsgSettingsResponse leaveMsgSettings;
+    private MessageLeaveSettingsResponse messageLeaveSettings;
 
     // 一对一人工客服，不支持机器人接待
     // private RobotSettingsResponse robotSettings;

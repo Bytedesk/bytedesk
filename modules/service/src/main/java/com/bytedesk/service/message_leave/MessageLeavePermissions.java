@@ -11,12 +11,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_leave;
 
-public class LeaveMsgPermissions {
+public class MessageLeavePermissions {
 
     public static final String LEAVEMSG_PREFIX = "LEAVEMSG_";
-    // LeaveMsg permissions
+    // MessageLeave permissions
     public static final String LEAVEMSG_CREATE = "hasAuthority('LEAVEMSG_CREATE')";
     public static final String LEAVEMSG_READ = "hasAuthority('LEAVEMSG_READ')";
     public static final String LEAVEMSG_UPDATE = "hasAuthority('LEAVEMSG_UPDATE')";

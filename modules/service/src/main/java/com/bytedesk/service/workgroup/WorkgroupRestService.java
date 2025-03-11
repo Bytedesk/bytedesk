@@ -34,7 +34,7 @@ import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
@@ -90,8 +90,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         workgroup.setOrgUid(request.getOrgUid());
         // 
-        LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatWorkgroupLeaveMsgSettings(request);
-        workgroup.setLeaveMsgSettings(leaveMsgSettings);
+        MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatWorkgroupMessageLeaveSettings(request);
+        workgroup.setMessageLeaveSettings(messageLeaveSettings);
         //
         RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
         workgroup.setRobotSettings(robotSettings);
@@ -142,8 +142,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setRoutingMode(request.getRoutingMode());
         workgroup.setStatus(request.getStatus());
         //
-        LeaveMsgSettings leaveMsgSettings = serviceSettingsService.formatWorkgroupLeaveMsgSettings(request);
-        workgroup.setLeaveMsgSettings(leaveMsgSettings);
+        MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatWorkgroupMessageLeaveSettings(request);
+        workgroup.setMessageLeaveSettings(messageLeaveSettings);
         //
         RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
         workgroup.setRobotSettings(robotSettings);

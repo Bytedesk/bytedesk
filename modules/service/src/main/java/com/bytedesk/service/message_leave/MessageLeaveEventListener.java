@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_leave;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -27,9 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class LeaveMsgEventListener {
+public class MessageLeaveEventListener {
 
-    private final LeaveMsgRestService LeaveMsgService;
+    private final MessageLeaveRestService MessageLeaveService;
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
@@ -37,9 +37,9 @@ public class LeaveMsgEventListener {
         // log.info("message leave_msg update event: {}", message);
         //
         if (message.getStatus().equals(MessageStatusEnum.LEAVE_MSG_SUBMIT.name())) {
-            LeaveMsgExtra extra = JSON.parseObject(message.getContent(), LeaveMsgExtra.class);
+            MessageLeaveExtra extra = JSON.parseObject(message.getContent(), MessageLeaveExtra.class);
             //
-            LeaveMsgRequest request = LeaveMsgRequest.builder()
+            MessageLeaveRequest request = MessageLeaveRequest.builder()
                     .contact(extra.getContact())
                     .content(extra.getContent())
                     .images(extra.getImages())
@@ -48,7 +48,7 @@ public class LeaveMsgEventListener {
                     .build();
             request.setOrgUid(extra.getOrgUid());
             //
-            LeaveMsgService.create(request);
+            MessageLeaveService.create(request);
         }
     }
 

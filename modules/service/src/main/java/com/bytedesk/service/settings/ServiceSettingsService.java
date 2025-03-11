@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 15:11:23
+ * @LastEditTime: 2025-03-11 10:56:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,7 @@ import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentRequest;
-import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.workgroup.WorkgroupRequest;
 import com.bytedesk.service.worktime.WorktimeEntity;
@@ -50,15 +50,15 @@ public class ServiceSettingsService {
 
     private final RobotRestService robotService;
 
-    public LeaveMsgSettings formatAgentLeaveMsgSettings(AgentRequest request) {
+    public MessageLeaveSettings formatAgentMessageLeaveSettings(AgentRequest request) {
         // 
-        if (request == null || request.getLeaveMsgSettings() == null) {
-            return LeaveMsgSettings.builder().build();
+        if (request == null || request.getMessageLeaveSettings() == null) {
+            return MessageLeaveSettings.builder().build();
         }
         //
-        LeaveMsgSettings serviceSettings = modelMapper.map(request.getLeaveMsgSettings(), LeaveMsgSettings.class);
+        MessageLeaveSettings serviceSettings = modelMapper.map(request.getMessageLeaveSettings(), MessageLeaveSettings.class);
         //
-        Iterator<String> worktimeIterator = request.getLeaveMsgSettings().getWorktimeUids().iterator();
+        Iterator<String> worktimeIterator = request.getMessageLeaveSettings().getWorktimeUids().iterator();
         while (worktimeIterator.hasNext()) {
             String worktimeUid = worktimeIterator.next();
             Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
@@ -216,15 +216,15 @@ public class ServiceSettingsService {
 
 
 
-    public LeaveMsgSettings formatWorkgroupLeaveMsgSettings(WorkgroupRequest request) {
+    public MessageLeaveSettings formatWorkgroupMessageLeaveSettings(WorkgroupRequest request) {
         // 
-        if (request == null || request.getLeaveMsgSettings() == null) {
-            return LeaveMsgSettings.builder().build();
+        if (request == null || request.getMessageLeaveSettings() == null) {
+            return MessageLeaveSettings.builder().build();
         }
         //
-        LeaveMsgSettings serviceSettings = modelMapper.map(request.getLeaveMsgSettings(), LeaveMsgSettings.class);
+        MessageLeaveSettings serviceSettings = modelMapper.map(request.getMessageLeaveSettings(), MessageLeaveSettings.class);
         //
-        Iterator<String> worktimeIterator = request.getLeaveMsgSettings().getWorktimeUids().iterator();
+        Iterator<String> worktimeIterator = request.getMessageLeaveSettings().getWorktimeUids().iterator();
         while (worktimeIterator.hasNext()) {
             String worktimeUid = worktimeIterator.next();
             Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);

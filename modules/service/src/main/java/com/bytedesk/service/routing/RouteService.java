@@ -225,7 +225,7 @@ public class RouteService {
         // 客服离线或小休不接待状态，则进入留言
         thread.setOffline();
         thread.setUnreadCount(0);
-        thread.setContent(agent.getLeaveMsgSettings().getLeaveMsgTip());
+        thread.setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
         thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         threadService.save(thread);
         //
@@ -341,7 +341,7 @@ public class RouteService {
     public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
         thread.setOffline();
-        thread.setContent(workgroup.getLeaveMsgSettings().getLeaveMsgTip());
+        thread.setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
         threadService.save(thread);
         //
         MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(workgroup, thread);

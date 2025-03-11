@@ -25,7 +25,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
 
@@ -80,7 +80,7 @@ public class WorkgroupEntity extends BaseEntity {
     // 留言设置
     @Embedded
     @Builder.Default
-    private LeaveMsgSettings leaveMsgSettings = new LeaveMsgSettings();
+    private MessageLeaveSettings messageLeaveSettings = new MessageLeaveSettings();
 
     @Embedded
     @Builder.Default

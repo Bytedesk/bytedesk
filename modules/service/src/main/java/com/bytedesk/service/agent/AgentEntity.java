@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 11:57:24
+ * @LastEditTime: 2025-03-11 10:55:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.service.leave_msg.settings.LeaveMsgSettings;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.team.member.MemberEntity;
 
@@ -96,7 +96,7 @@ public class AgentEntity extends BaseEntity {
     // 留言设置
     @Embedded
     @Builder.Default
-    private LeaveMsgSettings leaveMsgSettings = new LeaveMsgSettings();
+    private MessageLeaveSettings messageLeaveSettings = new MessageLeaveSettings();
 
     // 一对一人工客服，不支持机器人接待。通过自动回复设置，可以自动回复访客消息
     // @Embedded

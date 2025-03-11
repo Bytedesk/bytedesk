@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-23 13:10:03
+ * @Date: 2024-12-23 13:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 16:35:46
+ * @LastEditTime: 2024-12-23 16:35:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,19 +11,18 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg.settings;
+package com.bytedesk.service.message_leave.settings;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.service.leave_msg.LeaveMsgNotifyTypeEnum;
-import com.bytedesk.service.worktime.WorktimeResponse;
+import com.bytedesk.service.message_leave.MessageLeaveNotifyTypeEnum;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,50 +32,54 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveMsgSettingsResponse  implements Serializable {
+public class MessageLeaveSettingsRequest  implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    
     // 留言开关
     @Builder.Default
-    private boolean leaveMsgEnabled = true;
+    private boolean messageLeaveEnabled = true;
 
+    @NotBlank
     @Builder.Default
-    private String leaveMsgTip = I18Consts.I18N_LEAVEMSG_TIP;
+    private String messageLeaveTip = I18Consts.I18N_LEAVEMSG_TIP;
 
     // 处理留言agent
     @Builder.Default
-    private String leaveMsgAgentUid = BytedeskConsts.EMPTY_STRING;
+    private String messageLeaveAgentUid = BytedeskConsts.EMPTY_STRING;
 
     // 是否支持留言提醒
     @Builder.Default
-    private Boolean leaveMsgNotify = false;
+    private Boolean messageLeaveNotify = false;
 
     // 留言提醒类型
     @Builder.Default
-    private String leaveMsgNotifyType = LeaveMsgNotifyTypeEnum.EMAIL.name();
+    private String messageLeaveNotifyType = MessageLeaveNotifyTypeEnum.EMAIL.name();
 
     // 留言提醒邮箱
     @Builder.Default
-    private String leaveMsgNotifyEmail = BytedeskConsts.EMPTY_STRING;
+    private String messageLeaveNotifyEmail = BytedeskConsts.EMPTY_STRING;
 
     @Builder.Default
-    private String leaveMsgNotifyMobile = BytedeskConsts.EMPTY_STRING;
+    private String messageLeaveNotifyMobile = BytedeskConsts.EMPTY_STRING;
 
     // @Builder.Default
-    // private String leaveMsgNotifyWechat = BytedeskConsts.EMPTY_STRING;
+    // private String messageLeaveNotifyWechat = BytedeskConsts.EMPTY_STRING;
 
     // 留言提醒时间
     // @Builder.Default
-    // private String leaveMsgNotifyTime = BytedeskConsts.EMPTY_STRING;
+    // private String messageLeaveNotifyTime = BytedeskConsts.EMPTY_STRING;
 
     // 留言表单
     @Builder.Default
-    private String leaveMsgForm = BytedeskConsts.EMPTY_JSON_STRING;
+    private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
 
-    /** work time */
+    // @Builder.Default
+    // @OneToMany(fetch = FetchType.EAGER)
+    // private List<WorktimeRequest> worktimes = new ArrayList<>();
+    
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<WorktimeResponse> worktimes = new ArrayList<>();
+    private List<String> worktimeUids = new ArrayList<>();
+
     
 }

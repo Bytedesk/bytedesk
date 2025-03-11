@@ -104,7 +104,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             Boolean isOffline = !workgroup.isConnected();
-            Boolean isInServiceTime = workgroup.getLeaveMsgSettings().isInServiceTime();
+            Boolean isInServiceTime = workgroup.getMessageLeaveSettings().isInServiceTime();
             Boolean transferToRobot = workgroup.getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime);
             if (transferToRobot) {
                 // 转机器人

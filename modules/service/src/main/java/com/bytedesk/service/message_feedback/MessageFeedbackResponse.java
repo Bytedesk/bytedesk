@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-03-22 23:05:14
+ * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-19 11:56:12
+ * @LastEditTime: 2025-03-10 14:29:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,9 +11,8 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_feedback;
 
-import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -30,19 +29,17 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveMsgResponse extends BaseResponse {
+public class MessageFeedbackResponse extends BaseResponse {
 
-    private String contact;
+    private String name;
 
-    private String content;
+    private String description;
 
-    private List<String> images;
+    private String type;
 
-    private String threadTopic;
+    private String color;
 
-    private String status;
+    private Integer order;
 
     // private LocalDateTime createdAt;
-
-    // private LocalDateTime updatedAt;
 }

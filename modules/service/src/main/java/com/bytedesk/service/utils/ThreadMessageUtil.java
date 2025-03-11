@@ -170,7 +170,7 @@ public class ThreadMessageUtil {
         UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
-                .content(agent.getLeaveMsgSettings().getLeaveMsgTip())
+                .content(agent.getMessageLeaveSettings().getMessageLeaveTip())
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())

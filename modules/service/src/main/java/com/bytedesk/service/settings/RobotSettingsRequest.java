@@ -54,7 +54,7 @@ public class RobotSettingsRequest  implements Serializable {
     // private List<String> worktimeUids = new ArrayList<>();
     
     // @Builder.Default
-    // private LeaveMsgSettings LeaveMsgSettings = new LeaveMsgSettings();
+    // private MessageLeaveSettings MessageLeaveSettings = new MessageLeaveSettings();
 
     private String robotUid;
 

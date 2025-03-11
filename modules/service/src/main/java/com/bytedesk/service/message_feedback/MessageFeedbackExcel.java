@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-18 11:49:43
+ * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-05 21:30:59
+ * @LastEditTime: 2025-03-03 23:09:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,18 +11,30 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.leave_msg;
+package com.bytedesk.service.message_feedback;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
 import lombok.Data;
 
+/**
+ * https://github.com/alibaba/easyexcel
+ */
 @Data
-public class LeaveMsgExtra {
-    private String uid;
-    private String contact;
-    private String content;
-    private List<String> images = new ArrayList<>();
-    private String orgUid;
+public class MessageFeedbackExcel {
+
+    @ExcelProperty(index = 0, value = "Name")
+    @ColumnWidth(20)
+    private String name;
+
+    @ExcelProperty(index = 1, value = "Type")
+    @ColumnWidth(20)
+    private String type;
+
+    @ExcelProperty(index = 2, value = "Color")
+    @ColumnWidth(20)
+    private String color;
+
+    
 }
