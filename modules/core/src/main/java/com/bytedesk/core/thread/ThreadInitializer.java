@@ -103,6 +103,5 @@ public class ThreadInitializer implements SmartInitializingSingleton {
             tagRequest.setOrgUid(orgUid);
             tagRestService.create(tagRequest);
         }
-
     }
 }
