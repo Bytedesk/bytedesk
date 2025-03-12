@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 09:19:14
+ * @LastEditTime: 2025-03-12 14:47:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,7 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 // import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -100,11 +101,10 @@ public class RobotService {
             return;
         }
         String threadTopic = threadProtobuf.getTopic();
-        // if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) ||
-        // threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-        log.info("robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
-        processRobotThreadWebsocketMessage(query, threadTopic, threadProtobuf, messageProtobuf);
-        // }
+        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
+            log.info("robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+            processRobotThreadWebsocketMessage(query, threadTopic, threadProtobuf, messageProtobuf);
+        }
     }
 
     // 处理SSE请求消息
@@ -146,7 +146,9 @@ public class RobotService {
         if (!StringUtils.hasText(thread.getAgent())) {
             return;
         }
-        UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        // 实际上是
+        RobotProtobuf agent = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
+        // UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
         if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
             log.info("processRobotThreadWebsocketMessage thread reply");

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 22:55:28
+ * @LastEditTime: 2025-03-12 14:46:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,7 +80,13 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
                 },
-                () -> log.info("Chat stream completed")));
+                () -> {
+                    log.info("Chat stream completed");
+                    // 发送流结束标记
+                    // messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                    // messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                    // messageSendService.sendProtobufMessage(messageProtobuf);
+                }));
     }
 
     @Override

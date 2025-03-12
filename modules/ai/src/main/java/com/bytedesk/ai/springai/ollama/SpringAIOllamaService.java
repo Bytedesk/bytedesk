@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 22:54:30
+ * @LastEditTime: 2025-03-12 14:45:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,9 +90,9 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                 () -> {
                     log.info("Chat stream completed");
                     // 发送流结束标记
-                    messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                    messageProtobuf.setContent(""); // 或者可以是任何结束标记
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+                    // messageProtobuf.setType(MessageTypeEnum.STREAM_END);
+                    // messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                    // messageSendService.sendProtobufMessage(messageProtobuf);
                 }));
     }
 
