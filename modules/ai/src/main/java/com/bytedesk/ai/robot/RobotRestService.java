@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 10:24:34
+ * @LastEditTime: 2025-03-12 09:17:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -208,6 +208,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         thread.setType(request.getType());
         thread.setState(ThreadStateEnum.STARTED.name());
         thread.setUser(JSON.toJSONString(request.getUser()));
+        thread.setAgent(JSON.toJSONString(request.getAgent()));
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
 
@@ -242,7 +243,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         ThreadEntity thread = threadOptional.get();
         thread.setUser(JSON.toJSONString(request.getUser()));
-        thread.setAgent(request.getAgent());
+        thread.setAgent(JSON.toJSONString(request.getAgent()));
         //
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {

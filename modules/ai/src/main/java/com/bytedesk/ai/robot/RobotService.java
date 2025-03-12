@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 21:37:19
+ * @LastEditTime: 2025-03-12 09:19:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,6 +57,7 @@ public class RobotService {
     private final IMessageSendService messageSendService;
     private final RobotRestService robotRestService;
 
+    // 处理同步请求消息
     public void processSyncMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
@@ -64,7 +65,7 @@ public class RobotService {
             return;
         }
         String query = messageProtobuf.getContent();
-        log.info("robot processMessage {}", query);
+        log.info("robot processSyncMessage {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         if (threadProtobuf == null) {
             throw new RuntimeException("thread is null");
@@ -81,6 +82,7 @@ public class RobotService {
         // }
     }
 
+    // 处理websocket请求消息
     public void processWebsocketMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
@@ -88,7 +90,7 @@ public class RobotService {
             return;
         }
         String query = messageProtobuf.getContent();
-        log.info("robot processMessage {}", query);
+        log.info("robot processWebsocketMessage {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         if (threadProtobuf == null) {
             throw new RuntimeException("thread is null");
@@ -100,11 +102,12 @@ public class RobotService {
         String threadTopic = threadProtobuf.getTopic();
         // if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM) ||
         // threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-        log.info("robot robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+        log.info("robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
         processRobotThreadWebsocketMessage(query, threadTopic, threadProtobuf, messageProtobuf);
         // }
     }
 
+    // 处理SSE请求消息
     public void processSseMessage(String messageJson, SseEmitter emitter) {
         log.info("processPromptSSE: messageJson: {}", messageJson);
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
@@ -113,7 +116,7 @@ public class RobotService {
             return;
         }
         String query = messageProtobuf.getContent();
-        log.info("robot processMessage {}", query);
+        log.info("robot processSseMessage {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         if (threadProtobuf == null) {
             throw new RuntimeException("thread is null");
@@ -146,7 +149,7 @@ public class RobotService {
         UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
         if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
-            log.info("robot thread reply");
+            log.info("processRobotThreadWebsocketMessage thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
             //
@@ -183,7 +186,7 @@ public class RobotService {
         UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
         if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
-            log.info("robot thread reply");
+            log.info("processRobotThreadSseMessage thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
             //
