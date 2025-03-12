@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 18:17:37
+ * @LastEditTime: 2025-03-12 18:30:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -196,6 +196,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     public ThreadResponse createThread(ThreadRequest request) {
         UserEntity owner = authService.getUser();
+        if (owner == null) {
+            throw new RuntimeException("should login first not found");
+        }
         // String topic = request.getTopic();
         String topic = TopicUtils.formatOrgRobotMemberThreadTopic(request.getUid(), owner.getUid(), uidUtils.getUid());
 
@@ -206,14 +209,15 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         // }
 
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
-        ThreadEntity thread = new ThreadEntity();
+        ThreadEntity thread = ThreadEntity.builder()
+            .topic(topic)
+            .type(ThreadTypeEnum.LLM.name())
+            .state(ThreadStateEnum.STARTED.name())
+            .unreadCount(0)
+            .user(JSON.toJSONString(request.getUser()))
+            .owner(owner)
+        .build();
         thread.setUid(uidUtils.getUid());
-        thread.setTopic(request.getTopic());
-        // thread.setType(request.getType());
-        thread.setType(ThreadTypeEnum.LLM.name());
-        thread.setState(ThreadStateEnum.STARTED.name());
-        thread.setUser(JSON.toJSONString(request.getUser()));
-        thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
 
         String[] splits = topic.split("/");
