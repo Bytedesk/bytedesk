@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 23:02:07
+ * @LastEditTime: 2025-03-12 18:21:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -142,6 +142,14 @@ public class ThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_robot")
     private boolean robot = false;
+
+    // 备注
+    @Column(name = "thread_note")
+    private String note;
+
+    // 标签
+    @Builder.Default
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     @Builder.Default
     private String client = ClientEnum.WEB.name();

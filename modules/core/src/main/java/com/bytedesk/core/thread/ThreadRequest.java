@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 15:03:08
+ * @LastEditTime: 2025-03-12 18:23:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
@@ -90,6 +91,17 @@ public class ThreadRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean autoClose = false;
+
+    // 是否机器人
+    // @Builder.Default
+    // private Boolean robot = false;
+
+    // 备注
+    private String note;
+
+    // 标签
+    @Builder.Default
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
     // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
     private String agent;

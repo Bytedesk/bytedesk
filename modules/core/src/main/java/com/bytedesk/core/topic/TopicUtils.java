@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:41:42
+ * @LastEditTime: 2025-03-12 18:16:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,6 +83,7 @@ public class TopicUtils {
     private static final String TOPIC_ORG_DEPARTMENT_PATTERN = TOPIC_ORG_DEPARTMENT_PREFIX + "%s"; // "org/department/%s";
     private static final String TOPIC_ORG_GROUP_PATTERN = TOPIC_ORG_GROUP_PREFIX + "%s"; // "org/group/%s";
     private static final String TOPIC_ORG_ROBOT_THREAD_PATTERN = TOPIC_ORG_ROBOT_PREFIX + "%s/%s"; // "org/robot/%s/%s";
+    private static final String TOPIC_ORG_ROBOT_MEMBER_THREAD_PATTERN = TOPIC_ORG_ROBOT_PREFIX + "%s/%s/%s"; // "org/robot/%s/%s/%s";
     private static final String TOPIC_ORG_KB_THREAD_PATTERN = TOPIC_ORG_KB_PREFIX + "%s/%s"; // "org/kb/%s/%s";
     private static final String TOPIC_ORG_KBDOC_THREAD_PATTERN = TOPIC_ORG_KBDOC_PREFIX + "%s/%s"; // "org/kbdoc/%s/%s";
 
@@ -177,6 +178,10 @@ public class TopicUtils {
 
     public static String formatOrgRobotThreadTopic(String robotUid, String visitorUid) {
         return String.format(TOPIC_ORG_ROBOT_THREAD_PATTERN, robotUid, visitorUid);
+    }
+
+    public static String formatOrgRobotMemberThreadTopic(String robotUid, String userUid, String randomUid) {
+        return String.format(TOPIC_ORG_ROBOT_MEMBER_THREAD_PATTERN, robotUid, userUid, randomUid);
     }
 
     //////////////////////////////////////////////////////////////////////////

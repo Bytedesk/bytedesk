@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 17:19:10
+ * @LastEditTime: 2025-03-12 18:17:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,6 +53,7 @@ import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
@@ -195,7 +196,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     public ThreadResponse createThread(ThreadRequest request) {
         UserEntity owner = authService.getUser();
-        String topic = request.getTopic();
+        // String topic = request.getTopic();
+        String topic = TopicUtils.formatOrgRobotMemberThreadTopic(request.getUid(), owner.getUid(), uidUtils.getUid());
 
         // 允许一个用户创建多个相同机器人的会话
         // Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
@@ -219,7 +221,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             throw new RuntimeException("robot topic format error");
         }
         
-        // org/robot/robotUid/userUid
+        // org/robot/robotUid/userUid/randomUid
         String robotUid = splits[2];
         Optional<RobotEntity> robotOptional = findByUid(robotUid);
         if (robotOptional.isPresent()) {
