@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 14:26:53
+ * @LastEditTime: 2025-03-12 17:19:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,6 +52,7 @@ import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
@@ -196,16 +197,18 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         UserEntity owner = authService.getUser();
         String topic = request.getTopic();
 
-        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
-        if (threadOptional.isPresent()) {
-            return threadService.convertToResponse(threadOptional.get());
-        }
+        // 允许一个用户创建多个相同机器人的会话
+        // Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
+        // if (threadOptional.isPresent()) {
+        //     return threadService.convertToResponse(threadOptional.get());
+        // }
 
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = new ThreadEntity();
         thread.setUid(uidUtils.getUid());
         thread.setTopic(request.getTopic());
-        thread.setType(request.getType());
+        // thread.setType(request.getType());
+        thread.setType(ThreadTypeEnum.LLM.name());
         thread.setState(ThreadStateEnum.STARTED.name());
         thread.setUser(JSON.toJSONString(request.getUser()));
         thread.setOwner(owner);
@@ -242,7 +245,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         ThreadEntity thread = threadOptional.get();
         thread.setUser(JSON.toJSONString(request.getUser()));
-        thread.setAgent(JSON.toJSONString(request.getAgent()));
+        thread.setAgent(request.getAgent());
         //
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {

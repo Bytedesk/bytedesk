@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 17:24:41
+ * @LastEditTime: 2025-03-12 16:56:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -194,7 +194,7 @@ public class VisitorThreadService
                 .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
-        String robotString = ConvertAiUtils.convertToUserProtobufString(robot);
+        String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         thread.setAgent(robotString);
         // 保存
         threadService.save(thread);

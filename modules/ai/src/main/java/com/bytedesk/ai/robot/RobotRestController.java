@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 15:10:10
+ * @LastEditTime: 2025-03-12 17:17:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,6 +72,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(robot));
     }
     
+    // 员工/客服创建智能体会话
     @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
     @PostMapping("/create/thread")
     public ResponseEntity<?> createThread(@RequestBody ThreadRequest request) {
@@ -81,6 +82,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(thread));
     }
 
+    // 创建智能体模板
     @ActionAnnotation(title = "robot", action = "create", description = "create prompt robot")
     @PostMapping("/create/prompt")
     public ResponseEntity<?> createPromptRobot(@RequestBody RobotRequest request) {

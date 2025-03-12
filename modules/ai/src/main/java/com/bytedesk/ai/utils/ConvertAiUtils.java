@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 14:27:00
+ * @LastEditTime: 2025-03-12 17:12:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 // import com.bytedesk.ai.settings.RobotServiceSettings;
-import com.bytedesk.core.rbac.user.UserProtobuf;
+// import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
@@ -45,16 +45,16 @@ public class ConvertAiUtils {
         return JSON.toJSONString(robotProtobuf);
     }
 
-    public static UserProtobuf convertToUserProtobuf(RobotEntity entity) {
-        UserProtobuf userProtobuf = modelMapper.map(entity, UserProtobuf.class);
-        userProtobuf.setType(UserTypeEnum.ROBOT.name());
-        return userProtobuf;
-    }
+    // public static UserProtobuf convertToUserProtobuf(RobotEntity entity) {
+    //     UserProtobuf userProtobuf = modelMapper.map(entity, UserProtobuf.class);
+    //     userProtobuf.setType(UserTypeEnum.ROBOT.name());
+    //     return userProtobuf;
+    // }
 
-    public static String convertToUserProtobufString(RobotEntity entity) {
-        UserProtobuf userProtobuf = convertToUserProtobuf(entity);
-        return JSON.toJSONString(userProtobuf);
-    }
+    // public static String convertToUserProtobufString(RobotEntity entity) {
+    //     UserProtobuf userProtobuf = convertToUserProtobuf(entity);
+    //     return JSON.toJSONString(userProtobuf);
+    // }
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             ServiceSettings serviceSettings) {

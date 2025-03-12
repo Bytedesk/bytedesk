@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:19:50
+ * @LastEditTime: 2025-03-12 17:25:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,7 @@ public class RobotEventListener {
     // private final IMessageSendService messageSendService;
     private final RobotRestService robotRestService;
     // private final RobotFaqProcessor robotFaqProcessor;
-    private final RobotService robotService;
+    // private final RobotService robotService;
 
     @Order(5)
     @EventListener
@@ -62,7 +62,7 @@ public class RobotEventListener {
 
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
-        robotService.processWebsocketMessage(event.getJson());
+        // robotService.processWebsocketMessage(event.getJson());
     }
 
 

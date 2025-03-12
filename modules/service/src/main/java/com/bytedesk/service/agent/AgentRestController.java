@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:40:07
+ * @LastEditTime: 2025-03-12 17:39:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,15 +13,22 @@
  */
 package com.bytedesk.service.agent;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 // import com.bytedesk.core.rbac.role.RolePermissions;
@@ -29,13 +36,19 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/agent")
 public class AgentRestController extends BaseRestController<AgentRequest> {
 
     private final AgentRestService agentService;
+
+    private final RobotService robotService;
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
@@ -142,6 +155,41 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     public ResponseEntity<?> queryByUid(AgentRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @ActionAnnotation(title = "agent", action = "sendSseMessage", description = "sendSseMessage")
+    @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter sendSseMessage(@RequestParam(value = "message") String message) {
+        
+        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        
+        executorService.execute(() -> {
+            try {
+                robotService.processSseMemberMessage(message, emitter);
+            } catch (Exception e) {
+                log.error("Error processing SSE request", e);
+                emitter.completeWithError(e);
+            }
+        });
+        
+        // 添加超时和完成时的回调
+        emitter.onTimeout(() -> {
+            log.warn("SSE connection timed out");
+            emitter.complete();
+        });
+        
+        emitter.onCompletion(() -> {
+            log.info("SSE connection completed");
+        });
+        
+        return emitter;
+    }
+
+    // 在 Bean 销毁时关闭线程池
+    public void destroy() {
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdown();
+        }
     }
 
 }

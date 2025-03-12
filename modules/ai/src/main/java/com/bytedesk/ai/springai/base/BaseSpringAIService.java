@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -74,7 +75,39 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendSseMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    public void sendSseMemberMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+        // Assert.hasText(messageJson, "Message must not be empty");
+        Assert.notNull(emitter, "SseEmitter must not be null");
+
+        log.info("BaseSpringAIService sendSseMessage query {}", query);
+        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
+        //
+        MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
+        clonedMessage.setUid(uidUtils.getUid());
+        clonedMessage.setType(MessageTypeEnum.PROCESSING);
+        messageSendService.sendProtobufMessage(clonedMessage);
+        //
+        String prompt = "";
+        if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
+            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+            String context = String.join("\n", contentList);
+            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
+        } else {
+            prompt = robot.getLlm().getPrompt();
+        }
+        //
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(prompt));
+        messages.add(new UserMessage(query));
+        log.info("BaseSpringAIService sendSseMessage messages {}", messages);
+        //
+        Prompt aiPrompt = new Prompt(messages);
+        //
+        processPromptSSE(aiPrompt, threadProtobuf, messageProtobuf, emitter);
+    }
+
+    @Override
+    public void sendSseVisitorMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
@@ -102,8 +135,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         Prompt aiPrompt = new Prompt(messages);
         //
-        processPromptSSE(robot, aiPrompt, threadProtobuf, messageProtobuf, emitter);
+        processPromptSSE(aiPrompt, threadProtobuf, messageProtobuf, emitter);
     }
+
 
     @Override
     public String generateFaqPairsAsync(String chunk) {
@@ -157,7 +191,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected abstract String processPromptSync(String message);
 
-    protected abstract void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
+    protected abstract void processPromptSSE(Prompt prompt, ThreadProtobuf threadProtobuf,
             MessageProtobuf messageProtobuf, SseEmitter emitter);
 
     // 抽象方法，由具体实现类提供

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 13:57:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-23 14:34:30
+ * @LastEditTime: 2025-03-12 16:49:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,6 @@ public class RobotSettingsResponse  implements Serializable {
     @Builder.Default
     private Boolean nonWorktimeRobot = false;
 
-    
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotProtobuf robot;
 
