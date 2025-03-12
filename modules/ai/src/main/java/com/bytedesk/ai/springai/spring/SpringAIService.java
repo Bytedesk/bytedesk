@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 14:48:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:12:17
+ * @LastEditTime: 2025-03-12 18:01:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.springai.spring;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.message.MessageProtobuf;
 
 /**
@@ -37,8 +38,12 @@ public interface SpringAIService {
      * @param message 消息
      * @param emitter SseEmitter
      */
-    void sendSseMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter);
+    // 给员工/客服人员使用
+    void sendSseMemberMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobuf, SseEmitter emitter);
 
+    // 给访客使用
+    void sendSseVisitorMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter);
+    
     /**
      * 异步生成FAQ对
      * @param chunk 文本块

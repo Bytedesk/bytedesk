@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 14:45:30
+ * @LastEditTime: 2025-03-12 18:02:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -111,7 +110,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    public void processPromptSSE(RobotEntity robot, Prompt prompt, ThreadProtobuf threadProtobuf,
+    public void processPromptSSE(Prompt prompt, ThreadProtobuf threadProtobuf,
             MessageProtobuf messageProtobuf, SseEmitter emitter) {
 
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);

@@ -161,7 +161,7 @@ public class VisitorRestControllerAnonymous {
         
         executorService.execute(() -> {
             try {
-                robotService.processSseMessage(message, emitter);
+                robotService.processSseVisitorMessage(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);
