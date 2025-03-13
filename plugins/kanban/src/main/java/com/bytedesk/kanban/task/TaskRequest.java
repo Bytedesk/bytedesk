@@ -13,9 +13,11 @@
  */
 package com.bytedesk.kanban.task;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -49,8 +51,6 @@ public class TaskRequest extends BaseRequest {
     private Integer order = 0;
 
     @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
