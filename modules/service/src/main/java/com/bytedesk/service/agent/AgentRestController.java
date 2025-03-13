@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.annotation.TabooFilter;
 import com.bytedesk.core.base.BaseRestController;
 // import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
@@ -157,6 +158,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
+    @TabooFilter(title = "消息过滤", action = "发送消息")
     @ActionAnnotation(title = "agent", action = "sendSseMessage", description = "sendSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMessage(@RequestParam(value = "message") String message) {
