@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:31:43
+ * @LastEditTime: 2025-03-13 13:24:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,10 +17,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -29,6 +28,9 @@ import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -43,10 +45,11 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     private final UidUtils uidUtils;
 
+    private final AuthService authService;
+
     @Override
     public Page<LlmProviderResponse> queryByOrg(LlmProviderRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
-                "createdAt");
+        Pageable pageable = request.getPageable();
         Specification<LlmProviderEntity> specification = LlmProviderSpecification.search(request);
         Page<LlmProviderEntity> page = repository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
@@ -54,15 +57,27 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     @Override
     public Page<LlmProviderResponse> queryByUser(LlmProviderRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
+    @Cacheable(value = "provider", key = "#uid", unless = "#result == null")
     @Override
     public Optional<LlmProviderEntity> findByUid(String uid) {
         return repository.findByUid(uid);
     }
 
+    @Cacheable(value = "provider", key = "#name", unless = "#result == null")
+    public Optional<LlmProviderEntity> findByNameAndOrgUid(String name, String orgUid) {
+        return repository.findByNameAndLevelAndOrgUidAndDeletedFalse(name, LevelEnum.ORGANIZATION.name(), orgUid);
+    }
+
+    @Cacheable(value = "provider", key = "#name-#level", unless = "#result == null")
     public Optional<LlmProviderEntity> findByName(String name, String level) {
         return repository.findByNameAndLevel(name, level);
     }

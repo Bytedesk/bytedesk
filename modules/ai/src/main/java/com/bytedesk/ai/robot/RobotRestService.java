@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 12:53:41
+ * @LastEditTime: 2025-03-13 13:14:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,9 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -31,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.provider.LlmProviderEntity;
+import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -94,13 +94,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final Optional<SpringAIVectorService> springAIVectorService;
 
-    // private final Optional<OllamaChatService> ollamaChatService;
-
-    // private final Optional<SpringAIZhipuaiService> springAIZhipuaiChatService;
-
-    // private final FaqRestService faqRestService;
-
-    // private final ActionRestService actionRestService;
+    private final LlmProviderRestService llmProviderRestService;
 
     private final OptimisticLockingHandler optimisticLockingHandler;
 
@@ -122,8 +116,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<RobotEntity> specification = RobotSpecification.search(request);
         Page<RobotEntity> page = robotRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
@@ -131,8 +124,13 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     @Override
     public Page<RobotResponse> queryByUser(RobotRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("user not found");
+        }
+        request.setUserUid(user.getUid());
+        //
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
@@ -255,7 +253,14 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         thread.setUser(JSON.toJSONString(request.getUser()));
         // 
         RobotProtobuf robotProtobuf = JSON.parseObject(request.getAgent(), RobotProtobuf.class);
-        thread.setAgent(request.getAgent());
+        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByNameAndOrgUid(robotProtobuf.getLlm().getProvider(), thread.getOrgUid());
+        if (!llmProviderOptional.isPresent()) {
+            throw new RuntimeException("llm provider not found");
+        }
+        robotProtobuf.setAvatar(llmProviderOptional.get().getLogo());
+        robotProtobuf.setNickname(llmProviderOptional.get().getNickname());
+        thread.setAgent(JSON.toJSONString(robotProtobuf));
+        // thread.setAgent(request.getAgent());
         //
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
