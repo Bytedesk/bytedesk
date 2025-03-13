@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-13 17:02:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:02:26
+ * @LastEditTime: 2025-03-13 17:06:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,17 @@ import lombok.RequiredArgsConstructor;
 public class BlackService {
 
     private final BlackRestService blackRestService;
+
+    public boolean isBlackList(String visitorUid, String orgUid) {
+        Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(visitorUid, orgUid);
+        if (blackOpt.isPresent()) {
+            BlackEntity black = blackOpt.get();
+            if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     // 检查黑名单
     public boolean isBlackList(MessageProtobuf messageProtobuf) {

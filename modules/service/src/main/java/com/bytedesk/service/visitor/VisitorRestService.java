@@ -90,14 +90,16 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
                 // 更新浏览信息
                 visitor.setIp(visitorRequest.getIp());
                 visitor.setIpLocation(visitorRequest.getIpLocation());
-                save(visitor);
             }
             visitor.getDevice().setBrowser(visitorRequest.getBrowser());
             visitor.getDevice().setOs(visitorRequest.getOs());
             visitor.getDevice().setDevice(visitorRequest.getDevice());
             visitor.setExtra(visitorRequest.getExtra());
-            //
-            return convertToResponse(visitor);
+            VisitorEntity savedVisitor = save(visitor);
+            if (savedVisitor == null) {
+                throw new RuntimeException("visitor not saved");
+            }
+            return convertToResponse(savedVisitor);
         }
         // 
         if (!StringUtils.hasText(visitorRequest.getAvatar())) {
