@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 17:39:22
+ * @LastEditTime: 2025-03-13 11:20:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -162,8 +162,20 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @ActionAnnotation(title = "agent", action = "sendSseMessage", description = "sendSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMessage(@RequestParam(value = "message") String message) {
+
+        // 创建 SseEmitter 前先进行权限验证
+        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // if (authentication == null || !authentication.isAuthenticated()) {
+        //     log.warn("Unauthorized access to SSE endpoint");
+        //     throw new AccessDeniedException("Unauthorized");
+        // }
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+
+        // 添加完成/超时/错误处理器
+        // emitter.onCompletion(() -> log.debug("SSE emitter completed"));
+        // emitter.onTimeout(() -> log.debug("SSE emitter timed out"));
+        // emitter.onError((ex) -> log.error("SSE emitter error: {}", ex.getMessage()));
         
         executorService.execute(() -> {
             try {

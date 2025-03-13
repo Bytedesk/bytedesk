@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 10:22:09
+ * @LastEditTime: 2025-03-13 11:04:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+// import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -114,6 +115,12 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     @Override
     public void processPromptSSE(Prompt prompt, ThreadProtobuf threadProtobuf,
             MessageProtobuf messageProtobuf, SseEmitter emitter) {
+
+        // 检查权限
+        // if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+        //     log.warn("User not authenticated for SSE stream");
+        //     return;
+        // }
 
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
 
