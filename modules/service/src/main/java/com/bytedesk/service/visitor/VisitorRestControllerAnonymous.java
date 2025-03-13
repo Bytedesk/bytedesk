@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:07:13
+ * @LastEditTime: 2025-03-13 09:35:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ApiRateLimiter;
+import com.bytedesk.core.annotation.TabooFilter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
@@ -153,6 +154,7 @@ public class VisitorRestControllerAnonymous {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
+    @TabooFilter(title = "消息过滤", action = "发送消息")
     @VisitorAnnotation(title = "visitor", action = "sendSseMessage", description = "sendSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMessage(@RequestParam(value = "message") String message) {

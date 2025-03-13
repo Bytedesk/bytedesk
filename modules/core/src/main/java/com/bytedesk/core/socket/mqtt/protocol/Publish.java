@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 23:19:27
+ * @LastEditTime: 2025-03-13 09:38:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
+import com.bytedesk.core.annotation.TabooFilter;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
@@ -31,6 +32,7 @@ public class Publish {
     private final IMessageSendService messageSendService;
 
     //
+    @TabooFilter(title = "消息过滤", action = "发送消息")
     public void processPublish(Channel channel, MqttPublishMessage mqttPublishMessage) {
         // log.debug("processPublish {}", mqttPublishMessage.toString());
         // TODO: 发送：消息发送成功回执
