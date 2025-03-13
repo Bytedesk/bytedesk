@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 12:10:48
+ * @LastEditTime: 2025-03-13 10:46:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,7 +49,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -70,7 +70,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -93,7 +93,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -115,7 +115,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -136,7 +136,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -157,7 +157,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -180,7 +180,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));
@@ -204,7 +204,7 @@ public class ThreadMessageUtil {
         message.setOrgUid(thread.getOrgUid());
         message.setCreatedAt(LocalDateTime.now());
         message.setUpdatedAt(LocalDateTime.now());
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         message.setExtra(JSON.toJSONString(extra));

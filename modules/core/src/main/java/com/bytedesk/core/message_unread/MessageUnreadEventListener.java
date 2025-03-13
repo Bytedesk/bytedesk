@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-25 12:32:36
+ * @LastEditTime: 2025-03-13 10:42:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,7 +49,7 @@ public class MessageUnreadEventListener {
         }
         log.info("message unread create event: {} {} {}", message.getUid(), message.getType(), message.getContent());
         // 缓存未读消息
-        String threadTopic = message.getThreadTopic();
+        String threadTopic = message.getTopic();
         String userString = message.getUser();
         UserProtobuf user = JSONObject.parseObject(userString, UserProtobuf.class);
         String userUid = user.getUid();
@@ -133,7 +133,7 @@ public class MessageUnreadEventListener {
         }
         log.info("message unread update event: {} {} {}", message.getUid(), message.getType(), message.getContent());
         //
-        String threadTopic = message.getThreadTopic();
+        String threadTopic = message.getTopic();
         MessageStatusEnum messageState = MessageStatusEnum.fromValue(message.getStatus());
         //
         if (messageState.ordinal() < MessageStatusEnum.DELIVERED.ordinal()) {

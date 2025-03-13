@@ -72,7 +72,7 @@ public class MessagePersistService {
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
         }
-        message.setThreadTopic(threadTopic);
+        message.setTopic(threadTopic);
         message.setUser(JSON.toJSONString(messageProtobuf.getUser()));
         // 
         MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
