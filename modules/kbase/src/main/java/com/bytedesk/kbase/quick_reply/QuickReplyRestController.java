@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:39:22
+ * @LastEditTime: 2025-03-13 23:27:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,13 +57,13 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReplyList));
     }
 
-    @GetMapping("/query/list")
-    public ResponseEntity<?> queryList(QuickReplyRequest request) {
+    // @GetMapping("/query/list")
+    // public ResponseEntity<?> queryList(QuickReplyRequest request) {
 
-        List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
+    //     List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
         
-        return ResponseEntity.ok(JsonResult.success(quickReplyList));
-    }
+    //     return ResponseEntity.ok(JsonResult.success(quickReplyList));
+    // }
 
 
     @ActionAnnotation(title = "quick_reply", action = "create", description = "create quick_reply")
