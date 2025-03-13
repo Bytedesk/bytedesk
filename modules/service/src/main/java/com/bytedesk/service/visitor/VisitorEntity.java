@@ -16,6 +16,7 @@ package com.bytedesk.service.visitor;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LanguageEnum;
 
@@ -75,9 +76,7 @@ public class VisitorEntity extends BaseEntity {
 
 	// extra info，开发者自定义URL参数，使用json格式存储，便于扩展
 	@Builder.Default
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
-	@Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
 	// 方便后续扩展，比如用户被拉黑的时候，暂存于此
