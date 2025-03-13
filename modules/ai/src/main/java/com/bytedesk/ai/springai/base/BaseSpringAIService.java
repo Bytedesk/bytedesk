@@ -9,7 +9,6 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.util.Assert;
-import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -22,7 +21,6 @@ import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -83,13 +81,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
-        log.info("BaseSpringAIService sendSseMessage query {}", query);
+        log.info("BaseSpringAIService sendSseMemberMessage query {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         //
-        MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
-        clonedMessage.setUid(uidUtils.getUid());
-        clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        messageSendService.sendProtobufMessage(clonedMessage);
+        // MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
+        // clonedMessage.setUid(uidUtils.getUid());
+        // clonedMessage.setType(MessageTypeEnum.PROCESSING);
+        // messageSendService.sendProtobufMessage(clonedMessage);
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
@@ -103,7 +101,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
         messages.add(new UserMessage(query));
-        log.info("BaseSpringAIService sendSseMessage messages {}", messages);
+        log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
         //
@@ -115,13 +113,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
-        log.info("BaseSpringAIService sendSseMessage query {}", query);
+        log.info("BaseSpringAIService sendSseVisitorMessage query {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         //
-        MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
-        clonedMessage.setUid(uidUtils.getUid());
-        clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        messageSendService.sendProtobufMessage(clonedMessage);
+        // MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
+        // clonedMessage.setUid(uidUtils.getUid());
+        // clonedMessage.setType(MessageTypeEnum.PROCESSING);
+        // messageSendService.sendProtobufMessage(clonedMessage);
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
@@ -135,7 +133,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
         messages.add(new UserMessage(query));
-        log.info("BaseSpringAIService sendSseMessage messages {}", messages);
+        log.info("BaseSpringAIService sendSseVisitorMessage messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
         //

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 11:38:03
+ * @LastEditTime: 2025-03-13 12:20:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -165,19 +165,19 @@ public class VisitorRestControllerAnonymous {
             try {
                 robotService.processSseVisitorMessage(message, emitter);
             } catch (Exception e) {
-                log.error("Error processing SSE request", e);
+                log.error("sendSseVisitorMessage Error processing SSE request", e);
                 emitter.completeWithError(e);
             }
         });
         
         // 添加超时和完成时的回调
         emitter.onTimeout(() -> {
-            log.warn("SSE connection timed out");
+            log.warn("sendSseVisitorMessage SSE connection timed out");
             emitter.complete();
         });
         
         emitter.onCompletion(() -> {
-            log.info("SSE connection completed");
+            log.info("sendSseVisitorMessage SSE connection completed");
         });
         
         return emitter;
@@ -201,12 +201,12 @@ public class VisitorRestControllerAnonymous {
         
         // 添加超时和完成时的回调
         emitter.onTimeout(() -> {
-            log.warn("SSE connection timed out");
+            log.warn("sendSseMemberMessage SSE connection timed out");
             emitter.complete();
         });
         
         emitter.onCompletion(() -> {
-            log.info("SSE connection completed");
+            log.info("sendSseMemberMessage SSE connection completed");
         });
         
         return emitter;
