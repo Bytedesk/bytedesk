@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 09:26:09
+ * @LastEditTime: 2025-03-13 18:21:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,6 +73,10 @@ public class VisitorEntity extends BaseEntity {
 
 	@Builder.Default
 	private String status = VisitorStatusEnum.ONLINE.name();
+
+	// 标签
+    @Builder.Default
+    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
 
 	// extra info，开发者自定义URL参数，使用json格式存储，便于扩展
 	@Builder.Default
