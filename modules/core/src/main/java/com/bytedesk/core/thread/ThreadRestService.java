@@ -411,7 +411,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         ThreadEntity thread = threadOptional.get();
         thread.setState(ThreadStateEnum.STARTED.name());
-        thread.setAgent(JSON.toJSONString(threadRequest.getAgent()));
+        thread.setAgent(threadRequest.getAgent());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
