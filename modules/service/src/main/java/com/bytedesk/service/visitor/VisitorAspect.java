@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 21:46:01
+ * @LastEditTime: 2025-03-13 17:05:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,14 +18,11 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
-import com.bytedesk.core.black.BlackRestService;
-import com.bytedesk.core.black.BlackEntity;
+
+import com.bytedesk.core.black.BlackService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 /**
  * filter blocked visitor
@@ -36,7 +33,9 @@ import java.util.Optional;
 @AllArgsConstructor
 public class VisitorAspect {
 
-    private final BlackRestService blackRestService;
+    // private final BlackRestService blackRestService;
+
+    private final BlackService blackService;
 
     /**
      * 处理会话请求前执行
@@ -62,24 +61,26 @@ public class VisitorAspect {
                 VisitorRequest visitorRequest = (VisitorRequest) paramValue;
                 uid = visitorRequest.getUid();
                 orgUid = visitorRequest.getOrgUid();
-                log.debug("Found VisitorRequest - uid: {}, orgUid: {}", uid, orgUid);
+                log.debug("Found VisitorRequest - title {}, action {} uid: {}, orgUid: {}", 
+                    visitorAnnotation.title(), visitorAnnotation.action(), uid, orgUid);
                 
                 // 检查黑名单
-                if (uid != null && orgUid != null) {
-                    Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
-                    if (blackOpt.isPresent()) {
-                        BlackEntity black = blackOpt.get();
-                        if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
-                            throw new RuntimeException("Access denied for visitor: " + uid + " in org: " + orgUid);
-                        } else {
-                            log.debug("Found VisitorRequest - Visitor out of end time");
-                        }
-                    } else {
-                        log.debug("Found VisitorRequest - Visitor not in black list");
-                    }
-                } else {
-                    log.debug("Found VisitorRequest - uid or orgUid is null");
-                }
+                // if (uid != null && orgUid != null) {
+                //     Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
+                //     if (blackOpt.isPresent()) {
+                //         BlackEntity black = blackOpt.get();
+                //         if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
+                //             throw new RuntimeException("Access denied for visitor: " + uid + " in org: " + orgUid);
+                //         } else {
+                //             log.debug("Found VisitorRequest - Visitor out of end time");
+                //         }
+                //     } else {
+                //         log.debug("Found VisitorRequest - Visitor not in black list");
+                //     }
+                // } else {
+                //     log.debug("Found VisitorRequest - uid or orgUid is null");
+                // }
+
                 break;
             }
         }

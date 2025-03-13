@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:32:25
+ * @LastEditTime: 2025-03-13 17:04:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,9 +20,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -49,34 +47,21 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
 
     @Override
     public Page<BlackResponse> queryByOrg(BlackRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "createdAt");
-
+        Pageable pageable = request.getPageable();
         Specification<BlackEntity> specification = BlackSpecification.search(request);
-
         Page<BlackEntity> blacks = repository.findAll(specification, pageable);
-
         return blacks.map(this::convertToResponse);
     }
 
     @Override
     public Page<BlackResponse> queryByUser(BlackRequest request) {
-
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("User not found");
         }
         request.setUserUid(user.getUid());
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "createdAt");
-
-        Specification<BlackEntity> specification = BlackSpecification.search(request);
-
-        Page<BlackEntity> blacks = repository.findAll(specification, pageable);
-
-        return blacks.map(this::convertToResponse);
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "black", key = "#uid", unless = "#result == null")
@@ -170,7 +155,7 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
         return modelMapper.map(entity, BlackResponse.class);
     }
 
-    @Cacheable(value = "blacks", key = "#visitorUid + '_' + #orgUid")
+    @Cacheable(value = "blacks", key = "#visitorUid + '_' + #orgUid", unless = "#result == null")
     public Optional<BlackEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
         return repository.findByBlackUidAndOrgUidAndDeletedFalse(visitorUid, orgUid);
     }
