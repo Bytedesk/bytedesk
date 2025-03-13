@@ -40,7 +40,7 @@ public class QuickReplyResponse extends BaseResponse {
 
     private String level;
 
-    private String tags;
+    private List<String> tagList;
 
     private Boolean enabled;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 07:29:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 19:34:01
+ * @LastEditTime: 2025-03-13 18:58:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,8 +19,8 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.utils.StringListConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -73,7 +73,9 @@ public class AutoReplyKeywordEntity extends BaseEntity {
     private boolean enabled = true;
 
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
     private boolean isTransfer = false; // 是否是 转人工 关键词

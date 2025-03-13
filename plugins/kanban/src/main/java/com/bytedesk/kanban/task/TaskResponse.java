@@ -40,7 +40,7 @@ public class TaskResponse extends BaseResponse {
 
     private Integer order;
 
-    private String tags;
+    private List<String> tagList;
 
     private Boolean complete;
 

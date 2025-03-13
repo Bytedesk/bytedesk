@@ -41,7 +41,7 @@ public class ArticleArchiveResponse extends BaseResponse {
 
     private KbaseTypeEnum type;
 
-    private String tags;
+    private List<String> tagList;
 
     // 有效开始日期
     private LocalDateTime startDate;

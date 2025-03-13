@@ -60,7 +60,9 @@ public class SplitEntity extends BaseEntity {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     // 有效开始日期
     private LocalDateTime startDate;

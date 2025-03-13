@@ -41,7 +41,7 @@ public class SplitResponse extends BaseResponse {
     // 对应 拆分 document 的 id
     private String docId;
 
-    private String tags;
+    private List<String> tagList;
 
     // 有效开始日期
     private LocalDateTime startDate;

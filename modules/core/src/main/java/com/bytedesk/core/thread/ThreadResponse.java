@@ -80,7 +80,7 @@ public class ThreadResponse extends BaseResponse {
     private String note;
 
     // 标签
-    private String tags;
+    private List<String> tagList;
 
     private String client;
 

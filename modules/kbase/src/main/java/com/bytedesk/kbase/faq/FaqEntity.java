@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 14:52:43
+ * @LastEditTime: 2025-03-13 18:57:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -95,10 +94,12 @@ public class FaqEntity extends BaseEntity {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     /**
-     * 标签，多个标签用逗号分隔
+     * 标签列表
      */
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     // 被浏览次数
     // @Builder.Default
@@ -143,27 +144,6 @@ public class FaqEntity extends BaseEntity {
     private String fileUid; // 对应文件
 
     private String userUid;
-
-    // // 是否是常见问题/
-    // @Builder.Default
-    // private boolean isCommon = false;
-
-    // // 是否是快捷按钮
-    // @Builder.Default
-    // private boolean isShortcut = false;
-
-    // // 是否是猜你相问
-    // @Builder.Default
-    // private boolean isGuess = false;
-
-    // // 是否是热门问题
-    // @Builder.Default
-    // private boolean isHot = false;
-
-    // // 是否是快捷路径
-    // @Builder.Default
-    // private boolean isShortcutPath = false;
-
     
     /**
      * 排序权重
@@ -221,5 +201,34 @@ public class FaqEntity extends BaseEntity {
         
         // 如果没有找到匹配的VIP答案，返回默认答案
         return answer;
+    }
+
+    /**
+     * 添加标签
+     * @param tag 要添加的标签
+     */
+    public void addTag(String tag) {
+        if (tag != null && !tag.trim().isEmpty() && !tagList.contains(tag.trim())) {
+            tagList.add(tag.trim());
+        }
+    }
+
+    /**
+     * 移除标签
+     * @param tag 要移除的标签
+     */
+    public void removeTag(String tag) {
+        if (tag != null) {
+            tagList.remove(tag.trim());
+        }
+    }
+
+    /**
+     * 检查是否包含特定标签
+     * @param tag 要检查的标签
+     * @return 如果包含该标签则返回true
+     */
+    public boolean hasTag(String tag) {
+        return tag != null && tagList.contains(tag.trim());
     }
 }

@@ -76,7 +76,9 @@ public class VisitorEntity extends BaseEntity {
 
 	// 标签
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
 	// extra info，开发者自定义URL参数，使用json格式存储，便于扩展
 	@Builder.Default

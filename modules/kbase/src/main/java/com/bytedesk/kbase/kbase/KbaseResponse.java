@@ -93,7 +93,7 @@ public class KbaseResponse extends BaseResponse {
 
     private String platform;
 
-    private String tags;
+    private List<String> tagList;
 
     private Boolean showChat;
 

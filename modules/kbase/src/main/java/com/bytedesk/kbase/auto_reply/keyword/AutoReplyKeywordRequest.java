@@ -48,7 +48,7 @@ public class AutoReplyKeywordRequest extends BaseRequest {
 
     private String contentType;
 
-    private String tags;
+    private List<String> tagList;
 
     // 回复次数
     @Builder.Default
