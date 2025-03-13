@@ -82,6 +82,11 @@ public class ConvertUtils {
         return modelMapper.map(user, UserProtobuf.class);
     }
 
+    public static String convertToUserProtobufString(UserEntity user) {
+        UserProtobuf userProtobuf = convertToUserProtobuf(user);
+        return JSON.toJSONString(userProtobuf);
+    }
+
     public static ThreadProtobuf convertToThreadProtobuf(ThreadEntity thread) {
         ThreadProtobuf threadProtobuf = modelMapper.map(thread, ThreadProtobuf.class);
         //

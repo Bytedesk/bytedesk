@@ -114,4 +114,8 @@ public class ThreadRequest extends BaseRequest {
 
     // used for client query
     private String componentType;
+
+    // 强制重新创建新会话
+    @Builder.Default
+    private Boolean forceNew = false;
 }
