@@ -67,6 +67,10 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private Boolean downShowTransferToAgentButton = true;
 
+    // 会员等级
+	@Builder.Default
+	private Integer vipLevel = 0;
+
     // 是否有效
     // @Builder.Default
     // private Boolean valid = true;

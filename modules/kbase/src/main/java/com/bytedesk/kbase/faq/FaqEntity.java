@@ -114,6 +114,10 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private boolean downShowTransferToAgentButton = true;
 
+    // 会员等级，千人千面，根据用户等级显示不同答案
+	@Builder.Default
+	private int vipLevel = 0;
+
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")

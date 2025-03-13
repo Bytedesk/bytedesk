@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 12:20:35
+ * @LastEditTime: 2025-03-13 14:19:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -143,6 +143,7 @@ public class VisitorRestControllerAnonymous {
     }
 
     // 访客发送http消息
+    @TabooFilter(title = "敏感词过滤", action = "发送消息")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
@@ -154,7 +155,7 @@ public class VisitorRestControllerAnonymous {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
-    @TabooFilter(title = "消息过滤", action = "发送消息")
+    @TabooFilter(title = "敏感词过滤", action = "发送消息")
     @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
@@ -183,7 +184,7 @@ public class VisitorRestControllerAnonymous {
         return emitter;
     }
 
-    @TabooFilter(title = "消息过滤", action = "发送消息")
+    @TabooFilter(title = "敏感词过滤", action = "发送消息")
     @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {
