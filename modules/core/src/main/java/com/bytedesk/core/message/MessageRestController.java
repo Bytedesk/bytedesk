@@ -72,7 +72,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(MessageRequest request) {
 
-        Page<MessageResponse> response = messageService.queryByThreadTopic(request);
+        Page<MessageResponse> response = messageService.queryByTopic(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }

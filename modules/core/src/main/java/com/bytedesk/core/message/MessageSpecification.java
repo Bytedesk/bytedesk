@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 09:31:58
+ * @LastEditTime: 2025-03-13 11:01:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,20 +35,20 @@ public class MessageSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getComponentType())) {
                 // 
                 if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
-                    // threadTopic like '%group%' or threadTopic like '%member%'
+                    // topic like '%group%' or topic like '%member%'
                     predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("threadTopic"), "%group%"),
-                        criteriaBuilder.like(root.get("threadTopic"), "%member%")
+                        criteriaBuilder.like(root.get("topic"), "%group%"),
+                        criteriaBuilder.like(root.get("topic"), "%member%")
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
-                    // threadTopic like '%agent%' or threadTopic like '%workgroup%'
+                    // topic like '%agent%' or topic like '%workgroup%'
                     predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("threadTopic"), "%agent%"),
-                        criteriaBuilder.like(root.get("threadTopic"), "%workgroup%")
+                        criteriaBuilder.like(root.get("topic"), "%agent%"),
+                        criteriaBuilder.like(root.get("topic"), "%workgroup%")
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
-                    // threadTopic like '%robot%'
-                    predicates.add(criteriaBuilder.like(root.get("threadTopic"), "%robot%"));
+                    // topic like '%robot%'
+                    predicates.add(criteriaBuilder.like(root.get("topic"), "%robot%"));
                 }
             }
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
@@ -63,10 +63,10 @@ public class MessageSpecification extends BaseSpecification {
             // 
             String topic = request.getTopic();
             if (StringUtils.hasText(topic)) {
-                Predicate topicPredicate = criteriaBuilder.equal(root.get("threadTopic"), topic);
+                Predicate topicPredicate = criteriaBuilder.equal(root.get("topic"), topic);
                 if (TopicUtils.isOrgMemberTopic(topic)) {
                     String reverseTopic = TopicUtils.getOrgMemberTopicReverse(topic);
-                    Predicate reverseTopicPredicate = criteriaBuilder.equal(root.get("threadTopic"), reverseTopic);
+                    Predicate reverseTopicPredicate = criteriaBuilder.equal(root.get("topic"), reverseTopic);
                     predicates.add(criteriaBuilder.or(topicPredicate, reverseTopicPredicate));
                 } else {
                     predicates.add(topicPredicate);
