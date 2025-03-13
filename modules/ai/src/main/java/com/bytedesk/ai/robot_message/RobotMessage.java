@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:12
+ * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 14:29:13
+ * @LastEditTime: 2025-03-13 21:37:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,34 +12,30 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot_message;
+import com.bytedesk.core.message.AbstractMessageEntity;
 
-
-import com.bytedesk.core.base.BaseResponse;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
+/**
+ * 分表存储一对一客服消息
+ * 同步message中客服消息，包括uid。用于查询一对一客服消息，减少message表压力
+ */
+@Entity
 @Data
-@Builder
+@SuperBuilder
+@NoArgsConstructor // 添加无参构造函数
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class RobotMessageResponse extends BaseResponse {
+@Table(name = "bytedesk_ai_robot_message")
+public class RobotMessage extends AbstractMessageEntity {
 
-    private String name;
-
-    private String description;
-
-    private String type;
-
-    private String color;
-
-    private Integer order;
-
-    // private LocalDateTime createdAt;
+    private static final long serialVersionUID = 1L;
+    
+    // 可以在这里添加 AgentMessage 特有的字段（如果有的话）
 }

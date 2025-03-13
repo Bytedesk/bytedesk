@@ -239,29 +239,6 @@
       }
     },
     {
-      "uid": "9",
-      "name": "session_summary",
-      "type": "LLM",
-      "category": "i18n.module.service",
-      "i18n": {
-        "en": {
-          "nickname": "Session Summary",
-          "prompt": "Summarize the conversation and provide summary results.",
-          "description": "Create a session summary bot"
-        },
-        "zh_cn": {
-          "nickname": "会话小结",
-          "prompt": "对会话进行总结，并给出总结结果。",
-          "description": "创建一个会话小结机器人"
-        },
-        "zh_tw": {
-          "nickname": "會話小結",
-          "prompt": "對會話進行總結，並給出總結結果。",
-          "description": "創建一個會話小結機器人"
-        }
-      }
-    },
-    {
       "uid": "10",
       "name": "ticket_assistant",
       "type": "LLM",
@@ -787,29 +764,6 @@
           "nickname": "客服助手",
           "prompt": "你是客服人员的工作助手。根据提供的文档信息以及历史聊天记录回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.",
           "description": "創建一個客服助手機器人"
-        }
-      }
-    },
-    {
-      "uid": "33",
-      "name": "thread_summary",
-      "type": "LLM",
-      "category": "i18n.module.service",
-      "i18n": {
-        "en": {
-          "nickname": "Thread Summary",
-          "prompt": "Based on the thread history, generate a thread summary.",
-          "description": "Create a thread summary bot"
-        },
-        "zh_cn": {
-          "nickname": "会话小结",
-          "prompt": "根据会话历史记录，生成会话小结。",
-          "description": "创建一个会话小结机器人"
-        },
-        "zh_tw": {
-          "nickname": "會話小結",
-          "prompt": "根據會話歷史記錄，生成會話小結。",
-          "description": "創建一個會話小結機器人"
         }
       }
     },
