@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 12:16:15
+ * @LastEditTime: 2025-03-13 17:46:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,7 +83,7 @@ public class RobotService {
         }
         String threadTopic = threadProtobuf.getTopic();
         // if (!threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
-        //     return;
+        // return;
         // }
         // 仅处理员工/客服消息
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
@@ -93,41 +93,29 @@ public class RobotService {
             return;
         }
         RobotProtobuf robot = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
-        // UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
-        // if (robot.getType().equals(UserTypeEnum.ROBOT.name())) {
         log.info("processSseMemberMessage thread reply");
-        // RobotEntity robot = robotRestService.findByUid(agent.getUid())
-        // .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not
-        // found"));
         //
-        MessageProtobuf message = RobotMessageUtils.createMemberMessage(thread, threadProtobuf, robot,
+        MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
                 messageProtobuf);
-        //
-        // MessageProtobuf clonedMessage = SerializationUtils.clone(message);
-        // clonedMessage.setUid(uidUtils.getUid());
-        // clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        // messageSendService.sendProtobufMessage(clonedMessage);
         //
         if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.OLLAMA)) {
             springAIOllamaService
-                    .ifPresent(service -> service.sendSseMemberMessage(query, robot, message, emitter));
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DEEPSEEK)) {
             springAIDeepseekService
-                    .ifPresent(service -> service.sendSseMemberMessage(query, robot, message, emitter));
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DASHSCOPE)) {
             springAIDashscopeService
-                    .ifPresent(service -> service.sendSseMemberMessage(query, robot, message, emitter));
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.ZHIPU)) {
             springAIZhipuaiService
-                    .ifPresent(service -> service.sendSseMemberMessage(query, robot, message, emitter));
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else {
             springAIZhipuaiService
-                    .ifPresent(service -> service.sendSseMemberMessage(query, robot, message, emitter));
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         }
         // }
     }
-
 
     // 处理访客端SSE请求消息
     public void processSseVisitorMessage(String messageJson, SseEmitter emitter) {
@@ -136,7 +124,7 @@ public class RobotService {
         Assert.notNull(emitter, "emitter is null");
         //
         messageJson = messageService.processMessageJson(messageJson);
-        // 
+        //
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
         // if (messageType.equals(MessageTypeEnum.STREAM)) {
@@ -160,42 +148,38 @@ public class RobotService {
         if (!StringUtils.hasText(thread.getAgent())) {
             return;
         }
-        RobotProtobuf agent = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
+        RobotProtobuf robot = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
         // UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
-        if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
+        if (robot.getType().equals(UserTypeEnum.ROBOT.name())) {
             log.info("processSseVisitorMessage thread reply");
-            RobotEntity robot = robotRestService.findByUid(agent.getUid())
-                    .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            //
+            // 重新查询是因为，后台可能会更新机器人信息，比如机器人名称、llm配置等。
+            // RobotEntity robot = robotRestService.findByUid(agent.getUid())
+            //         .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
+            // RobotProtobuf robotProtobuf = RobotProtobuf.convertFromRobotEntity(robot);
+            // 机器人回复访客消息
             MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
                     messageProtobuf);
             //
-            // MessageProtobuf clonedMessage = SerializationUtils.clone(message);
-            // clonedMessage.setUid(uidUtils.getUid());
-            // clonedMessage.setType(MessageTypeEnum.PROCESSING);
-            // messageSendService.sendProtobufMessage(clonedMessage);
-            //
             if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.OLLAMA)) {
                 springAIOllamaService
-                        .ifPresent(service -> service.sendSseVisitorMessage(query, robot, message, emitter));
+                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DEEPSEEK)) {
                 springAIDeepseekService
-                        .ifPresent(service -> service.sendSseVisitorMessage(query, robot, message, emitter));
+                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DASHSCOPE)) {
                 springAIDashscopeService
-                        .ifPresent(service -> service.sendSseVisitorMessage(query, robot, message, emitter));
+                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.ZHIPU)) {
                 springAIZhipuaiService
-                        .ifPresent(service -> service.sendSseVisitorMessage(query, robot, message, emitter));
+                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             } else {
                 springAIZhipuaiService
-                        .ifPresent(service -> service.sendSseVisitorMessage(query, robot, message, emitter));
+                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             }
         }
     }
 
-    
     // 处理访客端同步请求消息，用于微信公众号等平台
     public void processSyncVisitorMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
@@ -259,8 +243,9 @@ public class RobotService {
             log.info("processRobotThreadWebsocketMessage thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
                     .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            //
-            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
+            RobotProtobuf robotProtobuf = RobotProtobuf.convertFromRobotEntity(robot);
+            // 机器人回复访客消息
+            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robotProtobuf,
                     messageProtobuf);
             //
             MessageProtobuf clonedMessage = SerializationUtils.clone(message);

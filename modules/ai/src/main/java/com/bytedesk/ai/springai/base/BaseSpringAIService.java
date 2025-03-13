@@ -79,7 +79,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendSseMemberMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
@@ -104,30 +104,30 @@ public abstract class BaseSpringAIService implements SpringAIService {
         processPromptSSE(aiPrompt, messageProtobuf, emitter);
     }
 
-    @Override
-    public void sendSseVisitorMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
-        // Assert.hasText(messageJson, "Message must not be empty");
-        Assert.notNull(emitter, "SseEmitter must not be null");
-        sendSseProcessingMessage(messageProtobuf, emitter);
-        //
-        String prompt = "";
-        if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
-            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
-            String context = String.join("\n", contentList);
-            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
-        } else {
-            prompt = robot.getLlm().getPrompt();
-        }
-        //
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(prompt));
-        messages.add(new UserMessage(query));
-        log.info("BaseSpringAIService sendSseVisitorMessage messages {}", messages);
-        //
-        Prompt aiPrompt = new Prompt(messages);
-        //
-        processPromptSSE(aiPrompt, messageProtobuf, emitter);
-    }
+    // @Override
+    // public void sendSseVisitorMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    //     // Assert.hasText(messageJson, "Message must not be empty");
+    //     Assert.notNull(emitter, "SseEmitter must not be null");
+    //     sendSseProcessingMessage(messageProtobuf, emitter);
+    //     //
+    //     String prompt = "";
+    //     if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
+    //         List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+    //         String context = String.join("\n", contentList);
+    //         prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
+    //     } else {
+    //         prompt = robot.getLlm().getPrompt();
+    //     }
+    //     //
+    //     List<Message> messages = new ArrayList<>();
+    //     messages.add(new SystemMessage(prompt));
+    //     messages.add(new UserMessage(query));
+    //     log.info("BaseSpringAIService sendSseVisitorMessage messages {}", messages);
+    //     //
+    //     Prompt aiPrompt = new Prompt(messages);
+    //     //
+    //     processPromptSSE(aiPrompt, messageProtobuf, emitter);
+    // }
 
 
     @Override
@@ -178,8 +178,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
     private void sendSseProcessingMessage(MessageProtobuf messageProtobuf, SseEmitter emitter) {
         //
         MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
-        clonedMessage.setUid(uidUtils.getUid());
-        clonedMessage.setType(MessageTypeEnum.PROCESSING);
+        clonedMessage.setUid(messageProtobuf.getUid());
+        clonedMessage.setType(MessageTypeEnum.TYPING);
+        // clonedMessage.setContent(I18Consts.I18N_TYPING);
+        // clonedMessage.setContent("...");
         try {
             emitter.send(SseEmitter.event()
             .data(JSON.toJSONString(clonedMessage))
