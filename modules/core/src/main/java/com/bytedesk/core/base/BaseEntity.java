@@ -30,6 +30,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 // import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -47,6 +50,9 @@ import java.time.LocalDateTime;
  * @author im.bytedesk.com
  */
 @Data
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity implements Serializable {
