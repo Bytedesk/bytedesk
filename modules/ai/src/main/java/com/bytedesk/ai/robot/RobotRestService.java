@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 18:30:33
+ * @LastEditTime: 2025-03-12 18:40:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -199,8 +199,20 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         if (owner == null) {
             throw new RuntimeException("should login first not found");
         }
-        // String topic = request.getTopic();
-        String topic = TopicUtils.formatOrgRobotMemberThreadTopic(request.getUid(), owner.getUid(), uidUtils.getUid());
+        // org/robot/robotUid/userUid
+        String preTopic = request.getTopic();
+        String[] splits = preTopic.split("/");
+        if (splits.length < 4) {
+            throw new RuntimeException("robot topic format error");
+        }
+        // org/robot/robotUid/userUid/randomUid
+        String robotUid = splits[2];
+        Optional<RobotEntity> robotOptional = findByUid(robotUid);
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot not found");
+        }
+        // org/robot/robotUid/userUid/randomUid
+        String topic = TopicUtils.formatOrgRobotMemberThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
 
         // 允许一个用户创建多个相同机器人的会话
         // Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
@@ -219,21 +231,11 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         .build();
         thread.setUid(uidUtils.getUid());
         thread.setOrgUid(owner.getOrgUid());
-
-        String[] splits = topic.split("/");
-        if (splits.length < 4) {
-            throw new RuntimeException("robot topic format error");
-        }
-        
-        // org/robot/robotUid/userUid/randomUid
-        String robotUid = splits[2];
-        Optional<RobotEntity> robotOptional = findByUid(robotUid);
-        if (robotOptional.isPresent()) {
-            RobotEntity robot = robotOptional.get();
-            robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
-            thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
-        }
-
+        // 
+        RobotEntity robot = robotOptional.get();
+        robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
+        thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
+        // 
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
