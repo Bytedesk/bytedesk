@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 13:14:42
+ * @LastEditTime: 2025-03-13 15:31:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,6 +57,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.OptimisticLockingHandler;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
@@ -267,6 +268,51 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             throw new RuntimeException("thread save failed");
         }
         //
+        return threadService.convertToResponse(savedThread);
+    }
+
+    // 创建客服助手机器人会话
+    public ThreadResponse createAgentAssistantThread(ThreadRequest request) {
+        UserEntity owner = authService.getUser();
+        if (owner == null) {
+            throw new RuntimeException("should login first not found");
+        }
+        Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(RobotConsts.ROBOT_NAME_AGENT_ASSISTANT, request.getOrgUid());
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot not found");
+        }
+        // org/robot/robotUid/userUid/randomUid
+        String topic = TopicUtils.formatOrgRobotMemberThreadTopic(robotOptional.get().getUid(), owner.getUid(), uidUtils.getUid());
+
+        // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
+        if (!request.getForceNew()) {
+            Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
+            if (threadOptional.isPresent()) {
+                return threadService.convertToResponse(threadOptional.get());
+            }
+        }
+
+        // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
+        ThreadEntity thread = ThreadEntity.builder()
+            .topic(topic)
+            .type(ThreadTypeEnum.LLM.name())
+            .state(ThreadStateEnum.STARTED.name())
+            .unreadCount(0)
+            .user(ConvertUtils.convertToUserProtobufString(owner))
+            // .owner(owner)
+        .build();
+        thread.setUid(uidUtils.getUid());
+        thread.setOrgUid(owner.getOrgUid());
+        // 
+        RobotEntity robot = robotOptional.get();
+        robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
+        thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
+        // 
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+
         return threadService.convertToResponse(savedThread);
     }
 

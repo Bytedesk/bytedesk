@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 23:31:05
+ * @LastEditTime: 2025-03-13 15:26:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -439,7 +439,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
     @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicAndOwner(@NonNull String topic, UserEntity user) {
-        return threadRepository.findFirstByTopicAndOwnerAndDeleted(topic, user, false);
+        return threadRepository.findFirstByTopicAndOwnerOrderByUpdatedDescAndDeleted(topic, user, false);
     }
 
     // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a

@@ -46,7 +46,10 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ RobotEntityListener.class })
-@Table(name = "bytedesk_ai_robot")
+// 限制name + orgUid唯一索引，防止重复创建机器人
+@Table(name = "bytedesk_ai_robot", uniqueConstraints = {
+    @jakarta.persistence.UniqueConstraint(columnNames = {"name", "orgUid"})
+})
 public class RobotEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
