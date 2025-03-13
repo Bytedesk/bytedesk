@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 09:36:37
+ * @LastEditTime: 2025-03-13 20:13:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,10 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.utils.StringListConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

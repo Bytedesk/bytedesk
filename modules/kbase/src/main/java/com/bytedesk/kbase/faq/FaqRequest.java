@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 14:50:55
+ * @LastEditTime: 2025-03-13 20:11:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.kbase.split.SplitStatusEnum;
 
@@ -78,8 +77,6 @@ public class FaqRequest extends BaseRequest {
     private Boolean enabled = true;
 
     @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
     private LocalDateTime startDate;

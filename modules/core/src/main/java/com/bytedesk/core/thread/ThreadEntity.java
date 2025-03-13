@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 18:21:54
+ * @LastEditTime: 2025-03-13 20:09:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,9 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -22,6 +25,7 @@ import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.utils.StringListConverter;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

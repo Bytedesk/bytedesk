@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 09:30:31
+ * @LastEditTime: 2025-03-13 20:12:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,9 +23,11 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.utils.StringListConverter;
 import com.bytedesk.team.member.MemberEntity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -154,10 +156,6 @@ public class KbaseEntity extends BaseEntity {
     // 有效结束日期
     private LocalDateTime endDate;
 
-    // @Builder.Default
-    // @ElementCollection
-    // @CollectionTable(name = "bytedesk_kbase_tags")
-    // private List<String> tags = new ArrayList<>();
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

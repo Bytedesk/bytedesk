@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;

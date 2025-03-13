@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 12:11:58
+ * @LastEditTime: 2025-03-13 20:10:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.auto_reply.fixed;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 
