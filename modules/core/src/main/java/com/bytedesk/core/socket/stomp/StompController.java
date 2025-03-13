@@ -51,7 +51,7 @@ public class StompController {
      * @param message   content
      */
     @MessageMapping("/{sid}.{uid}")
-    @TabooFilter(title = "消息过滤", action = "发送消息")
+    @TabooFilter(title = "敏感词过滤", action = "发送消息")
     public void message(Principal principal,
             @DestinationVariable(value = "sid") String sid,
             @DestinationVariable(value = "uid") String uid,

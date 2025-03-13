@@ -158,7 +158,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @TabooFilter(title = "消息过滤", action = "发送消息")
+    @TabooFilter(title = "敏感词过滤", action = "发送消息")
     @ActionAnnotation(title = "agent", action = "sendSseMessage", description = "sendSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMessage(@RequestParam(value = "message") String message) {

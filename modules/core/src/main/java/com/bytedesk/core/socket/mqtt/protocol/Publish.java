@@ -32,7 +32,7 @@ public class Publish {
     private final IMessageSendService messageSendService;
 
     //
-    @TabooFilter(title = "消息过滤", action = "发送消息")
+    @TabooFilter(title = "敏感词过滤", action = "发送消息")
     public void processPublish(Channel channel, MqttPublishMessage mqttPublishMessage) {
         // log.debug("processPublish {}", mqttPublishMessage.toString());
         // TODO: 发送：消息发送成功回执
