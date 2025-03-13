@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-26 12:28:07
+ * @LastEditTime: 2025-03-13 15:44:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,7 +41,7 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         Boolean existsByUid(String uid);
 
         /** used for member thread type */
-        Optional<ThreadEntity> findFirstByTopicAndOwnerOrderByUpdatedDescAndDeleted(String topic, UserEntity owner, Boolean deleted);
+        Optional<ThreadEntity> findFirstByTopicAndOwnerAndDeletedOrderByUpdatedAtDesc(String topic, UserEntity owner, Boolean deleted);
 
         List<ThreadEntity> findByTopicAndDeleted(String topic, Boolean deleted);
 
