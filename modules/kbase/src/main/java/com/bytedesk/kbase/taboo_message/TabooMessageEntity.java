@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:51:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 15:31:49
+ * @LastEditTime: 2025-03-13 20:15:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,14 +14,18 @@
 package com.bytedesk.kbase.taboo_message;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.utils.StringListConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;

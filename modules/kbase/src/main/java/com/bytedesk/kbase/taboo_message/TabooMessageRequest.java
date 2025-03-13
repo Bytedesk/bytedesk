@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 16:23:30
+ * @LastEditTime: 2025-03-13 20:16:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,9 +14,10 @@
 package com.bytedesk.kbase.taboo_message;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -38,8 +39,6 @@ public class TabooMessageRequest extends BaseRequest {
     private String type;
 
     @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
     
     private LocalDateTime startDate;
