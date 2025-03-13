@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 17:41:54
+ * @LastEditTime: 2025-03-13 14:52:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,15 +60,21 @@ public class FaqEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String question;
 
-    // 答案
+    // 默认答案（对所有用户级别展示的通用答案）
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String answer;
 
     // 支持一问多答，根据访客不同身份，显示不同答案
+    // @Builder.Default
+    // @Convert(converter = FaqListConverter.class)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // private List<String> answerList = new ArrayList<>();
+    
+    // 支持一问多答，根据不同VIP等级对应不同答案
     @Builder.Default
-    @Convert(converter = FaqListConverter.class)
+    @Convert(converter = FaqAnswerListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> answerList = new ArrayList<>();
+    private List<FaqAnswer> answerList = new ArrayList<>();
 
     // 支持设置关联问题
     @Builder.Default
@@ -114,10 +120,6 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private boolean downShowTransferToAgentButton = true;
 
-    // 会员等级，千人千面，根据用户等级显示不同答案
-	@Builder.Default
-	private int vipLevel = 0;
-
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
@@ -162,6 +164,19 @@ public class FaqEntity extends BaseEntity {
     // @Builder.Default
     // private boolean isShortcutPath = false;
 
+    
+    /**
+     * 排序权重
+     */
+    @Builder.Default
+    private int weight = 0;
+
+    /**
+     * 点击次数
+     */
+    @Builder.Default
+    private int hits = 0;
+
     // vector store id
     @Builder.Default
     @Convert(converter = StringListConverter.class)
@@ -177,14 +192,34 @@ public class FaqEntity extends BaseEntity {
     }
 
     /**
-     * 排序权重
+     * 获取指定VIP等级的答案，如果没有对应等级的答案，则返回默认答案
+     * @param vipLevel 用户VIP等级
+     * @return 根据VIP等级返回的答案
      */
-    @Builder.Default
-    private int weight = 0;
-
-    /**
-     * 点击次数
-     */
-    @Builder.Default
-    private int hits = 0;
+    public String getAnswerForVipLevel(int vipLevel) {
+        if (answerList != null && !answerList.isEmpty()) {
+            // 先查找是否有完全匹配的VIP等级答案
+            for (FaqAnswer vipAnswer : answerList) {
+                if (vipAnswer.getVipLevel() == vipLevel) {
+                    return vipAnswer.getAnswer();
+                }
+            }
+            
+            // 如果没有完全匹配的，查找小于用户当前等级的最高等级答案
+            FaqAnswer highestMatch = null;
+            for (FaqAnswer vipAnswer : answerList) {
+                if (vipAnswer.getVipLevel() < vipLevel && 
+                    (highestMatch == null || vipAnswer.getVipLevel() > highestMatch.getVipLevel())) {
+                    highestMatch = vipAnswer;
+                }
+            }
+            
+            if (highestMatch != null) {
+                return highestMatch.getAnswer();
+            }
+        }
+        
+        // 如果没有找到匹配的VIP答案，返回默认答案
+        return answer;
+    }
 }
