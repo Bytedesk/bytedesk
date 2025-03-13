@@ -42,7 +42,7 @@ public class AutoReplyKeywordResponse extends BaseResponse {
 
     private MessageTypeEnum contentType;
 
-    private String tags;
+    private List<String> tagList;
 
     // 回复次数
     private Integer replyCount;

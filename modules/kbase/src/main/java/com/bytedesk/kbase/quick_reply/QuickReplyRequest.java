@@ -46,7 +46,9 @@ public class QuickReplyRequest extends BaseRequest {
     private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
     private Boolean enabled = true;

@@ -36,7 +36,7 @@ public class AutoReplyFixedResponse extends BaseResponse {
 
     private String level;
 
-    private String tags;
+    private List<String> tagList;
 
     // 回复次数
     private Integer replyCount;

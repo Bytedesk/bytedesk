@@ -101,7 +101,9 @@ public class ThreadRequest extends BaseRequest {
 
     // 标签
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
     private String agent;

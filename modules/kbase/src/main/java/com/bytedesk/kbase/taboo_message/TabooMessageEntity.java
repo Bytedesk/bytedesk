@@ -59,7 +59,9 @@ public class TabooMessageEntity extends BaseEntity {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
     @Column(name = "is_enabled")

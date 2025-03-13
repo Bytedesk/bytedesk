@@ -56,7 +56,7 @@ public class FaqResponse extends BaseResponse {
     // private Boolean valid;
     private Boolean enabled;
 
-    private String tags;
+    private List<String> tagList;
 
     // 有效开始日期
     private LocalDateTime startDate;

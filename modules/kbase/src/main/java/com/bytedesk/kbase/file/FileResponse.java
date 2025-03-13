@@ -42,7 +42,7 @@ public class FileResponse extends BaseResponse {
 
     private String status;
 
-    private String tags;
+    private List<String> tagList;
 
     // 有效开始日期
     private LocalDateTime startDate;

@@ -38,7 +38,9 @@ public class TabooMessageRequest extends BaseRequest {
     private String type;
 
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
     
     private LocalDateTime startDate;
 

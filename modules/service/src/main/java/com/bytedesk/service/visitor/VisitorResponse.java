@@ -63,7 +63,7 @@ public class VisitorResponse extends BaseResponse {
 
 	private String status;
 
-	private String tags;
+	private List<String> tagList;
 
 	private String extra;
 

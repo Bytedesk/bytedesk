@@ -14,13 +14,16 @@
 package com.bytedesk.kbase.auto_reply.fixed;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.utils.StringListConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -59,7 +62,9 @@ public class AutoReplyFixedEntity extends BaseEntity {
     private boolean enabled = true;
 
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     // 回复次数
     @Builder.Default

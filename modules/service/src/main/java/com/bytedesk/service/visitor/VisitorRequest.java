@@ -73,7 +73,9 @@ public class VisitorRequest extends BaseRequest {
 
 	// 标签
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
 	// 自定义参数，从URL传入，使用json格式传入，例如：{"key1":"value1","key2":"value2"}
 	@Builder.Default

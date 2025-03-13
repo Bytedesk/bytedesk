@@ -43,7 +43,7 @@ public class TextResponse extends BaseResponse {
 
     // private String color;
 
-    private String tags;
+    private List<String> tagList;
 
     // 有效开始日期
     private LocalDateTime startDate;

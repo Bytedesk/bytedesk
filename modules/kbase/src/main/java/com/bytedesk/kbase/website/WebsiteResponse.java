@@ -42,7 +42,7 @@ public class WebsiteResponse extends BaseResponse {
 
     private String content;
 
-    private String tags;
+    private List<String> tagList;
 
     // 有效开始日期
     private LocalDateTime startDate;
