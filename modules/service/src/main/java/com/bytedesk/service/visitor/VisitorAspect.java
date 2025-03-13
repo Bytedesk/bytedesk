@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:05:19
+ * @LastEditTime: 2025-03-13 17:06:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,35 +65,15 @@ public class VisitorAspect {
                     visitorAnnotation.title(), visitorAnnotation.action(), uid, orgUid);
                 
                 // 检查黑名单
-                // if (uid != null && orgUid != null) {
-                //     Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
-                //     if (blackOpt.isPresent()) {
-                //         BlackEntity black = blackOpt.get();
-                //         if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
-                //             throw new RuntimeException("Access denied for visitor: " + uid + " in org: " + orgUid);
-                //         } else {
-                //             log.debug("Found VisitorRequest - Visitor out of end time");
-                //         }
-                //     } else {
-                //         log.debug("Found VisitorRequest - Visitor not in black list");
-                //     }
-                // } else {
-                //     log.debug("Found VisitorRequest - uid or orgUid is null");
-                // }
+                if (uid != null && orgUid != null) {
+                    if (blackService.isBlackList(uid, orgUid)) {
+                        throw new RuntimeException("Access denied for visitor: " + uid + " in org: " + orgUid);
+                    }
+                }
 
                 break;
             }
         }
-
-        // 处理 IP 相关逻辑
-        // ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        // if (attributes != null) {
-        //     HttpServletRequest request = attributes.getRequest();
-        //     String ip = IpUtils.getIp(request);
-        //     String ipLocation = ipService.getIpLocation(ip);
-        //     log.info("IP: {}, Location: {}", ip, ipLocation);
-        //     // TODO: 检查 IP 是否被封禁
-        // }
 
         // TODO: 检查付费情况，是否过期，是否试用到期等
         

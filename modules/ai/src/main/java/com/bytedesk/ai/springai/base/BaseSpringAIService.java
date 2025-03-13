@@ -11,7 +11,9 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.util.SerializationUtils;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
@@ -21,7 +23,7 @@ import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -81,13 +83,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
-        log.info("BaseSpringAIService sendSseMemberMessage query {}", query);
-        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
-        //
-        // MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
-        // clonedMessage.setUid(uidUtils.getUid());
-        // clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        // messageSendService.sendProtobufMessage(clonedMessage);
+        sendSseProcessingMessage(messageProtobuf, emitter);
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
@@ -105,21 +101,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         Prompt aiPrompt = new Prompt(messages);
         //
-        processPromptSSE(aiPrompt, threadProtobuf, messageProtobuf, emitter);
+        processPromptSSE(aiPrompt, messageProtobuf, emitter);
     }
 
     @Override
     public void sendSseVisitorMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
-
-        log.info("BaseSpringAIService sendSseVisitorMessage query {}", query);
-        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
-        //
-        // MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
-        // clonedMessage.setUid(uidUtils.getUid());
-        // clonedMessage.setType(MessageTypeEnum.PROCESSING);
-        // messageSendService.sendProtobufMessage(clonedMessage);
+        sendSseProcessingMessage(messageProtobuf, emitter);
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
@@ -137,7 +126,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         Prompt aiPrompt = new Prompt(messages);
         //
-        processPromptSSE(aiPrompt, threadProtobuf, messageProtobuf, emitter);
+        processPromptSSE(aiPrompt, messageProtobuf, emitter);
     }
 
 
@@ -186,6 +175,21 @@ public abstract class BaseSpringAIService implements SpringAIService {
         messagePersistCache.pushForPersist(messageJson);
     }
 
+    private void sendSseProcessingMessage(MessageProtobuf messageProtobuf, SseEmitter emitter) {
+        //
+        MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
+        clonedMessage.setUid(uidUtils.getUid());
+        clonedMessage.setType(MessageTypeEnum.PROCESSING);
+        try {
+            emitter.send(SseEmitter.event()
+            .data(JSON.toJSONString(clonedMessage))
+            .id(clonedMessage.getUid())
+            .name("message"));
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
 
     public String buildKbPrompt(String systemPrompt, String query, String context) {
         return systemPrompt + "\n" +
@@ -199,8 +203,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected abstract String processPromptSync(String message);
 
-    protected abstract void processPromptSSE(Prompt prompt, ThreadProtobuf threadProtobuf,
-            MessageProtobuf messageProtobuf, SseEmitter emitter);
+    protected abstract void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobuf, SseEmitter emitter);
 
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);
