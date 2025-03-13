@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 17:12:50
+ * @LastEditTime: 2025-03-13 17:57:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,10 @@ public class ConvertAiUtils {
     }
 
     public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
-        return modelMapper.map(entity, RobotProtobuf.class);
+        RobotProtobuf robotProtobuf =  modelMapper.map(entity, RobotProtobuf.class);
+        robotProtobuf.setIsKbEnabled(entity.isKbEnabled());
+        robotProtobuf.setType(UserTypeEnum.ROBOT.name());
+        return robotProtobuf;
     }
 
     public static String convertToRobotProtobufString(RobotEntity entity) {
@@ -44,17 +47,6 @@ public class ConvertAiUtils {
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
         return JSON.toJSONString(robotProtobuf);
     }
-
-    // public static UserProtobuf convertToUserProtobuf(RobotEntity entity) {
-    //     UserProtobuf userProtobuf = modelMapper.map(entity, UserProtobuf.class);
-    //     userProtobuf.setType(UserTypeEnum.ROBOT.name());
-    //     return userProtobuf;
-    // }
-
-    // public static String convertToUserProtobufString(RobotEntity entity) {
-    //     UserProtobuf userProtobuf = convertToUserProtobuf(entity);
-    //     return JSON.toJSONString(userProtobuf);
-    // }
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             ServiceSettings serviceSettings) {

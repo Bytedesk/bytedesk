@@ -154,7 +154,8 @@ public class I18Consts {
     public static final String I18N_AGENT_TRANSFER = I18N_PREFIX + "agent.transfer";
     // 
     public static final String I18N_BLACK_USER_ALREADY_EXISTS = I18N_PREFIX + "black.user.already.exists";
-
+    // typing
+    public static final String I18N_TYPING = I18N_PREFIX + "typing";
     
     
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 16:49:38
+ * @LastEditTime: 2025-03-13 17:41:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,5 +53,18 @@ public class RobotProtobuf implements Serializable {
 
     public static RobotProtobuf parseFrom(String user) {
         return JSON.parseObject(user, RobotProtobuf.class);
+    }
+
+    public static RobotProtobuf convertFromRobotEntity(RobotEntity robotEntity) {
+        return RobotProtobuf.builder()
+                .uid(robotEntity.getUid())
+                .nickname(robotEntity.getNickname())
+                .avatar(robotEntity.getAvatar())
+                .type(UserTypeEnum.ROBOT.name())
+                .extra(JSON.toJSONString(robotEntity))
+                .isKbEnabled(robotEntity.isKbEnabled()) // 确保正确设置
+                .kbUid(robotEntity.getKbUid())
+                .llm(robotEntity.getLlm())
+                .build();
     }
 }
