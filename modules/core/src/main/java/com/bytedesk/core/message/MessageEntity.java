@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:29:14
+ * @LastEditTime: 2025-03-13 21:36:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.core.message;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,6 +24,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Data
 @SuperBuilder
+@NoArgsConstructor // 添加无参构造函数
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @EntityListeners({ MessageEntityListener.class })
