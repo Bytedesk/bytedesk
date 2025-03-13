@@ -1,0 +1,94 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-03-13 10:04:42
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-13 10:07:08
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.core.message;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.black.BlackEntity;
+import com.bytedesk.core.black.BlackRestService;
+import com.bytedesk.core.thread.ThreadProtobuf;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class MessageService {
+
+    private final MessagePersistCache messagePersistCache;
+
+    // private final MessagePersistService messagePersistService;
+
+    // private final MessageSocketService messageSocketService;
+
+    private final BlackRestService blackRestService;
+
+    public String processMessageJson(String messageJson) {
+
+        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+        if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
+            messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
+        }
+
+        ThreadProtobuf thread = messageProtobuf.getThread();
+        if (thread == null) {
+            throw new RuntimeException("thread is null");
+        }
+
+        // Replace client timestamp
+        messageProtobuf.setCreatedAt(LocalDateTime.now());
+
+        // Check blacklist
+        if (isBlackList(messageProtobuf)) {
+            return null;
+        }
+
+        // Filter sensitive words
+        messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
+
+        // Cache message for persistence
+        messagePersistCache.pushForPersist(messageJson);
+
+        return messageJson;
+    }
+
+    // 检查黑名单
+    private boolean isBlackList(MessageProtobuf messageProtobuf) {
+        String uid = messageProtobuf.getUser().getUid();
+        MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+        if (extraObject != null) {
+            String orgUid = extraObject.getOrgUid();
+            Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
+            if (blackOpt.isPresent()) {
+                BlackEntity black = blackOpt.get();
+                if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // 过滤敏感词
+    private String filterTaboo(String messageJson) {
+        // TODO: 过滤敏感词，将敏感词替换为*
+        // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
+        return messageJson;
+    }
+
+}

@@ -35,7 +35,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import com.bytedesk.core.annotation.UserIp;
+import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -180,7 +180,7 @@ public class SpringAIDashscopeController {
 	}
 
 	// http://127.0.0.1:9003/springai/image/image2text
-	@UserIp
+	@BlackIpFilter
 	@PostMapping("/image2text")
 	@Operation(summary = "DashScope Image Recognition")
 	public Flux<JsonResult<?>> image2text(@RequestParam("image") MultipartFile image) {
@@ -199,7 +199,7 @@ public class SpringAIDashscopeController {
 
 	// http://127.0.0.1:9003/springai/image/text2Image?prompt=A beautiful sunset
 	// over a calm ocean
-	@UserIp
+	@BlackIpFilter
 	@GetMapping("/text2Image")
 	@Operation(summary = "DashScope Image Generation")
 	public JsonResult<?> text2Image(

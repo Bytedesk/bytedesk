@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 10:33:06
+ * @LastEditTime: 2025-03-13 10:08:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,21 +14,13 @@
 package com.bytedesk.core.message;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 // import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.black.BlackEntity;
-import com.bytedesk.core.black.BlackRestService;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
-import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.utils.MessageConvertUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,43 +30,48 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageEventListener {
 
+    private final MessageService messageService;
+
     private final MessagePersistCache messagePersistCache;
 
     private final MessagePersistService messagePersistService;
 
     private final MessageSocketService messageSocketService;
 
-    private final BlackRestService blackRestService;
+    // private final BlackRestService blackRestService;
 
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
         log.info("MessageJsonEvent {}", event.getJson());
         
         try {
-            String messageJson = event.getJson();
-            MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
-            if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
-                messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
-            }
-            
-            ThreadProtobuf thread = messageProtobuf.getThread();
-            if (thread == null) {
-                throw new RuntimeException("thread is null");
-            }
-            
-            // Replace client timestamp
-            messageProtobuf.setCreatedAt(LocalDateTime.now());
-
-            // Check blacklist
-            if (isBlackList(messageProtobuf)) {
+            String messageJson =  messageService.processMessageJson(event.getJson());
+            if (messageJson == null) {
                 return;
             }
-
-            // Filter sensitive words
-            messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
+            // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+            // if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
+            //     messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
+            // }
             
-            // Cache message for persistence
-            messagePersistCache.pushForPersist(messageJson);
+            // ThreadProtobuf thread = messageProtobuf.getThread();
+            // if (thread == null) {
+            //     throw new RuntimeException("thread is null");
+            // }
+            
+            // // Replace client timestamp
+            // messageProtobuf.setCreatedAt(LocalDateTime.now());
+
+            // // Check blacklist
+            // if (isBlackList(messageProtobuf)) {
+            //     return;
+            // }
+
+            // // Filter sensitive words
+            // messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
+            
+            // // Cache message for persistence
+            // messagePersistCache.pushForPersist(messageJson);
             
             // Send to Stomp clients
             messageSocketService.sendJsonMessage(messageJson);
@@ -97,29 +94,29 @@ public class MessageEventListener {
         }
     }
 
-    // 检查黑名单
-    private boolean isBlackList(MessageProtobuf messageProtobuf) {
-        String uid = messageProtobuf.getUser().getUid();
-        MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
-        if (extraObject != null) {
-            String orgUid = extraObject.getOrgUid();
-            Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
-            if (blackOpt.isPresent()) {
-                BlackEntity black = blackOpt.get();
-                if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    // // 检查黑名单
+    // private boolean isBlackList(MessageProtobuf messageProtobuf) {
+    //     String uid = messageProtobuf.getUser().getUid();
+    //     MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+    //     if (extraObject != null) {
+    //         String orgUid = extraObject.getOrgUid();
+    //         Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
+    //         if (blackOpt.isPresent()) {
+    //             BlackEntity black = blackOpt.get();
+    //             if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
 
-    // 过滤敏感词
-    private String filterTaboo(String messageJson) {
-        // TODO: 过滤敏感词，将敏感词替换为*
-        // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-        return messageJson;
-    }
+    // // 过滤敏感词
+    // private String filterTaboo(String messageJson) {
+    //     // TODO: 过滤敏感词，将敏感词替换为*
+    //     // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
+    //     return messageJson;
+    // }
 
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
@@ -138,7 +135,6 @@ public class MessageEventListener {
     // public void onMessageCreateEvent(MessageCreateEvent event) {
     //     List<String> messageJsonList = event.getMessageJsonList();
     //     Assert.notEmpty(messageJsonList, "Message JSON list must not be empty");
-        
     //     // ... rest of the method
     // }
 
