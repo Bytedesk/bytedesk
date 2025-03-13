@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 15:39:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 15:28:12
+ * @LastEditTime: 2025-03-13 10:43:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -481,8 +481,7 @@ public class ZhipuaiChatService implements DisposableBean {
                 .build();
         message.setUid(messageUid);
         message.setOrgUid(thread.getOrgUid());
-        //
-        message.setThreadTopic(thread.getTopic());
+        message.setTopic(thread.getTopic());
 
         if (!robotSimple.getLlm().isEnabled()) {
             // 机器人未开启

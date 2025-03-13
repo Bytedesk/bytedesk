@@ -61,7 +61,7 @@ public class MessageSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
             }
             // 
-            String topic = request.getThreadTopic();
+            String topic = request.getTopic();
             if (StringUtils.hasText(topic)) {
                 Predicate topicPredicate = criteriaBuilder.equal(root.get("threadTopic"), topic);
                 if (TopicUtils.isOrgMemberTopic(topic)) {
