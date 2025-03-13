@@ -20,6 +20,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadProtobuf;
@@ -36,17 +37,20 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected final UidUtils uidUtils;
     protected final RobotRestService robotRestService;
     protected final ThreadRestService threadRestService;
+    protected final MessagePersistCache messagePersistCache;
 
     protected BaseSpringAIService(Optional<SpringAIVectorService> springAIVectorService,
             IMessageSendService messageSendService,
             UidUtils uidUtils,
             RobotRestService robotRestService,
-            ThreadRestService threadRestService) {
+            ThreadRestService threadRestService,
+            MessagePersistCache messagePersistCache) {
         this.springAIVectorService = springAIVectorService;
         this.messageSendService = messageSendService;
         this.uidUtils = uidUtils;
         this.robotRestService = robotRestService;
         this.threadRestService = threadRestService;
+        this.messagePersistCache = messagePersistCache;
     }
 
     @Override
@@ -178,6 +182,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
         }
     }
+
+    @Override
+    public void persistMessage(String messageJson) {
+        messagePersistCache.pushForPersist(messageJson);
+    }
+
 
     public String buildKbPrompt(String systemPrompt, String query, String context) {
         return systemPrompt + "\n" +

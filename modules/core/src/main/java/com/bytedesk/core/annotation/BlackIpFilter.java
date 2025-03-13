@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:42:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 13:45:58
+ * @LastEditTime: 2025-03-13 09:54:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,15 +14,20 @@
 
 package com.bytedesk.core.annotation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * 获取用户ip
- */
-@Target(ElementType.METHOD)
+@Target({ ElementType.PARAMETER, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UserIp {
+@Documented
+public @interface BlackIpFilter {
+
+    public String title() default "";
+
+    public String action() default "";
+
+    public String description() default "";
 }

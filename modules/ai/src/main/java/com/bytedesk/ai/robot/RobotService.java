@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 18:03:47
+ * @LastEditTime: 2025-03-13 10:10:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ import java.util.Optional;
 
 // import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -30,6 +31,7 @@ import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -55,10 +57,16 @@ public class RobotService {
     private final ThreadRestService threadRestService;
     private final IMessageSendService messageSendService;
     private final RobotRestService robotRestService;
+    private final MessageService messageService;
 
     // 处理访客端SSE请求消息
     public void processSseVisitorMessage(String messageJson, SseEmitter emitter) {
         log.info("processSseVisitorMessage: messageJson: {}", messageJson);
+        Assert.notNull(messageJson, "messageJson is null");
+        Assert.notNull(emitter, "emitter is null");
+        //
+        messageJson = messageService.processMessageJson(messageJson);
+        // 
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
         // if (messageType.equals(MessageTypeEnum.STREAM)) {
@@ -123,6 +131,10 @@ public class RobotService {
     // 处理员工/客服SSE请求消息
     public void processSseMemberMessage(String messageJson, SseEmitter emitter) {
         log.info("processSseMemberMessage: messageJson: {}", messageJson);
+        Assert.notNull(messageJson, "messageJson is null");
+        Assert.notNull(emitter, "emitter is null");
+        //
+        messageJson = messageService.processMessageJson(messageJson);
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
         // if (messageType.equals(MessageTypeEnum.STREAM)) {

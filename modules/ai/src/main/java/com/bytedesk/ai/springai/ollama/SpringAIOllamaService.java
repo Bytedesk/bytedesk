@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 18:03:14
+ * @LastEditTime: 2025-03-13 10:21:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadProtobuf;
@@ -56,8 +57,9 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             IMessageSendService messageSendService,
             UidUtils uidUtils,
             RobotRestService robotRestService,
-            ThreadRestService threadRestService) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService);
+            ThreadRestService threadRestService, 
+            MessagePersistCache messagePersistCache) {
+        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService, messagePersistCache);
         this.bytedeskOllamaChatModel = bytedeskOllamaChatModel;
         // this.springAIVectorService = springAIVectorService;
         this.messageSendService = messageSendService;
@@ -130,9 +132,12 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                             //
                                             messageProtobuf.setContent(textContent);
                                             messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                            // 保存消息到数据库
+                                            String messageJson = JSON.toJSONString(messageProtobuf);
+                                            persistMessage(messageJson);
                                             // 发送SSE事件
                                             emitter.send(SseEmitter.event()
-                                                    .data(JSON.toJSONString(messageProtobuf))
+                                                    .data(messageJson)
                                                     .id(messageProtobuf.getUid())
                                                     .name("message"));
                                         }
@@ -141,10 +146,13 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     log.error("Ollama Error sending SSE event 1", e);
                                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                    // 保存消息到数据库
+                                    String messageJson = JSON.toJSONString(messageProtobuf);
+                                    persistMessage(messageJson);
                                     //
                                     try {
                                         emitter.send(SseEmitter.event()
-                                                .data(JSON.toJSONString(messageProtobuf))
+                                                .data(messageJson)
                                                 .id(messageProtobuf.getUid())
                                                 .name("error"));
                                         emitter.complete();
@@ -158,9 +166,12 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                 try {
                                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                    // 保存消息到数据库
+                                    String messageJson = JSON.toJSONString(messageProtobuf);
+                                    persistMessage(messageJson);
                                     //
                                     emitter.send(SseEmitter.event()
-                                            .data(JSON.toJSONString(messageProtobuf))
+                                            .data(messageJson)
                                             .id(messageProtobuf.getUid())
                                             .name("message"));
                                     emitter.complete();
@@ -173,8 +184,12 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     // 发送流结束标记
                                     messageProtobuf.setType(MessageTypeEnum.STREAM_END);
                                     messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                                    // 保存消息到数据库
+                                    String messageJson = JSON.toJSONString(messageProtobuf);
+                                    persistMessage(messageJson);
+                                    // 
                                     emitter.send(SseEmitter.event()
-                                            .data(JSON.toJSONString(messageProtobuf))
+                                            .data(messageJson)
                                             .id(messageProtobuf.getUid())
                                             .name("message"));
                                     emitter.complete();
@@ -189,8 +204,12 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                         // 发送流结束标记
                         messageProtobuf.setType(MessageTypeEnum.STREAM_END);
                         messageProtobuf.setContent("Ollama service is not available"); // 或者可以是任何结束标记
+                        // 保存消息到数据库
+                        String messageJson = JSON.toJSONString(messageProtobuf);
+                        persistMessage(messageJson);
+                        // 发送SSE事件
                         emitter.send(SseEmitter.event()
-                                .data(JSON.toJSONString(messageProtobuf))
+                                .data(messageJson)
                                 .id(messageProtobuf.getUid())
                                 .name("message"));
                         emitter.complete();
