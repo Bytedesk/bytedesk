@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 16:58:17
+ * @LastEditTime: 2025-03-14 17:12:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,16 +60,19 @@ public class TopicService {
         Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
             TopicEntity topicEntity = topicOptional.get();
-            if (topicEntity.getTopics().contains(topicRequest.getTopic())) {
-                return;
-            }
-            log.info("add topic: {}", topicRequest.getTopic());
+            // if (topicEntity.getTopics().contains(topicRequest.getTopic())) {
+            //     log.info("add topic: {}", topicRequest.getTopic());
+            //     return;
+            // }
             topicEntity.getTopics().add(topicRequest.getTopic());
+            // 读取topicRequest中的topics
+            topicEntity.getTopics().addAll(topicRequest.getTopics());
+            // 
             save(topicEntity);
             // 
             return;
         }
-        topicRequest.setUid(uidUtils.getCacheSerialUid());
+        topicRequest.setUid(uidUtils.getUid());
         // 
         TopicEntity topic = modelMapper.map(topicRequest, TopicEntity.class);
         topic.getTopics().add(topicRequest.getTopic());
