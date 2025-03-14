@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.utils.StringListConverter;
+import com.bytedesk.core.converter.StringListConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

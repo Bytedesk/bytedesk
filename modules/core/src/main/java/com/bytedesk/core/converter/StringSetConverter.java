@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-02-06 09:28:45
+ * @Date: 2024-04-15 16:14:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 11:48:17
+ * @LastEditTime: 2024-04-15 16:14:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,42 +11,36 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.utils;
+package com.bytedesk.core.converter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
-import org.springframework.util.StringUtils;
+import com.google.common.base.Strings;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 @Converter
-public class StringListConverter implements AttributeConverter<List<String>, String> {
+public class StringSetConverter implements AttributeConverter<Set<String>, String> {
 
     @Override
-    public String convertToDatabaseColumn(List<String> list) {
-        if (list == null) {
-            return "";
-        }
-        Iterator<String> iterator = list.iterator();  
+    public String convertToDatabaseColumn(Set<String> set) {
+        Iterator<String> iterator = set.iterator();  
         while(iterator.hasNext()){  
             String str = iterator.next();  
-            if(!StringUtils.hasText(str)){  
-                iterator.remove();
+            if(Strings.isNullOrEmpty(str)){  
+                iterator.remove();  // 正确
             }  
         }
-        return String.join(",", list);
+        return String.join(",", set);
     }
 
     @Override
-    public List<String> convertToEntityAttribute(String joined) {
-        if (joined == null) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(Arrays.asList(joined.split(",")));
+    public Set<String> convertToEntityAttribute(String joined) {
+        return joined == null ? new HashSet<>() : new HashSet<>(Arrays.asList(joined.split(",")));
     }
 
 }

@@ -107,12 +107,14 @@ public class VisitorThreadService
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         //
         ThreadEntity thread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.WORKGROUP.name())
                 .client(visitorRequest.getClient())
+                .orgUid(workgroup.getOrgUid())
                 .build();
-        thread.setUid(uidUtils.getUid());
-        thread.setOrgUid(workgroup.getOrgUid());
+        // thread.setUid(uidUtils.getUid());
+        // thread.setOrgUid(workgroup.getOrgUid());
         //
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);

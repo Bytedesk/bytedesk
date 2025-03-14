@@ -18,7 +18,7 @@ import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.utils.StringSetConverter;
+import com.bytedesk.core.converter.StringSetConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
