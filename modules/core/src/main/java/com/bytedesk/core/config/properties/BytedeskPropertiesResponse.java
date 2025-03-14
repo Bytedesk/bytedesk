@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 20:45:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 09:51:08
+ * @LastEditTime: 2025-03-14 20:55:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,6 +41,12 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean showRightCornerChat;
         private String privacyPolicyUrl;
         private String termsOfServiceUrl;
+        private Boolean loginUsernameEnable = true;
+        private Boolean loginMobileEnable = true;
+        private Boolean loginEmailEnable = false;
+        private Boolean loginScanEnable = false;
+        private Boolean docUrlShow = true;
+        private String docUrl;
     }
 
     // 
