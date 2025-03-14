@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:19:30
+ * @LastEditTime: 2025-03-14 17:05:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,9 +54,9 @@ public class TopicEventListener {
         //
         TopicRequest request = TopicRequest.builder()
                 .topic(event.getTopic())
-                // .userUid(event.getUserUid())
+                .userUid(event.getUserUid())
                 .build();
-        request.setUserUid(event.getUserUid());
+        // request.getTopics().add(event.getTopic());
         topicCacheService.pushRequest(request);
     }
 

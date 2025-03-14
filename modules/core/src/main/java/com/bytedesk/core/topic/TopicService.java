@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 13:29:57
+ * @LastEditTime: 2025-03-14 16:58:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,12 +45,13 @@ public class TopicService {
     private final OptimisticLockingHandler optimisticLockingHandler;
 
     public void create(String topic, String uid) {
-        TopicRequest topicRequest = TopicRequest.builder()
-                .topic(topic)
-                // .userUid(uid)
+        TopicRequest request = TopicRequest.builder()
+                // .topic(topic)
+                .userUid(uid)
                 .build();
-        topicRequest.setUserUid(uid);
-        create(topicRequest);
+        // topicRequest.setUserUid(uid);
+        request.getTopics().add(topic);
+        create(request);
     }
 
     // 创建topic
@@ -58,13 +59,13 @@ public class TopicService {
     public void create(TopicRequest topicRequest) {
         Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
-            TopicEntity topicElement = topicOptional.get();
-            if (topicElement.getTopics().contains(topicRequest.getTopic())) {
+            TopicEntity topicEntity = topicOptional.get();
+            if (topicEntity.getTopics().contains(topicRequest.getTopic())) {
                 return;
             }
             log.info("add topic: {}", topicRequest.getTopic());
-            topicElement.getTopics().add(topicRequest.getTopic());
-            save(topicElement);
+            topicEntity.getTopics().add(topicRequest.getTopic());
+            save(topicEntity);
             // 
             return;
         }
