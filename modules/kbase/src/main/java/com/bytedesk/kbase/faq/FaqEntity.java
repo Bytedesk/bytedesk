@@ -127,10 +127,13 @@ public class FaqEntity extends BaseEntity {
     private boolean enabled = true;
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    @Builder.Default
+    private LocalDateTime startDate = LocalDateTime.now();
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    // 当前 + 100 年
+    @Builder.Default
+    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
     // 分类
     private String categoryUid;

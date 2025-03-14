@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 10:27:03
+ * @LastEditTime: 2025-03-14 18:29:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,9 +83,12 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
-    private LocalDateTime startDate;
+    @Builder.Default
+    private LocalDateTime startDate = LocalDateTime.now();
 
-    private LocalDateTime endDate;
+    // 当前 + 100 年
+    @Builder.Default
+    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
     private String categoryUid;
 
