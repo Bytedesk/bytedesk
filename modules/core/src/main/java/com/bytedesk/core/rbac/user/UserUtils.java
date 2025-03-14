@@ -28,14 +28,14 @@ public class UserUtils {
         return user;
     }
 
-    public static UserProtobuf getClipboardAssistantUser() {
-        UserProtobuf user = UserProtobuf.builder()
-                .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
-                .avatar(AvatarConsts.getDefaultClipboardAssistantAvatarUrl())
-                .build();
-        user.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
-        return user;
-    }
+    // public static UserProtobuf getClipboardAssistantUser() {
+    //     UserProtobuf user = UserProtobuf.builder()
+    //             .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
+    //             .avatar(AvatarConsts.getDefaultClipboardAssistantAvatarUrl())
+    //             .build();
+    //     user.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
+    //     return user;
+    // }
 
     public static UserProtobuf getSystemChannelUser() {
         UserProtobuf user = UserProtobuf.builder()

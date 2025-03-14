@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 10:03:48
+ * @LastEditTime: 2025-03-14 14:40:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -168,6 +168,17 @@ public class MessagePersistService {
             }
         }
 
+        // INVITE_ACCEPT, INVITE_REJECT, INVITE_CANCEL, INVITE_VISITOR, INVITE_VISITOR_REJECT, INVITE_VISITOR_ACCEPT, INVITE_VISITOR_CANCEL
+        if (type.equals(MessageTypeEnum.INVITE_ACCEPT)
+                || type.equals(MessageTypeEnum.INVITE_REJECT)
+                || type.equals(MessageTypeEnum.INVITE_CANCEL)
+                || type.equals(MessageTypeEnum.INVITE_VISITOR)) {
+            if (StringUtils.hasText(messageProtobuf.getContent())) {
+                dealWithInviteMessage(type, messageProtobuf);
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -265,6 +276,24 @@ public class MessagePersistService {
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPT.name());
             } else if (type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_REJECT.name());
+            }
+            messageService.save(messageEntity);
+        }
+    }
+
+    // 处理邀请消息
+    private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
+        MessageInviteContent inviteContentObject = JSONObject.parseObject(message.getContent(),
+                MessageInviteContent.class);
+        Optional<MessageEntity> messageOpt = messageService.findByUid(inviteContentObject.getUid());
+        if (messageOpt.isPresent()) {
+            MessageEntity messageEntity = messageOpt.get();
+            if (type.equals(MessageTypeEnum.INVITE_ACCEPT)) {
+                messageEntity.setStatus(MessageStatusEnum.INVITE_ACCEPT.name());
+            } else if (type.equals(MessageTypeEnum.INVITE_REJECT)) {
+                messageEntity.setStatus(MessageStatusEnum.INVITE_REJECT.name());
+            } else if (type.equals(MessageTypeEnum.INVITE_CANCEL)) {
+                // messageEntity.setStatus(MessageStatusEnum.INVITE_CANCEL.name());
             }
             messageService.save(messageEntity);
         }

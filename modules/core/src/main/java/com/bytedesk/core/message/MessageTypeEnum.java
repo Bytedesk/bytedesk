@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 15:23:32
+ * @LastEditTime: 2025-03-14 14:41:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,6 +69,7 @@ public enum MessageTypeEnum {
     TRANSFER,
     TRANSFER_REJECT,
     TRANSFER_ACCEPT,
+    TRANSFER_CANCEL,
     INVITE,
     INVITE_REJECT,
     INVITE_ACCEPT,
@@ -77,6 +78,10 @@ public enum MessageTypeEnum {
     INVITE_VISITOR_REJECT,
     INVITE_VISITOR_ACCEPT,
     INVITE_VISITOR_CANCEL,
+    INVITE_GROUP,
+    INVITE_GROUP_REJECT,
+    INVITE_GROUP_ACCEPT,
+    INVITE_GROUP_CANCEL,
     ARTICLE,
     WEBRTC_AUDIO_INVITE,
     WEBRTC_VIDEO_INVITE,
