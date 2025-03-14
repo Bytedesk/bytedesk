@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 09:25:31
+ * @LastEditTime: 2025-03-14 13:58:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,11 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.bytedesk.ai.springai.ollama.config.OllamaAvailableCondition;
 import com.bytedesk.core.redis.JedisProperties;
 import com.bytedesk.kbase.config.KbaseConst;
 import lombok.Data;
@@ -52,7 +50,7 @@ import java.util.stream.IntStream;
 @Slf4j
 @Data
 @Configuration
-@Conditional(OllamaAvailableCondition.class)
+// @Conditional(OllamaAvailableCondition.class)
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaConfig {
 

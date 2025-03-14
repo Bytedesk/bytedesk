@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 10:34:05
+ * @LastEditTime: 2025-03-14 13:44:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,40 +61,40 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     @Override
     public Page<VisitorResponse> queryByUser(VisitorRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        return queryByOrg(request);
     }
 
     // @Override
-    public VisitorResponse queryByUid(VisitorRequest visitorRequest) {
-        Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
+    public VisitorResponse queryByUid(VisitorRequest request) {
+        Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
         if (!visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
         }
         return convertToResponse(visitorOptional.get());
     }
 
-    public VisitorResponse create(VisitorRequest visitorRequest) {
+    public VisitorResponse create(VisitorRequest request) {
         //
-        String uid =  visitorRequest.getUid();
+        String uid =  request.getUid();
         if (!StringUtils.hasText(uid)) {
-            visitorRequest.setUid(uidUtils.getUid());
+            request.setUid(uidUtils.getUid());
         } else {
-            visitorRequest.setUid(Utils.formatUid(visitorRequest.getOrgUid(), uidUtils.getUid()));
+            request.setUid(Utils.formatUid(request.getOrgUid(), uidUtils.getUid()));
         }
         log.info("visitor init, uid: {}", uid);
         VisitorEntity visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
             // 对比ip是否有变化
-            if (visitor.getIp() == null || !visitor.getIp().equals(visitorRequest.getIp())) {
+            if (visitor.getIp() == null || !visitor.getIp().equals(request.getIp())) {
                 // 更新浏览信息
-                visitor.setIp(visitorRequest.getIp());
-                visitor.setIpLocation(visitorRequest.getIpLocation());
+                visitor.setIp(request.getIp());
+                visitor.setIpLocation(request.getIpLocation());
             }
-            visitor.getDevice().setBrowser(visitorRequest.getBrowser());
-            visitor.getDevice().setOs(visitorRequest.getOs());
-            visitor.getDevice().setDevice(visitorRequest.getDevice());
-            visitor.setExtra(visitorRequest.getExtra());
+            visitor.setVipLevel(request.getVipLevel());
+            visitor.getDevice().setBrowser(request.getBrowser());
+            visitor.getDevice().setOs(request.getOs());
+            visitor.getDevice().setDevice(request.getDevice());
+            visitor.setExtra(request.getExtra());
             VisitorEntity savedVisitor = save(visitor);
             if (savedVisitor == null) {
                 throw new RuntimeException("visitor not saved");
@@ -102,14 +102,14 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
             return convertToResponse(savedVisitor);
         }
         // 
-        if (!StringUtils.hasText(visitorRequest.getAvatar())) {
-            visitorRequest.setAvatar(getAvatar(visitorRequest.getClient()));
+        if (!StringUtils.hasText(request.getAvatar())) {
+            request.setAvatar(getAvatar(request.getClient()));
         }
         //
-        log.info("visitorRequest {}", visitorRequest);
-        visitor = modelMapper.map(visitorRequest, VisitorEntity.class);
+        log.info("request {}", request);
+        visitor = modelMapper.map(request, VisitorEntity.class);
         //
-        VisitorDevice device = modelMapper.map(visitorRequest, VisitorDevice.class);
+        VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
         visitor.setDevice(device);
         //
         VisitorEntity savedVisitor = save(visitor);
@@ -142,13 +142,13 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         return convertToResponse(savedVisitor);
     }
 
-    public VisitorResponse updateTagList(VisitorRequest visitorRequest) {
-        Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
+    public VisitorResponse updateTagList(VisitorRequest request) {
+        Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
         if (!visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
         }
         VisitorEntity visitor = visitorOptional.get();
-        visitor.setTagList(visitorRequest.getTagList());
+        visitor.setTagList(request.getTagList());
         VisitorEntity savedVisitor = save(visitor);
         if (savedVisitor == null) {
             throw new RuntimeException("visitor not saved");
@@ -157,8 +157,8 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
     }
 
     /** 策略模式 */
-    public MessageProtobuf requestThread(VisitorRequest visitorRequest) {
-        return csThreadCreationContext.createCsThread(visitorRequest);
+    public MessageProtobuf requestThread(VisitorRequest request) {
+        return csThreadCreationContext.createCsThread(request);
     }
 
     @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
