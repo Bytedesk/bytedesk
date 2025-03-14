@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 14:31:46
+ * @LastEditTime: 2025-03-14 14:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,15 +57,15 @@ public class AssistantInitializer implements SmartInitializingSingleton {
         assistantService.create(fileAssistantRequest);
 
         // 剪贴助手
-        AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()
-                .topic(TopicUtils.TOPIC_CLIPBOARD_ASSISTANT)
-                .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
-                .avatar(AvatarConsts.getDefaultClipboardAssistantAvatarUrl())
-                .description(I18Consts.I18N_CLIPBOARD_ASSISTANT_DESCRIPTION)
-                .build();
-        clipboardAssistantRequest.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
-        clipboardAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
-        assistantService.create(clipboardAssistantRequest);
+        // AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()
+        //         .topic(TopicUtils.TOPIC_CLIPBOARD_ASSISTANT)
+        //         .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
+        //         .avatar(AvatarConsts.getDefaultClipboardAssistantAvatarUrl())
+        //         .description(I18Consts.I18N_CLIPBOARD_ASSISTANT_DESCRIPTION)
+        //         .build();
+        // clipboardAssistantRequest.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
+        // clipboardAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
+        // assistantService.create(clipboardAssistantRequest);
 
         // 
         // TODO: query扩充，用户填写一个问题，系统根据问题生成多个类似不同问法，用LLM生成一批同义句

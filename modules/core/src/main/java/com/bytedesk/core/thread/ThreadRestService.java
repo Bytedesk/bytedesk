@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 10:42:41
+ * @LastEditTime: 2025-03-14 14:29:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -550,8 +550,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
-
-    
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
