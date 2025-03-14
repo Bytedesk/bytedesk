@@ -11,12 +11,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.notice;
 
-public class NotificationPermissions {
+public class NoticePermissions {
 
     public static final String NOTIFICATION_PREFIX = "NOTIFICATION_";
-    // Notification permissions
+    // Notice permissions
     public static final String NOTIFICATION_CREATE = "hasAuthority('NOTIFICATION_CREATE')";
     public static final String NOTIFICATION_READ = "hasAuthority('NOTIFICATION_READ')";
     public static final String NOTIFICATION_UPDATE = "hasAuthority('NOTIFICATION_UPDATE')";

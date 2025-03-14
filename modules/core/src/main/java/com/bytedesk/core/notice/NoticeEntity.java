@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.notice;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -37,7 +37,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_core_notification")
-public class NotificationEntity extends BaseEntity {
+public class NoticeEntity extends BaseEntity {
     
     private String title;
 
@@ -48,7 +48,7 @@ public class NotificationEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "notification_status")
-    private String status = NotificationStatusEnum.UNREAD.name();
+    private String status = NoticeStatusEnum.UNREAD.name();
 
     @Builder.Default
     // json字段格式，搜索时，对数据库有依赖，不方便迁移

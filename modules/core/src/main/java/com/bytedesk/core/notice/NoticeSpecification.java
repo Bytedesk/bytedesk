@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.notice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,9 @@ import com.bytedesk.core.base.BaseSpecification;
 
 import jakarta.persistence.criteria.Predicate;
 
-public class NotificationSpecification extends BaseSpecification {
+public class NoticeSpecification extends BaseSpecification {
     
-    public static Specification<NotificationEntity> search(NotificationRequest request) {
+    public static Specification<NoticeEntity> search(NoticeRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

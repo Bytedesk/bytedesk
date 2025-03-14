@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.notice;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -27,48 +27,48 @@ import lombok.RequiredArgsConstructor;
 @RestController 
 @RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor
-public class NotificationRestController extends BaseRestController<NotificationRequest> {
+public class NoticeRestController extends BaseRestController<NoticeRequest> {
 
-    private final NotificationRestService notificationRestService;
+    private final NoticeRestService notificationRestService;
 
     @Override
-    public ResponseEntity<?> queryByOrg(NotificationRequest request) {
-        Page<NotificationResponse> page = notificationRestService.queryByOrg(request);
+    public ResponseEntity<?> queryByOrg(NoticeRequest request) {
+        Page<NoticeResponse> page = notificationRestService.queryByOrg(request);
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(NotificationRequest request) {
-        Page<NotificationResponse> page = notificationRestService.queryByUser(request);
+    public ResponseEntity<?> queryByUser(NoticeRequest request) {
+        Page<NoticeResponse> page = notificationRestService.queryByUser(request);
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
-    public ResponseEntity<?> create(NotificationRequest request) {
-        NotificationResponse notice = notificationRestService.create(request);
+    public ResponseEntity<?> create(NoticeRequest request) {
+        NoticeResponse notice = notificationRestService.create(request);
         return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
-    public ResponseEntity<?> update(NotificationRequest request) {
-        NotificationResponse notice = notificationRestService.update(request);
+    public ResponseEntity<?> update(NoticeRequest request) {
+        NoticeResponse notice = notificationRestService.update(request);
         return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
-    public ResponseEntity<?> delete(NotificationRequest request) {
+    public ResponseEntity<?> delete(NoticeRequest request) {
         notificationRestService.delete(request);
         return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
-    public Object export(NotificationRequest request, HttpServletResponse response) {
+    public Object export(NoticeRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(NotificationRequest request) {
+    public ResponseEntity<?> queryByUid(NoticeRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
