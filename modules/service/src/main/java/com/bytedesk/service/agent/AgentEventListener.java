@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:59:08
+ * @LastEditTime: 2025-03-14 22:55:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,16 +83,16 @@ public class AgentEventListener {
         AgentEntity agent = event.getAgent();
         log.info("agent onAgentCreateEvent: {}", agent.getUid());
         // 创建快捷回复知识库
-        KbaseRequest kownledgebaseRequestQuickReply = KbaseRequest.builder()
+        KbaseRequest kbaseQuickReply = KbaseRequest.builder()
                 .name(agent.getNickname() +  "Kb")
                 .descriptionHtml(agent.getNickname() + "Kb")
                 .language(LanguageEnum.ZH_CN.name())
                 .level(LevelEnum.AGENT.name())
                 .build();
-        kownledgebaseRequestQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
-        kownledgebaseRequestQuickReply.setOrgUid(agent.getOrgUid());
-        kownledgebaseRequestQuickReply.setAgentUid(agent.getUid());
-        knowledgebaseService.create(kownledgebaseRequestQuickReply);
+        kbaseQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
+        kbaseQuickReply.setOrgUid(agent.getOrgUid());
+        kbaseQuickReply.setAgentUid(agent.getUid());
+        knowledgebaseService.create(kbaseQuickReply);
     }
 
     @EventListener
