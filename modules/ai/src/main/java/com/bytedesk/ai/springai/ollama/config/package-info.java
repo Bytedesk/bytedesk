@@ -5,6 +5,6 @@
  * @author bytedesk.com
  */
 @NonNullApi
-package com.bytedesk.ai.config;
+package com.bytedesk.ai.springai.ollama.config;
 
 import org.springframework.lang.NonNullApi; 

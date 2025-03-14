@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 15:57:27
+ * @LastEditTime: 2025-03-14 09:25:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,9 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.bytedesk.ai.springai.ollama.config.OllamaAvailableCondition;
 import com.bytedesk.core.redis.JedisProperties;
 import com.bytedesk.kbase.config.KbaseConst;
 import lombok.Data;
@@ -50,7 +52,8 @@ import java.util.stream.IntStream;
 @Slf4j
 @Data
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
+@Conditional(OllamaAvailableCondition.class)
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaConfig {
 
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
@@ -65,6 +68,9 @@ public class SpringAIOllamaConfig {
     @Value("${spring.ai.ollama.embedding.options.model:qwen2.5:1.5b}")
     private String ollamaEmbeddingOptionsModel;
 
+    @Value("${spring.ai.ollama.service.auto-check:true}")
+    private boolean autoCheckService;
+
     @Autowired
     private JedisProperties jedisProperties;
 
@@ -73,6 +79,11 @@ public class SpringAIOllamaConfig {
      * @return true if Ollama service is available
      */
     private boolean isOllamaServiceAvailable() {
+        if (!autoCheckService) {
+            log.info("Ollama service auto-check is disabled");
+            return true;
+        }
+        
         try {
             var restClient = org.springframework.web.client.RestClient.builder()
                 .baseUrl(ollamaBaseUrl)
@@ -91,9 +102,8 @@ public class SpringAIOllamaConfig {
         }
     }
 
-    @Primary
     @Bean("bytedeskOllamaApi")
-    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaApi bytedeskOllamaApi() {
         if (!isOllamaServiceAvailable()) {
             log.warn("Ollama service is not available, some features may not work properly");
@@ -103,7 +113,7 @@ public class SpringAIOllamaConfig {
     }
 
     @Bean("bytedeskOllamaChatOptions")
-    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaChatOptions() {
         return OllamaOptions.builder()
                 .model(ollamaChatOptionsModel)
@@ -111,19 +121,18 @@ public class SpringAIOllamaConfig {
     }
 
     @Bean("bytedeskOllamaEmbeddingOptions")
-    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaEmbeddingOptions() {
         return OllamaOptions.builder()
                 .model(ollamaEmbeddingOptionsModel)
                 .build();
     }
 
-    @Primary
     @Bean("bytedeskOllamaChatModel")
-    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaChatModel bytedeskOllamaChatModel() {
         if (!isOllamaServiceAvailable()) {
-            log.warn("Ollama service is not available, some features may not work properly");
+            log.warn("Ollama service is not available, chat model will not be created");
             return null;
         }
         return OllamaChatModel.builder()
@@ -132,9 +141,8 @@ public class SpringAIOllamaConfig {
                 .build();
     }
 
-    @Primary
     @Bean("bytedeskOllamaEmbeddingModel")
-    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = false)
     EmbeddingModel bytedeskOllamaEmbeddingModel() {
         if (!isOllamaServiceAvailable()) {
             log.warn("Creating fallback embedding model");
@@ -172,7 +180,7 @@ public class SpringAIOllamaConfig {
     @Primary
     @Bean("bytedeskOllamaRedisVectorStore")
     @ConditionalOnProperty(name = {"spring.ai.ollama.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema"}, 
-        havingValue = "true", matchIfMissing = true)
+        havingValue = "true", matchIfMissing = false)
     public RedisVectorStore bytedeskOllamaRedisVectorStore(RedisVectorStoreProperties properties) {
         
         try {
