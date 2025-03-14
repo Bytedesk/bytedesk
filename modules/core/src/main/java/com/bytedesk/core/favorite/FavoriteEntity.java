@@ -18,9 +18,9 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.utils.StringListConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

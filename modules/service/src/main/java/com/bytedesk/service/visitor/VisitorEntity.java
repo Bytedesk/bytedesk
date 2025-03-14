@@ -20,9 +20,9 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.utils.StringListConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

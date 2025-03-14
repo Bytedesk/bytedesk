@@ -19,8 +19,8 @@ import java.util.HashSet;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.converter.StringSetConverter;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.utils.StringSetConverter;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

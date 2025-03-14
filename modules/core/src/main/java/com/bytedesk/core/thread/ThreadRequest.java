@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:09:36
+ * @LastEditTime: 2025-03-14 09:45:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -104,6 +104,18 @@ public class ThreadRequest extends BaseRequest {
 
     // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
     private String agent;
+
+    // 邀请多个客服参与会话
+    @Builder.Default
+    private List<String> agentUids = new ArrayList<>();
+
+    // 多个管理员监听会话
+    @Builder.Default
+    private List<String> monitorUids = new ArrayList<>();
+
+    // assistants: monitoring agent、quality check agent、robot agent
+    @Builder.Default
+    private List<String> assistantUids = new ArrayList<>();
 
     // group member uids
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 22:19:41
+ * @LastEditTime: 2025-03-14 10:04:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,15 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.converter.JsonListConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
@@ -31,6 +35,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import jakarta.persistence.Convert;
 
 @MappedSuperclass
 @Data
@@ -167,10 +172,24 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // multi agent assistants: monitoring agent、quality check agent、robot agent
+    // 邀请多个客服参与会话，存放多个 UserProtobuf 实体转换成的 JSON
+    // 每个字符串元素都是一个 UserProtobuf 实体序列化成的 JSON
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String multiAgents = BytedeskConsts.EMPTY_JSON_STRING;
+    @Convert(converter = JsonListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> agents = new ArrayList<>();
+
+    // 多个管理员监听会话
+    @Builder.Default
+    @Convert(converter = JsonListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> monitors = new ArrayList<>();
+
+    // assistants: monitoring agent、quality check agent、robot agent
+    @Builder.Default
+    @Convert(converter = JsonListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> assistants = new ArrayList<>();
 
     // belongs to user
     @ManyToOne(fetch = FetchType.LAZY)
