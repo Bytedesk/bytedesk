@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 23:27:33
+ * @LastEditTime: 2025-03-14 21:25:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,14 +56,6 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         
         return ResponseEntity.ok(JsonResult.success(quickReplyList));
     }
-
-    // @GetMapping("/query/list")
-    // public ResponseEntity<?> queryList(QuickReplyRequest request) {
-
-    //     List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
-        
-    //     return ResponseEntity.ok(JsonResult.success(quickReplyList));
-    // }
 
 
     @ActionAnnotation(title = "quick_reply", action = "create", description = "create quick_reply")
