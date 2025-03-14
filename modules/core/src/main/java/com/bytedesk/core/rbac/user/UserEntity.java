@@ -34,11 +34,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
 @Accessors(chain = true)
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true, exclude = { "password", "currentOrganization", "userOrganizationRoles" })
 @AllArgsConstructor
 @NoArgsConstructor

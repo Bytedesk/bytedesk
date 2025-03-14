@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-19 11:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 11:50:51
+ * @LastEditTime: 2025-03-14 16:05:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.notice.extra.NoticeExtraLogin;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -61,21 +62,24 @@ public class AuthEventListener {
             if (user == null) {
                 return;
             }
-            JSONObject contentObject = new JSONObject();
-            contentObject.put(I18Consts.I18N_NOTICE_TITLE, action.getTitle());
-            contentObject.put(I18Consts.I18N_NOTICE_CONTENT, action.getAction());
-            contentObject.put(I18Consts.I18N_NOTICE_IP, action.getIp());
-            contentObject.put(I18Consts.I18N_NOTICE_IP_LOCATION, action.getIpLocation());
-            String content = JSON.toJSONString(contentObject);
             // 
-            String userUid = user.getUid();
-            String topic = TopicUtils.getSystemTopic(userUid);
-            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-            if (threadOptional.isPresent()) {
-                ThreadEntity thread = threadOptional.get();
-                MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread, user.getOrgUid(), content);
-                messageSendService.sendProtobufMessage(message);
-            }
+            NoticeExtraLogin noticeExtraLogin = NoticeExtraLogin.;
+
+            // JSONObject contentObject = new JSONObject();
+            // contentObject.put(I18Consts.I18N_NOTICE_TITLE, action.getTitle());
+            // contentObject.put(I18Consts.I18N_NOTICE_CONTENT, action.getAction());
+            // contentObject.put(I18Consts.I18N_NOTICE_IP, action.getIp());
+            // contentObject.put(I18Consts.I18N_NOTICE_IP_LOCATION, action.getIpLocation());
+            // String content = JSON.toJSONString(contentObject);
+            // // 
+            // String userUid = user.getUid();
+            // String topic = TopicUtils.getSystemTopic(userUid);
+            // Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+            // if (threadOptional.isPresent()) {
+            //     ThreadEntity thread = threadOptional.get();
+            //     MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread, user.getOrgUid(), content);
+            //     messageSendService.sendProtobufMessage(message);
+            // }
         }
     }
 

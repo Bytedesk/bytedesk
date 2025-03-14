@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:48:14
+ * @LastEditTime: 2025-03-14 15:56:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,12 +14,13 @@
  */
 package com.bytedesk.core.rbac.authority;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.enums.LevelEnum;
@@ -30,12 +31,12 @@ import jakarta.persistence.*;
 /**
  * @author im.bytedesk.com
  */
-@Data
-@Builder
+@Getter
+@Setter
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_core_authority")
 public class AuthorityEntity extends BaseEntityNoOrg {

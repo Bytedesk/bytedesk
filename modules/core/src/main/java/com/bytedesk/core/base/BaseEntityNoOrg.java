@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 18:26:37
+ * @LastEditTime: 2025-03-14 15:56:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -46,8 +50,12 @@ import java.time.LocalDateTime;
  * @see https://docs.spring.io/spring-data/jpa/reference/auditing.html
  * @author im.bytedesk.com
  */
-@Data
+@Getter
+@Setter
+@SuperBuilder
 @MappedSuperclass
+@AllArgsConstructor
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntityNoOrg implements Serializable {
 
