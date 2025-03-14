@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 09:24:54
+ * @LastEditTime: 2025-03-14 22:54:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,12 +79,12 @@ public class KbaseEventListener {
                 if (!kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                         return;
                 }
-                // 
+                //
                 List<CategoryResponse> categories = new ArrayList<>();
                 Page<ArticleResponse> articles = new PageImpl<>(
-                        Collections.emptyList(), // 空的内容列表
-                        PageRequest.of(0, 1),    // 第一页，一页显示1个元素
-                        0                        // 总元素数为0
+                                Collections.emptyList(), // 空的内容列表
+                                PageRequest.of(0, 1), // 第一页，一页显示1个元素
+                                0 // 总元素数为0
                 );
                 kbaseStaticService.toHtmlKb(kbase, categories, articles, articles, articles);
                 kbaseStaticService.toHtmlSearch(kbase);
@@ -98,7 +98,7 @@ public class KbaseEventListener {
                 if (!kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                         return;
                 }
-                // 
+                //
                 kbaseStaticService.updateKbase(kbase);
         }
 
@@ -111,17 +111,21 @@ public class KbaseEventListener {
                 if (kbUid == null) {
                         return;
                 }
-                // 
+                //
                 Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(kbUid);
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
-                        // 
+                        //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
-                        // Page<ArticleResponse> articlesPage = kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
-                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(), categoryService.convertToResponse(category), categoriesPage.getContent(), articlesPage.getContent());
+                        // Page<CategoryResponse> categoriesPage =
+                        // kbaseService.getCategories(kbaseOptional.get());
+                        // Page<ArticleResponse> articlesPage =
+                        // kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
+                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(),
+                        // categoryService.convertToResponse(category), categoriesPage.getContent(),
+                        // articlesPage.getContent());
                 } else {
                         log.error("onCategoryCreateEvent kb not found {}", kbUid);
                 }
@@ -135,17 +139,21 @@ public class KbaseEventListener {
                 if (category.getKbUid() == null) {
                         return;
                 }
-                // 
+                //
                 Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(category.getKbUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
-                        // 
+                        //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
-                        // Page<ArticleResponse> articlesPage = kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
-                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(), categoryService.convertToResponse(category), categoriesPage.getContent(), articlesPage.getContent());
+                        // Page<CategoryResponse> categoriesPage =
+                        // kbaseService.getCategories(kbaseOptional.get());
+                        // Page<ArticleResponse> articlesPage =
+                        // kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
+                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(),
+                        // categoryService.convertToResponse(category), categoriesPage.getContent(),
+                        // articlesPage.getContent());
                 } else {
                         log.error("onCategoryUpdateEvent kb not found {}", category.getKbUid());
                 }
@@ -159,16 +167,19 @@ public class KbaseEventListener {
                 if (article.getKbUid() == null) {
                         return;
                 }
-                // 
+                //
                 Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
-                        // 
+                        //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
-                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(), articleService.convertToResponse(article), categoriesPage.getContent(), new ArrayList<>());
+                        // Page<CategoryResponse> categoriesPage =
+                        // kbaseService.getCategories(kbaseOptional.get());
+                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(),
+                        // articleService.convertToResponse(article), categoriesPage.getContent(), new
+                        // ArrayList<>());
                 } else {
                         log.error("onArticleCreateEvent kb not found {}", article.getKbUid());
                 }
@@ -182,22 +193,24 @@ public class KbaseEventListener {
                 if (article.getKbUid() == null) {
                         return;
                 }
-                // 
+                //
                 Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
                         }
-                        // 
+                        //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
-                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(), articleService.convertToResponse(article), categoriesPage.getContent(), new ArrayList<>());
+                        // Page<CategoryResponse> categoriesPage =
+                        // kbaseService.getCategories(kbaseOptional.get());
+                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(),
+                        // articleService.convertToResponse(article), categoriesPage.getContent(), new
+                        // ArrayList<>());
                 } else {
                         log.error("onArticleUpdateEvent kb not found {}", article.getKbUid());
                 }
         }
 
-        // 
-        
+        //
 
 }
