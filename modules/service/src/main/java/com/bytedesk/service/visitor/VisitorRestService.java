@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 16:37:38
+ * @LastEditTime: 2025-03-14 10:34:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -139,6 +139,20 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
             throw new RuntimeException("visitor not saved");
         }
         // 
+        return convertToResponse(savedVisitor);
+    }
+
+    public VisitorResponse updateTagList(VisitorRequest visitorRequest) {
+        Optional<VisitorEntity> visitorOptional = findByUid(visitorRequest.getUid());
+        if (!visitorOptional.isPresent()) {
+            throw new RuntimeException("visitor not found");
+        }
+        VisitorEntity visitor = visitorOptional.get();
+        visitor.setTagList(visitorRequest.getTagList());
+        VisitorEntity savedVisitor = save(visitor);
+        if (savedVisitor == null) {
+            throw new RuntimeException("visitor not saved");
+        }
         return convertToResponse(savedVisitor);
     }
 

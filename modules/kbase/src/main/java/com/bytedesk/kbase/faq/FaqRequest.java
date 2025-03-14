@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:11:18
+ * @LastEditTime: 2025-03-14 10:27:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,6 +50,10 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private String status = SplitStatusEnum.NEW.name();
 
+    // 被展示次数
+    @Builder.Default
+    private Integer viewCount = 0;
+
     // 被点击次数
     @Builder.Default
     private Integer clickCount = 0;
@@ -91,23 +95,4 @@ public class FaqRequest extends BaseRequest {
 
     private String docUid; // 对应文档
 
-    // // 是否是常见问题/
-    // @Builder.Default
-    // private Boolean isCommon = false;
-
-    // // 是否是快捷按钮
-    // @Builder.Default
-    // private Boolean isShortcut = false;
-
-    // // 是否是猜你相问
-    // @Builder.Default
-    // private Boolean isGuess = false;
-
-    // // 是否是热门问题
-    // @Builder.Default
-    // private Boolean isHot = false;
-
-    // // 是否是快捷路径
-    // @Builder.Default
-    // private Boolean isShortcutPath = false;
 }
