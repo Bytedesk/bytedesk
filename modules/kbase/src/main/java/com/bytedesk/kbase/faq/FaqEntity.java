@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 18:57:05
+ * @LastEditTime: 2025-03-14 18:18:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,7 +59,7 @@ public class FaqEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String question;
 
-    // 默认答案（对所有用户级别展示的通用答案）
+    // 默认答案（对所有用户级别展示的通用答案），等级为0时答案
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String answer;
 
