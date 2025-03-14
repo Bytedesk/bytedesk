@@ -18,11 +18,17 @@ import java.time.LocalDateTime;
 
 import com.bytedesk.core.utils.BdDateUtils;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class BaseResponse implements Serializable {
 
     protected String uid;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:09:23
+ * @LastEditTime: 2025-03-14 13:55:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,8 +20,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 // import lombok.experimental.Accessors;
 
@@ -31,9 +34,11 @@ import lombok.EqualsAndHashCode;
  */
 @Getter
 @Setter
+@SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-// @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class BaseRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
