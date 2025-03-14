@@ -13,6 +13,23 @@
  */
 package com.bytedesk.core.notice.extra;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class NoticeExtraLogin {
+
+    private String loginIp;
+
+    private String loginDevice;
+
+    private String loginOs;
+
+    private String loginBrowser;
+
+    private String loginLocation;
+
+    private String loginTime;
     
 }
