@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 18:56:02
+ * @LastEditTime: 2025-03-14 18:27:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
@@ -112,7 +113,19 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             if (!StringUtils.hasText(request.getUid())) {
                 entity.setUid(uidUtils.getUid());
             }
-            entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+            // entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+            // 根据request.relatedFaqUids查找关联的FAQ
+            List<FaqEntity> relatedFaqs = new ArrayList<>();
+            for (String relatedFaqUid : request.getRelatedFaqUids()) {
+                Optional<FaqEntity> relatedFaq = findByUid(relatedFaqUid);
+                if (relatedFaq.isPresent()) {
+                    relatedFaqs.add(relatedFaq.get());
+                } else {
+                    throw new RuntimeException("relatedFaqUid not found");
+                }
+            }
+            entity.setRelatedFaqs(relatedFaqs);
+            
 
             try {
                 FaqEntity savedEntity = save(entity);
@@ -147,13 +160,28 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             // modelMapper.map(request, entity);
             entity.setQuestion(request.getQuestion());
             entity.setAnswer(request.getAnswer());
-            entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
-
-            // category
-            // Optional<Category> categoryOptional = categoryService.findByUid(request.getCategoryUid());
-            // if (categoryOptional.isPresent()) {
-            //     entity.setCategory(categoryOptional.get());
-            // }
+            entity.setAnswerList(request.getAnswerList());
+            entity.setStatus(request.getStatus());
+            entity.setTagList(request.getTagList());
+            entity.setType(request.getType());
+            entity.setEnabled(request.getEnabled());
+            entity.setStartDate(request.getStartDate());
+            entity.setEndDate(request.getEndDate());
+            // 
+            entity.setCategoryUid(request.getCategoryUid());
+            entity.setKbUid(request.getKbUid());
+            // 
+            // 根据request.relatedFaqUids查找关联的FAQ
+            List<FaqEntity> relatedFaqs = new ArrayList<>();
+            for (String relatedFaqUid : request.getRelatedFaqUids()) {
+                Optional<FaqEntity> relatedFaq = findByUid(relatedFaqUid);
+                if (relatedFaq.isPresent()) {
+                    relatedFaqs.add(relatedFaq.get());
+                } else {
+                    throw new RuntimeException("relatedFaqUid not found");
+                }
+            }
+            entity.setRelatedFaqs(relatedFaqs);
 
             return convertToResponse(save(entity));
         } else {
