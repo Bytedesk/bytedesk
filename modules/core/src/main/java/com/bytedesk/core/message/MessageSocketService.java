@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-17 15:58:34
+ * @LastEditTime: 2025-03-14 11:48:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.Set;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicEntity;
@@ -56,16 +57,13 @@ public class MessageSocketService {
 
     // 发送消息给stomp访客端
     public void sendJsonMessage(@NonNull String messageJson) {
-        MessageProtobuf messageObject = JSON.parseObject(messageJson, MessageProtobuf.class);
+        Assert.notNull(messageJson, "messageJson is null");
         //
-        if (messageObject == null) {
-            throw new RuntimeException("messageObject is null");
-        }
-
+        MessageProtobuf messageObject = JSON.parseObject(messageJson, MessageProtobuf.class);
         if (messageObject.getThread() == null) {
-            throw new RuntimeException("thread is null");
+            throw new IllegalArgumentException("The thread field in message is null.");
         }
-
+        // 
         String topicStr = messageObject.getThread().getTopic();
         if (topicStr == null) {
             throw new IllegalArgumentException("The topic field in thread is null.");
@@ -74,7 +72,7 @@ public class MessageSocketService {
         // 例如，将 /org/agent/default_agent_uid/1418711693000834 转换为
         // /topic/org.agent.default_agent_uid.1418711693000834
         String topic = TopicUtils.TOPIC_PREFIX + topicStr.replace("/", ".");
-        log.debug("stomp topic {}, {}", topic, messageJson);
+        // log.debug("stomp topic {}, {}", topic, messageJson);
 
         // 发送给Stomp客户端
         simpMessagingTemplate.convertAndSend(topic, messageJson);
@@ -82,7 +80,7 @@ public class MessageSocketService {
 
     // 发送消息给mqtt客户端
     public void sendProtoMessage(@NonNull MessageProto.Message messageProto) {
-        log.debug("send proto message");
+        // log.debug("send proto message");
         ThreadProto.Thread thread = messageProto.getThread(); // 提取线程信息到临时变量
         ThreadTypeEnum threadType = ThreadTypeEnum.valueOf(thread.getType());
         String topic = thread.getTopic(); // 提取主题信息到临时变量
@@ -100,7 +98,6 @@ public class MessageSocketService {
                     .setUid(reverseThreadUid)
                     .setUser(user)
                     .build();
-            //
             MessageProto.Message reverseMessage = messageProto.toBuilder().setThread(reverseThread).build();
             doSendToSubscribers(reverseThreadTopic, reverseMessage);
         } else if (threadType.equals(ThreadTypeEnum.GROUP)) {
@@ -113,9 +110,7 @@ public class MessageSocketService {
     }
 
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
-        // log.debug("doSendToSubscribers: user={}, content={}, topic={}, type={}, clientId={}",
-        // messageProto.getUser().getNickname(), messageProto.getContent(), topic,
-        // messageProto.getType(), messageProto.getClient());
+        // log.debug("doSendToSubscribers: topic={}", topic);
         Set<TopicEntity> topicSet = topicService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
         topicSet.forEach(topicElement -> {
@@ -127,16 +122,14 @@ public class MessageSocketService {
     }
 
     private void doSendMessage(String topic, @NonNull MessageProto.Message messageProto, String clientId) {
-        // log.debug("doSendMessage: user={}, content={}, topic={}, type={}, clientId={}",
-        // messageProto.getUser().getNickname(), messageProto.getContent(), topic,
-        // messageProto.getType(), clientId);
+        log.debug("doSendMessage: topic {} clientId {}", topic, clientId);
         MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
         boolean dup = false;
         boolean retain = false;
         byte[] messageBytes = messageProto.toByteArray();
         // 当前活跃长连接信息
         if (mqttSessionService.containsKey(clientId)) {
-            log.debug("doSendMessage hasSession: topic {} clientId {}", topic, clientId);
+            // log.debug("doSendMessage hasSession: topic {} clientId {}", topic, clientId);
             // 订阅者收到MQTT消息的QoS级别, 最终取决于发布消息的QoS和主题订阅的QoS
             int messageId = mqttMessageIdService.getNextMessageId();
             //
