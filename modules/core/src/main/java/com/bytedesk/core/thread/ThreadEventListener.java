@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 16:56:47
+ * @LastEditTime: 2025-03-14 17:15:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,20 +59,22 @@ public class ThreadEventListener {
                 || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
                 || thread.getType().equals(ThreadTypeEnum.TICKET.name())) {
             // 防止首次消息延迟，立即订阅
-            TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
-            // request.setUserUid(user.getUid());
-            topicService.create(request);
+            String topic = thread.getTopic();
+            // TopicRequest request = TopicRequest.builder()
+            //         .topic(thread.getTopic())
+            //         .userUid(user.getUid())
+            //         .build();
+            // topicService.create(request);
             // 订阅内部会话
-            String topicInternal = TopicUtils.formatTopicInternal(thread.getTopic());
-            TopicRequest requestInternal = TopicRequest.builder()
-                    .topic(topicInternal)
+            String topicInternal = TopicUtils.formatTopicInternal(topic);
+            TopicRequest request = TopicRequest.builder()
+                    // .topic(topicInternal)
                     .userUid(user.getUid())
                     .build();
+            request.getTopics().add(topic);
+            request.getTopics().add(topicInternal);
             // requestInternal.setUserUid(user.getUid());
-            topicService.create(requestInternal);
+            topicService.create(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
