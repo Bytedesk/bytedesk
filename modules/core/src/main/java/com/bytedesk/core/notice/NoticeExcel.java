@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-09-01 09:28:51
+ * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 14:28:07
+ * @LastEditTime: 2025-03-03 23:16:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,33 +11,30 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.notice;
 
-import com.bytedesk.core.base.BaseResponse;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
+/**
+ * https://github.com/alibaba/easyexcel
+ */
 @Data
-@Builder
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class NotificationResponse extends BaseResponse {
-    
-    private String title;
+public class NoticeExcel {
 
-    private String content;
+    @ExcelProperty(index = 0, value = "Name")
+    @ColumnWidth(20)
+    private String name;
 
+    @ExcelProperty(index = 1, value = "Type")
+    @ColumnWidth(20)
     private String type;
 
-    private String extra;
+    @ExcelProperty(index = 2, value = "Color")
+    @ColumnWidth(20)
+    private String color;
 
-    // private LocalDateTime createdAt;
-
+    
 }

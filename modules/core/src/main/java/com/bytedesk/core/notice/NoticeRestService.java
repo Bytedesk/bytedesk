@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.notice;
 
 import java.util.Optional;
 
@@ -32,46 +32,46 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class NotificationRestService extends BaseRestService<NotificationEntity, NotificationRequest, NotificationResponse> {
+public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeRequest, NoticeResponse> {
 
-    private NotificationRepository noticeRepository;
+    private NoticeRepository noticeRepository;
 
     private ModelMapper modelMapper;
 
     private UidUtils uidUtils;
 
     @Override
-    public Page<NotificationResponse> queryByOrg(NotificationRequest request) {
+    public Page<NoticeResponse> queryByOrg(NoticeRequest request) {
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
 
-        Specification<NotificationEntity> specification = NotificationSpecification.search(request);
+        Specification<NoticeEntity> specification = NoticeSpecification.search(request);
 
-        Page<NotificationEntity> page = noticeRepository.findAll(specification, pageable);
+        Page<NoticeEntity> page = noticeRepository.findAll(specification, pageable);
 
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<NotificationResponse> queryByUser(NotificationRequest request) {
+    public Page<NoticeResponse> queryByUser(NoticeRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Cacheable(value = "notice", key = "#uid", unless = "#result == null")
     @Override
-    public Optional<NotificationEntity> findByUid(String uid) {
+    public Optional<NoticeEntity> findByUid(String uid) {
         return noticeRepository.findByUid(uid);
     }
 
     @Override
-    public NotificationResponse create(NotificationRequest request) {
+    public NoticeResponse create(NoticeRequest request) {
         
-        NotificationEntity entity = modelMapper.map(request, NotificationEntity.class);
+        NoticeEntity entity = modelMapper.map(request, NoticeEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
-        NotificationEntity savedEntity = save(entity);
+        NoticeEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create notice failed");
         }
@@ -79,13 +79,13 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
     }
 
     @Override
-    public NotificationResponse update(NotificationRequest request) {
+    public NoticeResponse update(NoticeRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     @Override
-    public NotificationEntity save(NotificationEntity entity) {
+    public NoticeEntity save(NoticeEntity entity) {
         try {
             return noticeRepository.save(entity);
         } catch (Exception e) {
@@ -95,7 +95,7 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<NotificationEntity> entity = noticeRepository.findByUid(uid);
+        Optional<NoticeEntity> entity = noticeRepository.findByUid(uid);
         if (entity.isPresent()) {
             // noticeRepository.delete(entity.get());
             entity.get().setDeleted(true);
@@ -104,24 +104,24 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
     }
 
     @Override
-    public void delete(NotificationRequest request) {
+    public void delete(NoticeRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            NotificationEntity entity) {
+            NoticeEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public NotificationResponse convertToResponse(NotificationEntity entity) {
-        return modelMapper.map(entity, NotificationResponse.class);
+    public NoticeResponse convertToResponse(NoticeEntity entity) {
+        return modelMapper.map(entity, NoticeResponse.class);
     }
 
     @Override
-    public NotificationResponse queryByUid(NotificationRequest request) {
+    public NoticeResponse queryByUid(NoticeRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
