@@ -306,8 +306,10 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_UNIFIED_THREAD_PATTERN, unifiedUid, visitorUid) + TOPIC_INTERNAL_SUFFIX;
     }
     
-
+    ////////////////////////////////////////////////////////////////////////////
     // 
-    public static final String 
+    public static final String formatTopicInternal(String topic) {
+        return topic + TOPIC_INTERNAL_SUFFIX;
+    }
 
 }
