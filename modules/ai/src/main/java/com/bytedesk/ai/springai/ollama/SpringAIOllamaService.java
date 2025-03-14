@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:36:19
+ * @LastEditTime: 2025-03-14 09:35:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -213,6 +213,99 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     }
                 });
     }
+
+    /**
+     * 检查Ollama服务是否正常运行
+     * @return 如果服务正常运行返回true，否则返回false
+     */
+    public boolean isServiceHealthy() {
+        if (!bytedeskOllamaChatModel.isPresent()) {
+            return false;
+        }
+        
+        try {
+            // 发送一个简单的测试请求来检测服务是否响应
+            String response = processPromptSync("test");
+            return !response.contains("不可用") && !response.equals("Ollama service is not available");
+        } catch (Exception e) {
+            log.error("Error checking Ollama service health", e);
+            return false;
+        }
+    }
+
+    /**
+     * 获取Ollama所有可用的模型列表
+     * @return 包含所有可用模型信息的对象
+     */
+    // public Object getAvailableModels() {
+    //     if (!bytedeskOllamaChatModel.isPresent()) {
+    //         throw new RuntimeException("Ollama service is not available");
+    //     }
+        
+    //     try {
+    //         // 这里假设OllamaChatModel有一个方法来获取模型列表
+    //         // 如果没有现成的方法，我们可以通过发送特定的API请求来获取
+    //         OllamaChatModel model = bytedeskOllamaChatModel.get();
+            
+    //         // 使用反射获取模型的client对象，这样可以访问底层的API
+    //         // 注意：这种方法依赖于Spring AI的内部实现，如果库更新可能需要调整
+    //         Object ollamaApi = getOllamaApiClient(model);
+    //         if (ollamaApi != null) {
+    //             // 通过反射调用模型列表API
+    //             return invokeListModelsMethod(ollamaApi);
+    //         }
+            
+    //         // 如果无法通过反射获取，则使用通用方法
+    //         // 请求Ollama的模型列表API
+    //         return getModelsViaPrompt();
+    //     } catch (Exception e) {
+    //         log.error("Error retrieving Ollama models", e);
+    //         throw new RuntimeException("Failed to retrieve Ollama models: " + e.getMessage(), e);
+    //     }
+    // }
+
+    // /**
+    //  * 通过反射获取OllamaChatModel的API客户端
+    //  */
+    // private Object getOllamaApiClient(OllamaChatModel model) {
+    //     try {
+    //         java.lang.reflect.Field clientField = model.getClass().getDeclaredField("client");
+    //         clientField.setAccessible(true);
+    //         return clientField.get(model);
+    //     } catch (Exception e) {
+    //         log.warn("Could not access Ollama API client through reflection", e);
+    //         return null;
+    //     }
+    // }
+
+    // /**
+    //  * 通过反射调用API客户端的listModels方法
+    //  */
+    // private Object invokeListModelsMethod(Object ollamaApi) {
+    //     try {
+    //         java.lang.reflect.Method listModelsMethod = ollamaApi.getClass().getMethod("listModels");
+    //         return listModelsMethod.invoke(ollamaApi);
+    //     } catch (Exception e) {
+    //         log.warn("Could not invoke listModels method through reflection", e);
+    //         return null;
+    //     }
+    // }
+
+    // /**
+    //  * 如果无法通过反射获取，则通过发送特定提示来获取模型列表
+    //  */
+    // private Object getModelsViaPrompt() {
+    //     // 向Ollama发送特定命令以获取模型列表
+    //     String response = processPromptSync("Please list all available models in a JSON format");
+        
+    //     try {
+    //         // 尝试解析响应为JSON
+    //         return JSON.parse(response);
+    //     } catch (Exception e) {
+    //         // 如果无法解析为JSON，则返回原始字符串
+    //         return response;
+    //     }
+    // }
 
     public Optional<OllamaChatModel> getOllamaChatModel() {
         return bytedeskOllamaChatModel;

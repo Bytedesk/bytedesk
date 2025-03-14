@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 17:57:34
+ * @LastEditTime: 2025-03-14 09:29:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -134,6 +134,40 @@ public class SpringAIOllamaController {
                     return ResponseEntity.ok(JsonResult.error(e.getMessage()));
                 }
     }
+
+    /**
+     * 检测Ollama服务是否正常运行
+     * http://127.0.0.1:9003/springai/ollama/health
+     */
+    @GetMapping("/health")
+    public ResponseEntity<JsonResult<?>> checkHealth() {
+        try {
+            boolean isHealthy = springAIOllamaService.isServiceHealthy();
+            if (isHealthy) {
+                return ResponseEntity.ok(JsonResult.success("Ollama service is running normally", true));
+            } else {
+                return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+            }
+        } catch (Exception e) {
+            log.error("Error checking Ollama health", e);
+            return ResponseEntity.ok(JsonResult.error("Failed to check Ollama service: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 获取Ollama所有可用的模型列表
+     * http://127.0.0.1:9003/springai/ollama/models
+     */
+    // @GetMapping("/models")
+    // public ResponseEntity<JsonResult<?>> getAvailableModels() {
+    //     try {
+    //         Object models = springAIOllamaService.getAvailableModels();
+    //         return ResponseEntity.ok(JsonResult.success(models));
+    //     } catch (Exception e) {
+    //         log.error("Error retrieving Ollama models", e);
+    //         return ResponseEntity.ok(JsonResult.error("Failed to retrieve Ollama models: " + e.getMessage()));
+    //     }
+    // }
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
