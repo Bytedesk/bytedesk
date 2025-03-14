@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-03-14 15:24:26
+ * @Date: 2025-03-14 16:11:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 16:14:07
+ * @LastEditTime: 2025-03-14 16:12:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,35 +11,28 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notice.extra;
+package com.bytedesk.core.base;
 
-import com.bytedesk.core.base.BaseExtra;
+import java.io.Serializable;
 
-import lombok.AllArgsConstructor;
+import com.alibaba.fastjson2.JSON;
+
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Setter
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-public class NoticeExtraLogin extends BaseExtra {
+@MappedSuperclass
+public abstract class BaseExtra implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String loginIp;
-
-    private String loginDevice;
-
-    private String loginOs;
-
-    private String loginBrowser;
-
-    private String loginLocation;
-
-    private String loginTime;
-
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 }

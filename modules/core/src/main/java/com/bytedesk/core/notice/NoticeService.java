@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 11:22:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 16:05:29
+ * @LastEditTime: 2025-03-14 16:26:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,35 +17,35 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.uid.UidUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class NoticeService {
+
+    private final ThreadRestService threadRestService;
+    private final IMessageSendService messageSendService;
+    private final UidUtils uidUtils;
 
     // send notice
     public void sendLoginNotice(NoticeRequest request) {
         // do something
-        JSONObject contentObject = new JSONObject();
-            contentObject.put(I18Consts.I18N_NOTICE_TITLE, action.getTitle());
-            contentObject.put(I18Consts.I18N_NOTICE_CONTENT, action.getAction());
-            contentObject.put(I18Consts.I18N_NOTICE_IP, action.getIp());
-            contentObject.put(I18Consts.I18N_NOTICE_IP_LOCATION, action.getIpLocation());
-            String content = JSON.toJSONString(contentObject);
-            // 
-            String userUid = user.getUid();
-            String topic = TopicUtils.getSystemTopic(userUid);
-            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-            if (threadOptional.isPresent()) {
-                ThreadEntity thread = threadOptional.get();
-                MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread, user.getOrgUid(), content);
-                messageSendService.sendProtobufMessage(message);
-            }
+        String topic = TopicUtils.getSystemTopic(request.getUserUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        if (threadOptional.isPresent()) {
+            ThreadEntity thread = threadOptional.get();
+            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread.toProtobuf(),
+                    request.getOrgUid(), request.getContent());
+            messageSendService.sendProtobufMessage(message);
+        }
     }
 
     // send transfer notice
@@ -65,12 +65,12 @@ public class NoticeService {
 
     // send timeout notice
     public void sendTimeoutNotice() {
-        
+
     }
 
     // send offline notice
     public void sendOfflineNotice() {
         // do something
     }
-    
+
 }

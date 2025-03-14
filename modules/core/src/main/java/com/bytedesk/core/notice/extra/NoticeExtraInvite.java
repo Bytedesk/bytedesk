@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 15:23:36
+ * @LastEditTime: 2025-03-14 16:07:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,16 +13,24 @@
  */
 package com.bytedesk.core.notice.extra;
 
+import java.io.Serializable;
+
 import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoticeExtraInvite {
+public class NoticeExtraInvite implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // 转接备注
     private String note;
