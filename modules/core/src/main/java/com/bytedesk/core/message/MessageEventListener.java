@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 10:08:02
+ * @LastEditTime: 2025-03-14 11:45:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,41 +38,15 @@ public class MessageEventListener {
 
     private final MessageSocketService messageSocketService;
 
-    // private final BlackRestService blackRestService;
-
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
-        log.info("MessageJsonEvent {}", event.getJson());
+        // log.info("MessageJsonEvent {}", event.getJson());
         
         try {
             String messageJson =  messageService.processMessageJson(event.getJson());
             if (messageJson == null) {
                 return;
             }
-            // MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
-            // if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
-            //     messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
-            // }
-            
-            // ThreadProtobuf thread = messageProtobuf.getThread();
-            // if (thread == null) {
-            //     throw new RuntimeException("thread is null");
-            // }
-            
-            // // Replace client timestamp
-            // messageProtobuf.setCreatedAt(LocalDateTime.now());
-
-            // // Check blacklist
-            // if (isBlackList(messageProtobuf)) {
-            //     return;
-            // }
-
-            // // Filter sensitive words
-            // messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
-            
-            // // Cache message for persistence
-            // messagePersistCache.pushForPersist(messageJson);
-            
             // Send to Stomp clients
             messageSocketService.sendJsonMessage(messageJson);
             
@@ -94,30 +68,6 @@ public class MessageEventListener {
         }
     }
 
-    // // 检查黑名单
-    // private boolean isBlackList(MessageProtobuf messageProtobuf) {
-    //     String uid = messageProtobuf.getUser().getUid();
-    //     MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
-    //     if (extraObject != null) {
-    //         String orgUid = extraObject.getOrgUid();
-    //         Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
-    //         if (blackOpt.isPresent()) {
-    //             BlackEntity black = blackOpt.get();
-    //             if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
-
-    // // 过滤敏感词
-    // private String filterTaboo(String messageJson) {
-    //     // TODO: 过滤敏感词，将敏感词替换为*
-    //     // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-    //     return messageJson;
-    // }
-
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
         // log.info("message quartz five second event: " + event);
@@ -130,12 +80,5 @@ public class MessageEventListener {
         });
     }
 
-    // @Async
-    // @EventListener
-    // public void onMessageCreateEvent(MessageCreateEvent event) {
-    //     List<String> messageJsonList = event.getMessageJsonList();
-    //     Assert.notEmpty(messageJsonList, "Message JSON list must not be empty");
-    //     // ... rest of the method
-    // }
 
 }
