@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 10:04:26
+ * @LastEditTime: 2025-03-14 10:42:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.converter.JsonListConverter;
+import com.bytedesk.core.converter.StringListConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
@@ -139,7 +140,9 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     // 标签
     @Builder.Default
-    private String tags = BytedeskConsts.EMPTY_ARRAY_STRING;
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
     private String client = ClientEnum.WEB.name();

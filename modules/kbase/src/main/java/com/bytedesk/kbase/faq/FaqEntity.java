@@ -101,9 +101,9 @@ public class FaqEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
-    // 被浏览次数
-    // @Builder.Default
-    // private int viewCount = 0;
+    // 被展示次数
+    @Builder.Default
+    private int viewCount = 0;
 
     // 被点击次数
     @Builder.Default
