@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 14:28:07
+ * @LastEditTime: 2025-03-14 15:48:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,14 +16,16 @@ package com.bytedesk.core.notice;
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
-@Data
-@Builder
+@Getter
+@Setter
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -38,6 +40,5 @@ public class NoticeResponse extends BaseResponse {
 
     private String extra;
 
-    // private LocalDateTime createdAt;
-
+    private String userUid;
 }
