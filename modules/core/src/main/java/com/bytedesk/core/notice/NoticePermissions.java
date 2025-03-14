@@ -15,11 +15,11 @@ package com.bytedesk.core.notice;
 
 public class NoticePermissions {
 
-    public static final String NOTIFICATION_PREFIX = "NOTIFICATION_";
+    public static final String NOTICE_PREFIX = "NOTICE_";
     // Notice permissions
-    public static final String NOTIFICATION_CREATE = "hasAuthority('NOTIFICATION_CREATE')";
-    public static final String NOTIFICATION_READ = "hasAuthority('NOTIFICATION_READ')";
-    public static final String NOTIFICATION_UPDATE = "hasAuthority('NOTIFICATION_UPDATE')";
-    public static final String NOTIFICATION_DELETE = "hasAuthority('NOTIFICATION_DELETE')";
-    public static final String NOTIFICATION_EXPORT = "hasAuthority('NOTIFICATION_EXPORT')";
+    public static final String NOTICE_CREATE = "hasAuthority('NOTICE_CREATE')";
+    public static final String NOTICE_READ = "hasAuthority('NOTICE_READ')";
+    public static final String NOTICE_UPDATE = "hasAuthority('NOTICE_UPDATE')";
+    public static final String NOTICE_DELETE = "hasAuthority('NOTICE_DELETE')";
+    public static final String NOTICE_EXPORT = "hasAuthority('NOTICE_EXPORT')";
 }

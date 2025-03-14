@@ -25,39 +25,39 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController 
-@RequestMapping("/api/v1/notification")
+@RequestMapping("/api/v1/notice")
 @RequiredArgsConstructor
 public class NoticeRestController extends BaseRestController<NoticeRequest> {
 
-    private final NoticeRestService notificationRestService;
+    private final NoticeRestService noticeRestService;
 
     @Override
     public ResponseEntity<?> queryByOrg(NoticeRequest request) {
-        Page<NoticeResponse> page = notificationRestService.queryByOrg(request);
+        Page<NoticeResponse> page = noticeRestService.queryByOrg(request);
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(NoticeRequest request) {
-        Page<NoticeResponse> page = notificationRestService.queryByUser(request);
+        Page<NoticeResponse> page = noticeRestService.queryByUser(request);
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> create(NoticeRequest request) {
-        NoticeResponse notice = notificationRestService.create(request);
+        NoticeResponse notice = noticeRestService.create(request);
         return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
     public ResponseEntity<?> update(NoticeRequest request) {
-        NoticeResponse notice = notificationRestService.update(request);
+        NoticeResponse notice = noticeRestService.update(request);
         return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
     public ResponseEntity<?> delete(NoticeRequest request) {
-        notificationRestService.delete(request);
+        noticeRestService.delete(request);
         return ResponseEntity.ok(JsonResult.success());
     }
 
