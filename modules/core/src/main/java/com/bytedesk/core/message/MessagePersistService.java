@@ -22,6 +22,8 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.notice.extra.NoticeExtraInvite;
+import com.bytedesk.core.notice.extra.NoticeExtraTransfer;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -266,8 +268,8 @@ public class MessagePersistService {
     // 处理转接消息
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithTransferMessage");
-        MessageTransferContent transferContentObject = JSONObject.parseObject(message.getContent(),
-                MessageTransferContent.class);
+        NoticeExtraTransfer transferContentObject = JSONObject.parseObject(message.getContent(),
+                NoticeExtraTransfer.class);
         //
         Optional<MessageEntity> messageOpt = messageService.findByUid(transferContentObject.getUid());
         if (messageOpt.isPresent()) {
@@ -283,8 +285,8 @@ public class MessagePersistService {
 
     // 处理邀请消息
     private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
-        MessageInviteContent inviteContentObject = JSONObject.parseObject(message.getContent(),
-                MessageInviteContent.class);
+        NoticeExtraInvite inviteContentObject = JSONObject.parseObject(message.getContent(),
+                NoticeExtraInvite.class);
         Optional<MessageEntity> messageOpt = messageService.findByUid(inviteContentObject.getUid());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
