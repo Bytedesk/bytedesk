@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:27:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 09:19:52
+ * @LastEditTime: 2025-03-14 15:06:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,24 +36,23 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_core_notification")
+@Table(name = "bytedesk_core_notice")
 public class NoticeEntity extends BaseEntity {
     
     private String title;
 
     private String content;
 
-    @Column(name = "notification_type")
+    @Column(name = "notice_type")
     private String type;
 
     @Builder.Default
-    @Column(name = "notification_status")
+    @Column(name = "notice_status")
     private String status = NoticeStatusEnum.UNREAD.name();
 
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 
 }
