@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 14:29:52
+ * @LastEditTime: 2025-03-14 14:36:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -217,39 +217,38 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     // 剪贴板会话：clipboard/{user_uid}
-    public ThreadResponse createClipboardAssistantThread(UserEntity user) {
-        //
-        String topic = TopicUtils.getClipboardTopic(user.getUid());
-        //
-        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
-        if (threadOptional.isPresent()) {
-            return convertToResponse(threadOptional.get());
-        }
-        // 剪贴助手用户信息，头像、昵称等
-        UserProtobuf userSimple = UserUtils.getClipboardAssistantUser();
-        ThreadEntity assistantThread = ThreadEntity.builder()
-                .type(ThreadTypeEnum.ASSISTANT.name())
-                .topic(topic)
-                .unreadCount(0)
-                .state(ThreadStateEnum.STARTED.name())
-                .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(userSimple))
-                .owner(user)
-                .build();
-        assistantThread.setUid(uidUtils.getUid());
-        if (StringUtils.hasText(user.getOrgUid())) {
-            assistantThread.setOrgUid(user.getOrgUid());
-        } else {
-            assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        }
-        //
-        ThreadEntity updateThread = save(assistantThread);
-        if (updateThread == null) {
-            throw new RuntimeException("thread save failed");
-        }
-
-        return convertToResponse(updateThread);
-    }
+    // public ThreadResponse createClipboardAssistantThread(UserEntity user) {
+    //     //
+    //     String topic = TopicUtils.getClipboardTopic(user.getUid());
+    //     //
+    //     Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
+    //     if (threadOptional.isPresent()) {
+    //         return convertToResponse(threadOptional.get());
+    //     }
+    //     // 剪贴助手用户信息，头像、昵称等
+    //     UserProtobuf userSimple = UserUtils.getClipboardAssistantUser();
+    //     ThreadEntity assistantThread = ThreadEntity.builder()
+    //             .type(ThreadTypeEnum.ASSISTANT.name())
+    //             .topic(topic)
+    //             .unreadCount(0)
+    //             .state(ThreadStateEnum.STARTED.name())
+    //             .client(ClientEnum.SYSTEM.name())
+    //             .user(JSON.toJSONString(userSimple))
+    //             .owner(user)
+    //             .build();
+    //     assistantThread.setUid(uidUtils.getUid());
+    //     if (StringUtils.hasText(user.getOrgUid())) {
+    //         assistantThread.setOrgUid(user.getOrgUid());
+    //     } else {
+    //         assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    //     }
+    //     //
+    //     ThreadEntity updateThread = save(assistantThread);
+    //     if (updateThread == null) {
+    //         throw new RuntimeException("thread save failed");
+    //     }
+    //     return convertToResponse(updateThread);
+    // }
 
     // 系统通知会话：system/{user_uid}
     public ThreadResponse createSystemChannelThread(UserEntity user) {
