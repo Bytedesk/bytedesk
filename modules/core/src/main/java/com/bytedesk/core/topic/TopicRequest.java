@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:15:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 14:23:32
+ * @LastEditTime: 2025-03-14 17:06:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,8 @@
  */
 package com.bytedesk.core.topic;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -24,9 +24,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
@@ -34,6 +35,9 @@ import lombok.experimental.Accessors;
 public class TopicRequest extends BaseRequest {
     
     private String topic;
+
+    @Builder.Default
+    private Set<String> topics = new HashSet<>();
     
     // @NotBlank
     // private String userUid;
@@ -50,5 +54,7 @@ public class TopicRequest extends BaseRequest {
      * current online clientIds
      */
     @Builder.Default
-    private List<String> clientIds = new ArrayList<>();
+    private Set<String> clientIds = new HashSet<>();
+    // private List<String> clientIds = new ArrayList<>();
+    
 }

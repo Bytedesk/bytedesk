@@ -13,9 +13,7 @@
  */
 package com.bytedesk.core.topic;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -53,7 +51,8 @@ public class TopicResponse extends BaseResponse {
      * current online clientIds
      */
     @Builder.Default
-    private List<String> clientIds = new ArrayList<>();
+    private Set<String> clientIds = new HashSet<>();
+    // private List<String> clientIds = new ArrayList<>();
 
     // 
     private String userUid;
