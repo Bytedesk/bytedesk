@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 10:44:10
+ * @LastEditTime: 2025-03-14 16:17:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,19 +14,23 @@
  */
 package com.bytedesk.core.message;
 
+import com.bytedesk.core.base.BaseExtra;
 import com.bytedesk.core.constant.BytedeskConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 // 消息扩展字段
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class MessageExtra {
+@SuperBuilder
+public class MessageExtra extends BaseExtra {
 
     // 有帮助、没帮助
     @Builder.Default

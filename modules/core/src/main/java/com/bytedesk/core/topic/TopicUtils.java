@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 18:16:46
+ * @LastEditTime: 2025-03-14 16:36:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,8 @@ public class TopicUtils {
     }
 
     public static final String TOPIC_PREFIX = "/topic/";
+    // internal
+    public static final String TOPIC_INTERNAL_SUFFIX = "_internal";
     //
     public static final String TOPIC_FILE_ASSISTANT = "file";
     public static final String TOPIC_CLIPBOARD_ASSISTANT = "clipboard";
@@ -218,6 +220,10 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_AGENT_THREAD_PATTERN, agentUid, visitorUid);
     }
 
+    public static String formatOrgAgentThreadTopicInternal(String agentUid, String visitorUid) {
+        return String.format(TOPIC_ORG_AGENT_THREAD_PATTERN, agentUid, visitorUid) + TOPIC_INTERNAL_SUFFIX;
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
     public static Boolean isOrgWorkgroupTopic(String topic) {
@@ -233,6 +239,10 @@ public class TopicUtils {
     // }
     public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String visitorUid) {
         return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, visitorUid);
+    }
+
+    public static String formatOrgWorkgroupThreadTopicInternal(String workgroupUid, String visitorUid) {
+        return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, visitorUid) + TOPIC_INTERNAL_SUFFIX;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -269,10 +279,17 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid);
     }
 
+    public static String formatOrgAgentTicketThreadTopicInternal(String agentUid, String ticketUid) {
+        return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
+    }
+
     public static String formatOrgWorkgroupTicketThreadTopic(String workgroupUid, String ticketUid) {
         return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid);
     }
 
+    public static String formatOrgWorkgroupTicketThreadTopicInternal(String workgroupUid, String ticketUid) {
+        return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // 统一客服入口
@@ -283,6 +300,10 @@ public class TopicUtils {
 
     public static String formatOrgUnifiedThreadTopic(String unifiedUid, String visitorUid) {    
         return String.format(TOPIC_ORG_UNIFIED_THREAD_PATTERN, unifiedUid, visitorUid);
+    }
+
+    public static String formatOrgUnifiedThreadTopicInternal(String unifiedUid, String visitorUid) {    
+        return String.format(TOPIC_ORG_UNIFIED_THREAD_PATTERN, unifiedUid, visitorUid) + TOPIC_INTERNAL_SUFFIX;
     }
     
 
