@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-13 09:07:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 09:09:22
+ * @LastEditTime: 2025-03-15 16:45:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.PARAMETER, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface TabooFilter {
+public @interface TabooJsonFilter {
 
     public String title() default "";
 

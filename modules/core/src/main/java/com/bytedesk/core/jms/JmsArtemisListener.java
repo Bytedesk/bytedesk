@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:57:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 16:25:10
+ * @LastEditTime: 2025-03-15 16:48:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,7 @@ package com.bytedesk.core.jms;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.annotation.TabooFilter;
+// import com.bytedesk.core.annotation.TabooJsonFilter;
 // import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 // import com.bytedesk.core.message.MessageProtobuf;
@@ -52,7 +52,7 @@ public class JmsArtemisListener {
 	// }
 
 	// topic pub sub
-	@TabooFilter(title = "taboo", action = "JmsArtemisListener")
+	// @TabooJsonFilter(title = "taboo", action = "JmsArtemisListener")
 	@JmsListener(destination = JmsArtemisConstants.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
 	public void receiveTopicMessage(String json) {
 		// log.info("jms receiveTopicMessage string {}", json);
