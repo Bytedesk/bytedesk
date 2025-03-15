@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 22:55:32
+ * @LastEditTime: 2025-03-15 16:13:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,8 +38,6 @@ import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
-import com.bytedesk.core.thread.event.ThreadCreateEvent;
-import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseRequest;
 import com.bytedesk.kbase.kbase.KbaseRestService;
@@ -133,15 +131,15 @@ public class AgentEventListener {
         }
     }
 
-    @EventListener
-    public void onThreadCreateEvent(ThreadCreateEvent event) {
-        // log.info("agent onThreadCreateEvent: " + event);
-    }
+    // @EventListener
+    // public void onThreadCreateEvent(ThreadCreateEvent event) {
+    //     // log.info("agent onThreadCreateEvent: " + event);
+    // }
 
-    @EventListener
-    public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-        // log.info("agent onThreadUpdateEvent: " + event);
-    }
+    // @EventListener
+    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
+    //     // log.info("agent onThreadUpdateEvent: " + event);
+    // }
 
     @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {

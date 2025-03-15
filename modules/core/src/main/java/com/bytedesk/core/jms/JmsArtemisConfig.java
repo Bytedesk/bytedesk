@@ -28,6 +28,7 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
 import jakarta.jms.Session;
+import lombok.RequiredArgsConstructor;
 
 // http://localhost:8161/console/auth/login
 // https://spring.io/guides/gs/messaging-jms
@@ -35,8 +36,10 @@ import jakarta.jms.Session;
 // https://activemq.apache.org/components/artemis/documentation/latest/index.html
 @EnableJms
 @Configuration
+@RequiredArgsConstructor
 public class JmsArtemisConfig {
 
+	private final JmsErrorHandler jmsErrorHandler;
     
     @Bean
 	public JmsListenerContainerFactory<?> jmsArtemisQueueFactory(ConnectionFactory connectionFactory,
@@ -46,6 +49,9 @@ public class JmsArtemisConfig {
 		configurer.configure(factory, connectionFactory);
 		// You could still override some settings if necessary.
 		factory.setPubSubDomain(false);
+		// factory.setConcurrency("3-10");
+		// 设置错误处理器
+        factory.setErrorHandler(jmsErrorHandler);
 		return factory;
 	}
 
@@ -57,6 +63,9 @@ public class JmsArtemisConfig {
 		configurer.configure(factory, connectionFactory);
 		// You could still override some settings if necessary.
 		factory.setPubSubDomain(true);
+		// factory.setConcurrency("3-10");
+		// 设置错误处理器
+        factory.setErrorHandler(jmsErrorHandler);
 		return factory;
 	}
 
