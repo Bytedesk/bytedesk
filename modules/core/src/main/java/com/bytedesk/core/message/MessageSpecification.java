@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 11:01:27
+ * @LastEditTime: 2025-03-15 14:14:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,6 +49,15 @@ public class MessageSpecification extends BaseSpecification {
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
                     // topic like '%robot%'
                     predicates.add(criteriaBuilder.like(root.get("topic"), "%robot%"));
+                } else if (TypeConsts.COMPONENT_TYPE_VISITOR.equals(request.getComponentType())) {
+                    // 访客端查询消息：过滤掉一些消息类型，比如：TRANSFER, TRANSFER_ACCEPT, TRANSFER_REJECT
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.TRANSFER.name()));
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.TRANSFER_ACCEPT.name()));
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.TRANSFER_REJECT.name()));
+                    // 过滤掉 INVITE, INVITE_ACCEPT, INVITE_REJECT
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.INVITE.name()));
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.INVITE_ACCEPT.name()));
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.INVITE_REJECT.name()));
                 }
             }
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
