@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 11:22:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 08:47:17
+ * @LastEditTime: 2025-03-15 09:53:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ public class NoticeService {
     private final ModelMapper modelMapper;
 
     // send notice
-    public void sendLoginNotice(NoticeRequest request) {
+    public void sendNotice(NoticeRequest request) {
         // 
         NoticeResponse noticeResponse = noticeRestService.create(request);
         if (noticeResponse != null) {
@@ -57,31 +57,6 @@ public class NoticeService {
             }
         }
         //
-    }
-
-    // send transfer notice
-    public void sendTransferNotice() {
-        // do something
-    }
-
-    // send invite notice
-    public void sendInviteNotice() {
-        // do something
-    }
-
-    // send close notice
-    public void sendCloseNotice() {
-        // do something
-    }
-
-    // send timeout notice
-    public void sendTimeoutNotice() {
-
-    }
-
-    // send offline notice
-    public void sendOfflineNotice() {
-        // do something
     }
 
 }

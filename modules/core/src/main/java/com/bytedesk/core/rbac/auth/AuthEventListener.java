@@ -70,7 +70,7 @@ public class AuthEventListener {
                     .userUid(user.getUid())
                     .orgUid(user.getOrgUid())
                     .build();
-            noticeService.sendLoginNotice(noticeRequest);
+            noticeService.sendNotice(noticeRequest);
         }
     }
 
