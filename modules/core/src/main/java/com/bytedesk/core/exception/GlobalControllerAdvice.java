@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 17:33:52
+ * @LastEditTime: 2025-03-15 16:20:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // 
 import org.springframework.http.HttpStatus;
 // import org.apache.coyote.BadRequestException; // tomcat
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -115,6 +116,36 @@ public class GlobalControllerAdvice {
         log.error("not handled exception:", e.getMessage());
         // e.printStackTrace();
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        // 特别处理敏感词异常
+        if (e.getMessage() != null && e.getMessage().contains("敏感词")) {
+            log.warn("敏感词异常: {}", e.getMessage());
+            return ResponseEntity.ok().body(JsonResult.error("消息含有敏感内容，已被过滤"));
+        }
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+    
+    // 添加对ListenerExecutionFailedException的处理
+    @ExceptionHandler(ListenerExecutionFailedException.class)
+    public ResponseEntity<?> handleListenerExecutionFailedException(ListenerExecutionFailedException e) {
+        log.error("JMS监听器执行失败: {}", e.getMessage());
+        // 检查是否是敏感词导致的异常
+        if (e.getCause() instanceof IllegalArgumentException && 
+            e.getCause().getMessage() != null && 
+            e.getCause().getMessage().contains("敏感词")) {
+            return ResponseEntity.ok().body(JsonResult.error("消息含有敏感内容，已被过滤"));
+        }
+        return ResponseEntity.ok().body(JsonResult.error("消息处理失败"));
+    }
+    
+    // 添加自定义TabooException处理
+    @ExceptionHandler(TabooException.class)
+    public ResponseEntity<?> handleTabooException(TabooException e) {
+        log.warn("敏感词异常: {}", e.getMessage());
+        return ResponseEntity.ok().body(JsonResult.error("消息含有敏感内容，已被过滤"));
     }
 
     @ExceptionHandler(BadCredentialsException.class)

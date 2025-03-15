@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 17:15:43
+ * @LastEditTime: 2025-03-15 16:16:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -91,7 +91,9 @@ public class ThreadEventListener {
         ThreadEntity thread = event.getThread();
         UserEntity user = thread.getOwner();
         log.info("thread onThreadUpdateEvent: {}", thread.getUid());
-        // TODO: 会话关闭之后，需要取消订阅
+        if (thread.isClosed()) {
+            return;
+        }
 
         // 机器人接待的会话存在user == null的情况，不需要订阅topic
         if (thread == null || user == null) {
@@ -151,16 +153,15 @@ public class ThreadEventListener {
         log.info("thread event listener onThreadCloseEvent: {}", thread.getAgent());
         //
         if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-            // 工作组会话
-            if (thread.isClosed() && thread.getOwner() != null) {
-                // 取消订阅
-                TopicRequest request = TopicRequest.builder()
-                        .topic(thread.getTopic())
-                        .userUid(thread.getOwner().getUid())
-                        .build();
-                // request.setUserUid(thread.getOwner().getUid());
-                topicService.remove(request);
-            }
+            // TODO：工作组会话，会话关闭后，需要取消订阅topic
+            // if (thread.isClosed() && thread.getOwner() != null) {
+            //     // 取消订阅
+            //     TopicRequest request = TopicRequest.builder()
+            //             .topic(thread.getTopic())
+            //             .userUid(thread.getOwner().getUid())
+            //             .build();
+            //     topicService.remove(request);
+            // }
         }
     }
 
