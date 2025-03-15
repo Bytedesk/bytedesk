@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-11 09:21:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-22 12:13:04
+ * @LastEditTime: 2025-03-15 10:24:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,18 +19,18 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 离线推送token
  */
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -48,5 +48,5 @@ public class PushTokenEntity extends BaseEntity {
     // ios or android
     private String device;
 
-    private String userUid;
+    // private String userUid;
 }

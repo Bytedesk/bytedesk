@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 11:55:51
+ * @LastEditTime: 2025-03-15 10:24:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -37,7 +38,7 @@ import com.bytedesk.core.rbac.authority.AuthorityEntity;
  */
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -76,7 +77,7 @@ public class RoleEntity extends BaseEntity {
 	private Set<AuthorityEntity> authorities = new HashSet<>();
 
 	// 除系统自带角色之外，允许管理员-自己创建角色
-	private String userUid;
+	// private String userUid;
 
 	@Builder.Default
 	private String platform = PlatformEnum.BYTEDESK.name();

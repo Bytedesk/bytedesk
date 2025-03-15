@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-28 22:02:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 14:58:39
+ * @LastEditTime: 2025-03-15 10:21:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * black list 
@@ -35,7 +36,7 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -65,9 +66,9 @@ public class BlackEntity extends BaseEntity {
     @Builder.Default
     private boolean blockIp = false;
 
-    // 执行拉黑的用户uid
-    @Column(nullable = false)
-    private String userUid;
+    // // 执行拉黑的用户uid
+    // @Column(nullable = false)
+    // private String userUid;
 
     // 执行拉黑的用户昵称
     private String userNickname;

@@ -29,13 +29,13 @@ public class KbaseConvertUtils {
 
     public static ArticleResponse convertToArticleResponse(ArticleEntity entity) {
         ArticleResponse articleResponse = modelMapper.map(entity, ArticleResponse.class);
-        articleResponse.setUser(UserProtobuf.parseFrom(entity.getUser()));
+        articleResponse.setUser(UserProtobuf.parseFromJson(entity.getUser()));
         return articleResponse;
     }
 
     public static ArticleArchiveResponse convertToArticleArchiveResponse(ArticleArchiveEntity entity) {
         ArticleArchiveResponse articleResponse = modelMapper.map(entity, ArticleArchiveResponse.class);
-        articleResponse.setUser(UserProtobuf.parseFrom(entity.getUser()));
+        articleResponse.setUser(UserProtobuf.parseFromJson(entity.getUser()));
         return articleResponse;
     }
 }
