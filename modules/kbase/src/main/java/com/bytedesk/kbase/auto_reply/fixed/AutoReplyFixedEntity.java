@@ -33,13 +33,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 自动回复-固定自动回复，无匹配规则，直接回复。
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -81,5 +82,5 @@ public class AutoReplyFixedEntity extends BaseEntity {
     private String kbUid; // 对应知识库
     
     // user uid
-    private String userUid;
+    // private String userUid;
 }
