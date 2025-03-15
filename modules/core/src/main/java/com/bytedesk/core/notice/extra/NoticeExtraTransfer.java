@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 09:59:56
+ * @LastEditTime: 2025-03-15 14:46:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,6 +47,10 @@ public class NoticeExtraTransfer extends BaseExtra {
 
     // 转接消息uid，用于transfer_accept/transfer_reject
     private String messageUid;
+
+    // 超时时间：单位秒，默认120秒
+    @Builder.Default
+    private Long expireTime = 120L;
 
     public static NoticeExtraTransfer parseFromJson(String json) {
         return JSON.parseObject(json, NoticeExtraTransfer.class);
