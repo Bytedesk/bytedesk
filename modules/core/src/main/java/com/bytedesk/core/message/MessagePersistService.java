@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 09:42:59
+ * @LastEditTime: 2025-03-15 12:19:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -172,9 +172,7 @@ public class MessagePersistService {
 
         // INVITE_ACCEPT, INVITE_REJECT, INVITE_CANCEL, INVITE_VISITOR, INVITE_VISITOR_REJECT, INVITE_VISITOR_ACCEPT, INVITE_VISITOR_CANCEL
         if (type.equals(MessageTypeEnum.INVITE_ACCEPT)
-                || type.equals(MessageTypeEnum.INVITE_REJECT)
-                || type.equals(MessageTypeEnum.INVITE_CANCEL)
-                || type.equals(MessageTypeEnum.INVITE_VISITOR)) {
+                || type.equals(MessageTypeEnum.INVITE_REJECT)) {
             if (StringUtils.hasText(messageProtobuf.getContent())) {
                 dealWithInviteMessage(type, messageProtobuf);
                 return true;
