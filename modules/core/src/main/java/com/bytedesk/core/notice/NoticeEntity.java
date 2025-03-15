@@ -16,22 +16,25 @@ package com.bytedesk.core.notice;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.message.MessageStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
  * 注意与message类型notice区分
  */
-@Data
+@Getter
+@Setter
 @Entity
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
@@ -51,7 +54,7 @@ public class NoticeEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "notice_status")
-    private String status = NoticeStatusEnum.UNREAD.name();
+    private String status = MessageStatusEnum.TRANSFER_PENDING.name();
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
