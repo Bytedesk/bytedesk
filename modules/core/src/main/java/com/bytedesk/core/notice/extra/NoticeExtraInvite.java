@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 09:43:08
+ * @LastEditTime: 2025-03-15 11:40:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,9 +39,13 @@ public class NoticeExtraInvite extends BaseExtra {
     // 被邀请会话
     private ThreadProtobuf thread;
 
-    private UserProtobuf agent;
+    // 接收客服
+    private UserProtobuf receiver;
 
-    // 邀请消息uid，用于transfer_accept/transfer_reject
+    // 发起邀请客服
+    private UserProtobuf sender;
+
+    // 邀请消息uid，用于invite_accept/invite_reject
     private String messageUid;
 
     public static NoticeExtraInvite parseFromJson(String json) {
