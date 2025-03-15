@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 16:42:54
+ * @LastEditTime: 2025-03-15 10:22:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,10 +35,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -80,7 +81,7 @@ public class CategoryEntity extends BaseEntity {
     private String kbUid;
 
     // 用户uid
-    private String userUid;
+    // private String userUid;
 
     @Builder.Default
     @Column(name = "post_count")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 09:46:09
+ * @LastEditTime: 2025-03-15 09:59:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,11 @@ public class NoticeExtraTransfer extends BaseExtra {
     // 被转接会话
     private ThreadProtobuf thread;
 
-    private UserProtobuf agent;
+    // 接收客服
+    private UserProtobuf receiver;
+
+    // 发起转接客服
+    private UserProtobuf sender;
 
     // 转接消息uid，用于transfer_accept/transfer_reject
     private String messageUid;

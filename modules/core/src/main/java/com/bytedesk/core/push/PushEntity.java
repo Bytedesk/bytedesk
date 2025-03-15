@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:30:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-21 17:14:08
+ * @LastEditTime: 2025-03-15 10:24:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,13 +26,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 
  */
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -58,10 +59,7 @@ public class PushEntity extends BaseEntity {
 
     private String deviceUid; // 设备唯一标识
 
-    // @Enumerated(EnumType.STRING)
     @Builder.Default
-    // private String status = StatusConsts.CODE_STATUS_PENDING;
-    // private PushStatus status = PushStatus.PENDING;
     @Column(name = "push_status")
     private String status = PushStatusEnum.PENDING.name();
 
@@ -72,5 +70,5 @@ public class PushEntity extends BaseEntity {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     // 修改邮箱、手机号需要记录用户uid和组织uid
-    private String userUid;
+    // private String userUid;
 }

@@ -275,9 +275,9 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)) {
-                messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPT.name());
+                messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPTED.name());
             } else if (type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
-                messageEntity.setStatus(MessageStatusEnum.TRANSFER_REJECT.name());
+                messageEntity.setStatus(MessageStatusEnum.TRANSFER_REJECTED.name());
             }
             messageService.save(messageEntity);
         }
@@ -291,9 +291,9 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.INVITE_ACCEPT)) {
-                messageEntity.setStatus(MessageStatusEnum.INVITE_ACCEPT.name());
+                messageEntity.setStatus(MessageStatusEnum.INVITE_ACCEPTED.name());
             } else if (type.equals(MessageTypeEnum.INVITE_REJECT)) {
-                messageEntity.setStatus(MessageStatusEnum.INVITE_REJECT.name());
+                messageEntity.setStatus(MessageStatusEnum.INVITE_REJECTED.name());
             } else if (type.equals(MessageTypeEnum.INVITE_CANCEL)) {
                 // messageEntity.setStatus(MessageStatusEnum.INVITE_CANCEL.name());
             }
