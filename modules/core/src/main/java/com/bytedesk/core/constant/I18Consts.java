@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 16:10:20
+ * @LastEditTime: 2025-03-15 18:09:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,11 @@ public class I18Consts {
     public static final String I18N_UNIFIED_DESCRIPTION = I18N_PREFIX + "unified.description";
     //
     public static final String I18N_WORKGROUP_NICKNAME = I18N_PREFIX + "workgroup.nickname";
+    public static final String I18N_WORKGROUP_BEFORE_NICKNAME = I18N_PREFIX + "workgroup.before.nickname";
+    public static final String I18N_WORKGROUP_AFTER_NICKNAME = I18N_PREFIX + "workgroup.after.nickname";
     public static final String I18N_WORKGROUP_DESCRIPTION = I18N_PREFIX + "workgroup.description";
+    public static final String I18N_WORKGROUP_BEFORE_DESCRIPTION = I18N_PREFIX + "workgroup.before.description";
+    public static final String I18N_WORKGROUP_AFTER_DESCRIPTION = I18N_PREFIX + "workgroup.after.description";
     //
     public static final String I18N_AGENT_NICKNAME = I18N_PREFIX + "agent.nickname";
     public static final String I18N_AGENT_DESCRIPTION = I18N_PREFIX + "agent.description";

@@ -24,14 +24,14 @@ import com.bytedesk.service.queue.settings.QueueSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
