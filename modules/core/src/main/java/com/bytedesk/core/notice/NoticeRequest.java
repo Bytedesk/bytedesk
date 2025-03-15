@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 15:46:21
+ * @LastEditTime: 2025-03-15 10:42:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.notice;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.message.MessageStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -41,7 +42,7 @@ public class NoticeRequest extends BaseRequest {
     // private String type = NoticeTypeEnum.LOGIN.name();
 
     @Builder.Default  // 与@SuperBuilder配合使用来设置默认值
-    private String status = NoticeStatusEnum.UNREAD.name();
+    private String status = MessageStatusEnum.TRANSFER_PENDING.name();
 
     @Builder.Default
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
