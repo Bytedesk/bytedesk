@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-20 13:19:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:34:14
+ * @LastEditTime: 2025-03-15 14:15:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(MessageRequest request) {
 
-        Page<MessageResponse> response = messageRestService.queryByThreadTopic(request);
+        Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }

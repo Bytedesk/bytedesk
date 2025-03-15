@@ -36,5 +36,6 @@ public class TypeConsts {
     public static final String COMPONENT_TYPE_TEAM = "team";
     public static final String COMPONENT_TYPE_SERVICE = "service";
     public static final String COMPONENT_TYPE_ROBOT = "robot";
+    public static final String COMPONENT_TYPE_VISITOR = "visitor";
 
 }

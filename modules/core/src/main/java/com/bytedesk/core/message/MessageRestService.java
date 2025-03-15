@@ -19,9 +19,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -61,18 +59,13 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "message", key = "#request.topic", unless = "#result == null")
-    public Page<MessageResponse> queryByTopic(MessageRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "createdAt");
-
-        Specification<MessageEntity> specs = MessageSpecification.search(request);
-
-        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-
-        return messagePage.map(ConvertUtils::convertToMessageResponse);
-    }
+    // @Cacheable(value = "message", key = "#request.topic", unless = "#result == null")
+    // public Page<MessageResponse> queryByTopic(MessageRequest request) {
+    //     Pageable pageable = request.getPageable();
+    //     Specification<MessageEntity> specs = MessageSpecification.search(request);
+    //     Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
+    //     return messagePage.map(ConvertUtils::convertToMessageResponse);
+    // }
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
     public Optional<MessageEntity> findByUid(String uid) {
