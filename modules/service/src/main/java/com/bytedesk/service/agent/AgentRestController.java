@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 11:20:23
+ * @LastEditTime: 2025-03-15 15:56:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -158,10 +158,10 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @TabooFilter(title = "敏感词过滤", action = "发送消息")
-    @ActionAnnotation(title = "agent", action = "sendSseMessage", description = "sendSseMessage")
+    @TabooFilter(title = "taboo", action = "sendAgentSseMessage")
+    @ActionAnnotation(title = "agent", action = "sendAgentSseMessage", description = "sendAgentSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sendSseMessage(@RequestParam(value = "message") String message) {
+    public SseEmitter sendAgentSseMessage(@RequestParam(value = "message") String message) {
 
         // 创建 SseEmitter 前先进行权限验证
         // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

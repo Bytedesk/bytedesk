@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:57:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 12:40:59
+ * @LastEditTime: 2025-03-15 15:54:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,9 +16,10 @@ package com.bytedesk.core.jms;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.annotation.TabooFilter;
+// import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.message.MessageProtobuf;
+// import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,29 +31,28 @@ import lombok.extern.slf4j.Slf4j;
 public class JmsArtemisListener {
 
 	// queue point to point
-	@JmsListener(destination = JmsArtemisConstants.QUEUE_STRING_NAME, containerFactory = "jmsArtemisQueueFactory")
-	public void receiveQueueMessage(String json) {
-		// log.info("jms receiveQueueMessage string {}", json);
-		BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishMessageJsonEvent(json);
-	}
+	// @JmsListener(destination = JmsArtemisConstants.QUEUE_STRING_NAME, containerFactory = "jmsArtemisQueueFactory")
+	// public void receiveQueueMessage(String json) {
+	// 	// log.info("jms receiveQueueMessage string {}", json);
+	// 	BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+    //     bytedeskEventPublisher.publishMessageJsonEvent(json);
+	// }
 
-	@JmsListener(destination = JmsArtemisConstants.QUEUE_MESSAGE_NAME, containerFactory = "jmsArtemisQueueFactory")
-	public void receiveQueueMessage(MessageProtobuf messageProtobuf) {
-		String json = JSON.toJSONString(messageProtobuf);
-        // log.info("jms receiveQueueMessage messageProtobuf: {}", json);
-        // 
-        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishMessageJsonEvent(json);
-	}
+	// @JmsListener(destination = JmsArtemisConstants.QUEUE_MESSAGE_NAME, containerFactory = "jmsArtemisQueueFactory")
+	// public void receiveQueueMessage(MessageProtobuf messageProtobuf) {
+	// 	String json = JSON.toJSONString(messageProtobuf);
+    //     // log.info("jms receiveQueueMessage messageProtobuf: {}", json);
+    //     BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+    //     bytedeskEventPublisher.publishMessageJsonEvent(json);
+	// }
 
-	@JmsListener(destination = JmsArtemisConstants.QUEUE_TEST_NAME, containerFactory = "jmsArtemisQueueFactory")
-	public void receiveQueueMessage(JmsArtemisMessage message) {
-		// log.info("jms receiveQueueMessage test {}", message);
-	}
+	// @JmsListener(destination = JmsArtemisConstants.QUEUE_TEST_NAME, containerFactory = "jmsArtemisQueueFactory")
+	// public void receiveQueueMessage(JmsArtemisMessage message) {
+	// 	// log.info("jms receiveQueueMessage test {}", message);
+	// }
 
 	// topic pub sub
-
+	@TabooFilter(title = "taboo", action = "JmsArtemisListener")
 	@JmsListener(destination = JmsArtemisConstants.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
 	public void receiveTopicMessage(String json) {
 		// log.info("jms receiveTopicMessage string {}", json);
@@ -60,18 +60,17 @@ public class JmsArtemisListener {
         bytedeskEventPublisher.publishMessageJsonEvent(json);
 	}
 
-	@JmsListener(destination = JmsArtemisConstants.TOPIC_MESSAGE_NAME, containerFactory = "jmsArtemisPubsubFactory")
-	public void receiveTopicMessage(MessageProtobuf messageProtobuf) {
-		String json = JSON.toJSONString(messageProtobuf);
-        // log.info("jms receiveTopicMessage messageProtobuf: {}", json);
-        // 
-        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishMessageJsonEvent(json);
-	}
+	// @JmsListener(destination = JmsArtemisConstants.TOPIC_MESSAGE_NAME, containerFactory = "jmsArtemisPubsubFactory")
+	// public void receiveTopicMessage(MessageProtobuf messageProtobuf) {
+	// 	String json = JSON.toJSONString(messageProtobuf);
+    //     // log.info("jms receiveTopicMessage messageProtobuf: {}", json);
+    //     BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+    //     bytedeskEventPublisher.publishMessageJsonEvent(json);
+	// }
 
-	@JmsListener(destination = JmsArtemisConstants.TOPIC_TEST_NAME, containerFactory = "jmsArtemisPubsubFactory")
-	public void receiveTopicMessage(JmsArtemisMessage message) {
-		// log.info("jms receiveTopicMessage test {}", message);
-	}
+	// @JmsListener(destination = JmsArtemisConstants.TOPIC_TEST_NAME, containerFactory = "jmsArtemisPubsubFactory")
+	// public void receiveTopicMessage(JmsArtemisMessage message) {
+	// 	// log.info("jms receiveTopicMessage test {}", message);
+	// }
 
 }
