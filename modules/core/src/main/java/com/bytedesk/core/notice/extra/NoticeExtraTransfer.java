@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 16:07:19
+ * @LastEditTime: 2025-03-15 09:21:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,6 @@ public class NoticeExtraTransfer implements Serializable {
     private ThreadEntity thread;
 
     // 转接消息uid，用于transfer_accept/transfer_reject
-    private String uid;
+    private String messageUid;
 
 }
