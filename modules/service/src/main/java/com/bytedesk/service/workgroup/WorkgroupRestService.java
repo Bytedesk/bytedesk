@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 13:53:57
+ * @LastEditTime: 2025-03-15 18:06:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,6 +77,10 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
+        // 判断uid是否已经存储，如果已经存在，则不创建新的workgroup
+        if (StringUtils.hasText(request.getUid()) && findByUid(request.getUid()).isPresent()) {
+            return convertToResponse(findByUid(request.getUid()).get());
+        }
         //
         WorkgroupEntity workgroup = WorkgroupEntity.builder()
                 .nickname(request.getNickname())

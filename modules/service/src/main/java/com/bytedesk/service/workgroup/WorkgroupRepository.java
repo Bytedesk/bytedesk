@@ -22,17 +22,20 @@ import org.springframework.lang.NonNull;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
+// import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * 
  */
 @Repository
-@Tag(name = "workgroup info - 客服技能组")
+// @Tag(name = "workgroup info - 客服技能组")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long>, JpaSpecificationExecutor<WorkgroupEntity> {
 
     Optional<WorkgroupEntity> findByUid(@NonNull String uid);
+
+    // existsByUid
+    boolean existsByUid(@NonNull String uid);
 
     // Optional<Workgroup> findByNicknameAndOrgUidAndDeleted(String nickname, String orgUid, Boolean deleted);
 

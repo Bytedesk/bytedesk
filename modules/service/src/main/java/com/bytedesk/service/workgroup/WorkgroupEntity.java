@@ -37,6 +37,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * WorkgroupEntity和skills的区别主要在于:
@@ -51,7 +52,7 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true, exclude = { "agents" })
 @AllArgsConstructor

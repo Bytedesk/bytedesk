@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 16:09:37
+ * @LastEditTime: 2025-03-15 18:07:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
 
     // private final MemberInitializer memberInitializer;
     // private final AgentInitializer agentInitializer;
-    private final WorkgroupRepository workgroupRepository;
+    // private final WorkgroupRepository workgroupRepository;
     private final WorkgroupRestService workgroupService;
 
     @Override
@@ -50,20 +50,23 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
     // 迁移到 unifiedInitializer 执行
     public void init() {
         
-        if (workgroupRepository.count() > 0) {
-            return;
-        }
+        // if (workgroupRepository.count() > 0) {
+        //     return;
+        // }
 
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         List<String> agentUids = Arrays.asList(BytedeskConsts.DEFAULT_AGENT_UID);
         //
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID)
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
+                .description(I18Consts.I18N_WORKGROUP_DESCRIPTION)
                 .agentUids(agentUids)
+                .orgUid(orgUid)
                 .build();
-        workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
-        workgroupRequest.setOrgUid(orgUid);
+        // workgroupRequest.setUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
+        // workgroupRequest.setOrgUid(orgUid);
         // 写入 faq uid 到 welcomeFaqUids
         if (orgUid.equals(BytedeskConsts.DEFAULT_ORGANIZATION_UID)) {
             // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
@@ -72,8 +75,26 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 workgroupRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
             }
         }
-        //
         workgroupService.create(workgroupRequest);
+        // 
+        // add workgroup before
+        WorkgroupRequest workgroupBeforeRequest = WorkgroupRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_BEFORE)
+                .nickname(I18Consts.I18N_WORKGROUP_BEFORE_NICKNAME)
+                .description(I18Consts.I18N_WORKGROUP_BEFORE_DESCRIPTION)
+                .agentUids(agentUids)
+                .orgUid(orgUid)
+                .build();
+        workgroupService.create(workgroupBeforeRequest);
+        // add workgroup after
+        WorkgroupRequest workgroupAfterRequest = WorkgroupRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_AFTER)
+                .nickname(I18Consts.I18N_WORKGROUP_AFTER_NICKNAME)
+                .description(I18Consts.I18N_WORKGROUP_AFTER_DESCRIPTION)
+                .agentUids(agentUids)
+                .orgUid(orgUid)
+                .build();
+        workgroupService.create(workgroupAfterRequest);
     }
     
 }
