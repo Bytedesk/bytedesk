@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 16:27:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 23:41:49
+ * @LastEditTime: 2025-03-15 15:55:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.message;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.annotation.TabooFilter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
@@ -38,6 +39,7 @@ public class MessageSendServiceImpl implements IMessageSendService {
         publishMessageJsonEvent(json);
     }
 
+    @TabooFilter(title = "taboo", action = "publishMessageJsonEvent")
     public void publishMessageJsonEvent(String json) {
         // log.debug("publishMessageJsonEvent: {}", json);
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
