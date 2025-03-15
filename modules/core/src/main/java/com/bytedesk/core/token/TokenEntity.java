@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 12:25:23
+ * @LastEditTime: 2025-03-15 10:25:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,13 +20,13 @@ import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 可用于强制用户重新登录，或者刷新token
@@ -38,7 +38,7 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -66,9 +66,9 @@ public class TokenEntity extends BaseEntity {
     private boolean revoked = false;
 
     // user, no need map, just uid
-    @NotBlank
-    @Column(nullable = false)
-    private String userUid;
+    // @NotBlank
+    // @Column(nullable = false)
+    // private String userUid;
 
     // current auth clientIds
     // @Builder.Default
