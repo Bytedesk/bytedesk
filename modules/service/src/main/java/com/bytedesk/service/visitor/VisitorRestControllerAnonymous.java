@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ApiRateLimiter;
-import com.bytedesk.core.annotation.TabooFilter;
+import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
@@ -145,7 +145,7 @@ public class VisitorRestControllerAnonymous {
     }
 
     // 访客发送http消息
-    @TabooFilter(title = "taboo", action = "sendRestMessage")
+    @TabooJsonFilter(title = "taboo", action = "sendRestMessage")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
@@ -157,7 +157,7 @@ public class VisitorRestControllerAnonymous {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
-    @TabooFilter(title = "taboo", action = "sendSseVisitorMessage")
+    @TabooJsonFilter(title = "taboo", action = "sendSseVisitorMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
@@ -186,7 +186,7 @@ public class VisitorRestControllerAnonymous {
         return emitter;
     }
 
-    @TabooFilter(title = "taboo", action = "sendSseMemberMessage")
+    @TabooJsonFilter(title = "taboo", action = "sendSseMemberMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {
