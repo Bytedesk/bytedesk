@@ -33,31 +33,41 @@ public class NoticeRestController extends BaseRestController<NoticeRequest> {
 
     @Override
     public ResponseEntity<?> queryByOrg(NoticeRequest request) {
+
         Page<NoticeResponse> page = noticeRestService.queryByOrg(request);
+
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(NoticeRequest request) {
+
         Page<NoticeResponse> page = noticeRestService.queryByUser(request);
+
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> create(NoticeRequest request) {
+
         NoticeResponse notice = noticeRestService.create(request);
+
         return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
     public ResponseEntity<?> update(NoticeRequest request) {
+
         NoticeResponse notice = noticeRestService.update(request);
+
         return ResponseEntity.ok(JsonResult.success(notice));
     }
 
     @Override
     public ResponseEntity<?> delete(NoticeRequest request) {
+
         noticeRestService.delete(request);
+        
         return ResponseEntity.ok(JsonResult.success());
     }
 
