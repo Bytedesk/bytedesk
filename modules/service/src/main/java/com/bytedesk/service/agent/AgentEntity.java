@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:26:24
+ * @LastEditTime: 2025-03-17 07:40:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -143,34 +143,6 @@ public class AgentEntity extends BaseEntity {
     // for quick query, space exchange for speed
     // private String userUid;
 
-    /**
-     主要用途：
-        精准分配：将会话分配给最合适的客服
-        专业服务：确保客服具备处理特定问题的能力
-        分层支持：实现初级/高级支持分流
-        多语言支持：按语言技能分配
-        产品线划分：不同产品对应不同技能组
-     */
-    // @Column(length = 1000)
-    // private String skills;  // 技能标签,逗号分隔,如: "java,python,database"
-    
-    // // 将skills字符串转换为List
-    // public List<String> getSkillList() {
-    //     if (skills == null || skills.isEmpty()) {
-    //         return new ArrayList<>();
-    //     }
-    //     return Arrays.asList(skills.split(","));
-    // }
-    
-    // // 检查是否具备某个技能
-    // public boolean hasSkill(String skill) {
-    //     return getSkillList().contains(skill);
-    // }
-    
-    // // 检查是否具备所有必需技能
-    // public boolean hasRequiredSkills(List<String> requiredSkills) {
-    //     return getSkillList().containsAll(requiredSkills);
-    // }
 
     public Boolean isAvailable() {
         return this.status.equals(AgentStatusEnum.AVAILABLE.name());
@@ -210,5 +182,35 @@ public class AgentEntity extends BaseEntity {
         this.currentThreadCount = 0;
     }
 
+    /**
+     主要用途：
+        精准分配：将会话分配给最合适的客服
+        专业服务：确保客服具备处理特定问题的能力
+        分层支持：实现初级/高级支持分流
+        多语言支持：按语言技能分配
+        产品线划分：不同产品对应不同技能组
+     */
+    // @Column(length = 1000)
+    // private String skills;  // 技能标签,逗号分隔,如: "java,python,database"
+    
+    // // 将skills字符串转换为List
+    // public List<String> getSkillList() {
+    //     if (skills == null || skills.isEmpty()) {
+    //         return new ArrayList<>();
+    //     }
+    //     return Arrays.asList(skills.split(","));
+    // }
+    
+    // // 检查是否具备某个技能
+    // public boolean hasSkill(String skill) {
+    //     return getSkillList().contains(skill);
+    // }
+    
+    // // 检查是否具备所有必需技能
+    // public boolean hasRequiredSkills(List<String> requiredSkills) {
+    //     return getSkillList().containsAll(requiredSkills);
+    // }
+
 
 }
+
