@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 17:47:37
+ * @LastEditTime: 2025-03-17 21:49:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
@@ -49,6 +51,44 @@ public class FaqRestControllerVisitor {
         Page<FaqResponse> page = faqService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    // query by uid
+    @GetMapping("/query/uid")
+    public ResponseEntity<?> queryByUid(FaqRequest request) {
+        
+        FaqResponse faq = faqService.queryByUid(request);
+        if (faq == null) {
+            return ResponseEntity.ok(JsonResult.error("faq not found"));
+        }
+        return ResponseEntity.ok(JsonResult.success(faq));
+    }
+
+    // rate up faq
+    @PostMapping("/rate/up")
+    public ResponseEntity<?> rateUp(@RequestBody FaqRequest request) {
+
+        FaqResponse faq = faqService.rateUp(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(faq));
+    }
+
+    // rate down faq
+    @PostMapping("/rate/down")
+    public ResponseEntity<?> rateDown(@RequestBody FaqRequest request) {
+
+        FaqResponse faq = faqService.rateDown(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(faq));
+    }
+
+    // comment faq
+    @PostMapping("/comment")
+    public ResponseEntity<?> comment(@RequestBody FaqRequest request) {
+
+        // FaqResponse faq = faqService.comment(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
     
 }
