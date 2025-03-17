@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 15:55:05
+ * @LastEditTime: 2025-03-17 16:13:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -102,12 +102,34 @@ public class ConvertUtils {
     public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
         ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
         // 
-        UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        thr
-        //
-        UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
-        threadResponse.setUser(user);
-
+        if (thread.getAgent() != null) {
+            UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+            threadResponse.setAgent(agent);
+        }
+        if (thread.getUser() != null) {
+            UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
+            threadResponse.setUser(user);
+        }
+        if (thread.getInvites() != null) {
+            // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
+            for (String invite : thread.getInvites()) {
+                UserProtobuf inviteUser = JSON.parseObject(invite, UserProtobuf.class);
+                threadResponse.getInvites().add(inviteUser);
+            }
+        }
+        if (thread.getMonitors() != null) {
+            for (String monitor : thread.getMonitors()) {
+                UserProtobuf monitorUser = JSON.parseObject(monitor, UserProtobuf.class);
+                threadResponse.getMonitors().add(monitorUser);
+            }
+        }
+        if (thread.getAssistants() != null) {
+            for (String assistant : thread.getAssistants()) {
+                UserProtobuf assistantUser = JSON.parseObject(assistant, UserProtobuf.class);
+                threadResponse.getAssistants().add(assistantUser);
+            }
+        }
+        // 
         return threadResponse;
     }
 
