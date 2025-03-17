@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 09:48:48
+ * @LastEditTime: 2025-03-17 10:31:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -70,7 +71,6 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
 
     @Override
     public NoticeResponse create(NoticeRequest request) {
-        
         NoticeEntity entity = modelMapper.map(request, NoticeEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
@@ -87,11 +87,44 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
+    public NoticeResponse acceptTransfer(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.TRANSFER_ACCEPTED.name());
+    }
+
+    public NoticeResponse rejectTransfer(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.TRANSFER_REJECTED.name());
+    }
+
+    public NoticeResponse cancelTransfer(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.TRANSFER_CANCELED.name());
+    }
+
+    public NoticeResponse timeOutTransfer(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.TRANSFER_TIMEOUT.name());
+    }
+
+    public NoticeResponse acceptInvite(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.INVITE_ACCEPTED.name());
+    }
+
+    public NoticeResponse rejectInvite(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.INVITE_REJECTED.name());
+    }
+
+    public NoticeResponse cancelInvite(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.INVITE_CANCELED.name());
+    }
+
+    public NoticeResponse timeOutInvite(String messageUid) {
+        return updateByMessageUid(messageUid, MessageStatusEnum.INVITE_TIMEOUT.name());
+    }
+
     public NoticeResponse updateByMessageUid(String messageUid, String status) {
-        Optional<NoticeEntity> entity = noticeRepository.findByExtraContains(messageUid);
+        Optional<NoticeEntity> entity = noticeRepository.findByStatusAndExtraContains(MessageStatusEnum.TRANSFER_PENDING.name(), messageUid);
         if (entity.isPresent()) {
             NoticeEntity noticeEntity = entity.get();
             noticeEntity.setStatus(status);
+            // 
             NoticeEntity savedEntity = save(noticeEntity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update notice failed");

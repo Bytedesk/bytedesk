@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 12:19:54
+ * @LastEditTime: 2025-03-17 10:29:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.notice.NoticeRestService;
 import com.bytedesk.core.notice.extra.NoticeExtraInvite;
 import com.bytedesk.core.notice.extra.NoticeExtraTransfer;
 
@@ -34,7 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessagePersistService {
 
-    private final MessageRestService messageService;
+    private final MessageRestService messageRestService;
+
+    private final NoticeRestService noticeRestService;
 
     private final ModelMapper modelMapper;
 
@@ -53,15 +56,15 @@ public class MessagePersistService {
         }
         //
         String uid = messageProtobuf.getUid();
-        if (messageService.existsByUid(uid)) {
+        if (messageRestService.existsByUid(uid)) {
             // 流式消息单独处理下
             if (type.equals(MessageTypeEnum.STREAM)) {
                 // 更新消息内容
-                Optional<MessageEntity> message = messageService.findByUid(uid);
+                Optional<MessageEntity> message = messageRestService.findByUid(uid);
                 if (message.isPresent()) {
                     MessageEntity m = message.get();
                     m.setContent(m.getContent() + messageProtobuf.getContent());
-                    messageService.save(m);
+                    messageRestService.save(m);
                 }
                 return;
             }
@@ -83,7 +86,7 @@ public class MessagePersistService {
             message.setOrgUid(orgUid);
         }
         //
-        messageService.save(message);
+        messageRestService.save(message);
     }
 
     // 处理消息通知，已处理的消息返回true，未处理的消息返回false
@@ -187,7 +190,7 @@ public class MessagePersistService {
         log.info("dealWithMessageReceipt: {}", type);
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止delivered在后面更新read消息
-        Optional<MessageEntity> messageOpt = messageService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent() && messageOpt.get().getStatus() != MessageStatusEnum.READ.name()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.READ)) {
@@ -195,7 +198,7 @@ public class MessagePersistService {
             } else if (type.equals(MessageTypeEnum.DELIVERED)) {
                 messageEntity.setStatus(MessageStatusEnum.DELIVERED.name());
             }
-            messageService.save(messageEntity);
+            messageRestService.save(messageEntity);
         }
     }
 
@@ -203,13 +206,13 @@ public class MessagePersistService {
     private void dealWithMessageRecall(MessageProtobuf message) {
         // log.info("dealWithMessageRecall");
         // content为撤回消息的uid
-        messageService.deleteByUid(message.getContent());
+        messageRestService.deleteByUid(message.getContent());
     }
 
     private void dealWithRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithMessageRateSubmit");
         // 如果是客服邀请评价，则content为邀请评价消息的uid，否则为空
-        Optional<MessageEntity> messageOpt = messageService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.RATE_SUBMIT)) {
@@ -218,26 +221,26 @@ public class MessagePersistService {
             } else if (type.equals(MessageTypeEnum.RATE_CANCEL)) {
                 messageEntity.setStatus(MessageStatusEnum.RATE_CANCEL.name());
             }
-            messageService.save(messageEntity);
+            messageRestService.save(messageEntity);
         }
     }
 
     private void dealWithLeaveMsg(MessageTypeEnum type, MessageProtobuf message) {
         log.info("dealWithLeaveMsg");
-        Optional<MessageEntity> messageOpt = messageService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
                 messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
                 messageEntity.setContent(message.getExtra());
-                messageService.save(messageEntity);
+                messageRestService.save(messageEntity);
             }
         }
     }
 
     private void dealWithFaqRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithFaqRateMessage");
-        Optional<MessageEntity> messageOpt = messageService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.FAQ_UP)) {
@@ -245,13 +248,13 @@ public class MessagePersistService {
             } else if (type.equals(MessageTypeEnum.FAQ_DOWN)) {
                 messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
             }
-            messageService.save(messageEntity);
+            messageRestService.save(messageEntity);
         }
     }
 
     private void dealWithRobotRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithRobotRateMessage");
-        Optional<MessageEntity> messageOpt = messageService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.ROBOT_UP)) {
@@ -259,7 +262,7 @@ public class MessagePersistService {
             } else if (type.equals(MessageTypeEnum.ROBOT_DOWN)) {
                 messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
             }
-            messageService.save(messageEntity);
+            messageRestService.save(messageEntity);
         }
     }
 
@@ -269,33 +272,58 @@ public class MessagePersistService {
         NoticeExtraTransfer transferContentObject = JSONObject.parseObject(message.getContent(),
                 NoticeExtraTransfer.class);
         //
-        Optional<MessageEntity> messageOpt = messageService.findByUid(transferContentObject.getMessageUid());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(transferContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)) {
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPTED.name());
+                // 更新notice表的状态
+                noticeRestService.acceptTransfer(transferContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_REJECTED.name());
+                // 更新notice表的状态
+                noticeRestService.rejectTransfer(transferContentObject.getMessageUid());
+            } else if (type.equals(MessageTypeEnum.TRANSFER_CANCEL)) {
+                messageEntity.setStatus(MessageStatusEnum.TRANSFER_CANCELED.name());
+                // 更新notice表的状态
+                noticeRestService.cancelTransfer(transferContentObject.getMessageUid());
+            } else if (type.equals(MessageTypeEnum.TRANSFER_TIMEOUT)) {
+                messageEntity.setStatus(MessageStatusEnum.TRANSFER_TIMEOUT.name());
+                // 更新notice表的状态
+                noticeRestService.timeOutTransfer(transferContentObject.getMessageUid());
             }
-            messageService.save(messageEntity);
+            messageRestService.save(messageEntity);
         }
+
+        
+
     }
 
     // 处理邀请消息
     private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
         NoticeExtraInvite inviteContentObject = JSONObject.parseObject(message.getContent(),
                 NoticeExtraInvite.class);
-        Optional<MessageEntity> messageOpt = messageService.findByUid(inviteContentObject.getMessageUid());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(inviteContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.INVITE_ACCEPT)) {
                 messageEntity.setStatus(MessageStatusEnum.INVITE_ACCEPTED.name());
+                // 更新notice表的状态
+                noticeRestService.acceptInvite(inviteContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.INVITE_REJECT)) {
                 messageEntity.setStatus(MessageStatusEnum.INVITE_REJECTED.name());
+                // 更新notice表的状态
+                noticeRestService.rejectInvite(inviteContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.INVITE_CANCEL)) {
-                // messageEntity.setStatus(MessageStatusEnum.INVITE_CANCEL.name());
+                messageEntity.setStatus(MessageStatusEnum.INVITE_CANCELED.name());
+                // 更新notice表的状态
+                noticeRestService.cancelInvite(inviteContentObject.getMessageUid());
+            } else if (type.equals(MessageTypeEnum.INVITE_TIMEOUT)) {
+                messageEntity.setStatus(MessageStatusEnum.INVITE_TIMEOUT.name());
+                // 更新notice表的状态
+                noticeRestService.timeOutInvite(inviteContentObject.getMessageUid());
             }
-            messageService.save(messageEntity);
+            messageRestService.save(messageEntity);
         }
     }
 
