@@ -91,7 +91,13 @@ public class ThreadEventListener {
         ThreadEntity thread = event.getThread();
         UserEntity user = thread.getOwner();
         log.info("thread onThreadUpdateEvent: {}", thread.getUid());
-        if (thread.isClosed()) {
+        if (thread.isClosed() 
+            || thread.isTransferPending()
+            || thread.isTransferAccepted() 
+            || thread.isTransferRejected() 
+            || thread.isTransferCanceled() 
+            || thread.isTransferTimeout()
+            ) {
             return;
         }
 
