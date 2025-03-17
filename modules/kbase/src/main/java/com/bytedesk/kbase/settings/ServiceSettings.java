@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 12:19:36
+ * @LastEditTime: 2025-03-17 17:33:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -120,10 +120,6 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     private Double autoCloseMin = Double.valueOf(25);
 
-    // TODO: 一条消息最大长度，超过此长度，则自动截断成多条消息发送
-    // @Builder.Default
-    // private int msgMaxLength = 1024;
-
     // 桌面版聊天窗口右侧iframe
     @Builder.Default
     private boolean showRightIframe = false;
@@ -138,7 +134,6 @@ public class ServiceSettings implements Serializable {
     // 常见问题
     @Builder.Default
     private boolean showFaqs = false;
-
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> faqs = new ArrayList<>();
@@ -146,7 +141,6 @@ public class ServiceSettings implements Serializable {
     // 快捷按钮
     @Builder.Default
     private boolean showQuickFaqs = false;
-
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> quickFaqs = new ArrayList<>();
@@ -154,7 +148,6 @@ public class ServiceSettings implements Serializable {
     // 猜你想问
     @Builder.Default
     private boolean showGuessFaqs = false;
-
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> guessFaqs = new ArrayList<>();
@@ -162,7 +155,6 @@ public class ServiceSettings implements Serializable {
     // 热门问题
     @Builder.Default
     private boolean showHotFaqs = false;
-
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> hotFaqs = new ArrayList<>();
@@ -170,7 +162,6 @@ public class ServiceSettings implements Serializable {
     // 快捷功能
     @Builder.Default
     private boolean showShortcutFaqs = false;
-
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> shortcutFaqs = new ArrayList<>();
