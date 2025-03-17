@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 14:36:59
+ * @LastEditTime: 2025-03-17 14:40:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,9 +22,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -80,25 +78,17 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public Page<ThreadResponse> query(ThreadRequest request) {
-
+        // 
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");
         }
         request.setOwnerUid(user.getUid());
         // 
-        // 优先加载最近更新的会话记录，updatedAt越大越新
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
-
-        Specification<ThreadEntity> specs = ThreadSpecification.search(request);
-
-        Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
-
-        return threadPage.map(this::convertToResponse);
+        return queryByOrg(request);
     }
 
-    public Optional<ThreadResponse> queryByThreadTopic(ThreadRequest request) {
+    public Optional<ThreadResponse> queryByTopic(ThreadRequest request) {
         //
         Optional<ThreadEntity> threadOptional = findFirstByTopic(request.getTopic());
         if (threadOptional.isPresent()) {

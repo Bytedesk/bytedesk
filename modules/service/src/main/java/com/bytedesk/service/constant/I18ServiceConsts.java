@@ -50,6 +50,37 @@ public class I18ServiceConsts {
     // exception is already in transfer canceled state
     public static final String I18N_ALREADY_IN_TRANSFER_CANCELED_STATE = I18Consts.I18N_PREFIX + "already.in.transfer.canceled.state";
 
+    // invite notice title
+    public static final String I18N_INVITE_NOTICE_TITLE = I18Consts.I18N_PREFIX + "invite.notice.title";
+    // invite notice content
+    public static final String I18N_INVITE_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "invite.notice.content";
+    // invite accept notice title
+    public static final String I18N_INVITE_ACCEPT_NOTICE_TITLE = I18Consts.I18N_PREFIX + "invite.accept.notice.title";
+    // invite accept notice content
+    public static final String I18N_INVITE_ACCEPT_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "invite.accept.notice.content";
+    // invite reject notice title
+    public static final String I18N_INVITE_REJECT_NOTICE_TITLE = I18Consts.I18N_PREFIX + "invite.reject.notice.title";
+    // invite reject notice content
+    public static final String I18N_INVITE_REJECT_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "invite.reject.notice.content";
+    // invite timeout notice title
+    public static final String I18N_INVITE_TIMEOUT_NOTICE_TITLE = I18Consts.I18N_PREFIX + "invite.timeout.notice.title";
+    // invite timeout notice content
+    public static final String I18N_INVITE_TIMEOUT_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "invite.timeout.notice.content";
+    // invite cancel notice title
+    public static final String I18N_INVITE_CANCEL_NOTICE_TITLE = I18Consts.I18N_PREFIX + "invite.cancel.notice.title";
+    // invite cancel notice content
+    public static final String I18N_INVITE_CANCEL_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "invite.cancel.notice.content";
+    // exception is already in invite pending state
+    public static final String I18N_ALREADY_IN_INVITE_PENDING_STATE = I18Consts.I18N_PREFIX + "already.in.invite.pending.state";
+    // exception is already in invite accepted state
+    public static final String I18N_ALREADY_IN_INVITE_ACCEPTED_STATE = I18Consts.I18N_PREFIX + "already.in.invite.accepted.state";
+    // exception is already in invite rejected state
+    public static final String I18N_ALREADY_IN_INVITE_REJECTED_STATE = I18Consts.I18N_PREFIX + "already.in.invite.rejected.state";
+    // exception is already in invite timeout state
+    public static final String I18N_ALREADY_IN_INVITE_TIMEOUT_STATE = I18Consts.I18N_PREFIX + "already.in.invite.timeout.state";
+    // exception is already in invite canceled state
+    public static final String I18N_ALREADY_IN_INVITE_CANCELED_STATE = I18Consts.I18N_PREFIX + "already.in.invite.canceled.state";
+
 
     
 }

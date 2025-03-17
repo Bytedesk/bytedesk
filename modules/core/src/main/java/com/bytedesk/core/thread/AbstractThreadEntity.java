@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 10:42:08
+ * @LastEditTime: 2025-03-17 14:39:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -180,7 +180,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Convert(converter = JsonListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> agents = new ArrayList<>();
+    private List<String> invites = new ArrayList<>();
 
     // 多个管理员监听会话
     @Builder.Default

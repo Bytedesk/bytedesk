@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 13:55:48
+ * @LastEditTime: 2025-03-17 14:40:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,7 +106,7 @@ public class ThreadRequest extends BaseRequest {
 
     // 邀请多个客服参与会话
     @Builder.Default
-    private List<String> agentUids = new ArrayList<>();
+    private List<String> inviteUids = new ArrayList<>();
 
     // 多个管理员监听会话
     @Builder.Default
