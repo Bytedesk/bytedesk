@@ -14,6 +14,7 @@
 package com.bytedesk.core.thread;
 
 public enum ThreadStateEnum {
+    ROBOT, // 机器人不需要排队
     QUEUING, // 排队中
     STARTED, // 开始会话
     TRANSFER_PENDING, // 转接待处理

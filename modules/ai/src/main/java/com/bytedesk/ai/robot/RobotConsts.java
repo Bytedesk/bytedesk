@@ -68,7 +68,13 @@ public class RobotConsts {
     public static final String ROBOT_NAME_THREAD_COMPLETION = "thread_completion";
 
     // 
-    public static final String ROBOT_LLM_DEFAULT_PROMPT = "角色：资深客服专家; 背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度";
+    public static final String ROBOT_LLM_DEFAULT_PROMPT = """
+        角色：资深客服专家; 
+        背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 
+        任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 
+        要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度;
+        严禁回答政治敏感问题;
+        """;;
 
     public static final String PROMPT_LLM_GENERATE_FAQ_TEMPLATE = """
             基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:

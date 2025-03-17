@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 11:35:10
+ * @LastEditTime: 2025-03-17 17:14:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,13 @@ public class FaqRestControllerVisitor {
 
     @GetMapping("/search")
     public ResponseEntity<?> search(FaqRequest request) {
+        List<FaqEntity> faqList = faqService.findByQuestionContains(request.getQuestion());
+        return ResponseEntity.ok(JsonResult.success(faqList));
+    }
+
+    // 换一换faq
+    @GetMapping("/change")
+    public ResponseEntity<?> change(FaqRequest request) {
         List<FaqEntity> faqList = faqService.findByQuestionContains(request.getQuestion());
         return ResponseEntity.ok(JsonResult.success(faqList));
     }
