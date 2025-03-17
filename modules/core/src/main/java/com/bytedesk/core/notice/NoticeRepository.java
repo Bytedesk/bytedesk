@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:29:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 07:26:43
+ * @LastEditTime: 2025-03-17 09:46:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,4 +21,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface NoticeRepository extends JpaRepository<NoticeEntity, Long>, JpaSpecificationExecutor<NoticeEntity> {
     
     Optional<NoticeEntity> findByUid(String uid);
+
+    // find by extra contains messageUid: ''
+    Optional<NoticeEntity> findByExtraContains(String messageUid);
+
+    // status and extra contains messageUid: ''
+    Optional<NoticeEntity> findByStatusAndExtraContains(String status, String messageUid);
 }
