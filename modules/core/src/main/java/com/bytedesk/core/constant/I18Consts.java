@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 18:09:06
+ * @LastEditTime: 2025-03-17 22:31:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,6 +69,9 @@ public class I18Consts {
     public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip";
     public static final String I18N_QUEUE_TIP = I18N_PREFIX + "queue.tip";
     public static final String I18N_QUEUE_MESSAGE_TEMPLATE = I18N_PREFIX + "queue.message.template"; // 新增的国际化常量
+    public static final String I18N_AUTO_CLOSE_TIP = I18N_PREFIX + "auto.close.tip"; // 自动关闭提示
+    public static final String I18N_AGENT_CLOSE_TIP = I18N_PREFIX + "agent.close.tip"; // 客服关闭提示
+    public static final String I18N_AGENT_TRANSFER_TIP = I18N_PREFIX + "agent.transfer.tip"; // 客服转接提示
     // unified
     public static final String I18N_UNIFIED_NICKNAME = I18N_PREFIX + "unified.nickname";
     public static final String I18N_UNIFIED_DESCRIPTION = I18N_PREFIX + "unified.description";
