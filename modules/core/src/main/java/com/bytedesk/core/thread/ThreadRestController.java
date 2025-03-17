@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 10:43:01
+ * @LastEditTime: 2025-03-17 14:41:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,10 +67,19 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
+    // query invite threads
+    @GetMapping("/query/invite")
+    public ResponseEntity<?> queryByThreadInvite(ThreadRequest request) {
+
+        Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(threadPage));
+    }
+
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByThreadTopic(ThreadRequest request) {
 
-        Optional<ThreadResponse> threadOptional = threadService.queryByThreadTopic(request);
+        Optional<ThreadResponse> threadOptional = threadService.queryByTopic(request);
         //
         if (threadOptional.isPresent()) {
             return ResponseEntity.ok(JsonResult.success(threadOptional.get()));

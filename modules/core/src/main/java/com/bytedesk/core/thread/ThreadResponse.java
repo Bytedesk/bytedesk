@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 13:56:00
+ * @LastEditTime: 2025-03-17 14:40:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,15 +89,13 @@ public class ThreadResponse extends BaseResponse {
     private String agent;
 
     // 邀请多个客服参与会话
-    private List<String> agents;
+    private List<String> invites;
 
     // 多个管理员监听会话
     private List<String> monitors;
 
     // assistants: monitoring agent、quality check agent、robot agent
     private List<String> assistants;
-
-	// private LocalDateTime updatedAt;
 
     private UserProtobuf user;
     //

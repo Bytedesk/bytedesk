@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 09:28:01
+ * @LastEditTime: 2025-03-17 14:43:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,21 @@ public class ThreadSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
-            // 
+            // 通过 private List<String> inviteUids 查询  private List<String> invites
+            if (request.getInviteUids() != null && !request.getInviteUids().isEmpty()) {
+                List<Predicate> invitePredicates = new ArrayList<>();
+                for (String inviteUid : request.getInviteUids()) {
+                    if (StringUtils.hasText(inviteUid)) {
+                        // 使用LIKE查询匹配invites字段中包含特定uid的记录
+                        invitePredicates.add(criteriaBuilder.like(root.get("invites"), "%" + inviteUid + "%"));
+                    }
+                }
+                if (!invitePredicates.isEmpty()) {
+                    // 使用OR连接多个uid条件（满足任一条件即可）
+                    predicates.add(criteriaBuilder.or(invitePredicates.toArray(new Predicate[0])));
+                }
+            }
+            //
             if (StringUtils.hasText(request.getOwnerUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("hide"), false));
                 predicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
