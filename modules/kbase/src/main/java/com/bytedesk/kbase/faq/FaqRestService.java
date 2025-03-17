@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 21:16:48
+ * @LastEditTime: 2025-03-17 21:35:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,8 +84,19 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
     }
 
     @Override
-    protected String getUidFromRequest(FaqRequest request) {
-        return request.getUid();
+    public FaqResponse queryByUid(FaqRequest request) {
+        Optional<FaqEntity> optionalEntity = findByUid(request.getUid());
+        if (optionalEntity.isPresent()) {
+            FaqEntity entity = optionalEntity.get();
+            entity.increaseClickCount();
+            // 
+            FaqEntity savedEntity = faqRepository.save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update click count");
+            }
+            return convertToResponse(savedEntity);
+        }
+        return null;
     }
 
     @Cacheable(value = "faq", key = "#uid", unless = "#result == null")
@@ -194,22 +205,32 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         }
     }
 
-    public FaqResponse upVote(String uid) {
+    public FaqResponse rateUp(String uid) {
         Optional<FaqEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
-            entity.up();
-            return convertToResponse(save(entity));
+            entity.increaseUpCount();
+            // 
+            FaqEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to rate up FAQ");
+            }
+            return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("faq not found");
         }
     }
 
-    public FaqResponse downVote(String uid) {
+    public FaqResponse rateDown(String uid) {
         Optional<FaqEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
-            entity.down();
+            entity.increaseDownCount();
+            // 
+            FaqEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to rate down FAQ");
+            }
             return convertToResponse(save(entity));
         } else {
             throw new RuntimeException("faq not found");

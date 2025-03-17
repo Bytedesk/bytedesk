@@ -61,9 +61,9 @@ public class FaqEventListener {
             log.info("faq rate extra faqUid {}, rate {}", extra.getFaqUid(), extra.getRate());
             //
             if (message.getStatus().equals(MessageStatusEnum.RATE_UP.name())) {
-                faqRestService.upVote(extra.getFaqUid());
+                faqRestService.rateUp(extra.getFaqUid());
             } else if (message.getStatus().equals(MessageStatusEnum.RATE_DOWN.name())) {
-                faqRestService.downVote(extra.getFaqUid());
+                faqRestService.rateDown(extra.getFaqUid());
             }
         }
     }

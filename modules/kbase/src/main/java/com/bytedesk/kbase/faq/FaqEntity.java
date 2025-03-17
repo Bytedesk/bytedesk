@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 20:03:35
+ * @LastEditTime: 2025-03-17 21:32:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -172,13 +172,33 @@ public class FaqEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> docIdList = new ArrayList<>();
 
-    public void up() {
-        this.setUpCount(this.upCount + 1);
+    public int increaseViewCount() {
+        this.viewCount++;
+        return this.viewCount;
     }
 
-    public void down() {
-        this.setDownCount(this.downCount + 1);
+    public int increaseClickCount() {
+        this.clickCount++;
+        return this.clickCount;
     }
+
+    public int increaseUpCount() {
+        this.upCount++;
+        return this.upCount;
+    }
+
+    public int increaseDownCount() {
+        this.downCount++;
+        return this.downCount;
+    }
+
+    // public void up() {
+    //     this.setUpCount(this.upCount + 1);
+    // }
+
+    // public void down() {
+    //     this.setDownCount(this.downCount + 1);
+    // }
 
     /**
      * 获取指定VIP等级的答案，如果没有对应等级的答案，则返回默认答案
