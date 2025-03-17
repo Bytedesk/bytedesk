@@ -81,6 +81,11 @@ public class FaqEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> relatedFaqs = new ArrayList<>();
 
+    // 是否是llm问答
+    @Builder.Default
+    @Column(name = "is_llm_qa")
+    private boolean isLlmQa = false;
+
     @Builder.Default
     @Column(name = "faq_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
