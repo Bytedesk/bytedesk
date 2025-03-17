@@ -11,9 +11,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.util.SerializationUtils;
-
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
@@ -23,7 +20,6 @@ import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -83,7 +79,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
-        sendSseProcessingMessage(messageProtobuf, emitter);
+        // sendSseTypingMessage(messageProtobuf, emitter);
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
@@ -175,22 +171,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
         messagePersistCache.pushForPersist(messageJson);
     }
 
-    private void sendSseProcessingMessage(MessageProtobuf messageProtobuf, SseEmitter emitter) {
-        //
-        MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
-        clonedMessage.setUid(messageProtobuf.getUid());
-        clonedMessage.setType(MessageTypeEnum.TYPING);
-        // clonedMessage.setContent(I18Consts.I18N_TYPING);
-        // clonedMessage.setContent("...");
-        try {
-            emitter.send(SseEmitter.event()
-            .data(JSON.toJSONString(clonedMessage))
-            .id(clonedMessage.getUid())
-            .name("message"));
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-    }
+    // private void sendSseTypingMessage(MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    //     //
+    //     MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
+    //     clonedMessage.setUid(messageProtobuf.getUid());
+    //     clonedMessage.setType(MessageTypeEnum.TYPING);
+    //     // clonedMessage.setContent(I18Consts.I18N_TYPING);
+    //     // clonedMessage.setContent("...");
+    //     try {
+    //         emitter.send(SseEmitter.event()
+    //         .data(JSON.toJSONString(clonedMessage))
+    //         .id(clonedMessage.getUid())
+    //         .name("message"));
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //     }
+    // }
 
 
     public String buildKbPrompt(String systemPrompt, String query, String context) {
