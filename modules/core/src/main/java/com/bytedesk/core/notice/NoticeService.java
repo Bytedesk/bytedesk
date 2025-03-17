@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 11:22:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 14:49:43
+ * @LastEditTime: 2025-03-17 10:04:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ public class NoticeService {
 
     // send notice
     public void sendNotice(NoticeRequest request) {
-        // 
+        // create notice
         NoticeResponse noticeResponse = noticeRestService.create(request);
         if (noticeResponse != null) {
             NoticeProtobuf noticeProtobuf = modelMapper.map(noticeResponse, NoticeProtobuf.class);
@@ -50,6 +50,7 @@ public class NoticeService {
             Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
             if (threadOptional.isPresent()) {
                 ThreadEntity thread = threadOptional.get();
+                // send notice message
                 MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread.toProtobuf(),
                         request.getOrgUid(), jsonContent);
                 messageSendService.sendProtobufMessage(message);

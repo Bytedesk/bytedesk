@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 15:43:28
+ * @LastEditTime: 2025-03-17 09:48:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,6 +58,16 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
         return noticeRepository.findByUid(uid);
     }
 
+    @Cacheable(value = "notice", key = "#messageUid", unless = "#result == null")
+    public Optional<NoticeEntity> findByExtraContains(String messageUid) {
+        return noticeRepository.findByExtraContains(messageUid);
+    }
+
+    @Cacheable(value = "notice", key = "#status + #messageUid", unless = "#result == null")
+    public Optional<NoticeEntity> findByStatusAndExtraContains(String status, String messageUid) {
+        return noticeRepository.findByStatusAndExtraContains(status, messageUid);
+    }
+
     @Override
     public NoticeResponse create(NoticeRequest request) {
         
@@ -76,6 +86,21 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
+
+    public NoticeResponse updateByMessageUid(String messageUid, String status) {
+        Optional<NoticeEntity> entity = noticeRepository.findByExtraContains(messageUid);
+        if (entity.isPresent()) {
+            NoticeEntity noticeEntity = entity.get();
+            noticeEntity.setStatus(status);
+            NoticeEntity savedEntity = save(noticeEntity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update notice failed");
+            }
+            return convertToResponse(savedEntity);
+        }
+        return null;
+    }
+
 
     @Override
     public NoticeEntity save(NoticeEntity entity) {
