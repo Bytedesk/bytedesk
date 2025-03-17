@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 19:45:08
+ * @LastEditTime: 2025-03-17 20:02:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,8 @@ package com.bytedesk.kbase.faq;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -77,17 +79,17 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             throw new RuntimeException("user not found");
         }
         request.setUserUid(user.getUid());
-        // 
+        //
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "faq", key="#uid", unless = "#result == null")
+    @Cacheable(value = "faq", key = "#uid", unless = "#result == null")
     @Override
     public Optional<FaqEntity> findByUid(String uid) {
         return faqRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "faq", key="#question", unless = "#result == null")
+    @Cacheable(value = "faq", key = "#question", unless = "#result == null")
     public List<FaqEntity> findByQuestionContains(String question) {
         return faqRepository.findByQuestionContains(question);
     }
@@ -124,7 +126,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 }
             }
             entity.setRelatedFaqs(relatedFaqs);
-            
+
             try {
                 FaqEntity savedEntity = save(entity);
                 if (savedEntity != null) {
@@ -140,7 +142,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 }
                 throw e;
             }
-            
+
             throw new RuntimeException("Failed to create FAQ");
         } catch (Exception e) {
             log.error("Error creating FAQ: {}", e.getMessage(), e);
@@ -165,10 +167,10 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             entity.setEnabled(request.getEnabled());
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
-            // 
+            //
             entity.setCategoryUid(request.getCategoryUid());
             entity.setKbUid(request.getKbUid());
-            // 
+            //
             // 根据request.relatedFaqUids查找关联的FAQ
             List<FaqEntity> relatedFaqs = new ArrayList<>();
             for (String relatedFaqUid : request.getRelatedFaqUids()) {
@@ -244,12 +246,50 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqEntity entity) {
-  
+
     }
 
     @Override
     public FaqResponse convertToResponse(FaqEntity entity) {
-        return modelMapper.map(entity, FaqResponse.class);
+        // return modelMapper.map(entity, FaqResponse.class);
+        FaqResponse response = FaqResponse.builder()
+                .question(entity.getQuestion())
+                .answer(entity.getAnswer())
+                .answerList(entity.getAnswerList())
+                .isLlmQa(entity.isLlmQa())
+                .type(entity.getType())
+                .status(entity.getStatus())
+                .viewCount(entity.getViewCount())
+                .clickCount(entity.getClickCount())
+                .upCount(entity.getUpCount())
+                .downCount(entity.getDownCount())
+                .downShowTransferToAgentButton(entity.isDownShowTransferToAgentButton())
+                .enabled(entity.isEnabled())
+                .tagList(entity.getTagList())
+                .startDate(entity.getStartDate())
+                .endDate(entity.getEndDate())
+                .categoryUid(entity.getCategoryUid())
+                .kbUid(entity.getKbUid())
+                .fileUid(entity.getFileUid())
+                .docUid(entity.getDocId())
+                // .weight(entity.getWeight())
+                .build();
+
+        // 处理相关问题，避免循环依赖
+        if (entity.getRelatedFaqs() != null) {
+            List<FaqResponse.SimpleFaqResponse> simpleFaqs = entity.getRelatedFaqs().stream()
+                    .map(relatedFaq -> FaqResponse.SimpleFaqResponse.builder()
+                            .uid(relatedFaq.getUid())
+                            .question(relatedFaq.getQuestion())
+                            .answer(relatedFaq.getAnswer())
+                            .type(relatedFaq.getType())
+                            .status(relatedFaq.getStatus())
+                            .build())
+                    .collect(Collectors.toList());
+            response.setRelatedFaqs(simpleFaqs);
+        }
+
+        return response;
     }
 
     public Page<FaqEntity> queryByOrgExcel(FaqRequest request) {
@@ -262,16 +302,16 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         return modelMapper.map(faq, FaqExcel.class);
     }
 
-    public FaqEntity convertExcelToFaq(FaqExcel excel,String kbUid, String orgUid) {
+    public FaqEntity convertExcelToFaq(FaqExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Faq.class); // String categoryUid,
         FaqEntity faq = FaqEntity.builder().build();
         faq.setUid(uidUtils.getUid());
         faq.setQuestion(excel.getQuestion());
         faq.setAnswer(excel.getAnswer());
-        // 
+        //
         // faq.setType(MessageTypeEnum.TEXT);
         faq.setType(MessageTypeEnum.fromValue(excel.getType()).name());
-        // 
+        //
         // faq.setCategoryUid(categoryUid);
         Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
@@ -284,13 +324,13 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                     .build();
             categoryRequest.setType(CategoryTypeEnum.LLM.name());
             categoryRequest.setOrgUid(orgUid);
-            // 
+            //
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
             faq.setCategoryUid(categoryResponse.getUid());
         }
         faq.setKbUid(kbUid);
         faq.setOrgUid(orgUid);
-        // 
+        //
         return faq;
     }
 
@@ -318,7 +358,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                     cleanJson = qaPairs.substring(contentStart, contentEnd + 1);
                 }
             }
-            
+
             // Parse JSON array of QA pairs
             JSONObject jsonObject = JSON.parseObject(cleanJson);
             List<JSONObject> qaList = jsonObject.getList("qaPairs", JSONObject.class);
@@ -326,22 +366,22 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 log.warn("No QA pairs found in response");
                 return;
             }
-            
+
             for (JSONObject qa : qaList) {
                 String question = qa.getString("question");
                 String answer = qa.getString("answer");
                 // String tags = qa.getString("tags");
-                
+
                 if (StringUtils.hasText(question) && StringUtils.hasText(answer)) {
                     FaqEntity faq = FaqEntity.builder()
-                        .question(question)
-                        .answer(answer)
-                        .type(MessageTypeEnum.TEXT.name())
-                        // .tags(tags)
-                        .kbUid(kbUid)
-                        .docId(docId)
-                        .build();
-                    
+                            .question(question)
+                            .answer(answer)
+                            .type(MessageTypeEnum.TEXT.name())
+                            // .tags(tags)
+                            .kbUid(kbUid)
+                            .docId(docId)
+                            .build();
+
                     faq.setUid(uidUtils.getUid());
                     faq.setOrgUid(orgUid);
                     save(faq);
@@ -376,9 +416,9 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 // 检查FAQ是否已存在
                 if (!faqRepository.existsByUid(uid)) {
                     FaqRequest request = FaqRequest.builder()
-                        .question(faq.getQuestion())
-                        .answer(faq.getAnswer())
-                        .build();
+                            .question(faq.getQuestion())
+                            .answer(faq.getAnswer())
+                            .build();
                     request.setUid(uid);
                     request.setOrgUid(orgUid);
                     request.setKbUid(kbUid);
