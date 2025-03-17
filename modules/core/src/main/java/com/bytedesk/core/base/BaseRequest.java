@@ -91,7 +91,7 @@ public abstract class BaseRequest implements Serializable {
      * @return Pageable 分页对象
      */
     public Pageable getPageable() {
-        return PageRequest.of(pageNumber, Math.max(pageSize, 10), Sort.Direction.DESC, "updatedAt");
+        return PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, "updatedAt");
     }
 
     /**
