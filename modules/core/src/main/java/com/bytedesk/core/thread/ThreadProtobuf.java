@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 14:38:08
+ * @LastEditTime: 2025-03-17 11:42:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import java.io.Serializable;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
@@ -43,4 +44,8 @@ public class ThreadProtobuf implements Serializable {
     private UserProtobuf user;
 
     private String extra;
+
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 }
