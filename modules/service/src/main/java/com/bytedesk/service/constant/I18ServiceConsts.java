@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 10:50:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 12:19:25
+ * @LastEditTime: 2025-03-17 12:48:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,16 @@ public class I18ServiceConsts {
     public static final String I18N_TRANSFER_CANCEL_NOTICE_TITLE = I18Consts.I18N_PREFIX + "transfer.cancel.notice.title";
     // transfer cancel notice content
     public static final String I18N_TRANSFER_CANCEL_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "transfer.cancel.notice.content";
+    // exception is already in transfer pending state
+    public static final String I18N_ALREADY_IN_TRANSFER_PENDING_STATE = I18Consts.I18N_PREFIX + "already.in.transfer.pending.state";
+    // exception is already in transfer accepted state
+    public static final String I18N_ALREADY_IN_TRANSFER_ACCEPTED_STATE = I18Consts.I18N_PREFIX + "already.in.transfer.accepted.state";
+    // exception is already in transfer rejected state
+    public static final String I18N_ALREADY_IN_TRANSFER_REJECTED_STATE = I18Consts.I18N_PREFIX + "already.in.transfer.rejected.state";
+    // exception is already in transfer timeout state
+    public static final String I18N_ALREADY_IN_TRANSFER_TIMEOUT_STATE = I18Consts.I18N_PREFIX + "already.in.transfer.timeout.state";
+    // exception is already in transfer canceled state
+    public static final String I18N_ALREADY_IN_TRANSFER_CANCELED_STATE = I18Consts.I18N_PREFIX + "already.in.transfer.canceled.state";
 
 
     
