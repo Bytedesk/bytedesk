@@ -71,7 +71,6 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     @Builder.Default
     private boolean showCaptcha = false;
 
-    // 存储到thread_log方便定时关闭会话
     /** auto close time in min - 默认自动关闭时间，单位分钟 */
     @Builder.Default
     private Double autoCloseMin = Double.valueOf(25);
