@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 14:11:17
+ * @LastEditTime: 2025-03-17 17:00:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,8 +69,17 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     public Boolean isStarted() {
         // return getState().equals(ThreadStateEnum.STARTED.name());
-        // not closed && not queuing
-        return !getState().equals(ThreadStateEnum.CLOSED.name()) && !getState().equals(ThreadStateEnum.QUEUING.name());
+        return getState().equals(ThreadStateEnum.STARTED.name())
+             || getState().equals(ThreadStateEnum.TRANSFER_PENDING.name())
+             || getState().equals(ThreadStateEnum.TRANSFER_ACCEPTED.name())
+             || getState().equals(ThreadStateEnum.TRANSFER_REJECTED.name())
+             || getState().equals(ThreadStateEnum.TRANSFER_TIMEOUT.name())
+             || getState().equals(ThreadStateEnum.TRANSFER_CANCELED.name())
+             || getState().equals(ThreadStateEnum.INVITE_PENDING.name())
+             || getState().equals(ThreadStateEnum.INVITE_ACCEPTED.name())
+             || getState().equals(ThreadStateEnum.INVITE_REJECTED.name())
+             || getState().equals(ThreadStateEnum.INVITE_TIMEOUT.name())
+             || getState().equals(ThreadStateEnum.INVITE_CANCELED.name());
     }
 
     // is transfer pending
