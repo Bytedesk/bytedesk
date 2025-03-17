@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:38:54
+ * @LastEditTime: 2025-03-17 21:19:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,9 +51,40 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     @Override
     public ResponseEntity<?> queryByUser(FaqRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+        
+        Page<FaqResponse> page = faqService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
+
+    @Override
+    public ResponseEntity<?> queryByUid(FaqRequest request) {
+        
+        FaqResponse faq = faqService.queryByUid(request);
+        if (faq == null) {
+            return ResponseEntity.ok(JsonResult.error("faq not found"));
+        }
+        return ResponseEntity.ok(JsonResult.success(faq));
+    }
+
+    // up
+    @PostMapping("/up")
+    public ResponseEntity<?> rateUp(@RequestBody FaqRequest request) {
+
+        FaqResponse faq = faqService.upVote(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(faq));
+    }
+
+    // down
+    @PostMapping("/down")
+    public ResponseEntity<?> rateDown(@RequestBody FaqRequest request) {
+
+        FaqResponse faq = faqService.downVote(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(faq));
+    }
+
 
     @ActionAnnotation(title = "faq", action = "create", description = "create faq")
     @Override
@@ -118,12 +150,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return "";
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(FaqRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
+    
 
 
 }
