@@ -123,7 +123,8 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     private String autoCloseTip = I18Consts.I18N_AUTO_CLOSE_TIP;
 
-    // 
+    @Builder.Default
+    private String agentCloseTip = I18Consts.I18N_AGENT_CLOSE_TIP;
 
     // 桌面版聊天窗口右侧iframe
     @Builder.Default

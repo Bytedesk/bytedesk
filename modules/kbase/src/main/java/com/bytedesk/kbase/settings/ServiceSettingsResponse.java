@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 12:21:46
+ * @LastEditTime: 2025-03-17 22:33:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,6 +73,10 @@ public class ServiceSettingsResponse implements Serializable {
 
     /** auto close time in min - 默认自动关闭时间，单位分钟 */
     private Double autoCloseMin;
+
+    private String autoCloseTip;
+
+    private String agentCloseTip;
 
     // 桌面版聊天窗口右侧iframe
     private Boolean showRightIframe;
