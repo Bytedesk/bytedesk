@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-07 21:22:25
+ * @LastEditTime: 2025-03-17 15:55:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -101,6 +101,9 @@ public class ConvertUtils {
 
     public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
         ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
+        // 
+        UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        thr
         //
         UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
         threadResponse.setUser(user);
