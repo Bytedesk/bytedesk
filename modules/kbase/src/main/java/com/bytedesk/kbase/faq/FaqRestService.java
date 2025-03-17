@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 20:02:53
+ * @LastEditTime: 2025-03-17 20:06:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -253,6 +253,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
     public FaqResponse convertToResponse(FaqEntity entity) {
         // return modelMapper.map(entity, FaqResponse.class);
         FaqResponse response = FaqResponse.builder()
+                .uid(entity.getUid())
                 .question(entity.getQuestion())
                 .answer(entity.getAnswer())
                 .answerList(entity.getAnswerList())
@@ -272,7 +273,6 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 .kbUid(entity.getKbUid())
                 .fileUid(entity.getFileUid())
                 .docUid(entity.getDocId())
-                // .weight(entity.getWeight())
                 .build();
 
         // 处理相关问题，避免循环依赖
