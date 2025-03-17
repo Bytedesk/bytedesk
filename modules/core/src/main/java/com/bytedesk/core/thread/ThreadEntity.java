@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 11:38:03
+ * @LastEditTime: 2025-03-17 12:27:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -74,6 +74,23 @@ public class ThreadEntity extends AbstractThreadEntity {
     // is transfer pending
     public Boolean isTransferPending() {
         return getState().equals(ThreadStateEnum.TRANSFER_PENDING.name());
+    }
+
+    // is transfer accepted
+    public Boolean isTransferAccepted() {
+        return getState().equals(ThreadStateEnum.TRANSFER_ACCEPTED.name());
+    }
+
+    public Boolean isTransferRejected() {
+        return getState().equals(ThreadStateEnum.TRANSFER_REJECTED.name());
+    }
+
+    public Boolean isTransferTimeout() {
+        return getState().equals(ThreadStateEnum.TRANSFER_TIMEOUT.name());
+    }
+
+    public Boolean isTransferCanceled() {
+        return getState().equals(ThreadStateEnum.TRANSFER_CANCELED.name());
     }
 
     public Boolean isOffline() {
