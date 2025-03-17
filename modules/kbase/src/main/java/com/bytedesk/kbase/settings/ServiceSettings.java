@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 22:32:16
+ * @LastEditTime: 2025-03-17 22:39:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -210,27 +210,6 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> proactiveFaqs = new ArrayList<>();  // 主动推送的常见问题列表
-
-    // 灰度发布配置
-    // @Builder.Default
-    // @Embedded
-    // @AttributeOverrides({
-    //     @AttributeOverride(name = "enableGrayRelease", 
-    //         column = @Column(name = "gray_release_enabled")),
-    //     @AttributeOverride(name = "features", 
-    //         column = @Column(name = "gray_release_features", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)),
-    //     @AttributeOverride(name = "whitelistUsers", 
-    //         column = @Column(name = "gray_release_whitelist", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)),
-    //     @AttributeOverride(name = "grayReleasePercentage", 
-    //         column = @Column(name = "gray_release_percentage")),
-    //     @AttributeOverride(name = "startTime", 
-    //         column = @Column(name = "gray_release_start_time")),
-    //     @AttributeOverride(name = "endTime", 
-    //         column = @Column(name = "gray_release_end_time")),
-    //     @AttributeOverride(name = "status", 
-    //         column = @Column(name = "gray_release_status", length = 32))
-    // })
-    // private GrayReleaseEntity grayReleaseConfig = new GrayReleaseEntity();
 
     @NotBlank
     @Builder.Default
