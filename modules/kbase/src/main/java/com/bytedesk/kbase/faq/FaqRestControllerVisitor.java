@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 17:14:01
+ * @LastEditTime: 2025-03-17 17:47:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,17 +33,22 @@ public class FaqRestControllerVisitor {
 
     private final FaqRestService faqService;
 
+    // 输入联想搜索faq
     @GetMapping("/search")
     public ResponseEntity<?> search(FaqRequest request) {
+
         List<FaqEntity> faqList = faqService.findByQuestionContains(request.getQuestion());
+        
         return ResponseEntity.ok(JsonResult.success(faqList));
     }
 
     // 换一换faq
     @GetMapping("/change")
     public ResponseEntity<?> change(FaqRequest request) {
-        List<FaqEntity> faqList = faqService.findByQuestionContains(request.getQuestion());
-        return ResponseEntity.ok(JsonResult.success(faqList));
+
+        Page<FaqResponse> page = faqService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 15:54:47
+ * @LastEditTime: 2025-03-17 17:42:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FaqSpecification extends BaseSpecification {
 
     public static Specification<FaqEntity> search(FaqRequest request) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
