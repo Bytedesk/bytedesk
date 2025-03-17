@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:31:41
+ * @LastEditTime: 2025-03-17 18:32:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "relatedFaqs" })
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({FaqEntityListener.class})
