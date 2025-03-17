@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 17:26:17
+ * @LastEditTime: 2025-03-17 18:29:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -94,6 +94,7 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
+    // 
     private String categoryUid;
 
     private String kbUid; // 对应知识库
