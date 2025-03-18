@@ -495,15 +495,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
-    // public TicketStatistics getStatistics() {
-    // TicketStatistics stats = new TicketStatistics();
-    // stats.setTotalTickets(ticketRepository.count());
-    // stats.setOpenTickets(ticketRepository.countByStatusNot("已关闭"));
-    // stats.setClosedTickets(ticketRepository.countByStatus("已关闭"));
-    // // TODO: 计算平均解决时间和SLA违规数
-    // return stats;
-    // }
-
     @Override
     public TicketResponse convertToResponse(TicketEntity entity) {
         return TicketConvertUtils.convertToResponse(entity);
