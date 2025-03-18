@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 15:36:50
+ * @LastEditTime: 2025-03-18 16:13:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -205,27 +205,29 @@ public class FaqEntity extends BaseEntity {
      * @param vipLevel 用户VIP等级
      * @return 根据VIP等级返回的答案
      */
-    public String getAnswerForVipLevel(int vipLevel) {
+    public String getAnswerForVipLevel(String vipLevel) {
         if (answerList != null && !answerList.isEmpty()) {
             // 先查找是否有完全匹配的VIP等级答案
             for (FaqAnswer vipAnswer : answerList) {
-                if (vipAnswer.getVipLevel() == vipLevel) {
+                if (vipAnswer.getVipLevel().equalsIgnoreCase(vipLevel)) {
                     return vipAnswer.getAnswer();
                 }
             }
             
-            // 如果没有完全匹配的，查找小于用户当前等级的最高等级答案
-            FaqAnswer highestMatch = null;
-            for (FaqAnswer vipAnswer : answerList) {
-                if (vipAnswer.getVipLevel() < vipLevel && 
-                    (highestMatch == null || vipAnswer.getVipLevel() > highestMatch.getVipLevel())) {
-                    highestMatch = vipAnswer;
-                }
-            }
+            // 如果没有完全匹配的，返回默认答案answer
+            return answer;
+
+            // FaqAnswer highestMatch = null;
+            // for (FaqAnswer vipAnswer : answerList) {
+            //     if (vipAnswer.getVipLevel() < vipLevel && 
+            //         (highestMatch == null || vipAnswer.getVipLevel() > highestMatch.getVipLevel())) {
+            //         highestMatch = vipAnswer;
+            //     }
+            // }
             
-            if (highestMatch != null) {
-                return highestMatch.getAnswer();
-            }
+            // if (highestMatch != null) {
+            //     return highestMatch.getAnswer();
+            // }
         }
         
         // 如果没有找到匹配的VIP答案，返回默认答案

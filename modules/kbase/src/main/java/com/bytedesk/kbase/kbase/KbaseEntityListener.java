@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 10:16:59
+ * @LastEditTime: 2025-03-18 15:55:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,7 @@ public class KbaseEntityListener {
 
     @PostPersist
     void postPersist(KbaseEntity kbase) {
-        log.info("kbase postPersist: {}", kbase.getName());
+        // log.info("kbase postPersist: {}", kbase.getName());
         KbaseEntity clonedKbase = SerializationUtils.clone(kbase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -41,7 +41,7 @@ public class KbaseEntityListener {
     // 
     @PostUpdate
     void postUpdate(KbaseEntity kbase) {
-        log.info("kbase postUpdate: {}", kbase.getName());
+        // log.info("kbase postUpdate: {}", kbase.getName());
         KbaseEntity clonedKbase = SerializationUtils.clone(kbase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
