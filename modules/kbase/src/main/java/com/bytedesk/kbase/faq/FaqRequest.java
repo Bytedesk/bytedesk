@@ -72,8 +72,8 @@ public class FaqRequest extends BaseRequest {
     private Integer downCount = 0;
 
     // 当用户点踩的时候，是否显示转人工按钮
-    @Builder.Default
-    private Boolean downShowTransferToAgentButton = true;
+    // @Builder.Default
+    // private Boolean downShowTransferToAgentButton = true;
 
     // 会员等级
 	@Builder.Default

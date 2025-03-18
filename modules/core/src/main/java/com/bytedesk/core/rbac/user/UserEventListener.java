@@ -70,9 +70,9 @@ public class UserEventListener {
             //
             TopicRequest topicRequestOrg = TopicRequest.builder()
                     .topic(TopicUtils.getOrgTopic(user.getOrgUid()))
-                    // .userUid(user.getUid())
+                    .userUid(user.getUid())
                     .build();
-            topicRequestOrg.setUserUid(user.getUid());
+            // topicRequestOrg.setUserUid(user.getUid());
             topicCacheService.push(JSON.toJSONString(topicRequestOrg));
         }
     }

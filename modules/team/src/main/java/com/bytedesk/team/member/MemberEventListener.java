@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 11:42:42
+ * @LastEditTime: 2025-03-18 15:25:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -116,9 +116,9 @@ public class MemberEventListener {
         // 默认订阅成员主题
         TopicRequest request = TopicRequest.builder()
                 .topic(TopicUtils.formatOrgMemberTopic(member.getUid()))
-                // .userUid(user.getUid())
+                .userUid(user.getUid())
                 .build();
-            request.setUserUid(user.getUid());
+            // request.setUserUid(user.getUid());
         topicCacheService.pushRequest(request);
     }
 
