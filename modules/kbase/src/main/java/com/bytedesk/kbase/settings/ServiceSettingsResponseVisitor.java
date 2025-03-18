@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 14:27:03
+ * @LastEditTime: 2025-03-18 17:07:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -116,6 +116,21 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     // 快捷功能
     @Builder.Default
     private List<FaqResponseVisitor> shortcutFaqs = new ArrayList<>();
+
+    // 主动触发设置
+    private Boolean enableProactiveTrigger;  // 是否启用主动触发
+
+    private Integer noResponseTimeout;  // 访客无响应超时时间(秒)，默认5分钟
+
+    private String proactiveMessage;  // 主动发送的消息内容
+
+    private Integer maxProactiveCount;  // 最大主动触发次数，防止打扰用户
+
+    private Integer proactiveInterval;  // 两次主动触发的最小间隔(秒)，默认10分钟
+
+    private String triggerConditions;  // 触发条件配置，JSON格式
+
+    private List<FaqResponseVisitor> proactiveFaqs;  // 主动推送的常见问题列表
 
     @Builder.Default
     private Boolean showLogo = true;

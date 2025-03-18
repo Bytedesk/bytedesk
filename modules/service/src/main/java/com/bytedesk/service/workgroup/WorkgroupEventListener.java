@@ -75,12 +75,14 @@ public class WorkgroupEventListener {
         
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
+                .uid(uidUtils.getUid())
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_DESCRIPTION)
                 .agentUids(agentUids)
+                .orgUid(orgUid)
                 .build();
-        workgroupRequest.setUid(uidUtils.getCacheSerialUid());
-        workgroupRequest.setOrgUid(orgUid);
+        // workgroupRequest.setUid(uidUtils.getUid());
+        // workgroupRequest.setOrgUid(orgUid);
         workgroupRequest.getServiceSettings().setFaqUids(faqUids);
         workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
         workgroupRequest.getMessageLeaveSettings().setWorktimeUids(worktimeUids);
