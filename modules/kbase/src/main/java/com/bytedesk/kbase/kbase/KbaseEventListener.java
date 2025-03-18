@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 22:54:11
+ * @LastEditTime: 2025-03-18 15:28:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,8 +83,8 @@ public class KbaseEventListener {
                 List<CategoryResponse> categories = new ArrayList<>();
                 Page<ArticleResponse> articles = new PageImpl<>(
                                 Collections.emptyList(), // 空的内容列表
-                                PageRequest.of(0, 1), // 第一页，一页显示1个元素
-                                0 // 总元素数为0
+                                PageRequest.of(0, 10), // 第一页，一页显示1个元素
+                                1 // 总元素数为0
                 );
                 kbaseStaticService.toHtmlKb(kbase, categories, articles, articles, articles);
                 kbaseStaticService.toHtmlSearch(kbase);

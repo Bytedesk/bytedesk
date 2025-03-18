@@ -56,7 +56,7 @@ public class FaqResponse extends BaseResponse {
 
     private Integer downCount;
 
-    private Boolean downShowTransferToAgentButton;
+    // private Boolean downShowTransferToAgentButton;
 
     // private Boolean valid;
     private Boolean enabled;
