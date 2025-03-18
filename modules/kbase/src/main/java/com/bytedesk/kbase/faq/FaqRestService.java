@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 21:35:13
+ * @LastEditTime: 2025-03-18 15:11:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -434,23 +434,39 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         try {
             // 加载JSON文件中的FAQ数据
             FaqConfiguration config = faqJsonLoader.loadFaqs();
-            // int count = 0;
+            List<FaqAnswer> answerList = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                FaqAnswer answer = new FaqAnswer();
+                answer.setVipLevel(i);
+                answer.setAnswer("Test Answer " + i);
+            }
+            List<String> relatedFaqUids = new ArrayList<>();
+            for (int i = 5; i < 10; i++) {
+                relatedFaqUids.add(Utils.formatUid(orgUid, "faq_00" + i));
+            }
 
+            int count = 0;
             // 遍历并保存每个FAQ
             for (Faq faq : config.getFaqs()) {
                 String uid = Utils.formatUid(orgUid, faq.getUid());
                 // 检查FAQ是否已存在
                 if (!faqRepository.existsByUid(uid)) {
                     FaqRequest request = FaqRequest.builder()
+                            .uid(uid)
                             .question(faq.getQuestion())
                             .answer(faq.getAnswer())
+                            .type(MessageTypeEnum.TEXT.name())
+                            .kbUid(kbUid)
+                            .orgUid(orgUid)
                             .build();
-                    request.setUid(uid);
-                    request.setOrgUid(orgUid);
-                    request.setKbUid(kbUid);
-                    request.setType(MessageTypeEnum.TEXT.name());
+                    if (count < 5) {
+                        // 仅给前5个FAQ添加扩展
+                        request.setAnswerList(answerList);
+                        request.setRelatedFaqUids(relatedFaqUids);
+                    }
+                    // 保存FAQ到数据库
                     create(request);
-                    // count++;
+                    count++;
                 } else {
                     // log.info("FAQ already exists: {}", faq.getUid());
                 }
