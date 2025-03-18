@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 14:24:00
+ * @LastEditTime: 2025-03-18 14:38:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -414,7 +414,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 : I18Consts.I18N_AGENT_CLOSED;
         thread.setContent(content);
         if (threadRequest.getAutoClose()) {
-            // 自动关闭，根据会话类型显示提示语
+            // TODO: 自动关闭，根据会话类型显示提示语
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
 
             } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
@@ -423,7 +423,10 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 
             }
         } else {
-            // 非自动关闭，客服手动关闭，显示客服关闭提示语
+            // TODO: 非自动关闭，客服手动关闭，显示客服关闭提示语
+            // UserProtobuf agentObject = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+
+            
         }
         //
         ThreadEntity updateThread = save(thread);
