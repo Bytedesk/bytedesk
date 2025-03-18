@@ -35,7 +35,7 @@ public class MessageExtra extends BaseExtra {
 
     // 有帮助、没帮助
     @Builder.Default
-    private String helpful = MessageHelpfulEnum.HELPFUL.name();
+    private String helpful = MessageHelpfulEnum.OTHER.name();
 
     /**
      * 没有帮助的情况下，支持用户输入反馈内容 feedback
