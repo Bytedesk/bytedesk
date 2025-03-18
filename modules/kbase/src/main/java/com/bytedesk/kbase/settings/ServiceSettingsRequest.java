@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 22:32:56
+ * @LastEditTime: 2025-03-18 18:23:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import java.util.List;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,6 +55,9 @@ public class ServiceSettingsRequest  implements Serializable {
     // show rate btn on chat toolbar
     @Builder.Default
     private Boolean showRateBtn = false;
+
+    @Builder.Default
+    private Boolean autoInviteRate = false;
 
     @Builder.Default
     private Integer rateMsgCount = 3;

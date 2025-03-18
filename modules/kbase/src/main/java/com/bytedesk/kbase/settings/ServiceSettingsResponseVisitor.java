@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 17:07:05
+ * @LastEditTime: 2025-03-18 18:23:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,11 +14,8 @@
 package com.bytedesk.kbase.settings;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.faq.FaqResponseVisitor;
 
@@ -37,43 +34,33 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Builder.Default
-    private LanguageEnum language = LanguageEnum.ZH_CN;
+    private LanguageEnum language;
 
-    @Builder.Default
-    private Boolean autoPopup = false;
+    private Boolean autoPopup;
 
-    @Builder.Default
-    private Boolean showTopTip = false;
+    private Boolean showTopTip;
 
-    @Builder.Default
-    private String topTip = I18Consts.I18N_TOP_TIP;
+    private String topTip;
 
-    @Builder.Default
-    private Boolean showRateBtn = false;
+    private Boolean showRateBtn;
 
-    @Builder.Default
-    private int rateMsgCount = 3;
+    private Boolean autoInviteRate;
 
-    @Builder.Default
-    private Boolean showPreForm = false;
+    private Integer rateMsgCount;
 
-    @Builder.Default
-    private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
+    private Boolean showPreForm;
 
-    @Builder.Default
-    private Boolean showHistory = false;
+    private String preForm;
+
+    private Boolean showHistory;
 
     // 输入联想开关
-    @Builder.Default
-    private Boolean showInputAssociation = false;
+    private Boolean showInputAssociation;
 
-    @Builder.Default
-    private boolean showCaptcha = false;
+    private Boolean showCaptcha;
 
     /** auto close time in min - 默认自动关闭时间，单位分钟 */
-    @Builder.Default
-    private Double autoCloseMin = Double.valueOf(25);
+    private Double autoCloseMin;
 
     // 桌面版聊天窗口右侧iframe
     private Boolean showRightIframe;
@@ -85,37 +72,31 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private Boolean showPreSearch;
 
     // 欢迎问题
-    @Builder.Default
-    private List<FaqResponseVisitor> welcomeFaqs = new ArrayList<>();
+    private List<FaqResponseVisitor> welcomeFaqs;
 
-    @Builder.Default
-    private Boolean showFaqs = true;
-    @Builder.Default
-    private List<FaqResponseVisitor> faqs = new ArrayList<>();
+    private Boolean showFaqs;
 
-    @Builder.Default
-    private Boolean showQuickFaqs = true;
+    private List<FaqResponseVisitor> faqs;
+
+    private Boolean showQuickFaqs;
+
     // 快捷问题
-    @Builder.Default
-    private List<FaqResponseVisitor> quickFaqs = new ArrayList<>();
+    private List<FaqResponseVisitor> quickFaqs;
     //
-    @Builder.Default
-    private Boolean showGuessFaqs = true;
+    private Boolean showGuessFaqs;
+    
     // 猜你想问
-    @Builder.Default
-    private List<FaqResponseVisitor> guessFaqs = new ArrayList<>();
+    private List<FaqResponseVisitor> guessFaqs;
     //
-    @Builder.Default
-    private Boolean showHotFaqs = true;
+    private Boolean showHotFaqs;
+
     // 热门问题
-    @Builder.Default
-    private List<FaqResponseVisitor> hotFaqs = new ArrayList<>();
+    private List<FaqResponseVisitor> hotFaqs;
     //
-    @Builder.Default
-    private Boolean showShortcutFaqs = true;
+    private Boolean showShortcutFaqs;
+
     // 快捷功能
-    @Builder.Default
-    private List<FaqResponseVisitor> shortcutFaqs = new ArrayList<>();
+    private List<FaqResponseVisitor> shortcutFaqs;
 
     // 主动触发设置
     private Boolean enableProactiveTrigger;  // 是否启用主动触发
@@ -132,8 +113,7 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private List<FaqResponseVisitor> proactiveFaqs;  // 主动推送的常见问题列表
 
-    @Builder.Default
-    private Boolean showLogo = true;
+    private Boolean showLogo;
 
     // robot
     // 是否允许转人工
