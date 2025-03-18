@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 21:49:32
+ * @LastEditTime: 2025-03-18 12:27:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,8 @@ package com.bytedesk.kbase.faq;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -33,13 +35,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 public class FaqRestControllerVisitor {
 
-    private final FaqRestService faqService;
+    private final FaqRestService faqRestService;
+
+    private final MessageRestService messageRestService;
 
     // 输入联想搜索faq
     @GetMapping("/search")
     public ResponseEntity<?> search(FaqRequest request) {
 
-        List<FaqEntity> faqList = faqService.findByQuestionContains(request.getQuestion());
+        List<FaqEntity> faqList = faqRestService.findByQuestionContains(request.getQuestion());
         
         return ResponseEntity.ok(JsonResult.success(faqList));
     }
@@ -48,7 +52,7 @@ public class FaqRestControllerVisitor {
     @GetMapping("/change")
     public ResponseEntity<?> change(FaqRequest request) {
 
-        Page<FaqResponse> page = faqService.queryByOrg(request);
+        Page<FaqResponse> page = faqRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -57,7 +61,7 @@ public class FaqRestControllerVisitor {
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(FaqRequest request) {
         
-        FaqResponse faq = faqService.queryByUid(request);
+        FaqResponse faq = faqRestService.queryByUid(request);
         if (faq == null) {
             return ResponseEntity.ok(JsonResult.error("faq not found"));
         }
@@ -68,7 +72,7 @@ public class FaqRestControllerVisitor {
     @PostMapping("/rate/up")
     public ResponseEntity<?> rateUp(@RequestBody FaqRequest request) {
 
-        FaqResponse faq = faqService.rateUp(request.getUid());
+        FaqResponse faq = faqRestService.rateUp(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success(faq));
     }
@@ -77,9 +81,27 @@ public class FaqRestControllerVisitor {
     @PostMapping("/rate/down")
     public ResponseEntity<?> rateDown(@RequestBody FaqRequest request) {
 
-        FaqResponse faq = faqService.rateDown(request.getUid());
+        FaqResponse faq = faqRestService.rateDown(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success(faq));
+    }
+
+    // rate message helpful
+    @PostMapping("/rate/message/helpful")
+    public ResponseEntity<?> rateMessageHelpful(@RequestBody FaqRequest request) {
+
+        MessageResponse message = messageRestService.rateUp(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(message));
+    }
+
+    // rate message not helpful
+    @PostMapping("/rate/message/unhelpful")
+    public ResponseEntity<?> rateMessageNotHelpful(@RequestBody FaqRequest request) {
+        
+        MessageResponse message = messageRestService.rateDown(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(message));
     }
 
     // comment faq

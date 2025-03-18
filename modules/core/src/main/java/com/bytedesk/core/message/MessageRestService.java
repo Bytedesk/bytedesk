@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 11:01:05
+ * @LastEditTime: 2025-03-18 12:26:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -70,6 +71,46 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
     public Optional<MessageEntity> findByUid(String uid) {
         return messageRepository.findByUid(uid);
+    }
+
+    // rate message extra helpful
+    public MessageResponse rateUp(String uid) {
+        Optional<MessageEntity> messageOptional = messageRepository.findByUid(uid);
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            // message.setHelpful(true);
+            MessageExtra messageExtra = JSON.parseObject(message.getExtra(), MessageExtra.class);
+            messageExtra.setHelpful(MessageHelpfulEnum.HELPFUL.name());
+            message.setExtra(JSON.toJSONString(messageExtra));
+            // 
+            MessageEntity savedMessage = save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
+            }
+            // 
+            return ConvertUtils.convertToMessageResponse(message);
+        }
+        return null;
+    }
+
+    // rate message extra unhelpful
+    public MessageResponse rateDown(String uid) {
+        Optional<MessageEntity> optionalMessage = findByUid(uid);
+        if (optionalMessage.isPresent()) {
+            MessageEntity message = optionalMessage.get();
+            // message.setHelpful(false);
+            MessageExtra messageExtra = JSON.parseObject(message.getExtra(), MessageExtra.class);
+            messageExtra.setHelpful(MessageHelpfulEnum.UNHELPFUL.name());
+            message.setExtra(JSON.toJSONString(messageExtra));
+            // 
+            MessageEntity savedMessage = save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
+            }
+            //
+            return ConvertUtils.convertToMessageResponse(message);
+        }
+        return null;
     }
 
     @Override
