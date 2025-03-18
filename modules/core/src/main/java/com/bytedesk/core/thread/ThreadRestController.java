@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 14:41:32
+ * @LastEditTime: 2025-03-18 22:47:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,6 +112,33 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     public ResponseEntity<?> update(@RequestBody ThreadRequest request) {
 
         ThreadResponse threadResponse = threadService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
+    // update top
+    @PostMapping("/update/top")
+    public ResponseEntity<?> updateTop(@RequestBody ThreadRequest request) {
+
+        ThreadResponse thread = threadService.updateTop(request);
+
+        return ResponseEntity.ok(JsonResult.success(thread));
+    }
+
+    // update star
+    @PostMapping("/update/star")
+    public ResponseEntity<?> updateStar(@RequestBody ThreadRequest request) {
+
+        ThreadResponse threadResponse = threadService.updateStar(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
+    // update mute
+    @PostMapping("/update/mute")
+    public ResponseEntity<?> updateMute(@RequestBody ThreadRequest request) {
+
+        ThreadResponse threadResponse = threadService.updateMute(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
