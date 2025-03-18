@@ -299,6 +299,8 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 .kbUid(entity.getKbUid())
                 .fileUid(entity.getFileUid())
                 .docUid(entity.getDocId())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
 
         // 处理相关问题，避免循环依赖
@@ -472,7 +474,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             List<FaqAnswer> answerList = new ArrayList<>();
             for (int i = 1; i <= 5; i++) {
                 FaqAnswer answer = new FaqAnswer();
-                answer.setVipLevel(i);
+                answer.setVipLevel("" + i);
                 answer.setAnswer("VIP " + i + " 专属回答：这是针对不同会员等级的答案示例");
                 answerList.add(answer);
             }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-10 17:41:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 14:50:34
+ * @LastEditTime: 2025-03-18 16:11:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 public class FaqAnswer {
     
     // VIP等级，会员等级，千人千面，根据用户等级显示不同答案
-    private int vipLevel;
+    private String vipLevel;
     
     // 针对该VIP等级的答案内容
     private String answer;
