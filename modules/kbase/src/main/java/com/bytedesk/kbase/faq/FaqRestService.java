@@ -481,7 +481,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             
             // 准备5个相关问题的UID列表
             List<String> relatedFaqUids = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
+            for (int i = 5; i < 10; i++) {
                 String relatedUid = Utils.formatUid(orgUid, "faq_00" + i);
                 relatedFaqUids.add(relatedUid);
             }
@@ -501,7 +501,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                         .build();
                 
                 // 为部分FAQ添加多答案和相关问题
-                if (count > 5) {
+                if (count < 5) {
                     request.setAnswerList(answerList);
                     request.setRelatedFaqUids(relatedFaqUids);
                 }
