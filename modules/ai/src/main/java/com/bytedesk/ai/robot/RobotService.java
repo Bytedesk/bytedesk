@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:46:54
+ * @LastEditTime: 2025-03-19 16:27:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;
+import com.bytedesk.ai.springai.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -52,6 +53,7 @@ public class RobotService {
     private final Optional<SpringAIZhipuaiService> springAIZhipuaiService;
     private final Optional<SpringAIDashscopeService> springAIDashscopeService;
     private final Optional<SpringAIOllamaService> springAIOllamaService;
+    private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
 
     private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
@@ -109,6 +111,9 @@ public class RobotService {
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.ZHIPU)) {
             springAIZhipuaiService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.SILICONFLOW)) {
+            springAISiliconFlowService
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else {
             springAIZhipuaiService
