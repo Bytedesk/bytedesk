@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:02:19
+ * @LastEditTime: 2025-03-19 15:26:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,7 +71,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
     private final QueueMemberRestService queueMemberRestService;
 
     private final MessageRestService messageRestService;
-    
+
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
         return createAgentCsThread(visitorRequest);
@@ -93,8 +93,8 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
             throw new RuntimeException("Agent uid " + agentUid + " not found");
         }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
-        if (threadOptional.isPresent() ) {
-            // 
+        if (threadOptional.isPresent()) {
+            //
             if (threadOptional.get().isStarted()) {
                 thread = threadOptional.get();
                 // 重新初始化会话额外信息，例如客服状态等
@@ -106,20 +106,23 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getAgentQueuingMessage(visitorRequest, thread);
+            } else if (threadOptional.get().isOffline()) {
+                thread = threadOptional.get();
+                // 返回离线状态的会话
+                return getAgentContinueMessage(visitorRequest, thread);
             }
-            //  else {
-            //     // 关闭或者离线状态，返回初始化状态的会话
-            //     thread = thread.reInit(false);
+            // else {
+            // // 关闭或者离线状态，返回初始化状态的会话
+            // thread = thread.reInit(false);
             // }
         }
-        // 
+        //
         if (thread == null) {
             // 不存在会话，创建会话
             thread = visitorThreadService.createAgentThread(visitorRequest, agent, topic);
             // 重新初始化会话额外信息，例如客服状态等
             thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
         }
-
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
         log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getQueueNickname());
@@ -142,12 +145,16 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // return routeToAgent(visitorRequest, thread, agent);
     }
 
-    private MessageProtobuf handleAvailableAgent(ThreadEntity thread, AgentEntity agent,
+    private MessageProtobuf handleAvailableAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
-        Assert.notNull(thread, "ThreadEntity must not be null");
+        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
         Assert.notNull(agent, "AgentEntity must not be null");
         Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
-        
+
+        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+        ThreadEntity thread = threadOptional.get();
+
         // 未满则接待
         thread.setStarted();
         thread.setUnreadCount(1);
@@ -170,8 +177,13 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf handleQueuedAgent(ThreadEntity thread, AgentEntity agent,
+    private MessageProtobuf handleQueuedAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
+        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+
+        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+        ThreadEntity thread = threadOptional.get();
         // 已满则排队
         // String queueTip = agent.getQueueSettings().getQueueTip();
         String content = "";
@@ -198,8 +210,14 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf handleOfflineAgent(ThreadEntity thread, AgentEntity agent,
+    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
+        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+
+        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+        ThreadEntity thread = threadOptional.get();
+
         // 客服离线或小休不接待状态，则进入留言
         thread.setOffline();
         thread.setUnreadCount(0);
@@ -217,7 +235,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         return messageProtobuf;
     }
 
-
     private MessageProtobuf getAgentContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
@@ -233,7 +250,5 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         //
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
-
-    
 
 }
