@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 20:01:25
+ * @LastEditTime: 2025-03-19 21:50:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 // import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -72,7 +73,7 @@ public class TicketService {
     private final AgentRestService agentRestService;
     // private final ApplicationEventPublisher eventPublisher;
     private final TicketRestService ticketRestService;
-    // private final ThreadRestService threadRestService;
+    private final ThreadRestService threadRestService;
 
     /**
      * 查询工单，并过滤掉没有任务的工单
@@ -381,8 +382,18 @@ public class TicketService {
                 // }
             }
             
-            // TODO: 将claimer添加到会话中
-            
+            // 将claimer添加到会话中
+            Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
+            if (threadOptional.isPresent()) {
+                ThreadEntity thread = threadOptional.get();
+                // 添加claimer到会话中
+                thread.getTicketors().add(assigneeJson);
+                // 保存
+                threadRestService.save(thread);
+                // 同步到ticket
+                String acceptUserUid = acceptAgentOptional.get().getUserUid();
+                topicService.create(threadEntity.getTopic(), acceptUserUid);
+            }
             
             // 6. 发布工单分配消息事件
             // 此处没有使用ticket自带消息机制，便于扩展
