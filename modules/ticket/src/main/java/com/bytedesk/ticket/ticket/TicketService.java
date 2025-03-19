@@ -369,8 +369,8 @@ public class TicketService {
             // 5. 创建工单会话
             // serviceThreadTopic跟threadUid合并
             ThreadEntity thread = null;
-            if (StringUtils.hasText(request.getThreadUid())) {
-                Optional<ThreadEntity> threadOptional = threadRestService.findByUid(request.getThreadUid());
+            if (StringUtils.hasText(ticket.getThreadUid())) {
+                Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
                 if (threadOptional.isPresent()) {
                     thread = threadOptional.get();
                 } else {

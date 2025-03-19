@@ -97,6 +97,9 @@ public class ThreadResponse extends BaseResponse {
     // assistants: monitoring agent、quality check agent、robot agent
     private List<UserProtobuf> assistants;
 
+    // ticket observers
+    private List<UserProtobuf> ticketors;
+
     private UserProtobuf user;
     //
     private UserProtobuf owner;

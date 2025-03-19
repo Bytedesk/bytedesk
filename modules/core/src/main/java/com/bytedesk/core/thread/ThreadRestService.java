@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:29:15
+ * @LastEditTime: 2025-03-19 18:44:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -181,7 +181,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .type(ThreadTypeEnum.ASSISTANT.name())
                 .topic(topic)
                 .unreadCount(0)
-                .state(ThreadStateEnum.STARTED.name())
+                .state(ThreadStateEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
@@ -251,7 +251,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .type(ThreadTypeEnum.CHANNEL.name())
                 .topic(topic)
                 .unreadCount(0)
-                .state(ThreadStateEnum.STARTED.name())
+                .state(ThreadStateEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
