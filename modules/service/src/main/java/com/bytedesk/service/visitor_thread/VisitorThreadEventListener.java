@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 09:16:22
+ * @LastEditTime: 2025-03-19 09:35:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,7 +105,6 @@ public class VisitorThreadEventListener {
                 } else {
                     content = I18Consts.I18N_AUTO_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
                 }
-                
             } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
                 String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
                 Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
@@ -118,13 +117,24 @@ public class VisitorThreadEventListener {
             }
         } else {
             // 非自动关闭，客服手动关闭，显示客服关闭提示语
-            String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
-            Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-            if (agentOptional.isPresent()) {
-                AgentEntity agent = agentOptional.get();
-                content = agent.getServiceSettings().getAgentCloseTip();
-            } else {
-                content = I18Consts.I18N_AGENT_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
+            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
+                Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+                if (workgroupOptional.isPresent()) {
+                    WorkgroupEntity workgroup = workgroupOptional.get();
+                    content = workgroup.getServiceSettings().getAgentCloseTip();
+                } else {
+                    content = I18Consts.I18N_AGENT_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
+                }
+            } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
+                String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
+                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+                if (agentOptional.isPresent()) {
+                    AgentEntity agent = agentOptional.get();
+                    content = agent.getServiceSettings().getAgentCloseTip();
+                } else {
+                    content = I18Consts.I18N_AGENT_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
+                }
             }
         }
 
