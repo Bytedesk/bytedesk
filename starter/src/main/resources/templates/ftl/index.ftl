@@ -54,7 +54,7 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="http://www.weikefu.net" class="stretched-link" target="_blank">在线客服</a></h5>
-					<span class="mb-0">支持人工坐席兜底，AI客服助手，AI意图识别，AI智能质检等数十项在线客服通用功能。
+					<span class="mb-0">AI客服助手，AI意图识别，AI智能质检、支持人工坐席兜底，数十项在线客服通用功能。
 						来自<a href="http://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
 					</span>
 				</div>
@@ -69,7 +69,7 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="#" class="stretched-link">AI助手</a></h5>
-					<span class="mb-0">对接Ollama/DeepSeek/智谱等大模型，支持私有部署/Api调用大模型.</span>
+					<span class="mb-0">对接Ollama/DeepSeek/智谱/Qwen通义千问等大模型，支持私有部署/Api调用大模型.</span>
 				</div>
 			</div>
 
@@ -82,7 +82,7 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="#" class="stretched-link">企业知识库/帮助中心</a></h5>
-					<span class="mb-0">AI写作助手，AI知识库问答，自动撰写内容，内部知识库管理、文档管理、对外知识库、帮助文档、内容公告</span>
+					<span class="mb-0">内部客服中心，AI写作助手，AI知识库问答，自动撰写内容，内部知识库管理、文档管理、对外知识库、帮助文档、内容公告</span>
 				</div>
 			</div>
 

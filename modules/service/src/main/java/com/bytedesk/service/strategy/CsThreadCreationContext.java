@@ -24,11 +24,14 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 创建新策略：
  * 1. 创建一个策略接口，定义创建线程的方法
  * 2. 按照此格式命名策略：ThreadTypeEnum.**.name() + CsThreadStrategy
  */
+@Slf4j
 @Component
 public class CsThreadCreationContext {
     
@@ -41,6 +44,7 @@ public class CsThreadCreationContext {
         for (CsThreadCreationStrategy strategy : strategies) {
             // 假设每个策略类都有一个与之对应的Bean名称，可以通过Bean名称和枚举值进行匹配。
             // 在实际应用中，可能需要其他机制来确保策略与枚举的正确匹配。
+            log.info("strategy: {}", strategy.getClass().getAnnotation(Component.class).value());
             String beanName = strategy.getClass().getAnnotation(Component.class).value();
             ThreadTypeEnum type = ThreadTypeEnum.valueOf(beanName.toUpperCase().replace("CSTHREADSTRATEGY", ""));
             strategyMap.put(type, strategy);
