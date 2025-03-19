@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 13:04:55
+ * @LastEditTime: 2025-03-19 15:03:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -141,18 +141,22 @@ public class VisitorThreadService
 
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
+        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        // thread.setUser(visitor);
+
         ThreadEntity thread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.AGENT.name())
+                .owner(agent.getMember().getUser())
+                .user(visitor)
                 .client(visitorRequest.getClient())
+                .orgUid(agent.getOrgUid())
                 .build();
-        thread.setUid(uidUtils.getUid());
+        // thread.setUid(uidUtils.getUid());
         //
-        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
-        thread.setUser(visitor);
-        //
-        thread.setOwner(agent.getMember().getUser());
-        thread.setOrgUid(agent.getOrgUid());
+        // thread.setOwner(agent.getMember().getUser());
+        // thread.setOrgUid(agent.getOrgUid());
         threadRestService.save(thread);
         //
         return thread;
@@ -173,18 +177,21 @@ public class VisitorThreadService
     }
 
     public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
+        // 
+        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         //
         ThreadEntity thread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.ROBOT.name())
                 .state(ThreadStateEnum.STARTED.name())
+                .user(visitor)
                 .client(visitorRequest.getClient())
+                .orgUid(robot.getOrgUid())
                 .build();
-        thread.setUid(uidUtils.getUid());
-        thread.setOrgUid(robot.getOrgUid());
-        //
-        UserProtobuf visitor = ServiceConvertUtils.convertToUserProtobuf(visitorRequest);
-        thread.setUser(JSON.toJSONString(visitor));
+        // thread.setUid(uidUtils.getUid());
+        // thread.setOrgUid(robot.getOrgUid());
+        // thread.setUser(visitor);
         threadRestService.save(thread);
         //
         return thread;
