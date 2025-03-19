@@ -15,8 +15,17 @@
     <version>${revision}</version>
 
     <modules>
+        <!-- <module>appoint</module> -->
+        <!-- <module>backup</module> -->
+        <!-- <module>calendar</module> -->
+        <!-- <module>elearning</module> -->
+        <!-- <module>note</module> -->
+        <!-- <module>pdf</module> -->
+        <module>remote</module>
+        <!-- <module>socialhub</module> -->
+        <!-- <module>form</module> -->
         <module>kanban</module>
-        <!-- <module>remote</module> -->
+
     </modules>
 
     <dependencies>
@@ -69,11 +78,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-rest</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -136,7 +145,51 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.bytedesk</groupId>
+            <artifactId>bytedesk-module-kbase</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedesk</groupId>
+            <artifactId>bytedesk-module-ai</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedesk</groupId>
+            <artifactId>bytedesk-module-service</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedesk</groupId>
+            <artifactId>bytedesk-module-team</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- <dependency>
+            <groupId>com.bytedesk</groupId>
+            <artifactId>bytedesk-module-social</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency> -->
+
         <!-- //////////////////////////////////第三方模块/////////////////////////////////////////// -->
+
+        <!-- export excel -->
+        <!-- https://mvnrepository.com/artifact/com.alibaba/easyexcel -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!--  -->
         <!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
@@ -149,14 +202,22 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+        <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-openapi3-jakarta-spring-boot-starter -->
         <dependency>
-            <groupId>org.springdoc</groupId>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>4.5.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+        <!-- <dependency> -->
+            <!-- <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version>
+            <version>2.6.0</version> -->
             <!-- 添加provided会报错 -->
             <!-- <scope>provided</scope> -->
-        </dependency>
+        <!-- </dependency> -->
 
         <!-- FIXME: not working? https://docs.spring.io/spring-data/rest/reference/tools.html -->
         <!-- <dependency>
