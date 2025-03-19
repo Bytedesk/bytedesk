@@ -22,7 +22,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
+/**
+ * @author: https://github.com/fzj111
+ * date: 2025-03-19
+ */
 @Configuration
 @ConditionalOnProperty(name = "spring.ai.siliconflow.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAISiliconFlowConfig {

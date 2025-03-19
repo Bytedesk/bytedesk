@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 16:29:18
+ * @LastEditTime: 2025-03-19 16:37:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** 
+ * @author https://github.com/fzj111
+ * date: 2025-03-19
+ * 
  * siliconFlow
  * https://docs.spring.io/spring-ai/reference/api/chat/siliconFlow-chat.html#chat-options
  * 参考：
