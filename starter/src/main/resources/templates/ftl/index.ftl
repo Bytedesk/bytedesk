@@ -26,7 +26,7 @@ Listed course START -->
 		<div class="row mb-4">
 			<div class="col-lg-8 mx-auto text-center">
 				<h2>微语开源套件：八合一</h2>
-				<p class="mb-0">开源、免费，所有数据存储在您自己的服务器上</p>
+				<p class="mb-0">开源、免费，私有部署，所有数据存储在您自己的服务器上</p>
 			</div>
 		</div>
 
