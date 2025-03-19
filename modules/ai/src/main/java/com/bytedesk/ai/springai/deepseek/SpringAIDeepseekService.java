@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:36:08
+ * @LastEditTime: 2025-03-19 10:30:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
+import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -50,9 +51,10 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             IMessageSendService messageSendService,
             UidUtils uidUtils,
             RobotRestService robotRestService,
-            ThreadRestService threadRestService, 
+            ThreadRestService threadRestService,
             MessagePersistCache messagePersistCache) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService, messagePersistCache);
+        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
+                messagePersistCache);
         this.deepSeekChatModel = deepSeekChatModel;
 
     }
@@ -120,16 +122,18 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                                             log.info("DeepSeek API response metadata: {}, text {}",
                                                     response.getMetadata(), textContent);
                                             //
-                                            messageProtobuf.setContent(textContent);
-                                            messageProtobuf.setType(MessageTypeEnum.STREAM);
-                                            // 保存消息到数据库
-                                            String messageJson = JSON.toJSONString(messageProtobuf);
-                                            persistMessage(messageJson);
-                                            // 发送SSE事件
-                                            emitter.send(SseEmitter.event()
-                                                    .data(messageJson)
-                                                    .id(messageProtobuf.getUid())
-                                                    .name("message"));
+                                            if (StringUtils.hasValue(textContent)) {
+                                                messageProtobuf.setContent(textContent);
+                                                messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                                // 保存消息到数据库
+                                                String messageJson = JSON.toJSONString(messageProtobuf);
+                                                persistMessage(messageJson);
+                                                // 发送SSE事件
+                                                emitter.send(SseEmitter.event()
+                                                        .data(messageJson)
+                                                        .id(messageProtobuf.getUid())
+                                                        .name("message"));
+                                            }
                                         }
                                     }
                                 } catch (Exception e) {
@@ -213,5 +217,4 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         return deepSeekChatModel;
     }
 
-    
 }

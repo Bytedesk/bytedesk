@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:35:22
+ * @LastEditTime: 2025-03-19 10:28:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
+import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -133,17 +134,19 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("Zhipuai API response metadata: {}, text {}", response.getMetadata(),
                                         textContent);
-                                //
-                                messageProtobuf.setContent(textContent);
-                                messageProtobuf.setType(MessageTypeEnum.STREAM);
-                                // 保存消息到数据库
-                                String messageJson = JSON.toJSONString(messageProtobuf);
-                                persistMessage(messageJson);
-                                // 发送SSE事件
-                                emitter.send(SseEmitter.event()
-                                        .data(messageJson)
-                                        .id(messageProtobuf.getUid())
-                                        .name("message"));
+                                // 判断textContent是否为null
+                                if (StringUtils.hasValue(textContent)) {
+                                    messageProtobuf.setContent(textContent);
+                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                    // 保存消息到数据库
+                                    String messageJson = JSON.toJSONString(messageProtobuf);
+                                    persistMessage(messageJson);
+                                    // 发送SSE事件
+                                    emitter.send(SseEmitter.event()
+                                            .data(messageJson)
+                                            .id(messageProtobuf.getUid())
+                                            .name("message"));
+                                }
                             }
                         }
                     } catch (Exception e) {

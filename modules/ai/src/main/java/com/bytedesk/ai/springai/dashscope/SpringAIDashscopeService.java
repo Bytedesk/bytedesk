@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:35:45
+ * @LastEditTime: 2025-03-19 10:31:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
+import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -58,9 +59,10 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
             MeterRegistry registry,
             UidUtils uidUtils,
             RobotRestService robotRestService,
-            ThreadRestService threadRestService, 
+            ThreadRestService threadRestService,
             MessagePersistCache messagePersistCache) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService, messagePersistCache);
+        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
+                messagePersistCache);
 
         // this.bytedeskDashScopeChatModel = bytedeskDashScopeChatModel;
         this.bytedeskDashScopeChatClient = bytedeskDashScopeChatClient;
@@ -136,16 +138,19 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                             textContent -> {
                                 try {
                                     //
-                                    messageProtobuf.setContent(textContent);
-                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
-                                    // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
-                                    // 发送SSE事件
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobuf.getUid())
-                                            .name("message"));
+                                    log.info("DashScope API response  text {}", textContent);
+                                    if (StringUtils.hasValue(textContent)) {
+                                        messageProtobuf.setContent(textContent);
+                                        messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                        // 保存消息到数据库
+                                        String messageJson = JSON.toJSONString(messageProtobuf);
+                                        persistMessage(messageJson);
+                                        // 发送SSE事件
+                                        emitter.send(SseEmitter.event()
+                                                .data(messageJson)
+                                                .id(messageProtobuf.getUid())
+                                                .name("message"));
+                                    }
                                 } catch (Exception e) {
                                     log.error("Error sending SSE event", e);
                                     messageProtobuf.setType(MessageTypeEnum.ERROR);
