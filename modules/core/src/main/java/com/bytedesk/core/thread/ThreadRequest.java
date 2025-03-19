@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 14:40:08
+ * @LastEditTime: 2025-03-19 19:31:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -115,6 +115,10 @@ public class ThreadRequest extends BaseRequest {
     // assistants: monitoring agent、quality check agent、robot agent
     @Builder.Default
     private List<String> assistantUids = new ArrayList<>();
+
+    // ticketors: ticket observers
+    @Builder.Default
+    private List<String> ticketorUids = new ArrayList<>();
 
     // group member uids
     @Builder.Default
