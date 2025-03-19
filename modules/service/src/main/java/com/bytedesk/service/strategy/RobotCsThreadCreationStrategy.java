@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 23:45:13
+ * @LastEditTime: 2025-03-19 13:46:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,20 +13,31 @@
  */
 package com.bytedesk.service.strategy;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.service.routing.RouteService;
+import com.bytedesk.service.queue.QueueService;
+import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
-
 import jakarta.annotation.Nonnull;
 
 import com.bytedesk.core.thread.ThreadEntity;
@@ -45,7 +56,16 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final VisitorThreadService visitorThreadService;
 
-    private final RouteService routeService;
+    // private final RouteService routeService;
+    private final QueueService queueService;
+
+    private final QueueMemberRestService queueMemberRestService;;
+
+    // private final MessageRestService messageRestService;
+
+    // private final WorkgroupRoutingService workgroupRoutingService;
+
+    private final RobotRestService robotRestService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -79,8 +99,58 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         }
         thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
 
-        return routeService.routeToRobot(visitorRequest, thread, robot);
+        // return routeService.routeToRobot(visitorRequest, thread, robot);
+        return routeToRobot(visitorRequest, thread, robot);
     }
+
+    @Transactional
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 200))
+    public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity threadFromRequest,
+            @Nonnull RobotEntity robot) {
+        try {
+            Assert.notNull(request, "VisitorRequest must not be null");
+            Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+            Assert.notNull(robot, "RobotEntity must not be null");
+            Assert.hasText(threadFromRequest.getUid(), "Thread UID must not be empty");
+
+            // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
+            Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+            Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+            
+            ThreadEntity thread = threadOptional.get();
+            // 排队计数
+            QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
+            log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+
+            // 更新线程状态
+            thread.setState(ThreadStateEnum.ROBOT.name());
+            thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
+            thread.setContent(robot.getServiceSettings().getWelcomeTip());
+            thread.setRobot(true);
+            thread.setUnreadCount(0);
+            // ThreadEntity savedThread =
+            threadService.save(thread);
+
+            // 增加接待数量
+            robot.increaseThreadCount();
+            robotRestService.save(robot);
+
+            // 更新排队状态
+            queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+            queueMemberEntity.setAcceptTime(LocalDateTime.now());
+            queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+            queueMemberRestService.save(queueMemberEntity);
+
+            return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn("Optimistic locking failure while routing to robot, retrying...", e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Error while routing to robot: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to route to robot", e);
+        }
+    }
+
 
     private MessageProtobuf getRobotContinueMessage(RobotEntity robot, @Nonnull ThreadEntity thread) {
         //
