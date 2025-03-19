@@ -153,9 +153,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 //
                 String userJson = BytedeskConsts.EMPTY_JSON_STRING;
                 // 使用在线客服工单会话user info
-                if (StringUtils.hasText(request.getServiceThreadTopic())) {
-                    String serviceThreadTopic = request.getServiceThreadTopic();
-                    Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+                if (StringUtils.hasText(request.getThreadUid())) {
+                    String threadUid = request.getThreadUid();
+                    Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
                     if (serviceThreadOptional.isPresent()) {
                         userJson = serviceThreadOptional.get().getUser();
                         ticket.setUser(userJson);
@@ -167,9 +167,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
             String userJson = BytedeskConsts.EMPTY_JSON_STRING;
             // 使用在线客服工单会话user info
-            if (StringUtils.hasText(request.getServiceThreadTopic())) {
-                String serviceThreadTopic = request.getServiceThreadTopic();
-                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+            if (StringUtils.hasText(request.getThreadUid())) {
+                String threadUid = request.getThreadUid();
+                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
                 if (serviceThreadOptional.isPresent()) {
                     userJson = serviceThreadOptional.get().getUser();
                     ticket.setUser(userJson);
@@ -336,9 +336,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (ticket.getType().equals(TicketTypeEnum.AGENT.name())) {
             topic = TopicUtils.formatOrgAgentTicketThreadTopic(ticket.getAssignee().getUid(), ticket.getUid());
             // 使用在线客服工单会话user info
-            if (StringUtils.hasText(ticket.getServiceThreadTopic())) {
-                String serviceThreadTopic = ticket.getServiceThreadTopic();
-                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+            if (StringUtils.hasText(ticket.getThreadUid())) {
+                String threadUid = ticket.getThreadUid();
+                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
                 if (serviceThreadOptional.isPresent()) {
                     visitorJson = serviceThreadOptional.get().getUser();
                 }
@@ -355,9 +355,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         } else if (ticket.getType().equals(TicketTypeEnum.WORKGROUP.name())) {
             topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getWorkgroup().getUid(), ticket.getUid());
             // 使用在线客服工单会话user info
-            if (StringUtils.hasText(ticket.getServiceThreadTopic())) {
-                String serviceThreadTopic = ticket.getServiceThreadTopic();
-                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findFirstByTopic(serviceThreadTopic);
+            if (StringUtils.hasText(ticket.getThreadUid())) {
+                String threadUid = ticket.getThreadUid();
+                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
                 if (serviceThreadOptional.isPresent()) {
                     visitorJson = serviceThreadOptional.get().getUser();
                 } else {
