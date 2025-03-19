@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 14:19:34
+ * @LastEditTime: 2025-03-19 14:50:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,12 +68,12 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
     }
 
     // 机器人对话，不支持转人工
-    public MessageProtobuf createRobotCsThread(VisitorRequest visitorRequest) {
-        String robotUid = visitorRequest.getSid();
+    public MessageProtobuf createRobotCsThread(VisitorRequest request) {
+        String robotUid = request.getSid();
         RobotEntity robot = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
-        String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), request.getUid());
         //
         ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
@@ -86,12 +86,12 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
             return getRobotContinueMessage(robot, thread);
         } else {
-            thread = visitorThreadService.createRobotThread(visitorRequest, robot, topic);
+            thread = visitorThreadService.createRobotThread(request, robot, topic);
             thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
         }
 
         // 排队计数
-        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
 
         // 更新线程状态
