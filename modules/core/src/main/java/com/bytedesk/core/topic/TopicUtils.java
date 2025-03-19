@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 16:36:07
+ * @LastEditTime: 2025-03-19 09:05:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -186,6 +186,16 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_ROBOT_MEMBER_THREAD_PATTERN, robotUid, userUid, randomUid);
     }
 
+    // get robot uid from thread topic
+    public static String getRobotUidFromThreadTopic(String threadTopic) {
+        // org/robot/{robot_uid}/{visitor_uid}
+        String[] topicArr = threadTopic.split("/");
+        if (topicArr.length != 4) {
+            throw new RuntimeException("Invalid private topic: " + threadTopic);
+        }
+        return topicArr[2];
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
     public static Boolean isOrgKbTopic(String topic) {
@@ -224,6 +234,16 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_AGENT_THREAD_PATTERN, agentUid, visitorUid) + TOPIC_INTERNAL_SUFFIX;
     }
 
+    // get agent uid from thread topic
+    public static String getAgentUidFromThreadTopic(String threadTopic) {
+        // org/agent/{agent_uid}/{visitor_uid}
+        String[] topicArr = threadTopic.split("/");
+        if (topicArr.length != 4) {
+            throw new RuntimeException("Invalid private topic: " + threadTopic);
+        }
+        return topicArr[2];
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
     public static Boolean isOrgWorkgroupTopic(String topic) {
@@ -243,6 +263,16 @@ public class TopicUtils {
 
     public static String formatOrgWorkgroupThreadTopicInternal(String workgroupUid, String visitorUid) {
         return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, visitorUid) + TOPIC_INTERNAL_SUFFIX;
+    }
+
+    // get workgroup uid from thread topic
+    public static String getWorkgroupUidFromThreadTopic(String threadTopic) {
+        // org/workgroup/{workgroup_uid}/{visitor_uid}
+        String[] topicArr = threadTopic.split("/");
+        if (topicArr.length != 4) {
+            throw new RuntimeException("Invalid private topic: " + threadTopic);
+        }
+        return topicArr[2];
     }
 
     //////////////////////////////////////////////////////////////////////////
