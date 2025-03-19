@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 08:50:25
+ * @LastEditTime: 2025-03-19 09:14:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,12 +13,23 @@
  */
 package com.bytedesk.service.visitor_thread;
 
+import java.util.Optional;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
+import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRestService;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
@@ -35,6 +46,16 @@ import lombok.extern.slf4j.Slf4j;
 public class VisitorThreadEventListener {
 
     private final VisitorThreadService visitorThreadService;
+
+    private final WorkgroupRestService workgroupRestService;
+
+    private final AgentRestService agentRestService;
+
+    private final RobotRestService robotRestService;
+
+    private final UidUtils uidUtils;
+
+    private final IMessageSendService messageSendService;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
@@ -62,29 +83,59 @@ public class VisitorThreadEventListener {
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
         log.info("visitor onThreadCloseEvent: {}", thread.getUid());
+        String topic = thread.getTopic();
+        String content = "会话已结束";
         if (thread.isAutoClose()) {
             // TODO: 自动关闭，根据会话类型显示提示语
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
+                Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+                if (workgroupOptional.isPresent()) {
+                    WorkgroupEntity workgroup = workgroupOptional.get();
+                    content = workgroup.getServiceSettings().getAutoCloseTip();
+                } else {
+                    content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+                }
 
             } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
+                String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
+                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+                if (agentOptional.isPresent()) {
+                    AgentEntity agent = agentOptional.get();
+                    content = agent.getServiceSettings().getAutoCloseTip();
+                } else {
+                    content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+                }
                 
             } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
-                
+                String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
+                Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
+                if (robotOptional.isPresent()) {
+                    RobotEntity robot = robotOptional.get();
+                    content = robot.getServiceSettings().getAutoCloseTip();
+                } else {
+                    content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+                }
             }
         } else {
             // TODO: 非自动关闭，客服手动关闭，显示客服关闭提示语
-            // UserProtobuf agentObject = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+            String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
+            Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+            if (agentOptional.isPresent()) {
+                AgentEntity agent = agentOptional.get();
+                content = agent.getServiceSettings().getAgentCloseTip();
+            } else {
+                content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+            }
         }
 
         // 发送消息
-        // MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED
-        //         : MessageTypeEnum.AGENT_CLOSED;
-        // MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getUid(),
-        //         updateThread,
-        //         messageTypeEnum,
-        //         content);
-        // messageSendService.sendProtobufMessage(messageProtobuf);
-        
+        MessageTypeEnum messageTypeEnum = thread.isAutoClose() ? MessageTypeEnum.AUTO_CLOSED
+                : MessageTypeEnum.AGENT_CLOSED;
+        MessageProtobuf messageProtobuf = thread.isAutoClose() ? MessageUtils.createAutoCloseMessage(
+                thread,
+                content);
+        messageSendService.sendProtobufMessage(messageProtobuf);
     }
 
     @EventListener

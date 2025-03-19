@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 08:50:05
+ * @LastEditTime: 2025-03-19 09:02:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,10 +33,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -66,7 +62,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
     private final UidUtils uidUtils;
 
-    private final IMessageSendService messageSendService;
+    // private final IMessageSendService messageSendService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
