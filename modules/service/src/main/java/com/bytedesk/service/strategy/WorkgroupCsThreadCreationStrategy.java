@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 15:44:29
+ * @LastEditTime: 2025-03-19 13:48:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,24 +13,37 @@
  */
 package com.bytedesk.service.strategy;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.queue.QueueService;
+import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.routing.RouteService;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import com.bytedesk.service.workgroup.WorkgroupRestService;
+import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 
 import jakarta.annotation.Nonnull;
 
@@ -56,6 +69,16 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
     private final RouteService routeService;
 
     private final IMessageSendService messageSendService;
+
+    private final AgentRestService agentRestService;
+
+    private final QueueService queueService;
+
+    private final QueueMemberRestService queueMemberRestService;;
+
+    private final MessageRestService messageRestService;
+
+    private final WorkgroupRoutingService workgroupRoutingService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -120,7 +143,124 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         }
         
         // 返回工作组会话
-        return routeService.routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
+        // return routeService.routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
+        return routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
+    }
+
+
+    public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, String threadTopic,
+            WorkgroupEntity workgroup) {
+        Assert.notNull(visitorRequest, "VisitorRequest must not be null");
+        Assert.hasText(threadTopic, "Thread topic must not be empty");
+        Assert.notNull(workgroup, "WorkgroupEntity must not be null");
+        Assert.notEmpty(workgroup.getAgents(), "No agents found in workgroup with uid " + workgroup.getUid());
+
+        log.info("routeWorkgroup: {}", workgroup.getUid());
+        // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
+        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
+        Assert.isTrue(threadOptional.isPresent(), "Thread with topic " + threadTopic + " not found");
+        
+        ThreadEntity thread = threadOptional.get();
+        // 下面人工接待
+        AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
+        if (agent == null) {
+            return getOfflineMessage(visitorRequest, thread, workgroup);
+        }
+        // 排队计数
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+        //
+        if (agent.isConnectedAndAvailable()) {
+            // 客服在线 且 接待状态
+            if (agent.canAcceptMore()) {
+                // 未满则接待
+                return handleAvailableWorkgroup(thread, agent, queueMemberEntity);
+            } else {
+                // 排队，已满则排队
+                return handleQueuedWorkgroup(thread, agent, queueMemberEntity);
+            }
+        } else {
+            // 离线状态永远显示离线提示语，不显示"继续会话"
+            // 客服离线 或 非接待状态
+            return getOfflineMessage(visitorRequest, thread, workgroup);
+        }
+    }
+
+    private MessageProtobuf handleAvailableWorkgroup(ThreadEntity thread, AgentEntity agent,
+            QueueMemberEntity queueMemberEntity) {
+        // 未满则接待
+        thread.setStarted();
+        thread.setUnreadCount(1);
+        thread.setContent(agent.getServiceSettings().getWelcomeTip());
+        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        // 增加接待数量，待优化
+        agent.increaseThreadCount();
+        agentRestService.save(agent);
+        // 更新排队状态，待优化
+        queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+        queueMemberEntity.setAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberRestService.save(queueMemberEntity);
+        //
+        thread.setOwner(agent.getMember().getUser());
+        //
+        UserProtobuf agentProtobuf = ServiceConvertUtils.convertToUserProtobuf(agent);
+        thread.setAgent(JSON.toJSONString(agentProtobuf));
+        thread.setRobot(false);
+        //
+        threadService.save(thread);
+        log.info("routeWorkgroup WelcomeMessage: {}", thread.toString());
+        //
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
+        messageSendService.sendProtobufMessage(messageProtobuf);
+        return messageProtobuf;
+    }
+
+    private MessageProtobuf handleQueuedWorkgroup(ThreadEntity thread, AgentEntity agent,
+            QueueMemberEntity queueMemberEntity) {
+        // 排队，已满则排队
+        // String queueTip = agent.getQueueSettings().getQueueTip();
+        String content = "";
+        if (queueMemberEntity.getBeforeNumber() == 0) {
+            // 客服接待刚满员，下一个就是他，
+            content = "请稍后，下一个就是您";
+            // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(),
+            // queueMemberEntity.getWaitTime());
+        } else {
+            // 前面有排队人数
+            content = " 当前排队人数：" + queueMemberEntity.getBeforeNumber() + " 大约等待时间："
+                    + queueMemberEntity.getBeforeNumber() * 2 + "  分钟";
+        }
+
+        // 进入排队队列
+        thread.setQueuing();
+        thread.setUnreadCount(0);
+        thread.setContent(content);
+        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        thread.setRobot(false);
+        //
+        threadService.save(thread);
+        log.info("routeWorkgroup QueueMessage: {}", thread.toString());
+        //
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
+        messageSendService.sendProtobufMessage(messageProtobuf);
+        return messageProtobuf;
+    }
+
+    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
+        thread.setOffline();
+        thread.setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
+        threadService.save(thread);
+        //
+        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(workgroup, thread);
+        // 保存留言消息
+        messageRestService.save(message);
+        // 返回留言消息
+        // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+        messageSendService.sendProtobufMessage(messageProtobuf);
+        return messageProtobuf;
     }
 
     // Q-原样返回会话
