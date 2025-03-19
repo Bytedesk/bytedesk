@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 09:58:36
+ * @LastEditTime: 2025-03-19 11:09:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,7 +95,6 @@ public class VisitorThreadEventListener {
                 } else {
                     content = I18Consts.I18N_AUTO_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
                 }
-
             } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
                 String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
                 Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
