@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 15:31:51
+ * @LastEditTime: 2025-03-19 16:59:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,6 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
     private final RobotRestService robotService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN) // not needed
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
