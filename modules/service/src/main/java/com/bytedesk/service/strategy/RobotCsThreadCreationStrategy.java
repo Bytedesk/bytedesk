@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 14:50:24
+ * @LastEditTime: 2025-03-19 15:21:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -118,54 +118,6 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // return routeService.routeToRobot(visitorRequest, thread, robot);
         // return routeToRobot(visitorRequest, thread, robot);
     }
-
-    // @Transactional
-    // @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 200))
-    // public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity threadFromRequest,
-    //         @Nonnull RobotEntity robot) {
-    //     try {
-    //         Assert.notNull(request, "VisitorRequest must not be null");
-    //         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
-    //         Assert.notNull(robot, "RobotEntity must not be null");
-    //         Assert.hasText(threadFromRequest.getUid(), "Thread UID must not be empty");
-
-    //         // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
-    //         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
-    //         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
-
-    //         ThreadEntity thread = threadOptional.get();
-    //         // 排队计数
-    //         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
-    //         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
-
-    //         // 更新线程状态
-    //         thread.setState(ThreadStateEnum.ROBOT.name());
-    //         thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
-    //         thread.setContent(robot.getServiceSettings().getWelcomeTip());
-    //         thread.setRobot(true);
-    //         thread.setUnreadCount(0);
-    //         // ThreadEntity savedThread =
-    //         threadService.save(thread);
-
-    //         // 增加接待数量
-    //         robot.increaseThreadCount();
-    //         robotRestService.save(robot);
-
-    //         // 更新排队状态
-    //         queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
-    //         queueMemberEntity.setAcceptTime(LocalDateTime.now());
-    //         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
-    //         queueMemberRestService.save(queueMemberEntity);
-
-    //         return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
-    //     } catch (ObjectOptimisticLockingFailureException e) {
-    //         log.warn("Optimistic locking failure while routing to robot, retrying...", e);
-    //         throw e;
-    //     } catch (Exception e) {
-    //         log.error("Error while routing to robot: {}", e.getMessage(), e);
-    //         throw new RuntimeException("Failed to route to robot", e);
-    //     }
-    // }
 
     private MessageProtobuf getRobotContinueMessage(RobotEntity robot, @Nonnull ThreadEntity thread) {
         //
