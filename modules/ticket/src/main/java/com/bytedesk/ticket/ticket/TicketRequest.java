@@ -44,7 +44,7 @@ public class TicketRequest extends BaseRequest {
     // 
     private String type;
     // 
-    // private String serviceThreadTopic;
+    private String topic;
     private String threadUid;
     private String categoryUid;
     // 
