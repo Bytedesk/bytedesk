@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 10:24:16
+ * @LastEditTime: 2025-03-19 17:03:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,6 +32,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * - agent：一对一人工客服，不支持机器人接待
@@ -40,7 +41,7 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -48,7 +49,7 @@ import lombok.experimental.Accessors;
 @EntityListeners({ RobotEntityListener.class })
 // 限制name + orgUid唯一索引，防止重复创建机器人
 @Table(name = "bytedesk_ai_robot", uniqueConstraints = {
-    @jakarta.persistence.UniqueConstraint(columnNames = {"name", "orgUid"})
+    // @jakarta.persistence.UniqueConstraint(columnNames = {"name", "orgUid"})
 })
 public class RobotEntity extends BaseEntity {
 
