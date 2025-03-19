@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-12 16:56:52
+ * @LastEditTime: 2025-03-19 12:38:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,7 +54,7 @@ public class VisitorThreadService
 
     private final VisitorThreadRepository visitorThreadRepository;
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     private final ModelMapper modelMapper;
 
@@ -118,7 +118,7 @@ public class VisitorThreadService
         //
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         thread.setUser(visitor);
-        threadService.save(thread);
+        threadRestService.save(thread);
         //
         return thread;
     }
@@ -134,7 +134,7 @@ public class VisitorThreadService
             thread.setExtra(extra);
         }
         // 保存
-        threadService.save(thread);
+        threadRestService.save(thread);
         //
         return thread;
     }
@@ -153,7 +153,7 @@ public class VisitorThreadService
         //
         thread.setOwner(agent.getMember().getUser());
         thread.setOrgUid(agent.getOrgUid());
-        threadService.save(thread);
+        threadRestService.save(thread);
         //
         return thread;
     }
@@ -167,7 +167,7 @@ public class VisitorThreadService
         String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
         thread.setAgent(agentString);
         // 保存
-        threadService.save(thread);
+        threadRestService.save(thread);
         //
         return thread;
     }
@@ -185,7 +185,7 @@ public class VisitorThreadService
         //
         UserProtobuf visitor = ServiceConvertUtils.convertToUserProtobuf(visitorRequest);
         thread.setUser(JSON.toJSONString(visitor));
-        threadService.save(thread);
+        threadRestService.save(thread);
         //
         return thread;
     }
@@ -199,7 +199,7 @@ public class VisitorThreadService
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         thread.setAgent(robotString);
         // 保存
-        threadService.save(thread);
+        threadRestService.save(thread);
         //
         return thread;
     }
@@ -237,8 +237,8 @@ public class VisitorThreadService
      * 如果1分钟之内无回复，则推送满意度：
      */
     @Async
-    public void autoCloseThread() {
-        List<ThreadEntity> threads = threadService.findStateOpen();
+    public void autoCloseThread(List<ThreadEntity> threads) {
+        // List<ThreadEntity> threads = threadRestService.findStateOpen();
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
             // 计算两个日期之间的毫秒差
@@ -263,7 +263,7 @@ public class VisitorThreadService
                 // diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes,
                 // diffInMinutes);
                 if (diffInMinutes > autoCloseMinutes) {
-                    threadService.autoClose(thread);
+                    threadRestService.autoClose(thread);
                 }
             }
         });
