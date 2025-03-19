@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 09:14:12
+ * @LastEditTime: 2025-03-19 09:16:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,16 +22,15 @@ import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -53,7 +52,7 @@ public class VisitorThreadEventListener {
 
     private final RobotRestService robotRestService;
 
-    private final UidUtils uidUtils;
+    // private final UidUtils uidUtils;
 
     private final IMessageSendService messageSendService;
 
@@ -86,7 +85,7 @@ public class VisitorThreadEventListener {
         String topic = thread.getTopic();
         String content = "会话已结束";
         if (thread.isAutoClose()) {
-            // TODO: 自动关闭，根据会话类型显示提示语
+            // 自动关闭，根据会话类型显示提示语
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
                 String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
                 Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
@@ -94,7 +93,7 @@ public class VisitorThreadEventListener {
                     WorkgroupEntity workgroup = workgroupOptional.get();
                     content = workgroup.getServiceSettings().getAutoCloseTip();
                 } else {
-                    content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+                    content = I18Consts.I18N_AUTO_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
                 }
 
             } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
@@ -104,7 +103,7 @@ public class VisitorThreadEventListener {
                     AgentEntity agent = agentOptional.get();
                     content = agent.getServiceSettings().getAutoCloseTip();
                 } else {
-                    content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+                    content = I18Consts.I18N_AUTO_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
                 }
                 
             } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
@@ -114,27 +113,25 @@ public class VisitorThreadEventListener {
                     RobotEntity robot = robotOptional.get();
                     content = robot.getServiceSettings().getAutoCloseTip();
                 } else {
-                    content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+                    content = I18Consts.I18N_AUTO_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
                 }
             }
         } else {
-            // TODO: 非自动关闭，客服手动关闭，显示客服关闭提示语
+            // 非自动关闭，客服手动关闭，显示客服关闭提示语
             String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
             Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
             if (agentOptional.isPresent()) {
                 AgentEntity agent = agentOptional.get();
                 content = agent.getServiceSettings().getAgentCloseTip();
             } else {
-                content = "会话已结束，感谢您的咨询，祝您生活愉快！";
+                content = I18Consts.I18N_AGENT_CLOSE_TIP;//"会话已结束，感谢您的咨询，祝您生活愉快！";
             }
         }
 
         // 发送消息
-        MessageTypeEnum messageTypeEnum = thread.isAutoClose() ? MessageTypeEnum.AUTO_CLOSED
-                : MessageTypeEnum.AGENT_CLOSED;
-        MessageProtobuf messageProtobuf = thread.isAutoClose() ? MessageUtils.createAutoCloseMessage(
-                thread,
-                content);
+        MessageProtobuf messageProtobuf = thread.isAutoClose() 
+            ? MessageUtils.createAutoCloseMessage(thread,content) 
+            : MessageUtils.createAgentCloseMessage(thread, content);
         messageSendService.sendProtobufMessage(messageProtobuf);
     }
 

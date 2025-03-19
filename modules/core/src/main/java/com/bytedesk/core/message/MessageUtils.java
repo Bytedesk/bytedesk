@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 09:13:22
+ * @LastEditTime: 2025-03-19 09:15:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,14 +74,14 @@ public class MessageUtils {
         return message;
     }
 
-    public static MessageProtobuf createAutoCloseMessage(ThreadEntity thread, MessageTypeEnum type, String content) {
+    public static MessageProtobuf createAutoCloseMessage(ThreadEntity thread, String content) {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.AUTO_CLOSED,
                 content);
     }
 
-    public static MessageProtobuf createAgentCloseMessage(ThreadEntity thread, MessageTypeEnum type, String content) {
+    public static MessageProtobuf createAgentCloseMessage(ThreadEntity thread, String content) {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.AGENT_CLOSED,
