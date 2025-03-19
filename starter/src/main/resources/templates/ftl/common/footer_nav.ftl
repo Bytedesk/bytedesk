@@ -87,7 +87,7 @@
 			<div class="col-12">
 				<div class="d-md-flex justify-content-between align-items-center pt-2 pb-4 text-center">
 					<!-- copyright text -->
-					<div class="text-primary-hover"> Copyrights <a href="https://www.bytedesk.com/" target="_blank" class="text-reset">©2013~2024 北京微语天下科技有限公司</a>.</div>
+					<div class="text-primary-hover"> Copyrights <a href="https://www.bytedesk.com/" target="_blank" class="text-reset">©2013~2025 北京微语天下科技有限公司</a>.</div>
 					<!-- copyright links-->
 					<div class="nav justify-content-center mt-3 mt-md-0">
 						<ul class="list-inline mb-0">
