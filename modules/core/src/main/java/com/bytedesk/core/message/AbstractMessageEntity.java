@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 21:19:34
+ * @LastEditTime: 2025-03-19 12:57:18
  * @Description: 消息实体抽象基类，用于统一所有消息类型的字段结构
  */
 package com.bytedesk.core.message;
@@ -66,13 +66,13 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Column(name = "message_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
     
-    // 是否是机器人
-    @Builder.Default
-    @Column(name = "is_robot", nullable = false)
-    private boolean robot = false;
+    // // 是否是机器人
+    // @Builder.Default
+    // @Column(name = "is_robot", nullable = false)
+    // private boolean robot = false;
 
-    // 是否是访客
-    @Builder.Default
-    @Column(name = "is_visitor", nullable = false)
-    private boolean visitor = false;
+    // // 是否是访客
+    // @Builder.Default
+    // @Column(name = "is_visitor", nullable = false)
+    // private boolean visitor = false;
 }

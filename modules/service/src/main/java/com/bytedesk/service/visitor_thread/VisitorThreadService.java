@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 12:38:23
+ * @LastEditTime: 2025-03-19 13:04:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -204,8 +204,6 @@ public class VisitorThreadService
         return thread;
     }
 
-
-
     public VisitorThreadEntity update(ThreadEntity thread) {
         Optional<VisitorThreadEntity> visitorThreadOpt = findByUid(thread.getUid());
         if (visitorThreadOpt.isPresent()) {
@@ -253,19 +251,17 @@ public class VisitorThreadService
             // log.info("before autoCloseThread threadUid {} threadType {} threadId {}
             // diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(),
             // diffInMinutes);
-            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
-                    || thread.getType().equals(ThreadTypeEnum.AGENT.name())
-                    || thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
-                ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
-                        ServiceSettingsResponseVisitor.class);
-                Double autoCloseMinutes = settings.getAutoCloseMin();
-                // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {},
-                // diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes,
-                // diffInMinutes);
-                if (diffInMinutes > autoCloseMinutes) {
-                    threadRestService.autoClose(thread);
-                }
+            // if (thread.isCustomerService()) {
+            ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
+                    ServiceSettingsResponseVisitor.class);
+            Double autoCloseMinutes = settings.getAutoCloseMin();
+            // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {},
+            // diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes,
+            // diffInMinutes);
+            if (diffInMinutes > autoCloseMinutes) {
+                threadRestService.autoClose(thread);
             }
+            // }
         });
     }
 

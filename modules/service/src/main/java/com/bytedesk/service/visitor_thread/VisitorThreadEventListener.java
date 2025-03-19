@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 12:38:03
+ * @LastEditTime: 2025-03-19 13:12:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,10 @@
  */
 package com.bytedesk.service.visitor_thread;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -152,8 +154,56 @@ public class VisitorThreadEventListener {
         List<ThreadEntity> threads = threadRestService.findServiceThreadStateStarted();
         // auto close thread
         visitorThreadService.autoCloseThread(threads);
-        // TODO: 触发器逻辑
+        // 触发器逻辑
         // 查找所有未关闭的会话，如果超过一定时间未回复，则判断是否触发自动回复
+        threads.forEach(thread -> {
+            // LocalDateTime转为时间戳需借助ZoneId和系统默认时区
+            long currentTimeMillis = System.currentTimeMillis();
+            long updatedAtMillis = thread.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
+            // 转换为分钟
+            long diffInSeconds= TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
+            // 
+            String topic = thread.getTopic();
+            // log.info("visitor_thread quartz one min event thread: " + thread.getUid());
+            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
+                Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+                if (workgroupOptional.isPresent()) {
+                    WorkgroupEntity workgroup = workgroupOptional.get();
+                    if (workgroup.getServiceSettings().isEnableProactiveTrigger() && diffInSeconds > workgroup.getServiceSettings().getNoResponseTimeout()) {
+                        // 触发自动回复
+                        log.info("visitor_thread quartz one min event thread: " + thread.getUid() + " trigger workgroup proactive message");
+                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, workgroup.getServiceSettings().getProactiveMessage());
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                    }
+                }
+            } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
+                String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
+                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+                if (agentOptional.isPresent()) {
+                    AgentEntity agent = agentOptional.get();
+                    if (agent.getServiceSettings().isEnableProactiveTrigger() && diffInSeconds > agent.getServiceSettings().getNoResponseTimeout()) {
+                        // 触发自动回复
+                        log.info("visitor_thread quartz one min event thread: " + thread.getUid() + " trigger agent proactive message");
+                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, agent.getServiceSettings().getProactiveMessage());
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                    }
+                }
+            } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
+                String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
+                Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
+                if (robotOptional.isPresent()) {
+                    RobotEntity robot = robotOptional.get();
+                    if (robot.getServiceSettings().isEnableProactiveTrigger() && diffInSeconds > robot.getServiceSettings().getNoResponseTimeout()) {
+                        // 触发自动回复
+                        log.info("visitor_thread quartz one min event thread: " + thread.getUid() + " trigger robot proactive message");
+                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, robot.getServiceSettings().getProactiveMessage());
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                    }
+                }
+            }
+        });
 
         
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 09:15:12
+ * @LastEditTime: 2025-03-19 13:10:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,6 +95,12 @@ public class MessageUtils {
                 content);
     }
 
+    public static MessageProtobuf createSystemMessage(ThreadEntity thread, String content) {
+        return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
+                thread,
+                MessageTypeEnum.TEXT,
+                content);
+    }
 
     public static void notifyUser(MessageProtobuf messageProtobuf) {
         String json = JSON.toJSONString(messageProtobuf);
