@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 18:12:54
+ * @LastEditTime: 2025-03-19 20:01:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadRestService;
+// import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.ticket.consts.TicketConsts;
@@ -72,7 +72,7 @@ public class TicketService {
     private final AgentRestService agentRestService;
     // private final ApplicationEventPublisher eventPublisher;
     private final TicketRestService ticketRestService;
-    private final ThreadRestService threadRestService;
+    // private final ThreadRestService threadRestService;
 
     /**
      * 查询工单，并过滤掉没有任务的工单
@@ -368,19 +368,22 @@ public class TicketService {
 
             // 5. 创建工单会话
             // serviceThreadTopic跟threadUid合并
-            ThreadEntity thread = null;
-            if (StringUtils.hasText(ticket.getThreadUid())) {
-                Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
-                if (threadOptional.isPresent()) {
-                    thread = threadOptional.get();
-                } else {
-                    thread = ticketRestService.createTicketThread(ticket);
+            if (!StringUtils.hasText(ticket.getThreadUid())) {
+                ThreadEntity thread = ticketRestService.createTicketThread(ticket);
+                if (thread != null) {
+                    ticket.setThreadUid(thread.getUid());
                 }
-            } else {
-                thread = ticketRestService.createTicketThread(ticket);
+                // Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
+                // if (threadOptional.isPresent()) {
+                //     thread = threadOptional.get();
+                // } else {
+                //     thread = ticketRestService.createTicketThread(ticket);
+                // }
             }
-            ticket.setThreadUid(thread.getUid());
-
+            
+            // TODO: 将claimer添加到会话中
+            
+            
             // 6. 发布工单分配消息事件
             // 此处没有使用ticket自带消息机制，便于扩展
             // eventPublisher.publishEvent(TicketMessageEvent.builder()
