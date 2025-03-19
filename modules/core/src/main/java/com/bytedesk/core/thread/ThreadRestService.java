@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 22:46:51
+ * @LastEditTime: 2025-03-19 08:50:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -478,21 +478,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 ? I18Consts.I18N_AUTO_CLOSED
                 : I18Consts.I18N_AGENT_CLOSED;
         thread.setContent(content);
-        if (threadRequest.getAutoClose()) {
-            // TODO: 自动关闭，根据会话类型显示提示语
-            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-
-            } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
-                
-            } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
-                
-            }
-        } else {
-            // TODO: 非自动关闭，客服手动关闭，显示客服关闭提示语
-            // UserProtobuf agentObject = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-
-            
-        }
+        
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -500,14 +486,14 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(updateThread));
-        // 发送消息
-        MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED
-                : MessageTypeEnum.AGENT_CLOSED;
-        MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getUid(),
-                updateThread,
-                messageTypeEnum,
-                content);
-        messageSendService.sendProtobufMessage(messageProtobuf);
+        // // 发送消息
+        // MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED
+        //         : MessageTypeEnum.AGENT_CLOSED;
+        // MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getUid(),
+        //         updateThread,
+        //         messageTypeEnum,
+        //         content);
+        // messageSendService.sendProtobufMessage(messageProtobuf);
         //
         return convertToResponse(updateThread);
     }
