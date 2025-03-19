@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:26:35
+ * @LastEditTime: 2025-03-19 15:49:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,8 +108,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
                 return getAgentQueuingMessage(visitorRequest, thread);
             } else if (threadOptional.get().isOffline()) {
                 thread = threadOptional.get();
-                // 返回离线状态的会话
-                return getAgentContinueMessage(visitorRequest, thread);
             }
             // else {
             // // 关闭或者离线状态，返回初始化状态的会话
@@ -169,7 +167,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         //
-        thread.setRobot(false);
+        // thread.setRobot(false);
         threadService.save(thread);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
@@ -202,7 +200,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         thread.setUnreadCount(0);
         thread.setContent(content);
         thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-        thread.setRobot(false);
+        // thread.setRobot(false);
         threadService.save(thread);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
@@ -250,5 +248,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         //
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
+
 
 }

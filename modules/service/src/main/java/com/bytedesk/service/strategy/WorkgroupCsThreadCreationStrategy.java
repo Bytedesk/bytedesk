@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:23:13
+ * @LastEditTime: 2025-03-19 15:48:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,12 +21,15 @@ import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -35,7 +38,7 @@ import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
-import com.bytedesk.service.routing.RouteService;
+// import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -66,7 +69,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
 
     private final VisitorThreadService visitorThreadService;
 
-    private final RouteService routeService;
+    // private final RouteService routeService;
 
     private final IMessageSendService messageSendService;
 
@@ -79,6 +82,8 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
     private final MessageRestService messageRestService;
 
     private final WorkgroupRoutingService workgroupRoutingService;
+
+    private final RobotRestService robotRestService;
 
     @Override
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
@@ -101,13 +106,9 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent() && !visitorRequest.getForceAgent()) {
-            // thread = threadOptional.get();
             //
             if (threadOptional.get().isStarted()) {
                 thread = threadOptional.get();
-                // workgroup = workgroupService.findByUid(workgroupUid)
-                // .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + "
-                // not found"));
                 // 重新初始化会话，包括重置机器人状态等
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                 // 返回继续会话消息
@@ -117,21 +118,15 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
+            } else if (threadOptional.get().isOffline()) {
+                thread = threadOptional.get();
+            } else if (threadOptional.get().isRoboting()) {
+                thread = threadOptional.get();
             }
-            // else {
-            // // 关闭或者离线状态，返回初始化状态的会话
-            // thread = thread.reInit(false);
-            // // workgroup = workgroupService.findByUid(workgroupUid)
-            // // .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid +
-            // " not found"));
-            // }
         }
 
         if (thread == null) {
             // 不存在会话，创建会话
-            // workgroup = workgroupService.findByUid(workgroupUid)
-            // .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + "
-            // not found"));
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
             // 重新初始化会话，包括重置机器人状态等
             thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
@@ -149,7 +144,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 if (robot != null) {
                     thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
                     // 返回机器人欢迎消息
-                    return routeService.routeToRobot(visitorRequest, thread, robot);
+                    return routeToRobot(visitorRequest, thread, robot);
                 } else {
                     throw new RuntimeException("Workgroup robot not found");
                 }
@@ -212,7 +207,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         //
         UserProtobuf agentProtobuf = ServiceConvertUtils.convertToUserProtobuf(agent);
         thread.setAgent(JSON.toJSONString(agentProtobuf));
-        thread.setRobot(false);
+        // thread.setRobot(false);
         //
         threadService.save(thread);
         log.info("routeWorkgroup WelcomeMessage: {}", thread.toString());
@@ -248,7 +243,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         thread.setUnreadCount(0);
         thread.setContent(content);
         thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-        thread.setRobot(false);
+        // thread.setRobot(false);
         //
         threadService.save(thread);
         log.info("routeWorkgroup QueueMessage: {}", thread.toString());
@@ -301,6 +296,41 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         log.info("getWorkgroupQueuingMessage: user: {}, agent {}", user.toString(), thread.getAgent());
         //
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
+    }
+
+    public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity threadFromRequest,
+            @Nonnull RobotEntity robot) {
+
+            // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
+            Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+            Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+            
+            ThreadEntity thread = threadOptional.get();
+            // 排队计数
+            QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
+            log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+
+            // 更新线程状态
+            thread.setState(ThreadStateEnum.ROBOTING.name());
+            thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
+            thread.setContent(robot.getServiceSettings().getWelcomeTip());
+            // thread.setRobot(true);
+            thread.setUnreadCount(0);
+            // ThreadEntity savedThread =
+            threadService.save(thread);
+
+            // 增加接待数量
+            robot.increaseThreadCount();
+            robotRestService.save(robot);
+
+            // 更新排队状态
+            queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+            queueMemberEntity.setAcceptTime(LocalDateTime.now());
+            queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+            queueMemberRestService.save(queueMemberEntity);
+
+            return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
+
     }
 
 }

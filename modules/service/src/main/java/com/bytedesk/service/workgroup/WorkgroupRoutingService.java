@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 工作组路由服务
  * 根据工作组路由模式选择客服
- * todo: 需要完善各个路由算法
  */
 @Slf4j
 @Component

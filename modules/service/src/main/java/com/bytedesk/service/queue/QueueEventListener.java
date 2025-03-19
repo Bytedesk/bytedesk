@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 22:19:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 16:11:08
+ * @LastEditTime: 2025-03-19 15:31:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,9 +51,9 @@ public class QueueEventListener {
     @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
-        log.info("queue onThreadCloseEvent: {}", thread.getAgent());
+        // log.info("queue onThreadCloseEvent: {}", thread.getAgent());
         String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(thread.getTopic());
-        log.info("queue onThreadAcceptEvent: {}", queueTopic);
+        log.info("queue onThreadCloseEvent: {}", queueTopic);
         String queueDay = thread.getCreatedAt().format(DateTimeFormatter.ISO_DATE);
         Optional<QueueEntity> queueOptional = queueRestService.findByTopicAndDay(queueTopic, queueDay);
         if (queueOptional.isPresent()) {

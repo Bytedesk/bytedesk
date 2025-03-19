@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:18:32
+ * @LastEditTime: 2025-03-19 15:48:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -129,6 +129,10 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     public Boolean isOffline() {
         return getState().equals(ThreadStateEnum.OFFLINE.name());
+    }
+
+    public Boolean isRoboting() {
+        return getState().equals(ThreadStateEnum.ROBOTING.name());
     }
 
     public Boolean isQueuing() {
