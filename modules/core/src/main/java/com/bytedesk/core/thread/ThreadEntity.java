@@ -166,10 +166,6 @@ public class ThreadEntity extends AbstractThreadEntity {
         return ConvertUtils.convertToThreadProtobuf(this);
     }
 
-    // public UserProtobuf getAgentProtobuf() {
-    // return JSON.parseObject(this.agent, UserProtobuf.class);
-    // }
-
     public UserProtobuf getUserProtobuf() {
         return JSON.parseObject(getUser(), UserProtobuf.class);
     }

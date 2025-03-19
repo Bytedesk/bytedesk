@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:48:38
+ * @LastEditTime: 2025-03-19 15:57:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,8 +105,8 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             throw new RuntimeException("Workgroup uid " + workgroupUid + " not found");
         }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
-        if (threadOptional.isPresent() && !visitorRequest.getForceAgent()) {
-            //
+        if (threadOptional.isPresent()) {
+            //  && !visitorRequest.getForceAgent()
             if (threadOptional.get().isStarted()) {
                 thread = threadOptional.get();
                 // 重新初始化会话，包括重置机器人状态等
@@ -122,6 +122,9 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 thread = threadOptional.get();
             } else if (threadOptional.get().isRoboting()) {
                 thread = threadOptional.get();
+                if (visitorRequest.getForceAgent()) {
+                    // 强制转人工，TODO: 记录转人工日志
+                }
             }
         }
 
