@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 14:57:37
+ * @LastEditTime: 2025-03-19 15:02:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,32 +85,40 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // 是否已经存在会话
         ThreadEntity thread = null;
         AgentEntity agent = null;
+        Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
+        if (agentOptional.isPresent()) {
+            agent = agentOptional.get();
+        } else {
+            log.info("Agent uid {} not found", agentUid);
+            throw new RuntimeException("Agent uid " + agentUid + " not found");
+        }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent() ) {
-            thread = threadOptional.get();
             // 
-            if (thread.isStarted()) {
-                agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
+            if (threadOptional.get().isStarted()) {
+                thread = threadOptional.get();
                 // 重新初始化会话额外信息，例如客服状态等
                 thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
                 // 返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing thread {}", topic);
                 return getAgentContinueMessage(visitorRequest, thread);
-            } else if (thread.isQueuing()) {
+            } else if (threadOptional.get().isQueuing()) {
+                thread = threadOptional.get();
                 // 返回排队中的会话
                 return getAgentQueuingMessage(visitorRequest, thread);
-            } else {
-                // 关闭或者离线状态，返回初始化状态的会话
-                thread = thread.reInit(false);
-                agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
             }
-        } else {
-            // 不存在会话，创建会话
-            agent = agentService.findByUid(agentUid).orElseThrow(() -> new RuntimeException("Agent uid " + agentUid + " not found"));
-            thread = visitorThreadService.createAgentThread(visitorRequest, agent, topic);
+            //  else {
+            //     // 关闭或者离线状态，返回初始化状态的会话
+            //     thread = thread.reInit(false);
+            // }
         }
-        // 重新初始化会话额外信息，例如客服状态等
-        thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
+        // 
+        if (thread == null) {
+            // 不存在会话，创建会话
+            thread = visitorThreadService.createAgentThread(visitorRequest, agent, topic);
+            // 重新初始化会话额外信息，例如客服状态等
+            thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
+        }
 
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);

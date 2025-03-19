@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 13:48:42
+ * @LastEditTime: 2025-03-19 15:12:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
@@ -93,36 +92,50 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         // 是否已经存在会话
         ThreadEntity thread = null;
         WorkgroupEntity workgroup = null;
+        Optional<WorkgroupEntity> workgroupOptional = workgroupService.findByUid(workgroupUid);
+        if (workgroupOptional.isPresent()) {
+            workgroup = workgroupOptional.get();
+        } else {
+            throw new RuntimeException("Workgroup uid " + workgroupUid + " not found");
+        }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent() && !visitorRequest.getForceAgent()) {
-            thread = threadOptional.get();
-            // 
-            if (thread.isStarted()) {
-                workgroup = workgroupService.findByUid(workgroupUid)
-                        .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
+            // thread = threadOptional.get();
+            //
+            if (threadOptional.get().isStarted()) {
+                thread = threadOptional.get();
+                // workgroup = workgroupService.findByUid(workgroupUid)
+                // .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + "
+                // not found"));
                 // 重新初始化会话，包括重置机器人状态等
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                 // 返回继续会话消息
                 log.info("Already have a processing thread {}", topic);
                 return getWorkgroupContinueMessage(visitorRequest, thread);
-            } else if (thread.isQueuing()) {
+            } else if (threadOptional.get().isQueuing()) {
+                thread = threadOptional.get();
                 // 返回排队中的会话
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
-            } else {
-                // 关闭或者离线状态，返回初始化状态的会话
-                thread = thread.reInit(false);
-                workgroup = workgroupService.findByUid(workgroupUid)
-                        .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
             }
-        } else {
-            // 不存在会话，创建会话
-            workgroup = workgroupService.findByUid(workgroupUid)
-                    .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + " not found"));
-            thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
+            // else {
+            // // 关闭或者离线状态，返回初始化状态的会话
+            // thread = thread.reInit(false);
+            // // workgroup = workgroupService.findByUid(workgroupUid)
+            // // .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid +
+            // " not found"));
+            // }
         }
-        // 重新初始化会话，包括重置机器人状态等
-        thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
-        log.info("createWorkgroupCsThread: {}", thread.toString());
+
+        if (thread == null) {
+            // 不存在会话，创建会话
+            // workgroup = workgroupService.findByUid(workgroupUid)
+            // .orElseThrow(() -> new RuntimeException("Workgroup uid " + workgroupUid + "
+            // not found"));
+            thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
+            // 重新初始化会话，包括重置机器人状态等
+            thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
+            log.info("createWorkgroupCsThread: {}", thread.toString());
+        }
 
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
@@ -141,26 +154,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
                 }
             }
         }
-        
-        // 返回工作组会话
-        // return routeService.routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
-        return routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
-    }
 
-
-    public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, String threadTopic,
-            WorkgroupEntity workgroup) {
-        Assert.notNull(visitorRequest, "VisitorRequest must not be null");
-        Assert.hasText(threadTopic, "Thread topic must not be empty");
-        Assert.notNull(workgroup, "WorkgroupEntity must not be null");
-        Assert.notEmpty(workgroup.getAgents(), "No agents found in workgroup with uid " + workgroup.getUid());
-
-        log.info("routeWorkgroup: {}", workgroup.getUid());
-        // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
-        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
-        Assert.isTrue(threadOptional.isPresent(), "Thread with topic " + threadTopic + " not found");
-        
-        ThreadEntity thread = threadOptional.get();
         // 下面人工接待
         AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agent == null) {
@@ -184,7 +178,51 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             // 客服离线 或 非接待状态
             return getOfflineMessage(visitorRequest, thread, workgroup);
         }
+
+        // 返回工作组会话
+        // return routeService.routeToWorkgroup(visitorRequest, thread.getTopic(),
+        // workgroup);
+        // return routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
+
     }
+
+    // public MessageProtobuf routeToWorkgroup(VisitorRequest visitorRequest, String threadTopic,
+    //         WorkgroupEntity workgroup) {
+    //     Assert.notNull(visitorRequest, "VisitorRequest must not be null");
+    //     Assert.hasText(threadTopic, "Thread topic must not be empty");
+    //     Assert.notNull(workgroup, "WorkgroupEntity must not be null");
+    //     Assert.notEmpty(workgroup.getAgents(), "No agents found in workgroup with uid " + workgroup.getUid());
+
+    //     log.info("routeWorkgroup: {}", workgroup.getUid());
+    //     // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
+    //     Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(threadTopic);
+    //     Assert.isTrue(threadOptional.isPresent(), "Thread with topic " + threadTopic + " not found");
+
+    //     ThreadEntity thread = threadOptional.get();
+    //     // 下面人工接待
+    //     AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
+    //     if (agent == null) {
+    //         return getOfflineMessage(visitorRequest, thread, workgroup);
+    //     }
+    //     // 排队计数
+    //     QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+    //     log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+    //     //
+    //     if (agent.isConnectedAndAvailable()) {
+    //         // 客服在线 且 接待状态
+    //         if (agent.canAcceptMore()) {
+    //             // 未满则接待
+    //             return handleAvailableWorkgroup(thread, agent, queueMemberEntity);
+    //         } else {
+    //             // 排队，已满则排队
+    //             return handleQueuedWorkgroup(thread, agent, queueMemberEntity);
+    //         }
+    //     } else {
+    //         // 离线状态永远显示离线提示语，不显示"继续会话"
+    //         // 客服离线 或 非接待状态
+    //         return getOfflineMessage(visitorRequest, thread, workgroup);
+    //     }
+    // }
 
     private MessageProtobuf handleAvailableWorkgroup(ThreadEntity thread, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
@@ -275,7 +313,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             // 广播消息，由消息通道统一处理
             messageSendService.sendProtobufMessage(messageProtobuf);
         }
-        // 
+        //
         return messageProtobuf;
     }
 
@@ -286,6 +324,5 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         //
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
-
 
 }
