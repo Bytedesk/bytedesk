@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 21:51:57
+ * @LastEditTime: 2025-03-19 22:03:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -374,6 +374,7 @@ public class TicketService {
             if (!StringUtils.hasText(ticket.getThreadUid())) {
                 ThreadEntity thread = ticketRestService.createTicketThread(ticket);
                 if (thread != null) {
+                    ticket.setTopic(thread.getTopic());
                     ticket.setThreadUid(thread.getUid());
                 }
             }

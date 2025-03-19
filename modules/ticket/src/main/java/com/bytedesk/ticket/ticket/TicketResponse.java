@@ -42,7 +42,7 @@ public class TicketResponse extends BaseResponse {
     private String type;
 
     // private ThreadResponse serviceThread;
-    private String serviceThreadTopic;
+    private String topic;
 
     // private ThreadResponse thread;
     private String threadUid;

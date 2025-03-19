@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:46:05
+ * @LastEditTime: 2025-03-19 22:02:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,15 +68,15 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @GetMapping("/query/service-thread-topic")
-    public ResponseEntity<?> queryByServiceThreadTopic(TicketRequest request) {
+    @GetMapping("/query/topic")
+    public ResponseEntity<?> queryByTopic(TicketRequest request) {
 
         Page<TicketResponse> page = ticketRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @GetMapping("/query/thread-uid")
+    @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
 
         Page<TicketResponse> page = ticketRestService.queryByOrg(request);
