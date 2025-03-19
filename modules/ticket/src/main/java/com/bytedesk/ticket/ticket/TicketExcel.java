@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 15:09:22
+ * @LastEditTime: 2025-03-19 18:16:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,9 +43,9 @@ public class TicketExcel {
     @ColumnWidth(20)
     private String type;
 
-    @ExcelProperty(value = "服务会话Topic")
-    @ColumnWidth(20)
-    private String serviceThreadTopic;
+    // @ExcelProperty(value = "服务会话Topic")
+    // @ColumnWidth(20)
+    // private String serviceThreadTopic;
 
     @ExcelProperty(value = "会话Uid")
     @ColumnWidth(20)

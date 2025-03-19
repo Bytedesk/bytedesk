@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 14:41:11
+ * @LastEditTime: 2025-03-19 18:12:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.ticket.consts.TicketConsts;
@@ -71,6 +72,7 @@ public class TicketService {
     private final AgentRestService agentRestService;
     // private final ApplicationEventPublisher eventPublisher;
     private final TicketRestService ticketRestService;
+    private final ThreadRestService threadRestService;
 
     /**
      * 查询工单，并过滤掉没有任务的工单
@@ -365,7 +367,18 @@ public class TicketService {
             runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
 
             // 5. 创建工单会话
-            ThreadEntity thread = ticketRestService.createTicketThread(ticket);
+            // serviceThreadTopic跟threadUid合并
+            ThreadEntity thread = null;
+            if (StringUtils.hasText(request.getThreadUid())) {
+                Optional<ThreadEntity> threadOptional = threadRestService.findByUid(request.getThreadUid());
+                if (threadOptional.isPresent()) {
+                    thread = threadOptional.get();
+                } else {
+                    thread = ticketRestService.createTicketThread(ticket);
+                }
+            } else {
+                thread = ticketRestService.createTicketThread(ticket);
+            }
             ticket.setThreadUid(thread.getUid());
 
             // 6. 发布工单分配消息事件
