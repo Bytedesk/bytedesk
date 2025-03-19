@@ -32,7 +32,7 @@
         "logo": "silicon.png",
         "apiUrl": "https://cloud.siliconflow.cn",
         "webUrl": "https://www.siliconflow.cn/",
-        "status": "DEVELOPMENT"
+        "status": "PRODUCTION"
     },
     "yiyan": {
         "nickname": "文心一言",

@@ -190,6 +190,15 @@ services:
       SPRING_AI_DASHSCOPE_IMAGE_ENABLED: false
       SPRING_AI_DASHSCOPE_EMBEDDING_ENABLED: false
       SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_ENABLED: false
+      SPRING_AI_NACOS_PROMPT_TEMPLATE_ENABLED: false
+      # siliconflow
+      # https://siliconflow.com/
+      # https://docs.spring.io/spring-ai/reference/api/chat/siliconflow-chat.html
+      SPRING_AI_SILICONFLOW_BASE_URL: https://api.siliconflow.cn
+      SPRING_AI_SILICONFLOW_API_KEY: 'sk-xxx'
+      SPRING_AI_SILICONFLOW_CHAT_ENABLED: false
+      SPRING_AI_SILICONFLOW_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
+      SPRING_AI_SILICONFLOW_CHAT_OPTIONS_TEMPERATURE: 0.7
       # moonshot
       SPRING_AI_MOONSHOT_CHAT_ENABLED: false
       SPRING_AI_MINIMAX_CHAT_ENABLED: false
