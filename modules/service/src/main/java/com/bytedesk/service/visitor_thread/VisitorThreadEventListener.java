@@ -52,8 +52,6 @@ public class VisitorThreadEventListener {
 
     private final RobotRestService robotRestService;
 
-    // private final UidUtils uidUtils;
-
     private final IMessageSendService messageSendService;
 
     @EventListener
@@ -150,6 +148,8 @@ public class VisitorThreadEventListener {
         // auto close thread
         visitorThreadService.autoCloseThread();
         // TODO: 触发器逻辑
+        // 查找所有未关闭的会话，如果超过一定时间未回复，则判断是否触发自动回复
+
         
     }
 
