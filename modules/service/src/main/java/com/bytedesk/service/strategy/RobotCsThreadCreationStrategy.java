@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:21:41
+ * @LastEditTime: 2025-03-19 15:48:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,10 +95,10 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
 
         // 更新线程状态
-        thread.setState(ThreadStateEnum.ROBOT.name());
+        thread.setState(ThreadStateEnum.ROBOTING.name());
         thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        thread.setRobot(true);
+        // thread.setRobot(true);
         thread.setUnreadCount(0);
         // ThreadEntity savedThread =
         threadService.save(thread);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 17:00:38
+ * @LastEditTime: 2025-03-19 15:48:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,7 @@ package com.bytedesk.core.thread;
 
 public enum ThreadStateEnum {
     NEW, // 新会话
-    ROBOT, // 机器人不需要排队
+    ROBOTING, // 机器人接待中
     QUEUING, // 排队中
     STARTED, // 开始会话
     TRANSFER_PENDING, // 转接待处理
