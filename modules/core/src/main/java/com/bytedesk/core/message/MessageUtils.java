@@ -88,6 +88,13 @@ public class MessageUtils {
                 content);
     }
 
+    public static MessageProtobuf createRateInviteMessage(ThreadEntity thread, String content) {
+        return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
+                thread,
+                MessageTypeEnum.RATE_INVITE,
+                content);
+    }
+
 
     public static void notifyUser(MessageProtobuf messageProtobuf) {
         String json = JSON.toJSONString(messageProtobuf);

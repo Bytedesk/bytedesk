@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 09:35:02
+ * @LastEditTime: 2025-03-19 09:58:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -150,6 +150,8 @@ public class VisitorThreadEventListener {
         // log.info("visitor_thread quartz one min event: " + event);
         // auto close thread
         visitorThreadService.autoCloseThread();
+        // TODO: 触发器逻辑
+        
     }
 
 }

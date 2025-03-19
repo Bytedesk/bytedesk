@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 18:19:07
+ * @LastEditTime: 2025-03-19 10:07:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,6 +51,8 @@ public class ServiceSettingsResponse implements Serializable {
     private Boolean showRateBtn;
 
     private Boolean autoInviteRate;
+
+    private String inviteRateTip;
 
     private Integer rateMsgCount;
 
