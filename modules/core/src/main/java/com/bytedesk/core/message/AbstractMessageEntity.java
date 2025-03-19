@@ -56,6 +56,9 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Column(name = "thread_topic")
     private String topic;
 
+    @Column(name = "thread_uid")
+    private String threadUid;
+
     /**
      * sender信息的JSON表示
      */

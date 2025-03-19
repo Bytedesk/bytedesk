@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 11:09:12
+ * @LastEditTime: 2025-03-19 12:38:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.visitor_thread;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
@@ -34,6 +35,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 
 import lombok.AllArgsConstructor;
@@ -53,6 +55,8 @@ public class VisitorThreadEventListener {
     private final RobotRestService robotRestService;
 
     private final IMessageSendService messageSendService;
+
+    private final ThreadRestService threadRestService;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
@@ -145,8 +149,9 @@ public class VisitorThreadEventListener {
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
         // log.info("visitor_thread quartz one min event: " + event);
+        List<ThreadEntity> threads = threadRestService.findServiceThreadStateStarted();
         // auto close thread
-        visitorThreadService.autoCloseThread();
+        visitorThreadService.autoCloseThread(threads);
         // TODO: 触发器逻辑
         // 查找所有未关闭的会话，如果超过一定时间未回复，则判断是否触发自动回复
 

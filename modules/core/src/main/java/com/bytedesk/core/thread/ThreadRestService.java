@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 09:02:27
+ * @LastEditTime: 2025-03-19 12:41:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,7 +85,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public Optional<ThreadResponse> queryByTopic(ThreadRequest request) {
-        //
         Optional<ThreadEntity> threadOptional = findFirstByTopic(request.getTopic());
         if (threadOptional.isPresent()) {
             return Optional.of(convertToResponse(threadOptional.get()));
@@ -482,14 +481,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(updateThread));
-        // // 发送消息
-        // MessageTypeEnum messageTypeEnum = threadRequest.getAutoClose() ? MessageTypeEnum.AUTO_CLOSED
-        //         : MessageTypeEnum.AGENT_CLOSED;
-        // MessageProtobuf messageProtobuf = MessageUtils.createThreadMessage(uidUtils.getUid(),
-        //         updateThread,
-        //         messageTypeEnum,
-        //         content);
-        // messageSendService.sendProtobufMessage(messageProtobuf);
         //
         return convertToResponse(updateThread);
     }
@@ -558,14 +549,9 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }
 
-    // @Cacheable(value = "threadOpen")
-    public List<ThreadEntity> findStateOpen() {
+    public List<ThreadEntity> findServiceThreadStateStarted() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });
-        // List<String> states = Arrays .asList(new String[] {
-        // ThreadStateEnum.CLOSED.name()});
-        // return threadRepository.findByTypesInAndStatesNotInAndDeleted(types, states,
-        // false);
         return threadRepository.findByTypesInAndStateAndDeletedFalse(types, ThreadStateEnum.STARTED.name());
     }
 

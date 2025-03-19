@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 10:29:39
+ * @LastEditTime: 2025-03-19 12:55:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.notice.NoticeRestService;
 import com.bytedesk.core.notice.extra.NoticeExtraInvite;
 import com.bytedesk.core.notice.extra.NoticeExtraTransfer;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -46,6 +47,7 @@ public class MessagePersistService {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJSON, MessageProtobuf.class);
         //
         MessageTypeEnum type = messageProtobuf.getType();
+        String threadUid = messageProtobuf.getThread().getUid();
         String threadTopic = messageProtobuf.getThread().getTopic();
         // log.info("orgUid: {}", orgUid);
 
@@ -77,8 +79,17 @@ public class MessagePersistService {
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
         }
+        message.setThreadUid(threadUid);
         message.setTopic(threadTopic);
         message.setUser(JSON.toJSONString(messageProtobuf.getUser()));
+        message.setUserUid(messageProtobuf.getUser().getUid());
+        if (UserTypeEnum.VISITOR.equals(messageProtobuf.getUser().getType())) {
+            message.setIsVisitor(true);
+        } else if (UserTypeEnum.AGENT.equals(messageProtobuf.getUser().getType())) {
+            message.setUserType(UserTypeEnum.AGENT.name());
+        } else if (UserTypeEnum.ROBOT.equals(messageProtobuf.getUser().getType())) {
+            message.setUserType(UserTypeEnum.ROBOT.name());
+        }
         // 
         MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
         if (extraObject != null) {
