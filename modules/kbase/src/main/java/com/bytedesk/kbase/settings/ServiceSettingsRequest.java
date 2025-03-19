@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 10:07:09
+ * @LastEditTime: 2025-03-19 12:20:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,10 +54,10 @@ public class ServiceSettingsRequest  implements Serializable {
 
     // show rate btn on chat toolbar
     @Builder.Default
-    private Boolean showRateBtn = true;
+    private Boolean showRateBtn = false;
 
     @Builder.Default
-    private Boolean autoInviteRate = true;
+    private Boolean autoInviteRate = false;
 
     @Builder.Default
     private String inviteRateTip = I18Consts.I18N_INVITE_RATE_TIP;
@@ -140,8 +140,8 @@ public class ServiceSettingsRequest  implements Serializable {
     private List<String> shortcutFaqUids = new ArrayList<>();
 
     // 可自定义设置相似问题、关联问题的引导语
-    @Builder.Default    
-    private String similarQuestionGuide = "您是否想问：";
+    // @Builder.Default    
+    // private String similarQuestionGuide = "您是否想问：";
 
     @Builder.Default
     private String relatedQuestionGuide = "您是否想问：";

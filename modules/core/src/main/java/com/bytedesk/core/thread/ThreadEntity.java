@@ -57,6 +57,7 @@ public class ThreadEntity extends AbstractThreadEntity {
         } else {
             setState(ThreadStateEnum.QUEUING.name());
         }
+        setRated(false);
         setHide(false);
         setAutoClose(false);
         setRobot(false);
