@@ -60,6 +60,10 @@
     ],
     "silicon": [
         {
+            "name": "Qwen/QwQ-32B",
+            "nickname": "Qwen/QwQ-32B"
+        },
+        {
             "name": "Qwen/Qwen2-7B-Instruct",
             "nickname": "Qwen2-7B-Instruct"
         },
