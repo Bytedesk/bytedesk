@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:51:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:15:59
+ * @LastEditTime: 2025-03-20 12:58:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,8 +20,6 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
@@ -35,13 +33,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
-/**
- * 敏感词
- */
+
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -56,11 +53,11 @@ public class TabooMessageEntity extends BaseEntity {
     @Column(name = "taboo_message_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
 
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
+    // @Builder.Default
+    // private String level = LevelEnum.ORGANIZATION.name();
 
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    // private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)

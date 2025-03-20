@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:17:02
+ * @LastEditTime: 2025-03-20 12:59:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.kbase.split.SplitStatusEnum;
 
 import lombok.AllArgsConstructor;
@@ -28,9 +26,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
@@ -55,11 +54,11 @@ public class TextRequest extends BaseRequest {
     @Builder.Default
     private String status = SplitStatusEnum.NEW.name();
 
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
+    // @Builder.Default
+    // private String level = LevelEnum.ORGANIZATION.name();
 
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    // private String platform = PlatformEnum.BYTEDESK.name();
 
     private String categoryUid; // 所属分类
 

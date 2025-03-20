@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 17:32:36
+ * @LastEditTime: 2025-03-20 13:10:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -364,7 +364,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 Optional<FaqEntity> welcomeFaqOptional = faqService.findByUid(welcomeFaqUid);
                 if (welcomeFaqOptional.isPresent()) {
                     FaqEntity welcomeFaqEntity = welcomeFaqOptional.get();
-                    log.info("welcomeFaqUid added {}", welcomeFaqUid);
+                    // log.info("welcomeFaqUid added {}", welcomeFaqUid);
                     serviceSettings.getWelcomeFaqs().add(welcomeFaqEntity);
                 } else {
                     throw new RuntimeException("welcomeFaq " + welcomeFaqUid + " not found");
@@ -609,7 +609,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     // 从json创建平台智能体
     public RobotResponse createPromptRobotFromJson(String orgUid, Robot robotJson, String categoryUid,
             String level) {
-        log.info("robotJson {}", robotJson.getName());
+        // log.info("robotJson {}", robotJson.getName());
         String uid = Utils.formatUid(orgUid, robotJson.getUid());
         // 判断uid是否已经存在
         if (StringUtils.hasText(uid) && existsByUid(uid)) {

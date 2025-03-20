@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 16:24:44
+ * @LastEditTime: 2025-03-20 13:05:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,18 +18,16 @@ import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
@@ -53,11 +51,11 @@ public class TaskRequest extends BaseRequest {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
+    // @Builder.Default
+    // private String level = LevelEnum.ORGANIZATION.name();
 
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    // private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
     private Boolean complete = false;

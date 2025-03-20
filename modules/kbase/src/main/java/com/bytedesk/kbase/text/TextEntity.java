@@ -20,8 +20,6 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.kbase.split.SplitStatusEnum;
 
 import jakarta.persistence.Column;
@@ -60,11 +58,11 @@ public class TextEntity extends BaseEntity {
     @Builder.Default
     private String status = SplitStatusEnum.NEW.name();
 
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
+    // @Builder.Default
+    // private String level = LevelEnum.ORGANIZATION.name();
 
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    // private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
