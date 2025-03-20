@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:20:58
+ * @LastEditTime: 2025-03-20 16:39:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.push.PushRestService;
-import com.bytedesk.core.rbac.authority.AuthorityPermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,8 +34,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
     private final UserRestService userRestService;
 
     private final UserService userService;
-
-    // private final AuthService authService;
 
     private final PushRestService pushService;
 
@@ -156,11 +153,11 @@ public class UserRestController extends BaseRestController<UserRequest> {
     // 静态权限配置，测试
     /** for testing，client will return 403, if don't have authority/role */
     // @PreAuthorize("hasAnyAuthority('SUPER', 'ADMIN','USER')")
-    @PreAuthorize(AuthorityPermissions.AUTHORITY_ANY)
-    @GetMapping("/test/super")
-    public ResponseEntity<?> testSuperAuthority() {
-        return ResponseEntity.ok("you have super authority");
-    }
+    // @PreAuthorize(AuthorityPermissions.AUTHORITY_ANY)
+    // @GetMapping("/test/super")
+    // public ResponseEntity<?> testSuperAuthority() {
+    //     return ResponseEntity.ok("you have super authority");
+    // }
 
     /** no need to add ROLE_ prefix, system will auto add */
     @GetMapping(value = "/test/cs")
