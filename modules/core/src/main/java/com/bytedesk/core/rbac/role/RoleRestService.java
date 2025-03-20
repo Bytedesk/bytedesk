@@ -99,7 +99,6 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
                         return convertToResponse(findByUid(request.getUid()).get());
                 }
-
                 if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
                         throw new RuntimeException("role " + request.getName() + " already exists");
                 }
@@ -107,7 +106,6 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 if (user != null) {
                         request.setUserUid(user.getUid());
                 }
-
                 RoleEntity role = modelMapper.map(request, RoleEntity.class);
                 if (StringUtils.hasText(request.getUid())) {
                         role.setUid(request.getUid());

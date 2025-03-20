@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:57:02
+ * @LastEditTime: 2025-03-20 16:36:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,6 @@ import com.bytedesk.core.enums.PermissionEnum;
 // import com.bytedesk.core.ip.IpPermissions;
 // import com.bytedesk.core.message.MessagePermissions;
 // import com.bytedesk.core.push.PushPermissions;
-import com.bytedesk.core.rbac.authority.AuthorityPermissions;
 // import com.bytedesk.core.rbac.organization.OrganizationPermissions;
 // import com.bytedesk.core.rbac.user.UserPermissions;
 // import com.bytedesk.core.thread.ThreadPermissions;
@@ -84,7 +83,6 @@ public class RoleInitializer {
 
         // 初始化权限前缀数组
         String[] authorities = {
-            AuthorityPermissions.AUTHORITY_PREFIX,
             RolePermissions.ROLE_PREFIX,
         };
 
