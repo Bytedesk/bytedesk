@@ -19,11 +19,11 @@ public class RobotPermissions extends BasePermissions {
 
     public static final String ROBOT_PREFIX = "ROBOT_";
     //
-    public static final String ROBOT_CREATE = formatAuthority(ROBOT_PREFIX + "CREATE");
-    public static final String ROBOT_READ = formatAuthority(ROBOT_PREFIX + "READ");
-    public static final String ROBOT_UPDATE = formatAuthority(ROBOT_PREFIX + "UPDATE");
-    public static final String ROBOT_DELETE = formatAuthority(ROBOT_PREFIX + "DELETE");
-    public static final String ROBOT_EXPORT = formatAuthority(ROBOT_PREFIX + "EXPORT");
+    public static final String ROBOT_CREATE = formatAuthority(ROBOT_PREFIX + CREATE);
+    public static final String ROBOT_READ = formatAuthority(ROBOT_PREFIX + READ);
+    public static final String ROBOT_UPDATE = formatAuthority(ROBOT_PREFIX + UPDATE);
+    public static final String ROBOT_DELETE = formatAuthority(ROBOT_PREFIX + DELETE);
+    public static final String ROBOT_EXPORT = formatAuthority(ROBOT_PREFIX + EXPORT);
     // 
-    public static final String ROBOT_ANY = formatAnyAuthority(ROBOT_PREFIX + "CREATE", ROBOT_PREFIX + "READ", ROBOT_PREFIX + "UPDATE", ROBOT_PREFIX + "EXPORT", ROBOT_PREFIX + "DELETE");
+    public static final String ROBOT_ANY = formatAnyAuthority(ROBOT_PREFIX + CREATE, ROBOT_PREFIX + READ, ROBOT_PREFIX + UPDATE, ROBOT_PREFIX + EXPORT, ROBOT_PREFIX + DELETE);
 }

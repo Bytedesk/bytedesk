@@ -19,12 +19,12 @@ package com.bytedesk.core.thread;
 
 //     public static final String THREAD_PREFIX = "THREAD_";
 //     // 
-//     public static final String THREAD_CREATE = formatAuthority(THREAD_PREFIX + "CREATE");
-//     public static final String THREAD_READ = formatAuthority(THREAD_PREFIX + "READ");
-//     public static final String THREAD_UPDATE = formatAuthority(THREAD_PREFIX + "UPDATE");
-//     public static final String THREAD_DELETE = formatAuthority(THREAD_PREFIX + "DELETE");
-//     public static final String THREAD_EXPORT = formatAuthority(THREAD_PREFIX + "EXPORT");
+//     public static final String THREAD_CREATE = formatAuthority(THREAD_PREFIX + CREATE);
+//     public static final String THREAD_READ = formatAuthority(THREAD_PREFIX + READ);
+//     public static final String THREAD_UPDATE = formatAuthority(THREAD_PREFIX + UPDATE);
+//     public static final String THREAD_DELETE = formatAuthority(THREAD_PREFIX + DELETE);
+//     public static final String THREAD_EXPORT = formatAuthority(THREAD_PREFIX + EXPORT);
 //     // 
-//     public static final String THREAD_ANY = formatAnyAuthority(THREAD_PREFIX + "CREATE", THREAD_PREFIX + "READ", THREAD_PREFIX + "UPDATE", THREAD_PREFIX + "EXPORT", THREAD_PREFIX + "DELETE");
+//     public static final String THREAD_ANY = formatAnyAuthority(THREAD_PREFIX + CREATE, THREAD_PREFIX + READ, THREAD_PREFIX + UPDATE, THREAD_PREFIX + EXPORT, THREAD_PREFIX + DELETE);
 
 // }

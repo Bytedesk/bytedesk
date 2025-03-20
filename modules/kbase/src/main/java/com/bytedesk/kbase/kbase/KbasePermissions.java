@@ -19,11 +19,11 @@ public class KbasePermissions extends BasePermissions {
 
     public static final String KBASE_PREFIX = "KBASE_";
     //
-    public static final String KBASE_CREATE = formatAuthority(KBASE_PREFIX + "CREATE");
-    public static final String KBASE_READ = formatAuthority(KBASE_PREFIX + "READ");
-    public static final String KBASE_UPDATE = formatAuthority(KBASE_PREFIX + "UPDATE");
-    public static final String KBASE_DELETE = formatAuthority(KBASE_PREFIX + "DELETE");
-    public static final String KBASE_EXPORT = formatAuthority(KBASE_PREFIX + "EXPORT");
+    public static final String KBASE_CREATE = formatAuthority(KBASE_PREFIX + CREATE);
+    public static final String KBASE_READ = formatAuthority(KBASE_PREFIX + READ);
+    public static final String KBASE_UPDATE = formatAuthority(KBASE_PREFIX + UPDATE);
+    public static final String KBASE_DELETE = formatAuthority(KBASE_PREFIX + DELETE);
+    public static final String KBASE_EXPORT = formatAuthority(KBASE_PREFIX + EXPORT);
     // 
-    public static final String KBASE_ANY = formatAnyAuthority(KBASE_PREFIX + "CREATE", KBASE_PREFIX + "READ", KBASE_PREFIX + "UPDATE", KBASE_PREFIX + "EXPORT", KBASE_PREFIX + "DELETE");
+    public static final String KBASE_ANY = formatAnyAuthority(KBASE_PREFIX + CREATE, KBASE_PREFIX + READ, KBASE_PREFIX + UPDATE, KBASE_PREFIX + EXPORT, KBASE_PREFIX + DELETE);
 }

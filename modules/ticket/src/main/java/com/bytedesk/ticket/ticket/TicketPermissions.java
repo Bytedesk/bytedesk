@@ -19,12 +19,12 @@ public class TicketPermissions extends BasePermissions {
 
     public static final String TICKET_PREFIX = "TICKET_";
     // 
-    public static final String TICKET_CREATE = formatAuthority(TICKET_PREFIX + "CREATE");
-    public static final String TICKET_READ = formatAuthority(TICKET_PREFIX + "READ");
-    public static final String TICKET_UPDATE = formatAuthority(TICKET_PREFIX + "UPDATE");
-    public static final String TICKET_DELETE = formatAuthority(TICKET_PREFIX + "DELETE");
-    public static final String TICKET_EXPORT = formatAuthority(TICKET_PREFIX + "EXPORT");
+    public static final String TICKET_CREATE = formatAuthority(TICKET_PREFIX + CREATE);
+    public static final String TICKET_READ = formatAuthority(TICKET_PREFIX + READ);
+    public static final String TICKET_UPDATE = formatAuthority(TICKET_PREFIX + UPDATE);
+    public static final String TICKET_DELETE = formatAuthority(TICKET_PREFIX + DELETE);
+    public static final String TICKET_EXPORT = formatAuthority(TICKET_PREFIX + EXPORT);
     // 
-    public static final String TICKET_ANY = formatAnyAuthority(TICKET_PREFIX + "CREATE", TICKET_PREFIX + "READ", TICKET_PREFIX + "UPDATE", TICKET_PREFIX + "EXPORT", TICKET_PREFIX + "DELETE");
+    public static final String TICKET_ANY = formatAnyAuthority(TICKET_PREFIX + CREATE, TICKET_PREFIX + READ, TICKET_PREFIX + UPDATE, TICKET_PREFIX + EXPORT, TICKET_PREFIX + DELETE);
 
 }

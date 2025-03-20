@@ -19,11 +19,11 @@ public class WorkgroupPermissions extends BasePermissions {
 
     public static final String WORKGROUP_PREFIX = "WORKGROUP_";
     //
-    public static final String WORKGROUP_CREATE = formatAuthority(WORKGROUP_PREFIX + "CREATE");
-    public static final String WORKGROUP_READ = formatAuthority(WORKGROUP_PREFIX + "READ");
-    public static final String WORKGROUP_UPDATE = formatAuthority(WORKGROUP_PREFIX + "UPDATE");
-    public static final String WORKGROUP_DELETE = formatAuthority(WORKGROUP_PREFIX + "DELETE");
-    public static final String WORKGROUP_EXPORT = formatAuthority(WORKGROUP_PREFIX + "EXPORT");
+    public static final String WORKGROUP_CREATE = formatAuthority(WORKGROUP_PREFIX + CREATE);
+    public static final String WORKGROUP_READ = formatAuthority(WORKGROUP_PREFIX + READ);
+    public static final String WORKGROUP_UPDATE = formatAuthority(WORKGROUP_PREFIX + UPDATE);
+    public static final String WORKGROUP_DELETE = formatAuthority(WORKGROUP_PREFIX + DELETE);
+    public static final String WORKGROUP_EXPORT = formatAuthority(WORKGROUP_PREFIX + EXPORT);
     // 
-    public static final String WORKGROUP_ANY = formatAnyAuthority(WORKGROUP_PREFIX + "CREATE", WORKGROUP_PREFIX + "READ", WORKGROUP_PREFIX + "UPDATE", WORKGROUP_PREFIX + "EXPORT", WORKGROUP_PREFIX + "DELETE");
+    public static final String WORKGROUP_ANY = formatAnyAuthority(WORKGROUP_PREFIX + CREATE, WORKGROUP_PREFIX + READ, WORKGROUP_PREFIX + UPDATE, WORKGROUP_PREFIX + EXPORT, WORKGROUP_PREFIX + DELETE);
 }
