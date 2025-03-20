@@ -115,7 +115,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/artist.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/ai" class="stretched-link" target="_blank">工作流</a></h5>
+					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/plugins/kanban/" class="stretched-link" target="_blank">工作流</a></h5>
 					<span class="mb-0">AI智能体，自动执行数据操作，自定义工作流、流程编排，Function Calling/Mcp</span>
 				</div>
 			</div>
@@ -126,7 +126,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/home.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/kanban" class="stretched-link" target="_blank">项目管理</a></h5>
+					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/plugins/kanban/" class="stretched-link" target="_blank">项目管理</a></h5>
 					<span class="mb-0">看板、日报、任务管理</span>
 				</div>
 			</div>
