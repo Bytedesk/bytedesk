@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 17:41:09
+ * @LastEditTime: 2025-03-20 18:28:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,7 +96,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         public RoleResponse createOrUpdate(RoleRequest request) {
                 if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-                        return update(request);
+                        return addAuthorities(request);
                 } else {
                         return create(request);
                 }
@@ -167,6 +167,29 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         throw new RuntimeException("role " + request.getUid() + " not found");
                 }
         }
+
+        public RoleResponse addAuthorities(RoleRequest request) {
+                Optional<RoleEntity> roleOptional = findByUid(request.getUid());
+                if (roleOptional.isPresent()) {
+                        RoleEntity role = roleOptional.get();
+                        if (request.getAuthorityUids()!= null) {
+                                for (String authorityUid : request.getAuthorityUids()) {
+                                        Optional<AuthorityEntity> authorityOptional = authorityService
+                                                       .findByUid(authorityUid);
+                                        authorityOptional.ifPresent(role::addAuthority);
+                                }
+                        }
+                        //
+                        RoleEntity savedRole = save(role);
+                        if (savedRole == null) {
+                                throw new RuntimeException("role " + request.getUid() + " update failed");
+                        }
+                        return convertToResponse(savedRole);
+                } else {
+                        throw new RuntimeException("role " + request.getUid() + " not found");
+                }
+        }
+
 
         @Override
         public void deleteByUid(String uid) {
