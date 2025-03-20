@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:26:13
+ * @LastEditTime: 2025-03-20 14:38:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,9 +20,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -45,16 +43,14 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     private final UidUtils uidUtils;
     // private final AuthService authService;
 
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_READ)
     @Override
     public Page<AuthorityResponse> queryByOrg(AuthorityRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC, "id");
+        Pageable pageable = request.getPageable();
         Specification<AuthorityEntity> specification = AuthoritySpecification.search(request);
         Page<AuthorityEntity> page = authorityRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
 
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_READ)
     @Override
     public Page<AuthorityResponse> queryByUser(AuthorityRequest request) {
         // TODO Auto-generated method stub
