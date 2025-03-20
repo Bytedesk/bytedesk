@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:36:04
+ * @LastEditTime: 2025-03-20 13:26:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 
 import java.util.Optional;
@@ -75,11 +77,22 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
         return authorityRepository.existsByValue(value);
     }
 
+    public AuthorityResponse createForPlatform(String permissionValue) {
+        AuthorityRequest authRequest = AuthorityRequest.builder()
+                    .uid(permissionValue.toLowerCase())
+                    .name(I18Consts.I18N_PREFIX + permissionValue)
+                    .value(permissionValue)
+                    .description("Permission for " + permissionValue)
+                    .level(LevelEnum.PLATFORM.name())
+                    .build();
+        return create(authRequest);
+    }
+
     @Override
     @Transactional
     public AuthorityResponse create(AuthorityRequest request) {
         if (existsByValue(request.getValue())) {
-            throw new RuntimeException("value " + request.getValue() + " already exists");
+            return findByValue(request.getValue()).map(this::convertToResponse).orElse(null);
         }
         // 
         AuthorityEntity authorityEntity = modelMapper.map(request, AuthorityEntity.class);

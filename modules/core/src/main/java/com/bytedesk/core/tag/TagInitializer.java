@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-06 21:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:53:46
+ * @LastEditTime: 2025-03-20 13:28:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,16 +32,7 @@ public class TagInitializer implements SmartInitializingSingleton {
     private void initPermissions() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
         //     String permissionValue = TagPermissions.ARTICLE_PREFIX + permission.name();
-        //     if (authorityService.existsByValue(permissionValue)) {
-        //         continue;
-        //     }
-        //     AuthorityRequest authRequest = AuthorityRequest.builder()
-        //             .name(I18Consts.I18N_PREFIX + permissionValue)
-        //             .value(permissionValue)
-        //             .description("Permission for " + permissionValue)
-        //             .build();
-        //     authRequest.setUid(permissionValue.toLowerCase());
-        //     authorityService.create(authRequest);
+        //     authorityService.createForPlatform(permissionValue);
         // }
     }
 
