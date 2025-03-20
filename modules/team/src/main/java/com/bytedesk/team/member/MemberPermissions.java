@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 17:07:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 22:05:40
+ * @LastEditTime: 2025-03-20 12:15:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,13 +13,17 @@
  */
 package com.bytedesk.team.member;
 
-public class MemberPermissions {
+import com.bytedesk.core.base.BasePermissions;
+
+public class MemberPermissions extends BasePermissions {
 
     public static final String MEMBER_PREFIX = "MEMBER_";
-    // Member permissions
-    public static final String MEMBER_CREATE = "hasAuthority('MEMBER_CREATE')";
-    public static final String MEMBER_READ = "hasAuthority('MEMBER_READ')";
-    public static final String MEMBER_UPDATE = "hasAuthority('MEMBER_UPDATE')";
-    public static final String MEMBER_DELETE = "hasAuthority('MEMBER_DELETE')";
-    public static final String MEMBER_EXPORT = "hasAuthority('MEMBER_EXPORT')";
+    //
+    public static final String MEMBER_CREATE = formatAuthority(MEMBER_PREFIX + "CREATE");
+    public static final String MEMBER_READ = formatAuthority(MEMBER_PREFIX + "READ");
+    public static final String MEMBER_UPDATE = formatAuthority(MEMBER_PREFIX + "UPDATE");
+    public static final String MEMBER_DELETE = formatAuthority(MEMBER_PREFIX + "DELETE");
+    public static final String MEMBER_EXPORT = formatAuthority(MEMBER_PREFIX + "EXPORT");
+    // 
+    public static final String MEMBER_ANY = formatAnyAuthority(MEMBER_PREFIX + "CREATE", MEMBER_PREFIX + "READ", MEMBER_PREFIX + "UPDATE", MEMBER_PREFIX + "EXPORT", MEMBER_PREFIX + "DELETE");
 }

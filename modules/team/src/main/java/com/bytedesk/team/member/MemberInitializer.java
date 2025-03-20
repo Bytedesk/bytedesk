@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 19:44:06
+ * @LastEditTime: 2025-03-20 12:15:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRequest;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.team.department.DepartmentConsts;
 
 import lombok.AllArgsConstructor;
@@ -31,10 +34,14 @@ public class MemberInitializer implements SmartInitializingSingleton {
 
     private final BytedeskProperties bytedeskProperties;
 
+    private final AuthorityRestService authorityService;
+
     @Override
     public void afterSingletonsInstantiated() {
         // 迁移到 WorkgroupInitializer 执行
         // init();
+        // 
+        initPermissions();
     }
 
     // @PostConstruct
@@ -62,4 +69,19 @@ public class MemberInitializer implements SmartInitializingSingleton {
         }
     }
 
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = MemberPermissions.MEMBER_PREFIX + permission.name();
+            if (authorityService.existsByValue(permissionValue)) {
+                continue;
+            }
+            AuthorityRequest authRequest = AuthorityRequest.builder()
+                    .name(I18Consts.I18N_PREFIX + permissionValue)
+                    .value(permissionValue)
+                    .description("Permission for " + permissionValue)
+                    .build();
+            authRequest.setUid(permissionValue.toLowerCase());
+            authorityService.create(authRequest);
+        }
+    }
 }
