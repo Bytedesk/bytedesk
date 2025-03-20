@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:34:52
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-08 10:36:56
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-20 12:45:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.core.channel;
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -27,13 +26,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * channel 频道 - 类似公众号
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -57,6 +57,6 @@ public class ChannelEntity extends BaseEntityNoOrg {
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
-    @Builder.Default
-    private String level = LevelEnum.PLATFORM.name();
+    // @Builder.Default
+    // private String level = LevelEnum.PLATFORM.name();
 }

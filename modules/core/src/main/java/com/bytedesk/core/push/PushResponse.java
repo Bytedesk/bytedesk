@@ -14,17 +14,15 @@
 package com.bytedesk.core.push;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.enums.PlatformEnum;
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -51,7 +49,7 @@ public class PushResponse extends BaseResponse {
 
     private String client;
 
-    private PlatformEnum platform;
+    // private PlatformEnum platform;
 
     // private LocalDateTime createdAt;
 

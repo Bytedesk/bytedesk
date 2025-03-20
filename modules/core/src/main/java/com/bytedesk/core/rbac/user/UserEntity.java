@@ -12,7 +12,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.role.RoleEntity;
 
@@ -108,8 +107,8 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
 
-	@Builder.Default
-	private String platform = PlatformEnum.BYTEDESK.name();
+	// @Builder.Default
+	// private String platform = PlatformEnum.BYTEDESK.name();
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
 	@ManyToOne(fetch = FetchType.LAZY)

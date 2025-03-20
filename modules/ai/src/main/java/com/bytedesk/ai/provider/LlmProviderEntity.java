@@ -15,7 +15,6 @@ package com.bytedesk.ai.provider;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -26,10 +25,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -58,7 +58,7 @@ public class LlmProviderEntity extends BaseEntity {
     @Builder.Default
     private String status = LlmProviderStatusEnum.DEVELOPMENT.name();
 
-    @Builder.Default
-    private String level = LevelEnum.PLATFORM.name();
+    // @Builder.Default
+    // private String level = LevelEnum.PLATFORM.name();
     
 }

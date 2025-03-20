@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 15:56:55
+ * @LastEditTime: 2025-03-20 12:40:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,8 +16,6 @@ package com.bytedesk.core.assistant;
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -58,7 +56,7 @@ public class AssistantEntity extends BaseEntityNoOrg {
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
-    @Builder.Default
-    private String level = LevelEnum.PLATFORM.name();
+    // @Builder.Default
+    // private String level = LevelEnum.PLATFORM.name();
 
 }

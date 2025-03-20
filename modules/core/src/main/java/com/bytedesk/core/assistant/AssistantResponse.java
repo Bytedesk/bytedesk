@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:05:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 14:09:56
+ * @LastEditTime: 2025-03-20 12:43:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,19 +15,17 @@ package com.bytedesk.core.assistant;
 
 import com.bytedesk.core.base.BaseResponse;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 public class AssistantResponse extends BaseResponse {
     
-    // private String aid;
-
     private String topic;
 
     // private String type;
@@ -38,7 +36,4 @@ public class AssistantResponse extends BaseResponse {
     private String avatar;
 
     private String description;
-
-    /** belong to org */
-    // private String orgUid;
 }

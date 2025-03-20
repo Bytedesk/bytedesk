@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:16:36
+ * @LastEditTime: 2025-03-20 12:41:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,11 +15,23 @@ package com.bytedesk.core.base;
 
 import java.io.Serializable;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
 
-@Data
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+@Getter
+@Setter
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class BaseRequestNoOrg implements Serializable {
 
     protected String uid;
@@ -33,4 +45,13 @@ public abstract class BaseRequestNoOrg implements Serializable {
     protected String content;
 
     protected String client;
+
+    // platform: 只有超级管理员才有权限
+    // organization: 管理员才有权限
+    @Builder.Default
+    private String level = LevelEnum.ORGANIZATION.name();
+
+    // 默认bytedesk平台
+    @Builder.Default
+    private String platform = PlatformEnum.BYTEDESK.name();
 }

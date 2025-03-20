@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 07:05:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:19:28
+ * @LastEditTime: 2025-03-20 12:31:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,25 +42,25 @@ public class AuthorityInitializer {
     public void init() {
 
         // 平台权限数组
-        String[] authoritiesPlatform = {
-            AuthorityPermissions.AUTHORITY_PREFIX,
-        };
-        for (String prefix : authoritiesPlatform) {
-            for (PermissionEnum permission : PermissionEnum.values()) {
-                String permissionValue = prefix + permission.name();
-                if (authorityService.existsByValue(permissionValue)) {
-                    continue;
-                }
-                AuthorityRequest authRequest = AuthorityRequest.builder()
-                    .name(I18Consts.I18N_PREFIX + permissionValue)
-                    .value(permissionValue)
-                    .description("Permission for " + permissionValue)
-                    .level(LevelEnum.PLATFORM.name())
-                    .build();
-                authRequest.setUid(permissionValue.toLowerCase());
-                authorityService.create(authRequest);
+        // String[] authoritiesPlatform = {
+        //     AuthorityPermissions.AUTHORITY_PREFIX,
+        // };
+        // for (String prefix : authoritiesPlatform) {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = AuthorityPermissions.AUTHORITY_PREFIX + permission.name();
+            if (authorityService.existsByValue(permissionValue)) {
+                continue;
             }
+            AuthorityRequest authRequest = AuthorityRequest.builder()
+                .name(I18Consts.I18N_PREFIX + permissionValue)
+                .value(permissionValue)
+                .description("Permission for " + permissionValue)
+                .level(LevelEnum.PLATFORM.name())
+                .build();
+            authRequest.setUid(permissionValue.toLowerCase());
+            authorityService.create(authRequest);
         }
+        // }
         
         /// 
         // 组织权限：初始化权限前缀数组
