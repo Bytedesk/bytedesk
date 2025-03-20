@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 16:36:23
+ * @LastEditTime: 2025-03-20 17:41:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,68 +59,63 @@ public class RoleInitializer {
 
     private void initRoles() {
         // 1. 超级管理员
-        createSuper();
+        // createSuper();
         // 2. 管理员
-        createAdmin();
+        // createAdmin();
         // 3. 团队成员
         createMember();
         // 4. 客服
         createAgent();
     }
 
-    private void createSuper() {
-        if (roleService.existsByNamePlatform(RoleConsts.ROLE_SUPER)) {
-            return;
-        }
-
-        RoleRequest roleRequest = RoleRequest.builder()
-                .uid(BytedeskConsts.DEFAULT_ROLE_SUPER_UID)
-                .name(RoleConsts.ROLE_SUPER)
-                .description("Super")
-                .level(LevelEnum.PLATFORM.name())
-                .system(true)
-                .build();
-
-        // 初始化权限前缀数组
-        String[] authorities = {
-            RolePermissions.ROLE_PREFIX,
-        };
-
-        // 遍历权限前缀数组
-        for (String prefix : authorities) {
-            for (PermissionEnum permission : PermissionEnum.values()) {
-                String permissionValue = prefix + permission.name();
-                roleRequest.getAuthorityUids().add(permissionValue.toLowerCase());
-            }
-        }
-        roleService.create(roleRequest);
-    }
-
-    private void createAdmin() {
-        if (roleService.existsByNamePlatform(RoleConsts.ROLE_ADMIN)) {
-            return;
-        }
-        RoleRequest roleRequest = RoleRequest.builder()
-                .uid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID)
-                .name(RoleConsts.ROLE_ADMIN)
-                .description("Admin")
-                .level(LevelEnum.PLATFORM.name())
-                .system(true)
-                .build();
-
-        // 初始化权限前缀数组
-        String[] authorities = {
-            RolePermissions.ROLE_PREFIX,
-        };
-        // 遍历权限前缀数组
-        for (String prefix : authorities) {
-            for (PermissionEnum permission : PermissionEnum.values()) {
-                String permissionValue = prefix + permission.name();
-                roleRequest.getAuthorityUids().add(permissionValue.toLowerCase());
-            }
-        }
-        roleService.create(roleRequest);
-    }
+    // private void createSuper() {
+    //     if (roleService.existsByNamePlatform(RoleConsts.ROLE_SUPER)) {
+    //         return;
+    //     }
+    //     RoleRequest roleRequest = RoleRequest.builder()
+    //             .uid(BytedeskConsts.DEFAULT_ROLE_SUPER_UID)
+    //             .name(RoleConsts.ROLE_SUPER)
+    //             .description("Super")
+    //             .level(LevelEnum.PLATFORM.name())
+    //             .system(true)
+    //             .build();
+    //     // 初始化权限前缀数组
+    //     String[] authorities = {
+    //         RolePermissions.ROLE_PREFIX,
+    //     };
+    //     // 遍历权限前缀数组
+    //     for (String prefix : authorities) {
+    //         for (PermissionEnum permission : PermissionEnum.values()) {
+    //             String permissionValue = prefix + permission.name();
+    //             roleRequest.getAuthorityUids().add(permissionValue.toLowerCase());
+    //         }
+    //     }
+    //     roleService.create(roleRequest);
+    // }
+    // private void createAdmin() {
+    //     if (roleService.existsByNamePlatform(RoleConsts.ROLE_ADMIN)) {
+    //         return;
+    //     }
+    //     RoleRequest roleRequest = RoleRequest.builder()
+    //             .uid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID)
+    //             .name(RoleConsts.ROLE_ADMIN)
+    //             .description("Admin")
+    //             .level(LevelEnum.PLATFORM.name())
+    //             .system(true)
+    //             .build();
+    //     // 初始化权限前缀数组
+    //     String[] authorities = {
+    //         RolePermissions.ROLE_PREFIX,
+    //     };
+    //     // 遍历权限前缀数组
+    //     for (String prefix : authorities) {
+    //         for (PermissionEnum permission : PermissionEnum.values()) {
+    //             String permissionValue = prefix + permission.name();
+    //             roleRequest.getAuthorityUids().add(permissionValue.toLowerCase());
+    //         }
+    //     }
+    //     roleService.create(roleRequest);
+    // }
 
     private void createMember() {
         if (roleService.existsByNamePlatform(RoleConsts.ROLE_MEMBER)) {

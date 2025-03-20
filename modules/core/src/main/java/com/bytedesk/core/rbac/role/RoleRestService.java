@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:10:53
+ * @LastEditTime: 2025-03-20 17:41:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -94,6 +94,14 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return roleRepository.existsByUid(uid);
         }
 
+        public RoleResponse createOrUpdate(RoleRequest request) {
+                if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+                        return update(request);
+                } else {
+                        return create(request);
+                }
+        }
+
         public RoleResponse create(RoleRequest request) {
                 // 判断uid是否已存在
                 if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
@@ -149,8 +157,6 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                                         authorityOptional.ifPresent(role::addAuthority);
                                 }
                         }
-                        // TODO: 给member对应的userUid删除/添加角色
-                        // role.setMemberUids(request.getMemberUids());
                         //
                         RoleEntity savedRole = save(role);
                         if (savedRole == null) {
