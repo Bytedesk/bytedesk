@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 14:59:50
+ * @LastEditTime: 2025-03-20 15:12:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,10 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.team.member;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
@@ -39,7 +43,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
     public void afterSingletonsInstantiated() {
         // 迁移到 WorkgroupInitializer 执行
         // init();
-        // 
+        //
         initPermissions();
     }
 
@@ -51,22 +55,28 @@ public class MemberInitializer implements SmartInitializingSingleton {
         String nickname = bytedeskProperties.getNickname();
         String email = bytedeskProperties.getEmail();
         String mobile = bytedeskProperties.getMobile();
-        if (!memberService.existsByEmailAndOrgUid(email, orgUid)) {
-            MemberRequest memberRequest = MemberRequest.builder()
-                    .jobNo("001")
-                    .jobTitle(I18Consts.I18N_ADMIN)
-                    .nickname(nickname)
-                    .seatNo("001")
-                    .telephone("001")
-                    .mobile(mobile)
-                    .email(email)
-                    .status(MemberStatusEnum.ACTIVE.name())
-                    .deptUid(DepartmentConsts.DEFAULT_DEPT_ADMIN_UID)
-                    .build();
-            memberRequest.setUid(BytedeskConsts.DEFAULT_MEMBER_UID);
-            memberRequest.setOrgUid(orgUid);
-            memberService.create(memberRequest);
-        }
+        //
+        Set<String> roleUids = new HashSet<>(Arrays.asList(
+                BytedeskConsts.DEFAULT_ROLE_SUPER_UID));
+        //
+        MemberRequest memberRequest = MemberRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_MEMBER_UID)
+                .jobNo("001")
+                .jobTitle(I18Consts.I18N_ADMIN)
+                .nickname(nickname)
+                .seatNo("001")
+                .telephone("001")
+                .mobile(mobile)
+                .email(email)
+                .roleUids(roleUids)
+                .status(MemberStatusEnum.ACTIVE.name())
+                .deptUid(DepartmentConsts.DEFAULT_DEPT_ADMIN_UID)
+                .orgUid(orgUid)
+                .build();
+        // memberRequest.setUid(BytedeskConsts.DEFAULT_MEMBER_UID);
+        // memberRequest.setOrgUid(orgUid);
+        memberService.create(memberRequest);
+
     }
 
     private void initPermissions() {

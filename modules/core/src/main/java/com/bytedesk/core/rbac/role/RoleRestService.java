@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:31:32
+ * @LastEditTime: 2025-03-20 15:10:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,7 +90,15 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return roleRepository.findByNameAndLevel(name, LevelEnum.PLATFORM.name());
         }
 
+        public Boolean existsByUid(String uid) {
+                return roleRepository.existsByUid(uid);
+        }
+
         public RoleResponse create(RoleRequest request) {
+                // 判断uid是否已存在
+                if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+                        return convertToResponse(findByUid(request.getUid()).get());
+                }
 
                 if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
                         throw new RuntimeException("role " + request.getName() + " already exists");
@@ -101,28 +109,11 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 }
 
                 RoleEntity role = modelMapper.map(request, RoleEntity.class);
-                // RoleEntity role = RoleEntity.builder()
-                //                 .uid(uidUtils.getUid())
-                //                 .name(request.getName())
-                //                 .description(request.getDescription())
-                //                 .level(request.getLevel())
-                //                 .system(request.getSystem())
-                //                 .build();
-                // role.setUid(uidUtils.getUid());
                 if (StringUtils.hasText(request.getUid())) {
                         role.setUid(request.getUid());
                 } else {
                         role.setUid(uidUtils.getUid());
                 }
-                //
-                // if (StringUtils.hasText(request.getOrgUid())) {
-                //         role.setOrgUid(request.getOrgUid());
-                //         role.setLevel(LevelEnum.ORGANIZATION.name());
-                // }
-                // 添加创建人
-                // if (authService.getUser() != null) {
-                //         role.setUserUid(authService.getUser().getUid());
-                // }
                 //
                 if (request.getAuthorityUids() != null) {
                         Iterator<String> iterator = request.getAuthorityUids().iterator();

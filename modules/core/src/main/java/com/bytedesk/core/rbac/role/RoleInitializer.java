@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:45:36
+ * @LastEditTime: 2025-03-20 15:08:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.rbac.role;
 
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 // import com.bytedesk.core.assistant.AssistantPermissions;
 // import com.bytedesk.core.black.BlackPermissions;
 // import com.bytedesk.core.category.CategoryPermissions;
@@ -74,6 +75,7 @@ public class RoleInitializer {
         }
 
         RoleRequest roleRequest = RoleRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_ROLE_SUPER_UID)
                 .name(RoleConsts.ROLE_SUPER)
                 .description("Super")
                 .level(LevelEnum.PLATFORM.name())
@@ -111,6 +113,7 @@ public class RoleInitializer {
             return;
         }
         RoleRequest roleRequest = RoleRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID)
                 .name(RoleConsts.ROLE_ADMIN)
                 .description("Admin")
                 .level(LevelEnum.PLATFORM.name())
@@ -142,6 +145,7 @@ public class RoleInitializer {
             return;
         }
         RoleRequest roleRequest = RoleRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID)
                 .name(RoleConsts.ROLE_MEMBER)
                 .description("Member")
                 .level(LevelEnum.PLATFORM.name())
@@ -169,6 +173,7 @@ public class RoleInitializer {
             return;
         }
         RoleRequest roleRequest = RoleRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID)
                 .name(RoleConsts.ROLE_AGENT)
                 .description("Agent")
                 .level(LevelEnum.PLATFORM.name())
