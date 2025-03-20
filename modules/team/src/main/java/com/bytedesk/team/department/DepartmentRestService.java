@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:08:22
+ * @LastEditTime: 2025-03-20 18:16:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,7 +73,15 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return departmentRepository.existsByNameAndOrgUid(name, orgUid);
     }
 
+    public Boolean existsByUid(String uid) {
+        return departmentRepository.existsByUid(uid);
+    }
+
     public DepartmentResponse create(DepartmentRequest request) {
+        // 判断uid是否存在
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return convertToResponse(findByUid(request.getUid()).get());
+        }
         // 
         if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
             log.error("department  " + request.getName() + " already exists");
