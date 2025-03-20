@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:08:49
+ * @LastEditTime: 2025-03-20 15:46:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,16 +86,6 @@ public class RoleInitializer {
         String[] authorities = {
             AuthorityPermissions.AUTHORITY_PREFIX,
             RolePermissions.ROLE_PREFIX,
-            // OrganizationPermissions.ORGANIZATION_PREFIX,
-            // UserPermissions.USER_PREFIX,
-            // AssistantPermissions.ASSISTANT_PREFIX,
-            // BlackPermissions.BLACK_PREFIX,
-            // CategoryPermissions.CATEGORY_PREFIX,
-            // ChannelPermissions.CHANNEL_PREFIX,
-            // IpPermissions.IP_PREFIX,
-            // MessagePermissions.MESSAGE_PREFIX,
-            // ThreadPermissions.THREAD_PREFIX,
-            // PushPermissions.PUSH_PREFIX
         };
 
         // 遍历权限前缀数组
@@ -123,12 +113,6 @@ public class RoleInitializer {
         // 初始化权限前缀数组
         String[] authorities = {
             RolePermissions.ROLE_PREFIX,
-            // OrganizationPermissions.ORGANIZATION_PREFIX,
-            // BlackPermissions.BLACK_PREFIX,
-            // CategoryPermissions.CATEGORY_PREFIX,
-            // IpPermissions.IP_PREFIX,
-            // MessagePermissions.MESSAGE_PREFIX,
-            // ThreadPermissions.THREAD_PREFIX,
         };
         // 遍历权限前缀数组
         for (String prefix : authorities) {
