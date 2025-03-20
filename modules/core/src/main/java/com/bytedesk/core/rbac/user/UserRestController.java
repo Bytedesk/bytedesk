@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 11:44:33
+ * @LastEditTime: 2025-03-20 11:08:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.core.rbac.user;
 
-import java.util.Optional;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.push.PushRestService;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.authority.AuthorityPermissions;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,20 +36,29 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     private final UserService userService;
 
-    private final AuthService authService;
+    // private final AuthService authService;
 
     private final PushRestService pushService;
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
-        UserEntity user = authService.getUser(); // 返回的是缓存，导致修改后的数据无法获取
-        Optional<UserEntity> userOptional = userService.findByUid(user.getUid());
-        if (userOptional.isPresent()) {
-            UserResponse userResponse = ConvertUtils.convertToUserResponse(userOptional.get());
+        
+        UserResponse userResponse = userRestService.getProfile();
+
+        if (userResponse != null) {
             return ResponseEntity.ok(JsonResult.success(userResponse));
         } else {
             return ResponseEntity.ok().body(JsonResult.error("user not found", -1, false));
         }
+
+        // UserEntity user = authService.getUser(); // 返回的是缓存，导致修改后的数据无法获取
+        // Optional<UserEntity> userOptional = userService.findByUid(user.getUid());
+        // if (userOptional.isPresent()) {
+        //     UserResponse userResponse = ConvertUtils.convertToUserResponse(userOptional.get());
+        //     return ResponseEntity.ok(JsonResult.success(userResponse));
+        // } else {
+        //     return ResponseEntity.ok().body(JsonResult.error("user not found", -1, false));
+        // }
     }
 
     @ActionAnnotation(title = "user", action = "changePassword", description = "changePassword")

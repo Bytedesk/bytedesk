@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:38:59
+ * @LastEditTime: 2025-03-20 11:06:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,11 +15,13 @@ package com.bytedesk.core.rbac.user;
 
 import java.util.Optional;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class UserRestService extends BaseRestService<UserEntity, UserRequest, UserResponse> {
 
     private final UserRepository userRepository;
+    
+    private final AuthService authService;
 
     @Override
     public Page<UserResponse> queryByOrg(UserRequest request) {
@@ -41,9 +45,23 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(value = "userCache", key = "#uid", unless = "#result == null")
     @Override
     public Optional<UserEntity> findByUid(String uid) {
         return userRepository.findByUid(uid);
+    }
+
+    public UserResponse getProfile() {
+        UserEntity user = authService.getUser(); // 返回的是缓存，导致修改后的数据无法获取
+        if (user == null) {
+            return null;
+        }
+        Optional<UserEntity> userOptional = userRepository.findByUid(user.getUid());
+        if (userOptional.isPresent()) {
+            return convertToResponse(userOptional.get());
+        } else {
+            return null;
+        }
     }
 
     @Override
