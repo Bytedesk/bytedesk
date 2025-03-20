@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:08:09
+ * @LastEditTime: 2025-03-20 11:20:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,6 +39,51 @@ public class UserRestController extends BaseRestController<UserRequest> {
     // private final AuthService authService;
 
     private final PushRestService pushService;
+
+    @Override
+    public ResponseEntity<?> queryByOrg(UserRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUser(UserRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public ResponseEntity<?> create(UserRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+     @ActionAnnotation(title = "user", action = "update", description = "update user info")
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
+
+        UserResponse userResponse = userRestService.update(userRequest);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    @Override
+    public ResponseEntity<?> delete(UserRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(UserRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @Override
+    public Object export(UserRequest request, HttpServletResponse response) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'export'");
+    }
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
@@ -125,49 +170,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok("you have admin or cs role");
     }
     
-    @Override
-    public ResponseEntity<?> queryByOrg(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
-    }
-
-    @Override
-    public ResponseEntity<?> queryByUser(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public ResponseEntity<?> create(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-     @ActionAnnotation(title = "user", action = "update", description = "update user info")
-    @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
-
-        UserResponse userResponse = userRestService.update(userRequest);
-
-        return ResponseEntity.ok(JsonResult.success(userResponse));
-    }
-
-    @Override
-    public ResponseEntity<?> delete(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public ResponseEntity<?> queryByUid(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
-    @Override
-    public Object export(UserRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
-    }
+    
     
 }
