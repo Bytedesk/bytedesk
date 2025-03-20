@@ -19,13 +19,13 @@ public class AgentPermissions extends BasePermissions {
 
     public static final String AGENT_PREFIX = "AGENT_";
     // Agent permissions
-    public static final String AGENT_CREATE = formatAuthority(AGENT_PREFIX + "CREATE");
-    public static final String AGENT_READ = formatAuthority(AGENT_PREFIX + "READ");
-    public static final String AGENT_UPDATE = formatAuthority(AGENT_PREFIX + "UPDATE");
-    public static final String AGENT_DELETE = formatAuthority(AGENT_PREFIX + "DELETE");
-    public static final String AGENT_EXPORT = formatAuthority(AGENT_PREFIX + "EXPORT");
+    public static final String AGENT_CREATE = formatAuthority(AGENT_PREFIX + CREATE);
+    public static final String AGENT_READ = formatAuthority(AGENT_PREFIX + READ);
+    public static final String AGENT_UPDATE = formatAuthority(AGENT_PREFIX + UPDATE);
+    public static final String AGENT_DELETE = formatAuthority(AGENT_PREFIX + DELETE);
+    public static final String AGENT_EXPORT = formatAuthority(AGENT_PREFIX + EXPORT);
 
     // 
-    public static final String AGENT_ANY = formatAnyAuthority(AGENT_PREFIX + "CREATE", AGENT_PREFIX + "READ", AGENT_PREFIX + "UPDATE", AGENT_PREFIX + "EXPORT", AGENT_PREFIX + "DELETE");
+    public static final String AGENT_ANY = formatAnyAuthority(AGENT_PREFIX + CREATE, AGENT_PREFIX + READ, AGENT_PREFIX + UPDATE, AGENT_PREFIX + EXPORT, AGENT_PREFIX + DELETE);
     
 }
