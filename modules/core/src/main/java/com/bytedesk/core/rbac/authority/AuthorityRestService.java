@@ -32,6 +32,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 
+import io.jsonwebtoken.lang.Assert;
+
 import java.util.Optional;
 
 @Service
@@ -74,6 +76,7 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     }
 
     public AuthorityResponse createForPlatform(String permissionValue) {
+        Assert.hasText(permissionValue, "permissionValue must not be empty");
         AuthorityRequest authRequest = AuthorityRequest.builder()
                     .uid(permissionValue.toLowerCase())
                     .name(I18Consts.I18N_PREFIX + permissionValue)
