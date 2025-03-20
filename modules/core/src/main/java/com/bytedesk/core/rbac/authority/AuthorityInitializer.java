@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 07:05:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:44:37
+ * @LastEditTime: 2025-03-20 12:16:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import com.bytedesk.core.enums.PermissionEnum;
 // import com.bytedesk.core.push.PushPermissions;
 // import com.bytedesk.core.rbac.organization.OrganizationPermissions;
 import com.bytedesk.core.rbac.role.RolePermissions;
-import com.bytedesk.core.rbac.user.UserPermissions;
+// import com.bytedesk.core.rbac.user.UserPermissions;
 // import com.bytedesk.core.thread.ThreadPermissions;
 
 import lombok.AllArgsConstructor;
@@ -67,7 +67,7 @@ public class AuthorityInitializer {
         String[] authoritiesOrganization = {
             RolePermissions.ROLE_PREFIX,
             // OrganizationPermissions.ORGANIZATION_PREFIX,
-            UserPermissions.USER_PREFIX,
+            // UserPermissions.USER_PREFIX,
             // AssistantPermissions.ASSISTANT_PREFIX,
             BlackPermissions.BLACK_PREFIX,
             // CategoryPermissions.CATEGORY_PREFIX,
