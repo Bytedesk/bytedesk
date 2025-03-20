@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:25:25
+ * @LastEditTime: 2025-03-20 14:59:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,6 +44,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
     }
 
     // @PostConstruct
+    // UnifiedInitializer 中调用
     public void init() {
         //
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
