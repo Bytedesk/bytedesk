@@ -13,13 +13,13 @@
  */
 package com.bytedesk.core.push;
 
-public class PushPermissions {
+// public class PushPermissions {
 
-    public static final String PUSH_PREFIX = "PUSH_";
-    // Push permissions
-    public static final String PUSH_CREATE = "hasAuthority('PUSH_CREATE')";
-    public static final String PUSH_READ = "hasAuthority('PUSH_READ')";
-    public static final String PUSH_UPDATE = "hasAuthority('PUSH_UPDATE')";
-    public static final String PUSH_DELETE = "hasAuthority('PUSH_DELETE')";
-    public static final String PUSH_EXPORT = "hasAuthority('PUSH_EXPORT')";
-}
+//     public static final String PUSH_PREFIX = "PUSH_";
+//     // Push permissions
+//     public static final String PUSH_CREATE = "hasAuthority('PUSH_CREATE')";
+//     public static final String PUSH_READ = "hasAuthority('PUSH_READ')";
+//     public static final String PUSH_UPDATE = "hasAuthority('PUSH_UPDATE')";
+//     public static final String PUSH_DELETE = "hasAuthority('PUSH_DELETE')";
+//     public static final String PUSH_EXPORT = "hasAuthority('PUSH_EXPORT')";
+// }

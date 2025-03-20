@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 06:55:22
+ * @LastEditTime: 2025-03-20 11:44:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,19 +15,19 @@ package com.bytedesk.core.rbac.role;
 
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.assistant.AssistantPermissions;
+// import com.bytedesk.core.assistant.AssistantPermissions;
 import com.bytedesk.core.black.BlackPermissions;
-import com.bytedesk.core.category.CategoryPermissions;
+// import com.bytedesk.core.category.CategoryPermissions;
 // import com.bytedesk.core.channel.ChannelPermissions;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
-import com.bytedesk.core.ip.IpPermissions;
-import com.bytedesk.core.message.MessagePermissions;
-import com.bytedesk.core.push.PushPermissions;
+// import com.bytedesk.core.ip.IpPermissions;
+// import com.bytedesk.core.message.MessagePermissions;
+// import com.bytedesk.core.push.PushPermissions;
 import com.bytedesk.core.rbac.authority.AuthorityPermissions;
-import com.bytedesk.core.rbac.organization.OrganizationPermissions;
+// import com.bytedesk.core.rbac.organization.OrganizationPermissions;
 import com.bytedesk.core.rbac.user.UserPermissions;
-import com.bytedesk.core.thread.ThreadPermissions;
+// import com.bytedesk.core.thread.ThreadPermissions;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,16 +68,16 @@ public class RoleInitializer {
         String[] authorities = {
             AuthorityPermissions.AUTHORITY_PREFIX,
             RolePermissions.ROLE_PREFIX,
-            OrganizationPermissions.ORGANIZATION_PREFIX,
+            // OrganizationPermissions.ORGANIZATION_PREFIX,
             UserPermissions.USER_PREFIX,
-            AssistantPermissions.ASSISTANT_PREFIX,
+            // AssistantPermissions.ASSISTANT_PREFIX,
             BlackPermissions.BLACK_PREFIX,
-            CategoryPermissions.CATEGORY_PREFIX,
+            // CategoryPermissions.CATEGORY_PREFIX,
             // ChannelPermissions.CHANNEL_PREFIX,
-            IpPermissions.IP_PREFIX,
-            MessagePermissions.MESSAGE_PREFIX,
-            ThreadPermissions.THREAD_PREFIX,
-            PushPermissions.PUSH_PREFIX
+            // IpPermissions.IP_PREFIX,
+            // MessagePermissions.MESSAGE_PREFIX,
+            // ThreadPermissions.THREAD_PREFIX,
+            // PushPermissions.PUSH_PREFIX
         };
 
         // 遍历权限前缀数组
@@ -104,12 +104,12 @@ public class RoleInitializer {
         // 初始化权限前缀数组
         String[] authorities = {
             RolePermissions.ROLE_PREFIX,
-            OrganizationPermissions.ORGANIZATION_PREFIX,
+            // OrganizationPermissions.ORGANIZATION_PREFIX,
             BlackPermissions.BLACK_PREFIX,
-            CategoryPermissions.CATEGORY_PREFIX,
-            IpPermissions.IP_PREFIX,
-            MessagePermissions.MESSAGE_PREFIX,
-            ThreadPermissions.THREAD_PREFIX,
+            // CategoryPermissions.CATEGORY_PREFIX,
+            // IpPermissions.IP_PREFIX,
+            // MessagePermissions.MESSAGE_PREFIX,
+            // ThreadPermissions.THREAD_PREFIX,
         };
         // 遍历权限前缀数组
         for (String prefix : authorities) {
@@ -135,8 +135,8 @@ public class RoleInitializer {
         // 初始化权限前缀数组
         String[] authorities = {
             BlackPermissions.BLACK_PREFIX,
-            MessagePermissions.MESSAGE_PREFIX,
-            ThreadPermissions.THREAD_PREFIX,
+            // MessagePermissions.MESSAGE_PREFIX,
+            // ThreadPermissions.THREAD_PREFIX,
         };
         // 遍历权限前缀数组
         for (String prefix : authorities) {
@@ -161,8 +161,8 @@ public class RoleInitializer {
         // 初始化权限前缀数组
         String[] authorities = {
             BlackPermissions.BLACK_PREFIX,
-            MessagePermissions.MESSAGE_PREFIX,
-            ThreadPermissions.THREAD_PREFIX,
+            // MessagePermissions.MESSAGE_PREFIX,
+            // ThreadPermissions.THREAD_PREFIX,
         };
         // 遍历权限前缀数组
         for (String prefix : authorities) {

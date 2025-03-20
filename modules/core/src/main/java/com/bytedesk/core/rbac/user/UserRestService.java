@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:06:54
+ * @LastEditTime: 2025-03-20 11:18:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -102,8 +103,7 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
 
     @Override
     public UserResponse convertToResponse(UserEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        return ConvertUtils.convertToUserResponse(entity);
     }
 
     @Override

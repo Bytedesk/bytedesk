@@ -36,7 +36,9 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @GetMapping("/query/super")
     public ResponseEntity<?> queryBySuper(RoleRequest request) {
+
         Page<RoleResponse> roles = roleService.queryBySuper(request);
+        
         return ResponseEntity.ok(JsonResult.success(roles));
     }
 

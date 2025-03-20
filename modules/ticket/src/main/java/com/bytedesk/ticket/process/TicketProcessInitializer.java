@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 13:03:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:56:26
+ * @LastEditTime: 2025-03-20 11:41:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,10 +26,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.PermissionEnum;
-import com.bytedesk.core.rbac.authority.AuthorityRequest;
-import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
 import com.bytedesk.core.utils.Utils;
@@ -44,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TicketProcessInitializer implements SmartInitializingSingleton {
 
-    private final AuthorityRestService authorityService;
+    // private final AuthorityRestService authorityService;
 
     private final OrganizationRestService organizationService;
 
@@ -61,19 +57,19 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
     }
 
     private void initAuthority() {
-        for (PermissionEnum permission : PermissionEnum.values()) {
-            String permissionValue = TicketProcessPermissions.PROCESS_PREFIX + permission.name();
-            if (authorityService.existsByValue(permissionValue)) {
-                continue;
-            }
-            AuthorityRequest authRequest = AuthorityRequest.builder()
-                    .name(I18Consts.I18N_PREFIX + permissionValue)
-                    .value(permissionValue)
-                    .description("Permission for " + permissionValue)
-                    .build();
-            authRequest.setUid(permissionValue.toLowerCase());
-            authorityService.create(authRequest);
-        }
+        // for (PermissionEnum permission : PermissionEnum.values()) {
+        //     String permissionValue = TicketProcessPermissions.PROCESS_PREFIX + permission.name();
+        //     if (authorityService.existsByValue(permissionValue)) {
+        //         continue;
+        //     }
+        //     AuthorityRequest authRequest = AuthorityRequest.builder()
+        //             .name(I18Consts.I18N_PREFIX + permissionValue)
+        //             .value(permissionValue)
+        //             .description("Permission for " + permissionValue)
+        //             .build();
+        //     authRequest.setUid(permissionValue.toLowerCase());
+        //     authorityService.create(authRequest);
+        // }
     }
 
     private void initProcess() {
