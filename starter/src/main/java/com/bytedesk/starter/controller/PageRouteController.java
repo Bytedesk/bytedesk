@@ -88,7 +88,7 @@ public class PageRouteController {
 			zh.put("visitorChat", "访客对话");
 			zh.put("workFlow", "工作流");
 			zh.put("knowledgeBase", "对内知识库");
-			zh.put("helpCenter", "帮助中心(对外知识库)");
+			zh.put("helpCenter", "对外帮助中心");
 			zh.put("kanban", "项目管理");
 			zh.put("javaDoc", "Java 文档");
 			zh.put("apiDoc", "Swagger API 文档");
@@ -119,7 +119,7 @@ public class PageRouteController {
 			zhTW.put("visitorChat", "訪客對話");
 			zhTW.put("workFlow", "工作流");
 			zhTW.put("knowledgeBase", "對內知識庫");
-			zhTW.put("helpCenter", "幫助中心(對外知識庫)");
+			zhTW.put("helpCenter", "對外幫助中心");
 			zhTW.put("kanban", "項目管理");
 			zhTW.put("javaDoc", "Java 文檔");
 			zhTW.put("apiDoc", "Swagger API 文檔");
