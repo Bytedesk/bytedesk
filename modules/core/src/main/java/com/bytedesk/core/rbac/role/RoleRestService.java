@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 09:28:24
+ * @LastEditTime: 2025-03-20 09:15:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -98,10 +98,14 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 }
                 // RoleEntity role = modelMapper.map(request, RoleEntity.class);
                 RoleEntity role = RoleEntity.builder()
+                                .uid(uidUtils.getUid())
                                 .name(request.getName())
                                 .description(request.getDescription())
+                                .level(request.getLevel())
+                                .system(request.getSystem())
                                 .build();
-                role.setUid(uidUtils.getUid());
+                // role.setUid(uidUtils.getUid());
+                //
                 if (StringUtils.hasText(request.getOrgUid())) {
                         role.setOrgUid(request.getOrgUid());
                         role.setLevel(LevelEnum.ORGANIZATION.name());
