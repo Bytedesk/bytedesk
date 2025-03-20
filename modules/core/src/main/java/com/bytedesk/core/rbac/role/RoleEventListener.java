@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 10:13:45
+ * @LastEditTime: 2025-03-20 17:02:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,8 @@ package com.bytedesk.core.rbac.role;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.rbac.authority.event.AuthorityCreateEvent;
+import com.bytedesk.core.rbac.authority.event.AuthorityUpdateEvent;
 import com.bytedesk.core.rbac.role.event.RoleCreateEvent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,5 +38,15 @@ public class RoleEventListener {
     //     RoleEntity roleEntity = event.getRoleEntity();
     //     log.info("onRoleUpdateEvent: {}", roleEntity.toString());
     // }
+
+    @EventListener
+    public void onAuthorityCreateEvent(AuthorityCreateEvent event) {
+        log.info("AuthorityCreateEvent");
+    }
+
+    @EventListener
+    public void onAuthorityUpdateEvent(AuthorityUpdateEvent event) {
+        log.info("AuthorityUpdateEvent");
+    }
 
 }
