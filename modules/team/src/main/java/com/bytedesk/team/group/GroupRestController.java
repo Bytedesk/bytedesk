@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 17:11:10
+ * @LastEditTime: 2025-03-20 15:05:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,21 +32,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
-/**
- * http://127.0.0.1:9003/swagger-ui/index.html
- */
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/group")
 @Tag(name = "group", description = "group apis")
 public class GroupRestController extends BaseRestController<GroupRequest> {
     
-    private final GroupRestService groupService;
+    private final GroupRestService groupRestService;
     
     @Override
     public ResponseEntity<?> queryByOrg(GroupRequest request) {
         
-        Page<GroupResponse> page = groupService.queryByOrg(request);
+        Page<GroupResponse> page = groupRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -54,7 +52,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public ResponseEntity<?> queryByUser(GroupRequest request) {
 
-        Page<GroupResponse> page = groupService.queryByUser(request);
+        Page<GroupResponse> page = groupRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -62,7 +60,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public ResponseEntity<?> queryByUid(GroupRequest request) {
         
-        GroupResponse group = groupService.queryByUid(request);
+        GroupResponse group = groupRestService.queryByUid(request);
         
         return ResponseEntity.ok(JsonResult.success(group));
     }
@@ -71,7 +69,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody GroupRequest request) {
         
-        GroupResponse group = groupService.create(request);
+        GroupResponse group = groupRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(group));
     }
@@ -80,7 +78,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public ResponseEntity<?> update(@RequestBody GroupRequest request) {
 
-        GroupResponse group = groupService.update(request);
+        GroupResponse group = groupRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(group));
     }
@@ -121,7 +119,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @PostMapping("/dismiss")
     public ResponseEntity<?> dismiss(@RequestBody GroupRequest request) {
 
-        groupService.dismiss(request);
+        groupRestService.dismiss(request);
         
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -130,7 +128,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody GroupRequest request) {
         
-        groupService.delete(request);
+        groupRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -139,7 +137,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public Object export(GroupRequest request, HttpServletResponse response) {
         // query data to export
-        Page<GroupEntity> groupPage = groupService.queryForExport(request);
+        Page<GroupEntity> groupPage = groupRestService.queryForExport(request);
         // 
         try {
             //
@@ -150,7 +148,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
-            List<GroupExcel> excelList = groupPage.getContent().stream().map(groupResponse -> groupService.convertToExcel(groupResponse)).toList();
+            List<GroupExcel> excelList = groupPage.getContent().stream().map(groupResponse -> groupRestService.convertToExcel(groupResponse)).toList();
             // write to excel
             EasyExcel.write(response.getOutputStream(), GroupExcel.class)
                     .autoCloseStream(Boolean.FALSE)

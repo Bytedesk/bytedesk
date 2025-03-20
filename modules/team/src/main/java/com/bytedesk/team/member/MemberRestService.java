@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 14:55:29
+ * @LastEditTime: 2025-03-20 15:16:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -109,8 +109,16 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         return convertToResponse(memberOptional.get());
     }
 
+    public Boolean existsByUid(String uid) {
+        return memberRepository.existsByUid(uid);
+    }
+
     @Transactional
     public MemberResponse create(MemberRequest request) {
+        // 判断uid是否已存在
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return convertToResponse(findByUid(request.getUid()).get());
+        }
         //
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {
