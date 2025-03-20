@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:19:35
+ * @LastEditTime: 2025-03-20 13:41:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,19 +28,24 @@ import com.bytedesk.core.rbac.authority.AuthorityPermissions;
 // import com.bytedesk.core.rbac.organization.OrganizationPermissions;
 // import com.bytedesk.core.rbac.user.UserPermissions;
 // import com.bytedesk.core.thread.ThreadPermissions;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoleInitializer {
 
     private final RoleRestService roleService;
 
+    private final AuthorityRestService authorityService;
+
     // 初始化角色, 在 OrganizationInitializer 中调用
     public void init() {
+        // 
+        initPermissions();
         // 初始化角色
         // 1. 超级管理员
         createSuper();
@@ -50,6 +55,13 @@ public class RoleInitializer {
         createMember();
         // 4. 客服
         createAgent();
+    }
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = RolePermissions.ROLE_PREFIX + permission.name();
+            authorityService.createForPlatform(permissionValue);
+        }
     }
 
     private void createSuper() {
