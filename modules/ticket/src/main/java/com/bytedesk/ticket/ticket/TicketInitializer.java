@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:34:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 08:59:24
+ * @LastEditTime: 2025-03-20 13:34:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,10 +20,8 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
-import com.bytedesk.core.rbac.authority.AuthorityRequest;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
 
@@ -48,17 +46,7 @@ public class TicketInitializer implements SmartInitializingSingleton {
     private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = TicketPermissions.TICKET_PREFIX + permission.name();
-            if (authorityService.existsByValue(permissionValue)) {
-                // log.info("Ticket authority {} already exists", permissionValue);
-                continue;
-            }
-            AuthorityRequest authRequest = AuthorityRequest.builder()
-                    .name(I18Consts.I18N_PREFIX + permissionValue)
-                    .value(permissionValue)
-                    .description("Permission for " + permissionValue)
-                    .build();
-            authRequest.setUid(permissionValue.toLowerCase());
-            authorityService.create(authRequest);
+            authorityService.createForPlatform(permissionValue);
         }
     }
 
