@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 18:06:35
+ * @LastEditTime: 2025-03-20 18:15:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.event.EventListener;
@@ -25,6 +28,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.excel.EasyExcel;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
@@ -41,7 +45,8 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.team.department.DepartmentConsts;
-import com.bytedesk.team.department.DepartmentEntity;
+import com.bytedesk.team.department.DepartmentRequest;
+import com.bytedesk.team.department.DepartmentResponse;
 import com.bytedesk.team.department.DepartmentRestService;
 import com.bytedesk.team.member.event.MemberCreateEvent;
 
@@ -73,15 +78,18 @@ public class MemberEventListener {
         String orgUid = organization.getUid();
         log.info("organization created: {}", organization.getName());
         //
-        DepartmentEntity department = DepartmentEntity.builder()
+        DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                .uid(uidUtils.getUid())
                 .name(DepartmentConsts.DEPT_ADMIN)
                 .description("Description for" + DepartmentConsts.DEPT_ADMIN)
+                .orgUid(orgUid)
                 .build();
-        department.setUid(uidUtils.getUid());
-        department.setOrgUid(orgUid);
-        department = departmentService.save(department);
+        // department.setUid(uidUtils.getUid());
+        // department.setOrgUid(orgUid);
+        DepartmentResponse departmentResponse = departmentService.create(departmentRequest);
         // 
-        if (department != null) {
+        if (departmentResponse != null) {
+            Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
             // 创建团队成员
             MemberRequest memberRequest = modelMapper.map(user, MemberRequest.class);
             memberRequest.setJobNo("001");
@@ -90,7 +98,8 @@ public class MemberEventListener {
             memberRequest.setTelephone("001");
             memberRequest.setMobile(user.getMobile());
             memberRequest.setStatus(MemberStatusEnum.ACTIVE.name());
-            memberRequest.setDeptUid(department.getUid());
+            memberRequest.setRoleUids(roleUids);
+            memberRequest.setDeptUid(departmentResponse.getUid());
             memberRequest.setOrgUid(orgUid);
             memberService.create(memberRequest);
         }

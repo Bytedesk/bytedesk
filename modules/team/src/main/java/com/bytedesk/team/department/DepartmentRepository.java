@@ -46,6 +46,8 @@ public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Lo
 
     Boolean existsByNameAndOrgUid(String name, String orgUid);
 
+    Boolean existsByUid(String uid);
+
     // Page<Department> findByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted, Pageable pageable);
 
     // List<Department> findAllByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted);

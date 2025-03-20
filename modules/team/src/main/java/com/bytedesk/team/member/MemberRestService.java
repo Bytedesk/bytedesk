@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:16:06
+ * @LastEditTime: 2025-03-20 18:10:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,12 @@
  */
 package com.bytedesk.team.member;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -30,6 +34,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
@@ -277,10 +282,12 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         if (StringUtils.hasText(memberExcel.getMobile()) && existsByMobileAndOrgUid(memberExcel.getMobile(), orgUid)) {
             return null;
         }
+        Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
         // 创建member
         MemberEntity member = modelMapper.map(memberExcel, MemberEntity.class);
         member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
+        member.setRoleUids(roleUids);
         // 生成user
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = UserRequest.builder().build();
@@ -382,12 +389,9 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         return savedThread;
     }
 
-    
-
     @Override
     public void delete(MemberRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(request.getUid());
     }
 
     @Override
