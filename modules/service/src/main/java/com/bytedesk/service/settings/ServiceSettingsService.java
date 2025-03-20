@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 10:56:33
+ * @LastEditTime: 2025-03-20 13:11:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,7 +88,7 @@ public class ServiceSettingsService {
                 Optional<FaqEntity> welcomeFaqOptional = faqService.findByUid(welcomeFaqUid);
                 if (welcomeFaqOptional.isPresent()) {
                     FaqEntity welcomeFaqEntity = welcomeFaqOptional.get();
-                    log.info("welcomeFaqUid added {}", welcomeFaqUid);
+                    // log.info("welcomeFaqUid added {}", welcomeFaqUid);
                     serviceSettings.getWelcomeFaqs().add(welcomeFaqEntity);
                 } else {
                     throw new RuntimeException("welcomeFaq " + welcomeFaqUid + " not found");
@@ -101,12 +101,12 @@ public class ServiceSettingsService {
             Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
             while (iterator.hasNext()) {
                 String faqUid = iterator.next();
-                log.info("update faq {}", faqUid);
+                // log.info("update faq {}", faqUid);
                 Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
                     FaqEntity faqEntity = faqOptional.get();
 
-                    log.info("save update faq {}", faqEntity.getUid());
+                    // log.info("save update faq {}", faqEntity.getUid());
                     serviceSettings.getFaqs().add(faqEntity);
                 } else {
                     throw new RuntimeException("faq " + faqUid + " not found");
@@ -122,7 +122,7 @@ public class ServiceSettingsService {
                 Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
                     FaqEntity quickFaqEntity = quickFaqOptional.get();
-                    log.info("quickFaqUid added {}", quickFaqUid);
+                    // log.info("quickFaqUid added {}", quickFaqUid);
                     serviceSettings.getQuickFaqs().add(quickFaqEntity);
                 } else {
                     throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
@@ -138,7 +138,7 @@ public class ServiceSettingsService {
                 Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
                 if (guessFaqOptional.isPresent()) {
                     FaqEntity guessFaq = guessFaqOptional.get();
-                    log.info("guessFaqUid added {}", guessFaqUid);
+                    // log.info("guessFaqUid added {}", guessFaqUid);
                     serviceSettings.getGuessFaqs().add(guessFaq);
                 } else {
                     throw new RuntimeException("guessFaq " + guessFaqUid + " not found");
@@ -154,7 +154,7 @@ public class ServiceSettingsService {
                 Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
                 if (hotFaqOptional.isPresent()) {
                     FaqEntity hotFaq = hotFaqOptional.get();
-                    log.info("hotFaqUid added {}", hotFaqUid);
+                    // log.info("hotFaqUid added {}", hotFaqUid);
                     serviceSettings.getHotFaqs().add(hotFaq);
                 } else {
                     throw new RuntimeException("hotFaq " + hotFaqUid + " not found");
