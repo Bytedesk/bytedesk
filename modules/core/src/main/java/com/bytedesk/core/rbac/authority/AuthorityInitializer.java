@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 07:05:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:16:48
+ * @LastEditTime: 2025-03-20 12:19:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,7 @@ package com.bytedesk.core.rbac.authority;
 import org.springframework.stereotype.Component;
 
 // import com.bytedesk.core.assistant.AssistantPermissions;
-import com.bytedesk.core.black.BlackPermissions;
+// import com.bytedesk.core.black.BlackPermissions;
 // import com.bytedesk.core.category.CategoryPermissions;
 // import com.bytedesk.core.channel.ChannelPermissions;
 import com.bytedesk.core.constant.I18Consts;
@@ -69,7 +69,7 @@ public class AuthorityInitializer {
             // OrganizationPermissions.ORGANIZATION_PREFIX,
             // UserPermissions.USER_PREFIX,
             // AssistantPermissions.ASSISTANT_PREFIX,
-            BlackPermissions.BLACK_PREFIX,
+            // BlackPermissions.BLACK_PREFIX,
             // CategoryPermissions.CATEGORY_PREFIX,
             // ChannelPermissions.CHANNEL_PREFIX,
             // IpPermissions.IP_PREFIX,

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:16:58
+ * @LastEditTime: 2025-03-20 12:19:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,7 @@ package com.bytedesk.core.rbac.role;
 import org.springframework.stereotype.Component;
 
 // import com.bytedesk.core.assistant.AssistantPermissions;
-import com.bytedesk.core.black.BlackPermissions;
+// import com.bytedesk.core.black.BlackPermissions;
 // import com.bytedesk.core.category.CategoryPermissions;
 // import com.bytedesk.core.channel.ChannelPermissions;
 import com.bytedesk.core.enums.LevelEnum;
@@ -71,7 +71,7 @@ public class RoleInitializer {
             // OrganizationPermissions.ORGANIZATION_PREFIX,
             // UserPermissions.USER_PREFIX,
             // AssistantPermissions.ASSISTANT_PREFIX,
-            BlackPermissions.BLACK_PREFIX,
+            // BlackPermissions.BLACK_PREFIX,
             // CategoryPermissions.CATEGORY_PREFIX,
             // ChannelPermissions.CHANNEL_PREFIX,
             // IpPermissions.IP_PREFIX,
@@ -105,7 +105,7 @@ public class RoleInitializer {
         String[] authorities = {
             RolePermissions.ROLE_PREFIX,
             // OrganizationPermissions.ORGANIZATION_PREFIX,
-            BlackPermissions.BLACK_PREFIX,
+            // BlackPermissions.BLACK_PREFIX,
             // CategoryPermissions.CATEGORY_PREFIX,
             // IpPermissions.IP_PREFIX,
             // MessagePermissions.MESSAGE_PREFIX,
@@ -134,7 +134,7 @@ public class RoleInitializer {
 
         // 初始化权限前缀数组
         String[] authorities = {
-            BlackPermissions.BLACK_PREFIX,
+            // BlackPermissions.BLACK_PREFIX,
             // MessagePermissions.MESSAGE_PREFIX,
             // ThreadPermissions.THREAD_PREFIX,
         };
@@ -160,7 +160,7 @@ public class RoleInitializer {
                 .build();
         // 初始化权限前缀数组
         String[] authorities = {
-            BlackPermissions.BLACK_PREFIX,
+            // BlackPermissions.BLACK_PREFIX,
             // MessagePermissions.MESSAGE_PREFIX,
             // ThreadPermissions.THREAD_PREFIX,
         };
