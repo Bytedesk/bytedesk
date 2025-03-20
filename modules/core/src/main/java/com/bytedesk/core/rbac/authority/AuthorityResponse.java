@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:50:29
+ * @LastEditTime: 2025-03-20 12:50:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,18 +15,22 @@ package com.bytedesk.core.rbac.authority;
 
 import com.bytedesk.core.base.BaseResponse;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 public class AuthorityResponse extends BaseResponse {
 
     private String name;
 
     private String value;
 
-    private String level;
+    // private String level;
 
     private String description;
 }

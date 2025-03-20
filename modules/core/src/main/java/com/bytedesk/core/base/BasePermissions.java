@@ -17,8 +17,10 @@ public class BasePermissions {
 
     protected static final String HAS_AUTHORITY = "hasAuthority('%s')";
     protected static final String HAS_ANY_AUTHORITY = "hasAnyAuthority(%s)";
+    // 
     protected static final String HAS_ROLE = "hasRole('%s')";
     protected static final String HAS_ANY_ROLE = "hasAnyRole(%s)";
+    // 
     protected static final String READ = "READ";
     protected static final String CREATE = "CREATE";
     protected static final String UPDATE = "UPDATE";

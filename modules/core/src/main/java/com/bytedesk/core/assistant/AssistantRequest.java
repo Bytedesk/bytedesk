@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 14:09:47
+ * @LastEditTime: 2025-03-20 12:41:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,17 +14,17 @@
 package com.bytedesk.core.assistant;
 
 import com.bytedesk.core.base.BaseRequestNoOrg;
-import com.bytedesk.core.enums.LevelEnum;
-
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
 public class AssistantRequest extends BaseRequestNoOrg {
     
     private String topic;
@@ -35,6 +35,6 @@ public class AssistantRequest extends BaseRequestNoOrg {
 
     private String description;
 
-    @Builder.Default
-    private String level = LevelEnum.PLATFORM.name();
+    // @Builder.Default
+    // private String level = LevelEnum.PLATFORM.name();
 }

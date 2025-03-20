@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 15:31:30
+ * @LastEditTime: 2025-03-20 12:37:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,12 +19,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 // import lombok.experimental.Accessors;
 
@@ -83,6 +87,15 @@ public abstract class BaseRequest implements Serializable {
      * 组织唯一标识
      */
     protected String orgUid;
+
+    // platform: 只有超级管理员才有权限
+    // organization: 管理员才有权限
+    @Builder.Default
+    private String level = LevelEnum.ORGANIZATION.name();
+
+    // 默认bytedesk平台
+    @Builder.Default
+    private String platform = PlatformEnum.BYTEDESK.name();
 
     /**
      * 获取分页对象

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 10:46:25
+ * @LastEditTime: 2025-03-20 12:38:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 
 @Getter
 @Setter
@@ -46,8 +44,8 @@ public class RoleRequest extends BaseRequest {
 	@Builder.Default
 	private Boolean system = false;
 
-    @Builder.Default
-	private String level = LevelEnum.PLATFORM.name();
+    // @Builder.Default
+	// private String level = LevelEnum.PLATFORM.name();
 
     @Builder.Default
     private Set<String> authorityUids = new HashSet<>();
@@ -57,6 +55,6 @@ public class RoleRequest extends BaseRequest {
 
     // private String userUid;
 
-    @Builder.Default
-	private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+	// private String platform = PlatformEnum.BYTEDESK.name();
 }

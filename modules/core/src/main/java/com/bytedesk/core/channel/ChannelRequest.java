@@ -14,15 +14,13 @@
 package com.bytedesk.core.channel;
 
 import com.bytedesk.core.base.BaseRequestNoOrg;
-import com.bytedesk.core.enums.LevelEnum;
-
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 public class ChannelRequest extends BaseRequestNoOrg {
@@ -35,6 +33,6 @@ public class ChannelRequest extends BaseRequestNoOrg {
 
     private String description;
 
-    @Builder.Default
-    private String level = LevelEnum.PLATFORM.name();
+    // @Builder.Default
+    // private String level = LevelEnum.PLATFORM.name();
 }

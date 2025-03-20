@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:12:52
+ * @LastEditTime: 2025-03-20 12:44:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,19 +17,16 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
-
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
@@ -42,13 +39,13 @@ public class CategoryRequest extends BaseRequest {
     @Builder.Default
     private Integer order = 0;
 
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
+    // @Builder.Default
+    // private String level = LevelEnum.ORGANIZATION.name();
 
-    // 需要前端传递字符串的情况下，使用string类型
-    @NotBlank
-    @Builder.Default
-    private String platform = BytedeskConsts.PLATFORM_BYTEDESK;
+    // // 需要前端传递字符串的情况下，使用string类型
+    // @NotBlank
+    // @Builder.Default
+    // private String platform = BytedeskConsts.PLATFORM_BYTEDESK;
 
     // 父类uid
     private String parentUid;

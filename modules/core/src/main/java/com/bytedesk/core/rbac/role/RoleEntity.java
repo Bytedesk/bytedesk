@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 09:03:10
+ * @LastEditTime: 2025-03-20 12:50:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,15 +27,8 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 
-/**
- * role table
- *
- * @author im.bytedesk.com
- */
 @Data
 @Entity
 @SuperBuilder
@@ -59,8 +52,8 @@ public class RoleEntity extends BaseEntity {
 	private String description;
 
 	// 超级管理员、管理员等是平台角色，用户自定义角色是Level.ORGANIZATION
-	@Builder.Default
-	private String level = LevelEnum.PLATFORM.name();
+	// @Builder.Default
+	// private String level = LevelEnum.PLATFORM.name();
 
 	// 是否是系统角色
 	@Builder.Default
@@ -75,8 +68,8 @@ public class RoleEntity extends BaseEntity {
 	// 除系统自带角色之外，允许管理员-自己创建角色
 	// private String userUid;
 
-	@Builder.Default
-	private String platform = PlatformEnum.BYTEDESK.name();
+	// @Builder.Default
+	// private String platform = PlatformEnum.BYTEDESK.name();
 
 	public void addAuthority(AuthorityEntity authority) {
 		this.authorities.add(authority);

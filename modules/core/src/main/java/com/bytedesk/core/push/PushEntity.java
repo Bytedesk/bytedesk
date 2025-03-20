@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:30:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:24:05
+ * @LastEditTime: 2025-03-20 12:49:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,9 +14,6 @@
 package com.bytedesk.core.push;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.enums.ClientEnum;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -27,6 +24,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.enums.ClientEnum;
 
 /**
  * 
@@ -66,8 +64,8 @@ public class PushEntity extends BaseEntity {
     @Builder.Default
     private String client = ClientEnum.WEB.name();
 
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    // private String platform = PlatformEnum.BYTEDESK.name();
 
     // 修改邮箱、手机号需要记录用户uid和组织uid
     // private String userUid;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:21:20
+ * @LastEditTime: 2025-03-20 12:39:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,10 +27,14 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PlatformEnum;
+
 // import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -97,5 +101,14 @@ public abstract class BaseEntity implements Serializable {
 
     // user uid
     private String userUid;
+
+    // platform: 只有超级管理员才有权限
+    // organization: 管理员才有权限
+    @Builder.Default
+    private String level = LevelEnum.ORGANIZATION.name();
+
+    // 默认bytedesk平台
+    @Builder.Default
+    private String platform = PlatformEnum.BYTEDESK.name();
     
 }

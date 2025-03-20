@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:31:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 09:11:23
+ * @LastEditTime: 2025-03-20 12:42:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.core.action;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 
 import jakarta.persistence.Column;
@@ -30,10 +29,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -74,7 +74,7 @@ public class ActionEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 
-    @Builder.Default
-     private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    //  private String platform = PlatformEnum.BYTEDESK.name();
 
 }
