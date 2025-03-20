@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 15:25:29
+ * @LastEditTime: 2025-03-20 18:06:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,7 +44,6 @@ import com.bytedesk.team.department.DepartmentConsts;
 import com.bytedesk.team.department.DepartmentEntity;
 import com.bytedesk.team.department.DepartmentRestService;
 import com.bytedesk.team.member.event.MemberCreateEvent;
-import com.bytedesk.team.member.event.MemberUpdateEvent;
 
 import jakarta.transaction.Transactional;
 
@@ -114,20 +113,21 @@ public class MemberEventListener {
         UserEntity user = member.getUser();
         log.info("member created: {}", event);
         // 默认订阅成员主题
+        String topic = TopicUtils.formatOrgMemberTopic(member.getUid());
         TopicRequest request = TopicRequest.builder()
-                .topic(TopicUtils.formatOrgMemberTopic(member.getUid()))
+                .topic(topic)
                 .userUid(user.getUid())
                 .build();
             // request.setUserUid(user.getUid());
         topicCacheService.pushRequest(request);
     }
 
-    @EventListener
-    public void onMemberUpdateEvent(MemberUpdateEvent event) {
-        // MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent) event.getObject();
-        log.info("member updated: {}", event);
-        // TODO: 删除旧的部门主题
-    }
+    // @EventListener
+    // public void onMemberUpdateEvent(MemberUpdateEvent event) {
+    //     // MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent) event.getObject();
+    //     log.info("member updated: {}", event);
+    //     // TODO: 删除旧的部门主题
+    // }
 
     // @EventListener
     // public void onRoleUpdateEvent(GenericApplicationEvent<RoleUpdateEvent> event) {

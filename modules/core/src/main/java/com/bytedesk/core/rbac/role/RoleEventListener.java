@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 17:37:41
+ * @LastEditTime: 2025-03-20 17:49:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class RoleEventListener {
-    
+
     private final RoleRestService roleService;
 
     @EventListener
@@ -43,8 +43,8 @@ public class RoleEventListener {
 
     // @EventListener
     // public void onRoleUpdateEvent(RoleUpdateEvent> event) {
-    //     RoleEntity roleEntity = event.getRoleEntity();
-    //     log.info("onRoleUpdateEvent: {}", roleEntity.toString());
+    // RoleEntity roleEntity = event.getRoleEntity();
+    // log.info("onRoleUpdateEvent: {}", roleEntity.toString());
     // }
 
     @EventListener
@@ -74,6 +74,31 @@ public class RoleEventListener {
                 .system(true)
                 .build();
         roleService.createOrUpdate(adminRoleRequest);
+        // 团队成员和客服: 仅赋予部分权限：ticket、robot、kbase
+        if (authorityEntity.getName().startsWith("ticket")
+                || authorityEntity.getName().startsWith("robot")
+                || authorityEntity.getName().startsWith("kbase")) {
+            // 团队成员
+            RoleRequest memberRoleRequest = RoleRequest.builder()
+                    .uid(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID)
+                    .name(RoleConsts.ROLE_MEMBER)
+                    .description("Member")
+                    .authorityUids(authorityUids)
+                    .level(LevelEnum.PLATFORM.name())
+                    .system(true)
+                    .build();
+            roleService.createOrUpdate(memberRoleRequest);
+            // 客服
+            RoleRequest agentRoleRequest = RoleRequest.builder()
+                    .uid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID)
+                    .name(RoleConsts.ROLE_AGENT)
+                    .description("Agent")
+                    .authorityUids(authorityUids)
+                    .level(LevelEnum.PLATFORM.name())
+                    .system(true)
+                    .build();
+            roleService.createOrUpdate(agentRoleRequest);
+        }
     }
 
 }
