@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-11-05 17:07:03
+ * @Date: 2024-11-05 16:58:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 10:34:04
+ * @LastEditTime: 2025-03-20 11:50:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,17 +13,17 @@
  */
 package com.bytedesk.service.workgroup;
 
-public class WorkgroupPermissions {
+import com.bytedesk.core.base.BasePermissions;
+
+public class WorkgroupPermissions extends BasePermissions {
 
     public static final String WORKGROUP_PREFIX = "WORKGROUP_";
-    // Workgroup permissions
-    public static final String WORKGROUP_CREATE = "hasAuthority('WORKGROUP_CREATE')";
-    public static final String WORKGROUP_READ = "hasAuthority('WORKGROUP_READ')";
-    public static final String WORKGROUP_UPDATE = "hasAuthority('WORKGROUP_UPDATE')";
-    public static final String WORKGROUP_DELETE = "hasAuthority('WORKGROUP_DELETE')";
-    public static final String WORKGROUP_EXPORT = "hasAuthority('WORKGROUP_EXPORT')";
-
+    //
+    public static final String WORKGROUP_CREATE = formatAuthority(WORKGROUP_PREFIX + "CREATE");
+    public static final String WORKGROUP_READ = formatAuthority(WORKGROUP_PREFIX + "READ");
+    public static final String WORKGROUP_UPDATE = formatAuthority(WORKGROUP_PREFIX + "UPDATE");
+    public static final String WORKGROUP_DELETE = formatAuthority(WORKGROUP_PREFIX + "DELETE");
+    public static final String WORKGROUP_EXPORT = formatAuthority(WORKGROUP_PREFIX + "EXPORT");
     // 
-    public static final String WORKGROUP_ANY = "hasAnyAuthority('WORKGROUP_CREATE', 'WORKGROUP_READ', 'WORKGROUP_UPDATE', 'WORKGROUP_EXPORT', 'WORKGROUP_DELETE')";
-    
+    public static final String WORKGROUP_ANY = formatAnyAuthority(WORKGROUP_PREFIX + "CREATE", WORKGROUP_PREFIX + "READ", WORKGROUP_PREFIX + "UPDATE", WORKGROUP_PREFIX + "EXPORT", WORKGROUP_PREFIX + "DELETE");
 }
