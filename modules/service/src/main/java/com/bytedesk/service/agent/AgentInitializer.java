@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-24 21:34:00
+ * @LastEditTime: 2025-03-20 11:59:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,10 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRequest;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -30,11 +34,13 @@ public class AgentInitializer implements SmartInitializingSingleton {
     private final AgentRestService agentService;
     private final AgentRepository agentRepository;
     private final BytedeskProperties bytedeskProperties;
+    private final AuthorityRestService authorityService;
 
     @Override
     public void afterSingletonsInstantiated() {
         // 迁移到 WorkgroupInitializer执行
         // init();
+        initPermissions();
     }
 
     public void init() {
@@ -47,6 +53,22 @@ public class AgentInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         String agentUid = BytedeskConsts.DEFAULT_AGENT_UID;
         agentService.createFromMember(mobile, orgUid, agentUid);
+    }
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = AgentPermissions.AGENT_PREFIX + permission.name();
+            if (authorityService.existsByValue(permissionValue)) {
+                continue;
+            }
+            AuthorityRequest authRequest = AuthorityRequest.builder()
+                    .name(I18Consts.I18N_PREFIX + permissionValue)
+                    .value(permissionValue)
+                    .description("Permission for " + permissionValue)
+                    .build();
+            authRequest.setUid(permissionValue.toLowerCase());
+            authorityService.create(authRequest);
+        }
     }
     
 }
