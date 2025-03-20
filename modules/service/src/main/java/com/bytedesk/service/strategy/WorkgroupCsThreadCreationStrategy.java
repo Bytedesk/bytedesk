@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:57:18
+ * @LastEditTime: 2025-03-20 10:11:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -131,8 +131,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         if (thread == null) {
             // 不存在会话，创建会话
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
-            // 重新初始化会话，包括重置机器人状态等
-            thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
             log.info("createWorkgroupCsThread: {}", thread.toString());
         }
 
