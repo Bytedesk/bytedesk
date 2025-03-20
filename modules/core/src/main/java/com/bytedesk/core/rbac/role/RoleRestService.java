@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 10:14:22
+ * @LastEditTime: 2025-03-20 10:52:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,13 +17,12 @@ import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
 import lombok.extern.slf4j.Slf4j;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -53,18 +53,18 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         private final AuthService authService;
 
-        public Page<RoleResponse> queryBySuper(RoleRequest roleRequest) {
-                Pageable pageable = PageRequest.of(roleRequest.getPageNumber(), roleRequest.getPageSize(),
-                                Sort.Direction.ASC, "id");
-                Specification<RoleEntity> specification = RoleSpecification.searchBySuper(roleRequest);
+        private final ModelMapper modelMapper;
+
+        public Page<RoleResponse> queryBySuper(RoleRequest request) {
+                Pageable pageable = request.getPageable();
+                Specification<RoleEntity> specification = RoleSpecification.searchBySuper(request);
                 Page<RoleEntity> rolePage = roleRepository.findAll(specification, pageable);
                 return rolePage.map(this::convertToResponse);
         }
 
-        public Page<RoleResponse> queryByOrg(RoleRequest roleRequest) {
-                Pageable pageable = PageRequest.of(roleRequest.getPageNumber(), roleRequest.getPageSize(),
-                                Sort.Direction.ASC, "id");
-                Specification<RoleEntity> specification = RoleSpecification.searchByOrg(roleRequest);
+        public Page<RoleResponse> queryByOrg(RoleRequest request) {
+                Pageable pageable = request.getPageable();
+                Specification<RoleEntity> specification = RoleSpecification.searchByOrg(request);
                 Page<RoleEntity> rolePage = roleRepository.findAll(specification, pageable);
                 return rolePage.map(this::convertToResponse);
         }
@@ -96,24 +96,34 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
                         throw new RuntimeException("role " + request.getName() + " already exists");
                 }
-                // RoleEntity role = modelMapper.map(request, RoleEntity.class);
-                RoleEntity role = RoleEntity.builder()
-                                .uid(uidUtils.getUid())
-                                .name(request.getName())
-                                .description(request.getDescription())
-                                .level(request.getLevel())
-                                .system(request.getSystem())
-                                .build();
+                UserEntity user = authService.getUser();
+                if (user != null) {
+                        request.setUserUid(user.getUid());
+                }
+
+                RoleEntity role = modelMapper.map(request, RoleEntity.class);
+                // RoleEntity role = RoleEntity.builder()
+                //                 .uid(uidUtils.getUid())
+                //                 .name(request.getName())
+                //                 .description(request.getDescription())
+                //                 .level(request.getLevel())
+                //                 .system(request.getSystem())
+                //                 .build();
                 // role.setUid(uidUtils.getUid());
+                if (StringUtils.hasText(request.getUid())) {
+                        role.setUid(request.getUid());
+                } else {
+                        role.setUid(uidUtils.getUid());
+                }
                 //
-                if (StringUtils.hasText(request.getOrgUid())) {
-                        role.setOrgUid(request.getOrgUid());
-                        role.setLevel(LevelEnum.ORGANIZATION.name());
-                }
+                // if (StringUtils.hasText(request.getOrgUid())) {
+                //         role.setOrgUid(request.getOrgUid());
+                //         role.setLevel(LevelEnum.ORGANIZATION.name());
+                // }
                 // 添加创建人
-                if (authService.getUser() != null) {
-                        role.setUserUid(authService.getUser().getUid());
-                }
+                // if (authService.getUser() != null) {
+                //         role.setUserUid(authService.getUser().getUid());
+                // }
                 //
                 if (request.getAuthorityUids() != null) {
                         Iterator<String> iterator = request.getAuthorityUids().iterator();
