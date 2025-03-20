@@ -35,35 +35,51 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_READ)
     @Override
     public ResponseEntity<?> queryByOrg(AuthorityRequest request) {
+
         Page<AuthorityResponse> authorities = authorityService.queryByOrg(request);
+
         return ResponseEntity.ok(JsonResult.success(authorities));
     }
 
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_READ)
     @Override
     public ResponseEntity<?> queryByUser(AuthorityRequest request) {
+
         Page<AuthorityResponse> authorities = authorityService.queryByUser(request);
+
         return ResponseEntity.ok(JsonResult.success(authorities));
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(AuthorityRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_CREATE)
     @Override
     public ResponseEntity<?> create(AuthorityRequest request) {
+
         AuthorityResponse authority = authorityService.create(request);
+
         return ResponseEntity.ok(JsonResult.success(authority));
     }
 
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_UPDATE)
     @Override
     public ResponseEntity<?> update(AuthorityRequest request) {
+
         AuthorityResponse authority = authorityService.update(request);
+
         return ResponseEntity.ok(JsonResult.success(authority));
     }
 
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_DELETE)
     @Override
     public ResponseEntity<?> delete(AuthorityRequest request) {
+
         authorityService.delete(request);
+
         return ResponseEntity.ok(JsonResult.success());
     }
 
@@ -73,9 +89,5 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(AuthorityRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 }

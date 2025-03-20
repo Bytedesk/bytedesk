@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:45:41
+ * @LastEditTime: 2025-03-20 14:55:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,52 +44,66 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     private final MemberRestService memberService;
 
     @Override
-    public ResponseEntity<?> queryByOrg(MemberRequest memberRequest) {
+    public ResponseEntity<?> queryByOrg(MemberRequest request) {
         //
-        Page<MemberResponse> memberResponse = memberService.queryByOrg(memberRequest);
+        Page<MemberResponse> memberResponse = memberService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(MemberRequest memberRequest) {
+    public ResponseEntity<?> queryByUser(MemberRequest request) {
         //
-        MemberResponse memberResponse = memberService.query(memberRequest);
+        Page<MemberResponse> memberResponse = memberService.queryByUser(request);
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
     @GetMapping("/query/userUid")
-    public ResponseEntity<?> queryByUserUid(MemberRequest memberRequest) {
+    public ResponseEntity<?> queryByUserUid(MemberRequest request) {
         //
-        MemberResponse memberResponse = memberService.queryByUserUid(memberRequest);
+        MemberResponse memberResponse = memberService.queryByUserUid(request);
+        if (memberResponse == null) {
+            return ResponseEntity.ok(JsonResult.error("user not found"));
+        }
         //
+        return ResponseEntity.ok(JsonResult.success(memberResponse));
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(MemberRequest request) {
+        
+        MemberResponse memberResponse = memberService.queryByUid(request);
+        if (memberResponse == null) {
+            return ResponseEntity.ok(JsonResult.error("user not found"));
+        }
+
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
     @ActionAnnotation(title = "member", action = "create", description = "create member")
     @Override
-    public ResponseEntity<?> create(@RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<?> create(@RequestBody MemberRequest request) {
 
-        MemberResponse member = memberService.create(memberRequest);
+        MemberResponse member = memberService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(member));
     }
 
     @ActionAnnotation(title = "member", action = "update", description = "update member")
     @Override
-    public ResponseEntity<?> update(@RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<?> update(@RequestBody MemberRequest request) {
 
-        MemberResponse member = memberService.update(memberRequest);
+        MemberResponse member = memberService.update(request);
         //
         return ResponseEntity.ok(JsonResult.success(member));
     }
 
     @ActionAnnotation(title = "member", action = "delete", description = "delete member")
     @Override
-    public ResponseEntity<?> delete(@RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<?> delete(@RequestBody MemberRequest request) {
 
-        memberService.deleteByUid(memberRequest.getUid());
+        memberService.deleteByUid(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -128,11 +142,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return "";
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(MemberRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
     
 }

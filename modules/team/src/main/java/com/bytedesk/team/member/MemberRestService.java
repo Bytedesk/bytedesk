@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 19:44:17
+ * @LastEditTime: 2025-03-20 14:55:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.cache.annotation.CachePut;
@@ -36,7 +34,6 @@ import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
-// import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -68,26 +65,46 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
 
     private final ThreadRestService threadService;
 
+    @Override
     public Page<MemberResponse> queryByOrg(MemberRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC, "id");
+        Pageable pageable = request.getPageable();
         Specification<MemberEntity> spec = MemberSpecification.search(request);
         Page<MemberEntity> memberPage = memberRepository.findAll(spec, pageable);
         return memberPage.map(this::convertToResponse);
     }
 
-    public MemberResponse query(MemberRequest request) {
+    @Override
+    public Page<MemberResponse> queryByUser(MemberRequest request) {
         UserEntity user = authService.getUser();
-        Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
-        if (!memberOptional.isPresent()) {
-            throw new RuntimeException("Member does not exist."); // 抛出具体的异常
+        if (user == null) {
+            return null;
         }
-        return convertToResponse(memberOptional.get());
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
+
+    // public MemberResponse query(MemberRequest request) {
+    //     UserEntity user = authService.getUser();
+    //     Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
+    //     if (!memberOptional.isPresent()) {
+    //         return null;
+    //     }
+    //     return convertToResponse(memberOptional.get());
+    // }
 
     public MemberResponse queryByUserUid(MemberRequest request) {
         Optional<MemberEntity> memberOptional = findByUserUid(request.getUid());
         if (!memberOptional.isPresent()) {
-            throw new RuntimeException("Member does not exist."); // 抛出具体的异常
+            return null;
+        }
+        return convertToResponse(memberOptional.get());
+    }
+
+    public MemberResponse queryByUid(MemberRequest request) {
+        Optional<MemberEntity> memberOptional = findByUid(request.getUid());
+        if (!memberOptional.isPresent()) {
+            return null;
         }
         return convertToResponse(memberOptional.get());
     }
@@ -357,11 +374,7 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         return savedThread;
     }
 
-    @Override
-    public Page<MemberResponse> queryByUser(MemberRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
+    
 
     @Override
     public void delete(MemberRequest request) {
