@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:09:59
+ * @LastEditTime: 2025-03-21 23:27:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,12 +21,14 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -147,6 +149,11 @@ public class ArticleEntity extends BaseEntity {
     @Column(name = "create_user", length = 1024)
     // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // TODO:多个附件
+    // @Builder.Default
+    // @OneToMany(mappedBy = "article")
+    // private List<UploadEntity> attachments = new ArrayList<>();
 
     // public Document toDocument(@NonNull ArticleEntity article) {
     //     return new Document(article.getTitle() + article.getContentMarkdown(),
