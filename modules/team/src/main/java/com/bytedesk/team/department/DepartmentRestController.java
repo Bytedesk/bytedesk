@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:45:35
+ * @LastEditTime: 2025-03-21 18:37:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,19 +24,21 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
+// import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/department")
-@Tag(name = "department - 部门", description = "department apis")
+// @Tag(name = "department - 部门", description = "department apis")
 public class DepartmentRestController extends BaseRestController<DepartmentRequest> {
 
     private final DepartmentRestService departmentService;
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(DepartmentRequest request) {
 
@@ -45,6 +47,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(DepartmentRequest request) {
         
@@ -53,6 +56,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_CREATE')")
     @ActionAnnotation(title = "department", action = "create", description = "create department")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest departmentRequest) {
 
@@ -61,6 +65,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
     @ActionAnnotation(title = "department", action = "update", description = "update department")
     public ResponseEntity<?> update(@RequestBody DepartmentRequest departmentRequest) {
 
@@ -69,6 +74,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_DELETE')")
     @ActionAnnotation(title = "department", action = "delete", description = "delete department")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest departmentRequest) {
@@ -78,12 +84,14 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_EXPORT')")
     @Override
     public Object export(DepartmentRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUid(DepartmentRequest request) {
         // TODO Auto-generated method stub
