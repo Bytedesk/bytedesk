@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-22 20:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 16:11:06
+ * @LastEditTime: 2025-03-21 16:38:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
@@ -68,7 +67,7 @@ public class BatchJobController {
     public ResponseEntity<?> getAllJobs() {
         try {
             Map<String, Object> result = new HashMap<>();
-            result.put("dailyReport", getJobDetails("dailyReportJob"));
+            // result.put("dailyReport", getJobDetails("dailyReportJob"));
             result.put("knowledgeExport", getJobDetails("knowledgeExportJob"));
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
@@ -87,7 +86,12 @@ public class BatchJobController {
         List<JobInstance> instances = jobExplorer.findJobInstancesByJobName(jobName, 0, 10);
         Map<String, Object> details = new HashMap<>();
         details.put("name", jobName);
-        details.put("instanceCount", jobExplorer.getJobInstanceCount(jobName));
+        try {
+            details.put("instanceCount", jobExplorer.getJobInstanceCount(jobName));
+        } catch (org.springframework.batch.core.launch.NoSuchJobException e) {
+            details.put("instanceCount", 0);
+            log.warn("Job not found: {}", jobName);
+        }
         details.put("recentInstances", instances);
         
         return details;

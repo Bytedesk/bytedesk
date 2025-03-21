@@ -40,7 +40,7 @@ public class BatchConfig {
      * @return 事务管理器
      */
     @Bean
-    public PlatformTransactionManager batchTransactionManager(DataSource dataSource) {
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
         return new JdbcTransactionManager(dataSource);
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-22 19:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 19:40:00
+ * @LastEditTime: 2025-03-21 16:40:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,10 +20,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -34,12 +31,11 @@ import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
+// import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.bytedesk.kbase.article.ArticleRepository;
@@ -58,18 +54,38 @@ public class KnowledgeExportJob {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
-    private final JobLauncher jobLauncher;
+    // private final JobLauncher jobLauncher;
     private final ArticleRepository articleRepository;
 
-    /**
-     * 定义知识库导出作业
-     * @return Job 导出作业
-     */
     @Bean
     public Job knowledgeExportJob() {
         return new JobBuilder("knowledgeExportJob", jobRepository)
-                .incrementer(new RunIdIncrementer())
-                .start(exportStep())
+                .start(prepareExportStep())
+                .next(exportKnowledgeStep())
+                .build();
+    }
+
+    @Bean
+    public Step prepareExportStep() {
+        return new StepBuilder("prepareExportStep", jobRepository)
+                .tasklet((contribution, chunkContext) -> {
+                    log.info("准备知识库导出");
+                    return RepeatStatus.FINISHED;
+                }, transactionManager)
+                .build();
+    }
+
+    @Bean
+    public Step exportKnowledgeStep() {
+        return new StepBuilder("exportKnowledgeStep", jobRepository)
+                .tasklet((contribution, chunkContext) -> {
+                    String format = chunkContext.getStepContext()
+                            .getJobParameters()
+                            .getOrDefault("format", "csv").toString();
+                    
+                    log.info("执行知识库导出步骤，格式: {}", format);
+                    return RepeatStatus.FINISHED;
+                }, transactionManager)
                 .build();
     }
 
@@ -96,22 +112,21 @@ public class KnowledgeExportJob {
      * 定时触发知识库导出作业
      * 每天凌晨2点执行
      */
-    @Scheduled(cron = "0 0 2 * * ?")
-    public void scheduleKnowledgeExport() {
-        try {
-            Map<String, JobParameter> confMap = new HashMap<>();
-            confMap.put("time", new JobParameter(System.currentTimeMillis()));
-            confMap.put("outputPath", new JobParameter("exports/knowledge_" + System.currentTimeMillis() + ".csv"));
+    // @Scheduled(cron = "0 0 2 * * ?")
+    // public void scheduleKnowledgeExport() {
+    //     try {
+    //         Map<String, JobParameter<?>> confMap = new HashMap<>();
+    //         confMap.put("time", new JobParameter<>(System.currentTimeMillis(), Long.class));
+    //         confMap.put("outputPath", new JobParameter<>("exports/knowledge_" + System.currentTimeMillis() + ".csv", String.class));
             
-            JobParameters jobParameters = new JobParametersBuilder(new JobParameters(confMap))
-                    .toJobParameters();
+    //         JobParameters jobParameters = new JobParameters(confMap);
             
-            JobExecution jobExecution = jobLauncher.run(knowledgeExportJob(), jobParameters);
-            log.info("知识库导出作业完成，状态: {}", jobExecution.getStatus());
-        } catch (Exception e) {
-            log.error("知识库导出作业执行失败", e);
-        }
-    }
+    //         JobExecution jobExecution = jobLauncher.run(knowledgeExportJob(), jobParameters);
+    //         log.info("知识库导出作业完成，状态: {}", jobExecution.getStatus());
+    //     } catch (Exception e) {
+    //         log.error("知识库导出作业执行失败", e);
+    //     }
+    // }
 
     /**
      * CSV文件写入器示例（实际使用时需配合ItemReader使用）
