@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 13:03:56
+ * @LastEditTime: 2025-03-21 14:09:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,9 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
-import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.event.AuthorityCreateEvent;
 import com.bytedesk.core.rbac.role.event.RoleCreateEvent;
@@ -46,12 +44,6 @@ public class RoleEventListener {
         // RoleEntity roleEntity = event.getRoleEntity();
         // log.info("onRoleCreateEvent: {}", roleEntity.toString());
     }
-
-    // @EventListener
-    // public void onRoleUpdateEvent(RoleUpdateEvent> event) {
-    // RoleEntity roleEntity = event.getRoleEntity();
-    // log.info("onRoleUpdateEvent: {}", roleEntity.toString());
-    // }
 
     @EventListener
     public void onAuthorityCreateEvent(AuthorityCreateEvent event) {
