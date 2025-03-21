@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 11:12:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 09:42:42
+ * @LastEditTime: 2025-03-21 12:54:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -55,7 +54,7 @@ public class RoleCacheService {
     }
 
     public void pushRequest(RoleRequest request) {
-        push(JSON.toJSONString(request));
+        push(request.toJson());
     }
 
     // 模拟 push 操作：向列表中添加元素

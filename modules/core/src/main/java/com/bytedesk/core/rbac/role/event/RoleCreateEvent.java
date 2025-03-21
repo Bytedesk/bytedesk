@@ -24,6 +24,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class RoleCreateEvent extends ApplicationEvent {
 
+    private static final long serialVersionUID = 1L;
+
     private RoleEntity roleEntity;
 
     public RoleCreateEvent(Object source, RoleEntity roleEntity) {
