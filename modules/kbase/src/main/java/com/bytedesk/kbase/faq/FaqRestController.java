@@ -111,7 +111,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "Faq-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            // String fileName = "Faq-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "常见问题-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
