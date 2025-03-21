@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 09:30:40
+ * @LastEditTime: 2025-03-21 20:36:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,7 +86,7 @@ public class PageRouteController {
 			zh.put("agentClient", "客服工作台");
 			zh.put("visitorChat", "访客对话");
 			zh.put("workFlow", "工作流");
-			zh.put("notebase", "知识库/帮助中心");
+			zh.put("notebase", "知识库");
 			zh.put("kanban", "项目管理");
 			zh.put("javaDoc", "Java 文档");
 			zh.put("apiDoc", "Swagger API 文档");
@@ -116,7 +116,7 @@ public class PageRouteController {
 			zhTW.put("agentClient", "客服工作台");
 			zhTW.put("visitorChat", "訪客對話");
 			zhTW.put("workFlow", "工作流");
-			zhTW.put("notebase", "知識庫/幫助中心");
+			zhTW.put("notebase", "知識庫");
 			zhTW.put("kanban", "項目管理");
 			zhTW.put("javaDoc", "Java 文檔");
 			zhTW.put("apiDoc", "Swagger API 文檔");
