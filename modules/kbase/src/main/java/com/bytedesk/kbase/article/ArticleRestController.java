@@ -25,6 +25,7 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/article")
@@ -33,7 +34,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
 
     private final ArticleRestService articleService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(ArticleRequest request) {
 
@@ -42,6 +43,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(ArticleRequest request) {
         
@@ -51,6 +53,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     }
 
     // query detail
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(ArticleRequest request) {
 
@@ -62,6 +65,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleRequest request) {
 
@@ -70,6 +74,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
     public ResponseEntity<?> update(@RequestBody ArticleRequest request) {
 
@@ -78,6 +83,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
     public ResponseEntity<?> delete(@RequestBody ArticleRequest request) {
 
@@ -86,12 +92,14 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(ArticleRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUid(ArticleRequest request) {
         // TODO Auto-generated method stub
