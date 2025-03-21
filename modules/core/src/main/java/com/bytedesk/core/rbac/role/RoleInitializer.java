@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 18:22:59
+ * @LastEditTime: 2025-03-21 11:27:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,12 +18,6 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
-// import com.bytedesk.core.ip.IpPermissions;
-// import com.bytedesk.core.message.MessagePermissions;
-// import com.bytedesk.core.push.PushPermissions;
-// import com.bytedesk.core.rbac.organization.OrganizationPermissions;
-// import com.bytedesk.core.rbac.user.UserPermissions;
-// import com.bytedesk.core.thread.ThreadPermissions;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.RequiredArgsConstructor;

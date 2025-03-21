@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 15:54:39
+ * @LastEditTime: 2025-03-21 11:25:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,7 @@ import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import com.bytedesk.core.annotation.TabooFilter;
+// import com.bytedesk.core.annotation.TabooFilter;
 import com.bytedesk.core.message.IMessageSendService;
 // import com.bytedesk.core.socket.MqService;
 
@@ -51,7 +51,7 @@ public class StompController {
      * @param message   content
      */
     @MessageMapping("/{sid}.{uid}")
-    @TabooFilter(value = "message", throwException = false)
+    // @TabooFilter(value = "message", throwException = false)
     public void message(Principal principal,
             @DestinationVariable(value = "sid") String sid,
             @DestinationVariable(value = "uid") String uid,
@@ -71,7 +71,7 @@ public class StompController {
      * @param message   msg
      */
     @MessageMapping("/test.{topic}")
-    @TabooFilter
+    // @TabooFilter
     public void receiveTestMessage(Principal principal,
             @DestinationVariable(value = "topic") String topic,
             @NonNull String message) {
