@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:39:15
+ * @LastEditTime: 2025-03-21 17:42:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -34,7 +35,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
 
     private final KbaseRestService knowledgeService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(KbaseRequest request) {
@@ -44,6 +45,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(KbaseRequest request) {
         
@@ -52,7 +54,15 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @Override
+    public ResponseEntity<?> queryByUid(KbaseRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
     // query detail
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(KbaseRequest request) {
 
@@ -64,6 +74,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
@@ -73,6 +84,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
@@ -82,6 +94,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
@@ -91,16 +104,13 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(KbaseRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(KbaseRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
 }

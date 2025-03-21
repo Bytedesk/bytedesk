@@ -29,6 +29,7 @@ import com.bytedesk.core.utils.JsonResult;
 // import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/robot")
@@ -38,6 +39,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
     private final RobotRestService robotService;
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
@@ -46,6 +48,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(RobotRequest request) {
         
@@ -54,6 +57,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUid(RobotRequest request) {
 
@@ -62,6 +66,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(robot));
     }
     
+    @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     @ActionAnnotation(title = "robot", action = "create", description = "create robot")
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
@@ -72,6 +77,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
     
     // 员工/客服创建智能体会话
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
     @PostMapping("/create/thread")
     public ResponseEntity<?> createThread(@RequestBody ThreadRequest request) {
@@ -82,6 +88,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     // 创建客服助手会话
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'AGENT')")
     @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
     @PostMapping("/create/agent/assistant/thread")
     public ResponseEntity<?> createAgentAssistantThread(@RequestBody ThreadRequest request) {
@@ -92,6 +99,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     // 创建智能体模板
+    @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     @ActionAnnotation(title = "robot", action = "create", description = "create prompt robot")
     @PostMapping("/create/prompt")
     public ResponseEntity<?> createPromptRobot(@RequestBody RobotRequest request) {
@@ -101,6 +109,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(robot));
     }
 
+    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
     @ActionAnnotation(title = "robot", action = "update", description = "update robot")
     @Override
     public ResponseEntity<?> update(@RequestBody RobotRequest request) {
@@ -111,6 +120,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     // update avatar
+    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
     @ActionAnnotation(title = "robot", action = "update", description = "update robot avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody RobotRequest request) {
@@ -120,6 +130,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @ActionAnnotation(title = "robot", action = "update", description = "update robot thread")
     @PostMapping("/update/thread")
     public ResponseEntity<?> updateThread(@RequestBody ThreadRequest request) {
@@ -129,6 +140,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(thread));
     }
 
+    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
     @ActionAnnotation(title = "robot", action = "update", description = "update prompt robot")
     @PostMapping("/update/prompt")
     public ResponseEntity<?> updatePromptRobot(@RequestBody RobotRequest request) {
@@ -138,6 +150,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
+    @PreAuthorize("hasAuthority('ROBOT_DELETE')")
     @ActionAnnotation(title = "robot", action = "delete", description = "delete robot")
     @Override
     public ResponseEntity<?> delete(@RequestBody RobotRequest request) {
@@ -147,6 +160,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @PreAuthorize("hasAuthority('ROBOT_EXPORT')")
     @Override
     public Object export(RobotRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

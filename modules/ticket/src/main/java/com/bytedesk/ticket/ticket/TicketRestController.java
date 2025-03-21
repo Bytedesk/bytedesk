@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 22:02:19
+ * @LastEditTime: 2025-03-21 17:41:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,6 +40,7 @@ import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.bytedesk.ticket.comment.TicketCommentEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/ticket")
@@ -52,6 +53,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
 
     private final ModelMapper modelMapper;
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {
 
@@ -60,6 +62,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(TicketRequest request) {
 
@@ -68,6 +71,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(TicketRequest request) {
 
@@ -76,6 +80,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
 
@@ -84,6 +89,14 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @Override
+    public ResponseEntity<?> queryByUid(TicketRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @PreAuthorize("hasAuthority('TICKET_CREATE')")
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
 
@@ -92,6 +105,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize("hasAuthority('TICKET_UPDATE')")
     @Override
     public ResponseEntity<?> update(TicketRequest request) {
 
@@ -100,6 +114,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize("hasAuthority('TICKET_DELETE')")
     @Override
     public ResponseEntity<?> delete(TicketRequest request) {
 
@@ -108,11 +123,13 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
     
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/{id}/comments")
     public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
         return ticketRestService.addComment(id, comment);
     }
     
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/{id}/attachments")
     public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
         return ticketRestService.uploadAttachment(id, file);
@@ -120,6 +137,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
+    @PreAuthorize("hasAuthority('TICKET_EXPORT')")
     @ActionAnnotation(title = "ticket", action = "export", description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
@@ -167,6 +185,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询工单，并过滤掉没有任务的工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/filter")
     public ResponseEntity<?> queryTicketFilter(TicketRequest request) {
         Page<TicketResponse> page = ticketService.queryTicketFilter(request);
@@ -176,6 +195,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询我创建的工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/created")
     public ResponseEntity<?> queryCreated(TicketRequest request) {
         Page<TicketResponse> page = ticketService.queryCreated(request);
@@ -185,6 +205,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询待我处理的工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/claimed")
     public ResponseEntity<?> queryClaimed(TicketRequest request) {
         Page<TicketResponse> page = ticketService.queryClaimed(request);
@@ -194,6 +215,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询待分配的工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @GetMapping("/query/unassigned")
     public ResponseEntity<?> queryUnassigned(TicketRequest request) {
         Page<TicketResponse> page = ticketService.queryUnassigned(request);
@@ -203,6 +225,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 认领工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/claim")
     public ResponseEntity<?> claimTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.claimTicket(request);
@@ -215,6 +238,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 开始处理工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/start")
     public ResponseEntity<?> startTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.startTicket(request);
@@ -227,6 +251,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 退回工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/unclaim")
     public ResponseEntity<?> unclaimTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.unclaimTicket(request);
@@ -239,6 +264,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 转派工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @PostMapping("/transfer")
     public ResponseEntity<?> transferTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.transferTicket(request);
@@ -251,6 +277,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 挂起工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/hold")
     public ResponseEntity<?> holdTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.holdTicket(request);
@@ -263,6 +290,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 恢复工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/resume")
     public ResponseEntity<?> resumeTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.resumeTicket(request);
@@ -275,6 +303,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 待回应工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/pend")
     public ResponseEntity<?> pendTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.pendTicket(request);
@@ -287,6 +316,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 重新打开工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/reopen")
     public ResponseEntity<?> reopenTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.reopenTicket(request);
@@ -299,6 +329,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 升级工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @PostMapping("/escalate")
     public ResponseEntity<?> escalateTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.escalateTicket(request);
@@ -311,6 +342,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 完成工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/resolve")
     public ResponseEntity<?> resolveTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.resolveTicket(request);
@@ -323,6 +355,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 客户验证工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/verify")
     public ResponseEntity<?> verifyTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.verifyTicket(request);
@@ -335,6 +368,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 关闭工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/close")
     public ResponseEntity<?> closeTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.closeTicket(request);
@@ -347,6 +381,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 取消工单
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.cancelTicket(request);
@@ -359,6 +394,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询工单任务历史
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/history/task")
     public ResponseEntity<?> queryTicketTaskHistory(TicketRequest request) {
         List<TicketHistoryTaskResponse> histories = ticketService.queryTicketTaskHistory(request);
@@ -368,6 +404,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询工单流程实例历史
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/history/process")
     public ResponseEntity<?> queryTicketProcessHistory(TicketRequest request) {
         List<TicketHistoryProcessResponse> histories = ticketService.queryTicketProcessHistory(request);
@@ -377,16 +414,13 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询工单活动历史
      */
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/history/activity")
     public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
         List<TicketHistoryActivityResponse> activities = ticketService.queryTicketActivityHistory(request);
         return ResponseEntity.ok(JsonResult.success(activities));
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
 } 
