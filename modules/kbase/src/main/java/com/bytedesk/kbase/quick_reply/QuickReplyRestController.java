@@ -30,6 +30,7 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/quickreply")
@@ -39,7 +40,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     private final QuickReplyRestService quickReplyRestService;
 
     // 管理后台加载
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(QuickReplyRequest request) {
         
@@ -49,6 +50,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     // 客服端加载
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
 
@@ -58,6 +60,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
 
+    @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @ActionAnnotation(title = "quick_reply", action = "create", description = "create quick_reply")
     @Override
     public ResponseEntity<?> create(@RequestBody QuickReplyRequest request) {
@@ -67,6 +70,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @ActionAnnotation(title = "quick_reply", action = "update", description = "update quick_reply")
     @Override
     public ResponseEntity<?> update(@RequestBody QuickReplyRequest request) {
@@ -76,6 +80,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @ActionAnnotation(title = "quick_reply", action = "delete", description = "delete quick_reply")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuickReplyRequest request) {
@@ -87,6 +92,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
+    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @ActionAnnotation(title = "quickReply", action = "export", description = "export quickReply")
     @Override
     public Object export(QuickReplyRequest request, HttpServletResponse response) {
@@ -122,6 +128,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return "";
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUid(QuickReplyRequest request) {
         // TODO Auto-generated method stub
