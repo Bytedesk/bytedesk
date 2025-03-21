@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 12:12:51
+ * @LastEditTime: 2025-03-21 15:32:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -168,6 +169,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 }
         }
 
+        @Transactional
         public RoleResponse addAuthorities(RoleRequest request) {
                 Optional<RoleEntity> roleOptional = findByUid(request.getUid());
                 if (roleOptional.isPresent()) {
