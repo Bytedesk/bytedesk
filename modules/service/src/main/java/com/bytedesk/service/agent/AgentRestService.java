@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 22:22:56
+ * @LastEditTime: 2025-03-21 16:56:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -304,7 +304,14 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
+    /**
+     * 更新坐席在线状态
+     * 
+     * @param userUid 用户ID
+     * @param connected 是否在线
+     */
     @Async
+    @Transactional
     public void updateConnect(String userUid, boolean connected) {
         // 参数uid是userUid，非agent uid，所以无法直接更新
         agentRepository.updateConnectedByUserUid(connected, userUid);
