@@ -61,37 +61,37 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error("User not found, please signup first"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USER_SIGNUP_FIRST));
     }
 
     @ExceptionHandler(EmailNotFoundException.class)
     public ResponseEntity<?> handleEmailNotFoundException(EmailNotFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error("Email not found, please signup first"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_EMAIL_SIGNUP_FIRST));
     }
 
     @ExceptionHandler(MobileNotFoundException.class)
     public ResponseEntity<?> handleMobileNotFoundException(MobileNotFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error("Mobile not found, please signup first"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_MOBILE_SIGNUP_FIRST));
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error("Resource not found, usually is uuids not exist"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_RESOURCE_NOT_FOUND));
     }
 
     @ExceptionHandler(UserDisabledException.class)
     public ResponseEntity<?> handleUserDisabledException(UserDisabledException e) {
-        return ResponseEntity.ok().body(JsonResult.error("User disabled, please contact admin"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USER_DISABLED));
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<?> handleForbiddenException(ForbiddenException e) {
-        return ResponseEntity.ok().body(JsonResult.error("Forbidden to access this resource"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_FORBIDDEN_ACCESS));
     }
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ResponseEntity<?> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException e) {
-        return ResponseEntity.ok().body(JsonResult.error("User blocked, please contact admin"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USER_BLOCKED));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
@@ -123,7 +123,7 @@ public class GlobalControllerAdvice {
         // 特别处理敏感词异常
         if (e.getMessage() != null && e.getMessage().contains("敏感词")) {
             log.warn("敏感词异常: {}", e.getMessage());
-            return ResponseEntity.ok().body(JsonResult.error("消息含有敏感内容，已被过滤"));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
         }
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
@@ -136,16 +136,16 @@ public class GlobalControllerAdvice {
         if (e.getCause() instanceof IllegalArgumentException && 
             e.getCause().getMessage() != null && 
             e.getCause().getMessage().contains("敏感词")) {
-            return ResponseEntity.ok().body(JsonResult.error("消息含有敏感内容，已被过滤"));
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
         }
-        return ResponseEntity.ok().body(JsonResult.error("消息处理失败"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_MESSAGE_PROCESSING_FAILED));
     }
     
     // 添加自定义TabooException处理
     @ExceptionHandler(TabooException.class)
     public ResponseEntity<?> handleTabooException(TabooException e) {
         log.warn("敏感词异常: {}", e.getMessage());
-        return ResponseEntity.ok().body(JsonResult.error("消息含有敏感内容，已被过滤"));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -157,40 +157,40 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> handleNullPointerException(NullPointerException ex) {
         log.error("not handled exception:", ex);
         // ex.printStackTrace();
-        return ResponseEntity.badRequest().body(JsonResult.error("Null Pointer Exception"));
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_NULL_POINTER_EXCEPTION));
     }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
-        return ResponseEntity.badRequest().body(JsonResult.error("Response Status Exception"));
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_RESPONSE_STATUS_EXCEPTION));
     }
 
     // org.eclipse.jetty.websocket.api.exceptions.WebSocketTimeoutException: Connection Idle Timeout
     // java.util.concurrent.TimeoutException: Idle timeout expired: 30004/30000 ms
     @ExceptionHandler(WebSocketTimeoutException.class)
     public ResponseEntity<?> handleWebSocketTimeoutException(WebSocketTimeoutException ex) {
-        return ResponseEntity.badRequest().body(JsonResult.error("TODO: jetty Websocket Timeout Exception"));
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_WEBSOCKET_TIMEOUT_EXCEPTION));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException ex) {
-        return ResponseEntity.badRequest().body(JsonResult.error("Http Request Method Not Supported Exception", 400));
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_HTTP_METHOD_NOT_SUPPORTED, 400));
     }
 
     @ExceptionHandler(value = AuthorizationDeniedException.class)
     public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(JsonResult.error("Authorization Denied Exception", 403));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(JsonResult.error(I18Consts.I18N_AUTHORIZATION_DENIED, 403));
     }
 
     @ExceptionHandler(value = RequestRejectedException.class)
     public ResponseEntity<?> handleRequestRejectedException(RequestRejectedException ex) {
-        return ResponseEntity.badRequest().body(JsonResult.error("Request Rejected Exception"));
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_REQUEST_REJECTED));
     }
 
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<?> handleMEntityNotFoundException(EntityNotFoundException ex) {
-        return ResponseEntity.badRequest().body(JsonResult.error("EntityNotFoundException"));
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_ENTITY_NOT_FOUND));
     }
 
     @ExceptionHandler(Exception.class)
@@ -199,6 +199,6 @@ public class GlobalControllerAdvice {
         // if (bytedeskProperties.getDebug()) {
         log.error("not handled exception:", e);
         // }
-        return ResponseEntity.badRequest().body(JsonResult.error("Internal Server Error"));
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_INTERNAL_SERVER_ERROR));
     }
 }
