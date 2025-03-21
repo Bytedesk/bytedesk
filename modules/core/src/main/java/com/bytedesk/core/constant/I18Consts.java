@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 10:06:32
+ * @LastEditTime: 2025-03-21 10:41:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -166,9 +166,22 @@ public class I18Consts {
     // typing
     public static final String I18N_TYPING = I18N_PREFIX + "typing";
 
-    // 
-    
-    
-    
-
+    // GlobalControllerAdvice 新增错误国际化常量
+    public static final String I18N_USER_SIGNUP_FIRST = I18N_PREFIX + "user.signup.first";
+    public static final String I18N_EMAIL_SIGNUP_FIRST = I18N_PREFIX + "email.signup.first";
+    public static final String I18N_MOBILE_SIGNUP_FIRST = I18N_PREFIX + "mobile.signup.first";
+    public static final String I18N_RESOURCE_NOT_FOUND = I18N_PREFIX + "resource.not.found";
+    public static final String I18N_USER_DISABLED = I18N_PREFIX + "user.disabled";
+    public static final String I18N_FORBIDDEN_ACCESS = I18N_PREFIX + "forbidden.access";
+    public static final String I18N_USER_BLOCKED = I18N_PREFIX + "user.blocked";
+    public static final String I18N_SENSITIVE_CONTENT = I18N_PREFIX + "sensitive.content";
+    public static final String I18N_MESSAGE_PROCESSING_FAILED = I18N_PREFIX + "message.processing.failed";
+    public static final String I18N_NULL_POINTER_EXCEPTION = I18N_PREFIX + "null.pointer.exception";
+    public static final String I18N_RESPONSE_STATUS_EXCEPTION = I18N_PREFIX + "response.status.exception";
+    public static final String I18N_WEBSOCKET_TIMEOUT_EXCEPTION = I18N_PREFIX + "websocket.timeout.exception";
+    public static final String I18N_HTTP_METHOD_NOT_SUPPORTED = I18N_PREFIX + "http.method.not.supported";
+    public static final String I18N_AUTHORIZATION_DENIED = I18N_PREFIX + "authorization.denied";
+    public static final String I18N_REQUEST_REJECTED = I18N_PREFIX + "request.rejected";
+    public static final String I18N_ENTITY_NOT_FOUND = I18N_PREFIX + "entity.not.found";
+    public static final String I18N_INTERNAL_SERVER_ERROR = I18N_PREFIX + "internal.server.error";
 }
