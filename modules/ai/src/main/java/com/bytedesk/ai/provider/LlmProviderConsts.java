@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 16:44:02
+ * @LastEditTime: 2025-03-21 14:44:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ public class LlmProviderConsts {
     public static final String DEEPSEEK = "deepseek";
     public static final String DASHSCOPE = "dashscope";
     public static final String SILICONFLOW = "silicon";
+    public static final String GITEE = "gitee";
     // 开发中
     public static final String YIYAN = "yiyan";
     public static final String HUNYUAN = "hunyuan";

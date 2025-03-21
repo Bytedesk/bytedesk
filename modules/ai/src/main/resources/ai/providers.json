@@ -36,7 +36,7 @@
     },
     "gitee": {
         "nickname": "Gitee魔力方舟",
-        "logo": "deepseek.png",
+        "logo": "gitee.svg",
         "apiUrl": "https://api.gitee.com",
         "webUrl": "https://ai.gitee.com/",
         "status": "PRODUCTION"
