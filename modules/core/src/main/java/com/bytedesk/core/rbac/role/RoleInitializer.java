@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 15:14:12
+ * @LastEditTime: 2025-03-21 15:43:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,12 +97,6 @@ public class RoleInitializer {
     }
 
     private void initPermissions() {
-        // 延迟1秒执行，确保角色已经创建
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            log.error("initPermissions error", e);
-        }
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = RolePermissions.ROLE_PREFIX + permission.name();
             authorityService.createForPlatform(permissionValue);
