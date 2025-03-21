@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 11:27:55
+ * @LastEditTime: 2025-03-21 12:17:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,10 +34,21 @@ public class RoleInitializer {
 
     // 初始化角色, 在 OrganizationInitializer 中调用
     public void init() {
-        // 
-        initPermissions();
         // 初始化角色
         initRoles();
+        // 
+        initPermissions();
+    }
+
+    private void initRoles() {
+        // 4. 客服
+        createAgent();
+        // 3. 团队成员
+        createMember();
+        // 2. 管理员
+        createAdmin();
+        // 1. 超级管理员
+        createSuper();
     }
 
     private void initPermissions() {
@@ -47,21 +58,8 @@ public class RoleInitializer {
         }
     }
 
-    private void initRoles() {
-        // 1. 超级管理员
-        createSuper();
-        // 2. 管理员
-        createAdmin();
-        // 3. 团队成员
-        createMember();
-        // 4. 客服
-        createAgent();
-    }
-
     private void createSuper() {
-        // if (roleService.existsByNamePlatform(RoleConsts.ROLE_SUPER)) {
-        //     return;
-        // }
+
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_SUPER_UID)
                 .name(RoleConsts.ROLE_SUPER)
@@ -72,9 +70,7 @@ public class RoleInitializer {
         roleService.create(roleRequest);
     }
     private void createAdmin() {
-        // if (roleService.existsByNamePlatform(RoleConsts.ROLE_ADMIN)) {
-        //     return;
-        // }
+
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID)
                 .name(RoleConsts.ROLE_ADMIN)
@@ -86,9 +82,7 @@ public class RoleInitializer {
     }
 
     private void createMember() {
-        // if (roleService.existsByNamePlatform(RoleConsts.ROLE_MEMBER)) {
-        //     return;
-        // }
+   
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID)
                 .name(RoleConsts.ROLE_MEMBER)
@@ -100,9 +94,7 @@ public class RoleInitializer {
     }
 
     private void createAgent() {
-        // if (roleService.existsByNamePlatform(RoleConsts.ROLE_AGENT)) {
-        //     return;
-        // }
+  
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID)
                 .name(RoleConsts.ROLE_AGENT)
