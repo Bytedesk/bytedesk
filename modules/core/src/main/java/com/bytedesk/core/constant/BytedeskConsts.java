@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:08:01
+ * @LastEditTime: 2025-03-21 17:56:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,6 +60,8 @@ public class BytedeskConsts {
     public static final String DEFAULT_ROLE_ADMIN_UID = "df_role_admin_uid";
     public static final String DEFAULT_ROLE_MEMBER_UID = "df_role_member_uid";
     public static final String DEFAULT_ROLE_AGENT_UID = "df_role_agent_uid";
+    public static final String DEFAULT_ROLE_USER_UID = "df_role_user_uid";
+    public static final String DEFAULT_ROLE_VISITOR_UID = "df_role_visitor_uid";
     // 
     public static final String ACTION_LOGIN_USERNAME = "loginWithUsernamePassword";
     public static final String ACTION_LOGIN_MOBILE = "loginWithMobileCode";
