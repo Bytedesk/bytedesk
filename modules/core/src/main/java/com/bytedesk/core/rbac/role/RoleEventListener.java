@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 12:38:57
+ * @LastEditTime: 2025-03-21 13:03:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.event.AuthorityCreateEvent;
@@ -55,7 +56,7 @@ public class RoleEventListener {
     @EventListener
     public void onAuthorityCreateEvent(AuthorityCreateEvent event) {
         AuthorityEntity authorityEntity = event.getAuthority();
-        log.info("role AuthorityCreateEvent: {}", authorityEntity.getName());
+        log.info("role AuthorityCreateEvent: {}", authorityEntity.getUid());
         // 给超级管理员和管理员赋予所有权限
         Set<String> authorityUids = new HashSet<>();
         authorityUids.add(authorityEntity.getUid());
@@ -91,7 +92,7 @@ public class RoleEventListener {
     }
 
     @EventListener
-    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+    public void onQuartzFiveMinEvent(QuartzFiveMinEvent event) {
         // log.info("role QuartzOneMinEvent");
         List<String> list = roleCacheService.getList();
         if (list != null) {
