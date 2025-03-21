@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 12:17:13
+ * @LastEditTime: 2025-03-21 14:58:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,7 +59,6 @@ public class RoleInitializer {
     }
 
     private void createSuper() {
-
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_SUPER_UID)
                 .name(RoleConsts.ROLE_SUPER)
@@ -70,7 +69,6 @@ public class RoleInitializer {
         roleService.create(roleRequest);
     }
     private void createAdmin() {
-
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID)
                 .name(RoleConsts.ROLE_ADMIN)
@@ -82,7 +80,6 @@ public class RoleInitializer {
     }
 
     private void createMember() {
-   
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID)
                 .name(RoleConsts.ROLE_MEMBER)
@@ -94,7 +91,6 @@ public class RoleInitializer {
     }
 
     private void createAgent() {
-  
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID)
                 .name(RoleConsts.ROLE_AGENT)
