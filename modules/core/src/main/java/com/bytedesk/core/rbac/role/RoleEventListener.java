@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 11:41:44
+ * @LastEditTime: 2025-03-21 12:38:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,50 +62,30 @@ public class RoleEventListener {
         // 超级管理员
         RoleRequest superRoleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_SUPER_UID)
-                .name(RoleConsts.ROLE_SUPER)
-                .description("Super")
                 .authorityUids(authorityUids)
-                .level(LevelEnum.PLATFORM.name())
-                .system(true)
                 .build();
-        // roleService.addAuthorities(superRoleRequest);
         roleCacheService.pushRequest(superRoleRequest);
         // 管理员
         RoleRequest adminRoleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID)
-                .name(RoleConsts.ROLE_ADMIN)
-                .description("Admin")
                 .authorityUids(authorityUids)
-                .level(LevelEnum.PLATFORM.name())
-                .system(true)
                 .build();
-        // roleService.addAuthorities(adminRoleRequest);
         roleCacheService.pushRequest(adminRoleRequest);
         // 团队成员和客服: 仅赋予部分权限：ticket、robot、kbase
-        if (authorityEntity.getName().startsWith("ticket")
-                || authorityEntity.getName().startsWith("robot")
-                || authorityEntity.getName().startsWith("kbase")) {
+        if (authorityEntity.getUid().startsWith("ticket")
+                || authorityEntity.getUid().startsWith("robot")
+                || authorityEntity.getUid().startsWith("kbase")) {
             // 团队成员
             RoleRequest memberRoleRequest = RoleRequest.builder()
                     .uid(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID)
-                    .name(RoleConsts.ROLE_MEMBER)
-                    .description("Member")
                     .authorityUids(authorityUids)
-                    .level(LevelEnum.PLATFORM.name())
-                    .system(true)
                     .build();
-            // roleService.addAuthorities(memberRoleRequest);
             roleCacheService.pushRequest(memberRoleRequest);
             // 客服
             RoleRequest agentRoleRequest = RoleRequest.builder()
                     .uid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID)
-                    .name(RoleConsts.ROLE_AGENT)
-                    .description("Agent")
                     .authorityUids(authorityUids)
-                    .level(LevelEnum.PLATFORM.name())
-                    .system(true)
                     .build();
-            // roleService.addAuthorities(agentRoleRequest);
             roleCacheService.pushRequest(agentRoleRequest);
         }
     }
