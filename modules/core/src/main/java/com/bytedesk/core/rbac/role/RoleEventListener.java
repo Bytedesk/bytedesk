@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 15:37:52
+ * @LastEditTime: 2025-03-21 18:14:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,14 +14,12 @@
 package com.bytedesk.core.rbac.role;
 
 import java.util.HashSet;
-// import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-// import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
@@ -60,7 +58,7 @@ public class RoleEventListener {
         roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID, k -> new HashSet<>())
                 .add(authorityEntity.getUid());
         
-        // 团队成员和客服: 仅赋予部分权限：ticket、robot、kbase
+        // 团队成员和客服、用户: 仅赋予部分权限：ticket、robot、kbase
         if (authorityEntity.getUid().startsWith("ticket")
                 || authorityEntity.getUid().startsWith("robot")
                 || authorityEntity.getUid().startsWith("kbase")) {
@@ -71,6 +69,18 @@ public class RoleEventListener {
             // 将权限添加到客服的权限集合
             roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_AGENT_UID, k -> new HashSet<>())
                     .add(authorityEntity.getUid());
+
+            // 将权限添加到用户的权限集合
+            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_USER_UID, k -> new HashSet<>())
+                    .add(authorityEntity.getUid());
+        }
+
+        // 访客创建工单时，必须登录
+        // 访客：仅赋予部分权限：ticket
+        if (authorityEntity.getUid().startsWith("ticket")) {
+            // 将权限添加到访客的权限集合
+            // roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_VISITOR_UID, k -> new HashSet<>())
+            //         .add(authorityEntity.getUid());
         }
     }
 
