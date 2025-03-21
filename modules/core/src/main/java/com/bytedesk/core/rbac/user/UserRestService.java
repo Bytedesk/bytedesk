@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 10:04:24
+ * @LastEditTime: 2025-03-21 10:31:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,8 @@ import java.util.Optional;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +36,14 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
     
     private final AuthService authService;
 
+    private final UserService userService;
+
     @Override
     public Page<UserResponse> queryByOrg(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        Pageable pageable = request.getPageable();
+        Specification<UserEntity> specification = UserSpecification.search(request);
+        Page<UserEntity> page = userRepository.findAll(specification, pageable);
+        return page.map(ConvertUtils::convertToUserResponse);
     }
 
     @Override
@@ -67,8 +73,7 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
 
     @Override
     public UserResponse create(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        return userService.register(request);
     }
 
     @Override
@@ -83,8 +88,10 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
             userEntity.setMobileVerified(request.getMobileVerified());
             userEntity.setEmail(request.getEmail());
             userEntity.setEmailVerified(request.getEmailVerified());
+            // 支持禁用用户
+            userEntity.setEnabled(request.getEnabled());
             // 
-            UserEntity savedUserEntity = userRepository.save(userEntity);
+            UserEntity savedUserEntity = save(userEntity);
             if (savedUserEntity == null) {
                 throw new RuntimeException("Failed to save user");
             }
@@ -95,20 +102,27 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
 
     @Override
     public UserEntity save(UserEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return userRepository.save(entity);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
     }
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<UserEntity> userOptional = userRepository.findByUid(uid);
+        if (userOptional.isPresent()) {
+            UserEntity userEntity = userOptional.get();
+            userEntity.setDeleted(true);
+            save(userEntity);
+        }
     }
 
     @Override
     public void delete(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(request.getUid());
     }
 
     @Override
