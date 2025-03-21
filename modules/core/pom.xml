@@ -218,6 +218,16 @@
 			<version>2.7.0</version>
 		</dependency>
 
+		<!-- 身份证/手机号脱敏 -->
+		<!-- https://doc.hutool.cn/pages/IdcardUtil/ -->
+		<!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->
+		<!-- <dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-core</artifactId>
+			<version>5.8.36</version>
+		</dependency> -->
+
+
 		<!-- 上传图片到阿里云OSS -->
 		<!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
 		<dependency>

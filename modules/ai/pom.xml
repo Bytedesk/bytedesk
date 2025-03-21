@@ -27,6 +27,7 @@
 		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
 		<!-- <mcp.version>0.7.0</mcp.version> -->
 		<jsonp.version>1.18.3</jsonp.version>
+		<hanlp.version>0.0.15</hanlp.version>
 	</properties>
 
 	<dependencies>
@@ -185,6 +186,14 @@
 			<version>${jsonp.version}</version>
 		</dependency>
 
+		<!-- https://hanlp.hankcs.com/ -->	
+		<!-- https://github.com/hankcs/HanLP -->
+		<!-- https://mvnrepository.com/artifact/com.hankcs.hanlp.restful/hanlp-restful -->
+		<dependency>
+			<groupId>com.hankcs.hanlp.restful</groupId>
+			<artifactId>hanlp-restful</artifactId>
+			<version>${hanlp.version}</version>
+		</dependency>
 
 		<!-- https://github.com/modelcontextprotocol/java-sdk -->
 		<!-- https://modelcontextprotocol.io/sdk/java/mcp-overview#features -->
