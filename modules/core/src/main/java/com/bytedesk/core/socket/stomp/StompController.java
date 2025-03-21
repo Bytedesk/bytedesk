@@ -21,7 +21,7 @@ import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-// import com.bytedesk.core.annotation.TabooFilter;
+import com.bytedesk.core.annotation.TabooFilter;
 import com.bytedesk.core.message.IMessageSendService;
 // import com.bytedesk.core.socket.MqService;
 
@@ -51,7 +51,7 @@ public class StompController {
      * @param message   content
      */
     @MessageMapping("/{sid}.{uid}")
-    // @TabooFilter(title = "敏感词过滤", action = "发送消息")
+    @TabooFilter(value = "message", throwException = false)
     public void message(Principal principal,
             @DestinationVariable(value = "sid") String sid,
             @DestinationVariable(value = "uid") String uid,
@@ -71,6 +71,7 @@ public class StompController {
      * @param message   msg
      */
     @MessageMapping("/test.{topic}")
+    @TabooFilter
     public void receiveTestMessage(Principal principal,
             @DestinationVariable(value = "topic") String topic,
             @NonNull String message) {
