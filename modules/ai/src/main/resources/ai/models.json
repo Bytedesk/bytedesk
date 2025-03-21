@@ -86,11 +86,11 @@
     ],
     "gitee": [
         {
-            "name": "deepseek-chat",
-            "nickname": "DeepSeek-V3"
+            "name": "QwQ-32B",
+            "nickname": "QwQ-32B"
         },
         {
-            "name": "deepseek-reasoner",
+            "name": "DeepSeek-R1",
             "nickname": "DeepSeek-R1"
         }
     ],
