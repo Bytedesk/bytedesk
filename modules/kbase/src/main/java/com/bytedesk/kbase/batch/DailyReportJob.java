@@ -13,63 +13,63 @@
  */
 package com.bytedesk.kbase.batch;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.PlatformTransactionManager;
+// import org.springframework.batch.core.Job;
+// import org.springframework.batch.core.Step;
+// import org.springframework.batch.core.job.builder.JobBuilder;
+// import org.springframework.batch.core.repository.JobRepository;
+// import org.springframework.batch.core.step.builder.StepBuilder;
+// import org.springframework.batch.repeat.RepeatStatus;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.transaction.PlatformTransactionManager;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Configuration
-@RequiredArgsConstructor
-public class DailyReportJob {
+// @Slf4j
+// @Configuration
+// @RequiredArgsConstructor
+// public class DailyReportJob {
 
-    private final JobRepository jobRepository;
-    private final PlatformTransactionManager transactionManager;
+//     private final JobRepository jobRepository;
+//     private final PlatformTransactionManager transactionManager;
 
-    @Bean
-    public Job dailyReportJob() {
-        return new JobBuilder("dailyReportJob", jobRepository)
-                .start(collectDataStep())
-                .next(generateReportStep())
-                .next(distributeReportStep())
-                .build();
-    }
+//     @Bean
+//     public Job kbaseDailyReportJob() {
+//         return new JobBuilder("dailyReportJob", jobRepository)
+//                 .start(collectDataStep())
+//                 .next(generateReportStep())
+//                 .next(distributeReportStep())
+//                 .build();
+//     }
 
-    @Bean
-    public Step collectDataStep() {
-        return new StepBuilder("collectDataStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    log.info("执行数据收集步骤");
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
-    }
+//     @Bean
+//     public Step collectDataStep() {
+//         return new StepBuilder("collectDataStep", jobRepository)
+//                 .tasklet((contribution, chunkContext) -> {
+//                     log.info("执行数据收集步骤");
+//                     return RepeatStatus.FINISHED;
+//                 }, transactionManager)
+//                 .build();
+//     }
 
-    @Bean
-    public Step generateReportStep() {
-        return new StepBuilder("generateReportStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    log.info("执行报表生成步骤");
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
-    }
+//     @Bean
+//     public Step generateReportStep() {
+//         return new StepBuilder("generateReportStep", jobRepository)
+//                 .tasklet((contribution, chunkContext) -> {
+//                     log.info("执行报表生成步骤");
+//                     return RepeatStatus.FINISHED;
+//                 }, transactionManager)
+//                 .build();
+//     }
 
-    @Bean
-    public Step distributeReportStep() {
-        return new StepBuilder("distributeReportStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    log.info("执行报表分发步骤");
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
-    }
-} 
+//     @Bean
+//     public Step distributeReportStep() {
+//         return new StepBuilder("distributeReportStep", jobRepository)
+//                 .tasklet((contribution, chunkContext) -> {
+//                     log.info("执行报表分发步骤");
+//                     return RepeatStatus.FINISHED;
+//                 }, transactionManager)
+//                 .build();
+//     }
+// } 
