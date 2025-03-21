@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 14:33:35
+ * @LastEditTime: 2025-03-21 14:35:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,34 +39,34 @@ public class SpringAIGiteeConfig {
     @Value("${spring.ai.gitee.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("deepSeekApi")
-    OpenAiApi deepSeekApi() {
+    @Bean("giteeApi")
+    OpenAiApi giteeApi() {
         return OpenAiApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .build();
     }
 
-    @Bean("deepSeekChatOptions")
-    OpenAiChatOptions deepSeekChatOptions() {
+    @Bean("giteeChatOptions")
+    OpenAiChatOptions giteeChatOptions() {
         return OpenAiChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
     }
 
-    @Bean("deepSeekChatModel")
-    OpenAiChatModel deepSeekChatModel() {
+    @Bean("giteeChatModel")
+    OpenAiChatModel giteeChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(deepSeekApi())
-                .defaultOptions(deepSeekChatOptions())
+                .openAiApi(giteeApi())
+                .defaultOptions(giteeChatOptions())
                 .build();
     }
 
-    @Bean("deepSeekChatClient")
-    ChatClient deepSeekChatClient() {
-        return  ChatClient.builder(deepSeekChatModel())
-                .defaultOptions(deepSeekChatOptions())
+    @Bean("giteeChatClient")
+    ChatClient giteeChatClient() {
+        return  ChatClient.builder(giteeChatModel())
+                .defaultOptions(giteeChatOptions())
                 .build();
     }
 

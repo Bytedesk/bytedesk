@@ -84,6 +84,16 @@
             "nickname": "DeepSeek-Coder-V2-Instruct"
         }
     ],
+    "gitee": [
+        {
+            "name": "deepseek-chat",
+            "nickname": "DeepSeek-V3"
+        },
+        {
+            "name": "deepseek-reasoner",
+            "nickname": "DeepSeek-R1"
+        }
+    ],
     "openai": [
         {
             "name": "gpt-4o",
