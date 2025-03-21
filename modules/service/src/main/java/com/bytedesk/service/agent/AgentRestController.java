@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 15:56:08
+ * @LastEditTime: 2025-03-21 17:41:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +51,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
@@ -60,6 +60,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
@@ -68,6 +69,14 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @Override
+    public ResponseEntity<?> queryByUid(AgentRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @ActionAnnotation(title = "agent", action = "detail", description = "query agent profile")
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(AgentRequest request) {
@@ -77,6 +86,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
     @PostMapping("/sync/current/thread/count")
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
@@ -88,6 +98,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.error("sync current thread count failed"));
     }
 
+    @PreAuthorize("hasAuthority('AGENT_CREATE')")
     @ActionAnnotation(title = "agent", action = "create", description = "create agent")
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
@@ -100,6 +111,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
+    @PreAuthorize("hasAuthority('AGENT_UPDATE')")
     @ActionAnnotation(title = "agent", action = "update", description = "update agent")
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
@@ -110,6 +122,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // updateAvatar
+    @PreAuthorize("hasAuthority('AGENT_UPDATE')")
     @ActionAnnotation(title = "agent", action = "updateAvatar", description = "update agent avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody AgentRequest request) {
@@ -119,6 +132,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
+    @PreAuthorize("hasAuthority('AGENT_UPDATE')")
     @ActionAnnotation(title = "agent", action = "updateStatus", description = "update agent status")
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody AgentRequest request) {
@@ -128,6 +142,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
+    @PreAuthorize("hasAuthority('AGENT_UPDATE')")
     @ActionAnnotation(title = "agent", action = "updateAutoReply", description = "update agent autoreply")
     @PostMapping("/update/autoreply")
     public ResponseEntity<?> updateAutoReply(@RequestBody AgentRequest request) {
@@ -137,6 +152,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
     
+    @PreAuthorize("hasAuthority('AGENT_DELETE')")
     @ActionAnnotation(title = "agent", action = "delete", description = "delete agent")
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
@@ -146,18 +162,16 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @PreAuthorize("hasAuthority('AGENT_EXPORT')")
     @Override
     public Object export(AgentRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(AgentRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+   
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @TabooJsonFilter(title = "taboo", action = "sendAgentSseMessage")
     @ActionAnnotation(title = "agent", action = "sendAgentSseMessage", description = "sendAgentSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

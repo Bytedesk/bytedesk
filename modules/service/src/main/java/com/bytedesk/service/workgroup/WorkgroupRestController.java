@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:34:26
+ * @LastEditTime: 2025-03-21 17:41:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @AllArgsConstructor
@@ -34,7 +35,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
 
     private final WorkgroupRestService workgroupService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN) // allow members to access this method
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     public ResponseEntity<?> queryByOrg(WorkgroupRequest request) {
 
         Page<WorkgroupResponse> workgroups = workgroupService.queryByOrg(request);
@@ -42,6 +43,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(WorkgroupRequest request) {
         
@@ -50,6 +52,14 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @Override
+    public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @PreAuthorize("hasAuthority('WORKGROUP_CREATE')")
     @ActionAnnotation(title = "workgroup", action = "create", description = "create workgroup")
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest request) {
 
@@ -58,6 +68,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
+    @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
     @ActionAnnotation(title = "workgroup", action = "update", description = "update workgroup")
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest request) {
 
@@ -67,6 +78,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     // updateAvatar
+    @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
     @ActionAnnotation(title = "workgroup", action = "updateAvatar", description = "update workgroup avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody WorkgroupRequest request) {
@@ -77,6 +89,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     // updateStatus
+    @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
     @ActionAnnotation(title = "workgroup", action = "updateStatus", description = "update workgroup status")
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody WorkgroupRequest request) {
@@ -86,6 +99,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
+    @PreAuthorize("hasAuthority('WORKGROUP_DELETE')")
     @ActionAnnotation(title = "workgroup", action = "delete", description = "delete workgroup")
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest request) {
 
@@ -94,17 +108,14 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @PreAuthorize("hasAuthority('WORKGROUP_EXPORT')")
     @Override
     public Object export(WorkgroupRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
     
 
     

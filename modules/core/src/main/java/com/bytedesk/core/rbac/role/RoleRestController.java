@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 17:09:42
+ * @LastEditTime: 2025-03-21 17:27:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,7 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
 
     private final RoleRestService roleService;
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @PreAuthorize("hasRole('SUPER')")
     @GetMapping("/query/super")
     public ResponseEntity<?> queryBySuper(RoleRequest request) {
 
@@ -42,7 +42,7 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
         return ResponseEntity.ok(JsonResult.success(roles));
     }
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(RoleRequest request) {
         
@@ -59,7 +59,13 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
         return ResponseEntity.ok(JsonResult.success(roles));
     }
 
-    
+    @Override
+    public ResponseEntity<?> queryByUid(RoleRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_CREATE')")
     @Override
     public ResponseEntity<?> create(RoleRequest request) {
 
@@ -68,27 +74,26 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
         return ResponseEntity.ok(JsonResult.success(role));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_UPDATE')")
     @Override
     public ResponseEntity<?> update(RoleRequest request) {
         RoleResponse role = roleService.update(request);
         return ResponseEntity.ok(JsonResult.success(role));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_DELETE')")
     @Override
     public ResponseEntity<?> delete(RoleRequest request) {
         roleService.delete(request);
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize("hasAuthority('ROLE_EXPORT')")
     @Override
     public Object export(RoleRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(RoleRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 }
