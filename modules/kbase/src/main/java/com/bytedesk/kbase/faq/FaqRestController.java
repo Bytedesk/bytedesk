@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,7 +38,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     private final FaqRestService faqService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(FaqRequest request) {
 
@@ -49,6 +48,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     public ResponseEntity<?> queryByUser(FaqRequest request) {
         
         Page<FaqResponse> page = faqService.queryByUser(request);
@@ -57,6 +57,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     public ResponseEntity<?> queryByUid(FaqRequest request) {
         
         FaqResponse faq = faqService.queryByUid(request);
@@ -68,6 +69,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     @ActionAnnotation(title = "faq", action = "create", description = "create faq")
     @Override
+    @PreAuthorize("hasAuthority('KBASE_CREATE')")
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
 
         FaqResponse Faq = faqService.create(request);
@@ -77,6 +79,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     @ActionAnnotation(title = "faq", action = "update", description = "update faq")
     @Override
+    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     public ResponseEntity<?> update(@RequestBody FaqRequest request) {
 
         FaqResponse Faq = faqService.update(request);
@@ -86,6 +89,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     @ActionAnnotation(title = "faq", action = "delete", description = "delete faq")
     @Override
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
 
         faqService.delete(request);
@@ -97,6 +101,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @ActionAnnotation(title = "faq", action = "export", description = "export faq")
     @GetMapping("/export")
+    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     public Object export(FaqRequest request, HttpServletResponse response) {
         // query data to export
         Page<FaqEntity> faqPage = faqService.queryByOrgExcel(request);

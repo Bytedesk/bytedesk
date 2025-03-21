@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -37,7 +36,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
 
     private final TextRestService textService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(TextRequest request) {
         
@@ -46,6 +45,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(TextRequest request) {
         
@@ -54,6 +54,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
     public ResponseEntity<?> create(TextRequest request) {
         
@@ -62,6 +63,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
     public ResponseEntity<?> update(TextRequest request) {
         
@@ -70,6 +72,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
     public ResponseEntity<?> delete(TextRequest request) {
         
@@ -78,6 +81,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(TextRequest request, HttpServletResponse response) {
         // query data to export
@@ -111,6 +115,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return "";
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUid(TextRequest request) {
         // TODO Auto-generated method stub
