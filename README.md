@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 16:48:21
+ * @LastEditTime: 2025-03-21 15:05:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -123,14 +123,14 @@ docker exec ollama-bytedesk ollama pull deepseek-r1
 docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 ```
 
-#### if don't need ollama, you can change `docker-compose.yaml` or `docker-compose-ollama.yaml`
+<!-- #### if don't need ollama, you can change `docker-compose.yaml` or `docker-compose-ollama.yaml`
 
 ```bash
 # disable Ollama chat
 SPRING_AI_OLLAMA_CHAT_ENABLED: false
 # disable Ollama embedding
 SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
-```
+``` -->
 
 #### stop container
 
