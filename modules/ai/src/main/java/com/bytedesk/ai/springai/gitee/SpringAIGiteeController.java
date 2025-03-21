@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * DeepSeek接口
+ * Gitee接口
  */
 @Slf4j
 @RestController
@@ -69,7 +69,7 @@ public class SpringAIGiteeController {
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return springAIGiteeService.getDeepSeekChatModel()
+        return springAIGiteeService.getGiteeChatModel()
             .map(model -> model.stream(prompt))
             .orElse(Flux.empty());
     }
@@ -114,12 +114,12 @@ public class SpringAIGiteeController {
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        if (!springAIGiteeService.getDeepSeekChatModel().isPresent()) {
-            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+        if (!springAIGiteeService.getGiteeChatModel().isPresent()) {
+            return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
         }
 
         try {
-            ChatResponse response = springAIGiteeService.getDeepSeekChatModel().get().call(
+            ChatResponse response = springAIGiteeService.getGiteeChatModel().get().call(
                 new Prompt(
                     message,
                     OpenAiChatOptions.builder()
