@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:41:03
+ * @LastEditTime: 2025-03-21 12:54:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.base;
 
 import java.io.Serializable;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -54,4 +55,8 @@ public abstract class BaseRequestNoOrg implements Serializable {
     // 默认bytedesk平台
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
+
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 }

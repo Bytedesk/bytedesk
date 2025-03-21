@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:37:42
+ * @LastEditTime: 2025-03-21 12:53:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -124,5 +125,9 @@ public abstract class BaseRequest implements Serializable {
         if (pageSize < 1) {
             throw new IllegalArgumentException("Page size must be positive");
         }
+    }
+
+    public String toJson() {
+        return JSON.toJSONString(this);
     }
 }

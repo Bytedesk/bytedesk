@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:43:55
+ * @LastEditTime: 2025-03-21 12:54:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,8 @@
 package com.bytedesk.core.base;
 
 import java.io.Serializable;
+
+import com.alibaba.fastjson2.JSON;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -27,5 +29,9 @@ public abstract class BaseResponseNoOrg implements Serializable {
     private String level;
 
     private String platform;
+
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
     
 }
