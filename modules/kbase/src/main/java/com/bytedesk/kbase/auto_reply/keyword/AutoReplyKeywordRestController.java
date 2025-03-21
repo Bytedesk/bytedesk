@@ -97,7 +97,8 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "kbase-auto_reply-keyword-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            // String fileName = "kbase-auto_reply-keyword-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "关键词自动回复-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据

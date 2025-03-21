@@ -92,7 +92,8 @@ public class TextRestController extends BaseRestController<TextRequest> {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "kbase-text-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            // String fileName = "kbase-text-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "文本-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
