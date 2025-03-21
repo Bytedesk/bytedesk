@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 10:37:35
+ * @LastEditTime: 2025-03-21 10:56:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -165,8 +165,6 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_RESPONSE_STATUS_EXCEPTION));
     }
 
-    // org.eclipse.jetty.websocket.api.exceptions.WebSocketTimeoutException: Connection Idle Timeout
-    // java.util.concurrent.TimeoutException: Idle timeout expired: 30004/30000 ms
     @ExceptionHandler(WebSocketTimeoutException.class)
     public ResponseEntity<?> handleWebSocketTimeoutException(WebSocketTimeoutException ex) {
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_WEBSOCKET_TIMEOUT_EXCEPTION));
