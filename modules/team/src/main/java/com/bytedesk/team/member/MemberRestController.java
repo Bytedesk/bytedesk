@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 14:55:20
+ * @LastEditTime: 2025-03-21 18:32:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * http://127.0.0.1:9003/swagger-ui/index.html
@@ -43,6 +44,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
 
     private final MemberRestService memberService;
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(MemberRequest request) {
         //
@@ -51,6 +53,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(MemberRequest request) {
         //
@@ -59,6 +62,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/userUid")
     public ResponseEntity<?> queryByUserUid(MemberRequest request) {
         //
@@ -70,6 +74,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUid(MemberRequest request) {
         
@@ -81,6 +86,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_CREATE')")
     @ActionAnnotation(title = "member", action = "create", description = "create member")
     @Override
     public ResponseEntity<?> create(@RequestBody MemberRequest request) {
@@ -90,6 +96,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(member));
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
     @ActionAnnotation(title = "member", action = "update", description = "update member")
     @Override
     public ResponseEntity<?> update(@RequestBody MemberRequest request) {
@@ -99,15 +106,17 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(member));
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_DELETE')")
     @ActionAnnotation(title = "member", action = "delete", description = "delete member")
     @Override
     public ResponseEntity<?> delete(@RequestBody MemberRequest request) {
 
-        memberService.deleteByUid(request.getUid());
+        memberService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize("hasAuthority('MEMBER_EXPORT')")
     @ActionAnnotation(title = "member", action = "export", description = "export member")
     @GetMapping("/export")
     public Object export(MemberRequest request, HttpServletResponse response) {
@@ -141,8 +150,6 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
 
         return "";
     }
-
-    
 
     
 }
