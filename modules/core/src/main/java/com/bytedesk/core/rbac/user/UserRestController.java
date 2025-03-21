@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 16:39:56
+ * @LastEditTime: 2025-03-21 10:13:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.push.PushRestService;
+import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,25 +39,35 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     private final PushRestService pushService;
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     public ResponseEntity<?> queryByOrg(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        
+        Page<UserResponse> userResponse = userRestService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        
+        Page<UserResponse> userResponse = userRestService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = "user", action = "create", description = "create user info")
     @Override
     public ResponseEntity<?> create(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        
+        UserResponse userResponse = userRestService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-     @ActionAnnotation(title = "user", action = "update", description = "update user info")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = "user", action = "update", description = "update user info")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
 
@@ -64,10 +76,14 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = "user", action = "delete", description = "delete user info")
     @Override
     public ResponseEntity<?> delete(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        
+        userRestService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
