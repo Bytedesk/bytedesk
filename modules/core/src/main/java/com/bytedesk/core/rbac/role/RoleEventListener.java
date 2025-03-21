@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 18:14:02
+ * @LastEditTime: 2025-03-21 18:15:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,13 +75,12 @@ public class RoleEventListener {
                     .add(authorityEntity.getUid());
         }
 
-        // 访客创建工单时，必须登录
-        // 访客：仅赋予部分权限：ticket
-        if (authorityEntity.getUid().startsWith("ticket")) {
-            // 将权限添加到访客的权限集合
-            // roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_VISITOR_UID, k -> new HashSet<>())
-            //         .add(authorityEntity.getUid());
-        }
+        // 访客创建工单时，必须填写手机号或邮箱登录，这样就转换为user角色，所以不赋予访客ticket权限
+        // if (authorityEntity.getUid().startsWith("ticket")) {
+        //     // 将权限添加到访客的权限集合
+        //     roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_VISITOR_UID, k -> new HashSet<>())
+        //             .add(authorityEntity.getUid());
+        // }
     }
 
     @EventListener
