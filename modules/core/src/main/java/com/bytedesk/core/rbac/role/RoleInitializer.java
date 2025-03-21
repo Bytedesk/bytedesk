@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 17:05:43
+ * @LastEditTime: 2025-03-21 17:56:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,13 +41,17 @@ public class RoleInitializer {
     }
 
     private void initRoles() {
-        // 4. 客服
+        // 1. 访客
+        createVisitor();
+        // 2. 用户
+        createUser();
+        // 3. 客服
         createAgent();
-        // 3. 团队成员
+        // 4. 团队成员
         createMember();
-        // 2. 管理员
+        // 5. 管理员
         createAdmin();
-        // 1. 超级管理员
+        // 6. 超级管理员
         createSuper();
     }
 
@@ -88,6 +92,30 @@ public class RoleInitializer {
                 .uid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID)
                 .name(RoleConsts.ROLE_AGENT)
                 .description("Agent")
+                .level(LevelEnum.PLATFORM.name())
+                .system(true)
+                .build();
+        roleService.create(roleRequest);
+    }
+
+    // createUser
+    private void createUser() {
+        RoleRequest roleRequest = RoleRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_ROLE_USER_UID)
+                .name(RoleConsts.ROLE_USER)
+                .description("User")
+                .level(LevelEnum.PLATFORM.name())
+                .system(true)
+                .build();
+        roleService.create(roleRequest);
+    }
+
+    // create visitor
+    private void createVisitor() {
+        RoleRequest roleRequest = RoleRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_ROLE_VISITOR_UID)
+                .name(RoleConsts.ROLE_VISITOR)
+                .description("Visitor")
                 .level(LevelEnum.PLATFORM.name())
                 .system(true)
                 .build();

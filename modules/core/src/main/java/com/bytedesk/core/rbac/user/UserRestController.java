@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 15:53:55
+ * @LastEditTime: 2025-03-21 17:53:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.push.PushRestService;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +38,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     private final PushRestService pushService;
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @PreAuthorize("hasRole('SUPER')")
     @Override
     public ResponseEntity<?> queryByOrg(UserRequest request) {
         
@@ -56,7 +55,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @PreAuthorize("hasRole('SUPER')")
     @ActionAnnotation(title = "user", action = "create", description = "create user info")
     @Override
     public ResponseEntity<?> create(UserRequest request) {
@@ -66,7 +65,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @PreAuthorize("hasRole('SUPER')")
     @ActionAnnotation(title = "user", action = "update", description = "update user info")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
@@ -76,7 +75,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @PreAuthorize("hasRole('SUPER')")
     @ActionAnnotation(title = "user", action = "delete", description = "delete user info")
     @Override
     public ResponseEntity<?> delete(UserRequest request) {
@@ -92,6 +91,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
+    @PreAuthorize("hasRole('SUPER')")
     @Override
     public Object export(UserRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
@@ -118,7 +118,8 @@ public class UserRestController extends BaseRestController<UserRequest> {
         //     return ResponseEntity.ok().body(JsonResult.error("user not found", -1, false));
         // }
     }
-
+   
+    
     @ActionAnnotation(title = "user", action = "changePassword", description = "changePassword")
     @PostMapping("/change/password")
     public ResponseEntity<?> changePassword(@RequestBody UserRequest userRequest) {
@@ -127,6 +128,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
+
 
     @ActionAnnotation(title = "user", action = "changeEmail", description = "changeEmail")
     @PostMapping("/change/email")
@@ -141,6 +143,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
+
 
     @ActionAnnotation(title = "user", action = "changeMobile", description = "changeMobile")
     @PostMapping("/change/mobile")
@@ -157,6 +160,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
+
     @ActionAnnotation(title = "user", action = "logout", description = "logout")
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
@@ -166,6 +170,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok().body(JsonResult.success());
     }
 
+
     // 静态权限配置，测试
     /** for testing，client will return 403, if don't have authority/role */
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_ANY)
@@ -174,14 +179,14 @@ public class UserRestController extends BaseRestController<UserRequest> {
     //     return ResponseEntity.ok("you have super authority");
     // }
 
+
     /** no need to add ROLE_ prefix, system will auto add */
-    @GetMapping(value = "/test/cs")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER', 'CS')")
-    // @PreAuthorize("hasRole('CS')")
-    public ResponseEntity<?> testCsRole() {
-        return ResponseEntity.ok("you have admin or cs role");
-    }
-    
-    
+    // @GetMapping(value = "/test/cs")
+    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    // // @PreAuthorize("hasRole('CS')")
+    // public ResponseEntity<?> testCsRole() {
+    //     return ResponseEntity.ok("you have admin or cs role");
+    // }
+
     
 }
