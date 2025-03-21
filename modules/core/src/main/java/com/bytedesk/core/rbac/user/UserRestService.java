@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:18:36
+ * @LastEditTime: 2025-03-21 10:04:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,8 +73,24 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
 
     @Override
     public UserResponse update(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Optional<UserEntity> userOptional = userRepository.findByUid(request.getUid());
+        if (userOptional.isPresent()) {
+            UserEntity userEntity = userOptional.get();
+            userEntity.setNickname(request.getNickname());
+            userEntity.setAvatar(request.getAvatar());
+            userEntity.setDescription(request.getDescription());
+            userEntity.setMobile(request.getMobile());
+            userEntity.setMobileVerified(request.getMobileVerified());
+            userEntity.setEmail(request.getEmail());
+            userEntity.setEmailVerified(request.getEmailVerified());
+            // 
+            UserEntity savedUserEntity = userRepository.save(userEntity);
+            if (savedUserEntity == null) {
+                throw new RuntimeException("Failed to save user");
+            }
+            return convertToResponse(savedUserEntity);
+        }
+        return null;
     }
 
     @Override
