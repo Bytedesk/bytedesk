@@ -166,14 +166,8 @@ public class KbaseEntity extends BaseEntity {
     @Builder.Default
     private boolean published = true;
 
-    // parentUid 父知识库uid
-    // private String parentUid;
-
     // 某人工客服快捷回复知识库
     private String agentUid;
-
-    // 创建者
-    // private String userUid;
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
