@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 14:12:34
+ * @LastEditTime: 2025-03-22 22:56:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-// import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -73,9 +72,6 @@ public class AuthService {
     public UsernamePasswordAuthenticationToken getAuthentication(@NonNull HttpServletRequest request, String subject) {
 
         UserDetails userDetails = userDetailsService.loadUserByUsernameAndPlatform(subject);
-        // for (GrantedAuthority authority : userDetails.getAuthorities()) {
-        //     log.info("getAuthentication Authority {} ", authority.getAuthority());
-        // }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,

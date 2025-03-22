@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 12:20:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 17:55:43
+ * @LastEditTime: 2025-03-22 22:58:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,7 @@ public class RoleConsts {
     // USER
     public static final String ROLE_USER = "ROLE_USER";
     // VISITOR
-    public static final String ROLE_VISITOR = "ROLE_VISITOR";
+    // public static final String ROLE_VISITOR = "ROLE_VISITOR";
 
 
     /**

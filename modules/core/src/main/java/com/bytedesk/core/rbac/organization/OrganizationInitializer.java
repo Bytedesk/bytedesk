@@ -79,7 +79,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
            OrganizationEntity savedOrganization = organizationService.save(organization);
             if (savedOrganization != null) {
                 user.setCurrentOrganization(savedOrganization);
-                user = userService.addSuperRole(user);
+                user = userService.addRoleSuper(user);
                 // user = userService.addAdminRole(user);
                 // user = userService.addMemberRole(user);
             } else {

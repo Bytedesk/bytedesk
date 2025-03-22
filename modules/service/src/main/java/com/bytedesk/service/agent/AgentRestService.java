@@ -137,7 +137,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 
         MemberEntity member = memberOptional.get();
         UserEntity user = member.getUser();
-        userService.addAgentRole(member.getUser());
+        userService.addRoleAgent(member.getUser());
         //
         AgentEntity agent = AgentEntity.builder()
                 .nickname(request.getNickname())
