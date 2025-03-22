@@ -104,12 +104,6 @@
 			<artifactId>spring-ai-weaviate-store-spring-boot-starter</artifactId>
 		</dependency> -->
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-docker-compose -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-spring-boot-docker-compose</artifactId>
-		</dependency> -->
-
 		<!-- mcp -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-client-spring-boot-starter -->
 		<!-- <dependency>
@@ -117,22 +111,10 @@
 			<artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
 		</dependency> -->
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-client-webflux-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-mcp-client-webflux-spring-boot-starter</artifactId>
-		</dependency> -->
-
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-server-webmvc-spring-boot-starter -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-mcp-server-webmvc-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-server-webflux-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-mcp-server-webflux-spring-boot-starter</artifactId>
 		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
@@ -185,79 +167,6 @@
 			<artifactId>jsoup</artifactId>
 			<version>${jsonp.version}</version>
 		</dependency>
-
-		<!-- https://hanlp.hankcs.com/ -->	
-		<!-- https://github.com/hankcs/HanLP -->
-		<!-- https://mvnrepository.com/artifact/com.hankcs.hanlp.restful/hanlp-restful -->
-		<dependency>
-			<groupId>com.hankcs.hanlp.restful</groupId>
-			<artifactId>hanlp-restful</artifactId>
-			<version>${hanlp.version}</version>
-		</dependency>
-
-		<!-- https://github.com/modelcontextprotocol/java-sdk -->
-		<!-- https://modelcontextprotocol.io/sdk/java/mcp-overview#features -->
-		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp-bom -->
-		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp -->
-		<!-- <dependency>
-			<groupId>io.modelcontextprotocol.sdk</groupId>
-			<artifactId>mcp</artifactId>
-		</dependency> -->
-
-		<!-- Spring WebFlux-based SSE client and server transport -->
-		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp-spring-webflux -->
-		<!-- <dependency>
-			<groupId>io.modelcontextprotocol.sdk</groupId>
-			<artifactId>mcp-spring-webflux</artifactId>
-		</dependency> -->
-
-		<!-- Spring WebMVC-based SSE server transport -->
-		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp-spring-webmvc -->
-		<!-- <dependency>
-			<groupId>io.modelcontextprotocol.sdk</groupId>
-			<artifactId>mcp-spring-webmvc</artifactId>
-		</dependency> -->
-
-
-		<!-- ///////////////////////////////////////////////////////////////////////////// -->
-
-		<!-- https://docs.langchain4j.dev/tutorials/spring-boot-integration -->
-		<!-- https://github.com/langchain4j/langchain4j-examples -->
-		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-spring-boot-starter -->
-		<!-- https://github.com/langchain4j/langchain4j?tab=readme-ov-file -->
-		<!-- <dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j-spring-boot-starter</artifactId>
-			<version>${langchain4j.version}</version>
-		</dependency> -->
-
-		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-ollama-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j-ollama-spring-boot-starter</artifactId>
-			<version>${langchain4j.version}</version>
-		</dependency> -->
-
-		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-open-ai-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j-open-ai-spring-boot-starter</artifactId>
-			<version>${langchain4j.version}</version>
-		</dependency> -->
-
-		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-qianfan-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j-qianfan-spring-boot-starter</artifactId>
-			 <version>${langchain4j.version}</version>
-		</dependency> -->
-
-		<!-- https://central.sonatype.com/artifact/dev.langchain4j/langchain4j-dashscope-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j-dashscope-spring-boot-starter</artifactId>
-			 <version>${langchain4j.version}</version>
-		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 		<dependency>

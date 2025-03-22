@@ -789,6 +789,305 @@
           "description": "創建一個輸入補全機器人"
         }
       }
+    },
+    {
+      "uid": "35",
+      "name": "chinese_word_segmentation",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Chinese Word Segmentation",
+          "prompt": "Split Chinese text into a sequence of words with semantic meaning, as a foundation for text understanding and processing.",
+          "description": "Create a Chinese word segmentation bot"
+        },
+        "zh_cn": {
+          "nickname": "中文分词",
+          "prompt": "将中文文本切分成有语义的词语序列，用于文本理解和处理的基础。",
+          "description": "创建一个中文分词机器人"
+        },
+        "zh_tw": {
+          "nickname": "中文分詞",
+          "prompt": "將中文文本切分成有語義的詞語序列，用於文本理解和處理的基礎。",
+          "description": "創建一個中文分詞機器人"
+        }
+      }
+    },
+    {
+      "uid": "36",
+      "name": "part_of_speech_tagging",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Part-of-Speech Tagging",
+          "prompt": "Identify the part of speech for each word in the text (such as noun, verb, adjective, etc.), providing grammatical information for text analysis.",
+          "description": "Create a part-of-speech tagging bot"
+        },
+        "zh_cn": {
+          "nickname": "词性标注",
+          "prompt": "识别文本中每个词的词性（如名词、动词、形容词等），为文本分析提供语法信息。",
+          "description": "创建一个词性标注机器人"
+        },
+        "zh_tw": {
+          "nickname": "詞性標註",
+          "prompt": "識別文本中每個詞的詞性（如名詞、動詞、形容詞等），為文本分析提供語法信息。",
+          "description": "創建一個詞性標註機器人"
+        }
+      }
+    },
+    {
+      "uid": "37",
+      "name": "dependency_parsing",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Dependency Parsing",
+          "prompt": "Analyze the dependency relationships between words in a sentence to determine the grammatical structure of the sentence.",
+          "description": "Create a dependency parsing bot"
+        },
+        "zh_cn": {
+          "nickname": "依存句法分析",
+          "prompt": "分析句子中词语之间的依存关系，确定句子的语法结构。",
+          "description": "创建一个依存句法分析机器人"
+        },
+        "zh_tw": {
+          "nickname": "依存句法分析",
+          "prompt": "分析句子中詞語之間的依存關係，確定句子的語法結構。",
+          "description": "創建一個依存句法分析機器人"
+        }
+      }
+    },
+    {
+      "uid": "38",
+      "name": "constituency_parsing",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Constituency Parsing",
+          "prompt": "Parse a sentence into a hierarchical structure of phrases and clauses, reflecting the relationships between grammatical components.",
+          "description": "Create a constituency parsing bot"
+        },
+        "zh_cn": {
+          "nickname": "成分句法分析",
+          "prompt": "将句子解析为词组和子句的层次结构，反映语法成分间的关系。",
+          "description": "创建一个成分句法分析机器人"
+        },
+        "zh_tw": {
+          "nickname": "成分句法分析",
+          "prompt": "將句子解析為詞組和子句的層次結構，反映語法成分間的關係。",
+          "description": "創建一個成分句法分析機器人"
+        }
+      }
+    },
+    {
+      "uid": "39",
+      "name": "semantic_dependency_analysis",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Semantic Dependency Analysis",
+          "prompt": "Analyze the semantic relationships between words in text, revealing deeper semantic connections between words.",
+          "description": "Create a semantic dependency analysis bot"
+        },
+        "zh_cn": {
+          "nickname": "语义依存分析",
+          "prompt": "分析文本中词语之间的语义关系，揭示词语间的深层语义联系。",
+          "description": "创建一个语义依存分析机器人"
+        },
+        "zh_tw": {
+          "nickname": "語義依存分析",
+          "prompt": "分析文本中詞語之間的語義關係，揭示詞語間的深層語義聯繫。",
+          "description": "創建一個語義依存分析機器人"
+        }
+      }
+    },
+    {
+      "uid": "40",
+      "name": "semantic_role_labeling",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Semantic Role Labeling",
+          "prompt": "Identify predicates in sentences and their related semantic roles (such as agent, patient, etc.).",
+          "description": "Create a semantic role labeling bot"
+        },
+        "zh_cn": {
+          "nickname": "语义角色标注",
+          "prompt": "识别句子中的谓词及其相关的语义角色（如施事者、受事者等）。",
+          "description": "创建一个语义角色标注机器人"
+        },
+        "zh_tw": {
+          "nickname": "語義角色標註",
+          "prompt": "識別句子中的謂詞及其相關的語義角色（如施事者、受事者等）。",
+          "description": "創建一個語義角色標註機器人"
+        }
+      }
+    },
+    {
+      "uid": "41",
+      "name": "abstract_meaning_representation",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Abstract Meaning Representation",
+          "prompt": "Convert text into an abstract semantic representation for cross-language understanding and processing.",
+          "description": "Create an abstract meaning representation bot"
+        },
+        "zh_cn": {
+          "nickname": "抽象意义表示",
+          "prompt": "将文本转换为抽象的语义表示形式，便于跨语言理解和处理。",
+          "description": "创建一个抽象意义表示机器人"
+        },
+        "zh_tw": {
+          "nickname": "抽象意義表示",
+          "prompt": "將文本轉換為抽象的語義表示形式，便於跨語言理解和處理。",
+          "description": "創建一個抽象意義表示機器人"
+        }
+      }
+    },
+    {
+      "uid": "42",
+      "name": "coreference_resolution",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Coreference Resolution",
+          "prompt": "Determine the entity or concept that pronouns or other referential expressions refer to in text.",
+          "description": "Create a coreference resolution bot"
+        },
+        "zh_cn": {
+          "nickname": "指代消解",
+          "prompt": "确定文本中代词或其他指代表达所指向的实体或概念。",
+          "description": "创建一个指代消解机器人"
+        },
+        "zh_tw": {
+          "nickname": "指代消解",
+          "prompt": "確定文本中代詞或其他指代表達所指向的實體或概念。",
+          "description": "創建一個指代消解機器人"
+        }
+      }
+    },
+    {
+      "uid": "43",
+      "name": "semantic_text_similarity",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Semantic Text Similarity",
+          "prompt": "Calculate the semantic similarity between texts for text matching and retrieval.",
+          "description": "Create a semantic text similarity bot"
+        },
+        "zh_cn": {
+          "nickname": "语义文本相似度",
+          "prompt": "计算文本之间的语义相似程度，用于文本匹配和检索。",
+          "description": "创建一个语义文本相似度机器人"
+        },
+        "zh_tw": {
+          "nickname": "語義文本相似度",
+          "prompt": "計算文本之間的語義相似程度，用於文本匹配和檢索。",
+          "description": "創建一個語義文本相似度機器人"
+        }
+      }
+    },
+    {
+      "uid": "44",
+      "name": "text_style_transfer",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Text Style Transfer",
+          "prompt": "Transform text from one style to another, such as converting formal language to colloquial expressions.",
+          "description": "Create a text style transfer bot"
+        },
+        "zh_cn": {
+          "nickname": "文本风格转换",
+          "prompt": "将文本从一种风格转换为另一种风格，如正式语体转换为口语化表达。",
+          "description": "创建一个文本风格转换机器人"
+        },
+        "zh_tw": {
+          "nickname": "文本風格轉換",
+          "prompt": "將文本從一種風格轉換為另一種風格，如正式語體轉換為口語化表達。",
+          "description": "創建一個文本風格轉換機器人"
+        }
+      }
+    },
+    {
+      "uid": "45",
+      "name": "keyword_extraction",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Keyword Extraction",
+          "prompt": "Extract keywords and phrases from text to summarize its core content.",
+          "description": "Create a keyword extraction bot"
+        },
+        "zh_cn": {
+          "nickname": "关键词短语提取",
+          "prompt": "从文本中提取关键词和短语，概括文本的核心内容。",
+          "description": "创建一个关键词短语提取机器人"
+        },
+        "zh_tw": {
+          "nickname": "關鍵詞短語提取",
+          "prompt": "從文本中提取關鍵詞和短語，概括文本的核心內容。",
+          "description": "創建一個關鍵詞短語提取機器人"
+        }
+      }
+    },
+    {
+      "uid": "46",
+      "name": "text_correction",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Text Correction",
+          "prompt": "Automatically detect and correct spelling, grammar, or expression errors in text.",
+          "description": "Create a text correction bot"
+        },
+        "zh_cn": {
+          "nickname": "文本纠错",
+          "prompt": "自动检测并修正文本中的拼写、语法或表达错误。",
+          "description": "创建一个文本纠错机器人"
+        },
+        "zh_tw": {
+          "nickname": "文本糾錯",
+          "prompt": "自動檢測並修正文本中的拼寫、語法或表達錯誤。",
+          "description": "創建一個文本糾錯機器人"
+        }
+      }
+    },
+    {
+      "uid": "47",
+      "name": "text_classification",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Text Classification",
+          "prompt": "Categorize text into different classes based on content, such as topic classification or sentiment classification.",
+          "description": "Create a text classification bot"
+        },
+        "zh_cn": {
+          "nickname": "文本分类",
+          "prompt": "根据内容将文本划分到不同的类别，如主题分类或情感分类。",
+          "description": "创建一个文本分类机器人"
+        },
+        "zh_tw": {
+          "nickname": "文本分類",
+          "prompt": "根據內容將文本劃分到不同的類別，如主題分類或情感分類。",
+          "description": "創建一個文本分類機器人"
+        }
+      }
     }
   ]
 }
