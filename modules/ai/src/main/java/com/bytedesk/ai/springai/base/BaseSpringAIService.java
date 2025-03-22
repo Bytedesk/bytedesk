@@ -100,32 +100,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         processPromptSSE(aiPrompt, messageProtobuf, emitter);
     }
 
-    // @Override
-    // public void sendSseVisitorMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
-    //     // Assert.hasText(messageJson, "Message must not be empty");
-    //     Assert.notNull(emitter, "SseEmitter must not be null");
-    //     sendSseProcessingMessage(messageProtobuf, emitter);
-    //     //
-    //     String prompt = "";
-    //     if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
-    //         List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
-    //         String context = String.join("\n", contentList);
-    //         prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
-    //     } else {
-    //         prompt = robot.getLlm().getPrompt();
-    //     }
-    //     //
-    //     List<Message> messages = new ArrayList<>();
-    //     messages.add(new SystemMessage(prompt));
-    //     messages.add(new UserMessage(query));
-    //     log.info("BaseSpringAIService sendSseVisitorMessage messages {}", messages);
-    //     //
-    //     Prompt aiPrompt = new Prompt(messages);
-    //     //
-    //     processPromptSSE(aiPrompt, messageProtobuf, emitter);
-    // }
-
-
     @Override
     public String generateFaqPairsAsync(String chunk) {
         if (!StringUtils.hasText(chunk)) {
@@ -187,7 +161,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
     //         // TODO: handle exception
     //     }
     // }
-
 
     public String buildKbPrompt(String systemPrompt, String query, String context) {
         return systemPrompt + "\n" +
