@@ -100,7 +100,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             throw new RuntimeException("Failed to create organization.");
         }
         user.setCurrentOrganization(savedOrganization);
-        userService.addAdminRole(user);
+        userService.addRoleAdmin(user);
         //
         return convertToResponse(savedOrganization);
 

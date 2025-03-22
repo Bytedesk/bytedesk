@@ -42,7 +42,7 @@ public class RoleInitializer {
 
     private void initRoles() {
         // 1. 访客
-        createVisitor();
+        // createVisitor();
         // 2. 用户
         createUser();
         // 3. 客服
@@ -111,16 +111,16 @@ public class RoleInitializer {
     }
 
     // create visitor
-    private void createVisitor() {
-        RoleRequest roleRequest = RoleRequest.builder()
-                .uid(BytedeskConsts.DEFAULT_ROLE_VISITOR_UID)
-                .name(RoleConsts.ROLE_VISITOR)
-                .description("Visitor")
-                .level(LevelEnum.PLATFORM.name())
-                .system(true)
-                .build();
-        roleService.create(roleRequest);
-    }
+    // private void createVisitor() {
+    //     RoleRequest roleRequest = RoleRequest.builder()
+    //             .uid(BytedeskConsts.DEFAULT_ROLE_VISITOR_UID)
+    //             .name(RoleConsts.ROLE_VISITOR)
+    //             .description("Visitor")
+    //             .level(LevelEnum.PLATFORM.name())
+    //             .system(true)
+    //             .build();
+    //     roleService.create(roleRequest);
+    // }
 
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {

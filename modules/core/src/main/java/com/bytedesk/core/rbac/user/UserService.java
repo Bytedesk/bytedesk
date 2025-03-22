@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 19:15:13
+ * @LastEditTime: 2025-03-22 23:02:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -130,6 +130,8 @@ public class UserService {
         user.setEnabled(true);
         //
         user = save(user);
+        // 新注册用户添加role_user
+        addRoleUser(user);
         //
         return ConvertUtils.convertToUserResponse(user);
     }
@@ -329,7 +331,7 @@ public class UserService {
             user.setCurrentOrganization(orgOptional.get());
         }
         // 
-        return addMemberRole(user);
+        return addRoleMember(user);
     }
 
     public UserEntity updateUserRolesFromMember(UserEntity user, Set<String> roleUids) {
@@ -362,35 +364,45 @@ public class UserService {
         }
     }
 
-    public UserEntity addMemberRole(UserEntity user) {
+    // add/remove role methods
+    // add role_user
+    public UserEntity addRoleUser(UserEntity user) {
+        return addRole(user, RoleConsts.ROLE_USER);
+    }
+
+    public UserEntity removeRoleUser(UserEntity user) {
+        return removeRole(user, RoleConsts.ROLE_USER);
+    }
+
+    public UserEntity addRoleMember(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_MEMBER);
     }
 
-    public UserEntity removeMemberRole(UserEntity user) {
+    public UserEntity removeRoleMember(UserEntity user) {
         return removeRole(user, RoleConsts.ROLE_MEMBER);
     }
 
-    public UserEntity addAgentRole(UserEntity user) {
+    public UserEntity addRoleAgent(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_AGENT);
     }
 
-    public UserEntity removeAgentRole(UserEntity user) {
+    public UserEntity removeRoleAgent(UserEntity user) {
         return removeRole(user, RoleConsts.ROLE_AGENT);
     }
 
-    public UserEntity addAdminRole(UserEntity user) {
+    public UserEntity addRoleAdmin(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_ADMIN);
     }
 
-    public UserEntity removeAdminRole(UserEntity user) {
+    public UserEntity removeRoleAdmin(UserEntity user) {
         return removeRole(user, RoleConsts.ROLE_ADMIN);
     }
 
-    public UserEntity addSuperRole(UserEntity user) {
+    public UserEntity addRoleSuper(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_SUPER);
     }
 
-    public UserEntity removeSuperRole(UserEntity user) {
+    public UserEntity removeRoleSuper(UserEntity user) {
         return removeRole(user, RoleConsts.ROLE_SUPER);
     }
     
