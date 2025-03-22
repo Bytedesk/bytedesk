@@ -132,11 +132,13 @@ public class UserEntity extends BaseEntityNoOrg {
 	// 添加方法以简化对用户组织和角色的管理
     public void addOrganizationRole(RoleEntity role) {
         OrganizationEntity organization = this.currentOrganization;
-        if (organization == null) {
+        if (organization == null || role == null || role.getId() == null) {
             return;
         }
+        
+        // 检查用户组织角色关联是否存在
         UserOrganizationRoleEntity uor = userOrganizationRoles.stream()
-            .filter(u -> u.getOrganization().equals(organization))
+            .filter(u -> u.getOrganization().getId().equals(organization.getId()))
             .findFirst()
             .orElseGet(() -> {
                 UserOrganizationRoleEntity newUor = UserOrganizationRoleEntity.builder()
@@ -146,14 +148,33 @@ public class UserEntity extends BaseEntityNoOrg {
                 userOrganizationRoles.add(newUor);
                 return newUor;
             });
-        uor.getRoles().add(role);
-		// 角色有效期为30天
-		uor.setStartDate(LocalDateTime.now());
-        // uor.endDate(LocalDateTime.now().plusDays(30));
-        //
-        // if (this.currentOrganization == null) {
-        //     this.currentOrganization = organization;
-        // }
+        
+        // 检查角色是否已存在于该用户组织关联中
+        boolean roleExists = uor.getRoles().stream()
+            .anyMatch(r -> r.getId().equals(role.getId()));
+            
+        if (!roleExists) {
+            // 重要：创建一个只包含ID的引用，而不使用完整的分离实体
+            // 这样Hibernate将在必要时从数据库加载角色，而不是尝试合并两个分离实例
+            RoleEntity roleReference = new RoleEntity();
+            roleReference.setId(role.getId());
+            uor.getRoles().add(roleReference);
+        }
+        
+        // 默认角色有效期为100年，过期后需要重新设置
+        uor.setStartDate(LocalDateTime.now());
+        uor.setEndDate(LocalDateTime.now().plusYears(100));
+        
+        // 添加role到currentRoles (如果不存在)
+        boolean currentRoleExists = currentRoles.stream()
+            .anyMatch(r -> r.getId().equals(role.getId()));
+            
+        if (!currentRoleExists) {
+            // 同样，创建一个只包含ID的引用
+            RoleEntity roleReference = new RoleEntity();
+            roleReference.setId(role.getId());
+            currentRoles.add(roleReference);
+        }
     }
 
 	public Set<String> getRoleUids() {
