@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 09:21:27
+ * @LastEditTime: 2025-03-22 10:53:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -120,8 +120,8 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Column(name = "create_user", length = 1024)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 多个附件
-    @OneToMany
-    @JoinColumn(name = "article_uid", referencedColumnName = "uuid")
-    private List<UploadEntity> attachments = new ArrayList<>();
+    // 多个附件，暂时不启用，直接将链接放在contentMarkdown/contentHtml中即可
+    // @OneToMany
+    // @JoinColumn(name = "article_uid", referencedColumnName = "uuid")
+    // private List<UploadEntity> attachments = new ArrayList<>();
 } 

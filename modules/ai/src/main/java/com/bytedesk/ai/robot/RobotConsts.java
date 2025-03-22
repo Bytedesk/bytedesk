@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 10:26:40
+ * @LastEditTime: 2025-03-22 10:32:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,51 +34,51 @@ public class RobotConsts {
     public static final String CATEGORY_WRITING = I18Consts.I18N_PREFIX + "WRITING";
 
     // robot name
-    public static final String ROBOT_NAME_VOID_AGENT = "void_agent";
-    public static final String ROBOT_NAME_CUSTOMER_SERVICE = "customer_service";
-    public static final String ROBOT_NAME_QUERY_EXPANSION = "query_expansion";
-    public static final String ROBOT_NAME_INTENT_REWRITE = "intent_rewrite";
-    public static final String ROBOT_NAME_INTENT_CLASSIFICATION = "intent_classification";
-    public static final String ROBOT_NAME_EMOTION_ANALYSIS = "emotion_analysis";
-    public static final String ROBOT_NAME_ROBOT_INSPECTION = "robot_inspection";
-    public static final String ROBOT_NAME_AGENT_INSPECTION = "agent_inspection";
-    public static final String ROBOT_NAME_TICKET_ASSISTANT = "ticket_assistant";
-    public static final String ROBOT_NAME_TICKET_SOLUTION_RECOMMENDATION = "ticket_solution_recommendation";
-    public static final String ROBOT_NAME_TICKET_SUMMARY = "ticket_summary";
-    public static final String ROBOT_NAME_VISITOR_PORTRAIT = "visitor_portrait";
-    public static final String ROBOT_NAME_VISITOR_INVITATION = "visitor_invitation";
-    public static final String ROBOT_NAME_VISITOR_RECOMMENDATION = "visitor_recommendation";
-    public static final String ROBOT_NAME_CUSTOMER_ASSISTANT = "customer_assistant";
-    public static final String ROBOT_NAME_PRE_SALE_CUSTOMER_ASSISTANT = "pre_sale_customer_assistant";
-    public static final String ROBOT_NAME_AFTER_SALE_CUSTOMER_ASSISTANT = "after_sale_customer_assistant";
-    public static final String ROBOT_NAME_LOGISTICS_CUSTOMER_ASSISTANT = "logistics_customer_assistant";
-    public static final String ROBOT_NAME_LANGUAGE_TRANSLATION = "language_translation";
-    public static final String ROBOT_NAME_LANGUAGE_RECOGNITION = "language_recognition";
-    public static final String ROBOT_NAME_SEMANTIC_ANALYSIS = "semantic_analysis";
-    public static final String ROBOT_NAME_ENTITY_RECOGNITION = "entity_recognition";
-    public static final String ROBOT_NAME_SENTIMENT_ANALYSIS = "sentiment_analysis";
-    public static final String ROBOT_NAME_SESSION_CLASSIFICATION = "session_classification";
-    public static final String ROBOT_NAME_GENERATE_TICKET = "generate_ticket";
-    public static final String ROBOT_NAME_CUSTOMER_SERVICE_EXPERT = "customer_service_expert";
-    public static final String ROBOT_NAME_GENERATE_FAQ = "generate_faq";
-    public static final String ROBOT_NAME_GENERATE_WECHAT_ARTICLE = "generate_wechat_article";
-    public static final String ROBOT_NAME_GENERATE_XIAOHONGSHU_ARTICLE = "generate_xiaohongshu_article";
-    public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant";
-    public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary";
-    public static final String ROBOT_NAME_THREAD_COMPLETION = "thread_completion";
-    public static final String ROBOT_NAME_CHINESE_WORD_SEGMENTATION = "chinese_word_segmentation";
-    public static final String ROBOT_NAME_PART_OF_SPEECH_TAGGING = "part_of_speech_tagging";
-    public static final String ROBOT_NAME_DEPENDENCY_PARSING = "dependency_parsing";
-    public static final String ROBOT_NAME_CONSTITUENCY_PARSING = "constituency_parsing";
-    public static final String ROBOT_NAME_SEMANTIC_DEPENDENCY_ANALYSIS = "semantic_dependency_analysis";
-    public static final String ROBOT_NAME_SEMANTIC_ROLE_LABELING = "semantic_role_labeling";
-    public static final String ROBOT_NAME_ABSTRACT_MEANING_REPRESENTATION = "abstract_meaning_representation";
-    public static final String ROBOT_NAME_COREFERENCE_RESOLUTION = "coreference_resolution";
-    public static final String ROBOT_NAME_SEMANTIC_TEXT_SIMILARITY = "semantic_text_similarity";
-    public static final String ROBOT_NAME_TEXT_STYLE_TRANSFER = "text_style_transfer";
-    public static final String ROBOT_NAME_KEYWORD_EXTRACTION = "keyword_extraction";
-    public static final String ROBOT_NAME_TEXT_CORRECTION = "text_correction";
-    public static final String ROBOT_NAME_TEXT_CLASSIFICATION = "text_classification";
+    public static final String ROBOT_NAME_VOID_AGENT = "void_agent"; // 空白智能体
+    public static final String ROBOT_NAME_CUSTOMER_SERVICE = "customer_service"; // 客服问答
+    public static final String ROBOT_NAME_QUERY_EXPANSION = "query_expansion"; // 问题扩写
+    public static final String ROBOT_NAME_INTENT_REWRITE = "intent_rewrite"; // 意图改写
+    public static final String ROBOT_NAME_INTENT_CLASSIFICATION = "intent_classification"; // 意图识别
+    public static final String ROBOT_NAME_EMOTION_ANALYSIS = "emotion_analysis"; // 情绪分析
+    public static final String ROBOT_NAME_ROBOT_INSPECTION = "robot_inspection"; // 机器人质检
+    public static final String ROBOT_NAME_AGENT_INSPECTION = "agent_inspection"; // 客服质检
+    public static final String ROBOT_NAME_TICKET_ASSISTANT = "ticket_assistant"; // 工单助手
+    public static final String ROBOT_NAME_TICKET_SOLUTION_RECOMMENDATION = "ticket_solution_recommendation"; // 工单解决方案推荐
+    public static final String ROBOT_NAME_TICKET_SUMMARY = "ticket_summary"; // 工单小结
+    public static final String ROBOT_NAME_VISITOR_PORTRAIT = "visitor_portrait"; // 访客画像
+    public static final String ROBOT_NAME_VISITOR_INVITATION = "visitor_invitation"; // 接客助手
+    public static final String ROBOT_NAME_VISITOR_RECOMMENDATION = "visitor_recommendation"; // 导购助手
+    public static final String ROBOT_NAME_CUSTOMER_ASSISTANT = "customer_assistant"; // 客服助手
+    public static final String ROBOT_NAME_PRE_SALE_CUSTOMER_ASSISTANT = "pre_sale_customer_assistant"; // 售前客服
+    public static final String ROBOT_NAME_AFTER_SALE_CUSTOMER_ASSISTANT = "after_sale_customer_assistant"; // 售后客服
+    public static final String ROBOT_NAME_LOGISTICS_CUSTOMER_ASSISTANT = "logistics_customer_assistant"; // 物流客服
+    public static final String ROBOT_NAME_LANGUAGE_TRANSLATION = "language_translation"; // 语言翻译
+    public static final String ROBOT_NAME_LANGUAGE_RECOGNITION = "language_recognition"; // 语言识别
+    public static final String ROBOT_NAME_SEMANTIC_ANALYSIS = "semantic_analysis"; // 语义分析
+    public static final String ROBOT_NAME_ENTITY_RECOGNITION = "entity_recognition"; // 实体识别
+    public static final String ROBOT_NAME_SENTIMENT_ANALYSIS = "sentiment_analysis"; // 情感分析
+    public static final String ROBOT_NAME_SESSION_CLASSIFICATION = "session_classification"; // 会话分类
+    public static final String ROBOT_NAME_GENERATE_TICKET = "generate_ticket"; // 生成工单
+    public static final String ROBOT_NAME_CUSTOMER_SERVICE_EXPERT = "customer_service_expert"; // 客服专家
+    public static final String ROBOT_NAME_GENERATE_FAQ = "generate_faq"; // 生成FAQ
+    public static final String ROBOT_NAME_GENERATE_WECHAT_ARTICLE = "generate_wechat_article"; // 生成公众号文章
+    public static final String ROBOT_NAME_GENERATE_XIAOHONGSHU_ARTICLE = "generate_xiaohongshu_article"; // 生成小红书文章
+    public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant"; // 客服助手
+    public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary"; // 会话摘要
+    public static final String ROBOT_NAME_THREAD_COMPLETION = "thread_completion"; // 输入补全
+    public static final String ROBOT_NAME_CHINESE_WORD_SEGMENTATION = "chinese_word_segmentation"; // 中文分词
+    public static final String ROBOT_NAME_PART_OF_SPEECH_TAGGING = "part_of_speech_tagging"; // 词性标注
+    public static final String ROBOT_NAME_DEPENDENCY_PARSING = "dependency_parsing"; // 依存句法分析
+    public static final String ROBOT_NAME_CONSTITUENCY_PARSING = "constituency_parsing"; // 成分句法分析
+    public static final String ROBOT_NAME_SEMANTIC_DEPENDENCY_ANALYSIS = "semantic_dependency_analysis"; // 语义依存分析
+    public static final String ROBOT_NAME_SEMANTIC_ROLE_LABELING = "semantic_role_labeling"; // 语义角色标注
+    public static final String ROBOT_NAME_ABSTRACT_MEANING_REPRESENTATION = "abstract_meaning_representation"; // 抽象意义表示
+    public static final String ROBOT_NAME_COREFERENCE_RESOLUTION = "coreference_resolution"; // 指代消解
+    public static final String ROBOT_NAME_SEMANTIC_TEXT_SIMILARITY = "semantic_text_similarity"; // 语义文本相似度
+    public static final String ROBOT_NAME_TEXT_STYLE_TRANSFER = "text_style_transfer"; // 文本风格转换
+    public static final String ROBOT_NAME_KEYWORD_EXTRACTION = "keyword_extraction"; // 关键词短语提取
+    public static final String ROBOT_NAME_TEXT_CORRECTION = "text_correction"; // 文本纠错
+    public static final String ROBOT_NAME_TEXT_CLASSIFICATION = "text_classification"; // 文本分类
 
     // 
     public static final String ROBOT_LLM_DEFAULT_PROMPT = """
