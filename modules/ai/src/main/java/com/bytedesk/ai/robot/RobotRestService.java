@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:10:03
+ * @LastEditTime: 2025-03-22 11:52:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,6 +47,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -198,38 +199,34 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         if (owner == null) {
             throw new RuntimeException("should login first not found");
         }
+        UserProtobuf agent = JSON.parseObject(request.getAgent(), UserProtobuf.class);
+        String robotUid = agent.getUid();
+        // String robotUid = request.getUser().getUid();
         // org/robot/robotUid/userUid
-        String preTopic = request.getTopic();
-        String[] splits = preTopic.split("/");
-        if (splits.length < 4) {
-            throw new RuntimeException("robot topic format error");
-        }
-        // org/robot/robotUid/userUid/randomUid
-        String robotUid = splits[2];
+        // String preTopic = request.getTopic();
+        // String[] splits = preTopic.split("/");
+        // if (splits.length < 4) {
+        //     throw new RuntimeException("robot topic format error");
+        // }
+        // // org/robot/robotUid/userUid/randomUid
+        // String robotUid = splits[2];
         Optional<RobotEntity> robotOptional = findByUid(robotUid);
         if (!robotOptional.isPresent()) {
-            throw new RuntimeException("robot not found");
+            throw new RuntimeException("robot " + robotUid + " not found");
         }
         // org/robot/robotUid/userUid/randomUid
-        String topic = TopicUtils.formatOrgRobotMemberThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
-
-        // 允许一个用户创建多个相同机器人的会话
-        // Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
-        // if (threadOptional.isPresent()) {
-        //     return threadService.convertToResponse(threadOptional.get());
-        // }
+        String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
 
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
+            .uid(uidUtils.getUid())
             .topic(topic)
             .type(ThreadTypeEnum.LLM.name())
-            .state(ThreadStateEnum.STARTED.name())
             .unreadCount(0)
-            .user(JSON.toJSONString(request.getUser()))
+            .user(request.getUser().toJson())
             .owner(owner)
+            .orgUid(owner.getOrgUid())
         .build();
-        thread.setUid(uidUtils.getUid());
-        thread.setOrgUid(owner.getOrgUid());
         // 
         RobotEntity robot = robotOptional.get();
         robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
@@ -282,7 +279,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             throw new RuntimeException("robot not found");
         }
         // org/robot/robotUid/userUid/randomUid
-        String topic = TopicUtils.formatOrgRobotMemberThreadTopic(robotOptional.get().getUid(), owner.getUid(), uidUtils.getUid());
+        String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotOptional.get().getUid(), owner.getUid(), uidUtils.getUid());
 
         // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
         if (!request.getForceNew()) {
