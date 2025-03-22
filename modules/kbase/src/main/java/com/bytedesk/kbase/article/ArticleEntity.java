@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 23:27:29
+ * @LastEditTime: 2025-03-22 08:00:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -150,10 +151,11 @@ public class ArticleEntity extends BaseEntity {
     // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // TODO:多个附件
-    // @Builder.Default
-    // @OneToMany(mappedBy = "article")
-    // private List<UploadEntity> attachments = new ArrayList<>();
+    // 多个附件
+    @Builder.Default
+    @OneToMany
+    @JoinColumn(name = "article_uid", referencedColumnName = "uuid")
+    private List<UploadEntity> attachments = new ArrayList<>();
 
     // public Document toDocument(@NonNull ArticleEntity article) {
     //     return new Document(article.getTitle() + article.getContentMarkdown(),

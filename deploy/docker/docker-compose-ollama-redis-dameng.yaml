@@ -200,6 +200,14 @@ services:
       SPRING_AI_SILICONFLOW_CHAT_ENABLED: false
       SPRING_AI_SILICONFLOW_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
       SPRING_AI_SILICONFLOW_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # gitee
+      # https://ai.gitee.com/
+      # https://ai.gitee.com/docs/best-practice/integration
+      SPRING_AI_GITEE_BASE_URL: https://ai.gitee.com
+      SPRING_AI_GITEE_API_KEY: 'sk-xxx'
+      SPRING_AI_GITEE_CHAT_ENABLED: false
+      SPRING_AI_GITEE_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
+      SPRING_AI_GITEE_CHAT_OPTIONS_TEMPERATURE: 0.7
       # moonshot
       SPRING_AI_MOONSHOT_CHAT_ENABLED: false
       SPRING_AI_MINIMAX_CHAT_ENABLED: false
