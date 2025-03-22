@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:50:59
+ * @LastEditTime: 2025-03-22 19:33:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +31,7 @@ import com.bytedesk.core.rbac.authority.AuthorityResponse;
  * @author bytedesk.com on 2019-06-24
  */
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -45,17 +46,5 @@ public class RoleResponse extends BaseResponse {
 
     private Boolean system;
 
-    private String level;
-
-    @Builder.Default
-    private Set<AuthorityResponse> authorities = new HashSet<>();
-
-    // @Builder.Default
-    // private Set<String> memberUids = new HashSet<>();
-
-    // private String userUid;
-    // private LocalDateTime createdAt;
-
-    // private String platform;
-
+    private Set<AuthorityResponse> authorities;
 }

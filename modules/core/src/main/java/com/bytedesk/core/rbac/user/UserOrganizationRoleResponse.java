@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 10:20:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 16:21:43
+ * @LastEditTime: 2025-03-22 19:31:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,5 @@ public class UserOrganizationRoleResponse {
 
     private OrganizationResponseSimple organization;
 
-    // private RoleResponse role;
     private Set<RoleResponse> roles;
 }

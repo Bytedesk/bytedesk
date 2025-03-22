@@ -34,5 +34,5 @@ public class AuthorityResponse extends BaseResponse {
 
     // private String level;
 
-    private String description;
+    // private String description;
 }
