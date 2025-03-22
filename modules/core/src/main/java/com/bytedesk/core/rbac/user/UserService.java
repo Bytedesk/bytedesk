@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 23:02:57
+ * @LastEditTime: 2025-03-22 23:13:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -130,8 +130,9 @@ public class UserService {
         user.setEnabled(true);
         //
         user = save(user);
-        // 新注册用户添加role_user
-        addRoleUser(user);
+         // 新注册用户添加role_user
+         addRoleUser(user);
+        
         //
         return ConvertUtils.convertToUserResponse(user);
     }
@@ -367,7 +368,23 @@ public class UserService {
     // add/remove role methods
     // add role_user
     public UserEntity addRoleUser(UserEntity user) {
-        return addRole(user, RoleConsts.ROLE_USER);
+        // return addRole(user, RoleConsts.ROLE_USER);
+        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_USER);
+        if (roleOptional.isPresent()) {
+            RoleEntity role = roleOptional.get();
+            // ROLE_USER 不需要organization的限制，直接添加到用户角色列表中
+            user.getCurrentRoles().add(role);
+            
+            // 直接保存用户实体
+            try {
+                return userRepository.save(user);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("User add user role failed..!!", e);
+            }
+        } else {
+            throw new RuntimeException("user Role not found..!!");
+        }
     }
 
     public UserEntity removeRoleUser(UserEntity user) {
