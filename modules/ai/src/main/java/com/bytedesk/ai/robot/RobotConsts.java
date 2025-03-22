@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 21:33:00
+ * @LastEditTime: 2025-03-22 10:26:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,6 +66,19 @@ public class RobotConsts {
     public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant";
     public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary";
     public static final String ROBOT_NAME_THREAD_COMPLETION = "thread_completion";
+    public static final String ROBOT_NAME_CHINESE_WORD_SEGMENTATION = "chinese_word_segmentation";
+    public static final String ROBOT_NAME_PART_OF_SPEECH_TAGGING = "part_of_speech_tagging";
+    public static final String ROBOT_NAME_DEPENDENCY_PARSING = "dependency_parsing";
+    public static final String ROBOT_NAME_CONSTITUENCY_PARSING = "constituency_parsing";
+    public static final String ROBOT_NAME_SEMANTIC_DEPENDENCY_ANALYSIS = "semantic_dependency_analysis";
+    public static final String ROBOT_NAME_SEMANTIC_ROLE_LABELING = "semantic_role_labeling";
+    public static final String ROBOT_NAME_ABSTRACT_MEANING_REPRESENTATION = "abstract_meaning_representation";
+    public static final String ROBOT_NAME_COREFERENCE_RESOLUTION = "coreference_resolution";
+    public static final String ROBOT_NAME_SEMANTIC_TEXT_SIMILARITY = "semantic_text_similarity";
+    public static final String ROBOT_NAME_TEXT_STYLE_TRANSFER = "text_style_transfer";
+    public static final String ROBOT_NAME_KEYWORD_EXTRACTION = "keyword_extraction";
+    public static final String ROBOT_NAME_TEXT_CORRECTION = "text_correction";
+    public static final String ROBOT_NAME_TEXT_CLASSIFICATION = "text_classification";
 
     // 
     public static final String ROBOT_LLM_DEFAULT_PROMPT = """
