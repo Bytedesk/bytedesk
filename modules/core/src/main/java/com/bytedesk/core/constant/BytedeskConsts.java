@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 17:56:18
+ * @LastEditTime: 2025-03-22 12:12:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,14 +67,10 @@ public class BytedeskConsts {
     public static final String ACTION_LOGIN_MOBILE = "loginWithMobileCode";
     public static final String ACTION_LOGIN_EMAIL = "loginWithEmailCode";
     public static final String ACTION_LOGIN_SCAN = "loginWithScanCode";
-
     // 
     public static final int COLUMN_EXTRA_LENGTH = 2048;
-
     // 
-    // public static final String STATISTIC_FILTER_TYPE_ORG = "ORG";
-    // public static final String STATISTIC_FILTER_TYPE_AGENT = "AGENT";
-    // public static final String STATISTIC_FILTER_TYPE_WORKGROUP = "WORKGROUP";
+    public static final String HAS_ANY_ROLE = "hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT', 'USER')";
 
 
 }
