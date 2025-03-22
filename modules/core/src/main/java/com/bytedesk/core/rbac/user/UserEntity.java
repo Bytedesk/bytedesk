@@ -116,14 +116,14 @@ public class UserEntity extends BaseEntityNoOrg {
 	private OrganizationEntity currentOrganization;
 
 	// 用户当前拥有的角色
-    // @Builder.Default
-    // @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    // @JoinTable(
-    //     name = "bytedesk_core_user_roles",
-    //     joinColumns = @JoinColumn(name = "user_id"),
-    //     inverseJoinColumns = @JoinColumn(name = "role_id")
-    // )
-    // private Set<RoleEntity> currentRoles = new HashSet<>();
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_core_user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<RoleEntity> currentRoles = new HashSet<>();
 
 	// 一个用户可以属于多个组织，每个组织中可以多个角色
 	@Builder.Default
@@ -171,13 +171,13 @@ public class UserEntity extends BaseEntityNoOrg {
         }
         
         // 5. 处理currentRoles集合
-        // boolean currentRoleExists = currentRoles.stream()
-        //     .anyMatch(r -> r.getId() != null && r.getId().equals(roleId));
+        boolean currentRoleExists = currentRoles.stream()
+            .anyMatch(r -> r.getId() != null && r.getId().equals(roleId));
             
-        // if (!currentRoleExists) {
-        //     // 直接使用传入的角色实例，保持一致性
-        //     currentRoles.add(role);
-        // }
+        if (!currentRoleExists) {
+            // 直接使用传入的角色实例，保持一致性
+            currentRoles.add(role);
+        }
     }
 
 	public Set<String> getRoleUids() {
@@ -228,16 +228,16 @@ public class UserEntity extends BaseEntityNoOrg {
             });
             
         // 同时从currentRoles中移除
-        // RoleEntity currentRoleToRemove = null;
-        // for (RoleEntity r : currentRoles) {
-        //     if (r.getId().equals(role.getId())) {
-        //         currentRoleToRemove = r;
-        //         break;
-        //     }
-        // }
-        // if (currentRoleToRemove != null) {
-        //     currentRoles.remove(currentRoleToRemove);
-        // }
+        RoleEntity currentRoleToRemove = null;
+        for (RoleEntity r : currentRoles) {
+            if (r.getId().equals(role.getId())) {
+                currentRoleToRemove = r;
+                break;
+            }
+        }
+        if (currentRoleToRemove != null) {
+            currentRoles.remove(currentRoleToRemove);
+        }
     }
 
 	// 遍历userOrganizationRoles，删除organization所对应的除系统角色之外的所有role
@@ -267,7 +267,7 @@ public class UserEntity extends BaseEntityNoOrg {
 		    uor.getRoles().removeAll(rolesToRemove);
 		    
 		    // 同时从currentRoles中移除
-		    // currentRoles.removeAll(rolesToRemove);
+		    currentRoles.removeAll(rolesToRemove);
 		}
 	}
 	
