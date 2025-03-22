@@ -20,6 +20,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -106,13 +109,20 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Builder.Default
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
-
-	// @Builder.Default
-	// private String platform = PlatformEnum.BYTEDESK.name();
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
 	@ManyToOne(fetch = FetchType.LAZY)
 	private OrganizationEntity currentOrganization;
+
+	// 用户当前拥有的角色
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "bytedesk_core_user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<RoleEntity> currentRoles = new HashSet<>();
 
 	// 一个用户可以属于多个组织，每个组织中可以多个角色
 	@Builder.Default

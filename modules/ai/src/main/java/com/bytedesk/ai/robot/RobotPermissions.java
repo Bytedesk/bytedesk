@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 16:58:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:49:25
+ * @LastEditTime: 2025-03-22 12:12:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,4 +26,5 @@ public class RobotPermissions extends BasePermissions {
     public static final String ROBOT_EXPORT = formatAuthority(ROBOT_PREFIX + EXPORT);
     // 
     public static final String ROBOT_ANY = formatAnyAuthority(ROBOT_PREFIX + CREATE, ROBOT_PREFIX + READ, ROBOT_PREFIX + UPDATE, ROBOT_PREFIX + EXPORT, ROBOT_PREFIX + DELETE);
+
 }

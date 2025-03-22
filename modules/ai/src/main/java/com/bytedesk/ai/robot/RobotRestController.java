@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
@@ -77,7 +78,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
     
     // 员工/客服创建智能体会话
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize(BytedeskConsts.HAS_ANY_ROLE)
     @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
     @PostMapping("/create/thread")
     public ResponseEntity<?> createThread(@RequestBody ThreadRequest request) {

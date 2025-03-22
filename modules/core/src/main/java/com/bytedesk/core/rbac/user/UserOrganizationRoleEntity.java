@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 09:19:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 18:21:15
+ * @LastEditTime: 2025-03-22 12:22:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,8 +58,6 @@ public class UserOrganizationRoleEntity implements Serializable  {
     @ManyToOne
     private OrganizationEntity organization;
 
-    // @ManyToOne
-    // private RoleEntity role;
     // 可以设置多个角色
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
