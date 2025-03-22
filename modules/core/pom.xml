@@ -18,6 +18,7 @@
 	<properties>
 		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>
 		<protobuf.version>3.25.5</protobuf.version>
+		<os-maven-plugin.version>1.7.1</os-maven-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -50,27 +51,31 @@
 		</dependency>
 
 		<!-- spring statemachine - 迁移到 cola statemachine -->
-		 <!-- https://github.com/spring-projects/spring-statemachine -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-starter -->
+		<!-- https://github.com/spring-projects/spring-statemachine -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-starter -->
 		<dependency>
-            <groupId>org.springframework.statemachine</groupId>
-            <artifactId>spring-statemachine-starter</artifactId>
-            <version>4.0.0</version>
+			<groupId>org.springframework.statemachine</groupId>
+			<artifactId>spring-statemachine-starter</artifactId>
+			<version>4.0.0</version>
 			<scope>provided</scope>
-        </dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-jpa -->
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-jpa -->
 		<!-- <dependency>
 			<groupId>org.springframework.statemachine</groupId>
 			<artifactId>spring-statemachine-data-jpa</artifactId>
 			<version>4.0.0</version>
 		</dependency> -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-redis -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-redis -->
 		<!-- <dependency>
 			<groupId>org.springframework.statemachine</groupId>
 			<artifactId>spring-statemachine-data-redis</artifactId>
 			<version>4.0.0</version>
 		</dependency> -->
-		<!-- 替换上面的 spring-statemachine https://mvnrepository.com/artifact/com.alibaba.cola/cola-component-statemachine -->
+		<!-- 替换上面的 spring-statemachine
+		https://mvnrepository.com/artifact/com.alibaba.cola/cola-component-statemachine -->
 		<dependency>
 			<groupId>com.alibaba.cola</groupId>
 			<artifactId>cola-component-statemachine</artifactId>
@@ -95,11 +100,11 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>${protobuf.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>${protobuf.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
 		<dependency>
@@ -136,7 +141,7 @@
 
 
 		<!-- ////////////////////// 推送 /////////////////////////////////// -->
-		
+
 
 		<!-- apple push -->
 		<!-- https://github.com/jchambers/pushy -->
@@ -163,7 +168,8 @@
 			<version>1.70</version>
 		</dependency>
 
-		<!--小米推送,FIXME: 找不到，只能将jar放到本地.m2相应目录中-->
+		<!--小米推送,FIXME:
+		找不到，只能将jar放到本地.m2相应目录中-->
 		<!-- <dependency>
 			<groupId>com.xiaomi</groupId>
 			<artifactId>xpush</artifactId>
@@ -208,7 +214,7 @@
 			<version>${jsonwebtoken.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<!-- ip2region -->
 		<!-- https://github.com/lionsoul2014/ip2region -->
 		<!-- https://mvnrepository.com/artifact/org.lionsoul/ip2region -->
@@ -259,25 +265,25 @@
 	</dependencies>
 
 	<build>
+		<extensions>
+			<!-- 用于动态检测操作系统类型 -->
+			<extension>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>${os-maven-plugin.version}</version>
+			</extension>
+		</extensions>
 		<plugins>
-			<!--自动生成protobuf
-			java类-->
+			<!--自动生成protobuf java类-->
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
 				<version>0.6.1</version>
-				<extensions>true</extensions>
 				<configuration>
-					<!--默认值-->
+					<protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
 					<protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
-					<!--默认值-->
-					<!--<outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>-->
-					<!--<outputDirectory>${project.build.sourceDirectory}</outputDirectory>-->
-					<!--设置是否在生成java文件之前清空outputDirectory的文件，默认值为true，设置为false时也会覆盖同名文件-->
+					<outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>
 					<clearOutputDirectory>false</clearOutputDirectory>
-					<!--默认值-->
-					<temporaryProtoFileDirectory>${project.build.directory}/protoc-dependencies</temporaryProtoFileDirectory>
-					<!--更多配置信息可以查看https://www.xolstice.org/protobuf-maven-plugin/compile-mojo.html-->
 				</configuration>
 				<executions>
 					<execution>
@@ -285,12 +291,6 @@
 							<goal>compile</goal>
 							<goal>test-compile</goal>
 						</goals>
-						<!--也可以设置成局部变量，执行compile或test-compile时才执行-->
-						<!--<configuration>-->
-						<!--<protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>-->
-						<!--<outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>-->
-						<!--<temporaryProtoFileDirectory>${project.build.directory}/protoc-dependencies</temporaryProtoFileDirectory>-->
-						<!--</configuration>-->
 					</execution>
 				</executions>
 			</plugin>
