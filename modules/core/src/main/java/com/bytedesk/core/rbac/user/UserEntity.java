@@ -3,6 +3,7 @@ package com.bytedesk.core.rbac.user;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -115,14 +116,14 @@ public class UserEntity extends BaseEntityNoOrg {
 	private OrganizationEntity currentOrganization;
 
 	// 用户当前拥有的角色
-    @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "bytedesk_core_user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<RoleEntity> currentRoles = new HashSet<>();
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // @JoinTable(
+    //     name = "bytedesk_core_user_roles",
+    //     joinColumns = @JoinColumn(name = "user_id"),
+    //     inverseJoinColumns = @JoinColumn(name = "role_id")
+    // )
+    // private Set<RoleEntity> currentRoles = new HashSet<>();
 
 	// 一个用户可以属于多个组织，每个组织中可以多个角色
 	@Builder.Default
@@ -131,12 +132,16 @@ public class UserEntity extends BaseEntityNoOrg {
 
 	// 添加方法以简化对用户组织和角色的管理
     public void addOrganizationRole(RoleEntity role) {
-        OrganizationEntity organization = this.currentOrganization;
-        if (organization == null || role == null || role.getId() == null) {
+        if (role == null || role.getId() == null) {
             return;
         }
         
-        // 检查用户组织角色关联是否存在
+        OrganizationEntity organization = this.currentOrganization;
+        if (organization == null) {
+            return;
+        }
+        
+        // 1. 处理用户组织角色关联
         UserOrganizationRoleEntity uor = userOrganizationRoles.stream()
             .filter(u -> u.getOrganization().getId().equals(organization.getId()))
             .findFirst()
@@ -149,32 +154,30 @@ public class UserEntity extends BaseEntityNoOrg {
                 return newUor;
             });
         
-        // 检查角色是否已存在于该用户组织关联中
-        boolean roleExists = uor.getRoles().stream()
-            .anyMatch(r -> r.getId().equals(role.getId()));
-            
-        if (!roleExists) {
-            // 重要：创建一个只包含ID的引用，而不使用完整的分离实体
-            // 这样Hibernate将在必要时从数据库加载角色，而不是尝试合并两个分离实例
-            RoleEntity roleReference = new RoleEntity();
-            roleReference.setId(role.getId());
-            uor.getRoles().add(roleReference);
-        }
-        
-        // 默认角色有效期为100年，过期后需要重新设置
+        // 2. 设置角色有效期
         uor.setStartDate(LocalDateTime.now());
         uor.setEndDate(LocalDateTime.now().plusYears(100));
         
-        // 添加role到currentRoles (如果不存在)
-        boolean currentRoleExists = currentRoles.stream()
-            .anyMatch(r -> r.getId().equals(role.getId()));
-            
-        if (!currentRoleExists) {
-            // 同样，创建一个只包含ID的引用
-            RoleEntity roleReference = new RoleEntity();
-            roleReference.setId(role.getId());
-            currentRoles.add(roleReference);
+        // 3. 检查是否已存在该角色ID
+        Long roleId = role.getId();
+        
+        // 4. 处理UserOrganizationRoleEntity中的角色集合
+        boolean roleExists = uor.getRoles().stream()
+            .anyMatch(r -> r.getId() != null && r.getId().equals(roleId));
+        
+        if (!roleExists) {
+            // 直接使用传入的角色实例，不创建新的引用
+            uor.getRoles().add(role);
         }
+        
+        // 5. 处理currentRoles集合
+        // boolean currentRoleExists = currentRoles.stream()
+        //     .anyMatch(r -> r.getId() != null && r.getId().equals(roleId));
+            
+        // if (!currentRoleExists) {
+        //     // 直接使用传入的角色实例，保持一致性
+        //     currentRoles.add(role);
+        // }
     }
 
 	public Set<String> getRoleUids() {
@@ -197,14 +200,44 @@ public class UserEntity extends BaseEntityNoOrg {
 	}
 
     public void removeOrganizationRole(RoleEntity role) {
+        if (role == null || role.getId() == null) {
+            return;
+        }
+        
         OrganizationEntity organization = this.currentOrganization;
         if (organization == null) {
             return;
         }
+        
+        // 从userOrganizationRoles中移除
         userOrganizationRoles.stream()
-            .filter(u -> u.getOrganization().equals(organization))
+            .filter(u -> u.getOrganization().getId().equals(organization.getId()))
             .findFirst()
-            .ifPresent(uor -> uor.getRoles().remove(role));
+            .ifPresent(uor -> {
+                // 通过ID查找角色并移除
+                RoleEntity roleToRemove = null;
+                for (RoleEntity r : uor.getRoles()) {
+                    if (r.getId().equals(role.getId())) {
+                        roleToRemove = r;
+                        break;
+                    }
+                }
+                if (roleToRemove != null) {
+                    uor.getRoles().remove(roleToRemove);
+                }
+            });
+            
+        // 同时从currentRoles中移除
+        // RoleEntity currentRoleToRemove = null;
+        // for (RoleEntity r : currentRoles) {
+        //     if (r.getId().equals(role.getId())) {
+        //         currentRoleToRemove = r;
+        //         break;
+        //     }
+        // }
+        // if (currentRoleToRemove != null) {
+        //     currentRoles.remove(currentRoleToRemove);
+        // }
     }
 
 	// 遍历userOrganizationRoles，删除organization所对应的除系统角色之外的所有role
@@ -213,17 +246,28 @@ public class UserEntity extends BaseEntityNoOrg {
 		if (organization == null) {
 			return;
 		}
-		Iterator<UserOrganizationRoleEntity> iterator = userOrganizationRoles.iterator();
-		while (iterator.hasNext()) {
-			UserOrganizationRoleEntity uor = iterator.next();
-			if (uor.getOrganization().equals(organization)) {
-				// 判断role.level是否为LevelEnum.PLATFORM.name(), 如果不是，则删除
-				for (RoleEntity role : uor.getRoles()) {
-					if (!role.getLevel().equals(LevelEnum.PLATFORM.name())) {
-						uor.getRoles().remove(role);
-					}
-				}
-			}
+		
+		// 找到当前组织关联
+		Optional<UserOrganizationRoleEntity> uorOptional = userOrganizationRoles.stream()
+		    .filter(u -> u.getOrganization().getId().equals(organization.getId()))
+		    .findFirst();
+		    
+		if (uorOptional.isPresent()) {
+		    UserOrganizationRoleEntity uor = uorOptional.get();
+		    // 创建要移除的角色列表，避免ConcurrentModificationException
+		    Set<RoleEntity> rolesToRemove = new HashSet<>();
+		    
+		    for (RoleEntity role : uor.getRoles()) {
+		        if (!LevelEnum.PLATFORM.name().equals(role.getLevel())) {
+		            rolesToRemove.add(role);
+		        }
+		    }
+		    
+		    // 移除非平台级别的角色
+		    uor.getRoles().removeAll(rolesToRemove);
+		    
+		    // 同时从currentRoles中移除
+		    // currentRoles.removeAll(rolesToRemove);
 		}
 	}
 	

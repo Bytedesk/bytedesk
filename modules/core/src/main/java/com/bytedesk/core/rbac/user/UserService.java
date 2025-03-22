@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-08 10:37:35
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-03-22 13:09:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -340,25 +340,26 @@ public class UserService {
 
         // 删除所有角色
         user.removeOrganizationRoles();
-        // 
+        
         // 增加角色，遍历roleUids，逐个添加
         for (String roleUid : roleUids) {
             Optional<RoleEntity> optional = roleService.findByUid(roleUid);
             if (optional.isPresent()) {
                 RoleEntity role = optional.get();
-                // 确保角色是持久化的
-                role = roleService.save(role);
+                // 直接使用数据库查询的角色实例，不再调用save
                 user.addOrganizationRole(role);
             } else {
                 throw new RuntimeException("Role not found..!!");
             }
         }
-        // 
-        UserEntity savedEntity = save(user);
-        if (savedEntity == null) {
-            throw new RuntimeException("User create failed..!!");
+        
+        // 使用直接的repository调用而非包装方法
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("User create failed..!!", e);
         }
-        return savedEntity;
     }
 
     public UserEntity addMemberRole(UserEntity user) {
@@ -397,15 +398,17 @@ public class UserService {
         Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(roleName);
         if (roleOptional.isPresent()) {
             RoleEntity role = roleOptional.get();
-            // 确保角色是持久化的
-            role = roleService.save(role);
+            // 重要：不要在这里调用roleService.save(role)
+            // 使用已存在的持久化角色实例，避免创建分离状态的实体
             user.addOrganizationRole(role);
-            //
-            UserEntity savedEntity = save(user);
-            if (savedEntity == null) {
-                throw new RuntimeException("User add role failed..!!");
+            
+            // 直接保存用户实体
+            try {
+                return userRepository.save(user);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("User add role failed..!!", e);
             }
-            return savedEntity;
         } else {
             throw new RuntimeException("Role not found..!!");
         }
@@ -416,11 +419,12 @@ public class UserService {
         if (roleOptional.isPresent()) {
             user.removeOrganizationRole(roleOptional.get());
             //
-            UserEntity savedEntity = save(user);
-            if (savedEntity == null) {
-                throw new RuntimeException("User remove role failed..!!");
+            try {
+                return userRepository.save(user);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("User remove role failed..!!", e);
             }
-            return savedEntity;
         } else {
             throw new RuntimeException("Role not found..!!");
         }
