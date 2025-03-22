@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 14:29:03
+ * @LastEditTime: 2025-03-22 19:19:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import org.springframework.security.core.GrantedAuthority;
 import com.bytedesk.core.base.BaseResponse;
 // import com.bytedesk.core.rbac.organization.OrganizationResponse;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
+import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.user.UserEntity.Sex;
 
 @Data
@@ -55,15 +56,9 @@ public class UserResponse extends BaseResponse {
     private Boolean mobileVerified;
     //
     private OrganizationResponseSimple currentOrganization;
+    private Set<RoleResponse> currentRoles;
     private Set<UserOrganizationRoleResponse> userOrganizationRoles;
 
     // used by other platforms other than bytedesk, like liangshibao/tiku/zhaobiao
     private Set<GrantedAuthority> authorities;
-    //
-    // @Builder.Default
-    // private Set<RoleResponse> roles = new HashSet<>();
-    // @Builder.Default
-    // private Set<String> organizations = new HashSet<>();
-
-    // private LocalDateTime createdAt;
 }

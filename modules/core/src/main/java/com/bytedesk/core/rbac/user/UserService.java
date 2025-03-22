@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 13:09:19
+ * @LastEditTime: 2025-03-22 19:15:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -349,7 +349,7 @@ public class UserService {
                 // 直接使用数据库查询的角色实例，不再调用save
                 user.addOrganizationRole(role);
             } else {
-                throw new RuntimeException("Role not found..!!");
+                throw new RuntimeException("Role not found: " + roleUid);
             }
         }
         
@@ -357,8 +357,8 @@ public class UserService {
         try {
             return userRepository.save(user);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("User create failed..!!", e);
+            log.error("Failed to update user roles from member", e);
+            throw new RuntimeException("User role update failed", e);
         }
     }
 
