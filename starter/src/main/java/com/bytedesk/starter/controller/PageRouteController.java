@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-23 20:44:32
+ * @LastEditTime: 2025-03-23 20:50:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -167,8 +167,10 @@ public class PageRouteController {
 
 	// http://127.0.0.1:9003/home
 	@GetMapping({"/home",})
-	public String home() {
-		return "forward:/chat/demo/bytedesk";
+	public String home(Model model) {
+		model.addAttribute("title", "微语首页");
+		model.addAttribute("chatUrl", "/chat/demo/bytedesk");
+		return "home";
 	}
 
 	/**
