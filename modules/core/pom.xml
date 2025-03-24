@@ -127,9 +127,27 @@
         <dependency>
             <groupId>com.github.houbb</groupId>
             <artifactId>pinyin</artifactId>
-            <!-- <version>0.3.1</version> -->
             <version>0.4.0</version>
         </dependency>
+
+		<!-- 中文分词 -->
+		<!-- https://github.com/houbb/segment -->
+		<!-- https://mvnrepository.com/artifact/com.github.houbb/segment -->
+		<dependency>
+			<groupId>com.github.houbb</groupId>
+			<artifactId>segment</artifactId>
+			<version>0.3.1</version>
+		</dependency>
+
+		<!-- 敏感词过滤 -->
+		<!-- https://github.com/houbb/sensitive-word -->
+		<!-- https://mvnrepository.com/artifact/com.github.houbb/sensitive-word -->
+		<!-- https://mp.weixin.qq.com/s/7wSy0PuJLTudEo9gTY5s5w -->
+		<dependency>
+			<groupId>com.github.houbb</groupId>
+			<artifactId>sensitive-word</artifactId>
+			<version>0.25.0</version>
+		</dependency>
 
 		<!-- TODO: Rate Limiter -->
 		<!-- https://bucket4j.com/8.14.0/toc.html -->
