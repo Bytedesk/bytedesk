@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 11:58:40
+ * @LastEditTime: 2025-03-24 17:26:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -129,7 +129,7 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         }
         
         // 满意度评分
-        Integer satisfactionRating = (Integer) execution.getVariable("satisfactionRating");
+        // Integer satisfactionRating = (Integer) execution.getVariable("satisfactionRating");
         // 不需要默认值，因为有可能用户没有评价
         
         log.info("Thread statistics generated for thread: {}, duration: {}s, messages: {}", 

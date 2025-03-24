@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 10:47:53
+ * @LastEditTime: 2025-03-24 17:25:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,29 +13,14 @@
  */
 package com.bytedesk.kbase.article;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import jakarta.persistence.PostLoad;
