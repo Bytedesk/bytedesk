@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 16:06:03
+ * @LastEditTime: 2025-03-24 16:57:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -512,7 +512,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     // 初始化
     public void initDefaultRobot(String orgUid, String uid) {
         // 为每个组织创建一个机器人
-        createDefaultRobot(orgUid, uid);
+        createDefaultRobot(orgUid, uid); // Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID)
         // 为每个组织创建一个空白智能体
         createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.ROBOT_NAME_VOID_AGENT));
     }
@@ -603,9 +603,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 // String uid = robotJson.getUid(); // Utils.formatUid(orgUid,
                 // robotJson.getUid());
                 // 判断uid是否已经存在
-                // if (StringUtils.hasText(uid) && existsByUid(uid)) {
-                // return null;
-                // }
+                if (StringUtils.hasText(uid) && existsByUid(uid)) {
+                    return;
+                }
                 // Get locale data (default to zh_cn if available, fallback to en)
                 RobotJsonLoader.LocaleData localeData = robotJson.getI18n().getZh_cn() != null
                         ? robotJson.getI18n().getZh_cn()
