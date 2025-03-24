@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:38:38
+ * @LastEditTime: 2025-03-24 12:32:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,7 +56,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     @Override
     public Page<OrganizationResponse> queryByOrg(OrganizationRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,"id");
+        Pageable pageable = request.getPageable();
         Specification<OrganizationEntity> specification = OrganizationSpecification.search(request);
         Page<OrganizationEntity> orgPage = organizationRepository.findAll(specification, pageable);
         return orgPage.map(this::convertToResponse);
@@ -65,10 +65,12 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     @Override
     public Page<OrganizationResponse> queryByUser(OrganizationRequest request) {
         UserEntity user = authService.getUser();
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "id");
-        Page<OrganizationEntity> orgPage = organizationRepository.findByUser(user, pageable);
-        return orgPage.map(organization -> convertToResponse(organization));
+        if (user == null) {
+            throw new RuntimeException("User not found.");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     public List<OrganizationEntity> findAll() {
