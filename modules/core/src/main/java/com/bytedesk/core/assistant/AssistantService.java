@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-08 08:56:29
+ * @LastEditTime: 2025-03-24 13:05:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,20 +13,22 @@
  */
 package com.bytedesk.core.assistant;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class AssistantService {
+public class AssistantService extends BaseRestService<AssistantEntity, AssistantRequest, AssistantResponse> {
 
     private final AssistantRepository assistantRepository;
 
@@ -34,41 +36,100 @@ public class AssistantService {
 
     private final UidUtils uidUtils;
 
-    public Page<AssistantResponse> query(AssistantRequest assistantRequest) {
-
-        Pageable pageable = PageRequest.of(assistantRequest.getPageNumber(), assistantRequest.getPageSize(),
-                Sort.Direction.ASC,
-                "id");
-
+    @Override
+    public Page<AssistantResponse> queryByOrg(AssistantRequest request) {
+        Pageable pageable = request.getPageable();
         Page<AssistantEntity> assistantPage = assistantRepository.findAll(pageable);
-
         return assistantPage.map(assistant -> convertToResponse(assistant));
     }
 
-    public AssistantEntity create(AssistantRequest assistantRequest) {
+    @Override
+    public Page<AssistantResponse> queryByUser(AssistantRequest request) {
+        return queryByOrg(request);
+    }
 
-        AssistantEntity assistant = modelMapper.map(assistantRequest, AssistantEntity.class);
+    @Override
+    public Optional<AssistantEntity> findByUid(String uid) {
+        return assistantRepository.findByUid(uid);
+    }
+
+    public Boolean existsByUid(String uid) {
+        return assistantRepository.existsByUid(uid);
+    }
+
+    @Override
+    public AssistantResponse create(AssistantRequest request) {
+        // 判断uid是否存在
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return convertToResponse(findByUid(request.getUid()).get());
+        }
+
+        AssistantEntity assistant = modelMapper.map(request, AssistantEntity.class);
         if (!StringUtils.hasText(assistant.getUid())) {
             assistant.setUid(uidUtils.getUid());
         }
 
-        if (assistantRepository.existsByUid(assistant.getUid())) {
-            // don't throw exception, just return null
-            return null;
+        // 保存
+        AssistantEntity savedAssistant = save(assistant);
+        if (savedAssistant == null) {
+            throw new RuntimeException("Create assistant failed");
         }
 
-        return save(assistant);
+        return convertToResponse(savedAssistant);
+
+    }
+    
+
+    @Override
+    public AssistantResponse update(AssistantRequest request) {
+        Optional<AssistantEntity> assistantOptional = findByUid(request.getUid());
+        if (assistantOptional.isPresent()) {
+            AssistantEntity assistant = assistantOptional.get();
+            // modelMapper.map(request, assistant);
+            // AssistantEntity savedAssistant = save(assistant);
+
+
+            return convertToResponse(save(assistant));
+        }
+        return null;
     }
 
-    private AssistantEntity save(AssistantEntity assistant) {
+    @Override
+    public AssistantEntity save(AssistantEntity entity) {
         try {
-            return assistantRepository.save(assistant);
+            return assistantRepository.save(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
         } catch (Exception e) {
             // TODO: handle exception
-            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<AssistantEntity> assistantOptional = findByUid(uid);
+        if (assistantOptional.isPresent()) {
+            AssistantEntity assistant = assistantOptional.get();
+            assistant.setDeleted(false);
+            save(assistant);
+            // delete(assistant.get());
         }
     }
 
+    @Override
+    public void delete(AssistantRequest request) {
+        deleteByUid(request.getUid());
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            AssistantEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    @Override
     public AssistantResponse convertToResponse(AssistantEntity assistant) {
         return modelMapper.map(assistant, AssistantResponse.class);
     }
