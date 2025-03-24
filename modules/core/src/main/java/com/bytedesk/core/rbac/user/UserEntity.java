@@ -2,7 +2,6 @@ package com.bytedesk.core.rbac.user;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -271,31 +270,7 @@ public class UserEntity extends BaseEntityNoOrg {
 		}
 	}
 	
-	// 添加方法以简化对用户组织和角色的管理
-	// public void addOrganizationRole(OrganizationEntity organization, RoleEntity role) {
-	// 	UserOrganizationRoleEntity uor = UserOrganizationRoleEntity.builder().user(this).organization(organization).role(role)
-	// 			.build();
-	// 	this.userOrganizationRoles.add(uor);
-	// 	//
-	// 	if (this.currentOrganization == null) {
-	// 		this.currentOrganization = organization;
-	// 	}
-	// }
-
-	// public void removeOrganizationRole(OrganizationEntity organization, RoleEntity role) {
-	// 	UserOrganizationRoleEntity uor = UserOrganizationRoleEntity.builder().user(this).organization(organization).role(role)
-	// 			.build();
-	// 	if (this.userOrganizationRoles.contains(uor)) {
-	// 		this.userOrganizationRoles.remove(uor);
-	// 	}
-	// }
-
 	@Builder.Default
-	// json字段格式，搜索时，对数据库有依赖，不方便迁移
-	// @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-	// 用于兼容postgreSQL，否则会报错，[ERROR: column "extra" is of type json but expression is
-	// of type character varying
-	// @JdbcTypeCode(SqlTypes.JSON)
 	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
 	private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
