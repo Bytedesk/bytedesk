@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 08:40:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:38:51
+ * @LastEditTime: 2025-03-24 14:34:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -66,37 +66,43 @@ public class ThreadInitializer implements SmartInitializingSingleton {
     }
 
     private void initThreadCategory() {
-        log.info("initThreadCategory");
+        // log.info("initThreadCategory");
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         for (String category : ThreadCategories.getAllCategories()) {
             // log.info("initThreadCategory: {}", category);
             CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .uid(Utils.formatUid(orgUid, category))
                     .name(category)
                     .order(0)
+                    .type(CategoryTypeEnum.THREAD.name())
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
                     .build();
-            categoryRequest.setType(CategoryTypeEnum.THREAD.name());
-            categoryRequest.setUid(Utils.formatUid(orgUid, category));
-            categoryRequest.setOrgUid(orgUid);
+            // categoryRequest.setType(CategoryTypeEnum.THREAD.name());
+            // categoryRequest.setUid(Utils.formatUid(orgUid, category));
+            // categoryRequest.setOrgUid(orgUid);
             categoryService.create(categoryRequest);
         }
     }
 
     private void initThreadTag() {
-        log.info("initThreadTag");
+        // log.info("initThreadTag");
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         for (String tag : ThreadTags.getAllTags()) {
             // log.info("initThreadCategory: {}", category);
             TagRequest tagRequest = TagRequest.builder()
+                    .uid(Utils.formatUid(orgUid, tag))
                     .name(tag)
                     .order(0)
+                    .type(TagTypeEnum.THREAD.name())
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
                     .build();
-            tagRequest.setType(TagTypeEnum.THREAD.name());
-            tagRequest.setUid(Utils.formatUid(orgUid, tag));
-            tagRequest.setOrgUid(orgUid);
+            // tagRequest.setType(TagTypeEnum.THREAD.name());
+            // tagRequest.setUid(Utils.formatUid(orgUid, tag));
+            // tagRequest.setOrgUid(orgUid);
             tagRestService.create(tagRequest);
         }
     }
