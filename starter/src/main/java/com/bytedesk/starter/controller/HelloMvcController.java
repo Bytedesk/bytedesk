@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 22:38:06
+ * @LastEditTime: 2025-03-24 22:56:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -149,7 +149,7 @@ public class HelloMvcController {
 	//
 	/**
 	 * 将中文转为普通格式拼音（不带声调）
-	 * http://127.0.0.0:9003/pinyin/normal?text=你好世界
+	 * http://127.0.0.1:9003/hello/pinyin/normal?text=你好世界
 	 * 
 	 * @param text 需要转换的中文文本
 	 * @return 转换结果
@@ -164,7 +164,7 @@ public class HelloMvcController {
 
 	/**
 	 * 将中文转为带声调的拼音
-	 * http://127.0.0.0:9003/pinyin/tone?text=你好世界
+	 * http://127.0.0.1:9003/hello/pinyin/tone?text=你好世界
 	 * 
 	 * @param text 需要转换的中文文本
 	 * @return 转换结果
@@ -173,13 +173,13 @@ public class HelloMvcController {
 	public Map<String, String> toneStylePinyin(@RequestParam String text) {
 		Map<String, String> result = new HashMap<>();
 		result.put("original", text);
-		result.put("pinyin", BdPinyinUtils.toPinyinWithShenDiao(text));
+		result.put("pinyin", BdPinyinUtils.toPinyinWithShengDiao(text));
 		return result;
 	}
 
 	/**
 	 * 获取单个汉字的多音字列表
-	 * http://127.0.0.0:9003/pinyin/multiple?character=重
+	 * http://127.0.0.1:9003/hello/pinyin/multiple?character=重
 	 * 
 	 * @param character 单个汉字
 	 * @return 多音字列表
@@ -200,12 +200,12 @@ public class HelloMvcController {
 
 	/**
 	 * 将中文转为首字母格式
-	 * http://127.0.0.0:9003/pinyin/firstletter?text=你好世界
+	 * http://127.0.0.1:9003/hello/pinyin/firstletter?text=你好世界
 	 * 
 	 * @param text 需要转换的中文文本
 	 * @return 转换结果
 	 */
-	@GetMapping("/firstletter")
+	@GetMapping("/pinyin/firstletter")
 	public Map<String, String> firstLetterPinyin(@RequestParam String text) {
 		Map<String, String> result = new HashMap<>();
 		result.put("original", text);

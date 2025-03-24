@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-16 11:54:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 22:30:01
+ * @LastEditTime: 2025-03-24 22:57:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,8 @@ import com.github.houbb.pinyin.support.style.PinyinToneStyles;
  * 
  * https://github.com/houbb/pinyin
  * https://mvnrepository.com/artifact/com.github.houbb/pinyin
+ * https://github.com/houbb/pinyin/blob/master/src/test/java/com/github/houbb/pinyin/test/util/PinyinHelperTest.java
+ * 
  */
 public class BdPinyinUtils {
 
@@ -44,7 +46,7 @@ public class BdPinyinUtils {
      * 
      * @since 0.0.1
      */
-    public static String toPinyinWithShenDiao(String text) {
+    public static String toPinyinWithShengDiao(String text) {
         // String text = "我爱中文";
         PinyinBs pinyinBs = PinyinBs.newInstance();
         return pinyinBs.toPinyin(text);
