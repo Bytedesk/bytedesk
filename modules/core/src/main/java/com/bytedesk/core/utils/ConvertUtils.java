@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 09:12:03
+ * @LastEditTime: 2025-03-24 18:26:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,11 +103,12 @@ public class ConvertUtils {
 
     public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
         ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
-        // 
-        if (thread.getAgent() != null) {
-            UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-            threadResponse.setAgent(agent);
-        }
+        // 用于更新robot-agent-llm配置，不能修改为UserProtobuf, 
+        // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
+        // if (thread.getAgent() != null) {
+        //     UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        //     threadResponse.setAgent(agent);
+        // }
         if (thread.getUser() != null) {
             UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
             threadResponse.setUser(user);

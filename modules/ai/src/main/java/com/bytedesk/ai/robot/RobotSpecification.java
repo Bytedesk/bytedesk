@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 09:07:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 17:55:53
+ * @LastEditTime: 2025-03-24 18:17:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,10 +43,10 @@ public class RobotSpecification extends BaseSpecification {
             // if (StringUtils.hasText(request.getName())) {
             //     predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             // }
-            // // nickname
-            // if (StringUtils.hasText(request.getNickname())) {
-            //     predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
-            // }
+            // nickname
+            if (StringUtils.hasText(request.getNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
+            }
             // // description
             // if (StringUtils.hasText(request.getDescription())) {
             //     predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
