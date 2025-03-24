@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 10:00:00
+ * @LastEditTime: 2025-03-24 11:58:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,7 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
+        // String visitorId = (String) execution.getVariable("visitorId");
         
         // 记录会话完成时间
         Date completionTime = new Date();
