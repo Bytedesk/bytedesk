@@ -17,6 +17,7 @@ import com.bytedesk.core.base.BaseRequestNoOrg;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
@@ -25,6 +26,7 @@ import lombok.experimental.SuperBuilder;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
+@NoArgsConstructor
 public class AssistantRequest extends BaseRequestNoOrg {
     
     private String topic;
