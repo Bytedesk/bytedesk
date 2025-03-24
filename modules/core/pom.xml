@@ -286,6 +286,7 @@
 					<clearOutputDirectory>false</clearOutputDirectory>
 				</configuration>
 				<executions>
+					<!-- 生成java类 -->
 					<execution>
 						<goals>
 							<goal>compile</goal>
