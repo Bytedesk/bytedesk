@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-16 11:54:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-16 11:54:42
+ * @LastEditTime: 2025-03-24 22:30:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,8 +26,7 @@ import com.github.houbb.pinyin.support.style.PinyinToneStyles;
  */
 public class BdPinyinUtils {
 
-    private BdPinyinUtils() {
-    }
+    private BdPinyinUtils() {}
     
     /**
      * 普通格式, 没有声调
