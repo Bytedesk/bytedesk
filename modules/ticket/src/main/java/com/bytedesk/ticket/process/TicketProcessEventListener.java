@@ -27,8 +27,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.process.event.TicketProcessCreateEvent;

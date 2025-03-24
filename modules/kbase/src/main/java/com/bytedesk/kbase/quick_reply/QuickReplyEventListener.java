@@ -19,12 +19,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.alibaba.excel.EasyExcel;
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

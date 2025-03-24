@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 

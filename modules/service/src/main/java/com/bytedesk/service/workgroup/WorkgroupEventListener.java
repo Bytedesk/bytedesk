@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;

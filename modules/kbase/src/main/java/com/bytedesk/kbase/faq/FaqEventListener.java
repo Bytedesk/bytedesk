@@ -24,11 +24,12 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.event.MessageUpdateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

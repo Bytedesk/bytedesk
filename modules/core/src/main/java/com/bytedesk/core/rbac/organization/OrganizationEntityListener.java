@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 13:57:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 11:40:15
+ * @LastEditTime: 2025-03-24 14:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,6 @@ import org.springframework.util.SerializationUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-
-// import com.bytedesk.core.event.BytedeskEventPublisher;
-// import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
 import lombok.AllArgsConstructor;
