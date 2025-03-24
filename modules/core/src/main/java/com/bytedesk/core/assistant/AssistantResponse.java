@@ -15,8 +15,10 @@ package com.bytedesk.core.assistant;
 
 import com.bytedesk.core.base.BaseResponse;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
@@ -24,6 +26,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public class AssistantResponse extends BaseResponse {
     
     private String topic;
