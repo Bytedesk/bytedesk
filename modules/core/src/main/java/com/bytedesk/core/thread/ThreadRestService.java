@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 13:28:51
+ * @LastEditTime: 2025-03-24 13:57:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,6 +33,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -175,17 +176,11 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .unreadCount(0)
                 .state(ThreadStateEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
+                .level(LevelEnum.USER.name())
                 .user(JSON.toJSONString(userSimple))
                 .userUid(user.getUid())
                 .owner(user)
                 .build();
-        // assistantThread.setUid(uidUtils.getUid());
-        // if (StringUtils.hasText(user.getOrgUid())) {
-        //     assistantThread.setOrgUid(user.getOrgUid());
-        // }
-        //  else {
-        //     assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        // }
 
         ThreadEntity updateThread = save(assistantThread);
         if (updateThread == null) {
@@ -248,17 +243,11 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .unreadCount(0)
                 .state(ThreadStateEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
+                .level(LevelEnum.USER.name())
                 .user(JSON.toJSONString(userSimple))
                 .userUid(user.getUid())
                 .owner(user)
                 .build();
-        // noticeThread.setUid(uidUtils.getUid());
-        // if (StringUtils.hasText(user.getOrgUid())) {
-        //     noticeThread.setOrgUid(user.getOrgUid());
-        // }
-        //  else {
-        //     noticeThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        // }
         //
         ThreadEntity updateThread = save(noticeThread);
         if (updateThread == null) {
