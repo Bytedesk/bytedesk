@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 12:59:59
+ * @LastEditTime: 2025-03-24 13:09:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,8 +51,6 @@ public class AssistantInitializer implements SmartInitializingSingleton {
                 .description(I18Consts.I18N_FILE_ASSISTANT_DESCRIPTION)
                 .level(LevelEnum.PLATFORM.name())
                 .build();
-        // fileAssistantRequest.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
-        // fileAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
         assistantService.create(fileAssistantRequest);
 
         // 剪贴助手
