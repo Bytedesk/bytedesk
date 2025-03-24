@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 16:02:05
+ * @LastEditTime: 2025-03-24 16:06:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -513,14 +513,11 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     public void initDefaultRobot(String orgUid, String uid) {
         // 为每个组织创建一个机器人
         createDefaultRobot(orgUid, uid);
-        // 为每个组织创建一个客服助手
-        // createDefaultAgentAssistantRobot(orgUid, Utils.formatUid(orgUid,
-        // RobotConsts.DEFAULT_ROBOT_DEMO_UID));
         // 为每个组织创建一个空白智能体
         createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.ROBOT_NAME_VOID_AGENT));
     }
 
-    // 为每个组织创建一个机器人
+    // 创建一个机器人
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
         //
         RobotRequest robotRequest = RobotRequest.builder()
@@ -550,34 +547,17 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return create(robotRequest);
     }
 
+    // 创建一个空白智能体
     public RobotResponse createDefaultPromptRobot(String orgUid, String uid) {
         // 
         RobotEntity robot = RobotEntity.builder()
                 .uid(uid)
                 .name(RobotConsts.ROBOT_NAME_VOID_AGENT)
                 .nickname("空白智能体")
-                .type(RobotTypeEnum.AGENT_ASSISTANT.name())
+                .type(RobotTypeEnum.LLM.name())
                 .orgUid(orgUid)
+                .isKbEnabled(false)
                 .build();
-        //
-        robot = save(robot);
-        if (robot == null) {
-            throw new RuntimeException("save robot failed");
-        }
-        return convertToResponse(robot);
-        .build();
-        
-        // robot.setName(request.getName());
-        // robot.setNickname(request.getNickname());
-        robot.setType(request.getType());
-        robot.setOrgUid(request.getOrgUid());
-        // robot.setKbEnabled(request.getIsKbEnabled());
-        // robot.setKbUid(request.getKbUid());
-        robot.setKbEnabled(true);
-        robot.setKbUid(Utils.formatUid(request.getOrgUid(), BytedeskConsts.DEFAULT_KB_LLM_UID));
-        //
-        // Set common settings
-        setRobotSettings(robot, request);
         //
         RobotEntity updatedRobot = save(robot);
         if (updatedRobot == null) {
@@ -585,7 +565,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
 
         return convertToResponse(updatedRobot);
-
     }
 
     public void initRobotJson() {
