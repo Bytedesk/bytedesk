@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 08:38:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 08:38:00
+ * @LastEditTime: 2025-03-24 17:26:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,7 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
         String threadUid = (String) execution.getVariable("threadUid");
         String visitorId = (String) execution.getVariable("visitorId");
         String agentId = (String) execution.getVariable("agentId");
-        String agentGroupId = (String) execution.getVariable("agentGroupId");
+        // String agentGroupId = (String) execution.getVariable("agentGroupId");
         String slaTime = (String) execution.getVariable("slaTime");
         
         // 记录SLA超时信息

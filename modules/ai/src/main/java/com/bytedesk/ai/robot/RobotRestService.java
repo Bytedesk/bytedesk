@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 16:57:05
+ * @LastEditTime: 2025-03-24 17:36:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -208,21 +208,21 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         // org/robot/robotUid/userUid/randomUid
         String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
-        String user = ConvertUtils.convertToUserProtobufString(owner);
+        //
+        RobotEntity robotEntity = robotOptional.get();
+        robotEntity.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
+        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.LLM.name())
                 .unreadCount(0)
-                .user(user)
+                .user(robot)
+                .agent(robot)
                 .owner(owner)
                 .orgUid(owner.getOrgUid())
                 .build();
-        //
-        RobotEntity robot = robotOptional.get();
-        robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
-        thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         //
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
@@ -519,6 +519,10 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     // 创建一个机器人
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
+        // 判断uid是否已经存在
+        if (StringUtils.hasText(uid) && existsByUid(uid)) {
+            return convertToResponse(findByUid(uid).get());
+        }
         //
         RobotRequest robotRequest = RobotRequest.builder()
                 .nickname(I18Consts.I18N_ROBOT_NICKNAME)
@@ -549,12 +553,21 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     // 创建一个空白智能体
     public RobotResponse createDefaultPromptRobot(String orgUid, String uid) {
-        // 
+        // 判断uid是否已经存在
+        if (StringUtils.hasText(uid) && existsByUid(uid)) {
+            return convertToResponse(findByUid(uid).get());
+        }
+        // Create RobotLlm with prompt from locale data
+        RobotLlm llm = RobotLlm.builder()
+                .prompt("请回答用户提出的问题")
+                .build();
+        //
         RobotEntity robot = RobotEntity.builder()
                 .uid(uid)
                 .name(RobotConsts.ROBOT_NAME_VOID_AGENT)
                 .nickname("空白智能体")
                 .type(RobotTypeEnum.LLM.name())
+                .llm(llm)
                 .orgUid(orgUid)
                 .isKbEnabled(false)
                 .build();
