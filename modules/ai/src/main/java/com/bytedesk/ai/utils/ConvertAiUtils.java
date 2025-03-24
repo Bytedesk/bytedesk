@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:57:27
+ * @LastEditTime: 2025-03-24 18:11:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 // import com.bytedesk.ai.settings.RobotServiceSettings;
 // import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -44,6 +45,13 @@ public class ConvertAiUtils {
 
     public static String convertToRobotProtobufString(RobotEntity entity) {
         RobotProtobuf robotProtobuf = convertToRobotProtobuf(entity);
+        robotProtobuf.setType(UserTypeEnum.ROBOT.name());
+        return JSON.toJSONString(robotProtobuf);
+    }
+
+    // convertToUserProtobufString
+    public static String convertToUserProtobufString(RobotEntity entity) {
+        UserProtobuf robotProtobuf = modelMapper.map(entity, UserProtobuf.class);
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
         return JSON.toJSONString(robotProtobuf);
     }

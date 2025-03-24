@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 17:36:01
+ * @LastEditTime: 2025-03-24 18:12:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -211,6 +211,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         //
         RobotEntity robotEntity = robotOptional.get();
         robotEntity.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
+        String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
         String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
@@ -218,8 +219,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 .topic(topic)
                 .type(ThreadTypeEnum.LLM.name())
                 .unreadCount(0)
-                .user(robot)
+                .user(user)
                 .agent(robot)
+                .userUid(owner.getUid())
                 .owner(owner)
                 .orgUid(owner.getOrgUid())
                 .build();
