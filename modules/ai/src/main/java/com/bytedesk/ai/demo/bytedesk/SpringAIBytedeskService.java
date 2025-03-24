@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.utils.demo.bytedesk;
+package com.bytedesk.ai.demo.bytedesk;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,7 +24,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
-import com.bytedesk.ai.utils.demo.utils.FileContent;
+import com.bytedesk.ai.demo.utils.FileContent;
 
 import lombok.extern.slf4j.Slf4j;
 

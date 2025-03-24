@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.utils.demo.airline;
+package com.bytedesk.ai.demo.airline;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.ai.utils.demo.airline.services.FlightBookingService;
-import com.bytedesk.ai.utils.demo.airline.services.BookingTools.BookingDetails;
+import com.bytedesk.ai.demo.airline.services.FlightBookingService;
+import com.bytedesk.ai.demo.airline.services.BookingTools.BookingDetails;
 import com.bytedesk.core.utils.JsonResult;
 
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;

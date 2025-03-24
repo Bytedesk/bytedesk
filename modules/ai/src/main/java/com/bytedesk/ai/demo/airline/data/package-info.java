@@ -1,4 +1,4 @@
 @NonNullApi
-package com.bytedesk.ai.utils.demo.airline.services;
+package com.bytedesk.ai.demo.airline.data;
 
 import org.springframework.lang.NonNullApi;

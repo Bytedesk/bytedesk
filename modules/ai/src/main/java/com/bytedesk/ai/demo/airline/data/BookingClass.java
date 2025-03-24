@@ -1,4 +1,4 @@
-package com.bytedesk.ai.utils.demo.airline.data;
+package com.bytedesk.ai.demo.airline.data;
 
 public enum BookingClass {
 

@@ -1,4 +1,4 @@
-package com.bytedesk.ai.utils.demo.utils;
+package com.bytedesk.ai.demo.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

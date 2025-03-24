@@ -29,14 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.demo.bytedesk.SpringAIBytedeskService;
+import com.bytedesk.ai.demo.utils.FileContent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.ai.utils.demo.bytedesk.SpringAIBytedeskService;
-import com.bytedesk.ai.utils.demo.utils.FileContent;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
