@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 12:31:49
+ * @LastEditTime: 2025-03-24 13:18:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,14 +57,6 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         // //
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
-
-    // @GetMapping("/query")
-    // public ResponseEntity<?> query(OrganizationRequest pageParam) {
-    //     //
-    //     Page<OrganizationResponse> orgPage = organizationService.query(pageParam);
-    //     // //
-    //     return ResponseEntity.ok(JsonResult.success(orgPage));
-    // }
 
     @GetMapping("/uid")
     public ResponseEntity<?> queryByUid(OrganizationRequest request) {

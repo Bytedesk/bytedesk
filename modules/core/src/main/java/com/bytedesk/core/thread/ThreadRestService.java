@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 18:44:46
+ * @LastEditTime: 2025-03-24 13:22:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,6 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
@@ -74,7 +73,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public Page<ThreadResponse> query(ThreadRequest request) {
-        // 
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");
@@ -93,21 +91,13 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public Optional<ThreadResponse> queryByThreadUid(ThreadRequest request) {
-        //
         Optional<ThreadEntity> threadOptional = findByUid(request.getUid());
         if (threadOptional.isPresent()) {
             return Optional.of(convertToResponse(threadOptional.get()));
         }
         return Optional.empty();
     }
-    /**
-     * create thread
-     * 
-     * @{TopicUtils}
-     * 
-     * @param request
-     * @return
-     */
+    
     public ThreadResponse create(ThreadRequest request) {
 
         UserEntity owner = authService.getUser();
@@ -178,6 +168,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         // 文件助手用户信息，头像、昵称等
         UserProtobuf userSimple = UserUtils.getFileAssistantUser();
         ThreadEntity assistantThread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.ASSISTANT.name())
                 .topic(topic)
                 .unreadCount(0)
@@ -186,12 +177,13 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .user(JSON.toJSONString(userSimple))
                 .owner(user)
                 .build();
-        assistantThread.setUid(uidUtils.getUid());
+        // assistantThread.setUid(uidUtils.getUid());
         if (StringUtils.hasText(user.getOrgUid())) {
             assistantThread.setOrgUid(user.getOrgUid());
-        } else {
-            assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
+        //  else {
+        //     assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        // }
 
         ThreadEntity updateThread = save(assistantThread);
         if (updateThread == null) {
@@ -248,6 +240,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         UserProtobuf userSimple = UserUtils.getSystemChannelUser();
         //
         ThreadEntity noticeThread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.CHANNEL.name())
                 .topic(topic)
                 .unreadCount(0)
@@ -259,9 +252,10 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         noticeThread.setUid(uidUtils.getUid());
         if (StringUtils.hasText(user.getOrgUid())) {
             noticeThread.setOrgUid(user.getOrgUid());
-        } else {
-            noticeThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
+        //  else {
+        //     noticeThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        // }
         //
         ThreadEntity updateThread = save(noticeThread);
         if (updateThread == null) {
