@@ -28,7 +28,7 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;

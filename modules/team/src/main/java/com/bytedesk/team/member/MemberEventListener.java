@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 18:15:02
+ * @LastEditTime: 2025-03-24 14:09:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,7 @@ import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -84,8 +84,6 @@ public class MemberEventListener {
                 .description("Description for" + DepartmentConsts.DEPT_ADMIN)
                 .orgUid(orgUid)
                 .build();
-        // department.setUid(uidUtils.getUid());
-        // department.setOrgUid(orgUid);
         DepartmentResponse departmentResponse = departmentService.create(departmentRequest);
         // 
         if (departmentResponse != null) {

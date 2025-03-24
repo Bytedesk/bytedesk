@@ -17,8 +17,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.uid.UidUtils;
 
 import jakarta.transaction.Transactional;

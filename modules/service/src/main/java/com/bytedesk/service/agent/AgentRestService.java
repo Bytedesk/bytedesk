@@ -175,13 +175,15 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         MemberEntity member = memberOptional.get();
         // 创建默认客服
         AgentRequest agentRequest = AgentRequest.builder()
+                .uid(agentUid)
                 .nickname(member.getNickname())
                 .email(member.getEmail())
                 .mobile(member.getMobile())
                 .memberUid(member.getUid())
+                .orgUid(orgUid)
                 .build();
-        agentRequest.setUid(agentUid);
-        agentRequest.setOrgUid(orgUid);
+        // agentRequest.setUid(agentUid);
+        // agentRequest.setOrgUid(orgUid);
         //
         // List<String> worktimeUids = new ArrayList<>();
         // String worktimeUid = worktimeService.createDefault();

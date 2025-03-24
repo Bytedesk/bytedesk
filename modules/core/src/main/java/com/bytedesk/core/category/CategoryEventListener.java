@@ -18,7 +18,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.OrganizationCreateEvent;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
