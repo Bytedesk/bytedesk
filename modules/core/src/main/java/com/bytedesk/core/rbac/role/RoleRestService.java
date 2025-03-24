@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 15:32:54
+ * @LastEditTime: 2025-03-24 21:58:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,14 +95,6 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return roleRepository.existsByUid(uid);
         }
 
-        // public RoleResponse createOrUpdate(RoleRequest request) {
-        //         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-        //                 return addAuthorities(request);
-        //         } else {
-        //                 return create(request);
-        //         }
-        // }
-
         public RoleResponse create(RoleRequest request) {
                 // 判断uid是否已存在
                 if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
@@ -137,7 +129,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 if (savedEntity == null) {
                         throw new RuntimeException("role " + request.getName() + " create failed");
                 }
-                // 
+                //
                 return convertToResponse(savedEntity);
         }
 
@@ -174,10 +166,10 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 Optional<RoleEntity> roleOptional = findByUid(request.getUid());
                 if (roleOptional.isPresent()) {
                         RoleEntity role = roleOptional.get();
-                        if (request.getAuthorityUids()!= null) {
+                        if (request.getAuthorityUids() != null) {
                                 for (String authorityUid : request.getAuthorityUids()) {
                                         Optional<AuthorityEntity> authorityOptional = authorityService
-                                                       .findByUid(authorityUid);
+                                                        .findByUid(authorityUid);
                                         authorityOptional.ifPresent(role::addAuthority);
                                 }
                         }
@@ -191,7 +183,6 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         throw new RuntimeException("role " + request.getUid() + " not found");
                 }
         }
-
 
         @Override
         public void deleteByUid(String uid) {

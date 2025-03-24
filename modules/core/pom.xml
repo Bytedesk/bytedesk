@@ -121,6 +121,16 @@
 			<version>1.4</version>
 		</dependency>
 
+		<!-- 汉字转拼音 -->
+        <!-- https://github.com/houbb/pinyin -->
+        <!-- https://mvnrepository.com/artifact/com.github.houbb/pinyin -->
+        <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>pinyin</artifactId>
+            <version>0.3.1</version>
+            <!-- <version>0.4.5</version> -->
+        </dependency>
+
 		<!-- TODO: Rate Limiter -->
 		<!-- https://bucket4j.com/8.14.0/toc.html -->
 		<!-- https://github.com/bucket4j/bucket4j -->
