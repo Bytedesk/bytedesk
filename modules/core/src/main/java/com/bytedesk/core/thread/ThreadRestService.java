@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 13:22:45
+ * @LastEditTime: 2025-03-24 13:28:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,7 +97,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         return Optional.empty();
     }
-    
+
     public ThreadResponse create(ThreadRequest request) {
 
         UserEntity owner = authService.getUser();
@@ -167,6 +167,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         // 文件助手用户信息，头像、昵称等
         UserProtobuf userSimple = UserUtils.getFileAssistantUser();
+        // 
         ThreadEntity assistantThread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.ASSISTANT.name())
@@ -175,12 +176,13 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .state(ThreadStateEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
+                .userUid(user.getUid())
                 .owner(user)
                 .build();
         // assistantThread.setUid(uidUtils.getUid());
-        if (StringUtils.hasText(user.getOrgUid())) {
-            assistantThread.setOrgUid(user.getOrgUid());
-        }
+        // if (StringUtils.hasText(user.getOrgUid())) {
+        //     assistantThread.setOrgUid(user.getOrgUid());
+        // }
         //  else {
         //     assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         // }
@@ -247,12 +249,13 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .state(ThreadStateEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(userSimple))
+                .userUid(user.getUid())
                 .owner(user)
                 .build();
-        noticeThread.setUid(uidUtils.getUid());
-        if (StringUtils.hasText(user.getOrgUid())) {
-            noticeThread.setOrgUid(user.getOrgUid());
-        }
+        // noticeThread.setUid(uidUtils.getUid());
+        // if (StringUtils.hasText(user.getOrgUid())) {
+        //     noticeThread.setOrgUid(user.getOrgUid());
+        // }
         //  else {
         //     noticeThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         // }
