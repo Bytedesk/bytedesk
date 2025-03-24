@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="BytedeskThread" exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
+  <process id="customerThreadProcess" name="客服会话流程" isExecutable="true">
+    <extensionElements>
+      <flowable:executionListener event="start" delegateExpression="${threadExecutionListener}"></flowable:executionListener>
+      <flowable:executionListener event="end" delegateExpression="${threadExecutionListener}"></flowable:executionListener>
+    </extensionElements>
+    <startEvent id="start" name="访客发起会话" flowable:formFieldValidation="true"></startEvent>
+    
+    <!-- 判断是否开启机器人接待 -->
+    <exclusiveGateway id="isRobotEnabled" name="机器人接待?"></exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="isRobotEnabled"></sequenceFlow>
+    
+    <!-- 机器人接待流程 -->
+    <serviceTask id="robotService" name="机器人接待" flowable:delegateExpression="${threadRobotServiceDelegate}"></serviceTask>
+    <sequenceFlow id="flow2" sourceRef="isRobotEnabled" targetRef="robotService">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${robotEnabled == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- 转人工判断 -->
+    <exclusiveGateway id="transferToHuman" name="是否转人工?"></exclusiveGateway>
+    <sequenceFlow id="flow3" sourceRef="robotService" targetRef="transferToHuman"></sequenceFlow>
+    
+    <!-- 继续机器人服务 -->
+    <sequenceFlow id="flow4" sourceRef="transferToHuman" targetRef="robotService">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${needHumanService == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- 判断人工坐席是否繁忙 -->
+    <exclusiveGateway id="isAgentsBusy" name="坐席繁忙?"></exclusiveGateway>
+    <sequenceFlow id="flow5" sourceRef="transferToHuman" targetRef="isAgentsBusy">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${needHumanService == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- 直接进入人工服务 -->
+    <sequenceFlow id="flow6" sourceRef="isRobotEnabled" targetRef="isAgentsBusy">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${robotEnabled == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- 排队等待 -->
+    <serviceTask id="queueService" name="排队等待" flowable:delegateExpression="${threadQueueServiceDelegate}"></serviceTask>
+    <sequenceFlow id="flow7" sourceRef="isAgentsBusy" targetRef="queueService">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${agentsBusy == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- 人工接待 -->
+    <userTask id="humanService" name="人工接待" flowable:candidateGroups="${agentGroupId}" flowable:formFieldValidation="true">
+      <documentation>客服人员接待访客</documentation>
+      <extensionElements>
+        <flowable:formProperty id="threadUid" name="会话ID" type="string" required="true"></flowable:formProperty>
+        <flowable:formProperty id="status" name="状态" type="enum" required="true">
+          <flowable:value id="ACTIVE" name="接待中"></flowable:value>
+          <flowable:value id="TRANSFER" name="需要转接"></flowable:value>
+          <flowable:value id="INVITE" name="邀请协助"></flowable:value>
+          <flowable:value id="RESOLVED" name="已解决"></flowable:value>
+        </flowable:formProperty>
+        <flowable:executionListener event="start" delegateExpression="${threadExecutionListener}"></flowable:executionListener>
+        <flowable:executionListener event="end" delegateExpression="${threadExecutionListener}"></flowable:executionListener>
+        <flowable:taskListener event="create" delegateExpression="${threadTaskListener}"></flowable:taskListener>
+        <flowable:taskListener event="assignment" delegateExpression="${threadTaskListener}"></flowable:taskListener>
+        <flowable:taskListener event="complete" delegateExpression="${threadTaskListener}"></flowable:taskListener>
+      </extensionElements>
+    </userTask>
+    
+    <!-- 从队列到人工服务 -->
+    <sequenceFlow id="flow8" sourceRef="queueService" targetRef="humanService"></sequenceFlow>
+    
+    <!-- 直接到人工服务 -->
+    <sequenceFlow id="flow9" sourceRef="isAgentsBusy" targetRef="humanService">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${agentsBusy == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- SLA计时器 -->
+    <boundaryEvent id="slaTimer" attachedToRef="humanService" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>${slaTime}</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    
+    <!-- SLA超时通知 -->
+    <serviceTask id="slaNotification" name="SLA超时通知" flowable:delegateExpression="${threadSLATimeoutNotificationDelegate}"></serviceTask>
+    <sequenceFlow id="flow10" sourceRef="slaTimer" targetRef="slaNotification"></sequenceFlow>
+    
+    <!-- 转接服务 -->
+    <serviceTask id="transferService" name="转接服务" flowable:delegateExpression="${threadTransferServiceDelegate}"></serviceTask>
+    <sequenceFlow id="flow11" sourceRef="humanService" targetRef="transferService">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status == 'TRANSFER'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="transferService" targetRef="humanService"></sequenceFlow>
+    
+    <!-- 邀请协助 -->
+    <serviceTask id="inviteService" name="邀请协助" flowable:delegateExpression="${threadInviteServiceDelegate}"></serviceTask>
+    <sequenceFlow id="flow13" sourceRef="humanService" targetRef="inviteService">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status == 'INVITE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow14" sourceRef="inviteService" targetRef="humanService"></sequenceFlow>
+    
+    <!-- 满意度评价 -->
+    <userTask id="satisfactionSurvey" name="满意度评价" flowable:assignee="${visitorId}" flowable:formFieldValidation="true">
+      <documentation>访客填写满意度评价</documentation>
+      <extensionElements>
+        <flowable:formProperty id="threadUid" name="会话ID" type="string" required="true"></flowable:formProperty>
+        <flowable:formProperty id="satisfaction" name="满意度" type="enum" required="true">
+          <flowable:value id="VERY_SATISFIED" name="非常满意"></flowable:value>
+          <flowable:value id="SATISFIED" name="满意"></flowable:value>
+          <flowable:value id="NEUTRAL" name="一般"></flowable:value>
+          <flowable:value id="UNSATISFIED" name="不满意"></flowable:value>
+          <flowable:value id="VERY_UNSATISFIED" name="非常不满意"></flowable:value>
+        </flowable:formProperty>
+        <flowable:formProperty id="resolved" name="问题是否解决" type="boolean" required="true"></flowable:formProperty>
+        <flowable:formProperty id="comment" name="备注" type="string"></flowable:formProperty>
+        <flowable:executionListener event="end" delegateExpression="${threadExecutionListener}"></flowable:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow15" sourceRef="humanService" targetRef="satisfactionSurvey">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status == 'RESOLVED'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- 结束流程 -->
+    <endEvent id="end" name="会话结束"></endEvent>
+    <sequenceFlow id="flow16" sourceRef="satisfactionSurvey" targetRef="end"></sequenceFlow>
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_customerThreadProcess">
+    <bpmndi:BPMNPlane bpmnElement="customerThreadProcess" id="BPMNPlane_customerThreadProcess">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="215.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="isRobotEnabled" id="BPMNShape_isRobotEnabled">
+        <omgdc:Bounds height="40.0" width="40.0" x="180.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="robotService" id="BPMNShape_robotService">
+        <omgdc:Bounds height="60.0" width="100.0" x="270.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="transferToHuman" id="BPMNShape_transferToHuman">
+        <omgdc:Bounds height="40.0" width="40.0" x="420.0" y="130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="isAgentsBusy" id="BPMNShape_isAgentsBusy">
+        <omgdc:Bounds height="40.0" width="40.0" x="320.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="queueService" id="BPMNShape_queueService">
+        <omgdc:Bounds height="60.0" width="100.0" x="410.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="humanService" id="BPMNShape_humanService">
+        <omgdc:Bounds height="60.0" width="100.0" x="520.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaTimer" id="BPMNShape_slaTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="560.0" y="245.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaNotification" id="BPMNShape_slaNotification">
+        <omgdc:Bounds height="60.0" width="100.0" x="560.0" y="310.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="transferService" id="BPMNShape_transferService">
+        <omgdc:Bounds height="60.0" width="100.0" x="680.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inviteService" id="BPMNShape_inviteService">
+        <omgdc:Bounds height="60.0" width="100.0" x="680.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="satisfactionSurvey" id="BPMNShape_satisfactionSurvey">
+        <omgdc:Bounds height="60.0" width="100.0" x="680.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="28.0" width="28.0" x="830.0" y="216.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      
+      <!-- 连线 -->
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="130.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="200.0" y="210.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="150.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="370.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="150.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="440.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="100.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="100.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="440.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="210.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="220.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="340.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="310.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="510.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="360.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="575.0" y="275.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="310.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="570.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="150.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="730.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="730.0" y="80.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="80.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="570.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="310.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="730.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="730.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="620.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="780.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="830.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
