@@ -30,8 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -106,9 +104,9 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         return categoryRepository.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeletedFalse(name, type, orgUid, level, platform);
     }
 
-    public Optional<CategoryEntity> findByNameAndTypeAndLevelAndPlatform(String name, String type, LevelEnum level,
-            PlatformEnum platform) {
-        return categoryRepository.findByNameAndTypeAndLevelAndPlatformAndDeletedFalse(name, type, level.name(), platform.name());
+    public Optional<CategoryEntity> findByNameAndTypeAndLevelAndPlatform(String name, String type, String level,
+            String platform) {
+        return categoryRepository.findByNameAndTypeAndLevelAndPlatformAndDeletedFalse(name, type, level, platform);
     }
 
     public Optional<CategoryEntity> findByNameAndKbUid(String name, String kbUid) {
