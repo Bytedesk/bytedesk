@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.enums.LevelEnum;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,11 @@ public class RobotSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // 查询level == 'PLATFORM' 或者 orgUid == request.getOrgUid()
+            predicates.add(criteriaBuilder.or(
+                criteriaBuilder.equal(root.get("level"), LevelEnum.PLATFORM.name()),
+                criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid())
+            ));
             // name
             // if (StringUtils.hasText(request.getName())) {
             //     predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

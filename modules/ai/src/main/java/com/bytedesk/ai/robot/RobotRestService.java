@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 15:34:57
+ * @LastEditTime: 2025-03-24 16:02:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -516,6 +516,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         // 为每个组织创建一个客服助手
         // createDefaultAgentAssistantRobot(orgUid, Utils.formatUid(orgUid,
         // RobotConsts.DEFAULT_ROBOT_DEMO_UID));
+        // 为每个组织创建一个空白智能体
+        createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.ROBOT_NAME_VOID_AGENT));
     }
 
     // 为每个组织创建一个机器人
@@ -546,6 +548,44 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         //
         return create(robotRequest);
+    }
+
+    public RobotResponse createDefaultPromptRobot(String orgUid, String uid) {
+        // 
+        RobotEntity robot = RobotEntity.builder()
+                .uid(uid)
+                .name(RobotConsts.ROBOT_NAME_VOID_AGENT)
+                .nickname("空白智能体")
+                .type(RobotTypeEnum.AGENT_ASSISTANT.name())
+                .orgUid(orgUid)
+                .build();
+        //
+        robot = save(robot);
+        if (robot == null) {
+            throw new RuntimeException("save robot failed");
+        }
+        return convertToResponse(robot);
+        .build();
+        
+        // robot.setName(request.getName());
+        // robot.setNickname(request.getNickname());
+        robot.setType(request.getType());
+        robot.setOrgUid(request.getOrgUid());
+        // robot.setKbEnabled(request.getIsKbEnabled());
+        // robot.setKbUid(request.getKbUid());
+        robot.setKbEnabled(true);
+        robot.setKbUid(Utils.formatUid(request.getOrgUid(), BytedeskConsts.DEFAULT_KB_LLM_UID));
+        //
+        // Set common settings
+        setRobotSettings(robot, request);
+        //
+        RobotEntity updatedRobot = save(robot);
+        if (updatedRobot == null) {
+            throw new RuntimeException("save robot failed");
+        }
+
+        return convertToResponse(updatedRobot);
+
     }
 
     public void initRobotJson() {
@@ -579,12 +619,13 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 } else {
                     categoryUid = categoryOptional.get().getUid();
                 }
-                // 
+                //
                 // createPromptRobotFromJson(robotJson, categoryUid, level);
-                // String uid = robotJson.getUid(); // Utils.formatUid(orgUid, robotJson.getUid());
+                // String uid = robotJson.getUid(); // Utils.formatUid(orgUid,
+                // robotJson.getUid());
                 // 判断uid是否已经存在
                 // if (StringUtils.hasText(uid) && existsByUid(uid)) {
-                //     return null;
+                // return null;
                 // }
                 // Get locale data (default to zh_cn if available, fallback to en)
                 RobotJsonLoader.LocaleData localeData = robotJson.getI18n().getZh_cn() != null
@@ -612,7 +653,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 // robot.setUid(uid);
                 // robot.setOrgUid(orgUid);
 
-                // RobotEntity savedRobot = 
+                // RobotEntity savedRobot =
                 save(robot);
                 // if (savedRobot == null) {
                 // throw new RuntimeException("create robot failed");
@@ -620,47 +661,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             }
         }
     }
-
-    // 从json创建平台智能体
-    // public RobotResponse createPromptRobotFromJson(Robot robotJson, String categoryUid,
-    //         String level) {
-    //     // log.info("robotJson {}", robotJson.getName());
-    //     String uid = robotJson.getUid(); // Utils.formatUid(orgUid, robotJson.getUid());
-    //     // 判断uid是否已经存在
-    //     if (StringUtils.hasText(uid) && existsByUid(uid)) {
-    //         return null;
-    //     }
-
-    //     // Get locale data (default to zh_cn if available, fallback to en)
-    //     RobotJsonLoader.LocaleData localeData = robotJson.getI18n().getZh_cn() != null ? robotJson.getI18n().getZh_cn()
-    //             : robotJson.getI18n().getEn();
-
-    //     // Create RobotLlm with prompt from locale data
-    //     RobotLlm llm = RobotLlm.builder()
-    //             .prompt(localeData.getPrompt())
-    //             .build();
-
-    //     // Create RobotEntity with data from both Robot and LocaleData
-    //     RobotEntity robot = RobotEntity.builder()
-    //             .name(robotJson.getName())
-    //             .nickname(localeData.getNickname())
-    //             .avatar(AvatarConsts.getDefaultRobotAvatar())
-    //             .description(localeData.getDescription())
-    //             .type(robotJson.getType())
-    //             .categoryUid(categoryUid)
-    //             .level(level)
-    //             .llm(llm)
-    //             .published(true)
-    //             .build();
-    //     robot.setUid(uid);
-    //     // robot.setOrgUid(orgUid);
-
-    //     RobotEntity savedRobot = save(robot);
-    //     if (savedRobot == null) {
-    //         throw new RuntimeException("create robot failed");
-    //     }
-    //     return convertToResponse(savedRobot);
-    // }
 
     // 创建智能体机器人
     public RobotResponse createPromptRobot(RobotRequest request) {
