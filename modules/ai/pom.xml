@@ -18,12 +18,10 @@
 	<description>https://www.bytedesk.com</description>
 
 	<properties>
-		<langchain4j.version>1.0.0-beta1</langchain4j.version>
-		<!-- <agentsflex.version>1.0.0-rc.6</agentsflex.version> -->
 		<ollama4j.version>1.0.93</ollama4j.version>
 		<spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version>
-		<!-- <spring-ai.version>1.0.0-M6</spring-ai.version> -->
-		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
+		<spring-ai.version>1.0.0-M6</spring-ai.version>
+		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
 		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
 		<!-- <mcp.version>0.7.0</mcp.version> -->
 		<jsonp.version>1.18.3</jsonp.version>

@@ -81,7 +81,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         }
 
         @Override
-        public Page<RoleResponse> queryByUid(RoleRequest request) {
+        public RoleResponse queryByUid(RoleRequest request) {
                 // TODO Auto-generated method stub
                 throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
         }
@@ -245,10 +245,6 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return null;
         }
 
-        @Override
-        public RoleResponse queryByUid(RoleRequest request) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-        }
+
 
 }
