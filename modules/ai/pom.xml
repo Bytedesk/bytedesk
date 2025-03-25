@@ -26,6 +26,7 @@
 		<!-- <mcp.version>0.7.0</mcp.version> -->
 		<jsonp.version>1.18.3</jsonp.version>
 		<hanlp.version>0.0.15</hanlp.version>
+		<selenium.version>4.30.0</selenium.version>
 	</properties>
 
 	<dependencies>
@@ -201,6 +202,47 @@
 			<artifactId>jsoup</artifactId>
 			<version>${jsonp.version}</version>
 		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+		<dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-api</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-manager</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-http</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+		<!-- 添加Chrome 134版本对应的DevTools支持 -->
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-devtools-v134 -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-devtools-v134</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 		<dependency>
